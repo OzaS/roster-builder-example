@@ -45,6 +45,8 @@ export type ConceptId =
   | "miniature-case"
   | "forge-workbench";
 
+export type PrototypeScreen = "library" | "overview" | "add-unit" | "unit-detail" | "validation";
+
 export type ConceptMeta = {
   id: ConceptId;
   name: string;

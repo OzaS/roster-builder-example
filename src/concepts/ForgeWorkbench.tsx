@@ -1,13 +1,19 @@
 import { Hammer, Plus, Sparkles } from "lucide-react";
-import { AppBar, ConceptProps, DetailPanel, FilterPill, PointsRing } from "./shared";
+import { AddUnitScreen, AppBar, ConceptProps, DetailPanel, FilterPill, LibraryScreen, PointsRing, ScreenTabs, ValidationScreen } from "./shared";
 import { UnitCard } from "../components/UnitCard";
 
 export function ForgeWorkbench(props: ConceptProps) {
-  const { roster, selectedSection, selectedUnit, onSelectSection, onSelectUnit, onToggleOption, onCountChange } = props;
+  const { roster, selectedSection, selectedUnit, screen, canGoBack, onSelectSection, onSelectUnit, onToggleOption, onCountChange, onNavigate, onBack } = props;
 
   return (
     <div className="concept-screen forge-workbench">
-      <AppBar roster={roster} />
+      <AppBar roster={roster} screen={screen} canGoBack={canGoBack} onBack={onBack} onNavigate={onNavigate} />
+      <ScreenTabs screen={screen} onNavigate={onNavigate} />
+      {screen === "library" ? <LibraryScreen roster={roster} onNavigate={onNavigate} /> : null}
+      {screen === "add-unit" ? <AddUnitScreen roster={roster} selectedSection={selectedSection} onSelectSection={onSelectSection} onSelectUnit={onSelectUnit} /> : null}
+      {screen === "validation" ? <ValidationScreen roster={roster} onNavigate={onNavigate} /> : null}
+      {screen === "library" || screen === "add-unit" || screen === "validation" ? null : (
+        <>
       <section className="bench-top">
         <div>
           <small>Forge workbench</small>
@@ -40,7 +46,7 @@ export function ForgeWorkbench(props: ConceptProps) {
           <div className="board-title">
             <Sparkles size={18} />
             <strong>{selectedSection.name}</strong>
-            <button type="button">
+            <button type="button" onClick={() => onNavigate("add-unit")}>
               <Plus size={16} />
               Unit
             </button>
@@ -49,8 +55,10 @@ export function ForgeWorkbench(props: ConceptProps) {
             <UnitCard key={unit.id} unit={unit} selected={selectedUnit.id === unit.id} onSelect={onSelectUnit} onCountChange={onCountChange} />
           ))}
         </section>
-        <DetailPanel unit={selectedUnit} onToggleOption={onToggleOption} title="Configuration vise" />
+        <DetailPanel unit={selectedUnit} onToggleOption={onToggleOption} onNavigate={onNavigate} title="Configuration vise" />
       </div>
+        </>
+      )}
     </div>
   );
 }

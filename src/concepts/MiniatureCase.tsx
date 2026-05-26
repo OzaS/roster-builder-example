@@ -1,13 +1,19 @@
 import { Box, Plus } from "lucide-react";
-import { AppBar, ConceptProps, DetailPanel, PointsRing, RoleIcon, UnitOptions } from "./shared";
+import { AddUnitScreen, AppBar, ConceptProps, LibraryScreen, PointsRing, RoleIcon, ScreenTabs, UnitOptions, ValidationScreen } from "./shared";
 import { UnitCard } from "../components/UnitCard";
 
 export function MiniatureCase(props: ConceptProps) {
-  const { roster, selectedUnit, selectedSectionId, onSelectSection, onSelectUnit, onToggleOption, onCountChange } = props;
+  const { roster, selectedSection, selectedUnit, selectedSectionId, screen, canGoBack, onSelectSection, onSelectUnit, onToggleOption, onCountChange, onNavigate, onBack } = props;
 
   return (
     <div className="concept-screen miniature-case">
-      <AppBar roster={roster} />
+      <AppBar roster={roster} screen={screen} canGoBack={canGoBack} onBack={onBack} onNavigate={onNavigate} />
+      <ScreenTabs screen={screen} onNavigate={onNavigate} />
+      {screen === "library" ? <LibraryScreen roster={roster} onNavigate={onNavigate} /> : null}
+      {screen === "add-unit" ? <AddUnitScreen roster={roster} selectedSection={selectedSection} onSelectSection={onSelectSection} onSelectUnit={onSelectUnit} /> : null}
+      {screen === "validation" ? <ValidationScreen roster={roster} onNavigate={onNavigate} /> : null}
+      {screen === "library" || screen === "add-unit" || screen === "validation" ? null : (
+        <>
       <section className="case-label">
         <span>
           <Box size={18} />
@@ -30,7 +36,7 @@ export function MiniatureCase(props: ConceptProps) {
               {section.units.map((unit) => (
                 <UnitCard key={unit.id} unit={unit} selected={selectedUnit.id === unit.id} onSelect={onSelectUnit} onCountChange={onCountChange} dense />
               ))}
-              <button className="empty-slot" type="button">
+              <button className="empty-slot" type="button" onClick={() => onNavigate("add-unit")}>
                 <Plus size={16} />
                 Empty slot
               </button>
@@ -44,7 +50,14 @@ export function MiniatureCase(props: ConceptProps) {
           <strong>{selectedUnit.name}</strong>
         </div>
         <UnitOptions unit={selectedUnit} onToggleOption={onToggleOption} compact />
+        <div className="detail-actions">
+          <button type="button" onClick={() => onNavigate("validation")}>
+            Check roster
+          </button>
+        </div>
       </section>
+        </>
+      )}
     </div>
   );
 }
