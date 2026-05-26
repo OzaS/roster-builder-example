@@ -3,7 +3,7 @@ import { Boxes, CircuitBoard, Gem, Hammer, Rows3 } from "lucide-react";
 import { ConceptSwitcher } from "./components/ConceptSwitcher";
 import { Shell } from "./components/Shell";
 import { mockRoster } from "./data/mockRoster";
-import type { ConceptId, ConceptMeta, PlatformPreview, Roster } from "./types";
+import type { ConceptId, ConceptMeta, PlatformPreview, PrototypeScreen, Roster } from "./types";
 import { ArmoryGlass } from "./concepts/ArmoryGlass";
 import { CommandDeck } from "./concepts/CommandDeck";
 import { ForgeWorkbench } from "./concepts/ForgeWorkbench";
@@ -70,6 +70,8 @@ function App() {
   const [selectedSectionId, setSelectedSectionId] = useState("hq");
   const [selectedUnitId, setSelectedUnitId] = useState("centurion");
   const [expandedSectionIds, setExpandedSectionIds] = useState<string[]>(["hq", "battleline", "elites"]);
+  const [screen, setScreen] = useState<PrototypeScreen>("library");
+  const [screenHistory, setScreenHistory] = useState<PrototypeScreen[]>([]);
 
   const selectedSection = useMemo(
     () => roster.sections.find((section) => section.id === selectedSectionId) ?? roster.sections[0],
@@ -82,6 +84,23 @@ function App() {
   );
 
   const concept = concepts.find((item) => item.id === selectedConcept) ?? concepts[0];
+
+  function navigate(screenId: PrototypeScreen) {
+    setScreenHistory((current) => (screenId === screen ? current : [...current, screen]));
+    setScreen(screenId);
+  }
+
+  function goBack() {
+    setScreenHistory((current) => {
+      const previous = current[current.length - 1];
+      if (previous) {
+        setScreen(previous);
+        return current.slice(0, -1);
+      }
+      setScreen("overview");
+      return current;
+    });
+  }
 
   function selectSection(id: string) {
     const section = roster.sections.find((item) => item.id === id);
@@ -102,6 +121,7 @@ function App() {
     if (parent) {
       setSelectedSectionId(parent.id);
     }
+    navigate("unit-detail");
   }
 
   function toggleOption(optionId: string) {
@@ -152,11 +172,15 @@ function App() {
     selectedUnit,
     selectedSectionId,
     expandedSectionIds,
+    screen,
+    canGoBack: screenHistory.length > 0 || screen !== "overview",
     onSelectSection: selectSection,
     onToggleSection: toggleSection,
     onSelectUnit: selectUnit,
     onToggleOption: toggleOption,
     onCountChange: changeCount,
+    onNavigate: navigate,
+    onBack: goBack,
   };
 
   return (

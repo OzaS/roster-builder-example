@@ -61,6 +61,34 @@
   display: block;
 }
 
+.screen-tabs {
+  position: sticky;
+  top: 58px;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  padding: 8px 10px;
+  background: var(--tabs-bg, rgba(12, 18, 20, 0.9));
+  border-bottom: 1px solid var(--tabs-line, rgba(255, 255, 255, 0.1));
+}
+
+.screen-tabs button {
+  min-width: 0;
+  min-height: 34px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  color: var(--tabs-ink, inherit);
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.screen-tabs button.active {
+  background: var(--tabs-active, rgba(255, 255, 255, 0.14));
+}
+
 .points-ring {
   display: grid;
   width: 86px;
@@ -294,6 +322,25 @@
   font-size: 13px;
 }
 
+.detail-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.detail-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 40px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  color: inherit;
+  background: var(--option-bg, rgba(255, 255, 255, 0.1));
+  cursor: pointer;
+}
+
 .option-row {
   gap: 9px;
   min-height: 50px;
@@ -354,6 +401,106 @@
   cursor: pointer;
 }
 
+.flow-screen {
+  display: grid;
+  gap: 14px;
+  padding: 16px 12px 24px;
+}
+
+.flow-heading h2 {
+  margin-top: 4px;
+  font-size: 26px;
+  line-height: 1.05;
+}
+
+.library-actions,
+.section-chip-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.library-actions .add-unit-bar {
+  flex: 1;
+}
+
+.library-list,
+.candidate-list,
+.check-list {
+  display: grid;
+  gap: 9px;
+}
+
+.library-card,
+.candidate-card,
+.check-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 72px;
+  padding: 12px;
+  border: 0;
+  border-radius: var(--radius-md);
+  color: inherit;
+  background: var(--flow-card-bg, rgba(255, 255, 255, 0.1));
+  box-shadow: var(--flow-card-shadow, none);
+  text-align: left;
+  cursor: pointer;
+}
+
+.library-card strong,
+.library-card small,
+.candidate-card strong,
+.candidate-card small,
+.check-card strong,
+.check-card small {
+  display: block;
+}
+
+.library-card > span:last-child,
+.candidate-card > span:last-child {
+  text-align: right;
+}
+
+.section-chip-row button {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  color: inherit;
+  background: var(--flow-card-bg, rgba(255, 255, 255, 0.1));
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.section-chip-row button.active {
+  background: var(--tabs-active, rgba(255, 255, 255, 0.18));
+}
+
+.candidate-card.limited {
+  color: var(--limited-ink, inherit);
+  outline: 1px solid rgba(216, 84, 72, 0.32);
+}
+
+.validation-summary {
+  display: grid;
+  gap: 4px;
+  padding: 13px;
+  border-radius: var(--radius-md);
+  background: var(--flow-card-bg, rgba(255, 255, 255, 0.1));
+}
+
+.validation-summary strong,
+.validation-summary small {
+  display: block;
+}
+
+.check-card {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
 .command-deck {
   --section-bg: rgba(53, 205, 221, 0.1);
   --unit-bg: linear-gradient(180deg, rgba(18, 34, 37, 0.92), rgba(10, 16, 18, 0.95));
@@ -366,6 +513,9 @@
     linear-gradient(180deg, rgba(0, 124, 140, 0.26), transparent 22%),
     #0a1012;
   color: #eaf9fc;
+  --tabs-bg: rgba(8, 13, 15, 0.94);
+  --tabs-active: rgba(51, 208, 223, 0.2);
+  --flow-card-bg: linear-gradient(180deg, rgba(18, 34, 37, 0.92), rgba(10, 16, 18, 0.95));
 }
 
 .command-hero,
@@ -442,6 +592,11 @@
     linear-gradient(150deg, rgba(139, 201, 207, 0.35), transparent 28%),
     #edf3f5;
   color: #172225;
+  --tabs-bg: rgba(244, 248, 249, 0.92);
+  --tabs-line: rgba(30, 47, 51, 0.09);
+  --tabs-active: #ffffff;
+  --flow-card-bg: rgba(248, 251, 252, 0.74);
+  --flow-card-shadow: var(--shadow-soft);
 }
 
 .glass-summary {
@@ -477,6 +632,11 @@
   --option-bg: #f1efe6;
   background: #eeeee8;
   color: #1d272a;
+  --tabs-bg: rgba(238, 238, 232, 0.94);
+  --tabs-line: rgba(32, 41, 43, 0.12);
+  --tabs-active: #fbfaf4;
+  --flow-card-bg: #fbfaf4;
+  --flow-card-shadow: 0 8px 18px rgba(36, 35, 28, 0.1);
 }
 
 .ledger-header {
@@ -554,6 +714,9 @@
     linear-gradient(180deg, rgba(70, 85, 78, 0.38), transparent 20%),
     #202625;
   color: #f4f5ef;
+  --tabs-bg: rgba(32, 38, 37, 0.95);
+  --tabs-active: rgba(120, 220, 69, 0.18);
+  --flow-card-bg: linear-gradient(180deg, rgba(56, 63, 61, 0.95), rgba(33, 38, 37, 0.95));
 }
 
 .case-label {
@@ -646,6 +809,11 @@
   --option-bg: rgba(255, 255, 255, 0.42);
   background: #e9e2d4;
   color: #1d272a;
+  --tabs-bg: rgba(233, 226, 212, 0.95);
+  --tabs-line: rgba(72, 66, 55, 0.12);
+  --tabs-active: #f8f4ed;
+  --flow-card-bg: rgba(255, 255, 255, 0.42);
+  --flow-card-shadow: 0 8px 16px rgba(72, 66, 55, 0.1);
 }
 
 .bench-top {

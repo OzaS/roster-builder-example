@@ -1,13 +1,19 @@
 import { AlertTriangle, Plus } from "lucide-react";
-import { AppBar, ConceptProps, DetailPanel, PointsRing, ValidationBadge } from "./shared";
+import { AddUnitScreen, AppBar, ConceptProps, DetailPanel, LibraryScreen, PointsRing, ScreenTabs, ValidationBadge, ValidationScreen } from "./shared";
 
 export function TacticalLedger(props: ConceptProps) {
-  const { roster, selectedUnit, onSelectUnit, onToggleOption, onCountChange } = props;
+  const { roster, selectedSection, selectedUnit, screen, canGoBack, onSelectSection, onSelectUnit, onToggleOption, onCountChange, onNavigate, onBack } = props;
   const allUnits = roster.sections.flatMap((section) => section.units.map((unit) => ({ ...unit, section: section.name, required: section.required })));
 
   return (
     <div className="concept-screen tactical-ledger">
-      <AppBar roster={roster} variant="light" />
+      <AppBar roster={roster} variant="light" screen={screen} canGoBack={canGoBack} onBack={onBack} onNavigate={onNavigate} />
+      <ScreenTabs screen={screen} onNavigate={onNavigate} />
+      {screen === "library" ? <LibraryScreen roster={roster} onNavigate={onNavigate} /> : null}
+      {screen === "add-unit" ? <AddUnitScreen roster={roster} selectedSection={selectedSection} onSelectSection={onSelectSection} onSelectUnit={onSelectUnit} /> : null}
+      {screen === "validation" ? <ValidationScreen roster={roster} onNavigate={onNavigate} /> : null}
+      {screen === "library" || screen === "add-unit" || screen === "validation" ? null : (
+        <>
       <section className="ledger-header">
         <div>
           <small>Roster ledger</small>
@@ -36,12 +42,14 @@ export function TacticalLedger(props: ConceptProps) {
           <AlertTriangle size={17} />
           <span>Chaplain needs an attached unit. Elite slot preference exceeded.</span>
         </div>
-        <DetailPanel unit={selectedUnit} onToggleOption={onToggleOption} title="Inspector" />
+        <DetailPanel unit={selectedUnit} onToggleOption={onToggleOption} onNavigate={onNavigate} title="Inspector" />
       </div>
       <button className="ledger-add" type="button" onClick={() => onCountChange(selectedUnit.id, 1)}>
         <Plus size={18} />
         Add model
       </button>
+        </>
+      )}
     </div>
   );
 }
