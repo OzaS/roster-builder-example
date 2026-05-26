@@ -19,6 +19,9 @@ export type RosterUnit = {
   count: number;
   status?: "valid" | "warning" | "error";
   note?: string;
+  keywords: string[];
+  availability: "available" | "limited" | "locked";
+  slotImpact: string;
   options: RosterOption[];
 };
 
@@ -39,13 +42,43 @@ export type Roster = {
 };
 
 export type ConceptId =
-  | "command-deck"
-  | "armory-glass"
-  | "tactical-ledger"
-  | "miniature-case"
-  | "forge-workbench";
+  | "armory-future"
+  | "curved-command"
+  | "roster-dock"
+  | "force-ribbon"
+  | "glass-ledger"
+  | "build-timeline"
+  | "archive-command-deck"
+  | "archive-armory-glass"
+  | "archive-tactical-ledger"
+  | "archive-miniature-case"
+  | "archive-forge-workbench";
 
-export type PrototypeScreen = "library" | "overview" | "add-unit" | "unit-detail" | "validation";
+export type GalleryMode = "current" | "archive";
+
+export type PrototypeScreen =
+  | "library"
+  | "system"
+  | "catalogue"
+  | "detachment"
+  | "overview"
+  | "add-unit"
+  | "unit-detail"
+  | "validation"
+  | "export";
+
+export type PrototypeAction =
+  | "openRoster"
+  | "createRoster"
+  | "selectSystem"
+  | "selectCatalogue"
+  | "selectDetachment"
+  | "selectSection"
+  | "addUnit"
+  | "configureUnit"
+  | "toggleOption"
+  | "validateRoster"
+  | "exportRoster";
 
 export type ConceptMeta = {
   id: ConceptId;

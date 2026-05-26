@@ -73,9 +73,13 @@ export function AppBar({
 
 export function screenLabel(screen?: PrototypeScreen) {
   if (screen === "library") return "Roster Library";
+  if (screen === "system") return "Game System";
+  if (screen === "catalogue") return "Catalogue";
+  if (screen === "detachment") return "Detachment";
   if (screen === "add-unit") return "Add Unit";
   if (screen === "unit-detail") return "Configure Unit";
   if (screen === "validation") return "Roster Checks";
+  if (screen === "export") return "Export Roster";
   return undefined;
 }
 
