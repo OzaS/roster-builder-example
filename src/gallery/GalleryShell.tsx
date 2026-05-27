@@ -1,30 +1,66 @@
-import { Archive, MonitorSmartphone, TabletSmartphone } from "lucide-react";
+import type { RefObject } from "react";
+import { Archive, Moon, MonitorSmartphone, Rows3, Smartphone, Sun, TabletSmartphone } from "lucide-react";
 import { DeviceFrame } from "../components/DeviceFrame";
-import type { ConceptId, GalleryMode, PlatformPreview } from "../types";
+import { ScreenshotButton } from "../components/v2/ScreenshotButton";
+import { WorkflowScreenPicker } from "../components/v2/WorkflowScreenPicker";
+import type { ConceptId, GalleryMode, NavigatorView, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode, WorkflowScreen } from "../types";
 import { archiveConcepts } from "./archiveRegistry";
 import { activeConcepts, futureConcepts, newConcepts } from "./conceptRegistry";
 import type { GalleryConcept } from "./galleryTypes";
+import { WorkflowBoard } from "./WorkflowBoard";
+import { workflowToPrototypeScreen } from "./workflow";
 
 type Props = {
   mode: GalleryMode;
   selectedConcept: ConceptId;
   platform: PlatformPreview;
+  themeMode: ThemeMode;
+  navigatorView: NavigatorView;
+  workflowScreen: WorkflowScreen;
   concept: GalleryConcept;
+  captureRef: RefObject<HTMLElement | null>;
   children: React.ReactNode;
+  boardProps: {
+    roster: Roster;
+    selectedSection: RosterSection;
+    selectedUnit: RosterUnit;
+    selectedSectionId: string;
+    expandedSectionIds: string[];
+    onSelectSection: (id: string) => void;
+    onToggleSection: (id: string) => void;
+    onSelectUnit: (id: string) => void;
+    onToggleOption: (id: string) => void;
+    onCountChange: (id: string, delta: number) => void;
+    onNavigate: (screen: ReturnType<typeof workflowToPrototypeScreen>) => void;
+    onBack: () => void;
+  };
   onModeChange: (mode: GalleryMode) => void;
   onConceptChange: (id: ConceptId) => void;
   onPlatformChange: (platform: PlatformPreview) => void;
+  onThemeModeChange: (mode: ThemeMode) => void;
+  onNavigatorViewChange: (view: NavigatorView) => void;
+  onWorkflowScreenChange: (screen: WorkflowScreen) => void;
+  onCapture: () => void;
 };
 
 export function GalleryShell({
   mode,
   selectedConcept,
   platform,
+  themeMode,
+  navigatorView,
+  workflowScreen,
   concept,
+  captureRef,
   children,
+  boardProps,
   onModeChange,
   onConceptChange,
   onPlatformChange,
+  onThemeModeChange,
+  onNavigatorViewChange,
+  onWorkflowScreenChange,
+  onCapture,
 }: Props) {
   return (
     <div className="app">
@@ -51,6 +87,28 @@ export function GalleryShell({
               <ConceptGroup title="Future Sample" concepts={futureConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
             ) : null}
             <ConceptGroup title="Roster Dock Variants" concepts={newConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
+            <WorkflowScreenPicker active={workflowScreen} onSelect={onWorkflowScreenChange} />
+            <ControlGroup title="View">
+              <button className={navigatorView === "single" ? "active" : ""} type="button" onClick={() => onNavigatorViewChange("single")}>
+                <Smartphone size={16} />
+                Single
+              </button>
+              <button className={navigatorView === "all-screens" ? "active" : ""} type="button" onClick={() => onNavigatorViewChange("all-screens")}>
+                <Rows3 size={16} />
+                All Screens
+              </button>
+            </ControlGroup>
+            <ControlGroup title="Theme">
+              <button className={themeMode === "dark" ? "active" : ""} type="button" onClick={() => onThemeModeChange("dark")}>
+                <Moon size={16} />
+                Dark
+              </button>
+              <button className={themeMode === "light" ? "active" : ""} type="button" onClick={() => onThemeModeChange("light")}>
+                <Sun size={16} />
+                Light
+              </button>
+            </ControlGroup>
+            <ScreenshotButton onCapture={onCapture} />
           </>
         ) : (
           <ConceptGroup title="Archive" concepts={archiveConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
@@ -66,9 +124,13 @@ export function GalleryShell({
           </button>
         </div>
       </aside>
-      <main className="gallery-stage">
-        <section className="preview-column">
-          <DeviceFrame platform={platform}>{children}</DeviceFrame>
+      <main className={`gallery-stage ${navigatorView === "all-screens" && mode === "current" ? "board-mode" : ""}`}>
+        <section className="preview-column" ref={captureRef}>
+          {mode === "current" && navigatorView === "all-screens" ? (
+            <WorkflowBoard concept={concept} platform={platform} themeMode={themeMode} {...boardProps} />
+          ) : (
+            <DeviceFrame platform={platform}>{children}</DeviceFrame>
+          )}
         </section>
         <aside className="notes-panel">
           <span className="notes-kicker">{concept.eyebrow}</span>
@@ -94,6 +156,15 @@ export function GalleryShell({
         </aside>
       </main>
     </div>
+  );
+}
+
+function ControlGroup({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="navigator-control-group">
+      <h3>{title}</h3>
+      <div className="navigator-control-buttons">{children}</div>
+    </section>
   );
 }
 

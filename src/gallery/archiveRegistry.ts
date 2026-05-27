@@ -1,4 +1,8 @@
-import { Boxes, CircuitBoard, Gem, GitBranch, Hammer, LayoutDashboard, ListTree, Route, Rows3, Sparkles } from "lucide-react";
+import { Boxes, CircuitBoard, Gauge, Gem, GitBranch, Hammer, Layers3, LayoutDashboard, ListChecks, ListTree, Route, Rows3, Sparkles } from "lucide-react";
+import { DockBalancedArchive } from "../archive/dock/DockBalancedArchive";
+import { DockEfficiencyArchive } from "../archive/dock/DockEfficiencyArchive";
+import { DockFocusArchive } from "../archive/dock/DockFocusArchive";
+import { DockShowcaseArchive } from "../archive/dock/DockShowcaseArchive";
 import { ArmoryGlassV1 } from "../archive/v1/ArmoryGlassV1";
 import { CommandDeckV1 } from "../archive/v1/CommandDeckV1";
 import { ForgeWorkbenchV1 } from "../archive/v1/ForgeWorkbenchV1";
@@ -131,5 +135,53 @@ export const archiveConcepts: GalleryConcept[] = [
     interaction: "System, catalogue, detachment, roster, and validation are explicit steps.",
     tradeoff: "Archived in favor of Dock variants.",
     component: BuildTimelineArchive,
+  },
+  {
+    id: "archive-dock-efficiency",
+    mode: "archive",
+    name: "Dock Efficiency",
+    eyebrow: "Archived dock variant",
+    icon: ListChecks,
+    bestFor: "Reference for the densest Dock variant.",
+    direction: "Restrained dark Material UI, compact rows, minimal decoration.",
+    interaction: "Points, checks, section, add, and unit rows stay close together.",
+    tradeoff: "Archived after Dock Glass was chosen.",
+    component: DockEfficiencyArchive,
+  },
+  {
+    id: "archive-dock-balanced",
+    mode: "archive",
+    name: "Dock Balanced",
+    eyebrow: "Archived dock variant",
+    icon: Gauge,
+    bestFor: "Reference for the practical default Dock variant.",
+    direction: "Dark finance-inspired shell with visible dock labels and comfortable density.",
+    interaction: "Original Roster Dock interaction model.",
+    tradeoff: "Archived after Dock Glass was chosen.",
+    component: DockBalancedArchive,
+  },
+  {
+    id: "archive-dock-focus",
+    mode: "archive",
+    name: "Dock Focus",
+    eyebrow: "Archived dock variant",
+    icon: Layers3,
+    bestFor: "Reference for lower-cognitive-load Dock editing.",
+    direction: "Dark top shell, prominent section rail, quieter rows.",
+    interaction: "One active section is emphasized.",
+    tradeoff: "Archived after Dock Glass was chosen.",
+    component: DockFocusArchive,
+  },
+  {
+    id: "archive-dock-showcase",
+    mode: "archive",
+    name: "Dock Showcase",
+    eyebrow: "Archived dock variant",
+    icon: Sparkles,
+    bestFor: "Reference for the prettiest Dock presentation.",
+    direction: "Large hero points treatment, richer rounded shells, stronger lighting.",
+    interaction: "Presentation-oriented Dock flow.",
+    tradeoff: "Archived after Dock Glass was chosen.",
+    component: DockShowcaseArchive,
   },
 ];

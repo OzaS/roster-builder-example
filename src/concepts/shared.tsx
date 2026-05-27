@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { AlertTriangle, ArrowLeft, CheckCircle2, FileDown, Filter, Plus, Search, Shield, Swords } from "lucide-react";
-import type { PrototypeScreen, Roster, RosterSection, RosterUnit } from "../types";
+import type { PrototypeScreen, Roster, RosterSection, RosterUnit, ThemeMode, WorkflowScreen } from "../types";
 import { OptionRow } from "../components/OptionRow";
 import { RosterNav } from "../components/RosterNav";
 import { UnitCard } from "../components/UnitCard";
@@ -16,6 +16,8 @@ export type ConceptProps = {
   expandedSectionIds: string[];
   screen: PrototypeScreen;
   canGoBack: boolean;
+  themeMode?: ThemeMode;
+  workflowScreen?: WorkflowScreen;
   onSelectSection: (id: string) => void;
   onToggleSection: (id: string) => void;
   onSelectUnit: (id: string) => void;

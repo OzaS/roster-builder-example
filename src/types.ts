@@ -1,6 +1,21 @@
 import type { LucideIcon } from "lucide-react";
 
 export type PlatformPreview = "phone" | "tablet";
+export type ThemeMode = "dark" | "light";
+export type NavigatorView = "single" | "all-screens";
+
+export type WorkflowScreen =
+  | "library"
+  | "create-roster"
+  | "drafts"
+  | "source"
+  | "overview"
+  | "add-detachment"
+  | "add-unit"
+  | "unit-detail"
+  | "option-drilldown"
+  | "diagnostics"
+  | "export";
 
 export type RosterOption = {
   id: string;
@@ -56,7 +71,11 @@ export type ConceptId =
   | "archive-curved-command"
   | "archive-force-ribbon"
   | "archive-glass-ledger"
-  | "archive-build-timeline";
+  | "archive-build-timeline"
+  | "archive-dock-efficiency"
+  | "archive-dock-balanced"
+  | "archive-dock-focus"
+  | "archive-dock-showcase";
 
 export type GalleryMode = "current" | "archive";
 
