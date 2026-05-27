@@ -2114,3 +2114,329 @@
 .device-frame.tablet .dock-showcase .dock-variant-hero {
   min-height: 210px;
 }
+
+.workflow-picker,
+.navigator-control-group,
+.screenshot-actions {
+  display: grid;
+  gap: 8px;
+}
+
+.workflow-picker h3,
+.navigator-control-group h3,
+.screenshot-actions h3 {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.workflow-screen-list {
+  display: grid;
+  gap: 4px;
+  max-height: 270px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.workflow-screen-list button,
+.navigator-control-buttons button,
+.screenshot-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  background: transparent;
+  cursor: pointer;
+  font-weight: 750;
+  text-align: left;
+}
+
+.workflow-screen-list button {
+  padding: 0 10px;
+}
+
+.workflow-screen-list button.active,
+.navigator-control-buttons button.active,
+.screenshot-actions button {
+  background: color-mix(in srgb, var(--surface-2) 82%, white);
+  box-shadow: inset 3px 3px 7px rgba(110, 130, 138, 0.16), inset -3px -3px 8px rgba(255, 255, 255, 0.72);
+}
+
+.navigator-control-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.navigator-control-buttons button,
+.screenshot-actions button {
+  justify-content: center;
+  padding: 0 10px;
+}
+
+.gallery-stage.board-mode {
+  grid-template-columns: 1fr;
+}
+
+.gallery-stage.board-mode .notes-panel {
+  display: none;
+}
+
+.workflow-board {
+  display: grid;
+  gap: 18px;
+  align-items: start;
+  width: 100%;
+  min-height: 100%;
+  padding: 18px;
+  overflow: auto;
+  background:
+    linear-gradient(120deg, color-mix(in srgb, var(--md-primary-container, #ffdada) 28%, transparent), transparent 36%),
+    var(--surface);
+}
+
+.workflow-board.phone {
+  grid-template-columns: repeat(3, minmax(390px, 390px));
+  justify-content: center;
+}
+
+.workflow-board.tablet {
+  grid-template-columns: repeat(2, minmax(760px, 760px));
+}
+
+.workflow-board-item {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+}
+
+.workflow-board-label {
+  justify-self: start;
+  padding: 4px 10px;
+  border-radius: 999px;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--surface-2) 74%, white);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.workflow-board.phone .device-frame.phone {
+  width: 390px;
+}
+
+.workflow-board.tablet .device-frame.tablet {
+  width: 760px;
+  height: 560px;
+}
+
+.workflow-surface {
+  display: grid;
+  gap: 14px;
+  padding: 18px 12px 96px;
+}
+
+.workflow-heading h2,
+.workflow-heading small {
+  display: block;
+}
+
+.workflow-heading h2 {
+  margin: 4px 0 0;
+  font-size: 26px;
+  line-height: 1.05;
+}
+
+.workflow-input-row {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 18px;
+  background: var(--dock-panel);
+}
+
+.workflow-input-row input {
+  min-height: 40px;
+  border: 1px solid var(--dock-border);
+  border-radius: 12px;
+  color: inherit;
+  background: color-mix(in srgb, var(--md-surface-container-high) 72%, transparent);
+  padding: 0 10px;
+}
+
+.workflow-action-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.workflow-action-grid button,
+.workflow-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  border: 0;
+  border-radius: 15px;
+  color: var(--md-on-primary);
+  background: var(--md-primary);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.workflow-list {
+  display: grid;
+  overflow: hidden;
+  border: 1px solid var(--dock-border);
+  border-radius: 20px;
+  background: var(--dock-panel);
+}
+
+.workflow-row,
+.workflow-diagnostic,
+.workflow-option-branch {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 62px;
+  padding: 10px 12px;
+  border: 0;
+  border-bottom: 1px solid var(--dock-border);
+  color: inherit;
+  background: transparent;
+  text-align: left;
+}
+
+.workflow-row strong,
+.workflow-row small,
+.workflow-option-branch strong,
+.workflow-option-branch small,
+.workflow-diagnostic strong,
+.workflow-diagnostic small {
+  display: block;
+}
+
+.workflow-row-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.workflow-row-actions button {
+  min-height: 28px;
+  border: 0;
+  border-radius: 999px;
+  color: inherit;
+  background: color-mix(in srgb, var(--md-surface-container-high) 72%, transparent);
+}
+
+.workflow-source-block,
+.workflow-warning-block,
+.workflow-count-row,
+.workflow-chip-row {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 18px;
+  background: var(--dock-panel);
+}
+
+.workflow-source-block button,
+.workflow-option-branch {
+  cursor: pointer;
+}
+
+.workflow-source-block button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  border: 0;
+  border-radius: 12px;
+  color: inherit;
+  background: color-mix(in srgb, var(--md-surface-container-high) 62%, transparent);
+}
+
+.workflow-count-row {
+  grid-template-columns: 1fr 1fr;
+}
+
+.workflow-count-row span,
+.workflow-chip-row span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--md-primary-container);
+  color: var(--md-on-primary-container);
+  font-weight: 800;
+}
+
+.workflow-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.workflow-option-branch.selected {
+  background: color-mix(in srgb, var(--md-primary-container) 42%, transparent);
+}
+
+.workflow-diagnostic {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.workflow-severity {
+  padding: 5px 8px;
+  border-radius: 999px;
+  color: var(--md-on-error-container);
+  background: var(--md-error-container);
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.workflow-warning-block {
+  grid-template-columns: 24px minmax(0, 1fr);
+  color: var(--md-on-error-container);
+  background: color-mix(in srgb, var(--md-error-container) 54%, transparent);
+}
+
+.workflow-full-sheet {
+  display: grid;
+  min-height: calc(100% - 60px);
+  align-content: end;
+  padding-top: 24px;
+}
+
+.dock-glass.light {
+  --dock-panel: color-mix(in srgb, var(--md-surface-container-lowest) 72%, transparent);
+  --dock-panel-strong: color-mix(in srgb, var(--md-surface-container-high) 78%, transparent);
+  --dock-glow: color-mix(in srgb, var(--md-primary-container) 40%, transparent);
+  background:
+    radial-gradient(circle at 50% -10%, var(--dock-glow), transparent 44%),
+    linear-gradient(160deg, color-mix(in srgb, var(--md-primary-container) 26%, transparent), transparent 38%),
+    var(--md-background);
+}
+
+.dock-glass.light .dock-variant-hero,
+.dock-glass.light .dock-unit-stream,
+.dock-glass.light .v2-validation-rail,
+.dock-glass.light .v2-budget,
+.dock-glass.light .dock-section-rail button,
+.dock-glass.light .dock-metrics-row span,
+.dock-glass.light .workflow-list,
+.dock-glass.light .workflow-input-row,
+.dock-glass.light .workflow-source-block,
+.dock-glass.light .workflow-warning-block,
+.dock-glass.light .workflow-count-row,
+.dock-glass.light .workflow-chip-row {
+  box-shadow: 0 14px 32px color-mix(in srgb, var(--md-shadow, black) 10%, transparent);
+}

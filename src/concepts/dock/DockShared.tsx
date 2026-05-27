@@ -5,6 +5,7 @@ import { MaterialAppFrame } from "../../components/v2/MaterialAppFrame";
 import { RosterBudgetBar } from "../../components/v2/RosterBudgetBar";
 import { UnitConfigSheet } from "../../components/v2/UnitConfigSheet";
 import { ValidationRail } from "../../components/v2/ValidationRail";
+import { WorkflowSurface } from "../../components/v2/WorkflowSurface";
 import type { RosterSection } from "../../types";
 import type { ConceptProps } from "../shared";
 import { V2FlowGate } from "../v2/shared";
@@ -26,13 +27,33 @@ export function DockVariantFrame({ props, density, title, children }: FrameProps
       roster={props.roster}
       screen={props.screen}
       canGoBack={props.canGoBack}
-      mode="dark"
+      mode={props.themeMode ?? "dark"}
       onBack={props.onBack}
       onNavigate={props.onNavigate}
       className={`dock-variant dock-${density}`}
       title={title}
     >
-      {shared ?? children}
+      {props.workflowScreen && ["drafts", "source", "option-drilldown", "diagnostics"].includes(props.workflowScreen) ? (
+        <WorkflowSurface
+          screen={props.workflowScreen}
+          roster={props.roster}
+          selectedUnit={props.selectedUnit}
+          themeMode={props.themeMode ?? "dark"}
+          onToggleOption={props.onToggleOption}
+          onNavigateValidation={() => props.onNavigate("validation")}
+        />
+      ) : props.workflowScreen === "unit-detail" ? (
+        <WorkflowSurface
+          screen={props.workflowScreen}
+          roster={props.roster}
+          selectedUnit={props.selectedUnit}
+          themeMode={props.themeMode ?? "dark"}
+          onToggleOption={props.onToggleOption}
+          onNavigateValidation={() => props.onNavigate("validation")}
+        />
+      ) : (
+        shared ?? children
+      )}
     </MaterialAppFrame>
   );
 }

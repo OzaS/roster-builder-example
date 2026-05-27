@@ -1,14 +1,19 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { mockRoster } from "./data/mockRoster";
 import { activeConcepts } from "./gallery/conceptRegistry";
 import { archiveConcepts } from "./gallery/archiveRegistry";
 import { findConcept, GalleryShell } from "./gallery/GalleryShell";
-import type { ConceptId, GalleryMode, PlatformPreview, PrototypeScreen, Roster } from "./types";
+import { workflowToPrototypeScreen } from "./gallery/workflow";
+import { captureElementAsPng } from "./utils/captureStage";
+import type { ConceptId, GalleryMode, NavigatorView, PlatformPreview, PrototypeScreen, Roster, ThemeMode, WorkflowScreen } from "./types";
 
 function App() {
   const [galleryMode, setGalleryMode] = useState<GalleryMode>("current");
-  const [selectedConcept, setSelectedConcept] = useState<ConceptId>("dock-balanced");
+  const [selectedConcept, setSelectedConcept] = useState<ConceptId>("dock-glass");
   const [platform, setPlatform] = useState<PlatformPreview>("phone");
+  const [themeMode, setThemeMode] = useState<ThemeMode>("dark");
+  const [navigatorView, setNavigatorView] = useState<NavigatorView>("single");
+  const [workflowScreen, setWorkflowScreen] = useState<WorkflowScreen>("overview");
   const [roster, setRoster] = useState<Roster>(mockRoster);
   const [selectedSectionId, setSelectedSectionId] = useState("hq");
   const [selectedUnitId, setSelectedUnitId] = useState("centurion");
@@ -28,17 +33,26 @@ function App() {
 
   const concept = findConcept(selectedConcept, galleryMode);
   const Concept = concept.component;
+  const captureRef = useRef<HTMLElement>(null);
 
   function changeGalleryMode(mode: GalleryMode) {
     setGalleryMode(mode);
-    setSelectedConcept(mode === "archive" ? archiveConcepts[0].id : "dock-balanced");
+    setSelectedConcept(mode === "archive" ? archiveConcepts[0].id : "dock-glass");
     setScreen("library");
+    setWorkflowScreen("library");
     setScreenHistory([]);
   }
 
   function changeConcept(id: ConceptId) {
     setSelectedConcept(id);
     setScreen("library");
+    setWorkflowScreen("library");
+    setScreenHistory([]);
+  }
+
+  function selectWorkflowScreen(nextWorkflowScreen: WorkflowScreen) {
+    setWorkflowScreen(nextWorkflowScreen);
+    setScreen(workflowToPrototypeScreen(nextWorkflowScreen));
     setScreenHistory([]);
   }
 
@@ -123,15 +137,43 @@ function App() {
     }));
   }
 
+  async function captureCurrentStage() {
+    if (!captureRef.current) return;
+    const screenName = navigatorView === "all-screens" ? "all-screens" : workflowScreen;
+    await captureElementAsPng(captureRef.current, `dock-glass-${screenName}-${platform}-${themeMode}.png`);
+  }
+
   return (
     <GalleryShell
       mode={galleryMode}
       selectedConcept={concept.id}
       platform={platform}
+      themeMode={themeMode}
+      navigatorView={navigatorView}
+      workflowScreen={workflowScreen}
       concept={concept}
+      captureRef={captureRef}
       onModeChange={changeGalleryMode}
       onConceptChange={changeConcept}
       onPlatformChange={setPlatform}
+      onThemeModeChange={setThemeMode}
+      onNavigatorViewChange={setNavigatorView}
+      onWorkflowScreenChange={selectWorkflowScreen}
+      onCapture={captureCurrentStage}
+      boardProps={{
+        roster,
+        selectedSection,
+        selectedUnit,
+        selectedSectionId,
+        expandedSectionIds,
+        onSelectSection: selectSection,
+        onToggleSection: toggleSection,
+        onSelectUnit: selectUnit,
+        onToggleOption: toggleOption,
+        onCountChange: changeCount,
+        onNavigate: navigate,
+        onBack: goBack,
+      }}
     >
       <Concept
         roster={roster}
@@ -140,6 +182,8 @@ function App() {
         selectedSectionId={selectedSectionId}
         expandedSectionIds={expandedSectionIds}
         screen={screen}
+        workflowScreen={workflowScreen}
+        themeMode={themeMode}
         canGoBack={screenHistory.length > 0 || screen !== "overview"}
         onSelectSection={selectSection}
         onToggleSection={toggleSection}
