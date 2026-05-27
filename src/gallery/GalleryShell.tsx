@@ -47,8 +47,10 @@ export function GalleryShell({
         </div>
         {mode === "current" ? (
           <>
-            <ConceptGroup title="Future Sample" concepts={futureConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
-            <ConceptGroup title="New Concepts" concepts={newConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
+            {futureConcepts.length > 0 ? (
+              <ConceptGroup title="Future Sample" concepts={futureConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
+            ) : null}
+            <ConceptGroup title="Roster Dock Variants" concepts={newConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
           </>
         ) : (
           <ConceptGroup title="Archive" concepts={archiveConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />

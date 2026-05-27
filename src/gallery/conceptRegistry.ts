@@ -1,88 +1,74 @@
-import { Gauge, GitBranch, LayoutDashboard, ListTree, Route, Sparkles } from "lucide-react";
-import { ArmoryGlassFuture } from "../concepts/future/ArmoryGlassFuture";
-import { BuildTimeline } from "../concepts/v2/BuildTimeline";
-import { CurvedCommand } from "../concepts/v2/CurvedCommand";
-import { ForceRibbon } from "../concepts/v2/ForceRibbon";
-import { GlassLedger } from "../concepts/v2/GlassLedger";
-import { RosterDock } from "../concepts/v2/RosterDock";
+import { Gauge, Gem, Layers3, ListChecks, Sparkles } from "lucide-react";
+import { DockBalanced } from "../concepts/dock/DockBalanced";
+import { DockEfficiency } from "../concepts/dock/DockEfficiency";
+import { DockFocus } from "../concepts/dock/DockFocus";
+import { DockGlass } from "../concepts/dock/DockGlass";
+import { DockShowcase } from "../concepts/dock/DockShowcase";
 import type { GalleryConcept } from "./galleryTypes";
 
-export const futureConcepts: GalleryConcept[] = [
-  {
-    id: "armory-future",
-    mode: "current",
-    name: "Armory Future",
-    eyebrow: "Pinned future sample",
-    icon: Sparkles,
-    bestFor: "Shared visual baseline for future experiments.",
-    direction: "Light frosted Material 3 with fewer cards, a soft top shell, force rail, continuous roster surface, and bottom dock.",
-    interaction: "Reviewer can move through list, roster, add, configure, validation, and export from one stable baseline.",
-    tradeoff: "Deliberately conservative; less provocative than the exploratory concepts.",
-    component: ArmoryGlassFuture,
-  },
-];
+export const futureConcepts: GalleryConcept[] = [];
 
 export const newConcepts: GalleryConcept[] = [
   {
-    id: "curved-command",
+    id: "dock-efficiency",
     mode: "current",
-    name: "Curved Command",
-    eyebrow: "Rounded dark shell",
-    icon: LayoutDashboard,
-    bestFor: "Phone-first roster review with clear top-level navigation.",
-    direction: "Dark capsule header, rising curved content panel, pill tabs, and sheet-based configuration.",
-    interaction: "Roster, add, and checks are always one tap away; unit config behaves like a sheet.",
-    tradeoff: "Strong mobile personality; tablet needs a wider sheet layout.",
-    component: CurvedCommand,
+    name: "Dock Efficiency",
+    eyebrow: "01 · most minimal",
+    icon: ListChecks,
+    bestFor: "Fastest roster editing and dense review.",
+    direction: "Restrained dark Material UI, compact rows, minimal decoration, always-visible status and actions.",
+    interaction: "Everything important stays close: points, checks, section, add, and unit rows.",
+    tradeoff: "Least emotional and least polished visually.",
+    component: DockEfficiency,
   },
   {
-    id: "roster-dock",
+    id: "dock-balanced",
     mode: "current",
-    name: "Roster Dock",
-    eyebrow: "Dark finance-style dock",
+    name: "Dock Balanced",
+    eyebrow: "02 · product default",
     icon: Gauge,
-    bestFor: "Fast repeated edits during game-night use.",
-    direction: "Dark glass, bright budget bars, compact data rows, and a floating bottom dock.",
-    interaction: "Primary actions live in the dock; add flow opens as a full-height picker.",
-    tradeoff: "Dense and dramatic; less airy than the baseline.",
-    component: RosterDock,
+    bestFor: "Likely product default for repeated roster editing.",
+    direction: "Dark finance-inspired shell with visible dock labels, budget bar, section rail, and comfortable row density.",
+    interaction: "Keeps the current Roster Dock model while sharpening hierarchy.",
+    tradeoff: "Less specialized than the more extreme variants.",
+    component: DockBalanced,
   },
   {
-    id: "force-ribbon",
+    id: "dock-focus",
     mode: "current",
-    name: "Force Ribbon",
-    eyebrow: "Organization-first layout",
-    icon: ListTree,
-    bestFor: "Users who think in detachments, roles, and slot counts.",
-    direction: "Horizontal role ribbon, continuous lane list, and tonal Material 3 surfaces.",
-    interaction: "Selecting a role swaps the roster lane and keeps slot impact visible.",
-    tradeoff: "More structural than expressive.",
-    component: ForceRibbon,
+    name: "Dock Focus",
+    eyebrow: "03 · calmer editing",
+    icon: Layers3,
+    bestFor: "Cleaner editing sessions with lower cognitive load.",
+    direction: "Dark top shell, prominent section rail, quieter rows, and metadata moved into the detail sheet.",
+    interaction: "One active section gets emphasis; details appear when the user selects a unit.",
+    tradeoff: "Hides some metadata until selection.",
+    component: DockFocus,
   },
   {
-    id: "glass-ledger",
+    id: "dock-glass",
     mode: "current",
-    name: "Glass Ledger",
-    eyebrow: "Power-user table",
-    icon: GitBranch,
-    bestFor: "Scan-heavy roster editing and tablet comparison.",
-    direction: "Frosted table/list hybrid with budget bars, sticky-like headers, and inline status markers.",
-    interaction: "Rows expand into detail configuration without card-per-unit browsing.",
-    tradeoff: "Best for experienced builders; more abstract for new users.",
-    component: GlassLedger,
+    name: "Dock Glass",
+    eyebrow: "04 · premium dark",
+    icon: Gem,
+    bestFor: "Premium dark product feel while preserving practical roster editing.",
+    direction: "Frosted roster streams, stronger blur/depth, brighter Material progress bars, and a stronger floating dock.",
+    interaction: "Continuous lanes remain efficient, with validation and points made more visual.",
+    tradeoff: "Blur and depth must be performance-tested on real devices.",
+    component: DockGlass,
   },
   {
-    id: "build-timeline",
+    id: "dock-showcase",
     mode: "current",
-    name: "Build Timeline",
-    eyebrow: "Guided creation flow",
-    icon: Route,
-    bestFor: "Onboarding users into BSData hierarchy.",
-    direction: "Stepper rail, one active work surface, soft neumorphic Material 3 panels.",
-    interaction: "System, catalogue, detachment, roster, and validation are explicit steps.",
-    tradeoff: "Excellent for creation; direct editing needs shortcuts.",
-    component: BuildTimeline,
+    name: "Dock Showcase",
+    eyebrow: "05 · prettiest",
+    icon: Sparkles,
+    bestFor: "Stakeholder demos and visual direction review.",
+    direction: "Large hero points treatment, richer rounded shells, stronger lighting, and presentation-grade depth.",
+    interaction: "Core add, configure, validate, and export actions remain easy despite lower density.",
+    tradeoff: "Lower information density.",
+    component: DockShowcase,
   },
 ];
 
-export const activeConcepts = [...futureConcepts, ...newConcepts];
+export const activeConcepts = newConcepts;

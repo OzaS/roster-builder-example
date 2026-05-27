@@ -7,7 +7,7 @@ import type { ConceptId, GalleryMode, PlatformPreview, PrototypeScreen, Roster }
 
 function App() {
   const [galleryMode, setGalleryMode] = useState<GalleryMode>("current");
-  const [selectedConcept, setSelectedConcept] = useState<ConceptId>("armory-future");
+  const [selectedConcept, setSelectedConcept] = useState<ConceptId>("dock-balanced");
   const [platform, setPlatform] = useState<PlatformPreview>("phone");
   const [roster, setRoster] = useState<Roster>(mockRoster);
   const [selectedSectionId, setSelectedSectionId] = useState("hq");
@@ -31,7 +31,7 @@ function App() {
 
   function changeGalleryMode(mode: GalleryMode) {
     setGalleryMode(mode);
-    setSelectedConcept(mode === "archive" ? archiveConcepts[0].id : activeConcepts[0].id);
+    setSelectedConcept(mode === "archive" ? archiveConcepts[0].id : "dock-balanced");
     setScreen("library");
     setScreenHistory([]);
   }

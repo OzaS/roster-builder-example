@@ -1,9 +1,14 @@
-import { Boxes, CircuitBoard, Gem, Hammer, Rows3 } from "lucide-react";
+import { Boxes, CircuitBoard, Gem, GitBranch, Hammer, LayoutDashboard, ListTree, Route, Rows3, Sparkles } from "lucide-react";
 import { ArmoryGlassV1 } from "../archive/v1/ArmoryGlassV1";
 import { CommandDeckV1 } from "../archive/v1/CommandDeckV1";
 import { ForgeWorkbenchV1 } from "../archive/v1/ForgeWorkbenchV1";
 import { MiniatureCaseV1 } from "../archive/v1/MiniatureCaseV1";
 import { TacticalLedgerV1 } from "../archive/v1/TacticalLedgerV1";
+import { ArmoryGlassFutureArchive } from "../archive/v2/ArmoryGlassFutureArchive";
+import { BuildTimelineArchive } from "../archive/v2/BuildTimelineArchive";
+import { CurvedCommandArchive } from "../archive/v2/CurvedCommandArchive";
+import { ForceRibbonArchive } from "../archive/v2/ForceRibbonArchive";
+import { GlassLedgerArchive } from "../archive/v2/GlassLedgerArchive";
 import type { GalleryConcept } from "./galleryTypes";
 
 export const archiveConcepts: GalleryConcept[] = [
@@ -66,5 +71,65 @@ export const archiveConcepts: GalleryConcept[] = [
     interaction: "Palette, assembly board, and configuration vise make the build flow explicit.",
     tradeoff: "Superseded by Build Timeline for onboarding clarity.",
     component: ForgeWorkbenchV1,
+  },
+  {
+    id: "archive-armory-future",
+    mode: "archive",
+    name: "Armory Future V2",
+    eyebrow: "Archived V2 baseline",
+    icon: Sparkles,
+    bestFor: "Reference for the previous light future baseline.",
+    direction: "Light frosted Material 3 with a soft shell, force rail, roster surface, and bottom dock.",
+    interaction: "Full sample flow from library through export.",
+    tradeoff: "Archived after Roster Dock became the chosen inspiration.",
+    component: ArmoryGlassFutureArchive,
+  },
+  {
+    id: "archive-curved-command",
+    mode: "archive",
+    name: "Curved Command V2",
+    eyebrow: "Archived V2 rounded shell",
+    icon: LayoutDashboard,
+    bestFor: "Reference for the rounded dark top-shell direction.",
+    direction: "Dark capsule header, curved content panel, pill tabs, and sheet-based configuration.",
+    interaction: "Roster, add, and checks are one tap away.",
+    tradeoff: "Archived in favor of Dock variants.",
+    component: CurvedCommandArchive,
+  },
+  {
+    id: "archive-force-ribbon",
+    mode: "archive",
+    name: "Force Ribbon V2",
+    eyebrow: "Archived V2 organization-first layout",
+    icon: ListTree,
+    bestFor: "Reference for role-ribbon navigation.",
+    direction: "Horizontal role ribbon, continuous lane list, and tonal Material surfaces.",
+    interaction: "Selecting a role swaps the roster lane and keeps slot impact visible.",
+    tradeoff: "Archived in favor of Dock variants.",
+    component: ForceRibbonArchive,
+  },
+  {
+    id: "archive-glass-ledger",
+    mode: "archive",
+    name: "Glass Ledger V2",
+    eyebrow: "Archived V2 power-user table",
+    icon: GitBranch,
+    bestFor: "Reference for scan-heavy table/list editing.",
+    direction: "Frosted table/list hybrid with budget bars and inline status markers.",
+    interaction: "Rows expand into detail configuration without card-per-unit browsing.",
+    tradeoff: "Archived in favor of Dock variants.",
+    component: GlassLedgerArchive,
+  },
+  {
+    id: "archive-build-timeline",
+    mode: "archive",
+    name: "Build Timeline V2",
+    eyebrow: "Archived V2 guided creation flow",
+    icon: Route,
+    bestFor: "Reference for onboarding and BSData hierarchy.",
+    direction: "Stepper rail, one active work surface, soft neumorphic panels.",
+    interaction: "System, catalogue, detachment, roster, and validation are explicit steps.",
+    tradeoff: "Archived in favor of Dock variants.",
+    component: BuildTimelineArchive,
   },
 ];
