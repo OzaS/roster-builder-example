@@ -1731,3 +1731,386 @@
   gap: 5px;
   font-size: 12px;
 }
+
+.dock-variant {
+  --dock-panel: color-mix(in srgb, var(--md-surface-container) 82%, transparent);
+  --dock-panel-strong: color-mix(in srgb, var(--md-surface-container-high) 90%, transparent);
+  --dock-border: color-mix(in srgb, var(--md-outline) 20%, transparent);
+  --dock-glow: color-mix(in srgb, var(--md-primary) 22%, transparent);
+  background:
+    radial-gradient(circle at 50% -10%, var(--dock-glow), transparent 42%),
+    var(--md-background);
+}
+
+.dock-variant-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  padding: 16px 14px;
+}
+
+.dock-variant-hero h1,
+.dock-variant-hero strong,
+.dock-variant-hero small {
+  display: block;
+}
+
+.dock-variant-hero h1 {
+  margin: 4px 0 0;
+  font-size: 23px;
+  line-height: 1.05;
+}
+
+.dock-variant-hero > div > strong {
+  margin-top: 12px;
+  font-size: 34px;
+  font-weight: 500;
+}
+
+.dock-hero-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.dock-hero-actions button {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid var(--dock-border);
+  border-radius: 16px;
+  color: inherit;
+  background: var(--dock-panel);
+  cursor: pointer;
+}
+
+.dock-status-strip {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dock-status-strip span,
+.dock-metrics-row span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--dock-panel);
+  color: var(--md-on-surface);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.dock-variant-workspace {
+  display: grid;
+  gap: 12px;
+  padding: 0 12px 88px;
+}
+
+.dock-metrics-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.dock-metrics-row span {
+  display: grid;
+  justify-items: start;
+  min-height: 54px;
+  border-radius: 16px;
+}
+
+.dock-metrics-row strong,
+.dock-metrics-row small {
+  display: block;
+}
+
+.dock-section-rail {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.dock-section-rail button {
+  display: grid;
+  gap: 2px;
+  min-width: 94px;
+  min-height: 50px;
+  padding: 8px 10px;
+  border: 1px solid var(--dock-border);
+  border-radius: 16px;
+  color: var(--md-on-surface);
+  background: var(--dock-panel);
+  text-align: left;
+  cursor: pointer;
+}
+
+.dock-section-rail button.active {
+  color: var(--md-on-primary-container);
+  background: var(--md-primary-container);
+}
+
+.dock-section-rail.prominent button {
+  min-width: 118px;
+  min-height: 62px;
+  border-radius: 20px;
+}
+
+.dock-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dock-section-title button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 14px;
+  color: var(--md-on-primary);
+  background: var(--md-primary);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.dock-action-bar {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1fr;
+  gap: 8px;
+}
+
+.dock-action-bar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 42px;
+  border: 0;
+  border-radius: 14px;
+  color: var(--md-on-primary-container);
+  background: var(--md-primary-container);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.dock-unit-stream {
+  display: grid;
+  overflow: hidden;
+  border: 1px solid var(--dock-border);
+  border-radius: 20px;
+  background: var(--dock-panel);
+}
+
+.dock-unit-stream .v2-unit-row {
+  background: transparent;
+}
+
+.dock-unit-stream.focus .v2-unit-copy small {
+  opacity: 0.72;
+}
+
+.dock-efficiency {
+  --dock-panel: color-mix(in srgb, var(--md-surface-container) 72%, transparent);
+  --dock-glow: color-mix(in srgb, var(--md-primary) 10%, transparent);
+}
+
+.dock-efficiency .dock-variant-hero {
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 10px 12px;
+}
+
+.dock-efficiency .dock-variant-hero h1 {
+  font-size: 18px;
+}
+
+.dock-efficiency .dock-variant-hero > div > strong {
+  margin-top: 4px;
+  font-size: 24px;
+}
+
+.dock-efficiency .dock-status-strip {
+  grid-column: auto;
+  justify-content: flex-end;
+}
+
+.dock-efficiency .dock-hero-actions {
+  display: none;
+}
+
+.dock-efficiency .dock-variant-workspace {
+  gap: 8px;
+  padding-inline: 8px;
+}
+
+.dock-efficiency .dock-metrics-row {
+  gap: 6px;
+}
+
+.dock-efficiency .dock-metrics-row span {
+  min-height: 42px;
+  border-radius: 10px;
+}
+
+.dock-efficiency .dock-section-rail button {
+  min-width: 82px;
+  min-height: 42px;
+  border-radius: 10px;
+}
+
+.dock-efficiency .dock-unit-stream {
+  border-radius: 12px;
+}
+
+.dock-efficiency .dock-unit-stream .v2-unit-row {
+  min-height: 52px;
+  padding-block: 6px;
+}
+
+.dock-efficiency .v2-bottom-dock {
+  min-height: 58px;
+  border-radius: 22px;
+}
+
+.dock-efficiency .v2-bottom-dock span {
+  display: none;
+}
+
+.dock-balanced .dock-variant-workspace {
+  gap: 12px;
+}
+
+.dock-focus {
+  --dock-glow: color-mix(in srgb, var(--md-primary) 16%, transparent);
+}
+
+.dock-focus .dock-variant-hero {
+  padding: 18px 14px 14px;
+}
+
+.dock-focus .dock-variant-hero > div > strong {
+  font-size: 30px;
+}
+
+.dock-focus .dock-variant-workspace {
+  gap: 15px;
+}
+
+.dock-focus .dock-unit-stream .v2-unit-row {
+  min-height: 68px;
+}
+
+.dock-focus .v2-unit-meta small,
+.dock-focus .v2-row-count {
+  display: none;
+}
+
+.dock-glass {
+  --dock-panel: color-mix(in srgb, var(--md-surface-container) 56%, transparent);
+  --dock-panel-strong: color-mix(in srgb, var(--md-surface-container-high) 68%, transparent);
+  --dock-glow: color-mix(in srgb, var(--md-primary) 28%, transparent);
+}
+
+.dock-glass .dock-variant-hero,
+.dock-glass .dock-unit-stream,
+.dock-glass .v2-validation-rail,
+.dock-glass .v2-budget,
+.dock-glass .dock-section-rail button,
+.dock-glass .dock-metrics-row span {
+  backdrop-filter: blur(18px);
+  box-shadow: 0 14px 32px color-mix(in srgb, var(--md-shadow, black) 18%, transparent);
+}
+
+.dock-glass .dock-variant-hero {
+  margin: 10px;
+  border: 1px solid var(--dock-border);
+  border-radius: 28px;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--md-surface-container-high) 62%, transparent), transparent);
+}
+
+.dock-glass .v2-bottom-dock {
+  background: color-mix(in srgb, var(--md-primary) 34%, var(--md-surface-container) 66%);
+  box-shadow: 0 20px 46px color-mix(in srgb, var(--md-primary) 20%, black 16%);
+}
+
+.dock-showcase {
+  --dock-panel: color-mix(in srgb, var(--md-surface-container-high) 64%, transparent);
+  --dock-glow: color-mix(in srgb, var(--md-primary) 34%, transparent);
+  background:
+    radial-gradient(circle at 22% 4%, color-mix(in srgb, var(--md-primary) 24%, transparent), transparent 34%),
+    radial-gradient(circle at 90% 18%, color-mix(in srgb, var(--md-tertiary) 18%, transparent), transparent 32%),
+    var(--md-background);
+}
+
+.dock-showcase .dock-variant-hero {
+  min-height: 250px;
+  align-content: start;
+  margin: 10px;
+  padding: 22px 18px;
+  border: 1px solid var(--dock-border);
+  border-radius: 32px;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--md-surface-container-high) 72%, transparent), transparent),
+    radial-gradient(circle at 70% 20%, color-mix(in srgb, var(--md-primary) 22%, transparent), transparent 42%);
+  box-shadow: 0 24px 54px color-mix(in srgb, var(--md-shadow, black) 26%, transparent);
+}
+
+.dock-showcase .dock-variant-hero h1 {
+  font-size: 30px;
+}
+
+.dock-showcase .dock-variant-hero > div > strong {
+  margin-top: 24px;
+  font-size: 48px;
+}
+
+.dock-showcase .dock-variant-workspace {
+  gap: 18px;
+  padding-inline: 16px;
+}
+
+.dock-showcase .dock-unit-stream {
+  border-radius: 28px;
+  background: color-mix(in srgb, var(--md-surface-container) 58%, transparent);
+  box-shadow: 0 18px 42px color-mix(in srgb, var(--md-shadow, black) 20%, transparent);
+  backdrop-filter: blur(20px);
+}
+
+.dock-showcase .dock-unit-stream .v2-unit-row {
+  min-height: 76px;
+}
+
+.dock-showcase .v2-bottom-dock {
+  min-height: 78px;
+  border-radius: 32px;
+  background: color-mix(in srgb, var(--md-primary) 38%, var(--md-surface-container) 62%);
+}
+
+.device-frame.tablet .dock-variant-workspace {
+  grid-template-columns: minmax(420px, 1fr) minmax(300px, 0.7fr);
+  align-items: start;
+}
+
+.device-frame.tablet .dock-variant-workspace > .v2-budget,
+.device-frame.tablet .dock-variant-workspace > .dock-metrics-row,
+.device-frame.tablet .dock-variant-workspace > .dock-section-rail,
+.device-frame.tablet .dock-variant-workspace > .dock-section-title,
+.device-frame.tablet .dock-variant-workspace > .dock-unit-stream {
+  grid-column: 1;
+}
+
+.device-frame.tablet .dock-variant-workspace > .v2-validation-rail {
+  grid-column: 2;
+  grid-row: 1 / span 5;
+}
+
+.device-frame.tablet .dock-showcase .dock-variant-hero {
+  min-height: 210px;
+}

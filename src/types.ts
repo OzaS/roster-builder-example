@@ -42,17 +42,21 @@ export type Roster = {
 };
 
 export type ConceptId =
-  | "armory-future"
-  | "curved-command"
-  | "roster-dock"
-  | "force-ribbon"
-  | "glass-ledger"
-  | "build-timeline"
+  | "dock-efficiency"
+  | "dock-balanced"
+  | "dock-focus"
+  | "dock-glass"
+  | "dock-showcase"
   | "archive-command-deck"
   | "archive-armory-glass"
   | "archive-tactical-ledger"
   | "archive-miniature-case"
-  | "archive-forge-workbench";
+  | "archive-forge-workbench"
+  | "archive-armory-future"
+  | "archive-curved-command"
+  | "archive-force-ribbon"
+  | "archive-glass-ledger"
+  | "archive-build-timeline";
 
 export type GalleryMode = "current" | "archive";
 
