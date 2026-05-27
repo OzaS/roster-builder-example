@@ -2,7 +2,7 @@ import type { LucideIcon } from "lucide-react";
 
 export type PlatformPreview = "phone" | "tablet";
 export type ThemeMode = "dark" | "light";
-export type NavigatorView = "single" | "all-screens";
+export type NavigatorView = "single" | "all-screens" | "elements";
 
 export type WorkflowScreen =
   | "library"

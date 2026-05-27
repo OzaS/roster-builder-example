@@ -1,5 +1,5 @@
 import type { RefObject } from "react";
-import { Archive, Moon, MonitorSmartphone, Rows3, Smartphone, Sun, TabletSmartphone } from "lucide-react";
+import { Archive, Component, Moon, MonitorSmartphone, Rows3, Smartphone, Sun, TabletSmartphone } from "lucide-react";
 import { DeviceFrame } from "../components/DeviceFrame";
 import { ScreenshotButton } from "../components/v2/ScreenshotButton";
 import { WorkflowScreenPicker } from "../components/v2/WorkflowScreenPicker";
@@ -9,6 +9,7 @@ import { activeConcepts, futureConcepts, newConcepts } from "./conceptRegistry";
 import type { GalleryConcept } from "./galleryTypes";
 import { WorkflowBoard } from "./WorkflowBoard";
 import { workflowToPrototypeScreen } from "./workflow";
+import { DesignElementsPanel } from "./DesignElementsPanel";
 
 type Props = {
   mode: GalleryMode;
@@ -97,6 +98,10 @@ export function GalleryShell({
                 <Rows3 size={16} />
                 All Screens
               </button>
+              <button className={navigatorView === "elements" ? "active" : ""} type="button" onClick={() => onNavigatorViewChange("elements")}>
+                <Component size={16} />
+                Elements
+              </button>
             </ControlGroup>
             <ControlGroup title="Theme">
               <button className={themeMode === "dark" ? "active" : ""} type="button" onClick={() => onThemeModeChange("dark")}>
@@ -124,10 +129,23 @@ export function GalleryShell({
           </button>
         </div>
       </aside>
-      <main className={`gallery-stage ${navigatorView === "all-screens" && mode === "current" ? "board-mode" : ""}`}>
+      <main className={`gallery-stage ${navigatorView !== "single" && mode === "current" ? "board-mode" : ""}`}>
         <section className="preview-column" ref={captureRef}>
           {mode === "current" && navigatorView === "all-screens" ? (
             <WorkflowBoard concept={concept} platform={platform} themeMode={themeMode} {...boardProps} />
+          ) : mode === "current" && navigatorView === "elements" ? (
+            <DesignElementsPanel
+              platform={platform}
+              themeMode={themeMode}
+              roster={boardProps.roster}
+              selectedSection={boardProps.selectedSection}
+              selectedUnit={boardProps.selectedUnit}
+              selectedSectionId={boardProps.selectedSectionId}
+              onSelectSection={boardProps.onSelectSection}
+              onSelectUnit={boardProps.onSelectUnit}
+              onToggleOption={boardProps.onToggleOption}
+              onCountChange={boardProps.onCountChange}
+            />
           ) : (
             <DeviceFrame platform={platform}>{children}</DeviceFrame>
           )}
