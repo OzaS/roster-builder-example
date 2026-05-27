@@ -139,7 +139,7 @@ function App() {
 
   async function captureCurrentStage() {
     if (!captureRef.current) return;
-    const screenName = navigatorView === "all-screens" ? "all-screens" : workflowScreen;
+    const screenName = navigatorView === "all-screens" ? "all-screens" : navigatorView === "elements" ? "elements" : workflowScreen;
     await captureElementAsPng(captureRef.current, `dock-glass-${screenName}-${platform}-${themeMode}.png`);
   }
 
