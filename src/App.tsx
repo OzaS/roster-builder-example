@@ -1,14 +1,11 @@
 import { useMemo, useRef, useState } from "react";
 import { mockRoster } from "./data/mockRoster";
-import { activeConcepts } from "./gallery/conceptRegistry";
-import { archiveConcepts } from "./gallery/archiveRegistry";
 import { findConcept, GalleryShell } from "./gallery/GalleryShell";
 import { workflowToPrototypeScreen } from "./gallery/workflow";
 import { captureElementAsPng } from "./utils/captureStage";
-import type { ColorScheme, ConceptId, GalleryMode, NavigatorView, PlatformPreview, PrototypeScreen, Roster, ThemeMode, WorkflowScreen } from "./types";
+import type { ColorScheme, ConceptId, NavigatorView, PlatformPreview, PrototypeScreen, Roster, ThemeMode, WorkflowScreen } from "./types";
 
 function App() {
-  const [galleryMode, setGalleryMode] = useState<GalleryMode>("current");
   const [selectedConcept, setSelectedConcept] = useState<ConceptId>("ux-command");
   const [platform, setPlatform] = useState<PlatformPreview>("phone");
   const [themeMode, setThemeMode] = useState<ThemeMode>("dark");
@@ -32,24 +29,17 @@ function App() {
     [roster.sections, selectedSection.units, selectedUnitId],
   );
 
-  const concept = findConcept(selectedConcept, galleryMode);
+  const concept = findConcept(selectedConcept);
   const Concept = concept.component;
   const captureRef = useRef<HTMLElement>(null);
 
-  function changeGalleryMode(mode: GalleryMode) {
-    const nextConceptId = mode === "archive" ? archiveConcepts[0].id : "ux-command";
-    setGalleryMode(mode);
-    setSelectedConcept(nextConceptId);
-    applyConceptEntryScreen(nextConceptId, mode);
-  }
-
   function changeConcept(id: ConceptId) {
     setSelectedConcept(id);
-    applyConceptEntryScreen(id, galleryMode);
+    applyConceptEntryScreen(id);
   }
 
-  function applyConceptEntryScreen(id: ConceptId, mode: GalleryMode) {
-    const entry = findConcept(id, mode);
+  function applyConceptEntryScreen(id: ConceptId) {
+    const entry = findConcept(id);
     const firstWorkflow = entry.workflow?.[0] ?? "library";
     setWorkflowScreen(firstWorkflow);
     setScreen(workflowToPrototypeScreen(firstWorkflow));
@@ -151,7 +141,6 @@ function App() {
 
   return (
     <GalleryShell
-      mode={galleryMode}
       selectedConcept={concept.id}
       platform={platform}
       themeMode={themeMode}
@@ -160,7 +149,6 @@ function App() {
       workflowScreen={workflowScreen}
       concept={concept}
       captureRef={captureRef}
-      onModeChange={changeGalleryMode}
       onConceptChange={changeConcept}
       onPlatformChange={setPlatform}
       onThemeModeChange={setThemeMode}
