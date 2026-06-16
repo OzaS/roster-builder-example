@@ -67,37 +67,8 @@ export type Roster = {
 };
 
 export type ConceptId =
-  | "ux-canvas"
   | "ux-command"
-  | "ux-wizard"
-  | "ux-workbench"
-  | "ux-deck"
-  | "brutal-stack"
-  | "agent-palette"
-  | "liquid-chrome"
-  | "editorial-brief"
-  | "spatial-radar"
-  | "dock-efficiency"
-  | "dock-balanced"
-  | "dock-focus"
-  | "dock-glass"
-  | "dock-showcase"
-  | "archive-command-deck"
-  | "archive-armory-glass"
-  | "archive-tactical-ledger"
-  | "archive-miniature-case"
-  | "archive-forge-workbench"
-  | "archive-armory-future"
-  | "archive-curved-command"
-  | "archive-force-ribbon"
-  | "archive-glass-ledger"
-  | "archive-build-timeline"
-  | "archive-dock-efficiency"
-  | "archive-dock-balanced"
-  | "archive-dock-focus"
-  | "archive-dock-showcase";
-
-export type GalleryMode = "current" | "archive";
+  | "ux-workbench";
 
 export type PrototypeScreen =
   | "library"
