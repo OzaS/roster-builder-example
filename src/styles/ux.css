@@ -2099,3 +2099,119 @@
   --ux-accent-ink: #ffffff;
   --ux-cool: #87672c;
 }
+
+/* ------------------------- current-design elements ------------------------- */
+
+.design-elements-panel.ux-screen {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(300px, 1fr));
+  gap: 16px;
+  align-content: start;
+  width: 100%;
+  min-height: 100%;
+  height: auto;
+  padding: 18px;
+  overflow: auto;
+  background:
+    radial-gradient(120% 60% at 96% 0%, color-mix(in srgb, var(--ux-accent) 16%, transparent), transparent 52%),
+    var(--ux-bg);
+}
+
+.design-elements-panel.ux-screen.phone {
+  grid-template-columns: minmax(320px, 1fr);
+}
+
+.design-elements-panel.ux-screen .ux-elements-hero,
+.design-elements-panel.ux-screen .ux-element-section {
+  border-color: var(--ux-line);
+  background: color-mix(in srgb, var(--ux-surface) 92%, transparent);
+  color: var(--ux-ink);
+  border-radius: var(--ux-r-lg);
+  box-shadow: none;
+}
+
+.design-elements-panel.ux-screen .ux-elements-hero {
+  min-height: 132px;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--ux-accent) 18%, var(--ux-surface)), var(--ux-surface)),
+    var(--ux-surface);
+}
+
+.design-elements-panel.ux-screen .ux-elements-hero small {
+  color: var(--ux-accent-2);
+  font-weight: 850;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.design-elements-panel.ux-screen .ux-elements-hero h1 {
+  font-size: 34px;
+  letter-spacing: 0;
+}
+
+.design-elements-panel.ux-screen .ux-elements-hero p {
+  color: var(--ux-muted);
+}
+
+.design-elements-panel.ux-screen .elements-hero-actions button,
+.design-elements-panel.ux-screen .element-icon {
+  border-color: var(--ux-line);
+  background: var(--ux-surface-2);
+}
+
+.design-elements-panel.ux-screen .ux-element-section {
+  border-radius: var(--ux-r-md);
+  backdrop-filter: none;
+}
+
+.design-elements-panel.ux-screen .ux-element-section h2 {
+  color: var(--ux-muted);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+}
+
+.design-elements-panel.ux-screen .ux-token-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.design-elements-panel.ux-screen .ux-token-swatch {
+  border-color: var(--ux-line);
+  border-radius: var(--ux-r-sm);
+}
+
+.design-elements-panel.ux-screen .ux-token-swatch small {
+  opacity: 0.72;
+}
+
+.design-elements-panel.ux-screen .ux-type-stack .type-display {
+  color: var(--ux-accent-2);
+  font-weight: 850;
+  letter-spacing: 0;
+}
+
+.design-elements-panel.ux-screen .ux-type-stack h2,
+.design-elements-panel.ux-screen .ux-type-stack h3 {
+  color: var(--ux-ink);
+}
+
+.design-elements-panel.ux-screen .ux-type-stack h3,
+.design-elements-panel.ux-screen .ux-type-stack p,
+.design-elements-panel.ux-screen .ux-type-stack small {
+  color: var(--ux-muted);
+}
+
+.design-elements-panel.ux-screen .ux-elements-command-wrap {
+  position: relative;
+  min-height: 92px;
+}
+
+.design-elements-panel.ux-screen .ux-elements-command-wrap .ux-cmd-bar {
+  position: static;
+}
+
+.design-elements-panel.ux-screen .ux-elements-static {
+  padding: 0 0 12px;
+  border-bottom-color: var(--ux-line);
+}
