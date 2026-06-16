@@ -1600,6 +1600,104 @@
   font-weight: 700;
 }
 
+/* ---- merged workbench: library / settings / smart-search layer ---- */
+.ux-wb-home-top {
+  grid-template-columns: minmax(0, 1fr) 40px;
+}
+.ux-wb-home-top.reversed {
+  grid-template-columns: 40px minmax(0, 1fr);
+}
+.ux-wb-home-body {
+  flex: 1;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: 16px 14px 24px;
+  overflow-y: auto;
+}
+
+.ux-setting-row {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 46px;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--ux-line);
+  border-radius: var(--ux-r-md);
+  background: var(--ux-surface);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.ux-setting-row:hover {
+  border-color: var(--ux-line-2);
+}
+.ux-setting-row.on {
+  border-color: color-mix(in srgb, var(--ux-accent) 55%, transparent);
+  background: color-mix(in srgb, var(--ux-accent) 8%, var(--ux-surface));
+}
+.ux-setting-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--ux-accent) 16%, transparent);
+  color: var(--ux-accent-2);
+}
+.ux-setting-text strong {
+  display: block;
+  font-size: 14.5px;
+}
+.ux-setting-text small {
+  display: block;
+  margin-top: 2px;
+  color: var(--ux-muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+.ux-switch {
+  position: relative;
+  width: 44px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--ux-surface-3);
+  border: 1px solid var(--ux-line-2);
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+.ux-switch::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--ux-muted);
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+.ux-setting-row.on .ux-switch {
+  background: var(--ux-accent);
+  border-color: var(--ux-accent);
+}
+.ux-setting-row.on .ux-switch::after {
+  transform: translateX(18px);
+  background: var(--ux-accent-ink);
+}
+
+.ux-wb-search.smart {
+  border-color: var(--ux-accent);
+  background: color-mix(in srgb, var(--ux-accent) 10%, var(--ux-surface));
+  color: var(--ux-accent-2);
+}
+
+/* keep the floating command bar from covering pane content */
+.ux-workbench.ux-smart .ux-wb-tree,
+.ux-workbench.ux-smart .ux-wb-detail,
+.ux-workbench.ux-smart .ux-wb-rail {
+  padding-bottom: 84px;
+}
+
 /* =====================================================================
    CONCEPT 5 — Field Cards
    ===================================================================== */

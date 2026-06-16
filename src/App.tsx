@@ -6,12 +6,13 @@ import { captureElementAsPng } from "./utils/captureStage";
 import type { ColorScheme, ConceptId, NavigatorView, PlatformPreview, PrototypeScreen, Roster, ThemeMode, WorkflowScreen } from "./types";
 
 function App() {
-  const [selectedConcept, setSelectedConcept] = useState<ConceptId>("ux-command");
+  const [selectedConcept, setSelectedConcept] = useState<ConceptId>("ux-workbench");
   const [platform, setPlatform] = useState<PlatformPreview>("phone");
   const [themeMode, setThemeMode] = useState<ThemeMode>("dark");
   const [colorScheme, setColorScheme] = useState<ColorScheme>("generic");
   const [navigatorView, setNavigatorView] = useState<NavigatorView>("single");
-  const [workflowScreen, setWorkflowScreen] = useState<WorkflowScreen>("overview");
+  const [workflowScreen, setWorkflowScreen] = useState<WorkflowScreen>("library");
+  const [smartSearch, setSmartSearch] = useState(true);
   const [roster, setRoster] = useState<Roster>(mockRoster);
   const [selectedSectionId, setSelectedSectionId] = useState("hq");
   const [selectedUnitId, setSelectedUnitId] = useState("centurion");
@@ -162,6 +163,8 @@ function App() {
         selectedUnit,
         selectedSectionId,
         expandedSectionIds,
+        smartSearch,
+        onToggleSmartSearch: () => setSmartSearch((value) => !value),
         onSelectSection: selectSection,
         onToggleSection: toggleSection,
         onSelectUnit: selectUnit,
@@ -181,6 +184,8 @@ function App() {
         workflowScreen={workflowScreen}
         themeMode={themeMode}
         colorScheme={colorScheme}
+        smartSearch={smartSearch}
+        onToggleSmartSearch={() => setSmartSearch((value) => !value)}
         canGoBack={screenHistory.length > 0 || screen !== "overview"}
         onSelectSection={selectSection}
         onToggleSection={toggleSection}

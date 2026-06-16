@@ -360,6 +360,40 @@ function WorkbenchElements({
           </button>
         ))}
       </ElementSection>
+
+      <ElementSection title="Smart Search (Settings)">
+        <div className="ux-wb-search smart">
+          <Command size={15} />
+          <input placeholder={`Add a legal ${selectedSection.name} unit or ask…`} readOnly />
+        </div>
+        <div className="ux-suggest">
+          <Sparkles size={14} />
+          <div className="ux-suggest-chips">
+            {["legal & affordable", "fills this slot", "best value pick"].map((label) => (
+              <button key={label} type="button" className="ux-suggest-chip">
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </ElementSection>
+
+      <ElementSection title="Floating Command Bar">
+        <div className="ux-elements-command-wrap">
+          <div className="ux-cmd-bar">
+            <button type="button" className="ux-cmd-tab" aria-label="Build">
+              <Layers size={18} />
+            </button>
+            <button type="button" className="ux-cmd-input">
+              <Command size={16} />
+              <span>Add unit or ask for help...</span>
+            </button>
+            <button type="button" className="ux-cmd-send" aria-label="Run">
+              <ArrowUp size={18} />
+            </button>
+          </div>
+        </div>
+      </ElementSection>
     </>
   );
 }

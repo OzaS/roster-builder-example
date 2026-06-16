@@ -11,6 +11,7 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "unit-detail", label: "Unit Detail" },
   { id: "option-drilldown", label: "Option Drilldown" },
   { id: "diagnostics", label: "Diagnostics" },
+  { id: "settings", label: "Settings" },
   { id: "export", label: "Export" },
 ];
 

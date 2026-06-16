@@ -1,18 +1,41 @@
-import { AlertTriangle, ChevronDown, Download, Layers, PanelsTopLeft, Plus, Search } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ArrowUp, ChevronDown, Cog, Command, Download, Layers, PanelsTopLeft, Plus, Search, Sparkles, Wand2 } from "lucide-react";
 import type { ConceptProps } from "../shared";
 import { BudgetMeter, Chip, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph } from "./uxShared";
 
 /**
- * Codex Workbench — master/detail for power users.
+ * Codex Workbench — master/detail for power users, now the single merged design.
  * The roster tree is always present (left on tablet). Selecting a unit edits it
  * live in the detail pane without losing the list context, and a validation rail
- * keeps roster legality visible. Deep nesting becomes one persistent tree.
+ * keeps roster legality visible.
+ *
+ * Folded in from the archived Quickstrike direction: a library entry screen, and
+ * a "Smart search & suggestions" tier (suggestion chips + a floating command bar)
+ * that the player turns on from Settings.
  */
 export function CodexWorkbench(props: ConceptProps) {
+  const shell = `ux-screen ux-workbench ${shellClass(props.themeMode, props.colorScheme)}`;
+
+  if (props.screen === "library") {
+    return (
+      <div className={shell}>
+        <Library props={props} />
+      </div>
+    );
+  }
+
+  if (props.screen === "settings") {
+    return (
+      <div className={shell}>
+        <Settings props={props} />
+      </div>
+    );
+  }
+
   const showingDetail = props.screen === "unit-detail";
   const showingChecks = props.screen === "validation";
+  const smart = props.smartSearch ?? false;
   return (
-    <div className={`ux-screen ux-workbench ${shellClass(props.themeMode, props.colorScheme)} ${showingDetail ? "show-detail" : ""} ${showingChecks ? "show-checks" : ""}`}>
+    <div className={`${shell} ${showingDetail ? "show-detail" : ""} ${showingChecks ? "show-checks" : ""} ${smart ? "ux-smart" : ""}`}>
       <header className="ux-wb-top">
         <button type="button" className="ux-icon-btn" aria-label="Lists" onClick={() => props.onNavigate("library")}>
           <Layers size={18} />
@@ -33,6 +56,7 @@ export function CodexWorkbench(props: ConceptProps) {
         <Detail props={props} />
         <Rail props={props} />
       </div>
+      {smart ? <CommandBar props={props} /> : null}
     </div>
   );
 }
@@ -137,19 +161,34 @@ function Detail({ props }: { props: ConceptProps }) {
 
 function AddPane({ props }: { props: ConceptProps }) {
   const pool = flattenUnits(props.roster).filter((u) => u.sectionId === props.selectedSectionId);
+  const smart = props.smartSearch ?? false;
+  const section = props.selectedSection.name;
+  const suggestions = [`legal ${section.toLowerCase()} under 120`, "fills this slot", "best value pick"];
   return (
     <section className="ux-wb-detail">
       <div className="ux-wb-detail-head">
         <span>
           <small>Add to</small>
-          <strong>{props.selectedSection.name}</strong>
+          <strong>{section}</strong>
         </span>
         <PanelsTopLeft size={20} />
       </div>
-      <div className="ux-wb-search">
-        <Search size={15} />
-        <input placeholder={`Search ${props.selectedSection.name}`} readOnly />
+      <div className={`ux-wb-search ${smart ? "smart" : ""}`}>
+        {smart ? <Command size={15} /> : <Search size={15} />}
+        <input placeholder={smart ? `Add a legal ${section} unit or ask…` : `Search ${section}`} readOnly />
       </div>
+      {smart ? (
+        <div className="ux-suggest">
+          <Sparkles size={14} />
+          <div className="ux-suggest-chips">
+            {suggestions.map((s) => (
+              <button key={s} type="button" className="ux-suggest-chip">
+                {s}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
       <div className="ux-pool">
         {(pool.length ? pool : flattenUnits(props.roster)).map((unit) => (
           <button key={unit.id} type="button" className="ux-pool-row" onClick={() => props.onSelectUnit(unit.id)}>
@@ -199,5 +238,104 @@ function Rail({ props }: { props: ConceptProps }) {
         <span>{props.roster.sections.length} slots</span>
       </div>
     </aside>
+  );
+}
+
+/** Library / home entry screen, ported from the archived Quickstrike direction. */
+function Library({ props }: { props: ConceptProps }) {
+  const recents = [
+    { name: props.roster.name, sub: props.roster.faction, pts: `${props.roster.pointsUsed}/${props.roster.pointsLimit}` },
+    { name: "Incursion Test List", sub: "Saved roster", pts: "500/1000" },
+    { name: "Narrative Boarding Patrol", sub: "Saved roster", pts: "490/500" },
+  ];
+  return (
+    <>
+      <header className="ux-wb-top ux-wb-home-top">
+        <div className="ux-wb-title">
+          <strong>Roster Builder</strong>
+          <small>{props.roster.system}</small>
+        </div>
+        <button type="button" className="ux-icon-btn" aria-label="Settings" onClick={() => props.onNavigate("settings")}>
+          <Cog size={18} />
+        </button>
+      </header>
+      <div className="ux-wb-home-body">
+        <div className="ux-cmd-hero">
+          <Wand2 size={20} />
+          <h2>What do you want to build?</h2>
+          <p>Open a recent list or start fresh. Tap a roster to drop into the workbench.</p>
+        </div>
+        <button type="button" className="ux-new-roster" onClick={() => props.onNavigate("overview")}>
+          <Plus size={22} />
+          <span>
+            <strong>New roster</strong>
+            <small>Pick a system and faction</small>
+          </span>
+        </button>
+        <div className="ux-result-label">Recent</div>
+        {recents.map((r) => (
+          <button key={r.name} type="button" className="ux-list-card" onClick={() => props.onNavigate("overview")}>
+            <span>
+              <strong>{r.name}</strong>
+              <small>{r.sub}</small>
+            </span>
+            <b>{r.pts}</b>
+          </button>
+        ))}
+      </div>
+    </>
+  );
+}
+
+/** Settings screen housing the "Smart search & suggestions" toggle. */
+function Settings({ props }: { props: ConceptProps }) {
+  const smart = props.smartSearch ?? false;
+  return (
+    <>
+      <header className="ux-wb-top ux-wb-home-top reversed">
+        <button type="button" className="ux-icon-btn" aria-label="Back" onClick={() => props.onNavigate("library")}>
+          <ArrowLeft size={18} />
+        </button>
+        <div className="ux-wb-title">
+          <strong>Settings</strong>
+          <small>Tune your builder</small>
+        </div>
+      </header>
+      <div className="ux-wb-home-body">
+        <div className="ux-result-label">Search & assistance</div>
+        <button type="button" className={`ux-setting-row ${smart ? "on" : ""}`} onClick={props.onToggleSmartSearch}>
+          <span className="ux-setting-icon">
+            <Sparkles size={17} />
+          </span>
+          <span className="ux-setting-text">
+            <strong>Smart search & suggestions</strong>
+            <small>Type-to-add command bar, fuzzy results, and AI suggestion chips in the add-unit menu.</small>
+          </span>
+          <span className="ux-switch" aria-hidden />
+        </button>
+        <p className="ux-hint">
+          <Sparkles size={14} />
+          When on, a floating command bar appears in the workbench and the add-unit menu offers quick suggestions for the current slot.
+        </p>
+      </div>
+    </>
+  );
+}
+
+/** Floating command bar, ported from the archived Quickstrike direction. */
+function CommandBar({ props }: { props: ConceptProps }) {
+  return (
+    <div className="ux-cmd-bar">
+      <button type="button" className="ux-cmd-tab" aria-label="Build" onClick={() => props.onNavigate("overview")}>
+        <Layers size={18} />
+      </button>
+      <button type="button" className="ux-cmd-input" onClick={() => props.onNavigate("add-unit")}>
+        <Command size={16} />
+        <span>Add unit or ask for help…</span>
+      </button>
+      <button type="button" className="ux-cmd-send" aria-label="Run" onClick={() => props.onNavigate("add-unit")}>
+        <ArrowUp size={18} />
+      </button>
+    </div>
   );
 }

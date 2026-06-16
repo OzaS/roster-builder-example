@@ -25,6 +25,7 @@ export type WorkflowScreen =
   | "unit-detail"
   | "option-drilldown"
   | "diagnostics"
+  | "settings"
   | "export";
 
 export type RosterOption = {
@@ -79,6 +80,7 @@ export type PrototypeScreen =
   | "add-unit"
   | "unit-detail"
   | "validation"
+  | "settings"
   | "export";
 
 export type PrototypeAction =
