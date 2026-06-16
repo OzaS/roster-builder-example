@@ -57,6 +57,16 @@ export type Roster = {
 };
 
 export type ConceptId =
+  | "ux-canvas"
+  | "ux-command"
+  | "ux-wizard"
+  | "ux-workbench"
+  | "ux-deck"
+  | "brutal-stack"
+  | "agent-palette"
+  | "liquid-chrome"
+  | "editorial-brief"
+  | "spatial-radar"
   | "dock-efficiency"
   | "dock-balanced"
   | "dock-focus"
