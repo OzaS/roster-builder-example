@@ -19,6 +19,9 @@ export type ConceptProps = {
   themeMode?: ThemeMode;
   colorScheme?: ColorScheme;
   workflowScreen?: WorkflowScreen;
+  /** When true, the premium "smart search & suggestions" features are enabled. */
+  smartSearch?: boolean;
+  onToggleSmartSearch?: () => void;
   onSelectSection: (id: string) => void;
   onToggleSection: (id: string) => void;
   onSelectUnit: (id: string) => void;

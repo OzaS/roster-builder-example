@@ -13,6 +13,8 @@ type Props = {
   selectedUnit: RosterUnit;
   selectedSectionId: string;
   expandedSectionIds: string[];
+  smartSearch: boolean;
+  onToggleSmartSearch: () => void;
   onSelectSection: (id: string) => void;
   onToggleSection: (id: string) => void;
   onSelectUnit: (id: string) => void;
@@ -32,6 +34,8 @@ export function WorkflowBoard({
   selectedUnit,
   selectedSectionId,
   expandedSectionIds,
+  smartSearch,
+  onToggleSmartSearch,
   onSelectSection,
   onToggleSection,
   onSelectUnit,
@@ -60,6 +64,8 @@ export function WorkflowBoard({
                 workflowScreen={item.id}
                 themeMode={themeMode}
                 colorScheme={colorScheme}
+                smartSearch={smartSearch}
+                onToggleSmartSearch={onToggleSmartSearch}
                 canGoBack={screen !== "overview"}
                 onSelectSection={onSelectSection}
                 onToggleSection={onToggleSection}

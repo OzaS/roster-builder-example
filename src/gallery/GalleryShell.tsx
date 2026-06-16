@@ -5,7 +5,7 @@ import { ScreenshotButton } from "../components/v2/ScreenshotButton";
 import { WorkflowScreenPicker } from "../components/v2/WorkflowScreenPicker";
 import type { ColorScheme, ConceptId, NavigatorView, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode, WorkflowScreen } from "../types";
 import { colorSchemes } from "../types";
-import { activeConcepts, uxConcepts } from "./conceptRegistry";
+import { activeConcepts, archivedConcepts, uxConcepts } from "./conceptRegistry";
 import type { GalleryConcept } from "./galleryTypes";
 import { WorkflowBoard } from "./WorkflowBoard";
 import { workflowToPrototypeScreen } from "./workflow";
@@ -27,6 +27,8 @@ type Props = {
     selectedUnit: RosterUnit;
     selectedSectionId: string;
     expandedSectionIds: string[];
+    smartSearch: boolean;
+    onToggleSmartSearch: () => void;
     onSelectSection: (id: string) => void;
     onToggleSection: (id: string) => void;
     onSelectUnit: (id: string) => void;
@@ -74,6 +76,9 @@ export function GalleryShell({
           </span>
         </div>
         <ConceptGroup title="Designs" concepts={uxConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
+        {archivedConcepts.length > 0 ? (
+          <ConceptGroup title="Archive" concepts={archivedConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
+        ) : null}
         <WorkflowScreenPicker active={workflowScreen} screens={concept.workflow} onSelect={onWorkflowScreenChange} />
         <ControlGroup title="View">
           <button className={navigatorView === "single" ? "active" : ""} type="button" onClick={() => onNavigatorViewChange("single")}>
