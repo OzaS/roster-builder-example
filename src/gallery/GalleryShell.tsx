@@ -5,7 +5,7 @@ import { ScreenshotButton } from "../components/v2/ScreenshotButton";
 import { WorkflowScreenPicker } from "../components/v2/WorkflowScreenPicker";
 import type { ConceptId, GalleryMode, NavigatorView, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode, WorkflowScreen } from "../types";
 import { archiveConcepts } from "./archiveRegistry";
-import { activeConcepts, futureConcepts, newConcepts } from "./conceptRegistry";
+import { activeConcepts, futureConcepts, newConcepts, uxConcepts } from "./conceptRegistry";
 import type { GalleryConcept } from "./galleryTypes";
 import { WorkflowBoard } from "./WorkflowBoard";
 import { workflowToPrototypeScreen } from "./workflow";
@@ -87,7 +87,8 @@ export function GalleryShell({
             {futureConcepts.length > 0 ? (
               <ConceptGroup title="Future Sample" concepts={futureConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
             ) : null}
-            <ConceptGroup title="Roster Dock Variants" concepts={newConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
+            <ConceptGroup title="UX Explorations" concepts={uxConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
+            <ConceptGroup title="Current Variants" concepts={newConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
             <WorkflowScreenPicker active={workflowScreen} onSelect={onWorkflowScreenChange} />
             <ControlGroup title="View">
               <button className={navigatorView === "single" ? "active" : ""} type="button" onClick={() => onNavigatorViewChange("single")}>

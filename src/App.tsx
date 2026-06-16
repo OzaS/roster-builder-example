@@ -9,7 +9,7 @@ import type { ConceptId, GalleryMode, NavigatorView, PlatformPreview, PrototypeS
 
 function App() {
   const [galleryMode, setGalleryMode] = useState<GalleryMode>("current");
-  const [selectedConcept, setSelectedConcept] = useState<ConceptId>("dock-glass");
+  const [selectedConcept, setSelectedConcept] = useState<ConceptId>("ux-canvas");
   const [platform, setPlatform] = useState<PlatformPreview>("phone");
   const [themeMode, setThemeMode] = useState<ThemeMode>("dark");
   const [navigatorView, setNavigatorView] = useState<NavigatorView>("single");
@@ -37,7 +37,7 @@ function App() {
 
   function changeGalleryMode(mode: GalleryMode) {
     setGalleryMode(mode);
-    setSelectedConcept(mode === "archive" ? archiveConcepts[0].id : "dock-glass");
+    setSelectedConcept(mode === "archive" ? archiveConcepts[0].id : "ux-canvas");
     setScreen("library");
     setWorkflowScreen("library");
     setScreenHistory([]);
