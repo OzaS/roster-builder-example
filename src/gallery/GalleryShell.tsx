@@ -148,8 +148,10 @@ export function GalleryShell({
             <WorkflowBoard concept={concept} platform={platform} themeMode={themeMode} colorScheme={colorScheme} {...boardProps} />
           ) : mode === "current" && navigatorView === "elements" ? (
             <DesignElementsPanel
+              concept={concept}
               platform={platform}
               themeMode={themeMode}
+              colorScheme={colorScheme}
               roster={boardProps.roster}
               selectedSection={boardProps.selectedSection}
               selectedUnit={boardProps.selectedUnit}
