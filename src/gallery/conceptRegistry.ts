@@ -10,19 +10,8 @@ import type { GalleryConcept } from "./galleryTypes";
 
 export const futureConcepts: GalleryConcept[] = [];
 
+// The two directions chosen to move forward with.
 export const uxConcepts: GalleryConcept[] = [
-  {
-    id: "ux-canvas",
-    mode: "current",
-    name: "Continuous Canvas",
-    eyebrow: "UX · kill the wizard",
-    icon: ScrollText,
-    bestFor: "Everyday list editing where momentum matters more than ceremony.",
-    direction: "One scrollable roster with a pinned points meter; modern dark/light surfaces and a calm slot rhythm.",
-    interaction: "Adding units never leaves the page — a slot-scoped sheet slides up, and units expand inline to edit loadouts.",
-    tradeoff: "Fixes the existing apps' deepest pain (5+ nested screens) but trades a guided hand-hold for new players.",
-    component: ContinuousCanvas,
-  },
   {
     id: "ux-command",
     mode: "current",
@@ -34,18 +23,7 @@ export const uxConcepts: GalleryConcept[] = [
     interaction: "Type to add any unit from anywhere instead of drilling system → catalogue → org → category → unit.",
     tradeoff: "Relies on strong search/AI; the value is invisible until the catalogue index is good.",
     component: QuickstrikeCommand,
-  },
-  {
-    id: "ux-wizard",
-    mode: "current",
-    name: "Muster Wizard",
-    eyebrow: "UX · guided, modernised",
-    icon: WandSparkles,
-    bestFor: "Onboarding and newer players who want a confident, hand-held setup.",
-    direction: "A clear progress spine, big touch targets, smart defaults and 'why this matters' helper text.",
-    interaction: "Keeps the familiar step flow but lets power users jump steps and auto-fill required slots.",
-    tradeoff: "Still linear by nature — better than the legacy wizard, but heavier than the canvas for veterans.",
-    component: MusterWizard,
+    workflow: ["library", "overview", "add-unit", "unit-detail", "diagnostics", "export"],
   },
   {
     id: "ux-workbench",
@@ -58,10 +36,39 @@ export const uxConcepts: GalleryConcept[] = [
     interaction: "Select in the tree, edit on the right, watch legality update in the rail — the deep nesting becomes one tree.",
     tradeoff: "Shines on tablet; on phone it falls back to a more conventional drill-in.",
     component: CodexWorkbench,
+    workflow: ["overview", "add-unit", "unit-detail", "diagnostics"],
+  },
+];
+
+// Earlier explorations kept for reference under the Archive tab.
+export const legacyConcepts: GalleryConcept[] = [
+  {
+    id: "ux-canvas",
+    mode: "archive",
+    name: "Continuous Canvas",
+    eyebrow: "UX · kill the wizard",
+    icon: ScrollText,
+    bestFor: "Everyday list editing where momentum matters more than ceremony.",
+    direction: "One scrollable roster with a pinned points meter; modern dark/light surfaces and a calm slot rhythm.",
+    interaction: "Adding units never leaves the page — a slot-scoped sheet slides up, and units expand inline to edit loadouts.",
+    tradeoff: "Fixes the existing apps' deepest pain (5+ nested screens) but trades a guided hand-hold for new players.",
+    component: ContinuousCanvas,
+  },
+  {
+    id: "ux-wizard",
+    mode: "archive",
+    name: "Muster Wizard",
+    eyebrow: "UX · guided, modernised",
+    icon: WandSparkles,
+    bestFor: "Onboarding and newer players who want a confident, hand-held setup.",
+    direction: "A clear progress spine, big touch targets, smart defaults and 'why this matters' helper text.",
+    interaction: "Keeps the familiar step flow but lets power users jump steps and auto-fill required slots.",
+    tradeoff: "Still linear by nature — better than the legacy wizard, but heavier than the canvas for veterans.",
+    component: MusterWizard,
   },
   {
     id: "ux-deck",
-    mode: "current",
+    mode: "archive",
     name: "Field Cards",
     eyebrow: "UX · gesture-native",
     icon: LayoutGrid,
@@ -71,12 +78,9 @@ export const uxConcepts: GalleryConcept[] = [
     tradeoff: "Lower information density than a table; great for browsing, less ideal for big-army audits.",
     component: FieldCards,
   },
-];
-
-export const newConcepts: GalleryConcept[] = [
   {
     id: "brutal-stack",
-    mode: "current",
+    mode: "archive",
     name: "Brutal Stack",
     eyebrow: "Dense utility",
     icon: Terminal,
@@ -88,7 +92,7 @@ export const newConcepts: GalleryConcept[] = [
   },
   {
     id: "agent-palette",
-    mode: "current",
+    mode: "archive",
     name: "Agent Palette",
     eyebrow: "AI-native",
     icon: Bot,
@@ -100,7 +104,7 @@ export const newConcepts: GalleryConcept[] = [
   },
   {
     id: "liquid-chrome",
-    mode: "current",
+    mode: "archive",
     name: "Liquid Chrome",
     eyebrow: "2026 polish",
     icon: Sparkles,
@@ -112,7 +116,7 @@ export const newConcepts: GalleryConcept[] = [
   },
   {
     id: "editorial-brief",
-    mode: "current",
+    mode: "archive",
     name: "Editorial Brief",
     eyebrow: "Typographic",
     icon: Newspaper,
@@ -124,7 +128,7 @@ export const newConcepts: GalleryConcept[] = [
   },
   {
     id: "spatial-radar",
-    mode: "current",
+    mode: "archive",
     name: "Spatial Radar",
     eyebrow: "Map interface",
     icon: Radar,
@@ -136,16 +140,16 @@ export const newConcepts: GalleryConcept[] = [
   },
   {
     id: "dock-glass",
-    mode: "current",
+    mode: "archive",
     name: "Dock Glass",
-    eyebrow: "Chosen direction",
+    eyebrow: "Earlier chosen direction",
     icon: Gem,
     bestFor: "Premium dark roster-building workflow with practical editing density.",
     direction: "Frosted roster streams, dark/light Material tokens, progress-first status, and a floating bottom dock.",
     interaction: "Workflow navigator shows each simulator-inspired step as its own mobile screen.",
-    tradeoff: "The workflow still needs product distillation, but this keeps the style direction stable.",
+    tradeoff: "Superseded by the focused Quickstrike + Codex directions.",
     component: DockGlass,
   },
 ];
 
-export const activeConcepts = [...uxConcepts, ...newConcepts];
+export const activeConcepts = uxConcepts;

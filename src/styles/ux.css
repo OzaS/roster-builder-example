@@ -1967,3 +1967,135 @@
 .device-frame.tablet .ux-workbench:not(.show-detail):not(.show-checks) .ux-wb-rail {
   display: grid;
 }
+
+/* =====================================================================
+   GAME COLOR SCHEMES
+   Each scheme retints the accent/cool tokens (both modes) plus the
+   background atmosphere per mode. Status colors stay constant for
+   legibility. `generic` intentionally has no overrides (uses base tokens).
+   Scheme rules come last so they win the equal-specificity battle with
+   the `.ux-screen.light` accent rule; mode-specific tints use the higher
+   `.ux-scheme-*.dark|.light` specificity to override base backgrounds.
+   ===================================================================== */
+
+/* ---- Warhammer 40,000 — gothic imperial crimson + bone & gold ---- */
+.ux-screen.ux-scheme-wh40k {
+  --ux-accent: #d8392f;
+  --ux-accent-2: #ef5b4d;
+  --ux-accent-ink: #fff3f0;
+  --ux-cool: #e0b145;
+}
+.ux-screen.ux-scheme-wh40k.dark {
+  --ux-bg: #0b0a0c;
+  --ux-surface: #161418;
+  --ux-surface-2: #1f1c22;
+  --ux-surface-3: #29252c;
+  --ux-line: rgba(224, 177, 69, 0.12);
+  --ux-line-2: rgba(224, 177, 69, 0.24);
+}
+.ux-screen.ux-scheme-wh40k.light {
+  --ux-bg: #efe7df;
+  --ux-surface: #fbf6f0;
+  --ux-surface-2: #f1e8df;
+  --ux-surface-3: #e7dccf;
+  --ux-ink: #241a17;
+  --ux-muted: #6d5a50;
+  --ux-line: rgba(40, 24, 16, 0.12);
+  --ux-line-2: rgba(40, 24, 16, 0.2);
+  --ux-accent: #b21f1f;
+  --ux-accent-2: #cc2f2a;
+  --ux-accent-ink: #fff5f3;
+  --ux-cool: #8a6a1f;
+}
+
+/* ---- Horus Heresy — gold on oxblood (dark) / aged parchment (light) ---- */
+.ux-screen.ux-scheme-horus-heresy {
+  --ux-accent: #c69a44;
+  --ux-accent-2: #e2c272;
+  --ux-accent-ink: #241603;
+  --ux-cool: #d98a52;
+}
+.ux-screen.ux-scheme-horus-heresy.dark {
+  --ux-bg: #190809;
+  --ux-surface: #270d10;
+  --ux-surface-2: #321216;
+  --ux-surface-3: #401a1e;
+  --ux-muted: #c39a8f;
+  --ux-line: rgba(214, 164, 82, 0.16);
+  --ux-line-2: rgba(214, 164, 82, 0.3);
+}
+.ux-screen.ux-scheme-horus-heresy.light {
+  --ux-bg: #e9dcc4;
+  --ux-surface: #f6ecd8;
+  --ux-surface-2: #efe1c8;
+  --ux-surface-3: #e5d4b6;
+  --ux-ink: #3a2519;
+  --ux-muted: #7d6045;
+  --ux-line: rgba(58, 37, 25, 0.16);
+  --ux-line-2: rgba(58, 37, 25, 0.26);
+  --ux-accent: #9a6a1c;
+  --ux-accent-2: #b5842a;
+  --ux-accent-ink: #fff7e6;
+  --ux-cool: #9c5a2a;
+}
+
+/* ---- Age of Sigmar — celestial azure + sigmarite gold ---- */
+.ux-screen.ux-scheme-age-of-sigmar {
+  --ux-accent: #29b3e6;
+  --ux-accent-2: #5ad0f6;
+  --ux-accent-ink: #04141f;
+  --ux-cool: #f3c63f;
+}
+.ux-screen.ux-scheme-age-of-sigmar.dark {
+  --ux-bg: #060f1d;
+  --ux-surface: #0d1a2c;
+  --ux-surface-2: #122438;
+  --ux-surface-3: #182f46;
+  --ux-line: rgba(90, 208, 246, 0.14);
+  --ux-line-2: rgba(90, 208, 246, 0.28);
+}
+.ux-screen.ux-scheme-age-of-sigmar.light {
+  --ux-bg: #e4eef6;
+  --ux-surface: #ffffff;
+  --ux-surface-2: #eef4fa;
+  --ux-surface-3: #e2ecf4;
+  --ux-ink: #122231;
+  --ux-muted: #4f6678;
+  --ux-line: rgba(18, 34, 49, 0.1);
+  --ux-line-2: rgba(18, 34, 49, 0.18);
+  --ux-accent: #1683b3;
+  --ux-accent-2: #2299cc;
+  --ux-accent-ink: #ffffff;
+  --ux-cool: #b58420;
+}
+
+/* ---- The Old World — muted bottle-green + bronze, antique ---- */
+.ux-screen.ux-scheme-old-world {
+  --ux-accent: #4f8a5b;
+  --ux-accent-2: #6fae7b;
+  --ux-accent-ink: #07140b;
+  --ux-cool: #c2933f;
+}
+.ux-screen.ux-scheme-old-world.dark {
+  --ux-bg: #0b110d;
+  --ux-surface: #141d16;
+  --ux-surface-2: #1b271e;
+  --ux-surface-3: #233226;
+  --ux-muted: #9aa896;
+  --ux-line: rgba(194, 147, 63, 0.12);
+  --ux-line-2: rgba(194, 147, 63, 0.24);
+}
+.ux-screen.ux-scheme-old-world.light {
+  --ux-bg: #e7e3d4;
+  --ux-surface: #f5f1e6;
+  --ux-surface-2: #ece7d7;
+  --ux-surface-3: #e0dac6;
+  --ux-ink: #232c24;
+  --ux-muted: #5d6857;
+  --ux-line: rgba(35, 44, 36, 0.12);
+  --ux-line-2: rgba(35, 44, 36, 0.2);
+  --ux-accent: #3a6b46;
+  --ux-accent-2: #4b855a;
+  --ux-accent-ink: #ffffff;
+  --ux-cool: #87672c;
+}

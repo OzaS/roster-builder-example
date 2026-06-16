@@ -13,9 +13,10 @@ import { BuildTimelineArchive } from "../archive/v2/BuildTimelineArchive";
 import { CurvedCommandArchive } from "../archive/v2/CurvedCommandArchive";
 import { ForceRibbonArchive } from "../archive/v2/ForceRibbonArchive";
 import { GlassLedgerArchive } from "../archive/v2/GlassLedgerArchive";
+import { legacyConcepts } from "./conceptRegistry";
 import type { GalleryConcept } from "./galleryTypes";
 
-export const archiveConcepts: GalleryConcept[] = [
+const legacyArchiveConcepts: GalleryConcept[] = [
   {
     id: "archive-command-deck",
     mode: "archive",
@@ -185,3 +186,7 @@ export const archiveConcepts: GalleryConcept[] = [
     component: DockShowcaseArchive,
   },
 ];
+
+// Recent exploration directions (the demoted UX + design variants) appear first,
+// followed by the older V1/V2/dock archive.
+export const archiveConcepts: GalleryConcept[] = [...legacyConcepts, ...legacyArchiveConcepts];

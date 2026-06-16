@@ -1,12 +1,13 @@
 import { DeviceFrame } from "../components/DeviceFrame";
-import { workflowScreens, workflowToPrototypeScreen } from "./workflow";
+import { resolveWorkflow, workflowToPrototypeScreen } from "./workflow";
 import type { GalleryConcept } from "./galleryTypes";
-import type { PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode } from "../types";
+import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode } from "../types";
 
 type Props = {
   concept: GalleryConcept;
   platform: PlatformPreview;
   themeMode: ThemeMode;
+  colorScheme: ColorScheme;
   roster: Roster;
   selectedSection: RosterSection;
   selectedUnit: RosterUnit;
@@ -25,6 +26,7 @@ export function WorkflowBoard({
   concept,
   platform,
   themeMode,
+  colorScheme,
   roster,
   selectedSection,
   selectedUnit,
@@ -42,7 +44,7 @@ export function WorkflowBoard({
 
   return (
     <section className={`workflow-board ${platform}`}>
-      {workflowScreens.map((item) => {
+      {resolveWorkflow(concept.workflow).map((item) => {
         const screen = workflowToPrototypeScreen(item.id);
         return (
           <article className="workflow-board-item" key={item.id}>
@@ -57,6 +59,7 @@ export function WorkflowBoard({
                 screen={screen}
                 workflowScreen={item.id}
                 themeMode={themeMode}
+                colorScheme={colorScheme}
                 canGoBack={screen !== "overview"}
                 onSelectSection={onSelectSection}
                 onToggleSection={onToggleSection}

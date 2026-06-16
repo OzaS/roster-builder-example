@@ -1,6 +1,6 @@
 import { ArrowUp, Command, CornerDownLeft, Filter, Layers, ListChecks, Plus, Share2, Sparkles, Wand2, Zap } from "lucide-react";
 import type { ConceptProps } from "../shared";
-import { BudgetMeter, Chip, flattenUnits, priceLabel, rosterChecks, StatusGlyph, themeClass } from "./uxShared";
+import { BudgetMeter, Chip, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph } from "./uxShared";
 
 /**
  * Quickstrike Command — search-first.
@@ -9,7 +9,7 @@ import { BudgetMeter, Chip, flattenUnits, priceLabel, rosterChecks, StatusGlyph,
  */
 export function QuickstrikeCommand(props: ConceptProps) {
   return (
-    <div className={`ux-screen ux-command ${themeClass(props.themeMode)}`}>
+    <div className={`ux-screen ux-command ${shellClass(props.themeMode, props.colorScheme)}`}>
       <Body props={props} />
       <CommandBar props={props} />
     </div>

@@ -14,6 +14,23 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "export", label: "Export" },
 ];
 
+const workflowLabels: Record<WorkflowScreen, string> = workflowScreens.reduce(
+  (acc, item) => ({ ...acc, [item.id]: item.label }),
+  {} as Record<WorkflowScreen, string>,
+);
+
+export function workflowScreenLabel(screen: WorkflowScreen): string {
+  return workflowLabels[screen] ?? screen;
+}
+
+/** Resolve which workflow screens a concept exposes, falling back to the full flow. */
+export function resolveWorkflow(workflow?: WorkflowScreen[]): Array<{ id: WorkflowScreen; label: string }> {
+  if (workflow && workflow.length > 0) {
+    return workflow.map((id) => ({ id, label: workflowScreenLabel(id) }));
+  }
+  return workflowScreens;
+}
+
 export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScreen {
   if (screen === "create-roster") return "system";
   if (screen === "drafts") return "library";

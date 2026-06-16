@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import { AlertTriangle, ArrowLeft, CheckCircle2, Info, ShieldAlert } from "lucide-react";
-import type { PrototypeScreen, Roster, RosterUnit, ThemeMode } from "../../types";
+import type { ColorScheme, PrototypeScreen, Roster, RosterUnit, ThemeMode } from "../../types";
 import type { ConceptProps } from "../shared";
 
 export type FlatUnit = RosterUnit & { sectionId: string; sectionName: string };
@@ -90,4 +90,13 @@ export function screenIsBuild(screen: PrototypeScreen) {
 
 export function themeClass(themeMode?: ThemeMode) {
   return themeMode === "light" ? "light" : "dark";
+}
+
+export function schemeClass(colorScheme?: ColorScheme) {
+  return `ux-scheme-${colorScheme ?? "generic"}`;
+}
+
+/** Combined root class helper: theme mode + game color scheme. */
+export function shellClass(themeMode?: ThemeMode, colorScheme?: ColorScheme) {
+  return `${themeClass(themeMode)} ${schemeClass(colorScheme)}`;
 }
