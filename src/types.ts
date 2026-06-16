@@ -4,6 +4,16 @@ export type PlatformPreview = "phone" | "tablet";
 export type ThemeMode = "dark" | "light";
 export type NavigatorView = "single" | "all-screens" | "elements";
 
+export type ColorScheme = "generic" | "wh40k" | "horus-heresy" | "age-of-sigmar" | "old-world";
+
+export const colorSchemes: Array<{ id: ColorScheme; label: string; short: string }> = [
+  { id: "generic", label: "Generic", short: "GEN" },
+  { id: "wh40k", label: "Warhammer 40,000", short: "40K" },
+  { id: "horus-heresy", label: "Horus Heresy", short: "HH" },
+  { id: "age-of-sigmar", label: "Age of Sigmar", short: "AoS" },
+  { id: "old-world", label: "The Old World", short: "TOW" },
+];
+
 export type WorkflowScreen =
   | "library"
   | "create-roster"

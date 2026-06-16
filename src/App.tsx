@@ -5,13 +5,14 @@ import { archiveConcepts } from "./gallery/archiveRegistry";
 import { findConcept, GalleryShell } from "./gallery/GalleryShell";
 import { workflowToPrototypeScreen } from "./gallery/workflow";
 import { captureElementAsPng } from "./utils/captureStage";
-import type { ConceptId, GalleryMode, NavigatorView, PlatformPreview, PrototypeScreen, Roster, ThemeMode, WorkflowScreen } from "./types";
+import type { ColorScheme, ConceptId, GalleryMode, NavigatorView, PlatformPreview, PrototypeScreen, Roster, ThemeMode, WorkflowScreen } from "./types";
 
 function App() {
   const [galleryMode, setGalleryMode] = useState<GalleryMode>("current");
-  const [selectedConcept, setSelectedConcept] = useState<ConceptId>("ux-canvas");
+  const [selectedConcept, setSelectedConcept] = useState<ConceptId>("ux-command");
   const [platform, setPlatform] = useState<PlatformPreview>("phone");
   const [themeMode, setThemeMode] = useState<ThemeMode>("dark");
+  const [colorScheme, setColorScheme] = useState<ColorScheme>("generic");
   const [navigatorView, setNavigatorView] = useState<NavigatorView>("single");
   const [workflowScreen, setWorkflowScreen] = useState<WorkflowScreen>("overview");
   const [roster, setRoster] = useState<Roster>(mockRoster);
@@ -36,17 +37,22 @@ function App() {
   const captureRef = useRef<HTMLElement>(null);
 
   function changeGalleryMode(mode: GalleryMode) {
+    const nextConceptId = mode === "archive" ? archiveConcepts[0].id : "ux-command";
     setGalleryMode(mode);
-    setSelectedConcept(mode === "archive" ? archiveConcepts[0].id : "ux-canvas");
-    setScreen("library");
-    setWorkflowScreen("library");
-    setScreenHistory([]);
+    setSelectedConcept(nextConceptId);
+    applyConceptEntryScreen(nextConceptId, mode);
   }
 
   function changeConcept(id: ConceptId) {
     setSelectedConcept(id);
-    setScreen("library");
-    setWorkflowScreen("library");
+    applyConceptEntryScreen(id, galleryMode);
+  }
+
+  function applyConceptEntryScreen(id: ConceptId, mode: GalleryMode) {
+    const entry = findConcept(id, mode);
+    const firstWorkflow = entry.workflow?.[0] ?? "library";
+    setWorkflowScreen(firstWorkflow);
+    setScreen(workflowToPrototypeScreen(firstWorkflow));
     setScreenHistory([]);
   }
 
@@ -140,7 +146,7 @@ function App() {
   async function captureCurrentStage() {
     if (!captureRef.current) return;
     const screenName = navigatorView === "all-screens" ? "all-screens" : navigatorView === "elements" ? "elements" : workflowScreen;
-    await captureElementAsPng(captureRef.current, `dock-glass-${screenName}-${platform}-${themeMode}.png`);
+    await captureElementAsPng(captureRef.current, `${selectedConcept}-${colorScheme}-${screenName}-${platform}-${themeMode}.png`);
   }
 
   return (
@@ -149,6 +155,7 @@ function App() {
       selectedConcept={concept.id}
       platform={platform}
       themeMode={themeMode}
+      colorScheme={colorScheme}
       navigatorView={navigatorView}
       workflowScreen={workflowScreen}
       concept={concept}
@@ -157,6 +164,7 @@ function App() {
       onConceptChange={changeConcept}
       onPlatformChange={setPlatform}
       onThemeModeChange={setThemeMode}
+      onColorSchemeChange={setColorScheme}
       onNavigatorViewChange={setNavigatorView}
       onWorkflowScreenChange={selectWorkflowScreen}
       onCapture={captureCurrentStage}
@@ -184,6 +192,7 @@ function App() {
         screen={screen}
         workflowScreen={workflowScreen}
         themeMode={themeMode}
+        colorScheme={colorScheme}
         canGoBack={screenHistory.length > 0 || screen !== "overview"}
         onSelectSection={selectSection}
         onToggleSection={toggleSection}

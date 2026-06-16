@@ -1,11 +1,12 @@
 import type { RefObject } from "react";
-import { Archive, Component, Moon, MonitorSmartphone, Rows3, Smartphone, Sun, TabletSmartphone } from "lucide-react";
+import { Archive, Component, Moon, MonitorSmartphone, Palette, Rows3, Smartphone, Sun, TabletSmartphone } from "lucide-react";
 import { DeviceFrame } from "../components/DeviceFrame";
 import { ScreenshotButton } from "../components/v2/ScreenshotButton";
 import { WorkflowScreenPicker } from "../components/v2/WorkflowScreenPicker";
-import type { ConceptId, GalleryMode, NavigatorView, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode, WorkflowScreen } from "../types";
+import type { ColorScheme, ConceptId, GalleryMode, NavigatorView, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode, WorkflowScreen } from "../types";
+import { colorSchemes } from "../types";
 import { archiveConcepts } from "./archiveRegistry";
-import { activeConcepts, futureConcepts, newConcepts, uxConcepts } from "./conceptRegistry";
+import { activeConcepts, futureConcepts, uxConcepts } from "./conceptRegistry";
 import type { GalleryConcept } from "./galleryTypes";
 import { WorkflowBoard } from "./WorkflowBoard";
 import { workflowToPrototypeScreen } from "./workflow";
@@ -16,6 +17,7 @@ type Props = {
   selectedConcept: ConceptId;
   platform: PlatformPreview;
   themeMode: ThemeMode;
+  colorScheme: ColorScheme;
   navigatorView: NavigatorView;
   workflowScreen: WorkflowScreen;
   concept: GalleryConcept;
@@ -39,6 +41,7 @@ type Props = {
   onConceptChange: (id: ConceptId) => void;
   onPlatformChange: (platform: PlatformPreview) => void;
   onThemeModeChange: (mode: ThemeMode) => void;
+  onColorSchemeChange: (scheme: ColorScheme) => void;
   onNavigatorViewChange: (view: NavigatorView) => void;
   onWorkflowScreenChange: (screen: WorkflowScreen) => void;
   onCapture: () => void;
@@ -49,6 +52,7 @@ export function GalleryShell({
   selectedConcept,
   platform,
   themeMode,
+  colorScheme,
   navigatorView,
   workflowScreen,
   concept,
@@ -59,6 +63,7 @@ export function GalleryShell({
   onConceptChange,
   onPlatformChange,
   onThemeModeChange,
+  onColorSchemeChange,
   onNavigatorViewChange,
   onWorkflowScreenChange,
   onCapture,
@@ -87,9 +92,8 @@ export function GalleryShell({
             {futureConcepts.length > 0 ? (
               <ConceptGroup title="Future Sample" concepts={futureConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
             ) : null}
-            <ConceptGroup title="UX Explorations" concepts={uxConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
-            <ConceptGroup title="Current Variants" concepts={newConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
-            <WorkflowScreenPicker active={workflowScreen} onSelect={onWorkflowScreenChange} />
+            <ConceptGroup title="Designs" concepts={uxConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
+            <WorkflowScreenPicker active={workflowScreen} screens={concept.workflow} onSelect={onWorkflowScreenChange} />
             <ControlGroup title="View">
               <button className={navigatorView === "single" ? "active" : ""} type="button" onClick={() => onNavigatorViewChange("single")}>
                 <Smartphone size={16} />
@@ -114,6 +118,14 @@ export function GalleryShell({
                 Light
               </button>
             </ControlGroup>
+            <ControlGroup title="Game scheme">
+              {colorSchemes.map((scheme) => (
+                <button key={scheme.id} className={colorScheme === scheme.id ? "active" : ""} type="button" onClick={() => onColorSchemeChange(scheme.id)}>
+                  <Palette size={16} />
+                  {scheme.label}
+                </button>
+              ))}
+            </ControlGroup>
             <ScreenshotButton onCapture={onCapture} />
           </>
         ) : (
@@ -133,7 +145,7 @@ export function GalleryShell({
       <main className={`gallery-stage ${navigatorView !== "single" && mode === "current" ? "board-mode" : ""}`}>
         <section className="preview-column" ref={captureRef}>
           {mode === "current" && navigatorView === "all-screens" ? (
-            <WorkflowBoard concept={concept} platform={platform} themeMode={themeMode} {...boardProps} />
+            <WorkflowBoard concept={concept} platform={platform} themeMode={themeMode} colorScheme={colorScheme} {...boardProps} />
           ) : mode === "current" && navigatorView === "elements" ? (
             <DesignElementsPanel
               platform={platform}

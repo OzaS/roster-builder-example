@@ -1,6 +1,6 @@
 import { AlertTriangle, ChevronDown, Download, Layers, PanelsTopLeft, Plus, Search } from "lucide-react";
 import type { ConceptProps } from "../shared";
-import { BudgetMeter, Chip, flattenUnits, priceLabel, rosterChecks, StatusGlyph, themeClass } from "./uxShared";
+import { BudgetMeter, Chip, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph } from "./uxShared";
 
 /**
  * Codex Workbench — master/detail for power users.
@@ -12,7 +12,7 @@ export function CodexWorkbench(props: ConceptProps) {
   const showingDetail = props.screen === "unit-detail";
   const showingChecks = props.screen === "validation";
   return (
-    <div className={`ux-screen ux-workbench ${themeClass(props.themeMode)} ${showingDetail ? "show-detail" : ""} ${showingChecks ? "show-checks" : ""}`}>
+    <div className={`ux-screen ux-workbench ${shellClass(props.themeMode, props.colorScheme)} ${showingDetail ? "show-detail" : ""} ${showingChecks ? "show-checks" : ""}`}>
       <header className="ux-wb-top">
         <button type="button" className="ux-icon-btn" aria-label="Lists" onClick={() => props.onNavigate("library")}>
           <Layers size={18} />
