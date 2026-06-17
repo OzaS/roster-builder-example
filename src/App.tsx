@@ -2,26 +2,75 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { mockRoster } from "./data/mockRoster";
 import { GalleryShell } from "./gallery/GalleryShell";
 import { buildConceptGroups, bundledDesignData, designById, findConceptInData, firstScreenInDesign, normalizeDesignData, type DesignData } from "./design-data/designData";
-import { workflowToPrototypeScreen } from "./gallery/workflow";
+import { prototypeToWorkflowScreen, workflowToPrototypeScreen } from "./gallery/workflow";
 import { captureElementAsPng } from "./utils/captureStage";
 import type { ColorScheme, ConceptId, NavigatorView, NavStyle, PlatformPreview, PrototypeScreen, Roster, ThemeMode, WorkflowScreen } from "./types";
 
+const GALLERY_STATE_KEY = "roster-builder.gallery-state.v1";
+const conceptIds = ["ux-workbench", "ux-command"] satisfies ConceptId[];
+const platformIds = ["phone", "tablet"] satisfies PlatformPreview[];
+const themeModes = ["dark", "light"] satisfies ThemeMode[];
+const colorSchemeIds = ["generic", "wh40k", "horus-heresy", "age-of-sigmar", "old-world"] satisfies ColorScheme[];
+const navigatorViews = ["single", "all-screens", "elements"] satisfies NavigatorView[];
+const navStyles = ["top", "tabs", "floating"] satisfies NavStyle[];
+const workflowScreenIds = [
+  "library",
+  "create-roster",
+  "drafts",
+  "source",
+  "tools",
+  "overview",
+  "add-detachment",
+  "add-unit",
+  "unit-detail",
+  "option-drilldown",
+  "diagnostics",
+  "settings",
+  "export",
+] satisfies WorkflowScreen[];
+const prototypeScreenIds = [
+  "library",
+  "system",
+  "catalogue",
+  "detachment",
+  "tools",
+  "overview",
+  "add-unit",
+  "unit-detail",
+  "validation",
+  "settings",
+  "export",
+] satisfies PrototypeScreen[];
+
+type PersistedGalleryState = {
+  selectedConcept?: ConceptId;
+  platform?: PlatformPreview;
+  themeMode?: ThemeMode;
+  colorScheme?: ColorScheme;
+  navigatorView?: NavigatorView;
+  workflowScreen?: WorkflowScreen;
+  smartSearch?: boolean;
+  navStyle?: NavStyle;
+  screen?: PrototypeScreen;
+};
+
 function App() {
+  const initialState = useMemo(readPersistedGalleryState, []);
   const [designData, setDesignData] = useState<DesignData>(bundledDesignData);
   const [designDataWritable, setDesignDataWritable] = useState(false);
-  const [selectedConcept, setSelectedConcept] = useState<ConceptId>("ux-workbench");
-  const [platform, setPlatform] = useState<PlatformPreview>("phone");
-  const [themeMode, setThemeMode] = useState<ThemeMode>("dark");
-  const [colorScheme, setColorScheme] = useState<ColorScheme>("generic");
-  const [navigatorView, setNavigatorView] = useState<NavigatorView>("single");
-  const [workflowScreen, setWorkflowScreen] = useState<WorkflowScreen>("library");
-  const [smartSearch, setSmartSearch] = useState(true);
-  const [navStyle, setNavStyle] = useState<NavStyle>("floating");
+  const [selectedConcept, setSelectedConcept] = useState<ConceptId>(initialState.selectedConcept ?? "ux-workbench");
+  const [platform, setPlatform] = useState<PlatformPreview>(initialState.platform ?? "phone");
+  const [themeMode, setThemeMode] = useState<ThemeMode>(initialState.themeMode ?? "dark");
+  const [colorScheme, setColorScheme] = useState<ColorScheme>(initialState.colorScheme ?? "generic");
+  const [navigatorView, setNavigatorView] = useState<NavigatorView>(initialState.navigatorView ?? "single");
+  const [workflowScreen, setWorkflowScreen] = useState<WorkflowScreen>(initialState.workflowScreen ?? "library");
+  const [smartSearch, setSmartSearch] = useState(initialState.smartSearch ?? true);
+  const [navStyle, setNavStyle] = useState<NavStyle>(initialState.navStyle ?? "floating");
   const [roster, setRoster] = useState<Roster>(mockRoster);
   const [selectedSectionId, setSelectedSectionId] = useState("hq");
   const [selectedUnitId, setSelectedUnitId] = useState("centurion");
   const [expandedSectionIds, setExpandedSectionIds] = useState<string[]>(["hq", "battleline", "elites"]);
-  const [screen, setScreen] = useState<PrototypeScreen>("library");
+  const [screen, setScreen] = useState<PrototypeScreen>(initialState.screen ?? workflowToPrototypeScreen(initialState.workflowScreen ?? "library"));
   const [screenHistory, setScreenHistory] = useState<PrototypeScreen[]>([]);
 
   const selectedSection = useMemo(
@@ -54,6 +103,20 @@ function App() {
       alive = false;
     };
   }, []);
+
+  useEffect(() => {
+    persistGalleryState({
+      selectedConcept,
+      platform,
+      themeMode,
+      colorScheme,
+      navigatorView,
+      workflowScreen,
+      smartSearch,
+      navStyle,
+      screen,
+    });
+  }, [selectedConcept, platform, themeMode, colorScheme, navigatorView, workflowScreen, smartSearch, navStyle, screen]);
 
   const conceptGroups = useMemo(() => buildConceptGroups(designData), [designData]);
   const concept = findConceptInData(designData, selectedConcept);
@@ -91,6 +154,7 @@ function App() {
 
   function navigate(screenId: PrototypeScreen) {
     setScreenHistory((current) => (screenId === screen ? current : [...current, screen]));
+    setWorkflowScreen(prototypeToWorkflowScreen(screenId));
     setScreen(screenId);
   }
 
@@ -242,6 +306,41 @@ function App() {
       />
     </GalleryShell>
   );
+}
+
+function readPersistedGalleryState(): PersistedGalleryState {
+  if (typeof window === "undefined") return {};
+  try {
+    const stored = window.localStorage.getItem(GALLERY_STATE_KEY);
+    if (!stored) return {};
+    const parsed = JSON.parse(stored) as Partial<PersistedGalleryState>;
+    return {
+      selectedConcept: isOneOf(parsed.selectedConcept, conceptIds) ? parsed.selectedConcept : undefined,
+      platform: isOneOf(parsed.platform, platformIds) ? parsed.platform : undefined,
+      themeMode: isOneOf(parsed.themeMode, themeModes) ? parsed.themeMode : undefined,
+      colorScheme: isOneOf(parsed.colorScheme, colorSchemeIds) ? parsed.colorScheme : undefined,
+      navigatorView: isOneOf(parsed.navigatorView, navigatorViews) ? parsed.navigatorView : undefined,
+      workflowScreen: isOneOf(parsed.workflowScreen, workflowScreenIds) ? parsed.workflowScreen : undefined,
+      smartSearch: typeof parsed.smartSearch === "boolean" ? parsed.smartSearch : undefined,
+      navStyle: isOneOf(parsed.navStyle, navStyles) ? parsed.navStyle : undefined,
+      screen: isOneOf(parsed.screen, prototypeScreenIds) ? parsed.screen : undefined,
+    };
+  } catch {
+    return {};
+  }
+}
+
+function persistGalleryState(state: PersistedGalleryState) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(GALLERY_STATE_KEY, JSON.stringify(state));
+  } catch {
+    // Losing reload persistence should not block the gallery.
+  }
+}
+
+function isOneOf<T extends string>(value: unknown, allowed: readonly T[]): value is T {
+  return typeof value === "string" && allowed.includes(value as T);
 }
 
 export default App;

@@ -1,4 +1,4 @@
-import { AlertTriangle, Archive, ArrowUp, Check, Command, CornerDownLeft, Database, Download, FileInput, Filter, Hammer, Layers, MessageCircle, PanelsTopLeft, Plus, Rows3, Search, Share2, Smartphone, Sparkles, Trash2, Zap } from "lucide-react";
+import { AlertTriangle, Archive, ArrowUp, Check, ChevronDown, Command, CornerDownLeft, Database, Download, FileInput, Filter, Hammer, Layers, MessageCircle, PanelsTopLeft, Plus, Rows3, Search, Share2, Smartphone, Sparkles, Trash2, Zap } from "lucide-react";
 import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode } from "../types";
 import { BudgetMeter, Chip, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
@@ -265,6 +265,56 @@ function WorkbenchElements({
           </button>
         </header>
         <BudgetMeter roster={roster} />
+      </ElementSection>
+
+      <ElementSection title="Roster Creation">
+        <button type="button" className="ux-start-row on">
+          <span>
+            <strong>Warhammer 40,000</strong>
+            <small>Matched play · Incursion to Onslaught</small>
+          </span>
+          <Check size={18} />
+        </button>
+        <div className="ux-filter-row">
+          {["1000 pts", "2000 pts", "Custom"].map((label) => (
+            <button key={label} type="button" className={`ux-filter-pill ${label === "Custom" ? "on" : ""}`}>
+              {label}
+            </button>
+          ))}
+        </div>
+        <label className="ux-custom-points">
+          <input value="1500" aria-label="Custom points limit" readOnly />
+          <span>pts</span>
+        </label>
+        <div className="ux-select-field-wrap">
+          <button type="button" className="ux-select-field open">
+            <span>
+              <strong>Select force</strong>
+              <small>Choose from available armies</small>
+            </span>
+            <ChevronDown size={16} />
+          </button>
+          <div className="ux-select-popover" style={{ position: "relative", top: 8 }}>
+            <div className="ux-wb-search">
+              <Search size={15} />
+              <input placeholder="Search forces" readOnly />
+            </div>
+            <details className="ux-force-group" open>
+              <summary>
+                <span>Imperium</span>
+                <ChevronDown size={14} />
+              </summary>
+              <div>
+                {["Adeptus Astartes", "Astra Militarum", "Adepta Sororitas"].map((force, index) => (
+                  <button key={force} type="button" className={`ux-force-option ${index === 0 ? "on" : ""}`}>
+                    <span>{force}</span>
+                    {index === 0 ? <Check size={15} /> : null}
+                  </button>
+                ))}
+              </div>
+            </details>
+          </div>
+        </div>
       </ElementSection>
 
       <ElementSection title="Roster Tree">

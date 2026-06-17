@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode } from "react";
+import { Fragment, useState, type ReactNode } from "react";
 import { AlertTriangle, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ClipboardList, Cog, Command, Database, Download, FileInput, Hammer, Layers, LibraryBig, PanelsTopLeft, Plus, Search, Share2, ShieldCheck, Sparkles, Star, StickyNote, Wand2 } from "lucide-react";
 import { mockCatalogues } from "../../data/mockRoster";
 import type { ConceptProps } from "../shared";
@@ -318,13 +318,56 @@ function Library({ props }: { props: ConceptProps }) {
 
 /** Roster creation flow ("Roster creation"). */
 function CreateScreen({ props }: { props: ConceptProps }) {
-  const systems: Array<[string, string]> = [
-    ["Warhammer 40,000", "Strike Force · 2000 pts"],
-    ["Horus Heresy", "Crusade · 3000 pts"],
-    ["Age of Sigmar", "Spearhead · 1000 pts"],
+  const systems = [
+    {
+      name: "Warhammer 40,000",
+      sub: "Matched play · Incursion to Onslaught",
+      groups: [
+        { label: "Imperium", forces: ["Adeptus Astartes", "Astra Militarum", "Adepta Sororitas", "Adeptus Custodes"] },
+        { label: "Xenos", forces: ["Aeldari", "Necrons", "T'au Empire", "Tyranids"] },
+        { label: "Chaos", forces: ["Chaos Space Marines", "Death Guard", "World Eaters", "Thousand Sons"] },
+      ],
+    },
+    {
+      name: "Horus Heresy",
+      sub: "Age of Darkness · Crusade armies",
+      groups: [
+        { label: "Legiones Astartes", forces: ["Dark Angels", "Sons of Horus", "Imperial Fists", "Emperor's Children"] },
+        { label: "Auxilia", forces: ["Solar Auxilia", "Mechanicum", "Talons of the Emperor"] },
+      ],
+    },
+    {
+      name: "Age of Sigmar",
+      sub: "Battlepack · Spearhead to Battlehost",
+      groups: [
+        { label: "Grand Alliances", forces: ["Stormcast Eternals", "Soulblight Gravelords", "Orruk Warclans", "Seraphon"] },
+        { label: "Chaos", forces: ["Slaves to Darkness", "Disciples of Tzeentch", "Blades of Khorne"] },
+      ],
+    },
   ];
-  const factions = ["Adeptus Astartes", "Aeldari", "Necrons", "Death Guard"];
   const points = ["1000", "2000", "3000"];
+  const [selectedSystem, setSelectedSystem] = useState<string | null>(null);
+  const [selectedPoints, setSelectedPoints] = useState<string | null>(null);
+  const [customPoints, setCustomPoints] = useState("1500");
+  const [selectedForce, setSelectedForce] = useState<string | null>(null);
+  const [forceOpen, setForceOpen] = useState(false);
+  const system = systems.find((item) => item.name === selectedSystem);
+  const resolvedPoints = selectedPoints === "custom" ? customPoints : selectedPoints;
+  const hasPoints = Boolean(resolvedPoints && Number(resolvedPoints) > 0);
+
+  function chooseSystem(name: string) {
+    setSelectedSystem(name);
+    setSelectedPoints(null);
+    setSelectedForce(null);
+    setForceOpen(false);
+  }
+
+  function choosePoints(value: string) {
+    setSelectedPoints(value);
+    setSelectedForce(null);
+    setForceOpen(false);
+  }
+
   return (
     <>
       <header className="ux-wb-top ux-wb-home-top reversed">
@@ -339,37 +382,96 @@ function CreateScreen({ props }: { props: ConceptProps }) {
       <div className="ux-wb-home-body">
         <div className="ux-start-group">
           <h4>Game system</h4>
-          {systems.map(([name, sub], index) => (
-            <button key={name} type="button" className={`ux-start-row ${index === 0 ? "on" : ""}`}>
+          {systems.map(({ name, sub }) => (
+            <button key={name} type="button" className={`ux-start-row ${selectedSystem === name ? "on" : ""}`} onClick={() => chooseSystem(name)}>
               <span>
                 <strong>{name}</strong>
                 <small>{sub}</small>
               </span>
-              {index === 0 ? <Check size={18} /> : null}
+              {selectedSystem === name ? <Check size={18} /> : null}
             </button>
           ))}
         </div>
-        <div className="ux-start-group">
-          <h4>Faction</h4>
-          <div className="ux-filter-row">
-            {factions.map((faction, index) => (
-              <button key={faction} type="button" className={`ux-filter-pill ${index === 0 ? "on" : ""}`}>
-                {faction}
+
+        {selectedSystem ? (
+          <div className="ux-start-group ux-start-step">
+            <h4>Points limit</h4>
+            <div className="ux-filter-row">
+              {points.map((value) => (
+                <button key={value} type="button" className={`ux-filter-pill ${selectedPoints === value ? "on" : ""}`} onClick={() => choosePoints(value)}>
+                  {value} pts
+                </button>
+              ))}
+              <button type="button" className={`ux-filter-pill ${selectedPoints === "custom" ? "on" : ""}`} onClick={() => choosePoints("custom")}>
+                Custom
               </button>
-            ))}
+            </div>
+            {selectedPoints === "custom" ? (
+              <label className="ux-custom-points">
+                <input
+                  value={customPoints}
+                  inputMode="numeric"
+                  aria-label="Custom points limit"
+                  onChange={(event) => {
+                    setCustomPoints(event.currentTarget.value.replace(/\D/g, "").slice(0, 5));
+                    setSelectedForce(null);
+                    setForceOpen(false);
+                  }}
+                />
+                <span>pts</span>
+              </label>
+            ) : null}
           </div>
-        </div>
-        <div className="ux-start-group">
-          <h4>Points limit</h4>
-          <div className="ux-filter-row">
-            {points.map((value, index) => (
-              <button key={value} type="button" className={`ux-filter-pill ${index === 1 ? "on" : ""}`}>
-                {value} pts
+        ) : null}
+
+        {system && hasPoints ? (
+          <div className="ux-start-group ux-start-step">
+            <h4>Force</h4>
+            <div className="ux-select-field-wrap">
+              <button type="button" className={`ux-select-field ${forceOpen ? "open" : ""}`} onClick={() => setForceOpen((value) => !value)}>
+                <span>
+                  <strong>{selectedForce ?? "Select force"}</strong>
+                  <small>{selectedForce ? `${selectedSystem} · ${resolvedPoints} pts` : "Choose from available armies"}</small>
+                </span>
+                <ChevronDown size={16} />
               </button>
-            ))}
+              {forceOpen ? (
+                <div className="ux-select-popover">
+                  <div className="ux-wb-search">
+                    <Search size={15} />
+                    <input placeholder="Search forces" readOnly />
+                  </div>
+                  {system.groups.map((group, index) => (
+                    <details key={group.label} className="ux-force-group" open={index === 0}>
+                      <summary>
+                        <span>{group.label}</span>
+                        <ChevronDown size={14} />
+                      </summary>
+                      <div>
+                        {group.forces.map((force) => (
+                          <button
+                            key={force}
+                            type="button"
+                            className={`ux-force-option ${selectedForce === force ? "on" : ""}`}
+                            onClick={() => {
+                              setSelectedForce(force);
+                              setForceOpen(false);
+                            }}
+                          >
+                            <span>{force}</span>
+                            {selectedForce === force ? <Check size={15} /> : null}
+                          </button>
+                        ))}
+                      </div>
+                    </details>
+                  ))}
+                </div>
+              ) : null}
+            </div>
           </div>
-        </div>
-        <button type="button" className="ux-primary" onClick={() => props.onNavigate("overview")}>
+        ) : null}
+
+        <button type="button" className="ux-primary" disabled={!selectedSystem || !hasPoints || !selectedForce} onClick={() => props.onNavigate("overview")}>
           <Plus size={16} />
           Create roster
         </button>

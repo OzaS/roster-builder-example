@@ -42,3 +42,11 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen === "diagnostics") return "validation";
   return screen;
 }
+
+export function prototypeToWorkflowScreen(screen: PrototypeScreen): WorkflowScreen {
+  if (screen === "system") return "create-roster";
+  if (screen === "catalogue") return "source";
+  if (screen === "detachment") return "add-detachment";
+  if (screen === "validation") return "diagnostics";
+  return screen;
+}
