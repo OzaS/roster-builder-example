@@ -92,6 +92,7 @@
           "Color Tokens",
           "Typography",
           "Workbench Chrome",
+          "Roster Creation",
           "Roster Tree",
           "Detail Pane",
           "Options",
@@ -106,7 +107,18 @@
           "Floating Command Bar"
         ]
       },
-      "comments": []
+      "comments": [
+        {
+          "id": "comment-1781735636507-4dvhf5",
+          "screen": "source",
+          "x": 72.70270270270271,
+          "y": 16.565533980582526,
+          "text": "New comment",
+          "mode": "point",
+          "status": "open",
+          "createdAt": "2026-06-17T22:33:56.507Z"
+        }
+      ]
     },
     {
       "id": "ux-command",
