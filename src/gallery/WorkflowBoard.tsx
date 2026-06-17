@@ -1,7 +1,7 @@
 import { DeviceFrame } from "../components/DeviceFrame";
 import { resolveWorkflow, workflowToPrototypeScreen } from "./workflow";
 import type { GalleryConcept } from "./galleryTypes";
-import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode } from "../types";
+import type { ColorScheme, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode } from "../types";
 
 type Props = {
   concept: GalleryConcept;
@@ -15,6 +15,7 @@ type Props = {
   expandedSectionIds: string[];
   smartSearch: boolean;
   onToggleSmartSearch: () => void;
+  navStyle: NavStyle;
   onSelectSection: (id: string) => void;
   onToggleSection: (id: string) => void;
   onSelectUnit: (id: string) => void;
@@ -36,6 +37,7 @@ export function WorkflowBoard({
   expandedSectionIds,
   smartSearch,
   onToggleSmartSearch,
+  navStyle,
   onSelectSection,
   onToggleSection,
   onSelectUnit,
@@ -66,6 +68,7 @@ export function WorkflowBoard({
                 colorScheme={colorScheme}
                 smartSearch={smartSearch}
                 onToggleSmartSearch={onToggleSmartSearch}
+                navStyle={navStyle}
                 canGoBack={screen !== "overview"}
                 onSelectSection={onSelectSection}
                 onToggleSection={onToggleSection}

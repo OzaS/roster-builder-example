@@ -18,7 +18,17 @@ export const uxConcepts: GalleryConcept[] = [
     interaction: "Select in the tree, edit on the right, watch legality update in the rail. Flip on smart search for type-to-add and AI suggestions.",
     tradeoff: "Shines on tablet; on phone it falls back to a more conventional drill-in.",
     component: CodexWorkbench,
-    workflow: ["library", "overview", "add-unit", "unit-detail", "diagnostics", "settings"],
+    workflow: ["library", "source", "tools", "settings", "create-roster", "overview", "add-unit", "unit-detail", "diagnostics"],
+    flows: [
+      { id: "main", label: "Main screen", screen: "library" },
+      { id: "lookup", label: "Lookup", screen: "source" },
+      { id: "tools", label: "Tools", screen: "tools" },
+      { id: "creation", label: "Roster creation", screen: "create-roster" },
+      { id: "edition", label: "Roster edition", screen: "overview" },
+      { id: "units", label: "Add & configure units", screen: "add-unit" },
+      { id: "diagnostics", label: "Diagnostics", screen: "diagnostics" },
+      { id: "settings", label: "Settings", screen: "settings" },
+    ],
   },
 ];
 

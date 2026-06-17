@@ -4,6 +4,9 @@ export type PlatformPreview = "phone" | "tablet";
 export type ThemeMode = "dark" | "light";
 export type NavigatorView = "single" | "all-screens" | "elements";
 
+/** In-prototype main navigation style for the merged design. */
+export type NavStyle = "top" | "tabs" | "floating";
+
 export type ColorScheme = "generic" | "wh40k" | "horus-heresy" | "age-of-sigmar" | "old-world";
 
 export const colorSchemes: Array<{ id: ColorScheme; label: string; short: string }> = [
@@ -19,6 +22,7 @@ export type WorkflowScreen =
   | "create-roster"
   | "drafts"
   | "source"
+  | "tools"
   | "overview"
   | "add-detachment"
   | "add-unit"
@@ -76,6 +80,7 @@ export type PrototypeScreen =
   | "system"
   | "catalogue"
   | "detachment"
+  | "tools"
   | "overview"
   | "add-unit"
   | "unit-detail"

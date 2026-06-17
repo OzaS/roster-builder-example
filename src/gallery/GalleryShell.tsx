@@ -1,9 +1,9 @@
 import type { RefObject } from "react";
-import { Component, Moon, MonitorSmartphone, Palette, Rows3, Smartphone, Sun, TabletSmartphone } from "lucide-react";
+import { Component, Moon, MonitorSmartphone, Navigation, Palette, PanelBottom, PanelTop, Rows3, Smartphone, Sun, TabletSmartphone } from "lucide-react";
 import { DeviceFrame } from "../components/DeviceFrame";
 import { ScreenshotButton } from "../components/v2/ScreenshotButton";
 import { WorkflowScreenPicker } from "../components/v2/WorkflowScreenPicker";
-import type { ColorScheme, ConceptId, NavigatorView, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode, WorkflowScreen } from "../types";
+import type { ColorScheme, ConceptId, NavigatorView, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode, WorkflowScreen } from "../types";
 import { colorSchemes } from "../types";
 import { activeConcepts, archivedConcepts, uxConcepts } from "./conceptRegistry";
 import type { GalleryConcept } from "./galleryTypes";
@@ -18,6 +18,7 @@ type Props = {
   colorScheme: ColorScheme;
   navigatorView: NavigatorView;
   workflowScreen: WorkflowScreen;
+  navStyle: NavStyle;
   concept: GalleryConcept;
   captureRef: RefObject<HTMLElement | null>;
   children: React.ReactNode;
@@ -29,6 +30,7 @@ type Props = {
     expandedSectionIds: string[];
     smartSearch: boolean;
     onToggleSmartSearch: () => void;
+    navStyle: NavStyle;
     onSelectSection: (id: string) => void;
     onToggleSection: (id: string) => void;
     onSelectUnit: (id: string) => void;
@@ -43,8 +45,15 @@ type Props = {
   onColorSchemeChange: (scheme: ColorScheme) => void;
   onNavigatorViewChange: (view: NavigatorView) => void;
   onWorkflowScreenChange: (screen: WorkflowScreen) => void;
+  onNavStyleChange: (style: NavStyle) => void;
   onCapture: () => void;
 };
+
+const navStyleOptions: Array<{ id: NavStyle; label: string; icon: typeof PanelTop }> = [
+  { id: "top", label: "Top bar", icon: PanelTop },
+  { id: "tabs", label: "Bottom tabs", icon: PanelBottom },
+  { id: "floating", label: "Floating tabs", icon: Navigation },
+];
 
 export function GalleryShell({
   selectedConcept,
@@ -53,6 +62,7 @@ export function GalleryShell({
   colorScheme,
   navigatorView,
   workflowScreen,
+  navStyle,
   concept,
   captureRef,
   children,
@@ -63,6 +73,7 @@ export function GalleryShell({
   onColorSchemeChange,
   onNavigatorViewChange,
   onWorkflowScreenChange,
+  onNavStyleChange,
   onCapture,
 }: Props) {
   return (
@@ -79,7 +90,18 @@ export function GalleryShell({
         {archivedConcepts.length > 0 ? (
           <ConceptGroup title="Archive" concepts={archivedConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
         ) : null}
-        <WorkflowScreenPicker active={workflowScreen} screens={concept.workflow} onSelect={onWorkflowScreenChange} />
+        <WorkflowScreenPicker active={workflowScreen} screens={concept.workflow} flows={concept.flows} onSelect={onWorkflowScreenChange} />
+        <ControlGroup title="Navigation">
+          {navStyleOptions.map((option) => {
+            const Icon = option.icon;
+            return (
+              <button key={option.id} className={navStyle === option.id ? "active" : ""} type="button" onClick={() => onNavStyleChange(option.id)}>
+                <Icon size={16} />
+                {option.label}
+              </button>
+            );
+          })}
+        </ControlGroup>
         <ControlGroup title="View">
           <button className={navigatorView === "single" ? "active" : ""} type="button" onClick={() => onNavigatorViewChange("single")}>
             <Smartphone size={16} />

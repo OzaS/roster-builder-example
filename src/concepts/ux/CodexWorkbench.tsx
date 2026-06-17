@@ -1,63 +1,84 @@
-import { AlertTriangle, ArrowLeft, ArrowUp, ChevronDown, Cog, Command, Download, Layers, PanelsTopLeft, Plus, Search, Sparkles, Wand2 } from "lucide-react";
+import { Fragment, type ReactNode } from "react";
+import { AlertTriangle, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ClipboardList, Cog, Command, Database, Download, FileInput, Hammer, Layers, LibraryBig, PanelsTopLeft, Plus, Search, Share2, ShieldCheck, Sparkles, Star, StickyNote, Wand2 } from "lucide-react";
+import { mockCatalogues } from "../../data/mockRoster";
 import type { ConceptProps } from "../shared";
-import { BudgetMeter, Chip, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph } from "./uxShared";
+import { BackOrTitle, BudgetMeter, Chip, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph } from "./uxShared";
 
 /**
- * Codex Workbench — master/detail for power users, now the single merged design.
- * The roster tree is always present (left on tablet). Selecting a unit edits it
- * live in the detail pane without losing the list context, and a validation rail
- * keeps roster legality visible.
- *
- * Folded in from the archived Quickstrike direction: a library entry screen, and
- * a "Smart search & suggestions" tier (suggestion chips + a floating command bar)
- * that the player turns on from Settings.
+ * Codex Workbench — the single merged design.
+ * Master/detail workbench (tree + live detail + validation rail) with a library
+ * entry, a roster-creation flow, and a Settings-gated smart-search tier. Main
+ * navigation can be rendered as a top bar, a bottom tab bar, or a floating tab
+ * bar so the directions can be compared side by side.
  */
 export function CodexWorkbench(props: ConceptProps) {
-  const shell = `ux-screen ux-workbench ${shellClass(props.themeMode, props.colorScheme)}`;
-
-  if (props.screen === "library") {
-    return (
-      <div className={shell}>
-        <Library props={props} />
-      </div>
-    );
-  }
-
-  if (props.screen === "settings") {
-    return (
-      <div className={shell}>
-        <Settings props={props} />
-      </div>
-    );
-  }
-
-  const showingDetail = props.screen === "unit-detail";
-  const showingChecks = props.screen === "validation";
+  const navStyle = props.navStyle ?? "top";
+  const hasTabs = navStyle !== "top";
   const smart = props.smartSearch ?? false;
-  return (
-    <div className={`${shell} ${showingDetail ? "show-detail" : ""} ${showingChecks ? "show-checks" : ""} ${smart ? "ux-smart" : ""}`}>
-      <header className="ux-wb-top">
-        <button type="button" className="ux-icon-btn" aria-label="Lists" onClick={() => props.onNavigate("library")}>
-          <Layers size={18} />
-        </button>
-        <div className="ux-wb-title">
-          <strong>{props.roster.name}</strong>
-          <small>{props.roster.faction} · {props.roster.system}</small>
+  const screen = props.screen;
+  const shell = `ux-screen ux-workbench ${shellClass(props.themeMode, props.colorScheme)} ${hasTabs ? "has-tabs" : ""}`.trim();
+
+  let body: ReactNode;
+  let modifier = "";
+
+  if (screen === "library") {
+    body = <Library props={props} />;
+  } else if (screen === "catalogue") {
+    body = <LookupScreen props={props} />;
+  } else if (screen === "tools") {
+    body = <ToolsScreen props={props} />;
+  } else if (screen === "settings") {
+    body = <SettingsScreen props={props} />;
+  } else if (screen === "system") {
+    body = <CreateScreen props={props} />;
+  } else {
+    const smartClass = !hasTabs && smart ? "ux-smart" : "";
+    modifier = [screen === "unit-detail" ? "show-detail" : "", screen === "validation" ? "show-checks" : "", smartClass].filter(Boolean).join(" ");
+    body = (
+      <>
+        <WorkbenchHeader props={props} />
+        <div className="ux-wb-budget">
+          <BudgetMeter roster={props.roster} />
         </div>
-        <button type="button" className="ux-icon-btn" aria-label="Export" onClick={() => props.onNavigate("export")}>
-          <Download size={18} />
-        </button>
-      </header>
-      <div className="ux-wb-budget">
-        <BudgetMeter roster={props.roster} />
-      </div>
-      <div className="ux-wb-layout">
-        <Tree props={props} />
-        <Detail props={props} />
-        <Rail props={props} />
-      </div>
-      {smart ? <CommandBar props={props} /> : null}
+        <div className="ux-wb-layout">
+          <Tree props={props} />
+          <Detail props={props} />
+          <Rail props={props} />
+        </div>
+      </>
+    );
+  }
+
+  const isWorkbenchScreen = screen !== "library" && screen !== "catalogue" && screen !== "tools" && screen !== "settings" && screen !== "system";
+  const showCommandBar = !hasTabs && smart && isWorkbenchScreen;
+
+  return (
+    <div className={`${shell} ${modifier}`.trim()}>
+      {body}
+      {hasTabs ? <TabBar props={props} /> : showCommandBar ? <CommandBar props={props} /> : null}
     </div>
+  );
+}
+
+function WorkbenchHeader({ props }: { props: ConceptProps }) {
+  return (
+    <header className="ux-wb-top">
+      <BackOrTitle
+        props={props}
+        fallback={
+          <button type="button" className="ux-icon-btn" aria-label="Lists" onClick={() => props.onNavigate("library")}>
+            <Layers size={18} />
+          </button>
+        }
+      />
+      <div className="ux-wb-title">
+        <strong>{props.roster.name}</strong>
+        <small>{props.roster.faction} · {props.roster.system}</small>
+      </div>
+      <button type="button" className="ux-icon-btn" aria-label="Export" onClick={() => props.onNavigate("export")}>
+        <Download size={18} />
+      </button>
+    </header>
   );
 }
 
@@ -119,6 +140,10 @@ function Detail({ props }: { props: ConceptProps }) {
   const unit = props.selectedUnit;
   return (
     <section className="ux-wb-detail">
+      <button type="button" className="ux-wb-back" onClick={props.onBack}>
+        <ArrowLeft size={14} />
+        Back to roster
+      </button>
       <div className="ux-wb-detail-head">
         <span>
           <small>{props.selectedSection.name}</small>
@@ -166,6 +191,10 @@ function AddPane({ props }: { props: ConceptProps }) {
   const suggestions = [`legal ${section.toLowerCase()} under 120`, "fills this slot", "best value pick"];
   return (
     <section className="ux-wb-detail">
+      <button type="button" className="ux-wb-back" onClick={props.onBack}>
+        <ArrowLeft size={14} />
+        Back to roster
+      </button>
       <div className="ux-wb-detail-head">
         <span>
           <small>Add to</small>
@@ -241,7 +270,7 @@ function Rail({ props }: { props: ConceptProps }) {
   );
 }
 
-/** Library / home entry screen, ported from the archived Quickstrike direction. */
+/** Library / home entry screen ("Main screen"). */
 function Library({ props }: { props: ConceptProps }) {
   const recents = [
     { name: props.roster.name, sub: props.roster.faction, pts: `${props.roster.pointsUsed}/${props.roster.pointsLimit}` },
@@ -265,7 +294,7 @@ function Library({ props }: { props: ConceptProps }) {
           <h2>What do you want to build?</h2>
           <p>Open a recent list or start fresh. Tap a roster to drop into the workbench.</p>
         </div>
-        <button type="button" className="ux-new-roster" onClick={() => props.onNavigate("overview")}>
+        <button type="button" className="ux-new-roster" onClick={() => props.onNavigate("system")}>
           <Plus size={22} />
           <span>
             <strong>New roster</strong>
@@ -287,13 +316,225 @@ function Library({ props }: { props: ConceptProps }) {
   );
 }
 
-/** Settings screen housing the "Smart search & suggestions" toggle. */
-function Settings({ props }: { props: ConceptProps }) {
-  const smart = props.smartSearch ?? false;
+/** Roster creation flow ("Roster creation"). */
+function CreateScreen({ props }: { props: ConceptProps }) {
+  const systems: Array<[string, string]> = [
+    ["Warhammer 40,000", "Strike Force · 2000 pts"],
+    ["Horus Heresy", "Crusade · 3000 pts"],
+    ["Age of Sigmar", "Spearhead · 1000 pts"],
+  ];
+  const factions = ["Adeptus Astartes", "Aeldari", "Necrons", "Death Guard"];
+  const points = ["1000", "2000", "3000"];
   return (
     <>
       <header className="ux-wb-top ux-wb-home-top reversed">
-        <button type="button" className="ux-icon-btn" aria-label="Back" onClick={() => props.onNavigate("library")}>
+        <button type="button" className="ux-icon-btn" aria-label="Back" onClick={props.onBack}>
+          <ArrowLeft size={18} />
+        </button>
+        <div className="ux-wb-title">
+          <strong>New roster</strong>
+          <small>Pick system, faction & size</small>
+        </div>
+      </header>
+      <div className="ux-wb-home-body">
+        <div className="ux-start-group">
+          <h4>Game system</h4>
+          {systems.map(([name, sub], index) => (
+            <button key={name} type="button" className={`ux-start-row ${index === 0 ? "on" : ""}`}>
+              <span>
+                <strong>{name}</strong>
+                <small>{sub}</small>
+              </span>
+              {index === 0 ? <Check size={18} /> : null}
+            </button>
+          ))}
+        </div>
+        <div className="ux-start-group">
+          <h4>Faction</h4>
+          <div className="ux-filter-row">
+            {factions.map((faction, index) => (
+              <button key={faction} type="button" className={`ux-filter-pill ${index === 0 ? "on" : ""}`}>
+                {faction}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="ux-start-group">
+          <h4>Points limit</h4>
+          <div className="ux-filter-row">
+            {points.map((value, index) => (
+              <button key={value} type="button" className={`ux-filter-pill ${index === 1 ? "on" : ""}`}>
+                {value} pts
+              </button>
+            ))}
+          </div>
+        </div>
+        <button type="button" className="ux-primary" onClick={() => props.onNavigate("overview")}>
+          <Plus size={16} />
+          Create roster
+        </button>
+      </div>
+    </>
+  );
+}
+
+/** Quick source lookup for units, rules, wargear, and keywords. */
+function LookupScreen({ props }: { props: ConceptProps }) {
+  const units = flattenUnits(props.roster).slice(0, 4);
+  const rules = [
+    { name: "Oath of Moment", sub: "Army rule", tag: "Core" },
+    { name: "Deep Strike", sub: "Deployment ability", tag: "Keyword" },
+    { name: "Invulnerable Save", sub: "Defensive rule", tag: "Rule" },
+  ];
+  const wargear = flattenUnits(props.roster)
+    .flatMap((unit) => unit.options.filter((option) => option.group !== "rule").map((option) => ({ ...option, unit: unit.name })))
+    .slice(0, 3);
+
+  return (
+    <>
+      <header className="ux-wb-top ux-wb-home-top">
+        <div className="ux-wb-title">
+          <strong>Lookup</strong>
+          <small>Sources, units & rules</small>
+        </div>
+        <button type="button" className="ux-icon-btn" aria-label="Settings" onClick={() => props.onNavigate("settings")}>
+          <Cog size={18} />
+        </button>
+      </header>
+      <div className="ux-wb-home-body">
+        <div className={`ux-wb-search ${props.smartSearch ? "smart" : ""}`}>
+          {props.smartSearch ? <Command size={15} /> : <Search size={15} />}
+          <input placeholder="Search Intercessors, Deep Strike, plasma..." readOnly />
+        </div>
+        <div className="ux-source-filters">
+          {["All sources", props.roster.system, props.roster.faction, "Core rules"].map((filter, index) => (
+            <button key={filter} type="button" className={`ux-filter-pill ${index === 0 ? "on" : ""}`}>
+              {filter}
+            </button>
+          ))}
+        </div>
+        <LookupGroup title="Units" icon={<BookOpen size={15} />}>
+          {units.map((unit) => (
+            <button key={unit.id} type="button" className="ux-lookup-row" onClick={() => props.onSelectUnit(unit.id)}>
+              <span>
+                <strong>{unit.name}</strong>
+                <small>{unit.sectionName} · {unit.role}</small>
+              </span>
+              <b>{unit.points} pts</b>
+            </button>
+          ))}
+        </LookupGroup>
+        <LookupGroup title="Rules" icon={<ClipboardList size={15} />}>
+          {rules.map((rule) => (
+            <button key={rule.name} type="button" className="ux-lookup-row">
+              <span>
+                <strong>{rule.name}</strong>
+                <small>{rule.sub}</small>
+              </span>
+              <Chip tone="cool">{rule.tag}</Chip>
+            </button>
+          ))}
+        </LookupGroup>
+        <LookupGroup title="Wargear" icon={<Hammer size={15} />}>
+          {wargear.map((item) => (
+            <button key={`${item.unit}-${item.id}`} type="button" className="ux-lookup-row">
+              <span>
+                <strong>{item.name}</strong>
+                <small>{item.unit}</small>
+              </span>
+              <b>{priceLabel(item.points)}</b>
+            </button>
+          ))}
+        </LookupGroup>
+      </div>
+    </>
+  );
+}
+
+function LookupGroup({ title, icon, children }: { title: string; icon: ReactNode; children: ReactNode }) {
+  return (
+    <section className="ux-lookup-group">
+      <div className="ux-lookup-title">
+        {icon}
+        <strong>{title}</strong>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+/** Utility hub for roster-building extras. */
+function ToolsScreen({ props }: { props: ConceptProps }) {
+  const checks = rosterChecks(props.roster);
+  const tools = [
+    { icon: <ShieldCheck size={18} />, title: checks.length ? `${checks.length} checks to resolve` : "Roster is legal", sub: `${props.roster.pointsLimit - props.roster.pointsUsed} points open`, action: () => props.onNavigate("validation") },
+    { icon: <Share2 size={18} />, title: "Export & share", sub: "Copy list, print, or hand off", action: () => props.onNavigate("export") },
+    { icon: <StickyNote size={18} />, title: "Matchup notes", sub: "Game plan and reminders", action: undefined },
+    { icon: <Star size={18} />, title: "Pinned rules", sub: "Oath of Moment, Deep Strike", action: () => props.onNavigate("catalogue") },
+  ];
+
+  return (
+    <>
+      <header className="ux-wb-top ux-wb-home-top">
+        <div className="ux-wb-title">
+          <strong>Tools</strong>
+          <small>{props.roster.name}</small>
+        </div>
+        <button type="button" className="ux-icon-btn" aria-label="Roster" onClick={() => props.onNavigate("overview")}>
+          <Layers size={18} />
+        </button>
+      </header>
+      <div className="ux-wb-home-body">
+        <div className="ux-tools-summary">
+          <BudgetMeter roster={props.roster} label="Current list" />
+          <div>
+            <strong>{flattenUnits(props.roster).length} units</strong>
+            <small>{props.roster.sections.length} roster sections</small>
+          </div>
+        </div>
+        <div className="ux-tools-grid">
+          {tools.map((tool) => (
+            <button key={tool.title} type="button" className="ux-tool-tile" onClick={tool.action}>
+              <span className="ux-setting-icon">{tool.icon}</span>
+              <span>
+                <strong>{tool.title}</strong>
+                <small>{tool.sub}</small>
+              </span>
+            </button>
+          ))}
+        </div>
+        <section className="ux-tools-panel">
+          <div className="ux-lookup-title">
+            <ClipboardList size={15} />
+            <strong>Table-side checklist</strong>
+          </div>
+          {["Confirm detachment rules", "Mark fixed secondary plan", "Review wargear swaps"].map((item, index) => (
+            <button key={item} type="button" className={`ux-source-row ${index === 0 ? "on" : ""}`}>
+              <span className="ux-opt-check" aria-hidden />
+              <span>
+                <strong>{item}</strong>
+                <small>{index === 0 ? "Ready for review" : "Saved for later"}</small>
+              </span>
+            </button>
+          ))}
+        </section>
+      </div>
+    </>
+  );
+}
+
+/** Settings screen housing the "Smart search & suggestions" toggle and sources. */
+function SettingsScreen({ props }: { props: ConceptProps }) {
+  const smart = props.smartSearch ?? false;
+  const sources = mockCatalogues.map((source, index) => ({
+    ...source,
+    system: index === 0 ? props.roster.system : "Warhammer 40,000",
+    imported: index === 0 ? "Imported today" : index === 1 ? "Updated 2 days ago" : "Needs review",
+  }));
+  return (
+    <>
+      <header className="ux-wb-top ux-wb-home-top reversed">
+        <button type="button" className="ux-icon-btn" aria-label="Back" onClick={props.onBack}>
           <ArrowLeft size={18} />
         </button>
         <div className="ux-wb-title">
@@ -315,14 +556,84 @@ function Settings({ props }: { props: ConceptProps }) {
         </button>
         <p className="ux-hint">
           <Sparkles size={14} />
-          When on, a floating command bar appears in the workbench and the add-unit menu offers quick suggestions for the current slot.
+          When on, the add-unit menu offers quick suggestions for the current slot. With the top-bar layout it also shows a floating command bar.
         </p>
+        <details className="ux-source-section" open>
+          <summary>
+            <span>
+              <Database size={16} />
+              <strong>Sources</strong>
+            </span>
+            <ChevronDown size={16} />
+          </summary>
+          <button type="button" className="ux-import-source">
+            <FileInput size={18} />
+            <span>
+              <strong>Import source</strong>
+              <small>Add catalogue files or rules packs</small>
+            </span>
+          </button>
+          <div className="ux-source-list">
+            {sources.map((source) => (
+              <button key={source.id} type="button" className={`ux-source-row ${source.status === "Current" ? "on" : ""}`}>
+                <span>
+                  <strong>{source.name}</strong>
+                  <small>{source.system} · {source.imported}</small>
+                </span>
+                <Chip tone={source.status === "Current" ? "valid" : "warning"}>{source.updated}</Chip>
+              </button>
+            ))}
+          </div>
+        </details>
       </div>
     </>
   );
 }
 
-/** Floating command bar, ported from the archived Quickstrike direction. */
+/** Bottom / floating main tab bar. */
+function TabBar({ props }: { props: ConceptProps }) {
+  const floating = props.navStyle === "floating";
+  const screen = props.screen;
+  const items = [
+    { id: "library", label: "Lists", icon: LibraryBig },
+    { id: "catalogue", label: "Lookup", icon: Search },
+    { id: "tools", label: "Tools", icon: Hammer },
+    { id: "settings", label: "Settings", icon: Cog },
+  ] as const;
+
+  const isActive = (id: string) => {
+    if (id === "library") return screen === "library" || screen === "overview" || screen === "unit-detail" || screen === "system" || screen === "add-unit" || screen === "validation";
+    return screen === id;
+  };
+
+  return (
+    <nav className={`ux-tabbar ${floating ? "floating" : ""}`} aria-label="Main navigation">
+      {items.map((item, index) => {
+        const Icon = item.icon;
+        return (
+          <Fragment key={item.id}>
+            {index === 2 ? (
+              <button
+                type="button"
+                className={`ux-tab ux-tab-fab ${screen === "add-unit" ? "active" : ""}`}
+                aria-label="Add unit"
+                onClick={() => props.onNavigate("add-unit")}
+              >
+                <Plus size={22} />
+              </button>
+            ) : null}
+            <button key={item.id} type="button" className={`ux-tab ${isActive(item.id) ? "active" : ""}`} onClick={() => props.onNavigate(item.id)}>
+              <Icon size={20} />
+              <span>{item.label}</span>
+            </button>
+          </Fragment>
+        );
+      })}
+    </nav>
+  );
+}
+
+/** Floating command bar, shown only with the top-bar layout when smart search is on. */
 function CommandBar({ props }: { props: ConceptProps }) {
   return (
     <div className="ux-cmd-bar">
