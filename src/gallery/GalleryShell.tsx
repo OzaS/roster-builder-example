@@ -1,4 +1,4 @@
-import { useMemo, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type RefObject } from "react";
+import { useMemo, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent, type RefObject } from "react";
 import { Archive, Component, MonitorSmartphone, Moon, Navigation, Palette, PanelBottom, Pencil, Plus, Rows3, Smartphone, Sun, TabletSmartphone, Trash2 } from "lucide-react";
 import { DeviceFrame } from "../components/DeviceFrame";
 import { ScreenshotButton } from "../components/v2/ScreenshotButton";
@@ -11,6 +11,7 @@ import { workflowToPrototypeScreen } from "./workflow";
 import { DesignElementsPanel } from "./DesignElementsPanel";
 import type { DesignData, DesignWorkflow, EditableDesign } from "../design-data/designData";
 import { screenLabel } from "../design-data/designData";
+import { ScreenGlance, type GlancePlacement } from "./ScreenGlance";
 
 type Props = {
   selectedConcept: ConceptId;
@@ -88,6 +89,7 @@ export function GalleryShell({
 }: Props) {
   const [railWidth, setRailWidth] = useState(280);
   const [workflowSelection, setWorkflowSelection] = useState<WorkflowPickerSelection>("all");
+  const [glance, setGlance] = useState<null | { screen: WorkflowScreen; placement?: GlancePlacement }>(null);
   const selectedDesign = designData.designs.find((design) => design.id === selectedConcept);
   const activeWorkflowSelection = navigatorView === "all-screens" ? workflowSelection : workflowIdForScreen(selectedDesign, workflowScreen);
   const visibleScreens = useMemo(() => visibleDesignScreens(selectedDesign), [selectedDesign]);
@@ -112,12 +114,16 @@ export function GalleryShell({
     onNavigatorViewChange(view);
   }
 
-  function updateSelectedDesign(updater: (design: EditableDesign) => EditableDesign) {
-    if (!selectedDesign || !designDataWritable) return;
+  function updateSelectedDesign(updater: (design: EditableDesign) => EditableDesign, requireWritable = true) {
+    if (!selectedDesign || (requireWritable && !designDataWritable)) return;
     onDesignDataChange({
       ...designData,
       designs: designData.designs.map((design) => (design.id === selectedDesign.id ? updater(design) : design)),
     });
+  }
+
+  function updateComments(comments: NonNullable<EditableDesign["comments"]>) {
+    updateSelectedDesign((design) => ({ ...design, comments }), false);
   }
 
   function createWorkflow() {
@@ -197,6 +203,23 @@ export function GalleryShell({
 
     window.addEventListener("pointermove", handlePointerMove);
     window.addEventListener("pointerup", handlePointerUp);
+  }
+
+  function openGlance(screen: WorkflowScreen, placement?: GlancePlacement) {
+    setGlance({ screen, placement });
+  }
+
+  function handleSinglePreviewClick(event: ReactMouseEvent<HTMLDivElement>) {
+    if (!event.shiftKey) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    event.preventDefault();
+    event.stopPropagation();
+    openGlance(workflowScreen, {
+      x: clampPercent(((event.clientX - rect.left) / rect.width) * 100),
+      y: clampPercent(((event.clientY - rect.top) / rect.height) * 100),
+      mode: "element",
+      elementHint: elementHint(event.target),
+    });
   }
 
   return (
@@ -295,7 +318,16 @@ export function GalleryShell({
       <main className={`gallery-stage ${navigatorView !== "single" ? "board-mode" : ""}`}>
         <section className="preview-column" ref={captureRef}>
           {navigatorView === "all-screens" ? (
-            <WorkflowBoard concept={concept} activeWorkflow={workflowSelection} platform={platform} themeMode={themeMode} colorScheme={colorScheme} {...boardProps} />
+            <WorkflowBoard
+              concept={concept}
+              design={selectedDesign}
+              activeWorkflow={workflowSelection}
+              platform={platform}
+              themeMode={themeMode}
+              colorScheme={colorScheme}
+              onOpenGlance={openGlance}
+              {...boardProps}
+            />
           ) : navigatorView === "elements" ? (
             <DesignElementsPanel
               concept={concept}
@@ -312,7 +344,9 @@ export function GalleryShell({
               onCountChange={boardProps.onCountChange}
             />
           ) : (
-            <DeviceFrame platform={platform}>{children}</DeviceFrame>
+            <div className="single-preview-shell" onClickCapture={handleSinglePreviewClick}>
+              <DeviceFrame platform={platform}>{children}</DeviceFrame>
+            </div>
           )}
         </section>
         <aside className="notes-panel">
@@ -338,6 +372,35 @@ export function GalleryShell({
           </dl>
         </aside>
       </main>
+      {glance ? (
+        <ScreenGlance
+          concept={concept}
+          design={selectedDesign}
+          screen={glance.screen}
+          platform={platform}
+          themeMode={themeMode}
+          colorScheme={colorScheme}
+          roster={boardProps.roster}
+          selectedSection={boardProps.selectedSection}
+          selectedUnit={boardProps.selectedUnit}
+          selectedSectionId={boardProps.selectedSectionId}
+          expandedSectionIds={boardProps.expandedSectionIds}
+          smartSearch={boardProps.smartSearch}
+          navStyle={navStyle}
+          initialPlacement={glance.placement}
+          onClose={() => setGlance(null)}
+          onScreenChange={(screen) => setGlance({ screen })}
+          onCommentsChange={updateComments}
+          onToggleSmartSearch={boardProps.onToggleSmartSearch}
+          onSelectSection={boardProps.onSelectSection}
+          onToggleSection={boardProps.onToggleSection}
+          onSelectUnit={boardProps.onSelectUnit}
+          onToggleOption={boardProps.onToggleOption}
+          onCountChange={boardProps.onCountChange}
+          onNavigate={boardProps.onNavigate}
+          onBack={boardProps.onBack}
+        />
+      ) : null}
     </div>
   );
 }
@@ -506,4 +569,16 @@ function uniqueWorkflowId(workflows: DesignWorkflow[], preferred: string) {
 
 function uniqueScreens(screens: WorkflowScreen[]) {
   return Array.from(new Set(screens));
+}
+
+function clampPercent(value: number) {
+  return Math.max(2, Math.min(98, value));
+}
+
+function elementHint(target: EventTarget) {
+  const element = target instanceof HTMLElement ? target : null;
+  if (!element) return undefined;
+  const label = element.getAttribute("aria-label") || element.textContent?.trim().slice(0, 48);
+  const className = typeof element.className === "string" ? element.className.split(" ").filter(Boolean).slice(0, 2).join(".") : "";
+  return [element.tagName.toLowerCase(), className ? `.${className}` : "", label ? `"${label}"` : ""].join(" ").trim();
 }

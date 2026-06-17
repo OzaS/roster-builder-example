@@ -1,11 +1,15 @@
 import { DeviceFrame } from "../components/DeviceFrame";
+import type { MouseEvent as ReactMouseEvent } from "react";
 import { resolveWorkflow, workflowToPrototypeScreen } from "./workflow";
 import type { GalleryConcept, WorkflowFlow } from "./galleryTypes";
 import type { ColorScheme, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode, WorkflowScreen } from "../types";
 import type { WorkflowPickerSelection } from "../components/v2/WorkflowScreenPicker";
+import type { GlancePlacement } from "./ScreenGlance";
+import { screenLabel, type EditableDesign } from "../design-data/designData";
 
 type Props = {
   concept: GalleryConcept;
+  design?: EditableDesign;
   activeWorkflow: WorkflowPickerSelection;
   platform: PlatformPreview;
   themeMode: ThemeMode;
@@ -25,10 +29,12 @@ type Props = {
   onCountChange: (id: string, delta: number) => void;
   onNavigate: (screen: ReturnType<typeof workflowToPrototypeScreen>) => void;
   onBack: () => void;
+  onOpenGlance: (screen: WorkflowScreen, placement?: GlancePlacement) => void;
 };
 
 export function WorkflowBoard({
   concept,
+  design,
   activeWorkflow,
   platform,
   themeMode,
@@ -48,9 +54,10 @@ export function WorkflowBoard({
   onCountChange,
   onNavigate,
   onBack,
+  onOpenGlance,
 }: Props) {
   const Concept = concept.component;
-  const groups = workflowGroups(concept, activeWorkflow);
+  const groups = workflowGroups(concept, design, activeWorkflow);
 
   return (
     <section className={`workflow-board ${platform}`}>
@@ -62,31 +69,35 @@ export function WorkflowBoard({
               const screen = workflowToPrototypeScreen(item.screen);
               return (
                 <article className="workflow-board-item" key={item.id}>
-                  <div className="workflow-board-label">{item.label}</div>
-                  <DeviceFrame platform={platform}>
-                    <Concept
-                      roster={roster}
-                      selectedSection={selectedSection}
-                      selectedUnit={selectedUnit}
-                      selectedSectionId={selectedSectionId}
-                      expandedSectionIds={expandedSectionIds}
-                      screen={screen}
-                      workflowScreen={item.screen}
-                      themeMode={themeMode}
-                      colorScheme={colorScheme}
-                      smartSearch={smartSearch}
-                      onToggleSmartSearch={onToggleSmartSearch}
-                      navStyle={navStyle}
-                      canGoBack={screen !== "overview"}
-                      onSelectSection={onSelectSection}
-                      onToggleSection={onToggleSection}
-                      onSelectUnit={onSelectUnit}
-                      onToggleOption={onToggleOption}
-                      onCountChange={onCountChange}
-                      onNavigate={onNavigate}
-                      onBack={onBack}
-                    />
-                  </DeviceFrame>
+                  <button type="button" className="workflow-board-label" onClick={() => onOpenGlance(item.screen)}>
+                    {item.label}
+                  </button>
+                  <div className="workflow-screen-hitarea" onClick={(event) => handleScreenClick(event, item.screen, onOpenGlance)}>
+                    <DeviceFrame platform={platform}>
+                      <Concept
+                        roster={roster}
+                        selectedSection={selectedSection}
+                        selectedUnit={selectedUnit}
+                        selectedSectionId={selectedSectionId}
+                        expandedSectionIds={expandedSectionIds}
+                        screen={screen}
+                        workflowScreen={item.screen}
+                        themeMode={themeMode}
+                        colorScheme={colorScheme}
+                        smartSearch={smartSearch}
+                        onToggleSmartSearch={onToggleSmartSearch}
+                        navStyle={navStyle}
+                        canGoBack={screen !== "overview"}
+                        onSelectSection={onSelectSection}
+                        onToggleSection={onToggleSection}
+                        onSelectUnit={onSelectUnit}
+                        onToggleOption={onToggleOption}
+                        onCountChange={onCountChange}
+                        onNavigate={onNavigate}
+                        onBack={onBack}
+                      />
+                    </DeviceFrame>
+                  </div>
                 </article>
               );
             })}
@@ -97,9 +108,30 @@ export function WorkflowBoard({
   );
 }
 
+function handleScreenClick(
+  event: ReactMouseEvent<HTMLDivElement>,
+  screen: WorkflowScreen,
+  onOpenGlance: (screen: WorkflowScreen, placement?: GlancePlacement) => void,
+) {
+  if (!event.shiftKey) return;
+  const rect = event.currentTarget.getBoundingClientRect();
+  event.preventDefault();
+  event.stopPropagation();
+  onOpenGlance(screen, {
+    x: clampPercent(((event.clientX - rect.left) / rect.width) * 100),
+    y: clampPercent(((event.clientY - rect.top) / rect.height) * 100),
+    mode: "element",
+    elementHint: elementHint(event.target),
+  });
+}
+
 type WorkflowBoardItem = { id: string; label: string; screen: WorkflowScreen };
 
-function workflowGroups(concept: GalleryConcept, activeWorkflow: WorkflowPickerSelection): Array<{ id: string; label: string; items: WorkflowBoardItem[] }> {
+function workflowGroups(
+  concept: GalleryConcept,
+  design: EditableDesign | undefined,
+  activeWorkflow: WorkflowPickerSelection,
+): Array<{ id: string; label: string; items: WorkflowBoardItem[] }> {
   const flows: WorkflowFlow[] =
     concept.flows && concept.flows.length > 0
       ? concept.flows
@@ -109,6 +141,18 @@ function workflowGroups(concept: GalleryConcept, activeWorkflow: WorkflowPickerS
   return filtered.map((flow) => ({
     id: flow.id,
     label: flow.label,
-    items: flow.screens.map((screen) => ({ id: `${flow.id}-${screen}`, label: screen, screen })),
+    items: flow.screens.map((screen) => ({ id: `${flow.id}-${screen}`, label: screenLabel(design, screen), screen })),
   }));
+}
+
+function clampPercent(value: number) {
+  return Math.max(2, Math.min(98, value));
+}
+
+function elementHint(target: EventTarget) {
+  const element = target instanceof HTMLElement ? target : null;
+  if (!element) return undefined;
+  const label = element.getAttribute("aria-label") || element.textContent?.trim().slice(0, 48);
+  const className = typeof element.className === "string" ? element.className.split(" ").filter(Boolean).slice(0, 2).join(".") : "";
+  return [element.tagName.toLowerCase(), className ? `.${className}` : "", label ? `"${label}"` : ""].join(" ").trim();
 }

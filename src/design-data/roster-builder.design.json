@@ -105,7 +105,8 @@
           "Workflow Board Group",
           "Floating Command Bar"
         ]
-      }
+      },
+      "comments": []
     },
     {
       "id": "ux-command",
@@ -189,7 +190,8 @@
           "Options",
           "Thumb Command Bar"
         ]
-      }
+      },
+      "comments": []
     }
   ]
 }

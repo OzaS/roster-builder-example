@@ -12,3 +12,7 @@
 ## Elements
 - When adding new UI primitives, controls, rows, cards, panels, or workflow/gallery chrome, add a representative entry to the Elements view.
 - Keep `design.elements.sections` in `src/design-data/roster-builder.design.json` aligned with `DesignElementsPanel`.
+
+## Comments
+- Screen review comments live in `design.comments` inside `src/design-data/roster-builder.design.json`.
+- Review comments when the user asks about screen feedback, comment state, Glance view, or design review notes.

@@ -18,6 +18,19 @@ export type DesignWorkflow = {
   screens: WorkflowScreen[];
 };
 
+export type DesignComment = {
+  id: string;
+  screen: WorkflowScreen;
+  x: number;
+  y: number;
+  text: string;
+  mode: "point" | "element";
+  status: "open" | "done";
+  elementHint?: string;
+  createdAt: string;
+  updatedAt?: string;
+};
+
 export type EditableDesign = {
   id: ConceptId;
   status: DesignStatus;
@@ -32,6 +45,7 @@ export type EditableDesign = {
   screens: DesignScreen[];
   workflows: DesignWorkflow[];
   trash: { screens: WorkflowScreen[] };
+  comments: DesignComment[];
   elements: { sections: string[] };
 };
 
@@ -75,6 +89,10 @@ export function normalizeDesignData(data: DesignData): DesignData {
       return {
         ...design,
         trash,
+        comments: (design.comments ?? []).map((comment) => ({
+          ...comment,
+          status: comment.status ?? "open",
+        })),
         workflows: workflows.map((workflow) => ({
           ...workflow,
           screens: uniqueScreens(workflow.screens.filter((screen) => knownScreens.has(screen) && !trash.screens.includes(screen))),
@@ -103,7 +121,7 @@ export function designById(data: DesignData, id: ConceptId) {
 }
 
 export function screenLabel(design: EditableDesign | undefined, screenId: WorkflowScreen) {
-  return design?.screens.find((screen) => screen.id === screenId)?.label ?? screenId;
+  return design?.screens?.find((screen) => screen.id === screenId)?.label ?? screenId;
 }
 
 export function firstScreenInDesign(design: EditableDesign | undefined): WorkflowScreen {

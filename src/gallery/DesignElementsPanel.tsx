@@ -1,4 +1,4 @@
-import { AlertTriangle, Archive, ArrowUp, Command, CornerDownLeft, Database, Download, FileInput, Filter, Hammer, Layers, PanelsTopLeft, Plus, Rows3, Search, Share2, Smartphone, Sparkles, Trash2, Zap } from "lucide-react";
+import { AlertTriangle, Archive, ArrowUp, Check, Command, CornerDownLeft, Database, Download, FileInput, Filter, Hammer, Layers, MessageCircle, PanelsTopLeft, Plus, Rows3, Search, Share2, Smartphone, Sparkles, Trash2, Zap } from "lucide-react";
 import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode } from "../types";
 import { BudgetMeter, Chip, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
@@ -539,6 +539,58 @@ function WorkbenchElements({
           <h2>Add & configure units</h2>
           <div className="workflow-board-label">Add unit</div>
         </section>
+      </ElementSection>
+
+      <ElementSection title="Glance Comments">
+        <div className="glance-device-target" style={{ minHeight: 180, borderRadius: 18, background: "rgba(13, 17, 22, 0.94)" }}>
+          <button type="button" className="comment-marker active" style={{ left: "42%", top: "38%" }}>
+            C
+          </button>
+          <button type="button" className="comment-marker done" style={{ left: "62%", top: "62%" }}>
+            E
+          </button>
+          <div className="comment-popover" style={{ left: "42%", top: "38%" }}>
+            <textarea value="This is comment" onChange={() => undefined} />
+            <small>button .ux-new-roster "New roster"</small>
+            <div className="comment-actions">
+              <button type="button">Save</button>
+              <button type="button">Done</button>
+              <button type="button" aria-label="Delete comment">
+                <Trash2 size={13} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </ElementSection>
+
+      <ElementSection title="Comments List">
+        <aside className="comments-drawer" style={{ maxHeight: "none" }}>
+          <h3>Comments</h3>
+          <article className="comment-list-row active">
+            <button type="button" className="comment-row-head">
+              <span>
+                <MessageCircle size={14} />
+              </span>
+              <strong>Lists</strong>
+              <small>point</small>
+            </button>
+            <textarea value="Clarify the empty state copy." onChange={() => undefined} />
+            <div className="comment-actions">
+              <button type="button">Done</button>
+              <button type="button">Remove</button>
+            </div>
+          </article>
+          <article className="comment-list-row done">
+            <button type="button" className="comment-row-head">
+              <span>
+                <Check size={14} />
+              </span>
+              <strong>Tools</strong>
+              <small>element</small>
+            </button>
+            <textarea value="Resolved visual spacing note." onChange={() => undefined} />
+          </article>
+        </aside>
       </ElementSection>
 
       <ElementSection title="Floating Command Bar">
