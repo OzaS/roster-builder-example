@@ -1,15 +1,16 @@
-import { useState, type RefObject } from "react";
-import { Archive, Component, MonitorSmartphone, Moon, Navigation, Palette, PanelBottom, Rows3, Smartphone, Sun, TabletSmartphone } from "lucide-react";
+import { useMemo, useState, type RefObject } from "react";
+import { Archive, Component, MonitorSmartphone, Moon, Navigation, Palette, PanelBottom, Plus, Rows3, Smartphone, Sun, TabletSmartphone, Trash2 } from "lucide-react";
 import { DeviceFrame } from "../components/DeviceFrame";
 import { ScreenshotButton } from "../components/v2/ScreenshotButton";
 import { WorkflowScreenPicker, type WorkflowPickerSelection } from "../components/v2/WorkflowScreenPicker";
 import type { ColorScheme, ConceptId, NavigatorView, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode, WorkflowScreen } from "../types";
 import { colorSchemes } from "../types";
-import { activeConcepts, archivedConcepts, uxConcepts } from "./conceptRegistry";
 import type { GalleryConcept } from "./galleryTypes";
 import { WorkflowBoard } from "./WorkflowBoard";
 import { workflowToPrototypeScreen } from "./workflow";
 import { DesignElementsPanel } from "./DesignElementsPanel";
+import type { DesignData, DesignWorkflow, EditableDesign } from "../design-data/designData";
+import { screenLabel } from "../design-data/designData";
 
 type Props = {
   selectedConcept: ConceptId;
@@ -20,6 +21,10 @@ type Props = {
   workflowScreen: WorkflowScreen;
   navStyle: NavStyle;
   concept: GalleryConcept;
+  designData: DesignData;
+  designDataWritable: boolean;
+  activeConcepts: GalleryConcept[];
+  archivedConcepts: GalleryConcept[];
   captureRef: RefObject<HTMLElement | null>;
   children: React.ReactNode;
   boardProps: {
@@ -47,6 +52,7 @@ type Props = {
   onWorkflowScreenChange: (screen: WorkflowScreen) => void;
   onNavStyleChange: (style: NavStyle) => void;
   onCapture: () => void;
+  onDesignDataChange: (data: DesignData) => void;
 };
 
 const navStyleOptions: Array<{ id: Exclude<NavStyle, "top">; label: string; icon: typeof PanelBottom }> = [
@@ -63,6 +69,10 @@ export function GalleryShell({
   workflowScreen,
   navStyle,
   concept,
+  designData,
+  designDataWritable,
+  activeConcepts,
+  archivedConcepts,
   captureRef,
   children,
   boardProps,
@@ -74,9 +84,12 @@ export function GalleryShell({
   onWorkflowScreenChange,
   onNavStyleChange,
   onCapture,
+  onDesignDataChange,
 }: Props) {
   const [workflowSelection, setWorkflowSelection] = useState<WorkflowPickerSelection>("all");
-  const activeWorkflowSelection = navigatorView === "all-screens" ? workflowSelection : workflowScreen;
+  const selectedDesign = designData.designs.find((design) => design.id === selectedConcept);
+  const activeWorkflowSelection = navigatorView === "all-screens" ? workflowSelection : workflowIdForScreen(selectedDesign, workflowScreen);
+  const visibleScreens = useMemo(() => visibleDesignScreens(selectedDesign), [selectedDesign]);
 
   function selectWorkflow(selection: WorkflowPickerSelection) {
     setWorkflowSelection(selection);
@@ -84,7 +97,11 @@ export function GalleryShell({
       onNavigatorViewChange("all-screens");
       return;
     }
-    onWorkflowScreenChange(selection);
+    const workflow = selectedDesign?.workflows.find((item) => item.id === selection);
+    const firstScreen = workflow?.screens[0];
+    if (firstScreen) {
+      onWorkflowScreenChange(firstScreen);
+    }
   }
 
   function selectNavigatorView(view: NavigatorView) {
@@ -92,6 +109,74 @@ export function GalleryShell({
       setWorkflowSelection("all");
     }
     onNavigatorViewChange(view);
+  }
+
+  function updateSelectedDesign(updater: (design: EditableDesign) => EditableDesign) {
+    if (!selectedDesign || !designDataWritable) return;
+    onDesignDataChange({
+      ...designData,
+      designs: designData.designs.map((design) => (design.id === selectedDesign.id ? updater(design) : design)),
+    });
+  }
+
+  function createWorkflow() {
+    const label = window.prompt("Workflow name");
+    if (!label?.trim()) return;
+    const id = slugify(label);
+    updateSelectedDesign((design) => ({
+      ...design,
+      workflows: [...design.workflows, { id: uniqueWorkflowId(design.workflows, id), label: label.trim(), screens: [] }],
+    }));
+  }
+
+  function renameWorkflow(workflowId: string) {
+    const workflow = selectedDesign?.workflows.find((item) => item.id === workflowId);
+    const label = window.prompt("Workflow name", workflow?.label);
+    if (!label?.trim()) return;
+    updateSelectedDesign((design) => ({
+      ...design,
+      workflows: design.workflows.map((item) => (item.id === workflowId ? { ...item, label: label.trim() } : item)),
+    }));
+  }
+
+  function deleteWorkflow(workflowId: string) {
+    if (workflowId === "unsorted") return;
+    updateSelectedDesign((design) => {
+      const workflow = design.workflows.find((item) => item.id === workflowId);
+      const movedScreens = workflow?.screens ?? [];
+      const nextWorkflows = design.workflows
+        .filter((item) => item.id !== workflowId)
+        .map((item) => (item.id === "unsorted" ? { ...item, screens: [...item.screens, ...movedScreens] } : item));
+      return { ...design, workflows: nextWorkflows };
+    });
+  }
+
+  function moveScreen(screen: WorkflowScreen, workflowId: string) {
+    updateSelectedDesign((design) => ({
+      ...design,
+      workflows: design.workflows.map((workflow) => ({
+        ...workflow,
+        screens: workflow.id === workflowId ? uniqueScreens([...workflow.screens, screen]) : workflow.screens.filter((item) => item !== screen),
+      })),
+    }));
+  }
+
+  function removeScreen(screen: WorkflowScreen) {
+    updateSelectedDesign((design) => ({
+      ...design,
+      workflows: design.workflows.map((workflow) => ({ ...workflow, screens: workflow.screens.filter((item) => item !== screen) })),
+      trash: { screens: uniqueScreens([...(design.trash?.screens ?? []), screen]) },
+    }));
+  }
+
+  function restoreScreen(screen: WorkflowScreen) {
+    updateSelectedDesign((design) => ({
+      ...design,
+      workflows: design.workflows.map((workflow) =>
+        workflow.id === "unsorted" ? { ...workflow, screens: uniqueScreens([...workflow.screens, screen]) } : workflow,
+      ),
+      trash: { screens: (design.trash?.screens ?? []).filter((item) => item !== screen) },
+    }));
   }
 
   return (
@@ -117,7 +202,7 @@ export function GalleryShell({
             ) : null}
           </div>
         </div>
-        <ConceptGroup title="Designs" concepts={uxConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
+        <ConceptGroup title="Designs" concepts={activeConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
         <div className="view-icon-switch" role="group" aria-label="View">
           <button className={navigatorView === "single" ? "active" : ""} type="button" onClick={() => selectNavigatorView("single")} aria-label="Single" title="Single">
             <Smartphone size={18} />
@@ -130,6 +215,17 @@ export function GalleryShell({
           </button>
         </div>
         <WorkflowScreenPicker active={activeWorkflowSelection} screens={concept.workflow} flows={concept.flows} onSelect={selectWorkflow} />
+        <WorkflowEditor
+          design={selectedDesign}
+          screens={visibleScreens}
+          writable={designDataWritable}
+          onCreateWorkflow={createWorkflow}
+          onRenameWorkflow={renameWorkflow}
+          onDeleteWorkflow={deleteWorkflow}
+          onMoveScreen={moveScreen}
+          onRemoveScreen={removeScreen}
+          onRestoreScreen={restoreScreen}
+        />
         <details className="rail-disclosure">
           <summary>
             <h3>Display</h3>
@@ -234,6 +330,99 @@ function ControlGroup({ title, children }: { title: string; children: React.Reac
   );
 }
 
+function WorkflowEditor({
+  design,
+  screens,
+  writable,
+  onCreateWorkflow,
+  onRenameWorkflow,
+  onDeleteWorkflow,
+  onMoveScreen,
+  onRemoveScreen,
+  onRestoreScreen,
+}: {
+  design?: EditableDesign;
+  screens: WorkflowScreen[];
+  writable: boolean;
+  onCreateWorkflow: () => void;
+  onRenameWorkflow: (workflowId: string) => void;
+  onDeleteWorkflow: (workflowId: string) => void;
+  onMoveScreen: (screen: WorkflowScreen, workflowId: string) => void;
+  onRemoveScreen: (screen: WorkflowScreen) => void;
+  onRestoreScreen: (screen: WorkflowScreen) => void;
+}) {
+  const trash = design?.trash?.screens ?? [];
+  return (
+    <details className="rail-disclosure workflow-editor">
+      <summary>
+        <h3>Workflow editor</h3>
+      </summary>
+      {!writable ? <p className="designer-note">Run the Vite dev server to save workflow edits back to JSON.</p> : null}
+      <button className="workflow-add-button" type="button" onClick={onCreateWorkflow} disabled={!writable}>
+        <Plus size={15} />
+        Add workflow
+      </button>
+      <div className="workflow-edit-list">
+        {design?.workflows.map((workflow) => (
+          <div className="workflow-edit-row" key={workflow.id}>
+            <span>
+              <strong>{workflow.label}</strong>
+              <small>{workflow.screens.length} screens</small>
+            </span>
+            <button type="button" onClick={() => onRenameWorkflow(workflow.id)} disabled={!writable}>
+              Rename
+            </button>
+            <button type="button" onClick={() => onDeleteWorkflow(workflow.id)} disabled={!writable || workflow.id === "unsorted"}>
+              Delete
+            </button>
+          </div>
+        ))}
+      </div>
+      <div className="screen-move-list">
+        {screens.map((screen) => (
+          <div className="screen-move-row" key={screen}>
+            <span>
+              <strong>{screenLabel(design, screen)}</strong>
+              <small>{screen}</small>
+            </span>
+            <select value={workflowIdForScreen(design, screen)} onChange={(event) => onMoveScreen(screen, event.currentTarget.value)} disabled={!writable}>
+              {design?.workflows.map((workflow) => (
+                <option value={workflow.id} key={workflow.id}>
+                  {workflow.label}
+                </option>
+              ))}
+            </select>
+            <button type="button" onClick={() => onRemoveScreen(screen)} disabled={!writable} aria-label={`Move ${screenLabel(design, screen)} to trash`}>
+              <Trash2 size={14} />
+            </button>
+          </div>
+        ))}
+      </div>
+      <details className="trash-section">
+        <summary>
+          <h3>Trash</h3>
+          <small>{trash.length}</small>
+        </summary>
+        {trash.length ? (
+          trash.map((screen) => (
+            <div className="screen-move-row" key={screen}>
+              <span>
+                <strong>{screenLabel(design, screen)}</strong>
+                <small>{screen}</small>
+              </span>
+              <button type="button" onClick={() => onRestoreScreen(screen)} disabled={!writable}>
+                Restore
+              </button>
+            </div>
+          ))
+        ) : (
+          <p className="designer-note">Trash is empty.</p>
+        )}
+      </details>
+    </details>
+  );
+}
+
 function ConceptGroup({
   title,
   concepts,
@@ -264,5 +453,36 @@ function ConceptGroup({
 }
 
 export function findConcept(id: ConceptId) {
-  return activeConcepts.find((item) => item.id === id) ?? activeConcepts[0];
+  throw new Error(`findConcept is deprecated; use design data in App instead (${id}).`);
+}
+
+function workflowIdForScreen(design: EditableDesign | undefined, screen: WorkflowScreen) {
+  return design?.workflows.find((workflow) => workflow.screens.includes(screen))?.id ?? "unsorted";
+}
+
+function visibleDesignScreens(design: EditableDesign | undefined) {
+  const trash = new Set(design?.trash?.screens ?? []);
+  return design?.screens.map((screen) => screen.id).filter((screen) => !trash.has(screen)) ?? [];
+}
+
+function slugify(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "") || "workflow";
+}
+
+function uniqueWorkflowId(workflows: DesignWorkflow[], preferred: string) {
+  let id = preferred;
+  let index = 2;
+  while (workflows.some((workflow) => workflow.id === id)) {
+    id = `${preferred}-${index}`;
+    index += 1;
+  }
+  return id;
+}
+
+function uniqueScreens(screens: WorkflowScreen[]) {
+  return Array.from(new Set(screens));
 }

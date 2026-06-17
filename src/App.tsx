@@ -1,11 +1,14 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { mockRoster } from "./data/mockRoster";
-import { findConcept, GalleryShell } from "./gallery/GalleryShell";
+import { GalleryShell } from "./gallery/GalleryShell";
+import { buildConceptGroups, bundledDesignData, designById, findConceptInData, firstScreenInDesign, normalizeDesignData, type DesignData } from "./design-data/designData";
 import { workflowToPrototypeScreen } from "./gallery/workflow";
 import { captureElementAsPng } from "./utils/captureStage";
 import type { ColorScheme, ConceptId, NavigatorView, NavStyle, PlatformPreview, PrototypeScreen, Roster, ThemeMode, WorkflowScreen } from "./types";
 
 function App() {
+  const [designData, setDesignData] = useState<DesignData>(bundledDesignData);
+  const [designDataWritable, setDesignDataWritable] = useState(false);
   const [selectedConcept, setSelectedConcept] = useState<ConceptId>("ux-workbench");
   const [platform, setPlatform] = useState<PlatformPreview>("phone");
   const [themeMode, setThemeMode] = useState<ThemeMode>("dark");
@@ -31,7 +34,29 @@ function App() {
     [roster.sections, selectedSection.units, selectedUnitId],
   );
 
-  const concept = findConcept(selectedConcept);
+  useEffect(() => {
+    let alive = true;
+    fetch("/__design-data/roster-builder")
+      .then((response) => {
+        if (!response.ok) throw new Error("Design data endpoint unavailable");
+        return response.json();
+      })
+      .then((data: DesignData) => {
+        if (!alive) return;
+        setDesignData(normalizeDesignData(data));
+        setDesignDataWritable(true);
+      })
+      .catch(() => {
+        if (!alive) return;
+        setDesignDataWritable(false);
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const conceptGroups = useMemo(() => buildConceptGroups(designData), [designData]);
+  const concept = findConceptInData(designData, selectedConcept);
   const Concept = concept.component;
   const captureRef = useRef<HTMLElement>(null);
 
@@ -41,11 +66,21 @@ function App() {
   }
 
   function applyConceptEntryScreen(id: ConceptId) {
-    const entry = findConcept(id);
-    const firstWorkflow = entry.workflow?.[0] ?? "library";
+    const firstWorkflow = firstScreenInDesign(designById(designData, id));
     setWorkflowScreen(firstWorkflow);
     setScreen(workflowToPrototypeScreen(firstWorkflow));
     setScreenHistory([]);
+  }
+
+  function updateDesignData(nextData: DesignData) {
+    const normalized = normalizeDesignData(nextData);
+    setDesignData(normalized);
+    if (!designDataWritable) return;
+    fetch("/__design-data/roster-builder", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(normalized),
+    }).catch(() => setDesignDataWritable(false));
   }
 
   function selectWorkflowScreen(nextWorkflowScreen: WorkflowScreen) {
@@ -150,6 +185,10 @@ function App() {
       navigatorView={navigatorView}
       workflowScreen={workflowScreen}
       concept={concept}
+      designData={designData}
+      designDataWritable={designDataWritable}
+      activeConcepts={conceptGroups.activeConcepts}
+      archivedConcepts={conceptGroups.archivedConcepts}
       captureRef={captureRef}
       onConceptChange={changeConcept}
       onPlatformChange={setPlatform}
@@ -160,6 +199,7 @@ function App() {
       navStyle={navStyle}
       onNavStyleChange={setNavStyle}
       onCapture={captureCurrentStage}
+      onDesignDataChange={updateDesignData}
       boardProps={{
         roster,
         selectedSection,
