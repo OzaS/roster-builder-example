@@ -952,6 +952,33 @@
   gap: 8px;
 }
 
+.rail-resizer {
+  position: absolute;
+  top: 0;
+  right: -5px;
+  bottom: 0;
+  z-index: 30;
+  width: 10px;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.rail-resizer::after {
+  content: "";
+  position: absolute;
+  top: 18px;
+  right: 4px;
+  bottom: 18px;
+  width: 2px;
+  border-radius: 999px;
+  background: transparent;
+  transition: background 0.15s ease;
+}
+
+.rail-resizer:hover::after {
+  background: color-mix(in srgb, var(--line) 72%, var(--ink));
+}
+
 .rail-topline {
   display: flex;
   align-items: center;
@@ -2275,7 +2302,7 @@
 }
 
 .workflow-edit-row {
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(0, 1fr) 30px 30px;
   padding: 8px;
 }
 
@@ -2298,6 +2325,8 @@
 
 .workflow-edit-row button,
 .screen-move-row button {
+  display: grid;
+  place-items: center;
   min-height: 30px;
   border: 0;
   border-radius: 8px;
