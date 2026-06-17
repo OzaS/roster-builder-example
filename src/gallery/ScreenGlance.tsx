@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type MouseEvent as ReactMouseEvent } from "react";
-import { Camera, Check, ListChecks, MessageCircle, MousePointer2, Trash2, X } from "lucide-react";
+import { Camera, Check, Eye, EyeOff, ListChecks, MessageCircle, MousePointer2, Trash2, X } from "lucide-react";
 import { DeviceFrame } from "../components/DeviceFrame";
 import type { ConceptProps } from "../concepts/shared";
 import type { DesignComment, EditableDesign } from "../design-data/designData";
@@ -74,12 +74,16 @@ export function ScreenGlance({
   const [armed, setArmed] = useState<null | DesignComment["mode"]>(initialPlacement ? initialPlacement.mode : null);
   const [activeCommentId, setActiveCommentId] = useState<string | null>(null);
   const [commentsOpen, setCommentsOpen] = useState(true);
+  const [commentsVisible, setCommentsVisible] = useState(true);
+  const [hiddenCommentIds, setHiddenCommentIds] = useState<Set<string>>(() => new Set());
   const [draftText, setDraftText] = useState("");
   const deviceCaptureRef = useRef<HTMLDivElement>(null);
   const Component = concept.component;
   const comments = design?.comments ?? [];
   const screenComments = comments.filter((comment) => comment.screen === screen);
   const activeComment = comments.find((comment) => comment.id === activeCommentId);
+  const visibleScreenComments = commentsVisible ? screenComments.filter((comment) => !hiddenCommentIds.has(comment.id)) : [];
+  const activeCommentVisible = activeComment && commentsVisible && !hiddenCommentIds.has(activeComment.id);
 
   useEffect(() => {
     if (initialPlacement) {
@@ -135,6 +139,31 @@ export function ScreenGlance({
   function deleteComment(commentId: string) {
     onCommentsChange(comments.filter((comment) => comment.id !== commentId));
     if (activeCommentId === commentId) setActiveCommentId(null);
+    setHiddenCommentIds((current) => {
+      const next = new Set(current);
+      next.delete(commentId);
+      return next;
+    });
+  }
+
+  function toggleCommentVisibility(commentId: string) {
+    setHiddenCommentIds((current) => {
+      const next = new Set(current);
+      if (next.has(commentId)) {
+        next.delete(commentId);
+      } else {
+        next.add(commentId);
+        if (activeCommentId === commentId) setActiveCommentId(null);
+      }
+      return next;
+    });
+  }
+
+  function toggleAllCommentVisibility() {
+    setCommentsVisible((current) => {
+      if (current) setActiveCommentId(null);
+      return !current;
+    });
   }
 
   return (
@@ -154,9 +183,12 @@ export function ScreenGlance({
             <ListChecks size={16} />
             Comments
           </button>
-          <button type="button" onClick={captureFocusedScreen}>
+          <button type="button" onClick={toggleAllCommentVisibility} className={commentsVisible ? "" : "active"}>
+            {commentsVisible ? <EyeOff size={16} /> : <Eye size={16} />}
+            {commentsVisible ? "Hide all" : "Show all"}
+          </button>
+          <button type="button" className="glance-icon" onClick={captureFocusedScreen} aria-label="Capture screenshot" title="Capture screenshot">
             <Camera size={16} />
-            Screenshot
           </button>
           <button type="button" className="glance-icon" onClick={onClose} aria-label="Close Glance">
             <X size={18} />
@@ -168,78 +200,86 @@ export function ScreenGlance({
         </p>
         <div className={`glance-layout ${commentsOpen ? "with-comments" : ""}`}>
           <div className="glance-device-shell">
-            <div className="glance-device-capture" ref={deviceCaptureRef}>
-              <DeviceFrame platform={platform}>
-                <div className={`glance-device-target ${armed ? "placing" : ""}`} onClick={placeComment}>
-                  <Component
-                    roster={roster}
-                    selectedSection={selectedSection}
-                    selectedUnit={selectedUnit}
-                    selectedSectionId={selectedSectionId}
-                    expandedSectionIds={expandedSectionIds}
-                    screen={workflowToPrototypeScreen(screen)}
-                    workflowScreen={screen}
-                    themeMode={themeMode}
-                    colorScheme={colorScheme}
-                    smartSearch={smartSearch}
-                    onToggleSmartSearch={onToggleSmartSearch}
-                    navStyle={navStyle}
-                    canGoBack={screen !== "overview"}
-                    onSelectSection={onSelectSection}
-                    onToggleSection={onToggleSection}
-                    onSelectUnit={onSelectUnit}
-                    onToggleOption={onToggleOption}
-                    onCountChange={onCountChange}
-                    onNavigate={onNavigate}
-                    onBack={onBack}
-                  />
-                </div>
-              </DeviceFrame>
-              <div className="comment-overlay" aria-hidden={screenComments.length === 0 && !activeComment}>
-                {screenComments.map((comment) => (
-                  <button
-                    type="button"
-                    key={comment.id}
-                    className={`comment-marker ${comment.status} ${activeCommentId === comment.id ? "active" : ""}`}
-                    style={{ left: `${comment.x}%`, top: `${comment.y}%` }}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      setActiveCommentId(comment.id);
-                      setDraftText(comment.text);
-                    }}
-                    aria-label="Open comment"
-                  >
-                    {comment.mode === "element" ? "E" : "C"}
-                  </button>
-                ))}
-                {activeComment ? (
-                  <div
-                    className={`comment-popover ${activeComment.status}`}
-                    style={{ left: `${activeComment.x}%`, top: `${activeComment.y}%` }}
-                    onClick={(event) => event.stopPropagation()}
-                  >
-                    <textarea value={draftText} onChange={(event) => setDraftText(event.currentTarget.value)} />
-                    {activeComment.elementHint ? <small>{activeComment.elementHint}</small> : null}
-                    <div className="comment-actions">
-                      <button type="button" onClick={(event) => {
-                        event.stopPropagation();
-                        saveActiveComment();
-                      }}>Save</button>
-                      <button type="button" onClick={(event) => {
-                        event.stopPropagation();
-                        toggleStatus(activeComment.id);
-                      }}>
-                        {activeComment.status === "done" ? "Open" : "Done"}
-                      </button>
-                      <button type="button" onClick={(event) => {
-                        event.stopPropagation();
-                        deleteComment(activeComment.id);
-                      }} aria-label="Delete comment">
-                        <Trash2 size={13} />
-                      </button>
-                    </div>
+            <div className="glance-device-export" ref={deviceCaptureRef}>
+              <div className="glance-device-capture">
+                <DeviceFrame platform={platform}>
+                  <div className={`glance-device-target ${armed ? "placing" : ""}`} onClick={placeComment}>
+                    <Component
+                      roster={roster}
+                      selectedSection={selectedSection}
+                      selectedUnit={selectedUnit}
+                      selectedSectionId={selectedSectionId}
+                      expandedSectionIds={expandedSectionIds}
+                      screen={workflowToPrototypeScreen(screen)}
+                      workflowScreen={screen}
+                      themeMode={themeMode}
+                      colorScheme={colorScheme}
+                      smartSearch={smartSearch}
+                      onToggleSmartSearch={onToggleSmartSearch}
+                      navStyle={navStyle}
+                      canGoBack={screen !== "overview"}
+                      onSelectSection={onSelectSection}
+                      onToggleSection={onToggleSection}
+                      onSelectUnit={onSelectUnit}
+                      onToggleOption={onToggleOption}
+                      onCountChange={onCountChange}
+                      onNavigate={onNavigate}
+                      onBack={onBack}
+                    />
                   </div>
-                ) : null}
+                </DeviceFrame>
+                <div className="comment-overlay" aria-hidden={visibleScreenComments.length === 0 && !activeCommentVisible}>
+                  {visibleScreenComments.map((comment) => (
+                    <button
+                      type="button"
+                      key={comment.id}
+                      className={`comment-marker ${comment.status} ${activeCommentId === comment.id ? "active" : ""}`}
+                      style={{ left: `${comment.x}%`, top: `${comment.y}%` }}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setActiveCommentId(comment.id);
+                        setDraftText(comment.text);
+                      }}
+                      aria-label="Open comment"
+                    >
+                      {comment.mode === "element" ? "E" : "C"}
+                    </button>
+                  ))}
+                  {activeCommentVisible ? (
+                    <div
+                      className={`comment-popover ${activeComment.status}`}
+                      style={{ left: `${activeComment.x}%`, top: `${activeComment.y}%` }}
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      <textarea value={draftText} onChange={(event) => setDraftText(event.currentTarget.value)} />
+                      {activeComment.elementHint ? <small>{activeComment.elementHint}</small> : null}
+                      <div className="comment-actions">
+                        <button type="button" onClick={(event) => {
+                          event.stopPropagation();
+                          saveActiveComment();
+                        }}>Save</button>
+                        <button type="button" onClick={(event) => {
+                          event.stopPropagation();
+                          toggleStatus(activeComment.id);
+                        }}>
+                          {activeComment.status === "done" ? "Open" : "Done"}
+                        </button>
+                        <button type="button" onClick={(event) => {
+                          event.stopPropagation();
+                          toggleCommentVisibility(activeComment.id);
+                        }}>
+                          Hide
+                        </button>
+                        <button type="button" onClick={(event) => {
+                          event.stopPropagation();
+                          deleteComment(activeComment.id);
+                        }} aria-label="Delete comment">
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
               </div>
             </div>
           </div>
@@ -257,7 +297,10 @@ export function ScreenGlance({
                 onCommentsChange(comments.map((comment) => (comment.id === commentId ? { ...comment, text, updatedAt: new Date().toISOString() } : comment)))
               }
               onToggleStatus={toggleStatus}
+              onToggleVisibility={toggleCommentVisibility}
               onDelete={deleteComment}
+              hiddenCommentIds={hiddenCommentIds}
+              commentsVisible={commentsVisible}
             />
           ) : null}
         </div>
@@ -273,7 +316,10 @@ function CommentsDrawer({
   onSelect,
   onTextChange,
   onToggleStatus,
+  onToggleVisibility,
   onDelete,
+  hiddenCommentIds,
+  commentsVisible,
 }: {
   comments: DesignComment[];
   design?: EditableDesign;
@@ -281,7 +327,10 @@ function CommentsDrawer({
   onSelect: (comment: DesignComment) => void;
   onTextChange: (commentId: string, text: string) => void;
   onToggleStatus: (commentId: string) => void;
+  onToggleVisibility: (commentId: string) => void;
   onDelete: (commentId: string) => void;
+  hiddenCommentIds: Set<string>;
+  commentsVisible: boolean;
 }) {
   const ordered = [...comments].sort((a, b) => Number(a.status === "done") - Number(b.status === "done"));
   return (
@@ -289,7 +338,12 @@ function CommentsDrawer({
       <h3>Comments</h3>
       {ordered.length ? (
         ordered.map((comment) => (
-          <article className={`comment-list-row ${comment.status} ${activeCommentId === comment.id ? "active" : ""}`} key={comment.id}>
+          <article
+            className={`comment-list-row ${comment.status} ${activeCommentId === comment.id ? "active" : ""} ${
+              !commentsVisible || hiddenCommentIds.has(comment.id) ? "hidden-comment" : ""
+            }`}
+            key={comment.id}
+          >
             <button type="button" className="comment-row-head" onClick={() => onSelect(comment)}>
               <span>{comment.status === "done" ? <Check size={14} /> : <MessageCircle size={14} />}</span>
               <strong>{screenLabel(design, comment.screen)}</strong>
@@ -299,6 +353,7 @@ function CommentsDrawer({
             {comment.elementHint ? <small>{comment.elementHint}</small> : null}
             <div className="comment-actions">
               <button type="button" onClick={() => onToggleStatus(comment.id)}>{comment.status === "done" ? "Open" : "Done"}</button>
+              <button type="button" onClick={() => onToggleVisibility(comment.id)}>{hiddenCommentIds.has(comment.id) ? "Show" : "Hide"}</button>
               <button type="button" onClick={() => onDelete(comment.id)}>Remove</button>
             </div>
           </article>
