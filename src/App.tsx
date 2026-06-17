@@ -3,7 +3,7 @@ import { mockRoster } from "./data/mockRoster";
 import { findConcept, GalleryShell } from "./gallery/GalleryShell";
 import { workflowToPrototypeScreen } from "./gallery/workflow";
 import { captureElementAsPng } from "./utils/captureStage";
-import type { ColorScheme, ConceptId, NavigatorView, PlatformPreview, PrototypeScreen, Roster, ThemeMode, WorkflowScreen } from "./types";
+import type { ColorScheme, ConceptId, NavigatorView, NavStyle, PlatformPreview, PrototypeScreen, Roster, ThemeMode, WorkflowScreen } from "./types";
 
 function App() {
   const [selectedConcept, setSelectedConcept] = useState<ConceptId>("ux-workbench");
@@ -13,6 +13,7 @@ function App() {
   const [navigatorView, setNavigatorView] = useState<NavigatorView>("single");
   const [workflowScreen, setWorkflowScreen] = useState<WorkflowScreen>("library");
   const [smartSearch, setSmartSearch] = useState(true);
+  const [navStyle, setNavStyle] = useState<NavStyle>("floating");
   const [roster, setRoster] = useState<Roster>(mockRoster);
   const [selectedSectionId, setSelectedSectionId] = useState("hq");
   const [selectedUnitId, setSelectedUnitId] = useState("centurion");
@@ -156,6 +157,8 @@ function App() {
       onColorSchemeChange={setColorScheme}
       onNavigatorViewChange={setNavigatorView}
       onWorkflowScreenChange={selectWorkflowScreen}
+      navStyle={navStyle}
+      onNavStyleChange={setNavStyle}
       onCapture={captureCurrentStage}
       boardProps={{
         roster,
@@ -165,6 +168,7 @@ function App() {
         expandedSectionIds,
         smartSearch,
         onToggleSmartSearch: () => setSmartSearch((value) => !value),
+        navStyle,
         onSelectSection: selectSection,
         onToggleSection: toggleSection,
         onSelectUnit: selectUnit,
@@ -186,6 +190,7 @@ function App() {
         colorScheme={colorScheme}
         smartSearch={smartSearch}
         onToggleSmartSearch={() => setSmartSearch((value) => !value)}
+        navStyle={navStyle}
         canGoBack={screenHistory.length > 0 || screen !== "overview"}
         onSelectSection={selectSection}
         onToggleSection={toggleSection}
