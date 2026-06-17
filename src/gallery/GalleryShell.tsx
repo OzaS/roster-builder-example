@@ -1,8 +1,8 @@
-import type { RefObject } from "react";
-import { Component, Moon, MonitorSmartphone, Navigation, Palette, PanelBottom, PanelTop, Rows3, Smartphone, Sun, TabletSmartphone } from "lucide-react";
+import { useState, type RefObject } from "react";
+import { Archive, Component, MonitorSmartphone, Moon, Navigation, Palette, PanelBottom, Rows3, Smartphone, Sun, TabletSmartphone } from "lucide-react";
 import { DeviceFrame } from "../components/DeviceFrame";
 import { ScreenshotButton } from "../components/v2/ScreenshotButton";
-import { WorkflowScreenPicker } from "../components/v2/WorkflowScreenPicker";
+import { WorkflowScreenPicker, type WorkflowPickerSelection } from "../components/v2/WorkflowScreenPicker";
 import type { ColorScheme, ConceptId, NavigatorView, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode, WorkflowScreen } from "../types";
 import { colorSchemes } from "../types";
 import { activeConcepts, archivedConcepts, uxConcepts } from "./conceptRegistry";
@@ -49,8 +49,7 @@ type Props = {
   onCapture: () => void;
 };
 
-const navStyleOptions: Array<{ id: NavStyle; label: string; icon: typeof PanelTop }> = [
-  { id: "top", label: "Top bar", icon: PanelTop },
+const navStyleOptions: Array<{ id: Exclude<NavStyle, "top">; label: string; icon: typeof PanelBottom }> = [
   { id: "tabs", label: "Bottom tabs", icon: PanelBottom },
   { id: "floating", label: "Floating tabs", icon: Navigation },
 ];
@@ -76,65 +75,95 @@ export function GalleryShell({
   onNavStyleChange,
   onCapture,
 }: Props) {
+  const [workflowSelection, setWorkflowSelection] = useState<WorkflowPickerSelection>("all");
+  const activeWorkflowSelection = navigatorView === "all-screens" ? workflowSelection : workflowScreen;
+
+  function selectWorkflow(selection: WorkflowPickerSelection) {
+    setWorkflowSelection(selection);
+    if (selection === "all") {
+      onNavigatorViewChange("all-screens");
+      return;
+    }
+    onWorkflowScreenChange(selection);
+  }
+
+  function selectNavigatorView(view: NavigatorView) {
+    if (view === "all-screens") {
+      setWorkflowSelection("all");
+    }
+    onNavigatorViewChange(view);
+  }
+
   return (
     <div className="app">
       <aside className="gallery-rail v2-gallery-rail">
-        <div className="brand-lockup">
-          <span className="brand-mark">RB</span>
-          <span>
-            <strong>Roster Builder</strong>
-            <small>Concept gallery</small>
-          </span>
+        <div className="rail-topline">
+          <div className="brand-lockup">
+            <span className="brand-mark">RB</span>
+            <span>
+              <strong>Roster Builder</strong>
+              <small>Concept gallery</small>
+            </span>
+          </div>
+          <div className="rail-actions">
+            <ScreenshotButton onCapture={onCapture} />
+            {archivedConcepts.length > 0 ? (
+              <details className="archive-menu">
+                <summary className="rail-icon-button" aria-label="Open archive" title="Open archive">
+                  <Archive size={17} />
+                </summary>
+                <ConceptGroup title="Archive" concepts={archivedConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
+              </details>
+            ) : null}
+          </div>
         </div>
         <ConceptGroup title="Designs" concepts={uxConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
-        {archivedConcepts.length > 0 ? (
-          <ConceptGroup title="Archive" concepts={archivedConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
-        ) : null}
-        <WorkflowScreenPicker active={workflowScreen} screens={concept.workflow} flows={concept.flows} onSelect={onWorkflowScreenChange} />
-        <ControlGroup title="Navigation">
-          {navStyleOptions.map((option) => {
-            const Icon = option.icon;
-            return (
-              <button key={option.id} className={navStyle === option.id ? "active" : ""} type="button" onClick={() => onNavStyleChange(option.id)}>
-                <Icon size={16} />
-                {option.label}
-              </button>
-            );
-          })}
-        </ControlGroup>
-        <ControlGroup title="View">
-          <button className={navigatorView === "single" ? "active" : ""} type="button" onClick={() => onNavigatorViewChange("single")}>
-            <Smartphone size={16} />
-            Single
+        <div className="view-icon-switch" role="group" aria-label="View">
+          <button className={navigatorView === "single" ? "active" : ""} type="button" onClick={() => selectNavigatorView("single")} aria-label="Single" title="Single">
+            <Smartphone size={18} />
           </button>
-          <button className={navigatorView === "all-screens" ? "active" : ""} type="button" onClick={() => onNavigatorViewChange("all-screens")}>
-            <Rows3 size={16} />
-            All Screens
+          <button className={navigatorView === "all-screens" ? "active" : ""} type="button" onClick={() => selectNavigatorView("all-screens")} aria-label="All screens" title="All screens">
+            <Rows3 size={18} />
           </button>
-          <button className={navigatorView === "elements" ? "active" : ""} type="button" onClick={() => onNavigatorViewChange("elements")}>
-            <Component size={16} />
-            Elements
+          <button className={navigatorView === "elements" ? "active" : ""} type="button" onClick={() => selectNavigatorView("elements")} aria-label="Elements" title="Elements">
+            <Component size={18} />
           </button>
-        </ControlGroup>
-        <ControlGroup title="Theme">
-          <button className={themeMode === "dark" ? "active" : ""} type="button" onClick={() => onThemeModeChange("dark")}>
-            <Moon size={16} />
-            Dark
-          </button>
-          <button className={themeMode === "light" ? "active" : ""} type="button" onClick={() => onThemeModeChange("light")}>
-            <Sun size={16} />
-            Light
-          </button>
-        </ControlGroup>
-        <ControlGroup title="Game scheme">
-          {colorSchemes.map((scheme) => (
-            <button key={scheme.id} className={colorScheme === scheme.id ? "active" : ""} type="button" onClick={() => onColorSchemeChange(scheme.id)}>
-              <Palette size={16} />
-              {scheme.label}
+        </div>
+        <WorkflowScreenPicker active={activeWorkflowSelection} screens={concept.workflow} flows={concept.flows} onSelect={selectWorkflow} />
+        <details className="rail-disclosure">
+          <summary>
+            <h3>Display</h3>
+          </summary>
+          <ControlGroup title="Navigation">
+            {navStyleOptions.map((option) => {
+              const Icon = option.icon;
+              return (
+                <button key={option.id} className={navStyle === option.id ? "active" : ""} type="button" onClick={() => onNavStyleChange(option.id)}>
+                  <Icon size={16} />
+                  {option.label}
+                </button>
+              );
+            })}
+          </ControlGroup>
+          <ControlGroup title="Theme">
+            <button className={themeMode === "dark" ? "active" : ""} type="button" onClick={() => onThemeModeChange("dark")}>
+              <Moon size={16} />
+              Dark
             </button>
-          ))}
-        </ControlGroup>
-        <ScreenshotButton onCapture={onCapture} />
+            <button className={themeMode === "light" ? "active" : ""} type="button" onClick={() => onThemeModeChange("light")}>
+              <Sun size={16} />
+              Light
+            </button>
+          </ControlGroup>
+          <ControlGroup title="Game scheme">
+            {colorSchemes.map((scheme) => (
+              <button key={scheme.id} className={colorScheme === scheme.id ? "active" : ""} type="button" onClick={() => onColorSchemeChange(scheme.id)}>
+                <Palette size={16} />
+                {scheme.label}
+              </button>
+            ))}
+          </ControlGroup>
+        </details>
         <div className="platform-toggle" role="group" aria-label="Preview device">
           <button className={platform === "phone" ? "active" : ""} onClick={() => onPlatformChange("phone")} type="button">
             <MonitorSmartphone size={17} />
@@ -149,7 +178,7 @@ export function GalleryShell({
       <main className={`gallery-stage ${navigatorView !== "single" ? "board-mode" : ""}`}>
         <section className="preview-column" ref={captureRef}>
           {navigatorView === "all-screens" ? (
-            <WorkflowBoard concept={concept} platform={platform} themeMode={themeMode} colorScheme={colorScheme} {...boardProps} />
+            <WorkflowBoard concept={concept} activeWorkflow={workflowSelection} platform={platform} themeMode={themeMode} colorScheme={colorScheme} {...boardProps} />
           ) : navigatorView === "elements" ? (
             <DesignElementsPanel
               concept={concept}

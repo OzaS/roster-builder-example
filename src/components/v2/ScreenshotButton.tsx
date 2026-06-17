@@ -6,12 +6,8 @@ type Props = {
 
 export function ScreenshotButton({ onCapture }: Props) {
   return (
-    <section className="screenshot-actions">
-      <h3>Action</h3>
-      <button type="button" onClick={onCapture}>
-        <Camera size={16} />
-        Screenshot
-      </button>
-    </section>
+    <button className="rail-icon-button" type="button" onClick={onCapture} aria-label="Take screenshot" title="Take screenshot">
+      <Camera size={17} />
+    </button>
   );
 }
