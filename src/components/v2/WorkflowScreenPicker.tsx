@@ -2,7 +2,7 @@ import type { WorkflowScreen } from "../../types";
 import type { WorkflowFlow } from "../../gallery/galleryTypes";
 import { resolveWorkflow } from "../../gallery/workflow";
 
-export type WorkflowPickerSelection = "all" | WorkflowScreen;
+export type WorkflowPickerSelection = "all" | string;
 
 type Props = {
   active: WorkflowPickerSelection;
@@ -12,7 +12,7 @@ type Props = {
 };
 
 export function WorkflowScreenPicker({ active, screens, flows, onSelect }: Props) {
-  const items = flows && flows.length > 0 ? flows : resolveWorkflow(screens).map((screen) => ({ id: screen.id, label: screen.label, screen: screen.id }));
+  const items = flows && flows.length > 0 ? flows : resolveWorkflow(screens).map((screen) => ({ id: screen.id, label: screen.label, screens: [screen.id] }));
 
   return (
     <details className="workflow-picker" open>
@@ -24,7 +24,7 @@ export function WorkflowScreenPicker({ active, screens, flows, onSelect }: Props
           All
         </button>
         {items.map((item) => (
-          <button className={active === item.screen ? "active" : ""} key={item.id} type="button" onClick={() => onSelect(item.screen)}>
+          <button className={active === item.id ? "active" : ""} key={item.id} type="button" onClick={() => onSelect(item.id)}>
             {item.label}
           </button>
         ))}

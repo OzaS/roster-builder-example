@@ -6,13 +6,13 @@ import type { ConceptProps } from "../concepts/shared";
 export type WorkflowFlow = {
   id: string;
   label: string;
-  screen: WorkflowScreen;
+  screens: WorkflowScreen[];
 };
 
 export type GalleryConcept = ConceptMeta & {
   component: ComponentType<ConceptProps>;
   /** Screens this design actually implements, used to drive the all-screens board. */
   workflow?: WorkflowScreen[];
-  /** High-level journeys surfaced in the workflow picker; falls back to `workflow`. */
+  /** High-level workflow groups surfaced in the workflow picker; falls back to `workflow`. */
   flows?: WorkflowFlow[];
 };

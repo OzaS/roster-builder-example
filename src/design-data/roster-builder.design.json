@@ -1,0 +1,225 @@
+{
+  "version": 1,
+  "designs": [
+    {
+      "id": "ux-workbench",
+      "status": "active",
+      "name": "Codex Workbench",
+      "eyebrow": "UX · master-detail",
+      "icon": "PanelsTopLeft",
+      "component": "CodexWorkbench",
+      "bestFor": "Tablet power-editing and tuning loadouts without losing roster context.",
+      "direction": "Library → persistent roster tree, live detail pane and a validation rail; optional smart search overlays it.",
+      "interaction": "Select in the tree, edit on the right, watch legality update in the rail. Flip on smart search for type-to-add and AI suggestions.",
+      "tradeoff": "Shines on tablet; on phone it falls back to a more conventional drill-in.",
+      "screens": [
+        {
+          "id": "library",
+          "label": "Lists"
+        },
+        {
+          "id": "source",
+          "label": "Lookup"
+        },
+        {
+          "id": "tools",
+          "label": "Tools"
+        },
+        {
+          "id": "settings",
+          "label": "Settings"
+        },
+        {
+          "id": "create-roster",
+          "label": "Roster creation"
+        },
+        {
+          "id": "overview",
+          "label": "Roster edition"
+        },
+        {
+          "id": "add-unit",
+          "label": "Add unit"
+        },
+        {
+          "id": "unit-detail",
+          "label": "Unit detail"
+        },
+        {
+          "id": "diagnostics",
+          "label": "Diagnostics"
+        }
+      ],
+      "workflows": [
+        {
+          "id": "main",
+          "label": "Main screen",
+          "screens": [
+            "library"
+          ]
+        },
+        {
+          "id": "lookup",
+          "label": "Lookup",
+          "screens": [
+            "source"
+          ]
+        },
+        {
+          "id": "tools",
+          "label": "Tools",
+          "screens": [
+            "tools"
+          ]
+        },
+        {
+          "id": "settings",
+          "label": "Settings",
+          "screens": [
+            "settings"
+          ]
+        },
+        {
+          "id": "creation",
+          "label": "Roster creation",
+          "screens": [
+            "create-roster"
+          ]
+        },
+        {
+          "id": "edition",
+          "label": "Roster edition",
+          "screens": [
+            "overview"
+          ]
+        },
+        {
+          "id": "units",
+          "label": "Add & configure units",
+          "screens": [
+            "add-unit",
+            "unit-detail"
+          ]
+        },
+        {
+          "id": "diagnostics",
+          "label": "Diagnostics",
+          "screens": [
+            "diagnostics"
+          ]
+        },
+        {
+          "id": "unsorted",
+          "label": "Unsorted",
+          "screens": []
+        }
+      ],
+      "trash": {
+        "screens": []
+      },
+      "elements": {
+        "sections": [
+          "Color Tokens",
+          "Typography",
+          "Workbench Chrome",
+          "Roster Tree",
+          "Detail Pane",
+          "Options",
+          "Validation Rail",
+          "Add Pool Rows",
+          "Smart Search (Settings)",
+          "Lookup & Sources",
+          "Tools Hub",
+          "Main Tab Bar",
+          "Designer Rail Controls",
+          "Workflow Board Group",
+          "Floating Command Bar"
+        ]
+      }
+    },
+    {
+      "id": "ux-command",
+      "status": "archived",
+      "name": "Quickstrike Command",
+      "eyebrow": "UX · search-first",
+      "icon": "Command",
+      "component": "QuickstrikeCommand",
+      "bestFor": "Experienced players who know what they want and hate tapping through menus.",
+      "direction": "Thumb-zone command bar, fuzzy results, smart legal/affordable filters, and assistant suggestions.",
+      "interaction": "Type to add any unit from anywhere instead of drilling system → catalogue → org → category → unit.",
+      "tradeoff": "Relies on strong search/AI; the value is invisible until the catalogue index is good.",
+      "screens": [
+        {
+          "id": "library",
+          "label": "Library"
+        },
+        {
+          "id": "overview",
+          "label": "Roster"
+        },
+        {
+          "id": "add-unit",
+          "label": "Add unit"
+        },
+        {
+          "id": "unit-detail",
+          "label": "Unit detail"
+        },
+        {
+          "id": "diagnostics",
+          "label": "Diagnostics"
+        },
+        {
+          "id": "export",
+          "label": "Export"
+        }
+      ],
+      "workflows": [
+        {
+          "id": "library",
+          "label": "Library",
+          "screens": [
+            "library"
+          ]
+        },
+        {
+          "id": "build",
+          "label": "Build",
+          "screens": [
+            "overview",
+            "add-unit",
+            "unit-detail"
+          ]
+        },
+        {
+          "id": "finish",
+          "label": "Finish",
+          "screens": [
+            "diagnostics",
+            "export"
+          ]
+        },
+        {
+          "id": "unsorted",
+          "label": "Unsorted",
+          "screens": []
+        }
+      ],
+      "trash": {
+        "screens": []
+      },
+      "elements": {
+        "sections": [
+          "Color Tokens",
+          "Typography",
+          "Command Header",
+          "Command Input",
+          "Result Rows",
+          "Roster Rows",
+          "Options",
+          "Thumb Command Bar"
+        ]
+      }
+    }
+  ]
+}

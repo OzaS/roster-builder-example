@@ -1,4 +1,4 @@
-import { AlertTriangle, ArrowUp, Command, CornerDownLeft, Download, Filter, Layers, PanelsTopLeft, Plus, Search, Share2, Sparkles, Zap } from "lucide-react";
+import { AlertTriangle, Archive, ArrowUp, Command, CornerDownLeft, Database, Download, FileInput, Filter, Hammer, Layers, PanelsTopLeft, Plus, Rows3, Search, Share2, Smartphone, Sparkles, Trash2, Zap } from "lucide-react";
 import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode } from "../types";
 import { BudgetMeter, Chip, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
@@ -376,6 +376,169 @@ function WorkbenchElements({
             ))}
           </div>
         </div>
+      </ElementSection>
+
+      <ElementSection title="Lookup & Sources">
+        <div className="ux-source-filters">
+          {["All sources", roster.system, roster.faction].map((label, index) => (
+            <button key={label} type="button" className={`ux-filter-pill ${index === 0 ? "on" : ""}`}>
+              {label}
+            </button>
+          ))}
+        </div>
+        <section className="ux-lookup-group">
+          <div className="ux-lookup-title">
+            <Search size={15} />
+            <strong>Units</strong>
+          </div>
+          {flattenUnits(roster).slice(0, 2).map((unit) => (
+            <button key={unit.id} type="button" className="ux-lookup-row">
+              <span>
+                <strong>{unit.name}</strong>
+                <small>{unit.role}</small>
+              </span>
+              <b>{unit.points} pts</b>
+            </button>
+          ))}
+        </section>
+        <details className="ux-source-section" open>
+          <summary>
+            <span>
+              <Database size={16} />
+              <strong>Sources</strong>
+            </span>
+          </summary>
+          <button type="button" className="ux-import-source">
+            <FileInput size={18} />
+            <span>
+              <strong>Import source</strong>
+              <small>Add catalogue files or rules packs</small>
+            </span>
+          </button>
+          <div className="ux-source-list">
+            <button type="button" className="ux-source-row on">
+              <span>
+                <strong>{roster.faction}</strong>
+                <small>{roster.system} · Imported today</small>
+              </span>
+              <Chip tone="valid">v42</Chip>
+            </button>
+          </div>
+        </details>
+      </ElementSection>
+
+      <ElementSection title="Tools Hub">
+        <div className="ux-tools-summary">
+          <BudgetMeter roster={roster} label="Current list" />
+          <div>
+            <strong>{flattenUnits(roster).length} units</strong>
+            <small>{roster.sections.length} roster sections</small>
+          </div>
+        </div>
+        <div className="ux-tools-grid">
+          {["Validation snapshot", "Export & share"].map((label) => (
+            <button key={label} type="button" className="ux-tool-tile">
+              <span className="ux-setting-icon">
+                <Hammer size={18} />
+              </span>
+              <span>
+                <strong>{label}</strong>
+                <small>Roster utility</small>
+              </span>
+            </button>
+          ))}
+        </div>
+        <section className="ux-tools-panel">
+          <div className="ux-lookup-title">
+            <Hammer size={15} />
+            <strong>Checklist</strong>
+          </div>
+          <button type="button" className="ux-source-row on">
+            <span className="ux-opt-check" aria-hidden />
+            <span>
+              <strong>Confirm detachment rules</strong>
+              <small>Ready for review</small>
+            </span>
+          </button>
+        </section>
+      </ElementSection>
+
+      <ElementSection title="Main Tab Bar">
+        <div className="ux-elements-command-wrap">
+          <nav className="ux-tabbar floating" aria-label="Main navigation">
+            <button type="button" className="ux-tab active">
+              <Layers size={20} />
+              <span>Lists</span>
+            </button>
+            <button type="button" className="ux-tab">
+              <Search size={20} />
+              <span>Lookup</span>
+            </button>
+            <button type="button" className="ux-tab ux-tab-fab" aria-label="Add unit">
+              <Plus size={22} />
+            </button>
+            <button type="button" className="ux-tab">
+              <Hammer size={20} />
+              <span>Tools</span>
+            </button>
+            <button type="button" className="ux-tab">
+              <Database size={20} />
+              <span>Settings</span>
+            </button>
+          </nav>
+        </div>
+      </ElementSection>
+
+      <ElementSection title="Designer Rail Controls">
+        <div className="rail-actions">
+          <button className="rail-icon-button" type="button" aria-label="Screenshot">
+            <Download size={17} />
+          </button>
+          <details className="archive-menu">
+            <summary className="rail-icon-button">
+              <Archive size={17} />
+            </summary>
+          </details>
+        </div>
+        <div className="view-icon-switch" role="group" aria-label="View">
+          <button className="active" type="button" aria-label="Single">
+            <Smartphone size={18} />
+          </button>
+          <button type="button" aria-label="All screens">
+            <Rows3 size={18} />
+          </button>
+          <button type="button" aria-label="Elements">
+            <PanelsTopLeft size={18} />
+          </button>
+        </div>
+        <details className="rail-disclosure workflow-editor" open>
+          <summary>
+            <h3>Workflow editor</h3>
+          </summary>
+          <button className="workflow-add-button" type="button">
+            <Plus size={15} />
+            Add workflow
+          </button>
+          <div className="screen-move-row">
+            <span>
+              <strong>Lookup</strong>
+              <small>source</small>
+            </span>
+            <select value="lookup" onChange={() => undefined}>
+              <option value="lookup">Lookup</option>
+            </select>
+            <button type="button" aria-label="Trash">
+              <Trash2 size={14} />
+            </button>
+          </div>
+        </details>
+      </ElementSection>
+
+      <ElementSection title="Workflow Board Group">
+        <section className="workflow-board-group">
+          <h2>Add & configure units</h2>
+          <div className="workflow-board-label">Add unit</div>
+        </section>
       </ElementSection>
 
       <ElementSection title="Floating Command Bar">

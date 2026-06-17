@@ -97,14 +97,18 @@ export function WorkflowBoard({
   );
 }
 
-type WorkflowBoardItem = WorkflowFlow & { screen: WorkflowScreen };
+type WorkflowBoardItem = { id: string; label: string; screen: WorkflowScreen };
 
 function workflowGroups(concept: GalleryConcept, activeWorkflow: WorkflowPickerSelection): Array<{ id: string; label: string; items: WorkflowBoardItem[] }> {
-  const items: WorkflowBoardItem[] =
+  const flows: WorkflowFlow[] =
     concept.flows && concept.flows.length > 0
       ? concept.flows
-      : resolveWorkflow(concept.workflow).map((screen) => ({ id: screen.id, label: screen.label, screen: screen.id }));
-  const filtered = activeWorkflow === "all" ? items : items.filter((item) => item.screen === activeWorkflow);
+      : resolveWorkflow(concept.workflow).map((screen) => ({ id: screen.id, label: screen.label, screens: [screen.id] }));
+  const filtered = activeWorkflow === "all" ? flows : flows.filter((flow) => flow.id === activeWorkflow);
 
-  return filtered.map((item) => ({ id: item.id, label: item.label, items: [item] }));
+  return filtered.map((flow) => ({
+    id: flow.id,
+    label: flow.label,
+    items: flow.screens.map((screen) => ({ id: `${flow.id}-${screen}`, label: screen, screen })),
+  }));
 }

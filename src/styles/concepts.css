@@ -2245,6 +2245,112 @@
   gap: 12px;
 }
 
+.designer-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.workflow-add-button,
+.workflow-edit-row,
+.screen-move-row,
+.trash-section summary {
+  display: grid;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  background: color-mix(in srgb, var(--surface-2) 72%, white);
+}
+
+.workflow-add-button {
+  grid-template-columns: 16px minmax(0, 1fr);
+  justify-items: start;
+  padding: 0 10px;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.workflow-edit-row {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  padding: 8px;
+}
+
+.screen-move-row {
+  grid-template-columns: minmax(0, 1fr) minmax(86px, 0.75fr) 34px;
+  padding: 8px;
+}
+
+.screen-move-row select {
+  min-width: 0;
+  height: 30px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.workflow-edit-row button,
+.screen-move-row button {
+  min-height: 30px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.workflow-add-button:disabled,
+.workflow-edit-row button:disabled,
+.screen-move-row button:disabled,
+.screen-move-row select:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.workflow-edit-list,
+.screen-move-list,
+.trash-section {
+  display: grid;
+  gap: 6px;
+}
+
+.workflow-edit-row strong,
+.workflow-edit-row small,
+.screen-move-row strong,
+.screen-move-row small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workflow-edit-row small,
+.screen-move-row small,
+.trash-section summary small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.trash-section summary {
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 0 10px;
+  list-style: none;
+  cursor: pointer;
+}
+
+.trash-section summary::-webkit-details-marker {
+  display: none;
+}
+
 .workflow-screen-list {
   display: grid;
   gap: 4px;
