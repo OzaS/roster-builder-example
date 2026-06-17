@@ -1,5 +1,5 @@
-import { useMemo, useState, type RefObject } from "react";
-import { Archive, Component, MonitorSmartphone, Moon, Navigation, Palette, PanelBottom, Plus, Rows3, Smartphone, Sun, TabletSmartphone, Trash2 } from "lucide-react";
+import { useMemo, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type RefObject } from "react";
+import { Archive, Component, MonitorSmartphone, Moon, Navigation, Palette, PanelBottom, Pencil, Plus, Rows3, Smartphone, Sun, TabletSmartphone, Trash2 } from "lucide-react";
 import { DeviceFrame } from "../components/DeviceFrame";
 import { ScreenshotButton } from "../components/v2/ScreenshotButton";
 import { WorkflowScreenPicker, type WorkflowPickerSelection } from "../components/v2/WorkflowScreenPicker";
@@ -86,6 +86,7 @@ export function GalleryShell({
   onCapture,
   onDesignDataChange,
 }: Props) {
+  const [railWidth, setRailWidth] = useState(280);
   const [workflowSelection, setWorkflowSelection] = useState<WorkflowPickerSelection>("all");
   const selectedDesign = designData.designs.find((design) => design.id === selectedConcept);
   const activeWorkflowSelection = navigatorView === "all-screens" ? workflowSelection : workflowIdForScreen(selectedDesign, workflowScreen);
@@ -179,9 +180,29 @@ export function GalleryShell({
     }));
   }
 
+  function startRailResize(event: ReactPointerEvent<HTMLDivElement>) {
+    event.preventDefault();
+    const startX = event.clientX;
+    const startWidth = railWidth;
+
+    function handlePointerMove(moveEvent: PointerEvent) {
+      const nextWidth = Math.min(420, Math.max(232, startWidth + moveEvent.clientX - startX));
+      setRailWidth(nextWidth);
+    }
+
+    function handlePointerUp() {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+    }
+
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+  }
+
   return (
-    <div className="app">
+    <div className="app" style={{ "--rail-width": `${railWidth}px` } as CSSProperties}>
       <aside className="gallery-rail v2-gallery-rail">
+        <div className="rail-resizer" role="separator" aria-orientation="vertical" aria-label="Resize designer panel" onPointerDown={startRailResize} />
         <div className="rail-topline">
           <div className="brand-lockup">
             <span className="brand-mark">RB</span>
@@ -370,10 +391,10 @@ function WorkflowEditor({
               <small>{workflow.screens.length} screens</small>
             </span>
             <button type="button" onClick={() => onRenameWorkflow(workflow.id)} disabled={!writable}>
-              Rename
+              <Pencil size={14} />
             </button>
-            <button type="button" onClick={() => onDeleteWorkflow(workflow.id)} disabled={!writable || workflow.id === "unsorted"}>
-              Delete
+            <button type="button" onClick={() => onDeleteWorkflow(workflow.id)} disabled={!writable || workflow.id === "unsorted"} aria-label={`Delete ${workflow.label}`}>
+              <Trash2 size={14} />
             </button>
           </div>
         ))}

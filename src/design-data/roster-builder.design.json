@@ -55,27 +55,9 @@
           "id": "main",
           "label": "Main screen",
           "screens": [
-            "library"
-          ]
-        },
-        {
-          "id": "lookup",
-          "label": "Lookup",
-          "screens": [
-            "source"
-          ]
-        },
-        {
-          "id": "tools",
-          "label": "Tools",
-          "screens": [
-            "tools"
-          ]
-        },
-        {
-          "id": "settings",
-          "label": "Settings",
-          "screens": [
+            "library",
+            "source",
+            "tools",
             "settings"
           ]
         },
@@ -90,21 +72,9 @@
           "id": "edition",
           "label": "Roster edition",
           "screens": [
-            "overview"
-          ]
-        },
-        {
-          "id": "units",
-          "label": "Add & configure units",
-          "screens": [
+            "overview",
             "add-unit",
-            "unit-detail"
-          ]
-        },
-        {
-          "id": "diagnostics",
-          "label": "Diagnostics",
-          "screens": [
+            "unit-detail",
             "diagnostics"
           ]
         },
