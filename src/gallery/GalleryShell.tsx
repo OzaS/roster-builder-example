@@ -21,6 +21,7 @@ type Props = {
   navigatorView: NavigatorView;
   workflowScreen: WorkflowScreen;
   navStyle: NavStyle;
+  statusBarUsesDesignBackground: boolean;
   concept: GalleryConcept;
   designData: DesignData;
   designDataWritable: boolean;
@@ -52,6 +53,7 @@ type Props = {
   onNavigatorViewChange: (view: NavigatorView) => void;
   onWorkflowScreenChange: (screen: WorkflowScreen) => void;
   onNavStyleChange: (style: NavStyle) => void;
+  onStatusBarUsesDesignBackgroundChange: (enabled: boolean) => void;
   onCapture: () => void;
   onDesignDataChange: (data: DesignData) => void;
 };
@@ -69,6 +71,7 @@ export function GalleryShell({
   navigatorView,
   workflowScreen,
   navStyle,
+  statusBarUsesDesignBackground,
   concept,
   designData,
   designDataWritable,
@@ -84,6 +87,7 @@ export function GalleryShell({
   onNavigatorViewChange,
   onWorkflowScreenChange,
   onNavStyleChange,
+  onStatusBarUsesDesignBackgroundChange,
   onCapture,
   onDesignDataChange,
 }: Props) {
@@ -295,6 +299,18 @@ export function GalleryShell({
               Light
             </button>
           </ControlGroup>
+          <ControlGroup title="Status bar">
+            <button
+              className="display-switch-row"
+              type="button"
+              role="switch"
+              aria-checked={statusBarUsesDesignBackground}
+              onClick={() => onStatusBarUsesDesignBackgroundChange(!statusBarUsesDesignBackground)}
+            >
+              <span>Design background</span>
+              <span className="display-switch" aria-hidden="true" />
+            </button>
+          </ControlGroup>
           <ControlGroup title="Game scheme">
             {colorSchemes.map((scheme) => (
               <button key={scheme.id} className={colorScheme === scheme.id ? "active" : ""} type="button" onClick={() => onColorSchemeChange(scheme.id)}>
@@ -325,6 +341,7 @@ export function GalleryShell({
               platform={platform}
               themeMode={themeMode}
               colorScheme={colorScheme}
+              statusBarUsesDesignBackground={statusBarUsesDesignBackground}
               onOpenGlance={openGlance}
               {...boardProps}
             />
@@ -345,7 +362,7 @@ export function GalleryShell({
             />
           ) : (
             <div className="single-preview-shell" onClickCapture={handleSinglePreviewClick}>
-              <DeviceFrame platform={platform}>{children}</DeviceFrame>
+              <DeviceFrame platform={platform} themeMode={themeMode} colorScheme={colorScheme} statusBarUsesDesignBackground={statusBarUsesDesignBackground}>{children}</DeviceFrame>
             </div>
           )}
         </section>
@@ -380,6 +397,7 @@ export function GalleryShell({
           platform={platform}
           themeMode={themeMode}
           colorScheme={colorScheme}
+          statusBarUsesDesignBackground={statusBarUsesDesignBackground}
           roster={boardProps.roster}
           selectedSection={boardProps.selectedSection}
           selectedUnit={boardProps.selectedUnit}

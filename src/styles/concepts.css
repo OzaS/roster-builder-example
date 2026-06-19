@@ -2272,6 +2272,55 @@
   gap: 12px;
 }
 
+.display-switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 38px;
+  padding: 7px 9px 7px 11px;
+  border: 1px solid var(--line, var(--ux-line, rgba(20, 29, 32, 0.16)));
+  border-radius: var(--radius-sm);
+  color: var(--ink, var(--ux-ink, #142026));
+  background: var(--surface, var(--ux-surface, #ffffff));
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.display-switch {
+  position: relative;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 20px;
+  border-radius: 10px;
+  background: var(--surface-3, var(--ux-surface-3, #cad3d6));
+  transition: background 160ms ease;
+}
+
+.display-switch::after {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(18, 31, 36, 0.24);
+  content: "";
+  transition: transform 160ms ease;
+}
+
+.display-switch-row[aria-checked="true"] .display-switch {
+  background: var(--accent, var(--ux-accent, #4a5bd6));
+}
+
+.display-switch-row[aria-checked="true"] .display-switch::after {
+  transform: translateX(14px);
+}
+
 .designer-note {
   margin: 0;
   color: var(--muted);

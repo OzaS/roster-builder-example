@@ -2665,6 +2665,54 @@
   grid-template-columns: minmax(320px, 1fr);
 }
 
+.ux-phone-status-preview {
+  width: min(360px, 100%);
+  overflow: hidden;
+  border: 8px solid #14191b;
+  border-radius: 22px 22px 8px 8px;
+  background: #101416;
+}
+
+.device-frame.ux-scheme-wh40k.theme-dark .phone-status-bar,
+.ux-phone-status-preview.ux-scheme-wh40k.theme-dark .phone-status-bar {
+  --phone-status-design-bg: #0b0a0c;
+}
+
+.device-frame.ux-scheme-wh40k.theme-light .phone-status-bar,
+.ux-phone-status-preview.ux-scheme-wh40k.theme-light .phone-status-bar {
+  --phone-status-design-bg: #efe7df;
+}
+
+.device-frame.ux-scheme-horus-heresy.theme-dark .phone-status-bar,
+.ux-phone-status-preview.ux-scheme-horus-heresy.theme-dark .phone-status-bar {
+  --phone-status-design-bg: #190809;
+}
+
+.device-frame.ux-scheme-horus-heresy.theme-light .phone-status-bar,
+.ux-phone-status-preview.ux-scheme-horus-heresy.theme-light .phone-status-bar {
+  --phone-status-design-bg: #e9dcc4;
+}
+
+.device-frame.ux-scheme-age-of-sigmar.theme-dark .phone-status-bar,
+.ux-phone-status-preview.ux-scheme-age-of-sigmar.theme-dark .phone-status-bar {
+  --phone-status-design-bg: #060f1d;
+}
+
+.device-frame.ux-scheme-age-of-sigmar.theme-light .phone-status-bar,
+.ux-phone-status-preview.ux-scheme-age-of-sigmar.theme-light .phone-status-bar {
+  --phone-status-design-bg: #e4eef6;
+}
+
+.device-frame.ux-scheme-old-world.theme-dark .phone-status-bar,
+.ux-phone-status-preview.ux-scheme-old-world.theme-dark .phone-status-bar {
+  --phone-status-design-bg: #0b110d;
+}
+
+.device-frame.ux-scheme-old-world.theme-light .phone-status-bar,
+.ux-phone-status-preview.ux-scheme-old-world.theme-light .phone-status-bar {
+  --phone-status-design-bg: #e7e3d4;
+}
+
 .design-elements-panel.ux-screen .ux-elements-hero,
 .design-elements-panel.ux-screen .ux-element-section {
   border-color: var(--ux-line);

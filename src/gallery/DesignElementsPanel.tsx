@@ -1,4 +1,5 @@
 import { AlertTriangle, Archive, ArrowUp, Check, ChevronDown, Command, CornerDownLeft, Database, Download, FileInput, Filter, Hammer, Layers, MessageCircle, PanelsTopLeft, Plus, Rows3, Search, Share2, Smartphone, Sparkles, Trash2, Zap } from "lucide-react";
+import { PhoneStatusBar } from "../components/DeviceFrame";
 import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode } from "../types";
 import { BudgetMeter, Chip, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
@@ -54,6 +55,11 @@ export function DesignElementsPanel({
 
       <TokenSection />
       <TypographySection roster={roster} />
+      <ElementSection title="Phone Status Bar">
+        <div className={`ux-phone-status-preview theme-${themeMode} ux-scheme-${colorScheme} status-bar-design`}>
+          <PhoneStatusBar />
+        </div>
+      </ElementSection>
       {isWorkbench ? (
         <WorkbenchElements roster={roster} selectedSection={selectedSection} selectedUnit={selectedUnit} selectedSectionId={selectedSectionId} onSelectSection={onSelectSection} onSelectUnit={onSelectUnit} onToggleOption={onToggleOption} />
       ) : (
@@ -561,6 +567,10 @@ function WorkbenchElements({
             <PanelsTopLeft size={18} />
           </button>
         </div>
+        <button className="display-switch-row" type="button" role="switch" aria-checked="true">
+          <span>Design background</span>
+          <span className="display-switch" aria-hidden="true" />
+        </button>
         <details className="rail-disclosure workflow-editor" open>
           <summary>
             <h3>Workflow editor</h3>

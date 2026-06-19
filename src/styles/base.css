@@ -141,10 +141,60 @@ small {
 }
 
 .device-frame {
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   border: 10px solid #14191b;
   background: #101416;
   box-shadow: 0 28px 70px rgba(20, 29, 32, 0.32);
+}
+
+.device-frame-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.device-frame-content > * {
+  height: 100%;
+}
+
+.phone-status-bar {
+  --phone-status-device-bg: #101416;
+  --phone-status-design-bg: #0d0f14;
+  --phone-status-ink: #f4f7f8;
+
+  display: flex;
+  flex: 0 0 28px;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 28px;
+  padding: 0 13px 0 17px;
+  color: var(--phone-status-ink);
+  background: var(--phone-status-device-bg);
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1;
+}
+
+.device-frame.theme-light .phone-status-bar,
+.ux-phone-status-preview.theme-light .phone-status-bar {
+  --phone-status-device-bg: #f7f8fa;
+  --phone-status-design-bg: #eef1f6;
+  --phone-status-ink: #141a26;
+}
+
+.device-frame.status-bar-design .phone-status-bar,
+.ux-phone-status-preview.status-bar-design .phone-status-bar {
+  background: var(--phone-status-design-bg);
+}
+
+.phone-status-icons {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .device-frame.phone {
