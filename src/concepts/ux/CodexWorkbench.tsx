@@ -65,6 +65,8 @@ export function CodexWorkbench(props: ConceptProps) {
 }
 
 function WorkbenchHeader({ props }: { props: ConceptProps }) {
+  const isUnitDetail = props.screen === "unit-detail";
+
   return (
     <header className="ux-wb-top">
       <BackOrTitle
@@ -76,12 +78,19 @@ function WorkbenchHeader({ props }: { props: ConceptProps }) {
         }
       />
       <div className="ux-wb-title">
-        <strong>{props.roster.name}</strong>
-        <small>{props.roster.faction} · {props.roster.system}</small>
+        <strong>{isUnitDetail ? props.selectedUnit.name : props.roster.name}</strong>
+        <small>{isUnitDetail ? props.selectedSection.name : `${props.roster.faction} · ${props.roster.system}`}</small>
       </div>
-      <button type="button" className="ux-icon-btn" aria-label="Export" onClick={() => props.onNavigate("export")}>
-        <Download size={18} />
-      </button>
+      {isUnitDetail ? (
+        <span className="ux-wb-header-points" aria-label={`${props.selectedUnit.points} points`}>
+          <b>{props.selectedUnit.points}</b>
+          <small>pts</small>
+        </span>
+      ) : (
+        <button type="button" className="ux-icon-btn" aria-label="Export" onClick={() => props.onNavigate("export")}>
+          <Download size={18} />
+        </button>
+      )}
     </header>
   );
 }
@@ -144,20 +153,6 @@ function Detail({ props }: { props: ConceptProps }) {
   const unit = props.selectedUnit;
   return (
     <section className="ux-wb-detail">
-      <button type="button" className="ux-wb-back" onClick={props.onBack}>
-        <ArrowLeft size={14} />
-        Back to roster
-      </button>
-      <div className="ux-wb-detail-head">
-        <span>
-          <small>{props.selectedSection.name}</small>
-          <strong>{unit.name}</strong>
-        </span>
-        <span className="ux-wb-detail-pts">
-          <b>{unit.points}</b>
-          <small>points</small>
-        </span>
-      </div>
       <div className="ux-keywords">
         {unit.keywords.map((k) => (
           <Chip key={k} tone="cool">

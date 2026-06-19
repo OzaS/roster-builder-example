@@ -1474,7 +1474,7 @@
    ===================================================================== */
 .ux-wb-top {
   display: grid;
-  grid-template-columns: 40px minmax(0, 1fr) 40px;
+  grid-template-columns: 40px minmax(0, 1fr) 48px;
   align-items: center;
   gap: 10px;
   padding: 12px 14px;
@@ -1492,8 +1492,29 @@
 }
 .ux-wb-title small {
   display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--ux-muted);
   font-size: 11.5px;
+}
+.ux-wb-header-points {
+  display: grid;
+  justify-items: end;
+  min-width: 0;
+  color: var(--ux-accent-2);
+  line-height: 1;
+}
+.ux-wb-header-points b {
+  font-size: 16px;
+  font-weight: 850;
+}
+.ux-wb-header-points small {
+  margin-top: 3px;
+  color: var(--ux-muted);
+  font-size: 9.5px;
+  font-weight: 750;
+  text-transform: uppercase;
 }
 .ux-wb-budget {
   padding: 12px 14px;
@@ -1650,20 +1671,6 @@
   font-size: 19px;
   font-weight: 850;
 }
-.ux-wb-detail-pts {
-  text-align: right;
-}
-.ux-wb-detail-pts b {
-  font-size: 22px;
-  font-weight: 850;
-  color: var(--ux-accent-2);
-}
-.ux-wb-detail-pts small {
-  display: block;
-  color: var(--ux-muted);
-  font-size: 11px;
-}
-
 .ux-wb-rail {
   display: grid;
   align-content: start;

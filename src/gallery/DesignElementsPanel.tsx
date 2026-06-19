@@ -1,4 +1,4 @@
-import { AlertTriangle, Archive, ArrowUp, Check, ChevronDown, Command, CornerDownLeft, Database, Download, FileInput, Filter, Hammer, Layers, MessageCircle, PanelsTopLeft, Plus, Rows3, Search, Share2, Smartphone, Sparkles, Trash2, Zap } from "lucide-react";
+import { AlertTriangle, Archive, ArrowLeft, ArrowUp, Check, ChevronDown, Command, CornerDownLeft, Database, Download, FileInput, Filter, Hammer, Layers, MessageCircle, PanelsTopLeft, Plus, Rows3, Search, Share2, Smartphone, Sparkles, Trash2, Zap } from "lucide-react";
 import { PhoneStatusBar } from "../components/DeviceFrame";
 import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode } from "../types";
 import { BudgetMeter, Chip, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph } from "../concepts/ux/uxShared";
@@ -270,6 +270,19 @@ function WorkbenchElements({
             <Download size={18} />
           </button>
         </header>
+        <header className="ux-wb-top ux-elements-static">
+          <button type="button" className="ux-icon-btn" aria-label="Back">
+            <ArrowLeft size={18} />
+          </button>
+          <div className="ux-wb-title">
+            <strong>{selectedUnit.name}</strong>
+            <small>{selectedSection.name}</small>
+          </div>
+          <span className="ux-wb-header-points" aria-label={`${selectedUnit.points} points`}>
+            <b>{selectedUnit.points}</b>
+            <small>pts</small>
+          </span>
+        </header>
         <BudgetMeter roster={roster} />
       </ElementSection>
 
@@ -354,16 +367,6 @@ function WorkbenchElements({
       </ElementSection>
 
       <ElementSection title="Detail Pane">
-        <div className="ux-wb-detail-head">
-          <span>
-            <small>{selectedSection.name}</small>
-            <strong>{selectedUnit.name}</strong>
-          </span>
-          <span className="ux-wb-detail-pts">
-            <b>{selectedUnit.points}</b>
-            <small>points</small>
-          </span>
-        </div>
         <div className="ux-keywords">
           {selectedUnit.keywords.map((keyword) => (
             <Chip key={keyword} tone="cool">
