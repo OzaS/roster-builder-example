@@ -13,10 +13,14 @@ import { BackOrTitle, BudgetMeter, Chip, flattenUnits, priceLabel, rosterChecks,
  */
 export function CodexWorkbench(props: ConceptProps) {
   const navStyle = props.navStyle ?? "top";
-  const hasTabs = navStyle !== "top";
+  const usesTabNavigation = navStyle !== "top";
   const smart = props.smartSearch ?? false;
   const screen = props.screen;
-  const shell = `ux-screen ux-workbench ${shellClass(props.themeMode, props.colorScheme)} ${hasTabs ? "has-tabs" : ""}`.trim();
+  const isMainTab = props.workflowScreen
+    ? (["library", "source", "tools", "settings"] as const).some((tab) => tab === props.workflowScreen)
+    : screen === "library" || screen === "catalogue" || screen === "tools" || screen === "settings";
+  const showTabBar = usesTabNavigation && isMainTab;
+  const shell = `ux-screen ux-workbench ${shellClass(props.themeMode, props.colorScheme)} ${showTabBar ? "has-tabs" : ""}`.trim();
 
   let body: ReactNode;
   let modifier = "";
@@ -32,7 +36,7 @@ export function CodexWorkbench(props: ConceptProps) {
   } else if (screen === "system") {
     body = <CreateScreen props={props} />;
   } else {
-    const smartClass = !hasTabs && smart ? "ux-smart" : "";
+    const smartClass = navStyle === "top" && smart ? "ux-smart" : "";
     modifier = [screen === "unit-detail" ? "show-detail" : "", screen === "validation" ? "show-checks" : "", smartClass].filter(Boolean).join(" ");
     body = (
       <>
@@ -50,12 +54,12 @@ export function CodexWorkbench(props: ConceptProps) {
   }
 
   const isWorkbenchScreen = screen !== "library" && screen !== "catalogue" && screen !== "tools" && screen !== "settings" && screen !== "system";
-  const showCommandBar = !hasTabs && smart && isWorkbenchScreen;
+  const showCommandBar = navStyle === "top" && smart && isWorkbenchScreen;
 
   return (
     <div className={`${shell} ${modifier}`.trim()}>
       {body}
-      {hasTabs ? <TabBar props={props} /> : showCommandBar ? <CommandBar props={props} /> : null}
+      {showTabBar ? <TabBar props={props} /> : showCommandBar ? <CommandBar props={props} /> : null}
     </div>
   );
 }
