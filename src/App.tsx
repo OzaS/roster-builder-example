@@ -51,6 +51,7 @@ type PersistedGalleryState = {
   workflowScreen?: WorkflowScreen;
   smartSearch?: boolean;
   navStyle?: NavStyle;
+  statusBarUsesDesignBackground?: boolean;
   screen?: PrototypeScreen;
 };
 
@@ -66,6 +67,7 @@ function App() {
   const [workflowScreen, setWorkflowScreen] = useState<WorkflowScreen>(initialState.workflowScreen ?? "library");
   const [smartSearch, setSmartSearch] = useState(initialState.smartSearch ?? true);
   const [navStyle, setNavStyle] = useState<NavStyle>(initialState.navStyle ?? "floating");
+  const [statusBarUsesDesignBackground, setStatusBarUsesDesignBackground] = useState(initialState.statusBarUsesDesignBackground ?? false);
   const [roster, setRoster] = useState<Roster>(mockRoster);
   const [selectedSectionId, setSelectedSectionId] = useState("hq");
   const [selectedUnitId, setSelectedUnitId] = useState("centurion");
@@ -114,9 +116,10 @@ function App() {
       workflowScreen,
       smartSearch,
       navStyle,
+      statusBarUsesDesignBackground,
       screen,
     });
-  }, [selectedConcept, platform, themeMode, colorScheme, navigatorView, workflowScreen, smartSearch, navStyle, screen]);
+  }, [selectedConcept, platform, themeMode, colorScheme, navigatorView, workflowScreen, smartSearch, navStyle, statusBarUsesDesignBackground, screen]);
 
   const conceptGroups = useMemo(() => buildConceptGroups(designData), [designData]);
   const concept = findConceptInData(designData, selectedConcept);
@@ -262,6 +265,8 @@ function App() {
       onWorkflowScreenChange={selectWorkflowScreen}
       navStyle={navStyle}
       onNavStyleChange={setNavStyle}
+      statusBarUsesDesignBackground={statusBarUsesDesignBackground}
+      onStatusBarUsesDesignBackgroundChange={setStatusBarUsesDesignBackground}
       onCapture={captureCurrentStage}
       onDesignDataChange={updateDesignData}
       boardProps={{
@@ -323,6 +328,7 @@ function readPersistedGalleryState(): PersistedGalleryState {
       workflowScreen: isOneOf(parsed.workflowScreen, workflowScreenIds) ? parsed.workflowScreen : undefined,
       smartSearch: typeof parsed.smartSearch === "boolean" ? parsed.smartSearch : undefined,
       navStyle: isOneOf(parsed.navStyle, navStyles) ? parsed.navStyle : undefined,
+      statusBarUsesDesignBackground: typeof parsed.statusBarUsesDesignBackground === "boolean" ? parsed.statusBarUsesDesignBackground : undefined,
       screen: isOneOf(parsed.screen, prototypeScreenIds) ? parsed.screen : undefined,
     };
   } catch {

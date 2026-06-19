@@ -14,6 +14,7 @@ type Props = {
   platform: PlatformPreview;
   themeMode: ThemeMode;
   colorScheme: ColorScheme;
+  statusBarUsesDesignBackground: boolean;
   roster: Roster;
   selectedSection: RosterSection;
   selectedUnit: RosterUnit;
@@ -39,6 +40,7 @@ export function WorkflowBoard({
   platform,
   themeMode,
   colorScheme,
+  statusBarUsesDesignBackground,
   roster,
   selectedSection,
   selectedUnit,
@@ -73,7 +75,7 @@ export function WorkflowBoard({
                     {item.label}
                   </button>
                   <div className="workflow-screen-hitarea" onClick={(event) => handleScreenClick(event, item.screen, onOpenGlance)}>
-                    <DeviceFrame platform={platform}>
+                    <DeviceFrame platform={platform} themeMode={themeMode} colorScheme={colorScheme} statusBarUsesDesignBackground={statusBarUsesDesignBackground}>
                       <Concept
                         roster={roster}
                         selectedSection={selectedSection}

@@ -91,6 +91,7 @@
         "sections": [
           "Color Tokens",
           "Typography",
+          "Phone Status Bar",
           "Workbench Chrome",
           "Roster Creation",
           "Roster Tree",
@@ -195,6 +196,7 @@
         "sections": [
           "Color Tokens",
           "Typography",
+          "Phone Status Bar",
           "Command Header",
           "Command Input",
           "Result Rows",

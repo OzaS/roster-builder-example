@@ -23,6 +23,7 @@ type Props = {
   platform: PlatformPreview;
   themeMode: ThemeMode;
   colorScheme: ColorScheme;
+  statusBarUsesDesignBackground: boolean;
   roster: Roster;
   selectedSection: RosterSection;
   selectedUnit: RosterUnit;
@@ -51,6 +52,7 @@ export function ScreenGlance({
   platform,
   themeMode,
   colorScheme,
+  statusBarUsesDesignBackground,
   roster,
   selectedSection,
   selectedUnit,
@@ -202,7 +204,7 @@ export function ScreenGlance({
           <div className="glance-device-shell">
             <div className="glance-device-export" ref={deviceCaptureRef}>
               <div className="glance-device-capture">
-                <DeviceFrame platform={platform}>
+                <DeviceFrame platform={platform} themeMode={themeMode} colorScheme={colorScheme} statusBarUsesDesignBackground={statusBarUsesDesignBackground}>
                   <div className={`glance-device-target ${armed ? "placing" : ""}`} onClick={placeComment}>
                     <Component
                       roster={roster}
