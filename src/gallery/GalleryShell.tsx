@@ -3,7 +3,7 @@ import { Archive, Component, MonitorSmartphone, Moon, Navigation, Palette, Panel
 import { DeviceFrame } from "../components/DeviceFrame";
 import { ScreenshotButton } from "../components/v2/ScreenshotButton";
 import { WorkflowScreenPicker, type WorkflowPickerSelection } from "../components/v2/WorkflowScreenPicker";
-import type { ColorScheme, ConceptId, NavigatorView, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode, WorkflowScreen } from "../types";
+import type { ColorScheme, ConceptId, NavigatorView, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode, UnitDetailView, WorkflowScreen } from "../types";
 import { colorSchemes } from "../types";
 import type { GalleryConcept } from "./galleryTypes";
 import { WorkflowBoard } from "./WorkflowBoard";
@@ -38,6 +38,8 @@ type Props = {
     smartSearch: boolean;
     onToggleSmartSearch: () => void;
     navStyle: NavStyle;
+    unitDetailView: UnitDetailView;
+    onUnitDetailViewChange: (view: UnitDetailView) => void;
     onSelectSection: (id: string) => void;
     onToggleSection: (id: string) => void;
     onSelectUnit: (id: string) => void;
@@ -405,6 +407,8 @@ export function GalleryShell({
           expandedSectionIds={boardProps.expandedSectionIds}
           smartSearch={boardProps.smartSearch}
           navStyle={navStyle}
+          unitDetailView={boardProps.unitDetailView}
+          onUnitDetailViewChange={boardProps.onUnitDetailViewChange}
           initialPlacement={glance.placement}
           onClose={() => setGlance(null)}
           onScreenChange={(screen) => setGlance({ screen })}

@@ -6,6 +6,7 @@ export type NavigatorView = "single" | "all-screens" | "elements";
 
 /** In-prototype main navigation style for the merged design. */
 export type NavStyle = "top" | "tabs" | "floating";
+export type UnitDetailView = "options" | "profile";
 
 export type ColorScheme = "generic" | "wh40k" | "horus-heresy" | "age-of-sigmar" | "old-world";
 
@@ -41,6 +42,47 @@ export type RosterOption = {
   disabled?: boolean;
 };
 
+export type RosterCompositionEntry = {
+  id: string;
+  name: string;
+  summary: string;
+  count: number;
+  countOffset?: number;
+  editable?: boolean;
+  pointsPerModel?: number;
+};
+
+export type RosterProfileRow = {
+  id: string;
+  name: string;
+  values: string[];
+  tags?: string[];
+};
+
+export type RosterProfileTable = {
+  id: string;
+  title: string;
+  columns: string[];
+  rows: RosterProfileRow[];
+};
+
+export type RosterUnitDetail = {
+  composition: RosterCompositionEntry[];
+  choiceGroups: Array<{
+    id: string;
+    title: string;
+    helper?: string;
+    optionIds: string[];
+  }>;
+  standaloneOptionIds: string[];
+  models: Array<{ id: string; count: number; countOffset?: number; name: string; summary: string }>;
+  profileTables: RosterProfileTable[];
+  traits: string[];
+  wargear: Array<{ id: string; name: string; description: string }>;
+  rules: string[];
+  categories: string[];
+};
+
 export type RosterUnit = {
   id: string;
   name: string;
@@ -53,6 +95,10 @@ export type RosterUnit = {
   availability: "available" | "limited" | "locked";
   slotImpact: string;
   options: RosterOption[];
+  minCount?: number;
+  maxCount?: number;
+  pointsPerAdditionalModel?: number;
+  detail?: RosterUnitDetail;
 };
 
 export type RosterSection = {

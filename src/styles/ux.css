@@ -1473,12 +1473,31 @@
    CONCEPT 4 — Codex Workbench
    ===================================================================== */
 .ux-wb-top {
+  position: relative;
   display: grid;
   grid-template-columns: 40px minmax(0, 1fr) 48px;
   align-items: center;
   gap: 10px;
   padding: 12px 14px;
   border-bottom: 1px solid var(--ux-line);
+}
+.ux-wb-top.unit-detail {
+  border-bottom: 0;
+}
+.ux-detail-progress {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  overflow: hidden;
+  background: var(--ux-surface-3);
+}
+.ux-detail-progress i {
+  display: block;
+  height: 100%;
+  border-radius: 0 999px 999px 0;
+  background: linear-gradient(90deg, var(--ux-accent), var(--ux-accent-2));
 }
 .ux-wb-title {
   min-width: 0;
@@ -1670,6 +1689,255 @@
   display: block;
   font-size: 19px;
   font-weight: 850;
+}
+
+.ux-unit-options,
+.ux-unit-profile,
+.ux-unit-option-section {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.ux-unit-options,
+.ux-unit-profile {
+  gap: 12px;
+}
+.ux-unit-option-section > h4,
+.ux-option-section-title h4 {
+  color: var(--ux-muted);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+.ux-option-section-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.ux-option-section-title small {
+  flex: 0 0 auto;
+  color: var(--ux-muted);
+  font-size: 10.5px;
+}
+.ux-composition-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 54px;
+  padding: 8px 10px;
+  border: 1px solid var(--ux-line);
+  border-radius: var(--ux-r-sm);
+  background: var(--ux-surface-2);
+}
+.ux-composition-main {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+.ux-composition-main strong,
+.ux-composition-main small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ux-composition-main strong {
+  font-size: 13.5px;
+}
+.ux-composition-main small {
+  margin-top: 2px;
+  color: var(--ux-muted);
+  font-size: 10.5px;
+}
+.ux-composition-state {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 7px;
+  color: var(--ux-accent-ink);
+  background: var(--ux-accent);
+}
+.ux-composition-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.ux-composition-controls > b {
+  margin-right: 3px;
+  color: var(--ux-accent-2);
+  font-size: 10.5px;
+  white-space: nowrap;
+}
+.ux-composition-controls button {
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  padding: 0;
+  border: 1px solid var(--ux-line);
+  border-radius: 7px;
+  background: var(--ux-surface-3);
+  cursor: pointer;
+}
+.ux-composition-controls > strong {
+  min-width: 20px;
+  text-align: center;
+  font-size: 13px;
+}
+.ux-composition-count {
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--ux-surface-3);
+  color: var(--ux-muted);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.ux-profile-section {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--ux-line);
+  border-radius: var(--ux-r-sm);
+  background: var(--ux-surface);
+}
+.ux-profile-section > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 38px;
+  padding: 8px 10px;
+  list-style: none;
+  cursor: pointer;
+}
+.ux-profile-section > summary::-webkit-details-marker {
+  display: none;
+}
+.ux-profile-section > summary strong {
+  font-size: 12px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+.ux-profile-section > summary svg {
+  color: var(--ux-muted);
+  transition: transform 150ms ease;
+}
+.ux-profile-section[open] > summary {
+  border-bottom: 1px solid var(--ux-line);
+}
+.ux-profile-section[open] > summary svg {
+  transform: rotate(180deg);
+}
+.ux-profile-section-body {
+  min-width: 0;
+  padding: 8px;
+}
+.ux-profile-models,
+.ux-profile-copy-list {
+  display: grid;
+  gap: 6px;
+}
+.ux-profile-model {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 7px;
+  background: var(--ux-surface-2);
+}
+.ux-profile-model > b {
+  color: var(--ux-accent-2);
+  font-size: 12px;
+}
+.ux-profile-model strong,
+.ux-profile-model small {
+  display: block;
+}
+.ux-profile-model strong {
+  font-size: 12.5px;
+}
+.ux-profile-model small {
+  margin-top: 1px;
+  color: var(--ux-muted);
+  font-size: 10.5px;
+}
+.ux-profile-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+.ux-profile-table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 10.5px;
+}
+.ux-profile-table th,
+.ux-profile-table td {
+  min-width: 34px;
+  padding: 7px 8px;
+  border-right: 1px solid var(--ux-line);
+  border-bottom: 1px solid var(--ux-line);
+  text-align: center;
+  white-space: nowrap;
+}
+.ux-profile-table thead th {
+  color: var(--ux-muted);
+  background: var(--ux-surface-2);
+  font-weight: 850;
+}
+.ux-profile-row-name th {
+  padding: 8px 9px;
+  text-align: left;
+  background: var(--ux-surface);
+}
+.ux-profile-row-name th strong {
+  font-size: 11.5px;
+}
+.ux-profile-row-name th small {
+  margin-left: 8px;
+  color: var(--ux-cool);
+  font-size: 9px;
+}
+.ux-profile-row-stats td {
+  background: color-mix(in srgb, var(--ux-surface-2) 72%, transparent);
+}
+.ux-profile-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.ux-profile-tag-list span {
+  padding: 4px 7px;
+  border: 1px solid color-mix(in srgb, var(--ux-cool) 34%, transparent);
+  border-radius: 6px;
+  color: var(--ux-cool);
+  background: color-mix(in srgb, var(--ux-cool) 9%, transparent);
+  font-size: 10px;
+  font-weight: 700;
+}
+.ux-profile-copy-list article {
+  padding: 8px;
+  border-radius: 7px;
+  background: var(--ux-surface-2);
+}
+.ux-profile-copy-list strong {
+  font-size: 12px;
+}
+.ux-profile-copy-list p {
+  margin-top: 4px;
+  color: var(--ux-muted);
+  font-size: 10.5px;
+  line-height: 1.45;
 }
 .ux-wb-rail {
   display: grid;
@@ -2019,6 +2287,124 @@
 .ux-workbench.ux-smart .ux-wb-detail,
 .ux-workbench.ux-smart .ux-wb-rail {
   padding-bottom: 84px;
+}
+
+.ux-workbench.has-detail-toggle .ux-wb-detail {
+  padding-bottom: 80px;
+}
+
+.ux-detail-mode-layer {
+  position: absolute;
+  z-index: 22;
+  bottom: 14px;
+  left: 50%;
+  width: max-content;
+  max-width: calc(100% - 24px);
+  transform: translateX(-50%);
+}
+
+.ux-detail-mode-bar {
+  position: relative;
+  display: grid;
+  grid-template-columns: max-content 58px max-content;
+  align-items: center;
+  gap: 2px;
+  padding: 7px 10px;
+  border: 1px solid var(--ux-line-2);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ux-surface) 94%, transparent);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(16px);
+}
+
+.ux-detail-mode-tab {
+  display: grid;
+  min-height: 44px;
+  place-items: center;
+  align-content: center;
+  gap: 3px;
+  padding: 4px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ux-muted);
+  font-size: 10.5px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.ux-detail-mode-tab.active {
+  color: var(--ux-accent-2);
+  background: color-mix(in srgb, var(--ux-accent) 16%, transparent);
+}
+
+.ux-detail-menu-fab {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin: -18px auto 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  color: var(--ux-accent-ink);
+  background: linear-gradient(180deg, var(--ux-accent-2), var(--ux-accent));
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--ux-accent) 32%, transparent);
+  cursor: pointer;
+}
+
+.ux-detail-menu-fab.active {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--ux-accent) 18%, transparent), 0 8px 22px color-mix(in srgb, var(--ux-accent) 36%, transparent);
+}
+
+.ux-detail-action-menu {
+  position: absolute;
+  z-index: 24;
+  right: 0;
+  bottom: calc(100% + 10px);
+  left: 0;
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  padding: 6px;
+  border: 1px solid var(--ux-line-2);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--ux-surface) 96%, transparent);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.34);
+  backdrop-filter: blur(16px);
+}
+
+.ux-detail-action-menu button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 38px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ux-ink);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ux-detail-action-menu button:hover {
+  background: var(--ux-surface-2);
+}
+
+.design-elements-panel.ux-screen .ux-detail-mode-layer.ux-elements-static {
+  position: static;
+  width: max-content;
+  max-width: 100%;
+  transform: none;
+}
+
+.design-elements-panel.ux-screen .ux-detail-action-menu.ux-elements-static {
+  position: static;
+  width: 100%;
+  margin-bottom: 12px;
 }
 
 /* back affordance inside a drilled-in pane (phone) */

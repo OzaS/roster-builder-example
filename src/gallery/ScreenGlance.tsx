@@ -7,7 +7,7 @@ import { screenLabel } from "../design-data/designData";
 import type { GalleryConcept } from "./galleryTypes";
 import { workflowToPrototypeScreen } from "./workflow";
 import { captureElementAsPng } from "../utils/captureStage";
-import type { ColorScheme, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode, WorkflowScreen } from "../types";
+import type { ColorScheme, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode, UnitDetailView, WorkflowScreen } from "../types";
 
 export type GlancePlacement = {
   x: number;
@@ -31,6 +31,8 @@ type Props = {
   expandedSectionIds: string[];
   smartSearch: boolean;
   navStyle: NavStyle;
+  unitDetailView: UnitDetailView;
+  onUnitDetailViewChange: (view: UnitDetailView) => void;
   initialPlacement?: GlancePlacement;
   onClose: () => void;
   onScreenChange: (screen: WorkflowScreen) => void;
@@ -60,6 +62,8 @@ export function ScreenGlance({
   expandedSectionIds,
   smartSearch,
   navStyle,
+  unitDetailView,
+  onUnitDetailViewChange,
   initialPlacement,
   onClose,
   onScreenChange,
@@ -219,6 +223,8 @@ export function ScreenGlance({
                       smartSearch={smartSearch}
                       onToggleSmartSearch={onToggleSmartSearch}
                       navStyle={navStyle}
+                      unitDetailView={unitDetailView}
+                      onUnitDetailViewChange={onUnitDetailViewChange}
                       canGoBack={screen !== "overview"}
                       onSelectSection={onSelectSection}
                       onToggleSection={onToggleSection}
