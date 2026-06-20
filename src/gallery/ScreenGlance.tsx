@@ -43,6 +43,9 @@ type Props = {
   onSelectUnit: (id: string) => void;
   onToggleOption: (id: string) => void;
   onCountChange: (id: string, delta: number) => void;
+  onLoadoutGroupCountChange: (unitId: string, groupId: string, delta: number) => void;
+  onSplitLoadoutGroup: (unitId: string, groupId: string) => void;
+  onSelectLoadoutChoice: (unitId: string, groupId: string, slotId: string, choiceId: string) => void;
   onNavigate: ConceptProps["onNavigate"];
   onBack: () => void;
 };
@@ -74,6 +77,9 @@ export function ScreenGlance({
   onSelectUnit,
   onToggleOption,
   onCountChange,
+  onLoadoutGroupCountChange,
+  onSplitLoadoutGroup,
+  onSelectLoadoutChoice,
   onNavigate,
   onBack,
 }: Props) {
@@ -231,6 +237,9 @@ export function ScreenGlance({
                       onSelectUnit={onSelectUnit}
                       onToggleOption={onToggleOption}
                       onCountChange={onCountChange}
+                      onLoadoutGroupCountChange={onLoadoutGroupCountChange}
+                      onSplitLoadoutGroup={onSplitLoadoutGroup}
+                      onSelectLoadoutChoice={onSelectLoadoutChoice}
                       onNavigate={onNavigate}
                       onBack={onBack}
                     />

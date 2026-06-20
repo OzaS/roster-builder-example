@@ -45,6 +45,9 @@ type Props = {
     onSelectUnit: (id: string) => void;
     onToggleOption: (id: string) => void;
     onCountChange: (id: string, delta: number) => void;
+    onLoadoutGroupCountChange: (unitId: string, groupId: string, delta: number) => void;
+    onSplitLoadoutGroup: (unitId: string, groupId: string) => void;
+    onSelectLoadoutChoice: (unitId: string, groupId: string, slotId: string, choiceId: string) => void;
     onNavigate: (screen: ReturnType<typeof workflowToPrototypeScreen>) => void;
     onBack: () => void;
   };
@@ -419,6 +422,9 @@ export function GalleryShell({
           onSelectUnit={boardProps.onSelectUnit}
           onToggleOption={boardProps.onToggleOption}
           onCountChange={boardProps.onCountChange}
+          onLoadoutGroupCountChange={boardProps.onLoadoutGroupCountChange}
+          onSplitLoadoutGroup={boardProps.onSplitLoadoutGroup}
+          onSelectLoadoutChoice={boardProps.onSelectLoadoutChoice}
           onNavigate={boardProps.onNavigate}
           onBack={boardProps.onBack}
         />
