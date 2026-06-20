@@ -4,7 +4,7 @@ export const mockRoster: Roster = {
   name: "Crusade Primary Detachment",
   faction: "Dark Angels",
   system: "10th Edition",
-  pointsUsed: 840,
+  pointsUsed: 885,
   pointsLimit: 1000,
   sections: [
     {
@@ -55,20 +55,83 @@ export const mockRoster: Roster = {
       required: "1/6",
       units: [
         {
-          id: "intercessors",
-          name: "Intercessor Squad",
+          id: "assault-squad",
+          name: "Assault Squad",
           role: "Troops",
-          points: 95,
-          count: 5,
+          points: 140,
+          count: 10,
           status: "valid",
-          keywords: ["Battleline", "Infantry", "Objective"],
+          keywords: ["Troops", "Infantry", "Antigrav"],
           availability: "available",
           slotImpact: "Fills 1 Battleline slot",
+          minCount: 2,
+          maxCount: 20,
+          pointsPerAdditionalModel: 12,
           options: [
-            { id: "auto-rifles", name: "Auto Bolt Rifles", group: "weapon", points: 0, selected: true },
-            { id: "grenade-launcher", name: "Auxiliary Grenade Launcher", group: "weapon", points: 5, selected: false },
-            { id: "objective-secured", name: "Objective Secured", group: "rule", points: 0, selected: true },
+            { id: "bolt-pistol", name: "Bolt pistol", group: "weapon", points: 0, selected: true },
+            { id: "chainsword", name: "Chainsword", group: "weapon", points: 0, selected: true },
+            { id: "combat-shields", name: "Unit swaps Bolt Pistols for Combat Shields", group: "upgrade", points: 20, selected: false },
+            { id: "frag-grenades", name: "Frag grenades", group: "rule", points: 0, selected: true },
+            { id: "krak-grenades", name: "Krak grenades", group: "rule", points: 0, selected: true },
+            { id: "prime-unit", name: "Prime Unit", group: "rule", points: 0, selected: false },
           ],
+          detail: {
+            composition: [
+              { id: "sergeant", name: "Sergeant", summary: "Bolt pistol, Chainsword", count: 1 },
+              { id: "legionary", name: "Legionary", summary: "Chainsword, Bolt pistol", count: 9, countOffset: -1, editable: true, pointsPerModel: 12 },
+            ],
+            choiceGroups: [
+              {
+                id: "combat-shield-choice",
+                title: "Every model may exchange its Bolt pistol for a combat shield",
+                optionIds: ["combat-shields"],
+              },
+            ],
+            standaloneOptionIds: ["frag-grenades", "krak-grenades", "prime-unit"],
+            models: [
+              { id: "sergeant", count: 1, name: "Sergeant", summary: "Bolt pistol, Chainsword" },
+              { id: "legionary", count: 9, countOffset: -1, name: "Legionary", summary: "Chainsword, Bolt pistol" },
+            ],
+            profileTables: [
+              {
+                id: "model-profile",
+                title: "Profile",
+                columns: ["M", "WS", "BS", "S", "T", "W", "I", "A", "LD", "CL", "WP", "IN", "SAV", "INV"],
+                rows: [
+                  { id: "assault-sergeant", name: "Assault Sergeant", values: ["12", "4", "4", "4", "4", "1", "4", "2", "8", "7", "7", "7", "3+", "-"], tags: ["Infantry", "Sergeant", "Antigrav"] },
+                  { id: "assault-legionary", name: "Assault Legionary (x9)", values: ["12", "4", "4", "4", "4", "1", "4", "2", "7", "7", "7", "7", "3+", "-"], tags: ["Infantry", "Antigrav"] },
+                ],
+              },
+              {
+                id: "ranged-weapon",
+                title: "Ranged Weapon",
+                columns: ["R", "FP", "RS", "AP", "D", "Special Rules", "Traits"],
+                rows: [
+                  { id: "bolt-pistol-profile", name: "Bolt pistol (x10)", values: ["12", "1", "4", "5", "1", "Pistol", "Assault, Ranged"] },
+                  { id: "frag-grenades-profile", name: "Frag grenades", values: ["6", "1", "3", "6", "1", "Blast (3\")", "Assault"] },
+                ],
+              },
+              {
+                id: "melee-weapon",
+                title: "Melee Weapon",
+                columns: ["IM", "AM", "SM", "AP", "D", "Special Rules", "Traits"],
+                rows: [
+                  { id: "chainsword-profile", name: "Chainsword (x10)", values: ["I", "A", "S", "5", "1", "Shred (6+)", "Chain"] },
+                  { id: "krak-grenades-profile", name: "Krak grenades", values: ["-3", "1", "6", "4", "2", "Detonation", "-"] },
+                ],
+              },
+            ],
+            traits: ["Loyalist", "Dark Angels"],
+            wargear: [
+              {
+                id: "frag-grenade-wargear",
+                name: "Frag grenades",
+                description: "When making Volley Attacks during Step 4 of the Charge Procedure, a unit containing at least one model with frag grenades may make a single frag grenade attack instead of a normal Shooting Attack.",
+              },
+            ],
+            rules: ["Bulky (2)", "Deep Strike", "Vanguard (2)", "Sergeant Sub-Type", "Infantry Type", "Antigrav Sub-Type", "Pistol", "Shred (6+)", "Blast (3\")", "Detonation"],
+            categories: ["Troops", "Assault Squad", "No default Power Weapon", "Infantry Model Type", "Antigrav Model Sub-Type"],
+          },
         },
       ],
     },

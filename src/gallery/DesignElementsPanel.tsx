@@ -1,4 +1,4 @@
-import { AlertTriangle, Archive, ArrowLeft, ArrowUp, Check, ChevronDown, Command, CornerDownLeft, Database, Download, FileInput, Filter, Hammer, Layers, MessageCircle, PanelsTopLeft, Plus, Rows3, Search, Share2, Smartphone, Sparkles, Trash2, Zap } from "lucide-react";
+import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, Cog, Command, Copy, CornerDownLeft, Database, Download, Ellipsis, FileInput, Filter, Hammer, Layers, MessageCircle, PanelsTopLeft, Plus, Rows3, Search, Share2, Smartphone, Sparkles, StickyNote, Trash2, Zap } from "lucide-react";
 import { PhoneStatusBar } from "../components/DeviceFrame";
 import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode } from "../types";
 import { BudgetMeter, Chip, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph } from "../concepts/ux/uxShared";
@@ -254,6 +254,7 @@ function WorkbenchElements({
   onToggleOption: (id: string) => void;
 }) {
   const checks = rosterChecks(roster);
+  const profileUnit = flattenUnits(roster).find((unit) => unit.detail) ?? selectedUnit;
 
   return (
     <>
@@ -270,17 +271,20 @@ function WorkbenchElements({
             <Download size={18} />
           </button>
         </header>
-        <header className="ux-wb-top ux-elements-static">
+        <header className="ux-wb-top unit-detail ux-elements-static">
           <button type="button" className="ux-icon-btn" aria-label="Back">
             <ArrowLeft size={18} />
           </button>
           <div className="ux-wb-title">
             <strong>{selectedUnit.name}</strong>
-            <small>{selectedSection.name}</small>
+            <small>{selectedSection.name} · {Math.max(0, roster.pointsLimit - roster.pointsUsed)} pts left</small>
           </div>
           <span className="ux-wb-header-points" aria-label={`${selectedUnit.points} points`}>
             <b>{selectedUnit.points}</b>
             <small>pts</small>
+          </span>
+          <span className="ux-detail-progress" role="progressbar" aria-label="Roster points used" aria-valuemin={0} aria-valuemax={roster.pointsLimit} aria-valuenow={roster.pointsUsed}>
+            <i style={{ width: `${Math.min(100, (roster.pointsUsed / roster.pointsLimit) * 100)}%` }} />
           </span>
         </header>
         <BudgetMeter roster={roster} />
@@ -378,6 +382,23 @@ function WorkbenchElements({
       </ElementSection>
 
       <OptionsSection selectedUnit={selectedUnit} onToggleOption={onToggleOption} />
+
+      <UnitProfilesElement unit={profileUnit} />
+
+      <ElementSection title="Unit Detail Toggle">
+        <div className="ux-detail-mode-layer ux-elements-static">
+          <div className="ux-detail-action-menu ux-elements-static" role="menu" aria-label="Unit actions">
+            <button type="button" role="menuitem"><Copy size={15} />Duplicate</button>
+            <button type="button" role="menuitem"><StickyNote size={15} />Add note</button>
+            <button type="button" role="menuitem"><Share2 size={15} />Share</button>
+          </div>
+          <nav className="ux-detail-mode-bar ux-elements-static" aria-label="Unit detail view">
+            <button type="button" className="ux-detail-mode-tab"><Cog size={18} /><span>Options</span></button>
+            <button type="button" className="ux-detail-menu-fab" aria-label="More unit actions"><Ellipsis size={22} /></button>
+            <button type="button" className="ux-detail-mode-tab active"><BookOpen size={18} /><span>Profile</span></button>
+          </nav>
+        </div>
+      </ElementSection>
 
       <ElementSection title="Validation Rail">
         <div className="ux-wb-rail-head">
@@ -696,6 +717,32 @@ function OptionsSection({ selectedUnit, onToggleOption }: { selectedUnit: Roster
             </section>
           );
         })}
+      </div>
+    </ElementSection>
+  );
+}
+
+function UnitProfilesElement({ unit }: { unit: RosterUnit }) {
+  const table = unit.detail?.profileTables[0];
+  const row = table?.rows[0];
+  if (!table || !row) return null;
+  const compactColumns = table.columns.slice(0, 8);
+  return (
+    <ElementSection title="Unit Profiles">
+      <div className="ux-profile-table-scroll">
+        <table className="ux-profile-table">
+          <thead>
+            <tr>{compactColumns.map((column) => <th scope="col" key={column}>{column}</th>)}</tr>
+          </thead>
+          <tbody className="ux-profile-row-group">
+            <tr className="ux-profile-row-name">
+              <th scope="rowgroup" colSpan={compactColumns.length}><strong>{row.name}</strong><small>{row.tags?.join(" · ")}</small></th>
+            </tr>
+            <tr className="ux-profile-row-stats">
+              {row.values.slice(0, compactColumns.length).map((value, index) => <td key={compactColumns[index]}>{value}</td>)}
+            </tr>
+          </tbody>
+        </table>
       </div>
     </ElementSection>
   );

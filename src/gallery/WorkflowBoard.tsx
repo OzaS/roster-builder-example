@@ -2,7 +2,7 @@ import { DeviceFrame } from "../components/DeviceFrame";
 import type { MouseEvent as ReactMouseEvent } from "react";
 import { resolveWorkflow, workflowToPrototypeScreen } from "./workflow";
 import type { GalleryConcept, WorkflowFlow } from "./galleryTypes";
-import type { ColorScheme, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode, WorkflowScreen } from "../types";
+import type { ColorScheme, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode, UnitDetailView, WorkflowScreen } from "../types";
 import type { WorkflowPickerSelection } from "../components/v2/WorkflowScreenPicker";
 import type { GlancePlacement } from "./ScreenGlance";
 import { screenLabel, type EditableDesign } from "../design-data/designData";
@@ -23,6 +23,8 @@ type Props = {
   smartSearch: boolean;
   onToggleSmartSearch: () => void;
   navStyle: NavStyle;
+  unitDetailView: UnitDetailView;
+  onUnitDetailViewChange: (view: UnitDetailView) => void;
   onSelectSection: (id: string) => void;
   onToggleSection: (id: string) => void;
   onSelectUnit: (id: string) => void;
@@ -49,6 +51,8 @@ export function WorkflowBoard({
   smartSearch,
   onToggleSmartSearch,
   navStyle,
+  unitDetailView,
+  onUnitDetailViewChange,
   onSelectSection,
   onToggleSection,
   onSelectUnit,
@@ -89,6 +93,8 @@ export function WorkflowBoard({
                         smartSearch={smartSearch}
                         onToggleSmartSearch={onToggleSmartSearch}
                         navStyle={navStyle}
+                        unitDetailView={unitDetailView}
+                        onUnitDetailViewChange={onUnitDetailViewChange}
                         canGoBack={screen !== "overview"}
                         onSelectSection={onSelectSection}
                         onToggleSection={onToggleSection}

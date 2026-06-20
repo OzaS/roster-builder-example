@@ -4,7 +4,7 @@ import { GalleryShell } from "./gallery/GalleryShell";
 import { buildConceptGroups, bundledDesignData, designById, findConceptInData, firstScreenInDesign, normalizeDesignData, type DesignData } from "./design-data/designData";
 import { prototypeToWorkflowScreen, workflowToPrototypeScreen } from "./gallery/workflow";
 import { captureElementAsPng } from "./utils/captureStage";
-import type { ColorScheme, ConceptId, NavigatorView, NavStyle, PlatformPreview, PrototypeScreen, Roster, ThemeMode, WorkflowScreen } from "./types";
+import type { ColorScheme, ConceptId, NavigatorView, NavStyle, PlatformPreview, PrototypeScreen, Roster, ThemeMode, UnitDetailView, WorkflowScreen } from "./types";
 
 const GALLERY_STATE_KEY = "roster-builder.gallery-state.v1";
 const conceptIds = ["ux-workbench", "ux-command"] satisfies ConceptId[];
@@ -13,6 +13,7 @@ const themeModes = ["dark", "light"] satisfies ThemeMode[];
 const colorSchemeIds = ["generic", "wh40k", "horus-heresy", "age-of-sigmar", "old-world"] satisfies ColorScheme[];
 const navigatorViews = ["single", "all-screens", "elements"] satisfies NavigatorView[];
 const navStyles = ["top", "tabs", "floating"] satisfies NavStyle[];
+const unitDetailViews = ["options", "profile"] satisfies UnitDetailView[];
 const workflowScreenIds = [
   "library",
   "create-roster",
@@ -52,6 +53,7 @@ type PersistedGalleryState = {
   smartSearch?: boolean;
   navStyle?: NavStyle;
   statusBarUsesDesignBackground?: boolean;
+  unitDetailView?: UnitDetailView;
   screen?: PrototypeScreen;
 };
 
@@ -68,9 +70,10 @@ function App() {
   const [smartSearch, setSmartSearch] = useState(initialState.smartSearch ?? true);
   const [navStyle, setNavStyle] = useState<NavStyle>(initialState.navStyle ?? "floating");
   const [statusBarUsesDesignBackground, setStatusBarUsesDesignBackground] = useState(initialState.statusBarUsesDesignBackground ?? false);
+  const [unitDetailView, setUnitDetailView] = useState<UnitDetailView>(initialState.unitDetailView ?? "options");
   const [roster, setRoster] = useState<Roster>(mockRoster);
-  const [selectedSectionId, setSelectedSectionId] = useState("hq");
-  const [selectedUnitId, setSelectedUnitId] = useState("centurion");
+  const [selectedSectionId, setSelectedSectionId] = useState("battleline");
+  const [selectedUnitId, setSelectedUnitId] = useState("assault-squad");
   const [expandedSectionIds, setExpandedSectionIds] = useState<string[]>(["hq", "battleline", "elites"]);
   const [screen, setScreen] = useState<PrototypeScreen>(initialState.screen ?? workflowToPrototypeScreen(initialState.workflowScreen ?? "library"));
   const [screenHistory, setScreenHistory] = useState<PrototypeScreen[]>([]);
@@ -117,9 +120,10 @@ function App() {
       smartSearch,
       navStyle,
       statusBarUsesDesignBackground,
+      unitDetailView,
       screen,
     });
-  }, [selectedConcept, platform, themeMode, colorScheme, navigatorView, workflowScreen, smartSearch, navStyle, statusBarUsesDesignBackground, screen]);
+  }, [selectedConcept, platform, themeMode, colorScheme, navigatorView, workflowScreen, smartSearch, navStyle, statusBarUsesDesignBackground, unitDetailView, screen]);
 
   const conceptGroups = useMemo(() => buildConceptGroups(designData), [designData]);
   const concept = findConceptInData(designData, selectedConcept);
@@ -226,15 +230,20 @@ function App() {
   }
 
   function changeCount(unitId: string, delta: number) {
-    setRoster((current) => ({
-      ...current,
-      sections: current.sections.map((section) => ({
+    setRoster((current) => {
+      let pointsDelta = 0;
+      const sections = current.sections.map((section) => ({
         ...section,
-        units: section.units.map((unit) =>
-          unit.id === unitId ? { ...unit, count: Math.max(1, Math.min(10, unit.count + delta)) } : unit,
-        ),
-      })),
-    }));
+        units: section.units.map((unit) => {
+          if (unit.id !== unitId) return unit;
+          const nextCount = Math.max(unit.minCount ?? 1, Math.min(unit.maxCount ?? 10, unit.count + delta));
+          const countDelta = nextCount - unit.count;
+          pointsDelta += countDelta * (unit.pointsPerAdditionalModel ?? 0);
+          return { ...unit, count: nextCount, points: unit.points + countDelta * (unit.pointsPerAdditionalModel ?? 0) };
+        }),
+      }));
+      return { ...current, sections, pointsUsed: current.pointsUsed + pointsDelta };
+    });
   }
 
   async function captureCurrentStage() {
@@ -278,6 +287,8 @@ function App() {
         smartSearch,
         onToggleSmartSearch: () => setSmartSearch((value) => !value),
         navStyle,
+        unitDetailView,
+        onUnitDetailViewChange: setUnitDetailView,
         onSelectSection: selectSection,
         onToggleSection: toggleSection,
         onSelectUnit: selectUnit,
@@ -300,6 +311,8 @@ function App() {
         smartSearch={smartSearch}
         onToggleSmartSearch={() => setSmartSearch((value) => !value)}
         navStyle={navStyle}
+        unitDetailView={unitDetailView}
+        onUnitDetailViewChange={setUnitDetailView}
         canGoBack={screenHistory.length > 0 || screen !== "overview"}
         onSelectSection={selectSection}
         onToggleSection={toggleSection}
@@ -329,6 +342,7 @@ function readPersistedGalleryState(): PersistedGalleryState {
       smartSearch: typeof parsed.smartSearch === "boolean" ? parsed.smartSearch : undefined,
       navStyle: isOneOf(parsed.navStyle, navStyles) ? parsed.navStyle : undefined,
       statusBarUsesDesignBackground: typeof parsed.statusBarUsesDesignBackground === "boolean" ? parsed.statusBarUsesDesignBackground : undefined,
+      unitDetailView: isOneOf(parsed.unitDetailView, unitDetailViews) ? parsed.unitDetailView : undefined,
       screen: isOneOf(parsed.screen, prototypeScreenIds) ? parsed.screen : undefined,
     };
   } catch {

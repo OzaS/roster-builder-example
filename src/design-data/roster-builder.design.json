@@ -97,6 +97,8 @@
           "Roster Tree",
           "Detail Pane",
           "Options",
+          "Unit Profiles",
+          "Unit Detail Toggle",
           "Validation Rail",
           "Add Pool Rows",
           "Smart Search (Settings)",
@@ -118,6 +120,17 @@
           "mode": "point",
           "status": "open",
           "createdAt": "2026-06-17T22:33:56.507Z"
+        },
+        {
+          "id": "comment-1781905391380-tuime2",
+          "screen": "unit-detail",
+          "x": 51.02564102564102,
+          "y": 2.31042654028436,
+          "text": "New comment",
+          "mode": "element",
+          "status": "open",
+          "elementHint": "div .phone-status-bar \"Phone status: 9:41, connected, full battery\"",
+          "createdAt": "2026-06-19T21:43:11.380Z"
         }
       ]
     },

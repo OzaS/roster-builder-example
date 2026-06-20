@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { AlertTriangle, ArrowLeft, CheckCircle2, FileDown, Filter, Plus, Search, Shield, Swords } from "lucide-react";
-import type { ColorScheme, NavStyle, PrototypeScreen, Roster, RosterSection, RosterUnit, ThemeMode, WorkflowScreen } from "../types";
+import type { ColorScheme, NavStyle, PrototypeScreen, Roster, RosterSection, RosterUnit, ThemeMode, UnitDetailView, WorkflowScreen } from "../types";
 import { OptionRow } from "../components/OptionRow";
 import { RosterNav } from "../components/RosterNav";
 import { UnitCard } from "../components/UnitCard";
@@ -24,6 +24,8 @@ export type ConceptProps = {
   onToggleSmartSearch?: () => void;
   /** Main navigation style for the prototype (top bar / bottom tabs / floating tabs). */
   navStyle?: NavStyle;
+  unitDetailView?: UnitDetailView;
+  onUnitDetailViewChange?: (view: UnitDetailView) => void;
   onSelectSection: (id: string) => void;
   onToggleSection: (id: string) => void;
   onSelectUnit: (id: string) => void;

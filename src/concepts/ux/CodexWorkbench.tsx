@@ -1,5 +1,5 @@
 import { Fragment, useState, type ReactNode } from "react";
-import { AlertTriangle, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ClipboardList, Cog, Command, Database, Download, FileInput, Hammer, Layers, LibraryBig, PanelsTopLeft, Plus, Search, Share2, ShieldCheck, Sparkles, Star, StickyNote, Wand2 } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ClipboardList, Cog, Command, Copy, Database, Download, Ellipsis, FileInput, Hammer, Layers, LibraryBig, Minus, PanelsTopLeft, Plus, Search, Share2, ShieldCheck, Sparkles, Star, StickyNote, Wand2 } from "lucide-react";
 import { mockCatalogues } from "../../data/mockRoster";
 import type { ConceptProps } from "../shared";
 import { BackOrTitle, BudgetMeter, Chip, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph } from "./uxShared";
@@ -16,6 +16,7 @@ export function CodexWorkbench(props: ConceptProps) {
   const usesTabNavigation = navStyle !== "top";
   const smart = props.smartSearch ?? false;
   const screen = props.screen;
+  const isUnitDetail = screen === "unit-detail";
   const isMainTab = props.workflowScreen
     ? (["library", "source", "tools", "settings"] as const).some((tab) => tab === props.workflowScreen)
     : screen === "library" || screen === "catalogue" || screen === "tools" || screen === "settings";
@@ -37,13 +38,15 @@ export function CodexWorkbench(props: ConceptProps) {
     body = <CreateScreen props={props} />;
   } else {
     const smartClass = navStyle === "top" && smart ? "ux-smart" : "";
-    modifier = [screen === "unit-detail" ? "show-detail" : "", screen === "validation" ? "show-checks" : "", smartClass].filter(Boolean).join(" ");
+    modifier = [isUnitDetail ? "show-detail has-detail-toggle" : "", screen === "validation" ? "show-checks" : "", smartClass].filter(Boolean).join(" ");
     body = (
       <>
         <WorkbenchHeader props={props} />
-        <div className="ux-wb-budget">
-          <BudgetMeter roster={props.roster} />
-        </div>
+        {!isUnitDetail ? (
+          <div className="ux-wb-budget">
+            <BudgetMeter roster={props.roster} />
+          </div>
+        ) : null}
         <div className="ux-wb-layout">
           <Tree props={props} />
           <Detail props={props} />
@@ -54,21 +57,53 @@ export function CodexWorkbench(props: ConceptProps) {
   }
 
   const isWorkbenchScreen = screen !== "library" && screen !== "catalogue" && screen !== "tools" && screen !== "settings" && screen !== "system";
-  const showCommandBar = navStyle === "top" && smart && isWorkbenchScreen;
+  const showCommandBar = navStyle === "top" && smart && isWorkbenchScreen && !isUnitDetail;
 
   return (
     <div className={`${shell} ${modifier}`.trim()}>
       {body}
-      {showTabBar ? <TabBar props={props} /> : showCommandBar ? <CommandBar props={props} /> : null}
+      {showTabBar ? <TabBar props={props} /> : isUnitDetail ? <DetailModeBar props={props} /> : showCommandBar ? <CommandBar props={props} /> : null}
+    </div>
+  );
+}
+
+function DetailModeBar({ props }: { props: ConceptProps }) {
+  const active = props.unitDetailView ?? "options";
+  const [menuOpen, setMenuOpen] = useState(false);
+  return (
+    <div className="ux-detail-mode-layer">
+      {menuOpen ? (
+        <div className="ux-detail-action-menu" role="menu" aria-label="Unit actions">
+          <button type="button" role="menuitem" onClick={() => setMenuOpen(false)}><Copy size={15} />Duplicate</button>
+          <button type="button" role="menuitem" onClick={() => setMenuOpen(false)}><StickyNote size={15} />Add note</button>
+          <button type="button" role="menuitem" onClick={() => setMenuOpen(false)}><Share2 size={15} />Share</button>
+        </div>
+      ) : null}
+      <nav className="ux-detail-mode-bar" aria-label="Unit detail view">
+        <button type="button" className={`ux-detail-mode-tab ${active === "options" ? "active" : ""}`} onClick={() => props.onUnitDetailViewChange?.("options")} aria-pressed={active === "options"}>
+          <Cog size={18} />
+          <span>Options</span>
+        </button>
+        <button type="button" className={`ux-detail-menu-fab ${menuOpen ? "active" : ""}`} onClick={() => setMenuOpen((open) => !open)} aria-label="More unit actions" aria-expanded={menuOpen}>
+          <Ellipsis size={22} />
+        </button>
+        <button type="button" className={`ux-detail-mode-tab ${active === "profile" ? "active" : ""}`} onClick={() => props.onUnitDetailViewChange?.("profile")} aria-pressed={active === "profile"}>
+          <BookOpen size={18} />
+          <span>Profile</span>
+        </button>
+      </nav>
     </div>
   );
 }
 
 function WorkbenchHeader({ props }: { props: ConceptProps }) {
   const isUnitDetail = props.screen === "unit-detail";
+  const pointsRemaining = props.roster.pointsLimit - props.roster.pointsUsed;
+  const progress = Math.min(100, Math.max(0, (props.roster.pointsUsed / props.roster.pointsLimit) * 100));
+  const remainingLabel = pointsRemaining >= 0 ? `${pointsRemaining} pts left` : `${Math.abs(pointsRemaining)} pts over`;
 
   return (
-    <header className="ux-wb-top">
+    <header className={`ux-wb-top ${isUnitDetail ? "unit-detail" : ""}`}>
       <BackOrTitle
         props={props}
         fallback={
@@ -79,7 +114,7 @@ function WorkbenchHeader({ props }: { props: ConceptProps }) {
       />
       <div className="ux-wb-title">
         <strong>{isUnitDetail ? props.selectedUnit.name : props.roster.name}</strong>
-        <small>{isUnitDetail ? props.selectedSection.name : `${props.roster.faction} · ${props.roster.system}`}</small>
+        <small>{isUnitDetail ? `${props.selectedSection.name} · ${remainingLabel}` : `${props.roster.faction} · ${props.roster.system}`}</small>
       </div>
       {isUnitDetail ? (
         <span className="ux-wb-header-points" aria-label={`${props.selectedUnit.points} points`}>
@@ -91,6 +126,11 @@ function WorkbenchHeader({ props }: { props: ConceptProps }) {
           <Download size={18} />
         </button>
       )}
+      {isUnitDetail ? (
+        <span className="ux-detail-progress" role="progressbar" aria-label="Roster points used" aria-valuemin={0} aria-valuemax={props.roster.pointsLimit} aria-valuenow={props.roster.pointsUsed}>
+          <i style={{ width: `${progress}%` }} />
+        </span>
+      ) : null}
     </header>
   );
 }
@@ -161,25 +201,214 @@ function Detail({ props }: { props: ConceptProps }) {
         ))}
       </div>
       {unit.note ? <p className="ux-config-note">{unit.note}</p> : null}
-      <div className="ux-opt-groups">
-        {(["weapon", "upgrade", "rule"] as const).map((group) => {
-          const opts = unit.options.filter((o) => o.group === group);
-          if (!opts.length) return null;
+      {props.unitDetailView === "profile" ? <UnitProfile props={props} /> : unit.detail ? <StructuredOptions props={props} /> : <FlatOptions props={props} />}
+    </section>
+  );
+}
+
+function StructuredOptions({ props }: { props: ConceptProps }) {
+  const unit = props.selectedUnit;
+  const detail = unit.detail;
+  if (!detail) return <FlatOptions props={props} />;
+
+  return (
+    <div className="ux-unit-options">
+      <section className="ux-unit-option-section">
+        <h4>Composition</h4>
+        {detail.composition.map((entry) => {
+          const count = entry.editable ? unit.count + (entry.countOffset ?? 0) : entry.count;
           return (
-            <section className="ux-opt-group" key={group}>
-              <h4>{group === "weapon" ? "Wargear" : group === "upgrade" ? "Upgrades" : "Special rules"}</h4>
-              {opts.map((opt) => (
-                <button key={opt.id} type="button" className={`ux-opt-row ${opt.selected ? "on" : ""}`} onClick={() => props.onToggleOption(opt.id)}>
-                  <span className="ux-opt-check" aria-hidden />
-                  <span>{opt.name}</span>
-                  <em>{priceLabel(opt.points)}</em>
-                </button>
-              ))}
-            </section>
+            <article className="ux-composition-row" key={entry.id}>
+              <div className="ux-composition-main">
+                <span className="ux-composition-state"><Check size={14} /></span>
+                <span>
+                  <strong>{entry.name}</strong>
+                  <small>{entry.summary}</small>
+                </span>
+              </div>
+              {entry.editable ? (
+                <div className="ux-composition-controls" aria-label={`${entry.name} count`}>
+                  {entry.pointsPerModel ? <b>{count * entry.pointsPerModel} pts</b> : null}
+                  <button type="button" aria-label={`Duplicate ${entry.name}`} title={`Duplicate ${entry.name}`} onClick={() => props.onCountChange(unit.id, 1)}>
+                    <Copy size={14} />
+                  </button>
+                  <button type="button" aria-label={`Remove ${entry.name}`} onClick={() => props.onCountChange(unit.id, -1)}>
+                    <Minus size={15} />
+                  </button>
+                  <strong>{count}</strong>
+                  <button type="button" aria-label={`Add ${entry.name}`} onClick={() => props.onCountChange(unit.id, 1)}>
+                    <Plus size={15} />
+                  </button>
+                </div>
+              ) : (
+                <span className="ux-composition-count">{entry.count}</span>
+              )}
+            </article>
           );
         })}
+      </section>
+
+      {detail.choiceGroups.map((group) => (
+        <section className="ux-unit-option-section" key={group.id}>
+          <div className="ux-option-section-title">
+            <h4>{group.title}</h4>
+            <small>{group.optionIds.filter((optionId) => unit.options.find((option) => option.id === optionId)?.selected).length}/{group.optionIds.length} selections</small>
+          </div>
+          {group.optionIds.map((optionId) => {
+            const option = unit.options.find((item) => item.id === optionId);
+            return option ? <OptionButton key={option.id} option={option} onToggle={props.onToggleOption} /> : null;
+          })}
+        </section>
+      ))}
+
+      <section className="ux-unit-option-section">
+        <h4>Rules & equipment</h4>
+        {detail.standaloneOptionIds.map((optionId) => {
+          const option = unit.options.find((item) => item.id === optionId);
+          return option ? <OptionButton key={option.id} option={option} onToggle={props.onToggleOption} /> : null;
+        })}
+      </section>
+    </div>
+  );
+}
+
+function FlatOptions({ props }: { props: ConceptProps }) {
+  const unit = props.selectedUnit;
+  return (
+    <div className="ux-opt-groups">
+      {(["weapon", "upgrade", "rule"] as const).map((group) => {
+        const options = unit.options.filter((option) => option.group === group);
+        if (!options.length) return null;
+        return (
+          <section className="ux-opt-group" key={group}>
+            <h4>{group === "weapon" ? "Wargear" : group === "upgrade" ? "Upgrades" : "Special rules"}</h4>
+            {options.map((option) => <OptionButton key={option.id} option={option} onToggle={props.onToggleOption} />)}
+          </section>
+        );
+      })}
+    </div>
+  );
+}
+
+function OptionButton({ option, onToggle }: { option: ConceptProps["selectedUnit"]["options"][number]; onToggle: (id: string) => void }) {
+  return (
+    <button type="button" className={`ux-opt-row ${option.selected ? "on" : ""}`} onClick={() => onToggle(option.id)}>
+      <span className="ux-opt-check" aria-hidden />
+      <span>{option.name}</span>
+      <em>{priceLabel(option.points)}</em>
+    </button>
+  );
+}
+
+function UnitProfile({ props }: { props: ConceptProps }) {
+  const unit = props.selectedUnit;
+  const detail = unit.detail;
+  if (!detail) {
+    return (
+      <div className="ux-empty small">
+        <BookOpen size={18} />
+        <strong>Profile unavailable</strong>
+        <small>This unit only has configuration data in the draft.</small>
       </div>
-    </section>
+    );
+  }
+
+  const modelTable = detail.profileTables.find((table) => table.id === "model-profile");
+  const weaponTables = detail.profileTables.filter((table) => table.id !== "model-profile");
+  return (
+    <div className="ux-unit-profile">
+      <ProfileSection title="Models" open>
+        <div className="ux-profile-models">
+          {detail.models.map((model) => {
+            const count = model.countOffset === undefined ? model.count : unit.count + model.countOffset;
+            return (
+              <div className="ux-profile-model" key={model.id}>
+                <b>{count}x</b>
+                <span>
+                  <strong>{model.name}</strong>
+                  <small>{model.summary}</small>
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </ProfileSection>
+
+      {modelTable ? (
+        <ProfileSection title="Profile" open>
+          <ProfileTable table={modelTable} unitCount={unit.count} />
+        </ProfileSection>
+      ) : null}
+
+      <ProfileSection title="Traits">
+        <div className="ux-profile-tag-list">{detail.traits.map((trait) => <span key={trait}>{trait}</span>)}</div>
+      </ProfileSection>
+
+      {weaponTables.map((table) => (
+        <ProfileSection title={table.title} key={table.id}>
+          <ProfileTable table={table} unitCount={unit.count} />
+        </ProfileSection>
+      ))}
+
+      <ProfileSection title="Wargear">
+        <div className="ux-profile-copy-list">
+          {detail.wargear.map((item) => (
+            <article key={item.id}>
+              <strong>{item.name}</strong>
+              <p>{item.description}</p>
+            </article>
+          ))}
+        </div>
+      </ProfileSection>
+
+      <ProfileSection title="Rules">
+        <div className="ux-profile-tag-list">{detail.rules.map((rule) => <span key={rule}>{rule}</span>)}</div>
+      </ProfileSection>
+
+      <ProfileSection title="Categories">
+        <div className="ux-profile-tag-list">{detail.categories.map((category) => <span key={category}>{category}</span>)}</div>
+      </ProfileSection>
+    </div>
+  );
+}
+
+function ProfileSection({ title, open = false, children }: { title: string; open?: boolean; children: ReactNode }) {
+  return (
+    <details className="ux-profile-section" open={open}>
+      <summary>
+        <strong>{title}</strong>
+        <ChevronDown size={15} />
+      </summary>
+      <div className="ux-profile-section-body">{children}</div>
+    </details>
+  );
+}
+
+function ProfileTable({ table, unitCount }: { table: NonNullable<ConceptProps["selectedUnit"]["detail"]>["profileTables"][number]; unitCount: number }) {
+  const rowName = (row: typeof table.rows[number]) => row.id === "assault-legionary" ? `Assault Legionary (x${unitCount - 1})` : row.name.replace("(x10)", `(x${unitCount})`);
+  return (
+    <div className="ux-profile-table-scroll">
+      <table className="ux-profile-table">
+        <thead>
+          <tr>
+            {table.columns.map((column) => <th scope="col" key={column}>{column}</th>)}
+          </tr>
+        </thead>
+        {table.rows.map((row) => (
+          <tbody className="ux-profile-row-group" key={row.id}>
+            <tr className="ux-profile-row-name">
+              <th scope="rowgroup" colSpan={table.columns.length}>
+                <strong>{rowName(row)}</strong>
+                {row.tags ? <small>{row.tags.join(" · ")}</small> : null}
+              </th>
+            </tr>
+            <tr className="ux-profile-row-stats">
+              {row.values.map((value, index) => <td key={`${row.id}-${table.columns[index]}`}>{value}</td>)}
+            </tr>
+          </tbody>
+        ))}
+      </table>
+    </div>
   );
 }
 
@@ -505,7 +734,7 @@ function LookupScreen({ props }: { props: ConceptProps }) {
       <div className="ux-wb-home-body">
         <div className={`ux-wb-search ${props.smartSearch ? "smart" : ""}`}>
           {props.smartSearch ? <Command size={15} /> : <Search size={15} />}
-          <input placeholder="Search Intercessors, Deep Strike, plasma..." readOnly />
+          <input placeholder="Search Assault Squad, Deep Strike, plasma..." readOnly />
         </div>
         <div className="ux-source-filters">
           {["All sources", props.roster.system, props.roster.faction, "Core rules"].map((filter, index) => (
