@@ -30,6 +30,9 @@ type Props = {
   onSelectUnit: (id: string) => void;
   onToggleOption: (id: string) => void;
   onCountChange: (id: string, delta: number) => void;
+  onLoadoutGroupCountChange: (unitId: string, groupId: string, delta: number) => void;
+  onSplitLoadoutGroup: (unitId: string, groupId: string) => void;
+  onSelectLoadoutChoice: (unitId: string, groupId: string, slotId: string, choiceId: string) => void;
   onNavigate: (screen: ReturnType<typeof workflowToPrototypeScreen>) => void;
   onBack: () => void;
   onOpenGlance: (screen: WorkflowScreen, placement?: GlancePlacement) => void;
@@ -58,6 +61,9 @@ export function WorkflowBoard({
   onSelectUnit,
   onToggleOption,
   onCountChange,
+  onLoadoutGroupCountChange,
+  onSplitLoadoutGroup,
+  onSelectLoadoutChoice,
   onNavigate,
   onBack,
   onOpenGlance,
@@ -101,6 +107,9 @@ export function WorkflowBoard({
                         onSelectUnit={onSelectUnit}
                         onToggleOption={onToggleOption}
                         onCountChange={onCountChange}
+                        onLoadoutGroupCountChange={onLoadoutGroupCountChange}
+                        onSplitLoadoutGroup={onSplitLoadoutGroup}
+                        onSelectLoadoutChoice={onSelectLoadoutChoice}
                         onNavigate={onNavigate}
                         onBack={onBack}
                       />

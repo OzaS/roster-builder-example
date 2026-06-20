@@ -1802,6 +1802,369 @@
   font-weight: 850;
 }
 
+.ux-loadout-group {
+  container-type: inline-size;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--ux-line);
+  border-radius: var(--ux-r-sm);
+  background: var(--ux-surface-2);
+}
+.ux-loadout-group-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 52px;
+  padding: 6px;
+}
+.ux-loadout-group.expanded .ux-loadout-group-head {
+  border-bottom: 1px solid var(--ux-line);
+}
+.ux-loadout-group-toggle {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 40px;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ux-ink);
+  text-align: left;
+  cursor: pointer;
+}
+.ux-loadout-group-toggle:hover {
+  background: color-mix(in srgb, var(--ux-accent) 7%, transparent);
+}
+.ux-loadout-group-toggle > span:first-child {
+  min-width: 0;
+}
+.ux-loadout-group-toggle strong,
+.ux-loadout-group-toggle small {
+  display: block;
+}
+.ux-loadout-group-toggle strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13.5px;
+}
+.ux-loadout-group-toggle > span:first-child small {
+  margin-top: 2px;
+  overflow: hidden;
+  color: var(--ux-muted);
+  font-size: 10.5px;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ux-loadout-group-meta {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 5px;
+  color: var(--ux-muted);
+}
+.ux-loadout-group-meta small {
+  color: var(--ux-accent-2);
+  font-size: 10.5px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.ux-loadout-group-meta svg {
+  transition: transform 0.16s ease;
+}
+.ux-loadout-group.expanded .ux-loadout-group-meta svg {
+  transform: rotate(180deg);
+}
+.ux-loadout-group-actions,
+.ux-loadout-count-controls {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+}
+.ux-loadout-group-actions {
+  gap: 5px;
+}
+.ux-loadout-count-controls {
+  border: 1px solid var(--ux-line-2);
+  border-radius: 7px;
+  background: var(--ux-surface-3);
+  overflow: hidden;
+}
+.ux-loadout-count-controls button {
+  display: grid;
+  width: 27px;
+  height: 29px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ux-ink);
+  cursor: pointer;
+}
+.ux-loadout-count-controls button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--ux-accent) 10%, transparent);
+}
+.ux-loadout-count-controls button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.ux-loadout-count-controls strong {
+  min-width: 20px;
+  text-align: center;
+  font-size: 11px;
+}
+.ux-loadout-split {
+  display: grid;
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--ux-line-2);
+  border-radius: 7px;
+  background: var(--ux-surface-3);
+  color: var(--ux-ink);
+  cursor: pointer;
+}
+.ux-loadout-split:disabled {
+  opacity: 0.38;
+  cursor: default;
+}
+@container (max-width: 280px) {
+  .ux-loadout-group-head {
+    flex-wrap: wrap;
+  }
+  .ux-loadout-group-toggle {
+    flex-basis: 100%;
+  }
+  .ux-loadout-group-actions {
+    margin-left: auto;
+  }
+}
+.ux-loadout-slots {
+  display: grid;
+}
+.ux-loadout-slot {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto 16px;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 7px 10px;
+  border: 0;
+  border-bottom: 1px solid var(--ux-line);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+.ux-loadout-slot:last-child {
+  border-bottom: 0;
+}
+.ux-loadout-slot:hover {
+  background: color-mix(in srgb, var(--ux-accent) 7%, transparent);
+}
+.ux-loadout-slot small {
+  color: var(--ux-muted);
+  font-size: 9.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.ux-loadout-slot strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12.5px;
+}
+.ux-loadout-slot em {
+  color: var(--ux-muted);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 750;
+  white-space: nowrap;
+}
+.ux-loadout-slot svg {
+  color: var(--ux-muted);
+}
+
+.ux-loadout-selector-layer {
+  position: absolute;
+  z-index: 50;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(5, 7, 10, 0.58);
+  backdrop-filter: blur(2px);
+}
+.ux-loadout-selector {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  width: 100%;
+  max-height: 82%;
+  overflow: hidden;
+  border: 1px solid var(--ux-line-2);
+  border-bottom: 0;
+  border-radius: 16px 16px 0 0;
+  background: var(--ux-bg);
+  box-shadow: 0 -18px 48px rgba(0, 0, 0, 0.42);
+}
+.ux-loadout-selector > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 56px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--ux-line);
+  background: var(--ux-surface);
+}
+.ux-loadout-selector > header strong,
+.ux-loadout-selector > header small {
+  display: block;
+}
+.ux-loadout-selector > header strong {
+  font-size: 15px;
+}
+.ux-loadout-selector > header small {
+  margin-top: 2px;
+  color: var(--ux-muted);
+  font-size: 11px;
+}
+.ux-loadout-selector > header button {
+  display: grid;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--ux-line);
+  border-radius: 8px;
+  background: var(--ux-surface-2);
+  cursor: pointer;
+}
+.ux-loadout-selector-search {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  margin: 10px 12px 8px;
+  padding: 0 10px;
+  min-height: 40px;
+  border: 1px solid var(--ux-line-2);
+  border-radius: 8px;
+  background: var(--ux-surface);
+  color: var(--ux-muted);
+}
+.ux-loadout-selector-search input {
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ux-ink);
+  font: inherit;
+  font-size: 12.5px;
+}
+.ux-loadout-choice-list {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-height: 0;
+  padding: 2px 12px 18px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.ux-loadout-choice {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 24px;
+  align-items: center;
+  gap: 10px;
+  min-height: 54px;
+  padding: 8px 10px;
+  border: 1px solid var(--ux-line);
+  border-radius: 8px;
+  background: var(--ux-surface-2);
+  text-align: left;
+  cursor: pointer;
+}
+.ux-loadout-choice:hover,
+.ux-loadout-choice.selected {
+  border-color: color-mix(in srgb, var(--ux-accent) 56%, transparent);
+}
+.ux-loadout-choice.selected {
+  background: color-mix(in srgb, var(--ux-accent) 10%, var(--ux-surface-2));
+}
+.ux-loadout-choice strong,
+.ux-loadout-choice small {
+  display: block;
+}
+.ux-loadout-choice strong {
+  font-size: 13px;
+}
+.ux-loadout-choice small {
+  margin-top: 2px;
+  color: var(--ux-muted);
+  font-size: 10.5px;
+}
+.ux-loadout-choice-check {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--ux-line-2);
+  border-radius: 999px;
+  color: var(--ux-accent-ink);
+}
+.ux-loadout-choice.selected .ux-loadout-choice-check {
+  border-color: var(--ux-accent);
+  background: var(--ux-accent);
+}
+.ux-loadout-selector-empty {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 34px 16px;
+  color: var(--ux-muted);
+  text-align: center;
+}
+.ux-loadout-selector-empty strong {
+  color: var(--ux-ink);
+  font-size: 13px;
+}
+.ux-loadout-selector-empty small {
+  font-size: 11px;
+}
+
+.device-frame.tablet .ux-loadout-selector-layer {
+  align-items: center;
+  padding: 24px;
+}
+.device-frame.tablet .ux-loadout-selector {
+  width: min(520px, 100%);
+  max-height: min(640px, calc(100% - 48px));
+  border-bottom: 1px solid var(--ux-line-2);
+  border-radius: 12px;
+}
+.design-elements-panel.ux-screen .ux-loadout-selector-layer.ux-elements-static {
+  position: static;
+  display: block;
+  margin-top: 12px;
+  padding: 0;
+  background: transparent;
+  backdrop-filter: none;
+}
+.design-elements-panel.ux-screen .ux-loadout-selector-layer.ux-elements-static .ux-loadout-selector {
+  width: 100%;
+  max-height: 360px;
+  border-bottom: 1px solid var(--ux-line-2);
+  border-radius: 12px;
+}
+
 .ux-profile-section {
   min-width: 0;
   overflow: hidden;
@@ -2888,7 +3251,7 @@
 
 /* Workbench becomes a true multi-pane on tablet */
 .device-frame.tablet .ux-wb-layout {
-  grid-template-columns: 300px minmax(0, 1fr) 260px;
+  grid-template-columns: minmax(180px, 30%) minmax(220px, 1fr) minmax(180px, 26%);
 }
 .device-frame.tablet .ux-wb-tree {
   border-right: 1px solid var(--ux-line);

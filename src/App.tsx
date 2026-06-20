@@ -246,6 +246,96 @@ function App() {
     });
   }
 
+  function splitLoadoutGroup(unitId: string, groupId: string) {
+    setRoster((current) => ({
+      ...current,
+      sections: current.sections.map((section) => ({
+        ...section,
+        units: section.units.map((unit) => {
+          if (unit.id !== unitId || !unit.detail) return unit;
+          const sourceIndex = unit.detail.loadoutGroups.findIndex((group) => group.id === groupId);
+          const source = unit.detail.loadoutGroups[sourceIndex];
+          if (!source || !source.canSplit || source.count <= 1) return unit;
+          const groupNumber = unit.detail.loadoutGroups.filter((group) => group.modelId === source.modelId).length + 1;
+          const clone = {
+            ...source,
+            id: `${source.modelId}-group-${groupNumber}`,
+            count: 1,
+            slots: source.slots.map((slot) => ({ ...slot, choices: [...slot.choices] })),
+          };
+          const loadoutGroups = [...unit.detail.loadoutGroups];
+          loadoutGroups[sourceIndex] = { ...source, count: source.count - 1 };
+          loadoutGroups.splice(sourceIndex + 1, 0, clone);
+          return { ...unit, detail: { ...unit.detail, loadoutGroups } };
+        }),
+      })),
+    }));
+  }
+
+  function changeLoadoutGroupCount(unitId: string, groupId: string, delta: number) {
+    setRoster((current) => {
+      let pointsDelta = 0;
+      const sections = current.sections.map((section) => ({
+        ...section,
+        units: section.units.map((unit) => {
+          if (unit.id !== unitId || !unit.detail) return unit;
+          const group = unit.detail.loadoutGroups.find((item) => item.id === groupId);
+          if (!group || !group.canSplit) return unit;
+          const totalModels = unit.detail.loadoutGroups.reduce((sum, item) => sum + item.count, 0);
+          const maximumModels = unit.maxCount ?? Number.POSITIVE_INFINITY;
+          const requestedDelta = delta < 0 ? -1 : 1;
+          if ((requestedDelta < 0 && group.count <= 1) || (requestedDelta > 0 && totalModels >= maximumModels)) return unit;
+          const selectedUpgradePoints = group.slots.reduce((sum, slot) => {
+            const choice = slot.choices.find((item) => item.id === slot.selectedChoiceId);
+            return sum + (choice?.points ?? 0);
+          }, 0);
+          pointsDelta = requestedDelta * (group.basePointsPerModel + selectedUpgradePoints);
+          return {
+            ...unit,
+            count: unit.count + requestedDelta,
+            points: unit.points + pointsDelta,
+            detail: {
+              ...unit.detail,
+              loadoutGroups: unit.detail.loadoutGroups.map((item) => item.id === groupId ? { ...item, count: item.count + requestedDelta } : item),
+            },
+          };
+        }),
+      }));
+      return { ...current, sections, pointsUsed: current.pointsUsed + pointsDelta };
+    });
+  }
+
+  function selectLoadoutChoice(unitId: string, groupId: string, slotId: string, choiceId: string) {
+    setRoster((current) => {
+      let pointsDelta = 0;
+      const sections = current.sections.map((section) => ({
+        ...section,
+        units: section.units.map((unit) => {
+          if (unit.id !== unitId || !unit.detail) return unit;
+          const group = unit.detail.loadoutGroups.find((item) => item.id === groupId);
+          const slot = group?.slots.find((item) => item.id === slotId);
+          const previous = slot?.choices.find((choice) => choice.id === slot.selectedChoiceId);
+          const next = slot?.choices.find((choice) => choice.id === choiceId);
+          if (!group || !slot || !previous || !next || previous.id === next.id) return unit;
+          const delta = (next.points - previous.points) * group.count;
+          pointsDelta += delta;
+          return {
+            ...unit,
+            points: unit.points + delta,
+            detail: {
+              ...unit.detail,
+              loadoutGroups: unit.detail.loadoutGroups.map((item) => item.id === groupId ? {
+                ...item,
+                slots: item.slots.map((itemSlot) => itemSlot.id === slotId ? { ...itemSlot, selectedChoiceId: choiceId } : itemSlot),
+              } : item),
+            },
+          };
+        }),
+      }));
+      return { ...current, sections, pointsUsed: current.pointsUsed + pointsDelta };
+    });
+  }
+
   async function captureCurrentStage() {
     if (!captureRef.current) return;
     const screenName = navigatorView === "all-screens" ? "all-screens" : navigatorView === "elements" ? "elements" : workflowScreen;
@@ -294,6 +384,9 @@ function App() {
         onSelectUnit: selectUnit,
         onToggleOption: toggleOption,
         onCountChange: changeCount,
+        onLoadoutGroupCountChange: changeLoadoutGroupCount,
+        onSplitLoadoutGroup: splitLoadoutGroup,
+        onSelectLoadoutChoice: selectLoadoutChoice,
         onNavigate: navigate,
         onBack: goBack,
       }}
@@ -319,6 +412,9 @@ function App() {
         onSelectUnit={selectUnit}
         onToggleOption={toggleOption}
         onCountChange={changeCount}
+        onLoadoutGroupCountChange={changeLoadoutGroupCount}
+        onSplitLoadoutGroup={splitLoadoutGroup}
+        onSelectLoadoutChoice={selectLoadoutChoice}
         onNavigate={navigate}
         onBack={goBack}
       />

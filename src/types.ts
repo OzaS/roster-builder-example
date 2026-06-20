@@ -42,14 +42,29 @@ export type RosterOption = {
   disabled?: boolean;
 };
 
-export type RosterCompositionEntry = {
+export type RosterLoadoutChoice = {
   id: string;
   name: string;
-  summary: string;
+  points: number;
+  profileValues: string[];
+};
+
+export type RosterLoadoutSlot = {
+  id: string;
+  label: string;
+  profileTableId: "ranged-weapon" | "melee-weapon";
+  selectedChoiceId: string;
+  choices: RosterLoadoutChoice[];
+};
+
+export type RosterLoadoutGroup = {
+  id: string;
+  modelId: string;
+  name: string;
   count: number;
-  countOffset?: number;
-  editable?: boolean;
-  pointsPerModel?: number;
+  basePointsPerModel: number;
+  canSplit: boolean;
+  slots: RosterLoadoutSlot[];
 };
 
 export type RosterProfileRow = {
@@ -67,7 +82,7 @@ export type RosterProfileTable = {
 };
 
 export type RosterUnitDetail = {
-  composition: RosterCompositionEntry[];
+  loadoutGroups: RosterLoadoutGroup[];
   choiceGroups: Array<{
     id: string;
     title: string;
@@ -75,7 +90,6 @@ export type RosterUnitDetail = {
     optionIds: string[];
   }>;
   standaloneOptionIds: string[];
-  models: Array<{ id: string; count: number; countOffset?: number; name: string; summary: string }>;
   profileTables: RosterProfileTable[];
   traits: string[];
   wargear: Array<{ id: string; name: string; description: string }>;

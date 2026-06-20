@@ -31,6 +31,9 @@ export type ConceptProps = {
   onSelectUnit: (id: string) => void;
   onToggleOption: (id: string) => void;
   onCountChange: (id: string, delta: number) => void;
+  onLoadoutGroupCountChange: (unitId: string, groupId: string, delta: number) => void;
+  onSplitLoadoutGroup: (unitId: string, groupId: string) => void;
+  onSelectLoadoutChoice: (unitId: string, groupId: string, slotId: string, choiceId: string) => void;
   onNavigate: (screen: PrototypeScreen) => void;
   onBack: () => void;
 };

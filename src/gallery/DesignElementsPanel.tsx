@@ -1,4 +1,4 @@
-import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, Cog, Command, Copy, CornerDownLeft, Database, Download, Ellipsis, FileInput, Filter, Hammer, Layers, MessageCircle, PanelsTopLeft, Plus, Rows3, Search, Share2, Smartphone, Sparkles, StickyNote, Trash2, Zap } from "lucide-react";
+import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ChevronRight, Cog, Command, Copy, CornerDownLeft, Database, Download, Ellipsis, FileInput, Filter, Hammer, Layers, MessageCircle, Minus, PanelsTopLeft, Plus, Rows3, Search, Share2, Smartphone, Sparkles, Split, StickyNote, Trash2, X, Zap } from "lucide-react";
 import { PhoneStatusBar } from "../components/DeviceFrame";
 import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode } from "../types";
 import { BudgetMeter, Chip, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph } from "../concepts/ux/uxShared";
@@ -383,6 +383,8 @@ function WorkbenchElements({
 
       <OptionsSection selectedUnit={selectedUnit} onToggleOption={onToggleOption} />
 
+      <LoadoutEditorElement unit={profileUnit} />
+
       <UnitProfilesElement unit={profileUnit} />
 
       <ElementSection title="Unit Detail Toggle">
@@ -743,6 +745,59 @@ function UnitProfilesElement({ unit }: { unit: RosterUnit }) {
             </tr>
           </tbody>
         </table>
+      </div>
+    </ElementSection>
+  );
+}
+
+function LoadoutEditorElement({ unit }: { unit: RosterUnit }) {
+  const group = unit.detail?.loadoutGroups.find((item) => item.canSplit) ?? unit.detail?.loadoutGroups[0];
+  const slot = group?.slots.find((item) => item.id === "melee") ?? group?.slots[0];
+  if (!group || !slot) return null;
+  return (
+    <ElementSection title="Loadout Groups & Selector">
+      <article className="ux-loadout-group expanded">
+        <header className="ux-loadout-group-head">
+          <button type="button" className="ux-loadout-group-toggle" aria-expanded="true">
+            <span><strong>{group.name} ×{group.count}</strong><small>Bolt pistol · Chainsword</small></span>
+            <span className="ux-loadout-group-meta"><small>{group.count * group.basePointsPerModel} pts</small><ChevronDown size={15} /></span>
+          </button>
+          <div className="ux-loadout-group-actions">
+            <div className="ux-loadout-count-controls">
+              <button type="button" aria-label={`Decrease ${group.name} count`}><Minus size={13} /></button>
+              <strong>{group.count}</strong>
+              <button type="button" aria-label={`Increase ${group.name} count`}><Plus size={13} /></button>
+            </div>
+            <button type="button" className="ux-loadout-split" aria-label={`Split one ${group.name}`} title="Split one model into a new group"><Split size={14} /></button>
+          </div>
+        </header>
+        <div className="ux-loadout-slots">
+          {group.slots.map((item) => {
+            const choice = item.choices.find((candidate) => candidate.id === item.selectedChoiceId);
+            return choice ? (
+              <button type="button" className="ux-loadout-slot" key={item.id}>
+                <small>{item.label}</small><strong>{choice.name}</strong><em>{choice.points ? `+${choice.points} pts` : "Included"}</em><ChevronRight size={15} />
+              </button>
+            ) : null;
+          })}
+        </div>
+      </article>
+      <div className="ux-loadout-selector-layer ux-elements-static">
+        <section className="ux-loadout-selector" role="dialog" aria-modal="true" aria-label={`Choose ${slot.label.toLowerCase()}`}>
+          <header><span><strong>Choose {slot.label.toLowerCase()}</strong><small>{group.name} ×{group.count}</small></span><button type="button" aria-label="Close selector"><X size={18} /></button></header>
+          <label className="ux-loadout-selector-search"><Search size={15} /><input placeholder={`Search ${slot.label.toLowerCase()} choices`} readOnly /></label>
+          <div className="ux-loadout-choice-list">
+            {slot.choices.map((choice) => {
+              const selected = choice.id === slot.selectedChoiceId;
+              return (
+                <button type="button" className={`ux-loadout-choice ${selected ? "selected" : ""}`} key={choice.id}>
+                  <span><strong>{choice.name}</strong><small>{choice.points ? `+${choice.points} pts per model` : "Included"}</small></span>
+                  <span className="ux-loadout-choice-check" aria-hidden>{selected ? <Check size={15} /> : null}</span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
       </div>
     </ElementSection>
   );

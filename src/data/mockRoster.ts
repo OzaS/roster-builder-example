@@ -1,4 +1,36 @@
-import type { Roster } from "../types";
+import type { Roster, RosterLoadoutChoice } from "../types";
+
+const pistolChoices = [
+  { id: "bolt-pistol", name: "Bolt pistol", points: 0, profileValues: ["12", "1", "4", "5", "1", "Pistol", "Assault, Ranged"] },
+  { id: "plasma-pistol", name: "Plasma pistol", points: 5, profileValues: ["12", "1", "4", "3", "1", "Breaching (4+)", "Pistol"] },
+  { id: "hand-flamer", name: "Hand flamer", points: 5, profileValues: ["Template", "1", "-", "6", "1", "Torrent", "Pistol"] },
+  { id: "volkite-serpenta", name: "Volkite serpenta", points: 5, profileValues: ["10", "2", "4", "5", "1", "Deflagrate", "Pistol"] },
+  { id: "inferno-pistol", name: "Inferno pistol", points: 10, profileValues: ["6", "1", "4", "1", "D3", "Armourbane", "Pistol"] },
+  { id: "needle-pistol", name: "Needle pistol", points: 5, profileValues: ["12", "1", "4", "6", "1", "Poisoned (3+)", "Pistol"] },
+  { id: "grav-pistol", name: "Grav pistol", points: 5, profileValues: ["12", "1", "4", "4", "1", "Graviton", "Pistol"] },
+  { id: "archaeotech-pistol", name: "Archaeotech pistol", points: 10, profileValues: ["12", "2", "4", "3", "2", "Master-crafted", "Pistol"] },
+  { id: "disintegrator-pistol", name: "Disintegrator pistol", points: 10, profileValues: ["12", "1", "4", "2", "2", "Gets Hot", "Pistol"] },
+  { id: "laspistol", name: "Laspistol", points: 0, profileValues: ["12", "1", "4", "6", "1", "-", "Pistol"] },
+] satisfies RosterLoadoutChoice[];
+
+const meleeChoices = [
+  { id: "chainsword", name: "Chainsword", points: 0, profileValues: ["I", "A", "S", "5", "1", "Shred (6+)", "Chain"] },
+  { id: "chainaxe", name: "Chainaxe", points: 0, profileValues: ["I", "A", "+1", "4", "1", "Shred (6+)", "Chain"] },
+  { id: "charnabal-sabre", name: "Charnabal sabre", points: 5, profileValues: ["I", "A", "S", "5", "1", "Breaching (5+)", "Duelling"] },
+  { id: "power-sword", name: "Power sword", points: 10, profileValues: ["I", "A", "S", "3", "1", "Breaching (6+)", "Power"] },
+  { id: "power-axe", name: "Power axe", points: 10, profileValues: ["-1", "A", "+1", "2", "1", "-", "Power"] },
+  { id: "power-maul", name: "Power maul", points: 10, profileValues: ["I", "A", "+2", "3", "1", "-", "Power"] },
+  { id: "power-lance", name: "Power lance", points: 10, profileValues: ["I", "A", "+1", "3", "1", "Reach", "Power"] },
+  { id: "lightning-claw", name: "Lightning claw", points: 5, profileValues: ["I", "A", "S", "3", "1", "Rending", "Specialist"] },
+  { id: "paired-lightning-claws", name: "Pair of lightning claws", points: 10, profileValues: ["I", "+1", "S", "3", "1", "Rending", "Specialist"] },
+  { id: "power-fist", name: "Power fist", points: 15, profileValues: ["-1", "A", "x2", "2", "2", "Unwieldy", "Power"] },
+  { id: "thunder-hammer", name: "Thunder hammer", points: 15, profileValues: ["-1", "A", "x2", "2", "3", "Concussive", "Power"] },
+  { id: "combat-blade", name: "Combat blade", points: 0, profileValues: ["I", "A", "S", "6", "1", "-", "Blade"] },
+  { id: "heavy-chainsword", name: "Heavy chainsword", points: 10, profileValues: ["-1", "A", "+2", "4", "2", "Shred (6+)", "Chain"] },
+  { id: "paragon-blade", name: "Paragon blade", points: 20, profileValues: ["I", "A", "+1", "2", "2", "Murderous Strike", "Power"] },
+  { id: "phoenix-spear", name: "Phoenix spear", points: 15, profileValues: ["I", "A", "+2", "2", "2", "Reach", "Power"] },
+  { id: "terranic-greatsword", name: "Terranic greatsword", points: 15, profileValues: ["-1", "A", "+2", "2", "2", "Rending", "Power"] },
+] satisfies RosterLoadoutChoice[];
 
 export const mockRoster: Roster = {
   name: "Crusade Primary Detachment",
@@ -68,17 +100,37 @@ export const mockRoster: Roster = {
           maxCount: 20,
           pointsPerAdditionalModel: 12,
           options: [
-            { id: "bolt-pistol", name: "Bolt pistol", group: "weapon", points: 0, selected: true },
-            { id: "chainsword", name: "Chainsword", group: "weapon", points: 0, selected: true },
             { id: "combat-shields", name: "Unit swaps Bolt Pistols for Combat Shields", group: "upgrade", points: 20, selected: false },
             { id: "frag-grenades", name: "Frag grenades", group: "rule", points: 0, selected: true },
             { id: "krak-grenades", name: "Krak grenades", group: "rule", points: 0, selected: true },
             { id: "prime-unit", name: "Prime Unit", group: "rule", points: 0, selected: false },
           ],
           detail: {
-            composition: [
-              { id: "sergeant", name: "Sergeant", summary: "Bolt pistol, Chainsword", count: 1 },
-              { id: "legionary", name: "Legionary", summary: "Chainsword, Bolt pistol", count: 9, countOffset: -1, editable: true, pointsPerModel: 12 },
+            loadoutGroups: [
+              {
+                id: "sergeant-group",
+                modelId: "sergeant",
+                name: "Sergeant",
+                count: 1,
+                basePointsPerModel: 32,
+                canSplit: false,
+                slots: [
+                  { id: "pistol", label: "Pistol", profileTableId: "ranged-weapon", selectedChoiceId: "bolt-pistol", choices: pistolChoices },
+                  { id: "melee", label: "Melee", profileTableId: "melee-weapon", selectedChoiceId: "chainsword", choices: meleeChoices },
+                ],
+              },
+              {
+                id: "legionary-group",
+                modelId: "legionary",
+                name: "Legionaries",
+                count: 9,
+                basePointsPerModel: 12,
+                canSplit: true,
+                slots: [
+                  { id: "pistol", label: "Pistol", profileTableId: "ranged-weapon", selectedChoiceId: "bolt-pistol", choices: pistolChoices },
+                  { id: "melee", label: "Melee", profileTableId: "melee-weapon", selectedChoiceId: "chainsword", choices: meleeChoices },
+                ],
+              },
             ],
             choiceGroups: [
               {
@@ -88,10 +140,6 @@ export const mockRoster: Roster = {
               },
             ],
             standaloneOptionIds: ["frag-grenades", "krak-grenades", "prime-unit"],
-            models: [
-              { id: "sergeant", count: 1, name: "Sergeant", summary: "Bolt pistol, Chainsword" },
-              { id: "legionary", count: 9, countOffset: -1, name: "Legionary", summary: "Chainsword, Bolt pistol" },
-            ],
             profileTables: [
               {
                 id: "model-profile",

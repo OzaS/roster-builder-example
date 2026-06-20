@@ -1,5 +1,5 @@
-import { Fragment, useState, type ReactNode } from "react";
-import { AlertTriangle, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ClipboardList, Cog, Command, Copy, Database, Download, Ellipsis, FileInput, Hammer, Layers, LibraryBig, Minus, PanelsTopLeft, Plus, Search, Share2, ShieldCheck, Sparkles, Star, StickyNote, Wand2 } from "lucide-react";
+import { Fragment, useCallback, useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import { AlertTriangle, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ChevronRight, ClipboardList, Cog, Command, Copy, Database, Download, Ellipsis, FileInput, Hammer, Layers, LibraryBig, Minus, PanelsTopLeft, Plus, Search, Share2, ShieldCheck, Sparkles, Split, Star, StickyNote, Wand2, X } from "lucide-react";
 import { mockCatalogues } from "../../data/mockRoster";
 import type { ConceptProps } from "../shared";
 import { BackOrTitle, BudgetMeter, Chip, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph } from "./uxShared";
@@ -22,6 +22,30 @@ export function CodexWorkbench(props: ConceptProps) {
     : screen === "library" || screen === "catalogue" || screen === "tools" || screen === "settings";
   const showTabBar = usesTabNavigation && isMainTab;
   const shell = `ux-screen ux-workbench ${shellClass(props.themeMode, props.colorScheme)} ${showTabBar ? "has-tabs" : ""}`.trim();
+  const [activeLoadoutSlot, setActiveLoadoutSlot] = useState<{ groupId: string; slotId: string } | null>(null);
+  const detailScrollRef = useRef<HTMLElement>(null);
+  const loadoutScrollTopRef = useRef(0);
+
+  const restoreDetailScroll = useCallback(() => {
+    window.requestAnimationFrame(() => {
+      if (detailScrollRef.current) detailScrollRef.current.scrollTop = loadoutScrollTopRef.current;
+    });
+  }, []);
+
+  const openLoadoutSelector = useCallback((groupId: string, slotId: string) => {
+    loadoutScrollTopRef.current = detailScrollRef.current?.scrollTop ?? 0;
+    setActiveLoadoutSlot({ groupId, slotId });
+    restoreDetailScroll();
+  }, [restoreDetailScroll]);
+
+  const closeLoadoutSelector = useCallback(() => {
+    setActiveLoadoutSlot(null);
+    restoreDetailScroll();
+  }, [restoreDetailScroll]);
+
+  useEffect(() => {
+    setActiveLoadoutSlot(null);
+  }, [screen, props.selectedUnit.id, props.unitDetailView]);
 
   let body: ReactNode;
   let modifier = "";
@@ -49,7 +73,7 @@ export function CodexWorkbench(props: ConceptProps) {
         ) : null}
         <div className="ux-wb-layout">
           <Tree props={props} />
-          <Detail props={props} />
+          <Detail props={props} scrollRef={detailScrollRef} onOpenLoadoutSlot={openLoadoutSelector} />
           <Rail props={props} />
         </div>
       </>
@@ -62,6 +86,7 @@ export function CodexWorkbench(props: ConceptProps) {
   return (
     <div className={`${shell} ${modifier}`.trim()}>
       {body}
+      {activeLoadoutSlot ? <LoadoutSelector props={props} target={activeLoadoutSlot} onClose={closeLoadoutSelector} /> : null}
       {showTabBar ? <TabBar props={props} /> : isUnitDetail ? <DetailModeBar props={props} /> : showCommandBar ? <CommandBar props={props} /> : null}
     </div>
   );
@@ -188,11 +213,11 @@ function Tree({ props }: { props: ConceptProps }) {
   );
 }
 
-function Detail({ props }: { props: ConceptProps }) {
+function Detail({ props, scrollRef, onOpenLoadoutSlot }: { props: ConceptProps; scrollRef: RefObject<HTMLElement | null>; onOpenLoadoutSlot: (groupId: string, slotId: string) => void }) {
   if (props.screen === "add-unit") return <AddPane props={props} />;
   const unit = props.selectedUnit;
   return (
-    <section className="ux-wb-detail">
+    <section className="ux-wb-detail" ref={scrollRef}>
       <div className="ux-keywords">
         {unit.keywords.map((k) => (
           <Chip key={k} tone="cool">
@@ -201,48 +226,71 @@ function Detail({ props }: { props: ConceptProps }) {
         ))}
       </div>
       {unit.note ? <p className="ux-config-note">{unit.note}</p> : null}
-      {props.unitDetailView === "profile" ? <UnitProfile props={props} /> : unit.detail ? <StructuredOptions props={props} /> : <FlatOptions props={props} />}
+      {props.unitDetailView === "profile" ? <UnitProfile props={props} /> : unit.detail ? <StructuredOptions props={props} onOpenLoadoutSlot={onOpenLoadoutSlot} /> : <FlatOptions props={props} />}
     </section>
   );
 }
 
-function StructuredOptions({ props }: { props: ConceptProps }) {
+function StructuredOptions({ props, onOpenLoadoutSlot }: { props: ConceptProps; onOpenLoadoutSlot: (groupId: string, slotId: string) => void }) {
   const unit = props.selectedUnit;
   const detail = unit.detail;
+  const [expandedGroupIds, setExpandedGroupIds] = useState<string[]>(["sergeant-group"]);
   if (!detail) return <FlatOptions props={props} />;
+  const totalModels = detail.loadoutGroups.reduce((sum, group) => sum + group.count, 0);
+
+  const toggleGroup = (groupId: string) => {
+    setExpandedGroupIds((current) => current.includes(groupId) ? current.filter((id) => id !== groupId) : [...current, groupId]);
+  };
 
   return (
     <div className="ux-unit-options">
       <section className="ux-unit-option-section">
-        <h4>Composition</h4>
-        {detail.composition.map((entry) => {
-          const count = entry.editable ? unit.count + (entry.countOffset ?? 0) : entry.count;
+        <h4>Model loadouts</h4>
+        {detail.loadoutGroups.map((group) => {
+          const slotChoices = group.slots.map((slot) => slot.choices.find((choice) => choice.id === slot.selectedChoiceId)).filter(Boolean);
+          const groupPoints = group.count * (group.basePointsPerModel + slotChoices.reduce((sum, choice) => sum + (choice?.points ?? 0), 0));
+          const groupName = group.count === 1 && group.name.endsWith("ies") ? `${group.name.slice(0, -3)}y` : group.name;
+          const expanded = expandedGroupIds.includes(group.id);
           return (
-            <article className="ux-composition-row" key={entry.id}>
-              <div className="ux-composition-main">
-                <span className="ux-composition-state"><Check size={14} /></span>
-                <span>
-                  <strong>{entry.name}</strong>
-                  <small>{entry.summary}</small>
-                </span>
-              </div>
-              {entry.editable ? (
-                <div className="ux-composition-controls" aria-label={`${entry.name} count`}>
-                  {entry.pointsPerModel ? <b>{count * entry.pointsPerModel} pts</b> : null}
-                  <button type="button" aria-label={`Duplicate ${entry.name}`} title={`Duplicate ${entry.name}`} onClick={() => props.onCountChange(unit.id, 1)}>
-                    <Copy size={14} />
-                  </button>
-                  <button type="button" aria-label={`Remove ${entry.name}`} onClick={() => props.onCountChange(unit.id, -1)}>
-                    <Minus size={15} />
-                  </button>
-                  <strong>{count}</strong>
-                  <button type="button" aria-label={`Add ${entry.name}`} onClick={() => props.onCountChange(unit.id, 1)}>
-                    <Plus size={15} />
-                  </button>
-                </div>
-              ) : (
-                <span className="ux-composition-count">{entry.count}</span>
-              )}
+            <article className={`ux-loadout-group ${expanded ? "expanded" : ""}`} key={group.id}>
+              <header className="ux-loadout-group-head">
+                <button type="button" className="ux-loadout-group-toggle" aria-expanded={expanded} onClick={() => toggleGroup(group.id)}>
+                  <span>
+                    <strong>{groupName} ×{group.count}</strong>
+                    <small>{slotChoices.map((choice) => choice?.name).join(" · ")}</small>
+                  </span>
+                  <span className="ux-loadout-group-meta">
+                    <small>{groupPoints} pts</small>
+                    <ChevronDown size={15} />
+                  </span>
+                </button>
+                {group.canSplit ? (
+                  <div className="ux-loadout-group-actions">
+                    <div className="ux-loadout-count-controls">
+                      <button type="button" aria-label={`Decrease ${groupName} count`} disabled={group.count <= 1} onClick={() => props.onLoadoutGroupCountChange(unit.id, group.id, -1)}><Minus size={13} /></button>
+                      <strong aria-label={`${group.count} models`}>{group.count}</strong>
+                      <button type="button" aria-label={`Increase ${groupName} count`} disabled={totalModels >= (unit.maxCount ?? Number.POSITIVE_INFINITY)} onClick={() => props.onLoadoutGroupCountChange(unit.id, group.id, 1)}><Plus size={13} /></button>
+                    </div>
+                    <button type="button" className="ux-loadout-split" aria-label={`Split one ${groupName}`} title="Split one model into a new group" disabled={group.count <= 1} onClick={() => props.onSplitLoadoutGroup(unit.id, group.id)}>
+                      <Split size={14} />
+                    </button>
+                  </div>
+                ) : null}
+              </header>
+              {expanded ? <div className="ux-loadout-slots">
+                {group.slots.map((slot) => {
+                  const choice = slot.choices.find((item) => item.id === slot.selectedChoiceId);
+                  if (!choice) return null;
+                  return (
+                    <button type="button" className="ux-loadout-slot" key={slot.id} onClick={() => onOpenLoadoutSlot(group.id, slot.id)}>
+                      <small>{slot.label}</small>
+                      <strong>{choice.name}</strong>
+                      <em>{choice.points ? `+${choice.points} pts` : "Included"}</em>
+                      <ChevronRight size={15} />
+                    </button>
+                  );
+                })}
+              </div> : null}
             </article>
           );
         })}
@@ -267,6 +315,64 @@ function StructuredOptions({ props }: { props: ConceptProps }) {
           const option = unit.options.find((item) => item.id === optionId);
           return option ? <OptionButton key={option.id} option={option} onToggle={props.onToggleOption} /> : null;
         })}
+      </section>
+    </div>
+  );
+}
+
+function LoadoutSelector({ props, target, onClose }: { props: ConceptProps; target: { groupId: string; slotId: string }; onClose: () => void }) {
+  const [query, setQuery] = useState("");
+  const group = props.selectedUnit.detail?.loadoutGroups.find((item) => item.id === target.groupId);
+  const slot = group?.slots.find((item) => item.id === target.slotId);
+  const choices = slot?.choices.filter((choice) => choice.name.toLowerCase().includes(query.trim().toLowerCase())) ?? [];
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onClose]);
+
+  if (!group || !slot) return null;
+  const groupName = group.count === 1 && group.name.endsWith("ies") ? `${group.name.slice(0, -3)}y` : group.name;
+  return (
+    <div className="ux-loadout-selector-layer" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+      <section className="ux-loadout-selector" role="dialog" aria-modal="true" aria-labelledby="loadout-selector-title">
+        <header>
+          <span>
+            <strong id="loadout-selector-title">Choose {slot.label.toLowerCase()}</strong>
+            <small>{groupName} ×{group.count}</small>
+          </span>
+          <button type="button" aria-label="Close selector" onClick={onClose}><X size={18} /></button>
+        </header>
+        <label className="ux-loadout-selector-search">
+          <Search size={15} />
+          <input value={query} onChange={(event) => setQuery(event.currentTarget.value)} placeholder={`Search ${slot.label.toLowerCase()} choices`} autoFocus />
+        </label>
+        <div className="ux-loadout-choice-list">
+          {choices.length ? choices.map((choice) => {
+            const selected = choice.id === slot.selectedChoiceId;
+            return (
+              <button type="button" className={`ux-loadout-choice ${selected ? "selected" : ""}`} key={choice.id} onClick={() => {
+                props.onSelectLoadoutChoice(props.selectedUnit.id, group.id, slot.id, choice.id);
+                onClose();
+              }}>
+                <span>
+                  <strong>{choice.name}</strong>
+                  <small>{choice.points ? `+${choice.points} pts per model` : "Included"}</small>
+                </span>
+                <span className="ux-loadout-choice-check" aria-hidden>{selected ? <Check size={15} /> : null}</span>
+              </button>
+            );
+          }) : (
+            <div className="ux-loadout-selector-empty">
+              <Search size={18} />
+              <strong>No matching choices</strong>
+              <small>Try a different weapon name.</small>
+            </div>
+          )}
+        </div>
       </section>
     </div>
   );
@@ -314,19 +420,34 @@ function UnitProfile({ props }: { props: ConceptProps }) {
   }
 
   const modelTable = detail.profileTables.find((table) => table.id === "model-profile");
-  const weaponTables = detail.profileTables.filter((table) => table.id !== "model-profile");
+  const weaponTables = detail.profileTables.filter((table) => table.id !== "model-profile").map((table) => {
+    const aggregated = new Map<string, { name: string; count: number; values: string[] }>();
+    detail.loadoutGroups.forEach((group) => {
+      group.slots.filter((slot) => slot.profileTableId === table.id).forEach((slot) => {
+        const choice = slot.choices.find((item) => item.id === slot.selectedChoiceId);
+        if (!choice) return;
+        const current = aggregated.get(choice.id);
+        aggregated.set(choice.id, { name: choice.name, count: (current?.count ?? 0) + group.count, values: choice.profileValues });
+      });
+    });
+    return {
+      ...table,
+      rows: Array.from(aggregated.entries()).map(([id, entry]) => ({ id: `${table.id}-${id}`, name: `${entry.name} (x${entry.count})`, values: entry.values })),
+    };
+  });
   return (
     <div className="ux-unit-profile">
       <ProfileSection title="Models" open>
         <div className="ux-profile-models">
-          {detail.models.map((model) => {
-            const count = model.countOffset === undefined ? model.count : unit.count + model.countOffset;
+          {detail.loadoutGroups.map((group) => {
+            const summary = group.slots.map((slot) => slot.choices.find((choice) => choice.id === slot.selectedChoiceId)?.name).filter(Boolean).join(", ");
+            const groupName = group.count === 1 && group.name.endsWith("ies") ? `${group.name.slice(0, -3)}y` : group.name;
             return (
-              <div className="ux-profile-model" key={model.id}>
-                <b>{count}x</b>
+              <div className="ux-profile-model" key={group.id}>
+                <b>{group.count}x</b>
                 <span>
-                  <strong>{model.name}</strong>
-                  <small>{model.summary}</small>
+                  <strong>{groupName}</strong>
+                  <small>{summary}</small>
                 </span>
               </div>
             );
