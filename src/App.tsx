@@ -4,7 +4,7 @@ import { GalleryShell } from "./gallery/GalleryShell";
 import { buildConceptGroups, bundledDesignData, designById, findConceptInData, firstScreenInDesign, normalizeDesignData, type DesignData } from "./design-data/designData";
 import { prototypeToWorkflowScreen, workflowToPrototypeScreen } from "./gallery/workflow";
 import { captureElementAsPng } from "./utils/captureStage";
-import type { ColorScheme, ConceptId, ForceCreationMode, NavigatorView, NavStyle, PlatformPreview, PrototypeScreen, Roster, RosterUnit, ThemeMode, UnitDetailView, WorkflowScreen } from "./types";
+import type { ColorScheme, ConceptId, ForceCreationMode, NavigatorView, NavStyle, PlatformPreview, PrototypeScreen, Roster, RosterUnit, TabletPanelLayout, ThemeMode, UnitDetailView, WorkflowScreen } from "./types";
 
 const GALLERY_STATE_KEY = "roster-builder.gallery-state.v1";
 const conceptIds = ["ux-workbench", "ux-command"] satisfies ConceptId[];
@@ -15,6 +15,7 @@ const navigatorViews = ["single", "all-screens", "elements"] satisfies Navigator
 const navStyles = ["top", "tabs", "floating"] satisfies NavStyle[];
 const unitDetailViews = ["options", "profile"] satisfies UnitDetailView[];
 const forceCreationModes = ["selector", "inline"] satisfies ForceCreationMode[];
+const defaultTabletPanelLayout: TabletPanelLayout = { treeRatio: 0.3, railRatio: 0.26, treeVisible: true, railVisible: true };
 const workflowScreenIds = [
   "library",
   "create-roster",
@@ -56,6 +57,7 @@ type PersistedGalleryState = {
   statusBarUsesDesignBackground?: boolean;
   unitDetailView?: UnitDetailView;
   forceCreationMode?: ForceCreationMode;
+  tabletPanelLayout?: TabletPanelLayout;
   screen?: PrototypeScreen;
 };
 
@@ -74,6 +76,7 @@ function App() {
   const [statusBarUsesDesignBackground, setStatusBarUsesDesignBackground] = useState(initialState.statusBarUsesDesignBackground ?? false);
   const [unitDetailView, setUnitDetailView] = useState<UnitDetailView>(initialState.unitDetailView ?? "options");
   const [forceCreationMode, setForceCreationMode] = useState<ForceCreationMode>(initialState.forceCreationMode ?? "selector");
+  const [tabletPanelLayout, setTabletPanelLayout] = useState<TabletPanelLayout>(initialState.tabletPanelLayout ?? defaultTabletPanelLayout);
   const [roster, setRoster] = useState<Roster>(mockRoster);
   const [selectedForceId, setSelectedForceId] = useState("primary-force");
   const [expandedForceIds, setExpandedForceIds] = useState<string[]>(mockRoster.forces.map((force) => force.id));
@@ -134,9 +137,10 @@ function App() {
       statusBarUsesDesignBackground,
       unitDetailView,
       forceCreationMode,
+      tabletPanelLayout,
       screen,
     });
-  }, [selectedConcept, platform, themeMode, colorScheme, navigatorView, workflowScreen, smartSearch, navStyle, statusBarUsesDesignBackground, unitDetailView, forceCreationMode, screen]);
+  }, [selectedConcept, platform, themeMode, colorScheme, navigatorView, workflowScreen, smartSearch, navStyle, statusBarUsesDesignBackground, unitDetailView, forceCreationMode, tabletPanelLayout, screen]);
 
   const conceptGroups = useMemo(() => buildConceptGroups(designData), [designData]);
   const concept = findConceptInData(designData, selectedConcept);
@@ -403,6 +407,8 @@ function App() {
         unitDetailView,
         onUnitDetailViewChange: setUnitDetailView,
         forceCreationMode,
+        tabletPanelLayout,
+        onTabletPanelLayoutChange: setTabletPanelLayout,
         onSelectForce: selectForce,
         onToggleForce: toggleForce,
         onCreateForce: createForce,
@@ -436,6 +442,8 @@ function App() {
         unitDetailView={unitDetailView}
         onUnitDetailViewChange={setUnitDetailView}
         forceCreationMode={forceCreationMode}
+        tabletPanelLayout={tabletPanelLayout}
+        onTabletPanelLayoutChange={setTabletPanelLayout}
         canGoBack={screenHistory.length > 0 || screen !== "overview"}
         onSelectSection={selectSection}
         onToggleSection={toggleSection}
@@ -494,6 +502,7 @@ function readPersistedGalleryState(): PersistedGalleryState {
       statusBarUsesDesignBackground: typeof parsed.statusBarUsesDesignBackground === "boolean" ? parsed.statusBarUsesDesignBackground : undefined,
       unitDetailView: isOneOf(parsed.unitDetailView, unitDetailViews) ? parsed.unitDetailView : undefined,
       forceCreationMode: isOneOf(parsed.forceCreationMode, forceCreationModes) ? parsed.forceCreationMode : undefined,
+      tabletPanelLayout: isTabletPanelLayout(parsed.tabletPanelLayout) ? parsed.tabletPanelLayout : undefined,
       screen: isOneOf(parsed.screen, prototypeScreenIds) ? parsed.screen : undefined,
     };
   } catch {
@@ -512,6 +521,19 @@ function persistGalleryState(state: PersistedGalleryState) {
 
 function isOneOf<T extends string>(value: unknown, allowed: readonly T[]): value is T {
   return typeof value === "string" && allowed.includes(value as T);
+}
+
+function isTabletPanelLayout(value: unknown): value is TabletPanelLayout {
+  if (!value || typeof value !== "object") return false;
+  const layout = value as Partial<TabletPanelLayout>;
+  return typeof layout.treeRatio === "number"
+    && layout.treeRatio >= 0.15
+    && layout.treeRatio <= 0.45
+    && typeof layout.railRatio === "number"
+    && layout.railRatio >= 0.15
+    && layout.railRatio <= 0.45
+    && typeof layout.treeVisible === "boolean"
+    && typeof layout.railVisible === "boolean";
 }
 
 export default App;

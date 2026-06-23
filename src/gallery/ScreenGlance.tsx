@@ -7,7 +7,7 @@ import { screenLabel } from "../design-data/designData";
 import type { GalleryConcept } from "./galleryTypes";
 import { workflowToPrototypeScreen } from "./workflow";
 import { captureElementAsPng } from "../utils/captureStage";
-import type { ColorScheme, ForceCreationMode, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode, UnitDetailView, WorkflowScreen } from "../types";
+import type { ColorScheme, ForceCreationMode, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, UnitDetailView, WorkflowScreen } from "../types";
 
 export type GlancePlacement = {
   x: number;
@@ -35,6 +35,8 @@ type Props = {
   navStyle: NavStyle;
   unitDetailView: UnitDetailView;
   forceCreationMode: ForceCreationMode;
+  tabletPanelLayout: TabletPanelLayout;
+  onTabletPanelLayoutChange: (layout: TabletPanelLayout) => void;
   onUnitDetailViewChange: (view: UnitDetailView) => void;
   onSelectForce: (id: string) => void;
   onToggleForce: (id: string) => void;
@@ -75,6 +77,8 @@ export function ScreenGlance({
   navStyle,
   unitDetailView,
   forceCreationMode,
+  tabletPanelLayout,
+  onTabletPanelLayoutChange,
   onUnitDetailViewChange,
   onSelectForce,
   onToggleForce,
@@ -245,6 +249,8 @@ export function ScreenGlance({
                       navStyle={navStyle}
                       unitDetailView={unitDetailView}
                       forceCreationMode={forceCreationMode}
+                      tabletPanelLayout={tabletPanelLayout}
+                      onTabletPanelLayoutChange={onTabletPanelLayoutChange}
                       onUnitDetailViewChange={onUnitDetailViewChange}
                       onSelectForce={onSelectForce}
                       onToggleForce={onToggleForce}

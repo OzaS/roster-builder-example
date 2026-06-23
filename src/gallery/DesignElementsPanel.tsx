@@ -1,4 +1,4 @@
-import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ChevronRight, Cog, Command, Copy, CornerDownLeft, Database, Download, Ellipsis, FileInput, Filter, Hammer, Layers, MessageCircle, Minus, PanelsTopLeft, Plus, Rows3, Search, Share2, Smartphone, Sparkles, Split, StickyNote, Trash2, X, Zap } from "lucide-react";
+import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, Cog, Command, Copy, CornerDownLeft, Database, Download, Ellipsis, FileInput, Filter, GripVertical, Hammer, Layers, Maximize2, MessageCircle, Minus, PanelsTopLeft, Plus, RotateCcw, Rows3, Search, Share2, Smartphone, Sparkles, Split, StickyNote, Trash2, X, Zap } from "lucide-react";
 import { PhoneStatusBar } from "../components/DeviceFrame";
 import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode } from "../types";
 import { BudgetMeter, Chip, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph } from "../concepts/ux/uxShared";
@@ -289,6 +289,8 @@ function WorkbenchElements({
         </header>
         <BudgetMeter roster={roster} />
       </ElementSection>
+
+      <TabletWorkspaceElement roster={roster} />
 
       <ElementSection title="Roster Creation">
         <button type="button" className="ux-start-row on">
@@ -698,6 +700,58 @@ function WorkbenchElements({
         </div>
       </ElementSection>
     </>
+  );
+}
+
+function TabletWorkspaceElement({ roster }: { roster: Roster }) {
+  const pointsLeft = Math.max(0, roster.pointsLimit - roster.pointsUsed);
+  const progress = Math.min(100, (roster.pointsUsed / roster.pointsLimit) * 100);
+
+  return (
+    <ElementSection title="Tablet Workspace Controls">
+      <div className="ux-elements-tablet-workspace">
+        <header className="ux-elements-tablet-navbar">
+          <button type="button" className="ux-icon-btn" aria-label="Lists"><Layers size={17} /></button>
+          <label className="ux-navbar-search">
+            <Search size={15} />
+            <input value="terminator" aria-label="Search roster" readOnly />
+            <X size={15} />
+          </label>
+          <span className="ux-roster-header-points"><b>{roster.pointsUsed} / {roster.pointsLimit}</b><small>{pointsLeft} pts left</small></span>
+          <button type="button" className="ux-icon-btn" aria-label="Workspace layout"><PanelsTopLeft size={17} /></button>
+          <span className="ux-elements-progress"><i style={{ width: `${progress}%` }} /></span>
+        </header>
+
+        <div className="ux-elements-workspace-body">
+          <aside className="ux-elements-pane"><strong>Roster</strong><small>Forces and units</small></aside>
+          <div className="ux-pane-divider" role="separator" aria-label="Resize roster panel">
+            <GripVertical size={13} />
+            <button type="button" aria-label="Hide roster panel"><ChevronLeft size={13} /></button>
+          </div>
+          <main className="ux-elements-pane detail"><strong>Detail</strong><small>Selected unit workspace</small></main>
+          <div className="ux-pane-divider collapsed" role="separator" aria-label="Restore validation panel">
+            <GripVertical size={13} />
+            <button type="button" aria-label="Restore validation panel"><ChevronLeft size={13} /></button>
+          </div>
+          <aside className="ux-elements-pane collapsed"><strong>Validation</strong></aside>
+        </div>
+
+        <div className="ux-elements-layout-menu">
+          <button type="button"><Maximize2 size={14} /> Focus Detail</button>
+          <button type="button"><PanelsTopLeft size={14} /> Restore three panels</button>
+          <button type="button"><RotateCcw size={14} /> Reset widths</button>
+        </div>
+
+        <div className="ux-elements-dock-preview">
+          <button type="button" className="ux-dock-handle" aria-label="Show navigation"><span /></button>
+          <nav className="ux-elements-mini-dock" aria-label="Tablet navigation">
+            <button type="button"><Layers size={17} /><small>Lists</small></button>
+            <button type="button"><Search size={17} /><small>Lookup</small></button>
+            <button type="button"><Hammer size={17} /><small>Tools</small></button>
+          </nav>
+        </div>
+      </div>
+    </ElementSection>
   );
 }
 

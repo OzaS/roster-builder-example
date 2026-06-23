@@ -3,7 +3,7 @@ import { Archive, Component, MonitorSmartphone, Moon, Navigation, Palette, Panel
 import { DeviceFrame } from "../components/DeviceFrame";
 import { ScreenshotButton } from "../components/v2/ScreenshotButton";
 import { WorkflowScreenPicker, type WorkflowPickerSelection } from "../components/v2/WorkflowScreenPicker";
-import type { ColorScheme, ConceptId, ForceCreationMode, NavigatorView, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode, UnitDetailView, WorkflowScreen } from "../types";
+import type { ColorScheme, ConceptId, ForceCreationMode, NavigatorView, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, UnitDetailView, WorkflowScreen } from "../types";
 import { colorSchemes } from "../types";
 import type { GalleryConcept } from "./galleryTypes";
 import { WorkflowBoard } from "./WorkflowBoard";
@@ -44,6 +44,8 @@ type Props = {
     unitDetailView: UnitDetailView;
     onUnitDetailViewChange: (view: UnitDetailView) => void;
     forceCreationMode: ForceCreationMode;
+    tabletPanelLayout: TabletPanelLayout;
+    onTabletPanelLayoutChange: (layout: TabletPanelLayout) => void;
     onSelectForce: (id: string) => void;
     onToggleForce: (id: string) => void;
     onCreateForce: (catalogueId: string, detachmentId: string) => void;
@@ -427,6 +429,8 @@ export function GalleryShell({
           unitDetailView={boardProps.unitDetailView}
           onUnitDetailViewChange={boardProps.onUnitDetailViewChange}
           forceCreationMode={boardProps.forceCreationMode}
+          tabletPanelLayout={boardProps.tabletPanelLayout}
+          onTabletPanelLayoutChange={boardProps.onTabletPanelLayoutChange}
           selectedForceId={boardProps.selectedForceId}
           expandedForceIds={boardProps.expandedForceIds}
           initialPlacement={glance.placement}
