@@ -1,5 +1,5 @@
-import { Fragment, useCallback, useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
-import { AlertTriangle, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ChevronRight, ClipboardList, Cog, Command, Copy, Database, Download, Ellipsis, FileInput, Hammer, Layers, LibraryBig, Minus, PanelsTopLeft, Plus, Search, Share2, ShieldCheck, Sparkles, Split, Star, StickyNote, Wand2, X } from "lucide-react";
+import { Fragment, useCallback, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject } from "react";
+import { AlertTriangle, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, ClipboardList, Cog, Command, Copy, Database, Download, Ellipsis, FileInput, GripVertical, Hammer, Layers, LibraryBig, Maximize2, Minimize2, Minus, PanelsTopLeft, Plus, RotateCcw, Search, Share2, ShieldCheck, Sparkles, Split, Star, StickyNote, Wand2, X } from "lucide-react";
 import { mockCatalogues, mockDetachments } from "../../data/mockRoster";
 import type { ConceptProps } from "../shared";
 import { BackOrTitle, BudgetMeter, Chip, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph } from "./uxShared";
@@ -21,11 +21,23 @@ export function CodexWorkbench(props: ConceptProps) {
     ? (["library", "source", "tools", "settings"] as const).some((tab) => tab === props.workflowScreen)
     : screen === "library" || screen === "catalogue" || screen === "tools" || screen === "settings";
   const showTabBar = usesTabNavigation && isMainTab;
-  const shell = `ux-screen ux-workbench ${shellClass(props.themeMode, props.colorScheme)} ${showTabBar ? "has-tabs" : ""}`.trim();
+  const isWorkbenchScreen = screen !== "library" && screen !== "catalogue" && screen !== "tools" && screen !== "settings" && screen !== "system";
   const [activeLoadoutSlot, setActiveLoadoutSlot] = useState<{ groupId: string; slotId: string } | null>(null);
   const [forceCreationOpen, setForceCreationOpen] = useState(false);
+  const [rosterSearchOpen, setRosterSearchOpen] = useState(false);
+  const [rosterSearchQuery, setRosterSearchQuery] = useState("");
+  const [layoutMenuOpen, setLayoutMenuOpen] = useState(false);
+  const [focusPane, setFocusPane] = useState<"tree" | "detail" | "rail" | null>(null);
+  const [focusChromeVisible, setFocusChromeVisible] = useState(false);
+  const [dockOpen, setDockOpen] = useState(false);
   const detailScrollRef = useRef<HTMLElement>(null);
   const loadoutScrollTopRef = useRef(0);
+  const layoutRef = useRef<HTMLDivElement>(null);
+  const shell = `ux-screen ux-workbench ${shellClass(props.themeMode, props.colorScheme)} ${showTabBar ? "has-tabs" : ""} ${dockOpen ? "dock-open" : "dock-closed"} ${props.tabletPanelLayout.treeVisible ? "" : "tree-collapsed"} ${props.tabletPanelLayout.railVisible ? "" : "rail-collapsed"} ${focusPane ? `focus-mode focus-${focusPane}` : ""} ${focusChromeVisible ? "focus-chrome-open" : ""}`.trim();
+  const panelStyle = {
+    "--ux-tree-track": props.tabletPanelLayout.treeVisible ? `max(160px, calc((100% - 20px) * ${props.tabletPanelLayout.treeRatio}))` : "0px",
+    "--ux-rail-track": props.tabletPanelLayout.railVisible ? `max(160px, calc((100% - 20px) * ${props.tabletPanelLayout.railRatio}))` : "0px",
+  } as CSSProperties;
 
   const restoreDetailScroll = useCallback(() => {
     window.requestAnimationFrame(() => {
@@ -48,6 +60,30 @@ export function CodexWorkbench(props: ConceptProps) {
     setActiveLoadoutSlot(null);
   }, [screen, props.selectedUnit.id, props.unitDetailView]);
 
+  useEffect(() => {
+    setFocusPane(null);
+    setFocusChromeVisible(false);
+    setRosterSearchOpen(false);
+    setRosterSearchQuery("");
+    setLayoutMenuOpen(false);
+    setDockOpen(false);
+  }, [screen]);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      if (rosterSearchOpen) {
+        setRosterSearchOpen(false);
+        setRosterSearchQuery("");
+      }
+      setLayoutMenuOpen(false);
+      setDockOpen(false);
+      if (focusPane) setFocusChromeVisible(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [focusPane, rosterSearchOpen]);
+
   let body: ReactNode;
   let modifier = "";
 
@@ -63,33 +99,59 @@ export function CodexWorkbench(props: ConceptProps) {
     body = <CreateScreen props={props} />;
   } else {
     const smartClass = navStyle === "top" && smart ? "ux-smart" : "";
-    modifier = [isUnitDetail ? "show-detail has-detail-toggle" : "", screen === "validation" ? "show-checks" : "", smartClass].filter(Boolean).join(" ");
+    modifier = [isUnitDetail ? "show-detail has-detail-toggle" : "", screen === "overview" ? "roster-overview" : "", screen === "validation" ? "show-checks" : "", smartClass].filter(Boolean).join(" ");
     body = (
       <>
-        <WorkbenchHeader props={props} />
+        <WorkbenchHeader
+          props={props}
+          searchOpen={rosterSearchOpen}
+          searchQuery={rosterSearchQuery}
+          layoutMenuOpen={layoutMenuOpen}
+          focusPane={focusPane}
+          onSearchOpenChange={(open) => {
+            setRosterSearchOpen(open);
+            if (!open) setRosterSearchQuery("");
+          }}
+          onSearchQueryChange={setRosterSearchQuery}
+          onLayoutMenuOpenChange={setLayoutMenuOpen}
+          onFocusPaneChange={(pane) => {
+            setFocusPane(pane);
+            setFocusChromeVisible(false);
+            setLayoutMenuOpen(false);
+          }}
+        />
         {!isUnitDetail ? (
-          <div className="ux-wb-budget">
+          <div className={`ux-wb-budget ${screen === "overview" ? "tablet-overview-budget" : ""}`}>
             <BudgetMeter roster={props.roster} />
           </div>
         ) : null}
-        <div className="ux-wb-layout">
-          <Tree props={props} creationOpen={forceCreationOpen} onCreationOpenChange={setForceCreationOpen} />
+        <div className="ux-wb-layout" ref={layoutRef} style={panelStyle}>
+          <Tree props={props} query={rosterSearchQuery} onQueryChange={setRosterSearchQuery} creationOpen={forceCreationOpen} onCreationOpenChange={setForceCreationOpen} />
+          <PaneDivider side="tree" props={props} layoutRef={layoutRef} />
           <Detail props={props} scrollRef={detailScrollRef} onOpenLoadoutSlot={openLoadoutSelector} />
+          <PaneDivider side="rail" props={props} layoutRef={layoutRef} />
           <Rail props={props} />
         </div>
       </>
     );
   }
 
-  const isWorkbenchScreen = screen !== "library" && screen !== "catalogue" && screen !== "tools" && screen !== "settings" && screen !== "system";
   const showCommandBar = navStyle === "top" && smart && isWorkbenchScreen && !isUnitDetail;
 
+  const handleShellPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const target = event.target as HTMLElement;
+    if (dockOpen && !target.closest(".ux-tabbar, .ux-dock-handle")) setDockOpen(false);
+    if (layoutMenuOpen && !target.closest(".ux-layout-menu, .ux-tablet-layout-button")) setLayoutMenuOpen(false);
+    if (focusPane && focusChromeVisible && !target.closest(".ux-wb-top, .ux-focus-top-handle")) setFocusChromeVisible(false);
+  };
+
   return (
-    <div className={`${shell} ${modifier}`.trim()}>
+    <div className={`${shell} ${modifier}`.trim()} onPointerDown={handleShellPointerDown}>
       {body}
+      {focusPane ? <EdgeHandle edge="top" expanded={focusChromeVisible} onReveal={() => setFocusChromeVisible(true)} /> : null}
       {forceCreationOpen && props.forceCreationMode !== "inline" ? <ForceSelector props={props} onClose={() => setForceCreationOpen(false)} /> : null}
       {activeLoadoutSlot ? <LoadoutSelector props={props} target={activeLoadoutSlot} onClose={closeLoadoutSelector} /> : null}
-      {showTabBar ? <TabBar props={props} /> : isUnitDetail ? <DetailModeBar props={props} /> : showCommandBar ? <CommandBar props={props} /> : null}
+      {showTabBar ? <><EdgeHandle edge="bottom" expanded={dockOpen} onReveal={() => setDockOpen(true)} /><TabBar props={props} onNavigate={(next) => { setDockOpen(false); props.onNavigate(next); }} /></> : isUnitDetail ? <DetailModeBar props={props} /> : showCommandBar ? <CommandBar props={props} /> : null}
     </div>
   );
 }
@@ -123,14 +185,35 @@ function DetailModeBar({ props }: { props: ConceptProps }) {
   );
 }
 
-function WorkbenchHeader({ props }: { props: ConceptProps }) {
+function WorkbenchHeader({
+  props,
+  searchOpen,
+  searchQuery,
+  layoutMenuOpen,
+  focusPane,
+  onSearchOpenChange,
+  onSearchQueryChange,
+  onLayoutMenuOpenChange,
+  onFocusPaneChange,
+}: {
+  props: ConceptProps;
+  searchOpen: boolean;
+  searchQuery: string;
+  layoutMenuOpen: boolean;
+  focusPane: "tree" | "detail" | "rail" | null;
+  onSearchOpenChange: (open: boolean) => void;
+  onSearchQueryChange: (query: string) => void;
+  onLayoutMenuOpenChange: (open: boolean) => void;
+  onFocusPaneChange: (pane: "tree" | "detail" | "rail" | null) => void;
+}) {
   const isUnitDetail = props.screen === "unit-detail";
+  const isOverview = props.screen === "overview";
   const pointsRemaining = props.roster.pointsLimit - props.roster.pointsUsed;
   const progress = Math.min(100, Math.max(0, (props.roster.pointsUsed / props.roster.pointsLimit) * 100));
   const remainingLabel = pointsRemaining >= 0 ? `${pointsRemaining} pts left` : `${Math.abs(pointsRemaining)} pts over`;
 
   return (
-    <header className={`ux-wb-top ${isUnitDetail ? "unit-detail" : ""}`}>
+    <header className={`ux-wb-top workspace-header ${isUnitDetail ? "unit-detail" : ""} ${isOverview ? "roster-overview" : ""}`}>
       <BackOrTitle
         props={props}
         fallback={
@@ -139,39 +222,73 @@ function WorkbenchHeader({ props }: { props: ConceptProps }) {
           </button>
         }
       />
-      <div className="ux-wb-title">
-        <strong>{isUnitDetail ? props.selectedUnit.name : props.roster.name}</strong>
-        <small>{isUnitDetail ? `${props.selectedSection.name} · ${remainingLabel}` : `${props.roster.faction} · ${props.roster.system}`}</small>
-      </div>
+      {searchOpen && isOverview ? (
+        <label className="ux-navbar-search"><Search size={15} /><input value={searchQuery} onChange={(event) => onSearchQueryChange(event.currentTarget.value)} placeholder="Search roster" autoFocus /></label>
+      ) : (
+        <div className="ux-wb-title">
+          <strong>{isUnitDetail ? props.selectedUnit.name : props.roster.name}</strong>
+          {isOverview ? <><small className="ux-phone-overview-subtitle">{props.roster.faction} · {props.roster.system}</small><small className="ux-tablet-overview-subtitle">{props.roster.faction} · {remainingLabel}</small></> : <small>{isUnitDetail ? `${props.selectedSection.name} · ${remainingLabel}` : `${props.roster.faction} · ${props.roster.system}`}</small>}
+        </div>
+      )}
+      {isOverview ? <button type="button" className="ux-icon-btn ux-tablet-header-control" aria-label={searchOpen ? "Close roster search" : "Search roster"} onClick={() => onSearchOpenChange(!searchOpen)}>{searchOpen ? <X size={17} /> : <Search size={17} />}</button> : null}
+      <button type="button" className="ux-icon-btn ux-tablet-header-control ux-tablet-layout-button" aria-label="Tablet layout" aria-expanded={layoutMenuOpen} onClick={() => onLayoutMenuOpenChange(!layoutMenuOpen)}><PanelsTopLeft size={17} /></button>
       {isUnitDetail ? (
         <span className="ux-wb-header-points" aria-label={`${props.selectedUnit.points} points`}>
           <b>{props.selectedUnit.points}</b>
           <small>pts</small>
         </span>
-      ) : (
+      ) : isOverview ? (
+        <span className="ux-roster-header-points" aria-label={`${props.roster.pointsUsed} of ${props.roster.pointsLimit} points`}><b>{props.roster.pointsUsed}</b><small>/ {props.roster.pointsLimit}</small></span>
+      ) : null}
+      {!isUnitDetail ? (
         <button type="button" className="ux-icon-btn" aria-label="Export" onClick={() => props.onNavigate("export")}>
           <Download size={18} />
         </button>
-      )}
-      {isUnitDetail ? (
-        <span className="ux-detail-progress" role="progressbar" aria-label="Roster points used" aria-valuemin={0} aria-valuemax={props.roster.pointsLimit} aria-valuenow={props.roster.pointsUsed}>
+      ) : null}
+      {isUnitDetail || isOverview ? (
+        <span className={`ux-detail-progress ${isOverview ? "ux-overview-progress" : ""}`} role="progressbar" aria-label="Roster points used" aria-valuemin={0} aria-valuemax={props.roster.pointsLimit} aria-valuenow={props.roster.pointsUsed}>
           <i style={{ width: `${progress}%` }} />
         </span>
+      ) : null}
+      {layoutMenuOpen ? (
+        <div className="ux-layout-menu" role="menu" aria-label="Tablet layout options">
+          <button type="button" role="menuitemcheckbox" aria-checked={props.tabletPanelLayout.treeVisible} onClick={() => props.onTabletPanelLayoutChange({ ...props.tabletPanelLayout, treeVisible: !props.tabletPanelLayout.treeVisible })}><span>{props.tabletPanelLayout.treeVisible ? <Check size={14} /> : null}</span>Roster panel</button>
+          <button type="button" role="menuitemcheckbox" aria-checked={props.tabletPanelLayout.railVisible} onClick={() => props.onTabletPanelLayoutChange({ ...props.tabletPanelLayout, railVisible: !props.tabletPanelLayout.railVisible })}><span>{props.tabletPanelLayout.railVisible ? <Check size={14} /> : null}</span>Validation panel</button>
+          <hr />
+          <button type="button" role="menuitem" className={focusPane === "tree" ? "active" : ""} onClick={() => { props.onTabletPanelLayoutChange({ ...props.tabletPanelLayout, treeVisible: true }); onFocusPaneChange("tree"); }}><Layers size={14} />Focus roster</button>
+          <button type="button" role="menuitem" className={focusPane === "detail" ? "active" : ""} onClick={() => onFocusPaneChange("detail")}><PanelsTopLeft size={14} />Focus details</button>
+          <button type="button" role="menuitem" className={focusPane === "rail" ? "active" : ""} onClick={() => { props.onTabletPanelLayoutChange({ ...props.tabletPanelLayout, railVisible: true }); onFocusPaneChange("rail"); }}><ShieldCheck size={14} />Focus validation</button>
+          <hr />
+          <button type="button" role="menuitem" onClick={() => { props.onTabletPanelLayoutChange({ ...props.tabletPanelLayout, treeVisible: true, railVisible: true }); onFocusPaneChange(null); }}><Minimize2 size={14} />Restore panels</button>
+          <button type="button" role="menuitem" onClick={() => { props.onTabletPanelLayoutChange({ treeRatio: 0.3, railRatio: 0.26, treeVisible: true, railVisible: true }); onFocusPaneChange(null); }}><RotateCcw size={14} />Reset widths</button>
+        </div>
       ) : null}
     </header>
   );
 }
 
-function Tree({ props, creationOpen, onCreationOpenChange }: { props: ConceptProps; creationOpen: boolean; onCreationOpenChange: (open: boolean) => void }) {
+function Tree({ props, query, onQueryChange, creationOpen, onCreationOpenChange }: { props: ConceptProps; query: string; onQueryChange: (query: string) => void; creationOpen: boolean; onCreationOpenChange: (open: boolean) => void }) {
+  const normalizedQuery = query.trim().toLowerCase();
+  const visibleForces = props.roster.forces.map((force) => {
+    const forceMatches = `${force.name} ${force.detachment}`.toLowerCase().includes(normalizedQuery);
+    const sections = force.sections.map((section) => {
+      const sectionMatches = section.name.toLowerCase().includes(normalizedQuery);
+      const units = !normalizedQuery || forceMatches || sectionMatches
+        ? section.units
+        : section.units.filter((unit) => `${unit.name} ${unit.role}`.toLowerCase().includes(normalizedQuery));
+      return { section, units, matches: !normalizedQuery || forceMatches || sectionMatches || units.length > 0 };
+    }).filter((item) => item.matches);
+    return { force, sections, matches: !normalizedQuery || forceMatches || sections.length > 0 };
+  }).filter((item) => item.matches);
   return (
     <nav className="ux-wb-tree" aria-label="Roster tree">
-      <div className="ux-wb-search">
+      <div className="ux-wb-search ux-tree-search">
         <Search size={15} />
-        <input placeholder="Filter units" readOnly />
+        <input placeholder="Filter units" value={query} onChange={(event) => onQueryChange(event.currentTarget.value)} />
       </div>
       <div className="ux-force-list">
-        {props.roster.forces.map((force) => {
-          const forceOpen = props.expandedForceIds.includes(force.id);
+        {visibleForces.map(({ force, sections }) => {
+          const forceOpen = normalizedQuery ? true : props.expandedForceIds.includes(force.id);
           return (
             <section className={`ux-force-entry ${forceOpen ? "open" : ""} ${props.selectedForceId === force.id ? "selected" : ""}`} key={force.id}>
               <button type="button" className="ux-force-summary" aria-expanded={forceOpen} onClick={() => props.onToggleForce(force.id)}>
@@ -184,8 +301,8 @@ function Tree({ props, creationOpen, onCreationOpenChange }: { props: ConceptPro
               </button>
               {forceOpen ? (
                 <div className="ux-force-sections">
-                  {force.sections.map((section) => {
-                    const open = props.expandedSectionIds.includes(section.id) || section.id === props.selectedSectionId;
+                  {sections.map(({ section, units }) => {
+                    const open = normalizedQuery ? true : props.expandedSectionIds.includes(section.id) || section.id === props.selectedSectionId;
                     return (
                       <div className={`ux-tree-branch ${open ? "open" : ""}`} key={section.id}>
                         <button type="button" className="ux-tree-section" onClick={() => props.onSelectSection(section.id)}>
@@ -195,7 +312,7 @@ function Tree({ props, creationOpen, onCreationOpenChange }: { props: ConceptPro
                         </button>
                         {open ? (
                           <div className="ux-tree-units">
-                            {section.units.map((unit) => (
+                            {units.map((unit) => (
                               <button
                                 key={unit.id}
                                 type="button"
@@ -210,7 +327,7 @@ function Tree({ props, creationOpen, onCreationOpenChange }: { props: ConceptPro
                                 {unit.status && unit.status !== "valid" ? <StatusGlyph status={unit.status} size={13} /> : <b>{unit.points}</b>}
                               </button>
                             ))}
-                            <button
+                            {!normalizedQuery ? <button
                               type="button"
                               className="ux-tree-add"
                               onClick={() => {
@@ -221,7 +338,7 @@ function Tree({ props, creationOpen, onCreationOpenChange }: { props: ConceptPro
                             >
                               <Plus size={13} />
                               Add unit
-                            </button>
+                            </button> : null}
                           </div>
                         ) : null}
                       </div>
@@ -233,13 +350,86 @@ function Tree({ props, creationOpen, onCreationOpenChange }: { props: ConceptPro
           );
         })}
       </div>
-      {creationOpen && props.forceCreationMode === "inline" ? <InlineForceDraft props={props} onClose={() => onCreationOpenChange(false)} /> : (
+      {normalizedQuery && visibleForces.length === 0 ? <div className="ux-empty small"><Search size={18} /><small>No matching units</small></div> : null}
+      {!normalizedQuery && (creationOpen && props.forceCreationMode === "inline" ? <InlineForceDraft props={props} onClose={() => onCreationOpenChange(false)} /> : (
         <button type="button" className="ux-force-add" onClick={() => onCreationOpenChange(true)}>
           <Plus size={14} />
           Add force
         </button>
-      )}
+      ))}
     </nav>
+  );
+}
+
+function PaneDivider({ side, props, layoutRef }: { side: "tree" | "rail"; props: ConceptProps; layoutRef: RefObject<HTMLDivElement | null> }) {
+  const layout = props.tabletPanelLayout;
+  const visible = side === "tree" ? layout.treeVisible : layout.railVisible;
+  const ratio = side === "tree" ? layout.treeRatio : layout.railRatio;
+  const updateRatio = (nextRatio: number) => {
+    const rect = layoutRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const available = Math.max(1, rect.width - 20);
+    const minimum = Math.min(0.35, 160 / available);
+    const otherRatio = side === "tree" ? (layout.railVisible ? layout.railRatio : 0) : (layout.treeVisible ? layout.treeRatio : 0);
+    const maximum = Math.min(0.45, Math.max(minimum, 1 - (220 / available) - otherRatio));
+    const clamped = Math.max(minimum, Math.min(maximum, nextRatio));
+    props.onTabletPanelLayoutChange({ ...layout, [side === "tree" ? "treeRatio" : "railRatio"]: Number(clamped.toFixed(3)) });
+  };
+  const startResize = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!visible || (event.target as HTMLElement).closest("button")) return;
+    const rect = layoutRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    event.preventDefault();
+    const startX = event.clientX;
+    const startRatio = ratio;
+    const available = Math.max(1, rect.width - 20);
+    const onMove = (moveEvent: PointerEvent) => {
+      const delta = (moveEvent.clientX - startX) / available;
+      updateRatio(startRatio + (side === "tree" ? delta : -delta));
+    };
+    const onUp = () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+    };
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+  };
+  const onKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+    event.preventDefault();
+    const direction = event.key === "ArrowRight" ? 1 : -1;
+    updateRatio(ratio + (side === "tree" ? direction : -direction) * 0.02);
+  };
+  const toggle = () => props.onTabletPanelLayoutChange({ ...layout, [side === "tree" ? "treeVisible" : "railVisible"]: !visible });
+  return (
+    <div className={`ux-pane-divider ${side} ${visible ? "" : "collapsed"}`} role="separator" aria-label={`Resize ${side === "tree" ? "roster" : "validation"} panel`} aria-orientation="vertical" tabIndex={0} onPointerDown={startResize} onKeyDown={onKeyDown} onDoubleClick={() => updateRatio(side === "tree" ? 0.3 : 0.26)}>
+      <GripVertical size={12} />
+      <button type="button" onClick={toggle} aria-label={`${visible ? "Hide" : "Show"} ${side === "tree" ? "roster" : "validation"} panel`} title={`${visible ? "Hide" : "Show"} panel`}>
+        {side === "tree" ? (visible ? <ChevronLeft size={12} /> : <ChevronRight size={12} />) : (visible ? <ChevronRight size={12} /> : <ChevronLeft size={12} />)}
+      </button>
+    </div>
+  );
+}
+
+function EdgeHandle({ edge, expanded, onReveal }: { edge: "top" | "bottom"; expanded: boolean; onReveal: () => void }) {
+  const startY = useRef<number | null>(null);
+  return (
+    <button
+      type="button"
+      className={`ux-${edge === "top" ? "focus-top" : "dock"}-handle ${expanded ? "expanded" : ""}`}
+      aria-label={edge === "top" ? "Show tablet navbar" : "Show main navigation"}
+      onClick={onReveal}
+      onPointerEnter={edge === "bottom" ? onReveal : undefined}
+      onPointerDown={(event) => { startY.current = event.clientY; }}
+      onPointerUp={(event) => {
+        if (startY.current === null) return;
+        const delta = event.clientY - startY.current;
+        if ((edge === "bottom" && delta < -18) || (edge === "top" && delta > 18)) onReveal();
+        startY.current = null;
+      }}
+    >
+      <span aria-hidden />
+    </button>
   );
 }
 
@@ -1124,8 +1314,9 @@ function SettingsScreen({ props }: { props: ConceptProps }) {
 }
 
 /** Bottom / floating main tab bar. */
-function TabBar({ props }: { props: ConceptProps }) {
+function TabBar({ props, onNavigate }: { props: ConceptProps; onNavigate?: ConceptProps["onNavigate"] }) {
   const floating = props.navStyle === "floating";
+  const navigate = onNavigate ?? props.onNavigate;
   const screen = props.screen;
   const items = [
     { id: "library", label: "Lists", icon: LibraryBig },
@@ -1150,12 +1341,12 @@ function TabBar({ props }: { props: ConceptProps }) {
                 type="button"
                 className={`ux-tab ux-tab-fab ${screen === "add-unit" ? "active" : ""}`}
                 aria-label="Add unit"
-                onClick={() => props.onNavigate("add-unit")}
+                onClick={() => navigate("add-unit")}
               >
                 <Plus size={22} />
               </button>
             ) : null}
-            <button key={item.id} type="button" className={`ux-tab ${isActive(item.id) ? "active" : ""}`} onClick={() => props.onNavigate(item.id)}>
+            <button key={item.id} type="button" className={`ux-tab ${isActive(item.id) ? "active" : ""}`} onClick={() => navigate(item.id)}>
               <Icon size={20} />
               <span>{item.label}</span>
             </button>

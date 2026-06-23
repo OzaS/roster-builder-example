@@ -2,7 +2,7 @@ import { DeviceFrame } from "../components/DeviceFrame";
 import type { MouseEvent as ReactMouseEvent } from "react";
 import { resolveWorkflow, workflowToPrototypeScreen } from "./workflow";
 import type { GalleryConcept, WorkflowFlow } from "./galleryTypes";
-import type { ColorScheme, ForceCreationMode, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode, UnitDetailView, WorkflowScreen } from "../types";
+import type { ColorScheme, ForceCreationMode, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, UnitDetailView, WorkflowScreen } from "../types";
 import type { WorkflowPickerSelection } from "../components/v2/WorkflowScreenPicker";
 import type { GlancePlacement } from "./ScreenGlance";
 import { screenLabel, type EditableDesign } from "../design-data/designData";
@@ -27,6 +27,8 @@ type Props = {
   navStyle: NavStyle;
   unitDetailView: UnitDetailView;
   forceCreationMode: ForceCreationMode;
+  tabletPanelLayout: TabletPanelLayout;
+  onTabletPanelLayoutChange: (layout: TabletPanelLayout) => void;
   onUnitDetailViewChange: (view: UnitDetailView) => void;
   onSelectForce: (id: string) => void;
   onToggleForce: (id: string) => void;
@@ -64,6 +66,8 @@ export function WorkflowBoard({
   navStyle,
   unitDetailView,
   forceCreationMode,
+  tabletPanelLayout,
+  onTabletPanelLayoutChange,
   onUnitDetailViewChange,
   onSelectForce,
   onToggleForce,
@@ -115,6 +119,8 @@ export function WorkflowBoard({
                         navStyle={navStyle}
                         unitDetailView={unitDetailView}
                         forceCreationMode={forceCreationMode}
+                        tabletPanelLayout={tabletPanelLayout}
+                        onTabletPanelLayoutChange={onTabletPanelLayoutChange}
                         onUnitDetailViewChange={onUnitDetailViewChange}
                         onSelectForce={onSelectForce}
                         onToggleForce={onToggleForce}

@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { AlertTriangle, ArrowLeft, CheckCircle2, FileDown, Filter, Plus, Search, Shield, Swords } from "lucide-react";
-import type { ColorScheme, ForceCreationMode, NavStyle, PrototypeScreen, Roster, RosterSection, RosterUnit, ThemeMode, UnitDetailView, WorkflowScreen } from "../types";
+import type { ColorScheme, ForceCreationMode, NavStyle, PrototypeScreen, Roster, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, UnitDetailView, WorkflowScreen } from "../types";
 import { OptionRow } from "../components/OptionRow";
 import { RosterNav } from "../components/RosterNav";
 import { UnitCard } from "../components/UnitCard";
@@ -29,6 +29,8 @@ export type ConceptProps = {
   unitDetailView?: UnitDetailView;
   onUnitDetailViewChange?: (view: UnitDetailView) => void;
   forceCreationMode?: ForceCreationMode;
+  tabletPanelLayout: TabletPanelLayout;
+  onTabletPanelLayoutChange: (layout: TabletPanelLayout) => void;
   onSelectForce: (id: string) => void;
   onToggleForce: (id: string) => void;
   onCreateForce: (catalogueId: string, detachmentId: string) => void;

@@ -8,6 +8,12 @@ export type NavigatorView = "single" | "all-screens" | "elements";
 export type NavStyle = "top" | "tabs" | "floating";
 export type UnitDetailView = "options" | "profile";
 export type ForceCreationMode = "selector" | "inline";
+export type TabletPanelLayout = {
+  treeRatio: number;
+  railRatio: number;
+  treeVisible: boolean;
+  railVisible: boolean;
+};
 
 export type ColorScheme = "generic" | "wh40k" | "horus-heresy" | "age-of-sigmar" | "old-world";
 
