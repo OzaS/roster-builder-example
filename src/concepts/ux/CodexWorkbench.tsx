@@ -1,8 +1,8 @@
 import { Fragment, useCallback, useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import { AlertTriangle, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ChevronRight, ClipboardList, Cog, Command, Copy, Database, Download, Ellipsis, FileInput, Hammer, Layers, LibraryBig, Minus, PanelsTopLeft, Plus, Search, Share2, ShieldCheck, Sparkles, Split, Star, StickyNote, Wand2, X } from "lucide-react";
-import { mockCatalogues } from "../../data/mockRoster";
+import { mockCatalogues, mockDetachments } from "../../data/mockRoster";
 import type { ConceptProps } from "../shared";
-import { BackOrTitle, BudgetMeter, Chip, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph } from "./uxShared";
+import { BackOrTitle, BudgetMeter, Chip, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph } from "./uxShared";
 
 /**
  * Codex Workbench — the single merged design.
@@ -23,6 +23,7 @@ export function CodexWorkbench(props: ConceptProps) {
   const showTabBar = usesTabNavigation && isMainTab;
   const shell = `ux-screen ux-workbench ${shellClass(props.themeMode, props.colorScheme)} ${showTabBar ? "has-tabs" : ""}`.trim();
   const [activeLoadoutSlot, setActiveLoadoutSlot] = useState<{ groupId: string; slotId: string } | null>(null);
+  const [forceCreationOpen, setForceCreationOpen] = useState(false);
   const detailScrollRef = useRef<HTMLElement>(null);
   const loadoutScrollTopRef = useRef(0);
 
@@ -72,7 +73,7 @@ export function CodexWorkbench(props: ConceptProps) {
           </div>
         ) : null}
         <div className="ux-wb-layout">
-          <Tree props={props} />
+          <Tree props={props} creationOpen={forceCreationOpen} onCreationOpenChange={setForceCreationOpen} />
           <Detail props={props} scrollRef={detailScrollRef} onOpenLoadoutSlot={openLoadoutSelector} />
           <Rail props={props} />
         </div>
@@ -86,6 +87,7 @@ export function CodexWorkbench(props: ConceptProps) {
   return (
     <div className={`${shell} ${modifier}`.trim()}>
       {body}
+      {forceCreationOpen && props.forceCreationMode !== "inline" ? <ForceSelector props={props} onClose={() => setForceCreationOpen(false)} /> : null}
       {activeLoadoutSlot ? <LoadoutSelector props={props} target={activeLoadoutSlot} onClose={closeLoadoutSelector} /> : null}
       {showTabBar ? <TabBar props={props} /> : isUnitDetail ? <DetailModeBar props={props} /> : showCommandBar ? <CommandBar props={props} /> : null}
     </div>
@@ -160,56 +162,136 @@ function WorkbenchHeader({ props }: { props: ConceptProps }) {
   );
 }
 
-function Tree({ props }: { props: ConceptProps }) {
+function Tree({ props, creationOpen, onCreationOpenChange }: { props: ConceptProps; creationOpen: boolean; onCreationOpenChange: (open: boolean) => void }) {
   return (
     <nav className="ux-wb-tree" aria-label="Roster tree">
       <div className="ux-wb-search">
         <Search size={15} />
         <input placeholder="Filter units" readOnly />
       </div>
-      {props.roster.sections.map((section) => {
-        const open = props.expandedSectionIds.includes(section.id) || section.id === props.selectedSectionId;
-        return (
-          <div className={`ux-tree-branch ${open ? "open" : ""}`} key={section.id}>
-            <button type="button" className="ux-tree-section" onClick={() => props.onSelectSection(section.id)}>
-              <ChevronDown size={14} className="ux-tree-caret" />
-              <strong>{section.name}</strong>
-              <small>{section.required ?? section.units.length}</small>
-            </button>
-            {open ? (
-              <div className="ux-tree-units">
-                {section.units.map((unit) => (
-                  <button
-                    key={unit.id}
-                    type="button"
-                    className={`ux-tree-unit ${unit.status ?? "valid"} ${props.selectedUnit.id === unit.id ? "active" : ""}`}
-                    onClick={() => props.onSelectUnit(unit.id)}
-                  >
-                    <span className="ux-tree-rail" aria-hidden />
-                    <span className="ux-tree-unit-main">
-                      <span>{unit.name}</span>
-                      <small>×{unit.count}</small>
-                    </span>
-                    {unit.status && unit.status !== "valid" ? <StatusGlyph status={unit.status} size={13} /> : <b>{unit.points}</b>}
-                  </button>
-                ))}
-                <button
-                  type="button"
-                  className="ux-tree-add"
-                  onClick={() => {
-                    props.onSelectSection(section.id);
-                    props.onNavigate("add-unit");
-                  }}
-                >
-                  <Plus size={13} />
-                  Add unit
-                </button>
-              </div>
-            ) : null}
-          </div>
-        );
-      })}
+      <div className="ux-force-list">
+        {props.roster.forces.map((force) => {
+          const forceOpen = props.expandedForceIds.includes(force.id);
+          return (
+            <section className={`ux-force-entry ${forceOpen ? "open" : ""} ${props.selectedForceId === force.id ? "selected" : ""}`} key={force.id}>
+              <button type="button" className="ux-force-summary" aria-expanded={forceOpen} onClick={() => props.onToggleForce(force.id)}>
+                <ChevronDown size={15} />
+                <span>
+                  <strong>{force.name}</strong>
+                  <small>{force.detachment}</small>
+                </span>
+                <b>{force.points} pts</b>
+              </button>
+              {forceOpen ? (
+                <div className="ux-force-sections">
+                  {force.sections.map((section) => {
+                    const open = props.expandedSectionIds.includes(section.id) || section.id === props.selectedSectionId;
+                    return (
+                      <div className={`ux-tree-branch ${open ? "open" : ""}`} key={section.id}>
+                        <button type="button" className="ux-tree-section" onClick={() => props.onSelectSection(section.id)}>
+                          <ChevronDown size={14} className="ux-tree-caret" />
+                          <strong>{section.name}</strong>
+                          <small>{section.required ?? section.units.length}</small>
+                        </button>
+                        {open ? (
+                          <div className="ux-tree-units">
+                            {section.units.map((unit) => (
+                              <button
+                                key={unit.id}
+                                type="button"
+                                className={`ux-tree-unit ${unit.status ?? "valid"} ${props.selectedUnit.id === unit.id ? "active" : ""}`}
+                                onClick={() => props.onSelectUnit(unit.id)}
+                              >
+                                <span className="ux-tree-rail" aria-hidden />
+                                <span className="ux-tree-unit-main">
+                                  <span>{unit.name}</span>
+                                  <small>×{unit.count}</small>
+                                </span>
+                                {unit.status && unit.status !== "valid" ? <StatusGlyph status={unit.status} size={13} /> : <b>{unit.points}</b>}
+                              </button>
+                            ))}
+                            <button
+                              type="button"
+                              className="ux-tree-add"
+                              onClick={() => {
+                                props.onSelectForce(force.id);
+                                props.onSelectSection(section.id);
+                                props.onNavigate("add-unit");
+                              }}
+                            >
+                              <Plus size={13} />
+                              Add unit
+                            </button>
+                          </div>
+                        ) : null}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : null}
+            </section>
+          );
+        })}
+      </div>
+      {creationOpen && props.forceCreationMode === "inline" ? <InlineForceDraft props={props} onClose={() => onCreationOpenChange(false)} /> : (
+        <button type="button" className="ux-force-add" onClick={() => onCreationOpenChange(true)}>
+          <Plus size={14} />
+          Add force
+        </button>
+      )}
     </nav>
+  );
+}
+
+function InlineForceDraft({ props, onClose }: { props: ConceptProps; onClose: () => void }) {
+  const [catalogueId, setCatalogueId] = useState("");
+  const [detachmentId, setDetachmentId] = useState("");
+  const submit = () => {
+    if (!catalogueId || !detachmentId) return;
+    props.onCreateForce(catalogueId, detachmentId);
+    onClose();
+  };
+  return (
+    <section className="ux-force-draft" aria-label="New force">
+      <header><strong>New force</strong><button type="button" aria-label="Cancel force creation" onClick={onClose}><X size={15} /></button></header>
+      <label><span>Force</span><select value={catalogueId} onChange={(event) => setCatalogueId(event.currentTarget.value)}><option value="">Choose force</option>{mockCatalogues.map((item) => <option value={item.id} key={item.id}>{item.name}</option>)}</select></label>
+      <label><span>Organization</span><select value={detachmentId} onChange={(event) => setDetachmentId(event.currentTarget.value)}><option value="">Choose detachment</option>{mockDetachments.map((item) => <option value={item.id} key={item.id}>{item.name}</option>)}</select></label>
+      <div className="ux-force-draft-actions"><button type="button" onClick={onClose}>Cancel</button><button type="button" className="primary" disabled={!catalogueId || !detachmentId} onClick={submit}>Add force</button></div>
+    </section>
+  );
+}
+
+function ForceSelector({ props, onClose }: { props: ConceptProps; onClose: () => void }) {
+  const [query, setQuery] = useState("");
+  const [catalogueId, setCatalogueId] = useState("");
+  const [detachmentId, setDetachmentId] = useState("");
+  const catalogues = mockCatalogues.filter((item) => item.name.toLowerCase().includes(query.trim().toLowerCase()));
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onClose]);
+  const submit = () => {
+    if (!catalogueId || !detachmentId) return;
+    props.onCreateForce(catalogueId, detachmentId);
+    onClose();
+  };
+  return (
+    <div className="ux-force-selector-layer" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+      <section className="ux-force-selector" role="dialog" aria-modal="true" aria-labelledby="force-selector-title">
+        <header><span><strong id="force-selector-title">Add force</strong><small>Choose a source and organization</small></span><button type="button" aria-label="Close force selector" onClick={onClose}><X size={18} /></button></header>
+        <div className="ux-force-selector-body">
+          <label className="ux-loadout-selector-search"><Search size={15} /><input value={query} onChange={(event) => setQuery(event.currentTarget.value)} placeholder="Search forces" autoFocus /></label>
+          <div className="ux-force-choice-list" aria-label="Available forces">
+            {catalogues.length ? catalogues.map((item) => <button type="button" className={catalogueId === item.id ? "selected" : ""} key={item.id} onClick={() => setCatalogueId(item.id)}><span><strong>{item.name}</strong><small>{item.updated} · {item.status}</small></span>{catalogueId === item.id ? <Check size={15} /> : null}</button>) : <div className="ux-loadout-selector-empty"><strong>No matching forces</strong><small>Try another name.</small></div>}
+          </div>
+          <div className="ux-force-detachments"><strong>Organization</strong>{mockDetachments.map((item) => <button type="button" className={detachmentId === item.id ? "selected" : ""} key={item.id} onClick={() => setDetachmentId(item.id)}><span><b>{item.name}</b><small>{item.slots} · {item.fit}</small></span>{detachmentId === item.id ? <Check size={15} /> : null}</button>)}</div>
+        </div>
+        <footer><button type="button" onClick={onClose}>Cancel</button><button type="button" className="primary" disabled={!catalogueId || !detachmentId} onClick={submit}>Add force</button></footer>
+      </section>
+    </div>
   );
 }
 
@@ -613,7 +695,7 @@ function Rail({ props }: { props: ConceptProps }) {
       )}
       <div className="ux-wb-rail-foot">
         <span>{flattenUnits(props.roster).length} units</span>
-        <span>{props.roster.sections.length} slots</span>
+        <span>{countSections(props.roster)} slots</span>
       </div>
     </aside>
   );
@@ -940,7 +1022,7 @@ function ToolsScreen({ props }: { props: ConceptProps }) {
           <BudgetMeter roster={props.roster} label="Current list" />
           <div>
             <strong>{flattenUnits(props.roster).length} units</strong>
-            <small>{props.roster.sections.length} roster sections</small>
+            <small>{countSections(props.roster)} roster sections</small>
           </div>
         </div>
         <div className="ux-tools-grid">

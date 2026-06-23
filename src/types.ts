@@ -7,6 +7,7 @@ export type NavigatorView = "single" | "all-screens" | "elements";
 /** In-prototype main navigation style for the merged design. */
 export type NavStyle = "top" | "tabs" | "floating";
 export type UnitDetailView = "options" | "profile";
+export type ForceCreationMode = "selector" | "inline";
 
 export type ColorScheme = "generic" | "wh40k" | "horus-heresy" | "age-of-sigmar" | "old-world";
 
@@ -122,13 +123,22 @@ export type RosterSection = {
   units: RosterUnit[];
 };
 
+export type RosterForce = {
+  id: string;
+  name: string;
+  detachment: string;
+  kind: "primary" | "auxiliary";
+  points: number;
+  sections: RosterSection[];
+};
+
 export type Roster = {
   name: string;
   faction: string;
   system: string;
   pointsUsed: number;
   pointsLimit: number;
-  sections: RosterSection[];
+  forces: RosterForce[];
 };
 
 export type ConceptId =

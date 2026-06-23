@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { mockRoster } from "./data/mockRoster";
+import { mockCatalogues, mockDetachments, mockRoster } from "./data/mockRoster";
 import { GalleryShell } from "./gallery/GalleryShell";
 import { buildConceptGroups, bundledDesignData, designById, findConceptInData, firstScreenInDesign, normalizeDesignData, type DesignData } from "./design-data/designData";
 import { prototypeToWorkflowScreen, workflowToPrototypeScreen } from "./gallery/workflow";
 import { captureElementAsPng } from "./utils/captureStage";
-import type { ColorScheme, ConceptId, NavigatorView, NavStyle, PlatformPreview, PrototypeScreen, Roster, ThemeMode, UnitDetailView, WorkflowScreen } from "./types";
+import type { ColorScheme, ConceptId, ForceCreationMode, NavigatorView, NavStyle, PlatformPreview, PrototypeScreen, Roster, RosterUnit, ThemeMode, UnitDetailView, WorkflowScreen } from "./types";
 
 const GALLERY_STATE_KEY = "roster-builder.gallery-state.v1";
 const conceptIds = ["ux-workbench", "ux-command"] satisfies ConceptId[];
@@ -14,6 +14,7 @@ const colorSchemeIds = ["generic", "wh40k", "horus-heresy", "age-of-sigmar", "ol
 const navigatorViews = ["single", "all-screens", "elements"] satisfies NavigatorView[];
 const navStyles = ["top", "tabs", "floating"] satisfies NavStyle[];
 const unitDetailViews = ["options", "profile"] satisfies UnitDetailView[];
+const forceCreationModes = ["selector", "inline"] satisfies ForceCreationMode[];
 const workflowScreenIds = [
   "library",
   "create-roster",
@@ -54,6 +55,7 @@ type PersistedGalleryState = {
   navStyle?: NavStyle;
   statusBarUsesDesignBackground?: boolean;
   unitDetailView?: UnitDetailView;
+  forceCreationMode?: ForceCreationMode;
   screen?: PrototypeScreen;
 };
 
@@ -71,21 +73,31 @@ function App() {
   const [navStyle, setNavStyle] = useState<NavStyle>(initialState.navStyle ?? "floating");
   const [statusBarUsesDesignBackground, setStatusBarUsesDesignBackground] = useState(initialState.statusBarUsesDesignBackground ?? false);
   const [unitDetailView, setUnitDetailView] = useState<UnitDetailView>(initialState.unitDetailView ?? "options");
+  const [forceCreationMode, setForceCreationMode] = useState<ForceCreationMode>(initialState.forceCreationMode ?? "selector");
   const [roster, setRoster] = useState<Roster>(mockRoster);
+  const [selectedForceId, setSelectedForceId] = useState("primary-force");
+  const [expandedForceIds, setExpandedForceIds] = useState<string[]>(mockRoster.forces.map((force) => force.id));
   const [selectedSectionId, setSelectedSectionId] = useState("battleline");
   const [selectedUnitId, setSelectedUnitId] = useState("assault-squad");
   const [expandedSectionIds, setExpandedSectionIds] = useState<string[]>(["hq", "battleline", "elites"]);
   const [screen, setScreen] = useState<PrototypeScreen>(initialState.screen ?? workflowToPrototypeScreen(initialState.workflowScreen ?? "library"));
   const [screenHistory, setScreenHistory] = useState<PrototypeScreen[]>([]);
 
-  const selectedSection = useMemo(
-    () => roster.sections.find((section) => section.id === selectedSectionId) ?? roster.sections[0],
-    [roster.sections, selectedSectionId],
+  const selectedForce = useMemo(
+    () => roster.forces.find((force) => force.id === selectedForceId) ?? roster.forces[0],
+    [roster.forces, selectedForceId],
   );
 
+  const selectedSection = useMemo(() => {
+    const allSections = roster.forces.flatMap((force) => force.sections);
+    return allSections.find((section) => section.id === selectedSectionId) ?? selectedForce.sections[0] ?? allSections[0];
+  }, [roster.forces, selectedForce.sections, selectedSectionId]);
+
   const selectedUnit = useMemo(
-    () => roster.sections.flatMap((section) => section.units).find((unit) => unit.id === selectedUnitId) ?? selectedSection.units[0],
-    [roster.sections, selectedSection.units, selectedUnitId],
+    () => roster.forces.flatMap((force) => force.sections).flatMap((section) => section.units).find((unit) => unit.id === selectedUnitId)
+      ?? selectedSection.units[0]
+      ?? roster.forces.flatMap((force) => force.sections).flatMap((section) => section.units)[0],
+    [roster.forces, selectedSection.units, selectedUnitId],
   );
 
   useEffect(() => {
@@ -121,9 +133,10 @@ function App() {
       navStyle,
       statusBarUsesDesignBackground,
       unitDetailView,
+      forceCreationMode,
       screen,
     });
-  }, [selectedConcept, platform, themeMode, colorScheme, navigatorView, workflowScreen, smartSearch, navStyle, statusBarUsesDesignBackground, unitDetailView, screen]);
+  }, [selectedConcept, platform, themeMode, colorScheme, navigatorView, workflowScreen, smartSearch, navStyle, statusBarUsesDesignBackground, unitDetailView, forceCreationMode, screen]);
 
   const conceptGroups = useMemo(() => buildConceptGroups(designData), [designData]);
   const concept = findConceptInData(designData, selectedConcept);
@@ -178,12 +191,29 @@ function App() {
   }
 
   function selectSection(id: string) {
-    const section = roster.sections.find((item) => item.id === id);
+    const force = roster.forces.find((item) => item.sections.some((section) => section.id === id));
+    const section = force?.sections.find((item) => item.id === id);
+    if (force) {
+      setSelectedForceId(force.id);
+      setExpandedForceIds((current) => current.includes(force.id) ? current : [...current, force.id]);
+    }
     setSelectedSectionId(id);
     if (section?.units[0]) {
       setSelectedUnitId(section.units[0].id);
     }
     setExpandedSectionIds((current) => (current.includes(id) ? current : [...current, id]));
+  }
+
+  function selectForce(id: string) {
+    const force = roster.forces.find((item) => item.id === id);
+    if (!force) return;
+    setSelectedForceId(id);
+    setExpandedForceIds((current) => current.includes(id) ? current : [...current, id]);
+    if (force.sections[0]) setSelectedSectionId(force.sections[0].id);
+  }
+
+  function toggleForce(id: string) {
+    setExpandedForceIds((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
   }
 
   function toggleSection(id: string) {
@@ -192,70 +222,49 @@ function App() {
 
   function selectUnit(id: string) {
     setSelectedUnitId(id);
-    const parent = roster.sections.find((section) => section.units.some((unit) => unit.id === id));
-    if (parent) {
-      setSelectedSectionId(parent.id);
+    const parentForce = roster.forces.find((force) => force.sections.some((section) => section.units.some((unit) => unit.id === id)));
+    const parentSection = parentForce?.sections.find((section) => section.units.some((unit) => unit.id === id));
+    if (parentForce && parentSection) {
+      setSelectedForceId(parentForce.id);
+      setSelectedSectionId(parentSection.id);
+      setExpandedForceIds((current) => current.includes(parentForce.id) ? current : [...current, parentForce.id]);
     }
     navigate("unit-detail");
   }
 
   function toggleOption(optionId: string) {
-    setRoster((current) => {
-      const pointsDelta = current.sections
-        .flatMap((section) => section.units)
-        .flatMap((unit) => unit.options)
-        .filter((option) => option.id === optionId)
-        .reduce((sum, option) => sum + (option.selected ? -option.points : option.points), 0);
-
+    setRoster((current) => updateRosterUnits(current, (unit) => {
+      if (unit.id !== selectedUnitId) return { unit };
+      const option = unit.options.find((item) => item.id === optionId);
+      if (!option) return { unit };
+      const pointsDelta = option.selected ? -option.points : option.points;
       return {
-        ...current,
-        sections: current.sections.map((section) => ({
-          ...section,
-          units: section.units.map((unit) => {
-            if (!unit.options.some((option) => option.id === optionId)) {
-              return unit;
-            }
-            const option = unit.options.find((item) => item.id === optionId);
-            const delta = option && !option.selected ? option.points : option ? -option.points : 0;
-            return {
-              ...unit,
-              points: Math.max(0, unit.points + delta),
-              options: unit.options.map((item) => (item.id === optionId ? { ...item, selected: !item.selected } : item)),
-            };
-          }),
-        })),
-        pointsUsed: Math.max(0, current.pointsUsed + pointsDelta),
+        pointsDelta,
+        unit: {
+          ...unit,
+          points: Math.max(0, unit.points + pointsDelta),
+          options: unit.options.map((item) => item.id === optionId ? { ...item, selected: !item.selected } : item),
+        },
       };
-    });
+    }));
   }
 
   function changeCount(unitId: string, delta: number) {
-    setRoster((current) => {
-      let pointsDelta = 0;
-      const sections = current.sections.map((section) => ({
-        ...section,
-        units: section.units.map((unit) => {
-          if (unit.id !== unitId) return unit;
-          const nextCount = Math.max(unit.minCount ?? 1, Math.min(unit.maxCount ?? 10, unit.count + delta));
-          const countDelta = nextCount - unit.count;
-          pointsDelta += countDelta * (unit.pointsPerAdditionalModel ?? 0);
-          return { ...unit, count: nextCount, points: unit.points + countDelta * (unit.pointsPerAdditionalModel ?? 0) };
-        }),
-      }));
-      return { ...current, sections, pointsUsed: current.pointsUsed + pointsDelta };
-    });
+    setRoster((current) => updateRosterUnits(current, (unit) => {
+      if (unit.id !== unitId) return { unit };
+      const nextCount = Math.max(unit.minCount ?? 1, Math.min(unit.maxCount ?? 10, unit.count + delta));
+      const countDelta = nextCount - unit.count;
+      const pointsDelta = countDelta * (unit.pointsPerAdditionalModel ?? 0);
+      return { pointsDelta, unit: { ...unit, count: nextCount, points: unit.points + pointsDelta } };
+    }));
   }
 
   function splitLoadoutGroup(unitId: string, groupId: string) {
-    setRoster((current) => ({
-      ...current,
-      sections: current.sections.map((section) => ({
-        ...section,
-        units: section.units.map((unit) => {
-          if (unit.id !== unitId || !unit.detail) return unit;
+    setRoster((current) => updateRosterUnits(current, (unit) => {
+          if (unit.id !== unitId || !unit.detail) return { unit };
           const sourceIndex = unit.detail.loadoutGroups.findIndex((group) => group.id === groupId);
           const source = unit.detail.loadoutGroups[sourceIndex];
-          if (!source || !source.canSplit || source.count <= 1) return unit;
+          if (!source || !source.canSplit || source.count <= 1) return { unit };
           const groupNumber = unit.detail.loadoutGroups.filter((group) => group.modelId === source.modelId).length + 1;
           const clone = {
             ...source,
@@ -266,74 +275,84 @@ function App() {
           const loadoutGroups = [...unit.detail.loadoutGroups];
           loadoutGroups[sourceIndex] = { ...source, count: source.count - 1 };
           loadoutGroups.splice(sourceIndex + 1, 0, clone);
-          return { ...unit, detail: { ...unit.detail, loadoutGroups } };
-        }),
-      })),
+          return { unit: { ...unit, detail: { ...unit.detail, loadoutGroups } } };
     }));
   }
 
   function changeLoadoutGroupCount(unitId: string, groupId: string, delta: number) {
-    setRoster((current) => {
-      let pointsDelta = 0;
-      const sections = current.sections.map((section) => ({
-        ...section,
-        units: section.units.map((unit) => {
-          if (unit.id !== unitId || !unit.detail) return unit;
+    setRoster((current) => updateRosterUnits(current, (unit) => {
+          if (unit.id !== unitId || !unit.detail) return { unit };
           const group = unit.detail.loadoutGroups.find((item) => item.id === groupId);
-          if (!group || !group.canSplit) return unit;
+          if (!group || !group.canSplit) return { unit };
           const totalModels = unit.detail.loadoutGroups.reduce((sum, item) => sum + item.count, 0);
           const maximumModels = unit.maxCount ?? Number.POSITIVE_INFINITY;
           const requestedDelta = delta < 0 ? -1 : 1;
-          if ((requestedDelta < 0 && group.count <= 1) || (requestedDelta > 0 && totalModels >= maximumModels)) return unit;
+          if ((requestedDelta < 0 && group.count <= 1) || (requestedDelta > 0 && totalModels >= maximumModels)) return { unit };
           const selectedUpgradePoints = group.slots.reduce((sum, slot) => {
             const choice = slot.choices.find((item) => item.id === slot.selectedChoiceId);
             return sum + (choice?.points ?? 0);
           }, 0);
-          pointsDelta = requestedDelta * (group.basePointsPerModel + selectedUpgradePoints);
+          const pointsDelta = requestedDelta * (group.basePointsPerModel + selectedUpgradePoints);
           return {
-            ...unit,
-            count: unit.count + requestedDelta,
-            points: unit.points + pointsDelta,
-            detail: {
-              ...unit.detail,
-              loadoutGroups: unit.detail.loadoutGroups.map((item) => item.id === groupId ? { ...item, count: item.count + requestedDelta } : item),
+            pointsDelta,
+            unit: {
+              ...unit,
+              count: unit.count + requestedDelta,
+              points: unit.points + pointsDelta,
+              detail: {
+                ...unit.detail,
+                loadoutGroups: unit.detail.loadoutGroups.map((item) => item.id === groupId ? { ...item, count: item.count + requestedDelta } : item),
+              },
             },
           };
-        }),
-      }));
-      return { ...current, sections, pointsUsed: current.pointsUsed + pointsDelta };
-    });
+    }));
   }
 
   function selectLoadoutChoice(unitId: string, groupId: string, slotId: string, choiceId: string) {
-    setRoster((current) => {
-      let pointsDelta = 0;
-      const sections = current.sections.map((section) => ({
-        ...section,
-        units: section.units.map((unit) => {
-          if (unit.id !== unitId || !unit.detail) return unit;
+    setRoster((current) => updateRosterUnits(current, (unit) => {
+          if (unit.id !== unitId || !unit.detail) return { unit };
           const group = unit.detail.loadoutGroups.find((item) => item.id === groupId);
           const slot = group?.slots.find((item) => item.id === slotId);
           const previous = slot?.choices.find((choice) => choice.id === slot.selectedChoiceId);
           const next = slot?.choices.find((choice) => choice.id === choiceId);
-          if (!group || !slot || !previous || !next || previous.id === next.id) return unit;
-          const delta = (next.points - previous.points) * group.count;
-          pointsDelta += delta;
+          if (!group || !slot || !previous || !next || previous.id === next.id) return { unit };
+          const pointsDelta = (next.points - previous.points) * group.count;
           return {
-            ...unit,
-            points: unit.points + delta,
-            detail: {
-              ...unit.detail,
-              loadoutGroups: unit.detail.loadoutGroups.map((item) => item.id === groupId ? {
-                ...item,
-                slots: item.slots.map((itemSlot) => itemSlot.id === slotId ? { ...itemSlot, selectedChoiceId: choiceId } : itemSlot),
-              } : item),
+            pointsDelta,
+            unit: {
+              ...unit,
+              points: unit.points + pointsDelta,
+              detail: {
+                ...unit.detail,
+                loadoutGroups: unit.detail.loadoutGroups.map((item) => item.id === groupId ? {
+                  ...item,
+                  slots: item.slots.map((itemSlot) => itemSlot.id === slotId ? { ...itemSlot, selectedChoiceId: choiceId } : itemSlot),
+                } : item),
+              },
             },
           };
-        }),
-      }));
-      return { ...current, sections, pointsUsed: current.pointsUsed + pointsDelta };
-    });
+    }));
+  }
+
+  function createForce(catalogueId: string, detachmentId: string) {
+    const catalogue = mockCatalogues.find((item) => item.id === catalogueId);
+    const detachment = mockDetachments.find((item) => item.id === detachmentId);
+    if (!catalogue || !detachment) return;
+    const forceId = `force-${Date.now()}`;
+    const sections = [
+      { id: `${forceId}-hq`, name: "HQ", required: "0/2", units: [] },
+      { id: `${forceId}-battleline`, name: "Battleline", required: "0/6", units: [] },
+      { id: `${forceId}-elites`, name: "Elites", required: "0/3", units: [] },
+      { id: `${forceId}-transport`, name: "Transport", required: "0/2", units: [] },
+    ];
+    setRoster((current) => ({
+      ...current,
+      forces: [...current.forces, { id: forceId, name: catalogue.name, detachment: detachment.name, kind: "auxiliary", points: 0, sections }],
+    }));
+    setSelectedForceId(forceId);
+    setSelectedSectionId(sections[0].id);
+    setExpandedForceIds((current) => [...current, forceId]);
+    setExpandedSectionIds((current) => [...current, sections[0].id]);
   }
 
   async function captureCurrentStage() {
@@ -364,6 +383,8 @@ function App() {
       onWorkflowScreenChange={selectWorkflowScreen}
       navStyle={navStyle}
       onNavStyleChange={setNavStyle}
+      forceCreationMode={forceCreationMode}
+      onForceCreationModeChange={setForceCreationMode}
       statusBarUsesDesignBackground={statusBarUsesDesignBackground}
       onStatusBarUsesDesignBackgroundChange={setStatusBarUsesDesignBackground}
       onCapture={captureCurrentStage}
@@ -372,6 +393,8 @@ function App() {
         roster,
         selectedSection,
         selectedUnit,
+        selectedForceId,
+        expandedForceIds,
         selectedSectionId,
         expandedSectionIds,
         smartSearch,
@@ -379,6 +402,10 @@ function App() {
         navStyle,
         unitDetailView,
         onUnitDetailViewChange: setUnitDetailView,
+        forceCreationMode,
+        onSelectForce: selectForce,
+        onToggleForce: toggleForce,
+        onCreateForce: createForce,
         onSelectSection: selectSection,
         onToggleSection: toggleSection,
         onSelectUnit: selectUnit,
@@ -395,6 +422,8 @@ function App() {
         roster={roster}
         selectedSection={selectedSection}
         selectedUnit={selectedUnit}
+        selectedForceId={selectedForceId}
+        expandedForceIds={expandedForceIds}
         selectedSectionId={selectedSectionId}
         expandedSectionIds={expandedSectionIds}
         screen={screen}
@@ -406,9 +435,13 @@ function App() {
         navStyle={navStyle}
         unitDetailView={unitDetailView}
         onUnitDetailViewChange={setUnitDetailView}
+        forceCreationMode={forceCreationMode}
         canGoBack={screenHistory.length > 0 || screen !== "overview"}
         onSelectSection={selectSection}
         onToggleSection={toggleSection}
+        onSelectForce={selectForce}
+        onToggleForce={toggleForce}
+        onCreateForce={createForce}
         onSelectUnit={selectUnit}
         onToggleOption={toggleOption}
         onCountChange={changeCount}
@@ -420,6 +453,27 @@ function App() {
       />
     </GalleryShell>
   );
+}
+
+function updateRosterUnits(
+  roster: Roster,
+  update: (unit: RosterUnit) => { unit: RosterUnit; pointsDelta?: number },
+): Roster {
+  let rosterPointsDelta = 0;
+  const forces = roster.forces.map((force) => {
+    let forcePointsDelta = 0;
+    const sections = force.sections.map((section) => ({
+      ...section,
+      units: section.units.map((unit) => {
+        const result = update(unit);
+        forcePointsDelta += result.pointsDelta ?? 0;
+        return result.unit;
+      }),
+    }));
+    rosterPointsDelta += forcePointsDelta;
+    return { ...force, points: force.points + forcePointsDelta, sections };
+  });
+  return { ...roster, forces, pointsUsed: roster.pointsUsed + rosterPointsDelta };
 }
 
 function readPersistedGalleryState(): PersistedGalleryState {
@@ -439,6 +493,7 @@ function readPersistedGalleryState(): PersistedGalleryState {
       navStyle: isOneOf(parsed.navStyle, navStyles) ? parsed.navStyle : undefined,
       statusBarUsesDesignBackground: typeof parsed.statusBarUsesDesignBackground === "boolean" ? parsed.statusBarUsesDesignBackground : undefined,
       unitDetailView: isOneOf(parsed.unitDetailView, unitDetailViews) ? parsed.unitDetailView : undefined,
+      forceCreationMode: isOneOf(parsed.forceCreationMode, forceCreationModes) ? parsed.forceCreationMode : undefined,
       screen: isOneOf(parsed.screen, prototypeScreenIds) ? parsed.screen : undefined,
     };
   } catch {

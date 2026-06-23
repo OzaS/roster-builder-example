@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { AlertTriangle, ArrowLeft, CheckCircle2, FileDown, Filter, Plus, Search, Shield, Swords } from "lucide-react";
-import type { ColorScheme, NavStyle, PrototypeScreen, Roster, RosterSection, RosterUnit, ThemeMode, UnitDetailView, WorkflowScreen } from "../types";
+import type { ColorScheme, ForceCreationMode, NavStyle, PrototypeScreen, Roster, RosterSection, RosterUnit, ThemeMode, UnitDetailView, WorkflowScreen } from "../types";
 import { OptionRow } from "../components/OptionRow";
 import { RosterNav } from "../components/RosterNav";
 import { UnitCard } from "../components/UnitCard";
@@ -12,6 +12,8 @@ export type ConceptProps = {
   roster: Roster;
   selectedSection: RosterSection;
   selectedUnit: RosterUnit;
+  selectedForceId: string;
+  expandedForceIds: string[];
   selectedSectionId: string;
   expandedSectionIds: string[];
   screen: PrototypeScreen;
@@ -26,6 +28,10 @@ export type ConceptProps = {
   navStyle?: NavStyle;
   unitDetailView?: UnitDetailView;
   onUnitDetailViewChange?: (view: UnitDetailView) => void;
+  forceCreationMode?: ForceCreationMode;
+  onSelectForce: (id: string) => void;
+  onToggleForce: (id: string) => void;
+  onCreateForce: (catalogueId: string, detachmentId: string) => void;
   onSelectSection: (id: string) => void;
   onToggleSection: (id: string) => void;
   onSelectUnit: (id: string) => void;
@@ -181,6 +187,7 @@ export function DetailPanel({
 export function SectionStack({
   roster,
   selectedSection,
+  selectedForceId,
   selectedSectionId,
   expandedSectionIds,
   onSelectSection,
@@ -192,6 +199,7 @@ export function SectionStack({
   ConceptProps,
   | "roster"
   | "selectedSection"
+  | "selectedForceId"
   | "selectedSectionId"
   | "expandedSectionIds"
   | "onSelectSection"
@@ -203,7 +211,7 @@ export function SectionStack({
     <div className="section-stack">
       <RosterNav
         compact={dense}
-        sections={roster.sections}
+        sections={(roster.forces.find((force) => force.id === selectedForceId) ?? roster.forces[0]).sections}
         selectedSectionId={selectedSectionId}
         expandedSectionIds={expandedSectionIds}
         onSelectSection={onSelectSection}
@@ -284,14 +292,16 @@ export function AddUnitScreen({
   onSelectSection,
   onSelectUnit,
 }: Pick<ConceptProps, "roster" | "selectedSection" | "onSelectSection" | "onSelectUnit">) {
-  const candidates = roster.sections.flatMap((section) =>
+  const selectedForce = roster.forces.find((force) => force.sections.some((section) => section.id === selectedSection.id)) ?? roster.forces[0];
+  const candidates = roster.forces.flatMap((force) => force.sections.flatMap((section) =>
     section.units.map((unit) => ({
       ...unit,
+      force: force.name,
       section: section.name,
       sectionId: section.id,
       available: unit.status !== "error",
     })),
-  );
+  ));
 
   return (
     <section className="flow-screen add-screen">
@@ -300,7 +310,7 @@ export function AddUnitScreen({
         <h2>Add to roster</h2>
       </div>
       <div className="section-chip-row">
-        {roster.sections.map((section) => (
+        {selectedForce.sections.map((section) => (
           <button className={section.id === selectedSection.id ? "active" : ""} key={section.id} type="button" onClick={() => onSelectSection(section.id)}>
             {section.name}
           </button>
@@ -316,7 +326,7 @@ export function AddUnitScreen({
           >
             <span>
               <strong>{unit.name}</strong>
-              <small>{unit.section} · {unit.role}</small>
+              <small>{unit.force} · {unit.section} · {unit.role}</small>
             </span>
             <span>
               <b>{unit.points} pts</b>
@@ -330,7 +340,7 @@ export function AddUnitScreen({
 }
 
 export function ValidationScreen({ roster, onNavigate }: { roster: Roster; onNavigate: (screen: PrototypeScreen) => void }) {
-  const units = roster.sections.flatMap((section) => section.units.map((unit) => ({ ...unit, section: section.name })));
+  const units = roster.forces.flatMap((force) => force.sections.flatMap((section) => section.units.map((unit) => ({ ...unit, section: section.name }))));
   const checks = units.filter((unit) => unit.status && unit.status !== "valid");
 
   return (

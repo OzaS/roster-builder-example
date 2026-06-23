@@ -1,6 +1,6 @@
 import { ArrowUp, Command, CornerDownLeft, Filter, Layers, ListChecks, Plus, Share2, Sparkles, Wand2, Zap } from "lucide-react";
 import type { ConceptProps } from "../shared";
-import { BudgetMeter, Chip, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph } from "./uxShared";
+import { BudgetMeter, Chip, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph } from "./uxShared";
 
 /**
  * Quickstrike Command — search-first.
@@ -45,7 +45,7 @@ function Topline({ props }: { props: ConceptProps }) {
       <div className="ux-cmd-stat-row">
         <Chip tone="valid">{flattenUnits(props.roster).length} units</Chip>
         <Chip tone={checks ? "warning" : "valid"}>{checks ? `${checks} checks` : "legal"}</Chip>
-        <Chip tone="neutral">{props.roster.sections.length} slots</Chip>
+        <Chip tone="neutral">{countSections(props.roster)} slots</Chip>
       </div>
     </header>
   );
@@ -55,7 +55,7 @@ function Roster({ props }: { props: ConceptProps }) {
   return (
     <main className="ux-cmd-body">
       <Topline props={props} />
-      {props.roster.sections.map((section) => (
+      {props.roster.forces.flatMap((force) => force.sections.map((section) => (
         <section className="ux-cmd-group" key={section.id}>
           <div className="ux-cmd-group-head">
             <strong>{section.name}</strong>
@@ -72,7 +72,7 @@ function Roster({ props }: { props: ConceptProps }) {
             </button>
           ))}
         </section>
-      ))}
+      )))}
     </main>
   );
 }

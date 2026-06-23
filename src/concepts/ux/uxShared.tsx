@@ -3,12 +3,16 @@ import { AlertTriangle, ArrowLeft, CheckCircle2, Info, ShieldAlert } from "lucid
 import type { ColorScheme, PrototypeScreen, Roster, RosterUnit, ThemeMode } from "../../types";
 import type { ConceptProps } from "../shared";
 
-export type FlatUnit = RosterUnit & { sectionId: string; sectionName: string };
+export type FlatUnit = RosterUnit & { forceId: string; forceName: string; sectionId: string; sectionName: string };
 
 export function flattenUnits(roster: Roster): FlatUnit[] {
-  return roster.sections.flatMap((section) =>
-    section.units.map((unit) => ({ ...unit, sectionId: section.id, sectionName: section.name })),
-  );
+  return roster.forces.flatMap((force) => force.sections.flatMap((section) =>
+    section.units.map((unit) => ({ ...unit, forceId: force.id, forceName: force.name, sectionId: section.id, sectionName: section.name })),
+  ));
+}
+
+export function countSections(roster: Roster) {
+  return roster.forces.reduce((sum, force) => sum + force.sections.length, 0);
 }
 
 export function rosterChecks(roster: Roster): FlatUnit[] {
