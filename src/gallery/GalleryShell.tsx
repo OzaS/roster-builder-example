@@ -3,7 +3,7 @@ import { Archive, Component, MonitorSmartphone, Moon, Navigation, Palette, Panel
 import { DeviceFrame } from "../components/DeviceFrame";
 import { ScreenshotButton } from "../components/v2/ScreenshotButton";
 import { WorkflowScreenPicker, type WorkflowPickerSelection } from "../components/v2/WorkflowScreenPicker";
-import type { ColorScheme, ConceptId, NavigatorView, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode, UnitDetailView, WorkflowScreen } from "../types";
+import type { ColorScheme, ConceptId, ForceCreationMode, NavigatorView, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode, UnitDetailView, WorkflowScreen } from "../types";
 import { colorSchemes } from "../types";
 import type { GalleryConcept } from "./galleryTypes";
 import { WorkflowBoard } from "./WorkflowBoard";
@@ -21,6 +21,7 @@ type Props = {
   navigatorView: NavigatorView;
   workflowScreen: WorkflowScreen;
   navStyle: NavStyle;
+  forceCreationMode: ForceCreationMode;
   statusBarUsesDesignBackground: boolean;
   concept: GalleryConcept;
   designData: DesignData;
@@ -33,6 +34,8 @@ type Props = {
     roster: Roster;
     selectedSection: RosterSection;
     selectedUnit: RosterUnit;
+    selectedForceId: string;
+    expandedForceIds: string[];
     selectedSectionId: string;
     expandedSectionIds: string[];
     smartSearch: boolean;
@@ -40,6 +43,10 @@ type Props = {
     navStyle: NavStyle;
     unitDetailView: UnitDetailView;
     onUnitDetailViewChange: (view: UnitDetailView) => void;
+    forceCreationMode: ForceCreationMode;
+    onSelectForce: (id: string) => void;
+    onToggleForce: (id: string) => void;
+    onCreateForce: (catalogueId: string, detachmentId: string) => void;
     onSelectSection: (id: string) => void;
     onToggleSection: (id: string) => void;
     onSelectUnit: (id: string) => void;
@@ -58,6 +65,7 @@ type Props = {
   onNavigatorViewChange: (view: NavigatorView) => void;
   onWorkflowScreenChange: (screen: WorkflowScreen) => void;
   onNavStyleChange: (style: NavStyle) => void;
+  onForceCreationModeChange: (mode: ForceCreationMode) => void;
   onStatusBarUsesDesignBackgroundChange: (enabled: boolean) => void;
   onCapture: () => void;
   onDesignDataChange: (data: DesignData) => void;
@@ -76,6 +84,7 @@ export function GalleryShell({
   navigatorView,
   workflowScreen,
   navStyle,
+  forceCreationMode,
   statusBarUsesDesignBackground,
   concept,
   designData,
@@ -92,6 +101,7 @@ export function GalleryShell({
   onNavigatorViewChange,
   onWorkflowScreenChange,
   onNavStyleChange,
+  onForceCreationModeChange,
   onStatusBarUsesDesignBackgroundChange,
   onCapture,
   onDesignDataChange,
@@ -294,6 +304,10 @@ export function GalleryShell({
               );
             })}
           </ControlGroup>
+          <ControlGroup title="Force creation">
+            <button className={forceCreationMode === "selector" ? "active" : ""} type="button" onClick={() => onForceCreationModeChange("selector")}><PanelBottom size={16} />Selector</button>
+            <button className={forceCreationMode === "inline" ? "active" : ""} type="button" onClick={() => onForceCreationModeChange("inline")}><Rows3 size={16} />Inline</button>
+          </ControlGroup>
           <ControlGroup title="Theme">
             <button className={themeMode === "dark" ? "active" : ""} type="button" onClick={() => onThemeModeChange("dark")}>
               <Moon size={16} />
@@ -412,11 +426,17 @@ export function GalleryShell({
           navStyle={navStyle}
           unitDetailView={boardProps.unitDetailView}
           onUnitDetailViewChange={boardProps.onUnitDetailViewChange}
+          forceCreationMode={boardProps.forceCreationMode}
+          selectedForceId={boardProps.selectedForceId}
+          expandedForceIds={boardProps.expandedForceIds}
           initialPlacement={glance.placement}
           onClose={() => setGlance(null)}
           onScreenChange={(screen) => setGlance({ screen })}
           onCommentsChange={updateComments}
           onToggleSmartSearch={boardProps.onToggleSmartSearch}
+          onSelectForce={boardProps.onSelectForce}
+          onToggleForce={boardProps.onToggleForce}
+          onCreateForce={boardProps.onCreateForce}
           onSelectSection={boardProps.onSelectSection}
           onToggleSection={boardProps.onToggleSection}
           onSelectUnit={boardProps.onSelectUnit}

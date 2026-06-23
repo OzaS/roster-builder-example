@@ -7,7 +7,7 @@ import { screenLabel } from "../design-data/designData";
 import type { GalleryConcept } from "./galleryTypes";
 import { workflowToPrototypeScreen } from "./workflow";
 import { captureElementAsPng } from "../utils/captureStage";
-import type { ColorScheme, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode, UnitDetailView, WorkflowScreen } from "../types";
+import type { ColorScheme, ForceCreationMode, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode, UnitDetailView, WorkflowScreen } from "../types";
 
 export type GlancePlacement = {
   x: number;
@@ -27,12 +27,18 @@ type Props = {
   roster: Roster;
   selectedSection: RosterSection;
   selectedUnit: RosterUnit;
+  selectedForceId: string;
+  expandedForceIds: string[];
   selectedSectionId: string;
   expandedSectionIds: string[];
   smartSearch: boolean;
   navStyle: NavStyle;
   unitDetailView: UnitDetailView;
+  forceCreationMode: ForceCreationMode;
   onUnitDetailViewChange: (view: UnitDetailView) => void;
+  onSelectForce: (id: string) => void;
+  onToggleForce: (id: string) => void;
+  onCreateForce: (catalogueId: string, detachmentId: string) => void;
   initialPlacement?: GlancePlacement;
   onClose: () => void;
   onScreenChange: (screen: WorkflowScreen) => void;
@@ -61,12 +67,18 @@ export function ScreenGlance({
   roster,
   selectedSection,
   selectedUnit,
+  selectedForceId,
+  expandedForceIds,
   selectedSectionId,
   expandedSectionIds,
   smartSearch,
   navStyle,
   unitDetailView,
+  forceCreationMode,
   onUnitDetailViewChange,
+  onSelectForce,
+  onToggleForce,
+  onCreateForce,
   initialPlacement,
   onClose,
   onScreenChange,
@@ -220,6 +232,8 @@ export function ScreenGlance({
                       roster={roster}
                       selectedSection={selectedSection}
                       selectedUnit={selectedUnit}
+                      selectedForceId={selectedForceId}
+                      expandedForceIds={expandedForceIds}
                       selectedSectionId={selectedSectionId}
                       expandedSectionIds={expandedSectionIds}
                       screen={workflowToPrototypeScreen(screen)}
@@ -230,7 +244,11 @@ export function ScreenGlance({
                       onToggleSmartSearch={onToggleSmartSearch}
                       navStyle={navStyle}
                       unitDetailView={unitDetailView}
+                      forceCreationMode={forceCreationMode}
                       onUnitDetailViewChange={onUnitDetailViewChange}
+                      onSelectForce={onSelectForce}
+                      onToggleForce={onToggleForce}
+                      onCreateForce={onCreateForce}
                       canGoBack={screen !== "overview"}
                       onSelectSection={onSelectSection}
                       onToggleSection={onToggleSection}

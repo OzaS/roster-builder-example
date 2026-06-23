@@ -2,7 +2,7 @@ import { DeviceFrame } from "../components/DeviceFrame";
 import type { MouseEvent as ReactMouseEvent } from "react";
 import { resolveWorkflow, workflowToPrototypeScreen } from "./workflow";
 import type { GalleryConcept, WorkflowFlow } from "./galleryTypes";
-import type { ColorScheme, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode, UnitDetailView, WorkflowScreen } from "../types";
+import type { ColorScheme, ForceCreationMode, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode, UnitDetailView, WorkflowScreen } from "../types";
 import type { WorkflowPickerSelection } from "../components/v2/WorkflowScreenPicker";
 import type { GlancePlacement } from "./ScreenGlance";
 import { screenLabel, type EditableDesign } from "../design-data/designData";
@@ -18,13 +18,19 @@ type Props = {
   roster: Roster;
   selectedSection: RosterSection;
   selectedUnit: RosterUnit;
+  selectedForceId: string;
+  expandedForceIds: string[];
   selectedSectionId: string;
   expandedSectionIds: string[];
   smartSearch: boolean;
   onToggleSmartSearch: () => void;
   navStyle: NavStyle;
   unitDetailView: UnitDetailView;
+  forceCreationMode: ForceCreationMode;
   onUnitDetailViewChange: (view: UnitDetailView) => void;
+  onSelectForce: (id: string) => void;
+  onToggleForce: (id: string) => void;
+  onCreateForce: (catalogueId: string, detachmentId: string) => void;
   onSelectSection: (id: string) => void;
   onToggleSection: (id: string) => void;
   onSelectUnit: (id: string) => void;
@@ -49,13 +55,19 @@ export function WorkflowBoard({
   roster,
   selectedSection,
   selectedUnit,
+  selectedForceId,
+  expandedForceIds,
   selectedSectionId,
   expandedSectionIds,
   smartSearch,
   onToggleSmartSearch,
   navStyle,
   unitDetailView,
+  forceCreationMode,
   onUnitDetailViewChange,
+  onSelectForce,
+  onToggleForce,
+  onCreateForce,
   onSelectSection,
   onToggleSection,
   onSelectUnit,
@@ -90,6 +102,8 @@ export function WorkflowBoard({
                         roster={roster}
                         selectedSection={selectedSection}
                         selectedUnit={selectedUnit}
+                        selectedForceId={selectedForceId}
+                        expandedForceIds={expandedForceIds}
                         selectedSectionId={selectedSectionId}
                         expandedSectionIds={expandedSectionIds}
                         screen={screen}
@@ -100,7 +114,11 @@ export function WorkflowBoard({
                         onToggleSmartSearch={onToggleSmartSearch}
                         navStyle={navStyle}
                         unitDetailView={unitDetailView}
+                        forceCreationMode={forceCreationMode}
                         onUnitDetailViewChange={onUnitDetailViewChange}
+                        onSelectForce={onSelectForce}
+                        onToggleForce={onToggleForce}
+                        onCreateForce={onCreateForce}
                         canGoBack={screen !== "overview"}
                         onSelectSection={onSelectSection}
                         onToggleSection={onToggleSection}

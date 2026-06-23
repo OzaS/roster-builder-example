@@ -1,7 +1,7 @@
 import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ChevronRight, Cog, Command, Copy, CornerDownLeft, Database, Download, Ellipsis, FileInput, Filter, Hammer, Layers, MessageCircle, Minus, PanelsTopLeft, Plus, Rows3, Search, Share2, Smartphone, Sparkles, Split, StickyNote, Trash2, X, Zap } from "lucide-react";
 import { PhoneStatusBar } from "../components/DeviceFrame";
 import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode } from "../types";
-import { BudgetMeter, Chip, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph } from "../concepts/ux/uxShared";
+import { BudgetMeter, Chip, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
 
 type Props = {
@@ -144,7 +144,7 @@ function QuickstrikeElements({
           <div className="ux-cmd-stat-row">
             <Chip tone="valid">{units.length} units</Chip>
             <Chip tone="warning">{rosterChecks(roster).length} checks</Chip>
-            <Chip tone="neutral">{roster.sections.length} slots</Chip>
+            <Chip tone="neutral">{countSections(roster)} slots</Chip>
           </div>
         </div>
       </ElementSection>
@@ -345,7 +345,7 @@ function WorkbenchElements({
           <Search size={15} />
           <input placeholder="Filter units" readOnly />
         </div>
-        {roster.sections.slice(0, 3).map((section) => (
+        {roster.forces[0].sections.slice(0, 3).map((section) => (
           <div className={`ux-tree-branch ${section.id === selectedSectionId ? "open" : ""}`} key={section.id}>
             <button type="button" className="ux-tree-section" onClick={() => onSelectSection(section.id)}>
               <PanelsTopLeft size={14} />
@@ -369,6 +369,8 @@ function WorkbenchElements({
           </div>
         ))}
       </ElementSection>
+
+      <ForceEntriesElement roster={roster} />
 
       <ElementSection title="Detail Pane">
         <div className="ux-keywords">
@@ -419,7 +421,7 @@ function WorkbenchElements({
         ))}
         <div className="ux-wb-rail-foot">
           <span>{flattenUnits(roster).length} units</span>
-          <span>{roster.sections.length} slots</span>
+          <span>{countSections(roster)} slots</span>
         </div>
       </ElementSection>
 
@@ -514,7 +516,7 @@ function WorkbenchElements({
           <BudgetMeter roster={roster} label="Current list" />
           <div>
             <strong>{flattenUnits(roster).length} units</strong>
-            <small>{roster.sections.length} roster sections</small>
+            <small>{countSections(roster)} roster sections</small>
           </div>
         </div>
         <div className="ux-tools-grid">
@@ -797,6 +799,42 @@ function LoadoutEditorElement({ unit }: { unit: RosterUnit }) {
               );
             })}
           </div>
+        </section>
+      </div>
+    </ElementSection>
+  );
+}
+
+function ForceEntriesElement({ roster }: { roster: Roster }) {
+  return (
+    <ElementSection title="Force Entries & Creation">
+      <div className="ux-force-list ux-elements-force-list">
+        {roster.forces.map((force, index) => (
+          <section className={`ux-force-entry ${index === 0 ? "open selected" : ""}`} key={force.id}>
+            <button type="button" className="ux-force-summary" aria-expanded={index === 0}>
+              <ChevronDown size={15} />
+              <span><strong>{force.name}</strong><small>{force.detachment}</small></span>
+              <b>{force.points} pts</b>
+            </button>
+          </section>
+        ))}
+      </div>
+      <button type="button" className="ux-force-add"><Plus size={14} />Add force</button>
+      <section className="ux-force-draft" aria-label="New force">
+        <header><strong>New force</strong><button type="button" aria-label="Cancel force creation"><X size={15} /></button></header>
+        <label><span>Force</span><select defaultValue="dark-angels"><option value="dark-angels">Dark Angels</option></select></label>
+        <label><span>Organization</span><select defaultValue="crusade"><option value="crusade">Crusade Force Organization Chart</option></select></label>
+        <div className="ux-force-draft-actions"><button type="button">Cancel</button><button type="button" className="primary">Add force</button></div>
+      </section>
+      <div className="ux-force-selector-layer ux-elements-static">
+        <section className="ux-force-selector" role="dialog" aria-modal="true" aria-label="Add force">
+          <header><span><strong>Add force</strong><small>Choose a source and organization</small></span><button type="button" aria-label="Close force selector"><X size={18} /></button></header>
+          <div className="ux-force-selector-body">
+            <label className="ux-loadout-selector-search"><Search size={15} /><input placeholder="Search forces" readOnly /></label>
+            <div className="ux-force-choice-list"><button type="button" className="selected"><span><strong>Dark Angels</strong><small>v42 · Current</small></span><Check size={15} /></button><button type="button"><span><strong>Adeptus Astartes</strong><small>v19 · Current</small></span></button></div>
+            <div className="ux-force-detachments"><strong>Organization</strong><button type="button" className="selected"><span><b>Crusade Force Organization Chart</b><small>11 slots · Recommended</small></span><Check size={15} /></button></div>
+          </div>
+          <footer><button type="button">Cancel</button><button type="button" className="primary">Add force</button></footer>
         </section>
       </div>
     </ElementSection>
