@@ -18,6 +18,18 @@
           "label": "Lists"
         },
         {
+          "id": "collections",
+          "label": "Library"
+        },
+        {
+          "id": "app",
+          "label": "App"
+        },
+        {
+          "id": "subscription-main",
+          "label": "Supporter feature"
+        },
+        {
           "id": "source",
           "label": "Lookup"
         },
@@ -38,6 +50,10 @@
           "label": "Roster edition"
         },
         {
+          "id": "subscription-edition",
+          "label": "Smart tools subscription"
+        },
+        {
           "id": "add-unit",
           "label": "Add unit"
         },
@@ -56,8 +72,17 @@
           "label": "Main screen",
           "screens": [
             "library",
+            "subscription-main",
             "source",
             "tools",
+            "collections"
+          ]
+        },
+        {
+          "id": "app",
+          "label": "App & settings",
+          "screens": [
+            "app",
             "settings"
           ]
         },
@@ -73,6 +98,7 @@
           "label": "Roster edition",
           "screens": [
             "overview",
+            "subscription-edition",
             "add-unit",
             "unit-detail",
             "diagnostics"
@@ -93,6 +119,7 @@
           "Typography",
           "Phone Status Bar",
           "Workbench Chrome",
+          "Subscription Gate",
           "Tablet Workspace Controls",
           "Roster Creation",
           "Roster Tree",
@@ -107,6 +134,8 @@
           "Smart Search (Settings)",
           "Lookup & Sources",
           "Tools Hub",
+          "Library Collections",
+          "App & Account",
           "Main Tab Bar",
           "Designer Rail Controls",
           "Workflow Board Group",

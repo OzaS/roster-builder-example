@@ -18,11 +18,15 @@ const forceCreationModes = ["selector", "inline"] satisfies ForceCreationMode[];
 const defaultTabletPanelLayout: TabletPanelLayout = { treeRatio: 0.3, railRatio: 0.26, treeVisible: true, railVisible: true };
 const workflowScreenIds = [
   "library",
+  "collections",
+  "app",
+  "subscription-main",
   "create-roster",
   "drafts",
   "source",
   "tools",
   "overview",
+  "subscription-edition",
   "add-detachment",
   "add-unit",
   "unit-detail",
@@ -33,6 +37,8 @@ const workflowScreenIds = [
 ] satisfies WorkflowScreen[];
 const prototypeScreenIds = [
   "library",
+  "collections",
+  "app",
   "system",
   "catalogue",
   "detachment",
