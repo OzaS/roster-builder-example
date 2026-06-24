@@ -3,7 +3,7 @@ import { Archive, Component, MonitorSmartphone, Moon, Navigation, Palette, Panel
 import { DeviceFrame } from "../components/DeviceFrame";
 import { ScreenshotButton } from "../components/v2/ScreenshotButton";
 import { WorkflowScreenPicker, type WorkflowPickerSelection } from "../components/v2/WorkflowScreenPicker";
-import type { ColorScheme, ConceptId, ForceCreationMode, NavigatorView, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, UnitDetailView, WorkflowScreen } from "../types";
+import type { ColorScheme, ConceptId, DetachmentFavorite, ForceCreationMode, NavigatorView, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, UnitDetailView, UnitFavorite, WorkflowScreen } from "../types";
 import { colorSchemes } from "../types";
 import type { GalleryConcept } from "./galleryTypes";
 import { WorkflowBoard } from "./WorkflowBoard";
@@ -32,6 +32,8 @@ type Props = {
   children: React.ReactNode;
   boardProps: {
     roster: Roster;
+    unitFavorites: UnitFavorite[];
+    detachmentFavorites: DetachmentFavorite[];
     selectedSection: RosterSection;
     selectedUnit: RosterUnit;
     selectedForceId: string;
@@ -49,6 +51,15 @@ type Props = {
     onSelectForce: (id: string) => void;
     onToggleForce: (id: string) => void;
     onCreateForce: (catalogueId: string, detachmentId: string) => void;
+    onRenameUnit: (unitId: string, customName: string) => void;
+    onRenameForce: (forceId: string, customName: string) => void;
+    onDuplicateUnit: (unitId: string) => void;
+    onDeleteUnit: (unitId: string) => void;
+    onMoveUnit: (unitId: string, destinationSectionId: string) => void;
+    onReuseUnitFavorite: (favoriteId: string, destinationSectionId: string) => void;
+    onReuseDetachmentFavorite: (favoriteId: string) => void;
+    onDeleteUnitFavorite: (favoriteId: string) => void;
+    onDeleteDetachmentFavorite: (favoriteId: string) => void;
     onSelectSection: (id: string) => void;
     onToggleSection: (id: string) => void;
     onSelectUnit: (id: string) => void;
@@ -420,6 +431,8 @@ export function GalleryShell({
           colorScheme={colorScheme}
           statusBarUsesDesignBackground={statusBarUsesDesignBackground}
           roster={boardProps.roster}
+          unitFavorites={boardProps.unitFavorites}
+          detachmentFavorites={boardProps.detachmentFavorites}
           selectedSection={boardProps.selectedSection}
           selectedUnit={boardProps.selectedUnit}
           selectedSectionId={boardProps.selectedSectionId}
@@ -441,6 +454,15 @@ export function GalleryShell({
           onSelectForce={boardProps.onSelectForce}
           onToggleForce={boardProps.onToggleForce}
           onCreateForce={boardProps.onCreateForce}
+          onRenameUnit={boardProps.onRenameUnit}
+          onRenameForce={boardProps.onRenameForce}
+          onDuplicateUnit={boardProps.onDuplicateUnit}
+          onDeleteUnit={boardProps.onDeleteUnit}
+          onMoveUnit={boardProps.onMoveUnit}
+          onReuseUnitFavorite={boardProps.onReuseUnitFavorite}
+          onReuseDetachmentFavorite={boardProps.onReuseDetachmentFavorite}
+          onDeleteUnitFavorite={boardProps.onDeleteUnitFavorite}
+          onDeleteDetachmentFavorite={boardProps.onDeleteDetachmentFavorite}
           onSelectSection={boardProps.onSelectSection}
           onToggleSection={boardProps.onToggleSection}
           onSelectUnit={boardProps.onSelectUnit}

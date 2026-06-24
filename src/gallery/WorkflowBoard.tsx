@@ -2,7 +2,7 @@ import { DeviceFrame } from "../components/DeviceFrame";
 import type { MouseEvent as ReactMouseEvent } from "react";
 import { resolveWorkflow, workflowToPrototypeScreen } from "./workflow";
 import type { GalleryConcept, WorkflowFlow } from "./galleryTypes";
-import type { ColorScheme, ForceCreationMode, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, UnitDetailView, WorkflowScreen } from "../types";
+import type { ColorScheme, DetachmentFavorite, ForceCreationMode, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, UnitDetailView, UnitFavorite, WorkflowScreen } from "../types";
 import type { WorkflowPickerSelection } from "../components/v2/WorkflowScreenPicker";
 import type { GlancePlacement } from "./ScreenGlance";
 import { screenLabel, type EditableDesign } from "../design-data/designData";
@@ -16,6 +16,8 @@ type Props = {
   colorScheme: ColorScheme;
   statusBarUsesDesignBackground: boolean;
   roster: Roster;
+  unitFavorites: UnitFavorite[];
+  detachmentFavorites: DetachmentFavorite[];
   selectedSection: RosterSection;
   selectedUnit: RosterUnit;
   selectedForceId: string;
@@ -33,6 +35,15 @@ type Props = {
   onSelectForce: (id: string) => void;
   onToggleForce: (id: string) => void;
   onCreateForce: (catalogueId: string, detachmentId: string) => void;
+  onRenameUnit: (unitId: string, customName: string) => void;
+  onRenameForce: (forceId: string, customName: string) => void;
+  onDuplicateUnit: (unitId: string) => void;
+  onDeleteUnit: (unitId: string) => void;
+  onMoveUnit: (unitId: string, destinationSectionId: string) => void;
+  onReuseUnitFavorite: (favoriteId: string, destinationSectionId: string) => void;
+  onReuseDetachmentFavorite: (favoriteId: string) => void;
+  onDeleteUnitFavorite: (favoriteId: string) => void;
+  onDeleteDetachmentFavorite: (favoriteId: string) => void;
   onSelectSection: (id: string) => void;
   onToggleSection: (id: string) => void;
   onSelectUnit: (id: string) => void;
@@ -55,6 +66,8 @@ export function WorkflowBoard({
   colorScheme,
   statusBarUsesDesignBackground,
   roster,
+  unitFavorites,
+  detachmentFavorites,
   selectedSection,
   selectedUnit,
   selectedForceId,
@@ -72,6 +85,15 @@ export function WorkflowBoard({
   onSelectForce,
   onToggleForce,
   onCreateForce,
+  onRenameUnit,
+  onRenameForce,
+  onDuplicateUnit,
+  onDeleteUnit,
+  onMoveUnit,
+  onReuseUnitFavorite,
+  onReuseDetachmentFavorite,
+  onDeleteUnitFavorite,
+  onDeleteDetachmentFavorite,
   onSelectSection,
   onToggleSection,
   onSelectUnit,
@@ -104,6 +126,8 @@ export function WorkflowBoard({
                     <DeviceFrame platform={platform} themeMode={themeMode} colorScheme={colorScheme} statusBarUsesDesignBackground={statusBarUsesDesignBackground}>
                       <Concept
                         roster={roster}
+                        unitFavorites={unitFavorites}
+                        detachmentFavorites={detachmentFavorites}
                         selectedSection={selectedSection}
                         selectedUnit={selectedUnit}
                         selectedForceId={selectedForceId}
@@ -125,6 +149,15 @@ export function WorkflowBoard({
                         onSelectForce={onSelectForce}
                         onToggleForce={onToggleForce}
                         onCreateForce={onCreateForce}
+                        onRenameUnit={onRenameUnit}
+                        onRenameForce={onRenameForce}
+                        onDuplicateUnit={onDuplicateUnit}
+                        onDeleteUnit={onDeleteUnit}
+                        onMoveUnit={onMoveUnit}
+                        onReuseUnitFavorite={onReuseUnitFavorite}
+                        onReuseDetachmentFavorite={onReuseDetachmentFavorite}
+                        onDeleteUnitFavorite={onDeleteUnitFavorite}
+                        onDeleteDetachmentFavorite={onDeleteDetachmentFavorite}
                         canGoBack={screen !== "overview"}
                         onSelectSection={onSelectSection}
                         onToggleSection={onToggleSection}

@@ -4,10 +4,11 @@ import { GalleryShell } from "./gallery/GalleryShell";
 import { buildConceptGroups, bundledDesignData, designById, findConceptInData, firstScreenInDesign, normalizeDesignData, type DesignData } from "./design-data/designData";
 import { prototypeToWorkflowScreen, workflowToPrototypeScreen } from "./gallery/workflow";
 import { captureElementAsPng } from "./utils/captureStage";
-import type { ColorScheme, ConceptId, ForceCreationMode, NavigatorView, NavStyle, PlatformPreview, PrototypeScreen, Roster, RosterUnit, TabletPanelLayout, ThemeMode, UnitDetailView, WorkflowScreen } from "./types";
+import type { ColorScheme, ConceptId, DetachmentFavorite, FavoriteLibrary, ForceCreationMode, NavigatorView, NavStyle, PlatformPreview, PrototypeScreen, Roster, RosterForce, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, UnitDetailView, UnitFavorite, WorkflowScreen } from "./types";
 
 const GALLERY_STATE_KEY = "roster-builder.gallery-state.v1";
-const conceptIds = ["ux-workbench", "ux-command"] satisfies ConceptId[];
+const FAVORITES_KEY = "roster-builder.favorites.v1";
+const conceptIds = ["ux-workbench"] satisfies ConceptId[];
 const platformIds = ["phone", "tablet"] satisfies PlatformPreview[];
 const themeModes = ["dark", "light"] satisfies ThemeMode[];
 const colorSchemeIds = ["generic", "wh40k", "horus-heresy", "age-of-sigmar", "old-world"] satisfies ColorScheme[];
@@ -84,6 +85,7 @@ function App() {
   const [forceCreationMode, setForceCreationMode] = useState<ForceCreationMode>(initialState.forceCreationMode ?? "selector");
   const [tabletPanelLayout, setTabletPanelLayout] = useState<TabletPanelLayout>(initialState.tabletPanelLayout ?? defaultTabletPanelLayout);
   const [roster, setRoster] = useState<Roster>(mockRoster);
+  const [favorites, setFavorites] = useState<FavoriteLibrary>(() => readFavoriteLibrary());
   const [selectedForceId, setSelectedForceId] = useState("primary-force");
   const [expandedForceIds, setExpandedForceIds] = useState<string[]>(mockRoster.forces.map((force) => force.id));
   const [selectedSectionId, setSelectedSectionId] = useState("battleline");
@@ -147,6 +149,14 @@ function App() {
       screen,
     });
   }, [selectedConcept, platform, themeMode, colorScheme, navigatorView, workflowScreen, smartSearch, navStyle, statusBarUsesDesignBackground, unitDetailView, forceCreationMode, tabletPanelLayout, screen]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+    } catch {
+      // Keep the in-memory library usable when storage is unavailable or full.
+    }
+  }, [favorites]);
 
   const conceptGroups = useMemo(() => buildConceptGroups(designData), [designData]);
   const concept = findConceptInData(designData, selectedConcept);
@@ -365,6 +375,126 @@ function App() {
     setExpandedSectionIds((current) => [...current, sections[0].id]);
   }
 
+  function renameUnit(unitId: string, customName: string) {
+    const location = findUnitLocation(roster, unitId);
+    const trimmed = customName.trim();
+    if (!location || !trimmed) return;
+    const renamed = deepClone({ ...location.unit, customName: trimmed });
+    setRoster(replaceUnit(roster, unitId, renamed));
+    setFavorites((current) => ({
+      ...current,
+      units: [...current.units, { id: uniqueId("favorite-unit"), createdAt: new Date().toISOString(), sourceSectionName: location.section.name, unit: deepClone(renamed) }],
+    }));
+  }
+
+  function renameForce(forceId: string, customName: string) {
+    const force = roster.forces.find((item) => item.id === forceId);
+    const trimmed = customName.trim();
+    if (!force || !trimmed) return;
+    const renamed = deepClone({ ...force, customName: trimmed });
+    setRoster({ ...roster, forces: roster.forces.map((item) => item.id === forceId ? renamed : item) });
+    setFavorites((current) => ({
+      ...current,
+      detachments: [...current.detachments, { id: uniqueId("favorite-detachment"), createdAt: new Date().toISOString(), force: deepClone(renamed) }],
+    }));
+  }
+
+  function duplicateUnit(unitId: string) {
+    const location = findUnitLocation(roster, unitId);
+    if (!location) return;
+    const clone = cloneUnit(location.unit);
+    const forces = roster.forces.map((force) => force.id !== location.force.id ? force : {
+      ...force,
+      points: force.points + clone.points,
+      sections: force.sections.map((section) => section.id !== location.section.id ? section : {
+        ...section,
+        units: insertAfter(section.units, unitId, clone),
+      }),
+    });
+    setRoster({ ...roster, forces, pointsUsed: roster.pointsUsed + clone.points });
+    setSelectedUnitId(clone.id);
+  }
+
+  function deleteUnit(unitId: string) {
+    const location = findUnitLocation(roster, unitId);
+    if (!location) return;
+    const nextRoster = {
+      ...roster,
+      pointsUsed: roster.pointsUsed - location.unit.points,
+      forces: roster.forces.map((force) => force.id !== location.force.id ? force : {
+        ...force,
+        points: force.points - location.unit.points,
+        sections: force.sections.map((section) => section.id === location.section.id ? { ...section, units: section.units.filter((unit) => unit.id !== unitId) } : section),
+      }),
+    };
+    setRoster(nextRoster);
+    if (selectedUnitId === unitId) {
+      const fallback = location.section.units.find((unit) => unit.id !== unitId)
+        ?? nextRoster.forces.flatMap((force) => force.sections).flatMap((section) => section.units)[0];
+      if (fallback) setSelectedUnitId(fallback.id);
+      setScreen("overview");
+      setWorkflowScreen("overview");
+    }
+  }
+
+  function moveUnit(unitId: string, destinationSectionId: string) {
+    const source = findUnitLocation(roster, unitId);
+    const destination = findSectionLocation(roster, destinationSectionId);
+    if (!source || !destination || source.section.id === destination.section.id || source.section.name !== destination.section.name) return;
+    const forces = roster.forces.map((force) => {
+      let points = force.points;
+      if (force.id === source.force.id) points -= source.unit.points;
+      if (force.id === destination.force.id) points += source.unit.points;
+      return {
+        ...force,
+        points,
+        sections: force.sections.map((section) => {
+          if (section.id === source.section.id) return { ...section, units: section.units.filter((unit) => unit.id !== unitId) };
+          if (section.id === destination.section.id) return { ...section, units: [...section.units, source.unit] };
+          return section;
+        }),
+      };
+    });
+    setRoster({ ...roster, forces });
+    setSelectedForceId(destination.force.id);
+    setSelectedSectionId(destination.section.id);
+    setExpandedForceIds((current) => current.includes(destination.force.id) ? current : [...current, destination.force.id]);
+    setExpandedSectionIds((current) => current.includes(destination.section.id) ? current : [...current, destination.section.id]);
+  }
+
+  function reuseUnitFavorite(favoriteId: string, destinationSectionId: string) {
+    const favorite = favorites.units.find((item) => item.id === favoriteId);
+    const destination = findSectionLocation(roster, destinationSectionId);
+    if (!favorite || !destination || destination.section.name !== favorite.sourceSectionName) return;
+    const clone = cloneUnit(favorite.unit);
+    setRoster({
+      ...roster,
+      pointsUsed: roster.pointsUsed + clone.points,
+      forces: roster.forces.map((force) => force.id !== destination.force.id ? force : {
+        ...force,
+        points: force.points + clone.points,
+        sections: force.sections.map((section) => section.id === destination.section.id ? { ...section, units: [...section.units, clone] } : section),
+      }),
+    });
+    setSelectedForceId(destination.force.id);
+    setSelectedSectionId(destination.section.id);
+    setSelectedUnitId(clone.id);
+    setExpandedForceIds((current) => current.includes(destination.force.id) ? current : [...current, destination.force.id]);
+    setExpandedSectionIds((current) => current.includes(destination.section.id) ? current : [...current, destination.section.id]);
+  }
+
+  function reuseDetachmentFavorite(favoriteId: string) {
+    const favorite = favorites.detachments.find((item) => item.id === favoriteId);
+    if (!favorite) return;
+    const clone = cloneForce(favorite.force);
+    setRoster({ ...roster, forces: [...roster.forces, clone], pointsUsed: roster.pointsUsed + clone.points });
+    setSelectedForceId(clone.id);
+    setSelectedSectionId(clone.sections[0]?.id ?? "");
+    setSelectedUnitId(clone.sections[0]?.units[0]?.id ?? selectedUnitId);
+    setExpandedForceIds((current) => [...current, clone.id]);
+    if (clone.sections[0]) setExpandedSectionIds((current) => [...current, clone.sections[0].id]);
+  }
+
   async function captureCurrentStage() {
     if (!captureRef.current) return;
     const screenName = navigatorView === "all-screens" ? "all-screens" : navigatorView === "elements" ? "elements" : workflowScreen;
@@ -401,6 +531,8 @@ function App() {
       onDesignDataChange={updateDesignData}
       boardProps={{
         roster,
+        unitFavorites: favorites.units,
+        detachmentFavorites: favorites.detachments,
         selectedSection,
         selectedUnit,
         selectedForceId,
@@ -418,6 +550,15 @@ function App() {
         onSelectForce: selectForce,
         onToggleForce: toggleForce,
         onCreateForce: createForce,
+        onRenameUnit: renameUnit,
+        onRenameForce: renameForce,
+        onDuplicateUnit: duplicateUnit,
+        onDeleteUnit: deleteUnit,
+        onMoveUnit: moveUnit,
+        onReuseUnitFavorite: reuseUnitFavorite,
+        onReuseDetachmentFavorite: reuseDetachmentFavorite,
+        onDeleteUnitFavorite: (id) => setFavorites((current) => ({ ...current, units: current.units.filter((item) => item.id !== id) })),
+        onDeleteDetachmentFavorite: (id) => setFavorites((current) => ({ ...current, detachments: current.detachments.filter((item) => item.id !== id) })),
         onSelectSection: selectSection,
         onToggleSection: toggleSection,
         onSelectUnit: selectUnit,
@@ -432,6 +573,8 @@ function App() {
     >
       <Concept
         roster={roster}
+        unitFavorites={favorites.units}
+        detachmentFavorites={favorites.detachments}
         selectedSection={selectedSection}
         selectedUnit={selectedUnit}
         selectedForceId={selectedForceId}
@@ -456,6 +599,15 @@ function App() {
         onSelectForce={selectForce}
         onToggleForce={toggleForce}
         onCreateForce={createForce}
+        onRenameUnit={renameUnit}
+        onRenameForce={renameForce}
+        onDuplicateUnit={duplicateUnit}
+        onDeleteUnit={deleteUnit}
+        onMoveUnit={moveUnit}
+        onReuseUnitFavorite={reuseUnitFavorite}
+        onReuseDetachmentFavorite={reuseDetachmentFavorite}
+        onDeleteUnitFavorite={(id) => setFavorites((current) => ({ ...current, units: current.units.filter((item) => item.id !== id) }))}
+        onDeleteDetachmentFavorite={(id) => setFavorites((current) => ({ ...current, detachments: current.detachments.filter((item) => item.id !== id) }))}
         onSelectUnit={selectUnit}
         onToggleOption={toggleOption}
         onCountChange={changeCount}
@@ -488,6 +640,117 @@ function updateRosterUnits(
     return { ...force, points: force.points + forcePointsDelta, sections };
   });
   return { ...roster, forces, pointsUsed: roster.pointsUsed + rosterPointsDelta };
+}
+
+function readFavoriteLibrary(): FavoriteLibrary {
+  const empty: FavoriteLibrary = { version: 1, units: [], detachments: [] };
+  if (typeof window === "undefined") return empty;
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(FAVORITES_KEY) ?? "null") as Partial<FavoriteLibrary> | null;
+    if (!parsed || parsed.version !== 1 || !Array.isArray(parsed.units) || !Array.isArray(parsed.detachments)) return empty;
+    if (!parsed.units.every(isUnitFavorite) || !parsed.detachments.every(isDetachmentFavorite)) return empty;
+    return { version: 1, units: parsed.units as UnitFavorite[], detachments: parsed.detachments as DetachmentFavorite[] };
+  } catch {
+    return empty;
+  }
+}
+
+function isUnitFavorite(value: unknown): value is UnitFavorite {
+  if (!value || typeof value !== "object") return false;
+  const favorite = value as Partial<UnitFavorite>;
+  return typeof favorite.id === "string"
+    && typeof favorite.createdAt === "string"
+    && typeof favorite.sourceSectionName === "string"
+    && isRosterUnit(favorite.unit);
+}
+
+function isDetachmentFavorite(value: unknown): value is DetachmentFavorite {
+  if (!value || typeof value !== "object") return false;
+  const favorite = value as Partial<DetachmentFavorite>;
+  const force = favorite.force as Partial<RosterForce> | undefined;
+  return typeof favorite.id === "string"
+    && typeof favorite.createdAt === "string"
+    && Boolean(force)
+    && typeof force?.id === "string"
+    && typeof force.name === "string"
+    && typeof force.detachment === "string"
+    && typeof force.points === "number"
+    && Array.isArray(force.sections)
+    && force.sections.every((section) => section && typeof section.id === "string" && typeof section.name === "string" && Array.isArray(section.units) && section.units.every(isRosterUnit));
+}
+
+function isRosterUnit(value: unknown): value is RosterUnit {
+  if (!value || typeof value !== "object") return false;
+  const unit = value as Partial<RosterUnit>;
+  return typeof unit.id === "string"
+    && typeof unit.name === "string"
+    && typeof unit.role === "string"
+    && typeof unit.points === "number"
+    && typeof unit.count === "number"
+    && Array.isArray(unit.options)
+    && Array.isArray(unit.keywords);
+}
+
+function uniqueId(prefix: string) {
+  return `${prefix}-${typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`}`;
+}
+
+function deepClone<T>(value: T): T {
+  return structuredClone(value);
+}
+
+function cloneUnit(unit: RosterUnit): RosterUnit {
+  return { ...deepClone(unit), id: uniqueId("unit") };
+}
+
+function cloneForce(force: RosterForce): RosterForce {
+  const forceId = uniqueId("force");
+  return {
+    ...deepClone(force),
+    id: forceId,
+    kind: "auxiliary",
+    sections: force.sections.map((section) => ({
+      ...deepClone(section),
+      id: uniqueId(`${forceId}-section`),
+      units: section.units.map(cloneUnit),
+    })),
+  };
+}
+
+function findUnitLocation(roster: Roster, unitId: string): { force: RosterForce; section: RosterSection; unit: RosterUnit } | undefined {
+  for (const force of roster.forces) {
+    for (const section of force.sections) {
+      const unit = section.units.find((item) => item.id === unitId);
+      if (unit) return { force, section, unit };
+    }
+  }
+}
+
+function findSectionLocation(roster: Roster, sectionId: string): { force: RosterForce; section: RosterSection } | undefined {
+  for (const force of roster.forces) {
+    const section = force.sections.find((item) => item.id === sectionId);
+    if (section) return { force, section };
+  }
+}
+
+function replaceUnit(roster: Roster, unitId: string, replacement: RosterUnit): Roster {
+  return {
+    ...roster,
+    forces: roster.forces.map((force) => ({
+      ...force,
+      sections: force.sections.map((section) => ({
+        ...section,
+        units: section.units.map((unit) => unit.id === unitId ? replacement : unit),
+      })),
+    })),
+  };
+}
+
+function insertAfter(units: RosterUnit[], sourceId: string, unit: RosterUnit) {
+  const index = units.findIndex((item) => item.id === sourceId);
+  const next = [...units];
+  next.splice(index < 0 ? next.length : index + 1, 0, unit);
+  return next;
 }
 
 function readPersistedGalleryState(): PersistedGalleryState {

@@ -7,7 +7,7 @@ import { screenLabel } from "../design-data/designData";
 import type { GalleryConcept } from "./galleryTypes";
 import { workflowToPrototypeScreen } from "./workflow";
 import { captureElementAsPng } from "../utils/captureStage";
-import type { ColorScheme, ForceCreationMode, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, UnitDetailView, WorkflowScreen } from "../types";
+import type { ColorScheme, DetachmentFavorite, ForceCreationMode, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, UnitDetailView, UnitFavorite, WorkflowScreen } from "../types";
 
 export type GlancePlacement = {
   x: number;
@@ -25,6 +25,8 @@ type Props = {
   colorScheme: ColorScheme;
   statusBarUsesDesignBackground: boolean;
   roster: Roster;
+  unitFavorites: UnitFavorite[];
+  detachmentFavorites: DetachmentFavorite[];
   selectedSection: RosterSection;
   selectedUnit: RosterUnit;
   selectedForceId: string;
@@ -41,6 +43,15 @@ type Props = {
   onSelectForce: (id: string) => void;
   onToggleForce: (id: string) => void;
   onCreateForce: (catalogueId: string, detachmentId: string) => void;
+  onRenameUnit: ConceptProps["onRenameUnit"];
+  onRenameForce: ConceptProps["onRenameForce"];
+  onDuplicateUnit: ConceptProps["onDuplicateUnit"];
+  onDeleteUnit: ConceptProps["onDeleteUnit"];
+  onMoveUnit: ConceptProps["onMoveUnit"];
+  onReuseUnitFavorite: ConceptProps["onReuseUnitFavorite"];
+  onReuseDetachmentFavorite: ConceptProps["onReuseDetachmentFavorite"];
+  onDeleteUnitFavorite: ConceptProps["onDeleteUnitFavorite"];
+  onDeleteDetachmentFavorite: ConceptProps["onDeleteDetachmentFavorite"];
   initialPlacement?: GlancePlacement;
   onClose: () => void;
   onScreenChange: (screen: WorkflowScreen) => void;
@@ -67,6 +78,8 @@ export function ScreenGlance({
   colorScheme,
   statusBarUsesDesignBackground,
   roster,
+  unitFavorites,
+  detachmentFavorites,
   selectedSection,
   selectedUnit,
   selectedForceId,
@@ -83,6 +96,15 @@ export function ScreenGlance({
   onSelectForce,
   onToggleForce,
   onCreateForce,
+  onRenameUnit,
+  onRenameForce,
+  onDuplicateUnit,
+  onDeleteUnit,
+  onMoveUnit,
+  onReuseUnitFavorite,
+  onReuseDetachmentFavorite,
+  onDeleteUnitFavorite,
+  onDeleteDetachmentFavorite,
   initialPlacement,
   onClose,
   onScreenChange,
@@ -234,6 +256,8 @@ export function ScreenGlance({
                   <div className={`glance-device-target ${armed ? "placing" : ""}`} onClick={placeComment}>
                     <Component
                       roster={roster}
+                      unitFavorites={unitFavorites}
+                      detachmentFavorites={detachmentFavorites}
                       selectedSection={selectedSection}
                       selectedUnit={selectedUnit}
                       selectedForceId={selectedForceId}
@@ -255,6 +279,15 @@ export function ScreenGlance({
                       onSelectForce={onSelectForce}
                       onToggleForce={onToggleForce}
                       onCreateForce={onCreateForce}
+                      onRenameUnit={onRenameUnit}
+                      onRenameForce={onRenameForce}
+                      onDuplicateUnit={onDuplicateUnit}
+                      onDeleteUnit={onDeleteUnit}
+                      onMoveUnit={onMoveUnit}
+                      onReuseUnitFavorite={onReuseUnitFavorite}
+                      onReuseDetachmentFavorite={onReuseDetachmentFavorite}
+                      onDeleteUnitFavorite={onDeleteUnitFavorite}
+                      onDeleteDetachmentFavorite={onDeleteDetachmentFavorite}
                       canGoBack={screen !== "overview"}
                       onSelectSection={onSelectSection}
                       onToggleSection={onToggleSection}

@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { AlertTriangle, ArrowLeft, CheckCircle2, FileDown, Filter, Plus, Search, Shield, Swords } from "lucide-react";
-import type { ColorScheme, ForceCreationMode, NavStyle, PrototypeScreen, Roster, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, UnitDetailView, WorkflowScreen } from "../types";
+import type { ColorScheme, DetachmentFavorite, ForceCreationMode, NavStyle, PrototypeScreen, Roster, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, UnitDetailView, UnitFavorite, WorkflowScreen } from "../types";
 import { OptionRow } from "../components/OptionRow";
 import { RosterNav } from "../components/RosterNav";
 import { UnitCard } from "../components/UnitCard";
@@ -10,6 +10,8 @@ export { ValidationBadge };
 
 export type ConceptProps = {
   roster: Roster;
+  unitFavorites: UnitFavorite[];
+  detachmentFavorites: DetachmentFavorite[];
   selectedSection: RosterSection;
   selectedUnit: RosterUnit;
   selectedForceId: string;
@@ -34,6 +36,15 @@ export type ConceptProps = {
   onSelectForce: (id: string) => void;
   onToggleForce: (id: string) => void;
   onCreateForce: (catalogueId: string, detachmentId: string) => void;
+  onRenameUnit: (unitId: string, customName: string) => void;
+  onRenameForce: (forceId: string, customName: string) => void;
+  onDuplicateUnit: (unitId: string) => void;
+  onDeleteUnit: (unitId: string) => void;
+  onMoveUnit: (unitId: string, destinationSectionId: string) => void;
+  onReuseUnitFavorite: (favoriteId: string, destinationSectionId: string) => void;
+  onReuseDetachmentFavorite: (favoriteId: string) => void;
+  onDeleteUnitFavorite: (favoriteId: string) => void;
+  onDeleteDetachmentFavorite: (favoriteId: string) => void;
   onSelectSection: (id: string) => void;
   onToggleSection: (id: string) => void;
   onSelectUnit: (id: string) => void;
