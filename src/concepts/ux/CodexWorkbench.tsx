@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject } from "react";
-import { AlertTriangle, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, ClipboardList, Cog, Command, Copy, Database, Download, Ellipsis, FileInput, GripVertical, Hammer, Heart, Layers, LibraryBig, Maximize2, Minimize2, Minus, PanelsTopLeft, Plus, RotateCcw, Search, Share2, ShieldCheck, Sparkles, Split, Star, StickyNote, UserRound, UsersRound, Wand2, X } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, ClipboardList, Cog, Command, Copy, Database, Download, Ellipsis, FileInput, GripVertical, Hammer, Heart, Layers, LibraryBig, Maximize2, Minimize2, Minus, MoveRight, PanelsTopLeft, Pencil, Plus, RotateCcw, Search, Share2, ShieldCheck, Sparkles, Split, Star, StickyNote, Trash2, UserRound, UsersRound, Wand2, X } from "lucide-react";
 import { mockCatalogues, mockDetachments } from "../../data/mockRoster";
 import type { ConceptProps } from "../shared";
 import { BackOrTitle, BudgetMeter, Chip, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "./uxShared";
@@ -165,13 +165,14 @@ export function CodexWorkbench(props: ConceptProps) {
 function DetailModeBar({ props }: { props: ConceptProps }) {
   const active = props.unitDetailView ?? "options";
   const [menuOpen, setMenuOpen] = useState(false);
+  const [dialog, setDialog] = useState<"rename" | "move" | null>(null);
   return (
     <div className="ux-detail-mode-layer">
       {menuOpen ? (
         <div className="ux-detail-action-menu" role="menu" aria-label="Unit actions">
-          <button type="button" role="menuitem" onClick={() => setMenuOpen(false)}><Copy size={15} />Duplicate</button>
-          <button type="button" role="menuitem" onClick={() => setMenuOpen(false)}><StickyNote size={15} />Add note</button>
-          <button type="button" role="menuitem" onClick={() => setMenuOpen(false)}><Share2 size={15} />Share</button>
+          <button type="button" role="menuitem" onClick={() => { setMenuOpen(false); setDialog("rename"); }}><Pencil size={15} />Rename & favorite</button>
+          <button type="button" role="menuitem" onClick={() => { setMenuOpen(false); props.onDuplicateUnit(props.selectedUnit.id); }}><Copy size={15} />Duplicate</button>
+          <button type="button" role="menuitem" onClick={() => { setMenuOpen(false); setDialog("move"); }}><MoveRight size={15} />Move</button>
         </div>
       ) : null}
       <nav className="ux-detail-mode-bar" aria-label="Unit detail view">
@@ -187,6 +188,64 @@ function DetailModeBar({ props }: { props: ConceptProps }) {
           <span>Profile</span>
         </button>
       </nav>
+      {dialog === "rename" ? <RenameDialog title="Rename unit" description="A reusable snapshot will be saved to your Library." initialValue={unitDisplayName(props.selectedUnit)} onClose={() => setDialog(null)} onSave={(name) => { props.onRenameUnit(props.selectedUnit.id, name); setDialog(null); }} /> : null}
+      {dialog === "move" ? <UnitDestinationDialog props={props} title="Move unit" sourceSectionName={props.selectedSection.name} excludeSectionId={props.selectedSectionId} onClose={() => setDialog(null)} onSelect={(sectionId) => { props.onMoveUnit(props.selectedUnit.id, sectionId); setDialog(null); }} /> : null}
+    </div>
+  );
+}
+
+function RenameDialog({ title, description, initialValue, onClose, onSave }: { title: string; description: string; initialValue: string; onClose: () => void; onSave: (name: string) => void }) {
+  const [value, setValue] = useState(initialValue);
+  const trimmed = value.trim();
+  useEffect(() => {
+    const handleKey = (event: KeyboardEvent) => event.key === "Escape" && onClose();
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [onClose]);
+  return (
+    <div className="ux-entry-dialog-layer" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+      <section className="ux-entry-dialog" role="dialog" aria-modal="true" aria-labelledby="rename-entry-title">
+        <header><span><strong id="rename-entry-title">{title}</strong><small>{description}</small></span><button type="button" onClick={onClose} aria-label="Close"><X size={17} /></button></header>
+        <label><span>Custom name</span><input value={value} onChange={(event) => setValue(event.currentTarget.value)} autoFocus maxLength={80} onKeyDown={(event) => { if (event.key === "Enter" && trimmed) onSave(trimmed); }} /></label>
+        {!trimmed ? <small className="ux-entry-dialog-error">Enter a name to continue.</small> : null}
+        <footer><button type="button" onClick={onClose}>Cancel</button><button type="button" className="primary" disabled={!trimmed} onClick={() => onSave(trimmed)}>Save favorite</button></footer>
+      </section>
+    </div>
+  );
+}
+
+function UnitDestinationDialog({ props, title, sourceSectionName, excludeSectionId, onClose, onSelect }: { props: ConceptProps; title: string; sourceSectionName: string; excludeSectionId?: string; onClose: () => void; onSelect: (sectionId: string) => void }) {
+  const destinations = props.roster.forces.flatMap((force) => force.sections
+    .filter((section) => section.name === sourceSectionName && section.id !== excludeSectionId)
+    .map((section) => ({ force, section })));
+  useEffect(() => {
+    const handleKey = (event: KeyboardEvent) => event.key === "Escape" && onClose();
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [onClose]);
+  return (
+    <div className="ux-entry-dialog-layer" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+      <section className="ux-entry-dialog" role="dialog" aria-modal="true" aria-labelledby="destination-title">
+        <header><span><strong id="destination-title">{title}</strong><small>Compatible {sourceSectionName} sections</small></span><button type="button" onClick={onClose} aria-label="Close"><X size={17} /></button></header>
+        <div className="ux-destination-list">
+          {destinations.length ? destinations.map(({ force, section }) => <button key={section.id} type="button" onClick={() => onSelect(section.id)}><span><strong>{forceDisplayName(force)}</strong><small>{force.detachment} · {section.name}</small></span><MoveRight size={16} /></button>) : <div className="ux-favorite-empty"><MoveRight size={19} /><strong>No compatible destination</strong><small>Add another detachment with a {sourceSectionName} section first.</small></div>}
+        </div>
+        <footer><button type="button" onClick={onClose}>Cancel</button></footer>
+      </section>
+    </div>
+  );
+}
+
+function ForceActionMenu({ props, forceId }: { props: ConceptProps; forceId: string }) {
+  const [open, setOpen] = useState(false);
+  const [renaming, setRenaming] = useState(false);
+  const force = props.roster.forces.find((item) => item.id === forceId);
+  if (!force) return null;
+  return (
+    <div className="ux-force-actions">
+      <button type="button" aria-label={`Actions for ${forceDisplayName(force)}`} aria-expanded={open} onClick={() => setOpen((value) => !value)}><Ellipsis size={16} /></button>
+      {open ? <div className="ux-force-action-menu" role="menu"><button type="button" role="menuitem" onClick={() => { setOpen(false); setRenaming(true); }}><Pencil size={14} />Rename & favorite</button></div> : null}
+      {renaming ? <RenameDialog title="Rename detachment" description="The configured detachment and its units will be saved to your Library." initialValue={forceDisplayName(force)} onClose={() => setRenaming(false)} onSave={(name) => { props.onRenameForce(force.id, name); setRenaming(false); }} /> : null}
     </div>
   );
 }
@@ -232,7 +291,7 @@ function WorkbenchHeader({
         <label className="ux-navbar-search"><Search size={15} /><input value={searchQuery} onChange={(event) => onSearchQueryChange(event.currentTarget.value)} placeholder="Search roster" autoFocus /></label>
       ) : (
         <div className="ux-wb-title">
-          <strong>{isUnitDetail ? props.selectedUnit.name : props.roster.name}</strong>
+          <strong>{isUnitDetail ? unitDisplayName(props.selectedUnit) : props.roster.name}</strong>
           {isOverview ? <><small className="ux-phone-overview-subtitle">{props.roster.faction} · {props.roster.system}</small><small className="ux-tablet-overview-subtitle">{props.roster.faction} · {remainingLabel}</small></> : <small>{isUnitDetail ? `${props.selectedSection.name} · ${remainingLabel}` : `${props.roster.faction} · ${props.roster.system}`}</small>}
         </div>
       )}
@@ -274,14 +333,16 @@ function WorkbenchHeader({
 }
 
 function Tree({ props, query, onQueryChange, creationOpen, onCreationOpenChange }: { props: ConceptProps; query: string; onQueryChange: (query: string) => void; creationOpen: boolean; onCreationOpenChange: (open: boolean) => void }) {
+  const [renamingUnitId, setRenamingUnitId] = useState<string | null>(null);
+  const renamingUnit = flattenUnits(props.roster).find((unit) => unit.id === renamingUnitId);
   const normalizedQuery = query.trim().toLowerCase();
   const visibleForces = props.roster.forces.map((force) => {
-    const forceMatches = `${force.name} ${force.detachment}`.toLowerCase().includes(normalizedQuery);
+    const forceMatches = `${force.customName ?? ""} ${force.name} ${force.detachment}`.toLowerCase().includes(normalizedQuery);
     const sections = force.sections.map((section) => {
       const sectionMatches = section.name.toLowerCase().includes(normalizedQuery);
       const units = !normalizedQuery || forceMatches || sectionMatches
         ? section.units
-        : section.units.filter((unit) => `${unit.name} ${unit.role}`.toLowerCase().includes(normalizedQuery));
+        : section.units.filter((unit) => `${unit.customName ?? ""} ${unit.name} ${unit.role}`.toLowerCase().includes(normalizedQuery));
       return { section, units, matches: !normalizedQuery || forceMatches || sectionMatches || units.length > 0 };
     }).filter((item) => item.matches);
     return { force, sections, matches: !normalizedQuery || forceMatches || sections.length > 0 };
@@ -297,14 +358,17 @@ function Tree({ props, query, onQueryChange, creationOpen, onCreationOpenChange 
           const forceOpen = normalizedQuery ? true : props.expandedForceIds.includes(force.id);
           return (
             <section className={`ux-force-entry ${forceOpen ? "open" : ""} ${props.selectedForceId === force.id ? "selected" : ""}`} key={force.id}>
-              <button type="button" className="ux-force-summary" aria-expanded={forceOpen} onClick={() => props.onToggleForce(force.id)}>
-                <ChevronDown size={15} />
-                <span>
-                  <strong>{force.name}</strong>
-                  <small>{force.detachment}</small>
-                </span>
-                <b>{force.points} pts</b>
-              </button>
+              <div className="ux-force-summary">
+                <button type="button" className="ux-force-summary-main" aria-expanded={forceOpen} onClick={() => props.onToggleForce(force.id)}>
+                  <ChevronDown size={15} />
+                  <span>
+                    <strong>{forceDisplayName(force)}</strong>
+                    <small>{force.detachment}</small>
+                  </span>
+                  <b>{force.points} pts</b>
+                </button>
+                <ForceActionMenu props={props} forceId={force.id} />
+              </div>
               {forceOpen ? (
                 <div className="ux-force-sections">
                   {sections.map(({ section, units }) => {
@@ -318,21 +382,7 @@ function Tree({ props, query, onQueryChange, creationOpen, onCreationOpenChange 
                         </button>
                         {open ? (
                           <div className="ux-tree-units">
-                            {units.map((unit) => (
-                              <button
-                                key={unit.id}
-                                type="button"
-                                className={`ux-tree-unit ${unit.status ?? "valid"} ${props.selectedUnit.id === unit.id ? "active" : ""}`}
-                                onClick={() => props.onSelectUnit(unit.id)}
-                              >
-                                <span className="ux-tree-rail" aria-hidden />
-                                <span className="ux-tree-unit-main">
-                                  <span>{unit.name}</span>
-                                  <small>×{unit.count}</small>
-                                </span>
-                                {unit.status && unit.status !== "valid" ? <StatusGlyph status={unit.status} size={13} /> : <b>{unit.points}</b>}
-                              </button>
-                            ))}
+                            {units.map((unit) => <SwipeableUnitRow key={unit.id} unit={unit} active={props.selectedUnit.id === unit.id} onSelect={() => props.onSelectUnit(unit.id)} onDelete={() => props.onDeleteUnit(unit.id)} onRename={() => setRenamingUnitId(unit.id)} onDuplicate={() => props.onDuplicateUnit(unit.id)} />)}
                             {!normalizedQuery ? <button
                               type="button"
                               className="ux-tree-add"
@@ -363,7 +413,44 @@ function Tree({ props, query, onQueryChange, creationOpen, onCreationOpenChange 
           Add force
         </button>
       ))}
+      {renamingUnit ? <RenameDialog title="Rename unit" description="A reusable snapshot will be saved to your Library." initialValue={unitDisplayName(renamingUnit)} onClose={() => setRenamingUnitId(null)} onSave={(name) => { props.onRenameUnit(renamingUnit.id, name); setRenamingUnitId(null); }} /> : null}
     </nav>
+  );
+}
+
+function SwipeableUnitRow({ unit, active, onSelect, onDelete, onRename, onDuplicate }: { unit: ConceptProps["selectedUnit"]; active: boolean; onSelect: () => void; onDelete: () => void; onRename: () => void; onDuplicate: () => void }) {
+  const [offset, setOffset] = useState(0);
+  const startX = useRef<number | null>(null);
+  const startOffset = useRef(0);
+  const dragged = useRef(false);
+  const close = () => setOffset(0);
+  return (
+    <div className={`ux-swipe-unit ${offset < 0 ? "open" : ""}`}>
+      <div className="ux-swipe-actions" aria-label={`Actions for ${unitDisplayName(unit)}`} aria-hidden={offset === 0}>
+        <button type="button" tabIndex={offset < 0 ? 0 : -1} className="delete" onClick={() => { close(); onDelete(); }}><Trash2 size={14} /><span>Delete</span></button>
+        <button type="button" tabIndex={offset < 0 ? 0 : -1} onClick={() => { close(); onRename(); }}><Pencil size={14} /><span>Rename</span></button>
+        <button type="button" tabIndex={offset < 0 ? 0 : -1} onClick={() => { close(); onDuplicate(); }}><Copy size={14} /><span>Duplicate</span></button>
+      </div>
+      <button
+        type="button"
+        className={`ux-tree-unit ux-swipe-unit-content ${unit.status ?? "valid"} ${active ? "active" : ""}`}
+        style={{ transform: `translateX(${offset}px)` }}
+        onPointerDown={(event) => { startX.current = event.clientX; startOffset.current = offset; dragged.current = false; event.currentTarget.setPointerCapture(event.pointerId); }}
+        onPointerMove={(event) => {
+          if (startX.current === null) return;
+          const delta = event.clientX - startX.current;
+          if (Math.abs(delta) > 6) dragged.current = true;
+          setOffset(Math.max(-174, Math.min(0, startOffset.current + delta)));
+        }}
+        onPointerUp={() => { startX.current = null; setOffset((current) => current < -42 ? -174 : 0); }}
+        onPointerCancel={() => { startX.current = null; setOffset((current) => current < -42 ? -174 : 0); }}
+        onClick={(event) => { if (dragged.current) { event.preventDefault(); dragged.current = false; return; } if (offset < 0) close(); else onSelect(); }}
+      >
+        <span className="ux-tree-rail" aria-hidden />
+        <span className="ux-tree-unit-main"><span>{unitDisplayName(unit)}</span><small>×{unit.count}</small></span>
+        {unit.status && unit.status !== "valid" ? <StatusGlyph status={unit.status} size={13} /> : <b>{unit.points}</b>}
+      </button>
+    </div>
   );
 }
 
@@ -450,6 +537,7 @@ function InlineForceDraft({ props, onClose }: { props: ConceptProps; onClose: ()
   return (
     <section className="ux-force-draft" aria-label="New force">
       <header><strong>New force</strong><button type="button" aria-label="Cancel force creation" onClick={onClose}><X size={15} /></button></header>
+      {props.detachmentFavorites.length ? <FavoriteCreationSection title="Favorite detachments">{props.detachmentFavorites.map((favorite) => <button type="button" key={favorite.id} onClick={() => { props.onReuseDetachmentFavorite(favorite.id); onClose(); }}><Heart size={14} /><span><strong>{forceDisplayName(favorite.force)}</strong><small>{favorite.force.points} pts</small></span><Plus size={14} /></button>)}</FavoriteCreationSection> : null}
       <label><span>Force</span><select value={catalogueId} onChange={(event) => setCatalogueId(event.currentTarget.value)}><option value="">Choose force</option>{mockCatalogues.map((item) => <option value={item.id} key={item.id}>{item.name}</option>)}</select></label>
       <label><span>Organization</span><select value={detachmentId} onChange={(event) => setDetachmentId(event.currentTarget.value)}><option value="">Choose detachment</option>{mockDetachments.map((item) => <option value={item.id} key={item.id}>{item.name}</option>)}</select></label>
       <div className="ux-force-draft-actions"><button type="button" onClick={onClose}>Cancel</button><button type="button" className="primary" disabled={!catalogueId || !detachmentId} onClick={submit}>Add force</button></div>
@@ -480,6 +568,7 @@ function ForceSelector({ props, onClose }: { props: ConceptProps; onClose: () =>
         <header><span><strong id="force-selector-title">Add force</strong><small>Choose a source and organization</small></span><button type="button" aria-label="Close force selector" onClick={onClose}><X size={18} /></button></header>
         <div className="ux-force-selector-body">
           <label className="ux-loadout-selector-search"><Search size={15} /><input value={query} onChange={(event) => setQuery(event.currentTarget.value)} placeholder="Search forces" autoFocus /></label>
+          {props.detachmentFavorites.length ? <FavoriteCreationSection title="Favorite detachments">{props.detachmentFavorites.map((favorite) => <button type="button" key={favorite.id} onClick={() => { props.onReuseDetachmentFavorite(favorite.id); onClose(); }}><Heart size={14} /><span><strong>{forceDisplayName(favorite.force)}</strong><small>{favorite.force.points} pts · configured</small></span><Plus size={14} /></button>)}</FavoriteCreationSection> : null}
           <div className="ux-force-choice-list" aria-label="Available forces">
             {catalogues.length ? catalogues.map((item) => <button type="button" className={catalogueId === item.id ? "selected" : ""} key={item.id} onClick={() => setCatalogueId(item.id)}><span><strong>{item.name}</strong><small>{item.updated} · {item.status}</small></span>{catalogueId === item.id ? <Check size={15} /> : null}</button>) : <div className="ux-loadout-selector-empty"><strong>No matching forces</strong><small>Try another name.</small></div>}
           </div>
@@ -845,11 +934,15 @@ function AddPane({ props }: { props: ConceptProps }) {
           </div>
         </div>
       ) : null}
+      {props.unitFavorites.length ? <FavoriteCreationSection title="Favorite units">{props.unitFavorites.map((favorite) => {
+        const compatible = favorite.sourceSectionName === section;
+        return <button type="button" key={favorite.id} disabled={!compatible} title={compatible ? undefined : `Requires a ${favorite.sourceSectionName} section`} onClick={() => { props.onReuseUnitFavorite(favorite.id, props.selectedSectionId); props.onNavigate("unit-detail"); }}><Heart size={14} /><span><strong>{unitDisplayName(favorite.unit)}</strong><small>{compatible ? `${favorite.unit.points} pts · configured` : `Requires ${favorite.sourceSectionName}`}</small></span><Plus size={14} /></button>;
+      })}</FavoriteCreationSection> : null}
       <div className="ux-pool">
         {(pool.length ? pool : flattenUnits(props.roster)).map((unit) => (
           <button key={unit.id} type="button" className="ux-pool-row" onClick={() => props.onSelectUnit(unit.id)}>
             <span>
-              <strong>{unit.name}</strong>
+              <strong>{unitDisplayName(unit)}</strong>
               <small>{unit.role}</small>
             </span>
             <span className="ux-pool-meta">
@@ -883,7 +976,7 @@ function Rail({ props }: { props: ConceptProps }) {
           <button key={unit.id} type="button" className={`ux-rail-item ${unit.status}`} onClick={() => props.onSelectUnit(unit.id)}>
             <StatusGlyph status={unit.status} size={15} />
             <span>
-              <strong>{unit.name}</strong>
+              <strong>{unitDisplayName(unit)}</strong>
               <small>{unit.note ?? unit.slotImpact}</small>
             </span>
           </button>
@@ -1142,7 +1235,7 @@ function LookupScreen({ props }: { props: ConceptProps }) {
           {units.map((unit) => (
             <button key={unit.id} type="button" className="ux-lookup-row" onClick={() => props.onSelectUnit(unit.id)}>
               <span>
-                <strong>{unit.name}</strong>
+                <strong>{unitDisplayName(unit)}</strong>
                 <small>{unit.sectionName} · {unit.role}</small>
               </span>
               <b>{unit.points} pts</b>
@@ -1252,6 +1345,8 @@ function AppAvatarButton({ props }: { props: ConceptProps }) {
 
 /** Collection space for reusable fan armies and roster building blocks. */
 function CollectionsLibrary({ props }: { props: ConceptProps }) {
+  const [unitDestination, setUnitDestination] = useState<string | null>(null);
+  const unitFavorite = props.unitFavorites.find((item) => item.id === unitDestination);
   return (
     <>
       <header className="ux-wb-top ux-wb-home-top">
@@ -1262,30 +1357,30 @@ function CollectionsLibrary({ props }: { props: ConceptProps }) {
         <AppAvatarButton props={props} />
       </header>
       <div className="ux-wb-home-body ux-collections-body">
-        <CollectionPlaceholder
-          icon={<UsersRound size={20} />}
-          title="Fan-built armies"
-          description="Armies built to represent your collection for downloaded game systems and catalogues will live here."
-        />
-        <CollectionPlaceholder
-          icon={<Heart size={20} />}
-          title="Favorites & reusable entries"
-          description="Save favorite units and force entries from your rosters to reuse them in future lists."
-        />
+        <FavoriteLibrarySection title="Favorite units" icon={<Heart size={18} />} empty="Rename a configured unit to save it here.">
+          {props.unitFavorites.map((favorite) => <article className="ux-favorite-card" key={favorite.id}><span><strong>{unitDisplayName(favorite.unit)}</strong><small>{favorite.sourceSectionName} · {favorite.unit.points} pts</small></span><div><button type="button" onClick={() => setUnitDestination(favorite.id)}><Plus size={14} />Add</button><button type="button" aria-label={`Delete ${unitDisplayName(favorite.unit)}`} onClick={() => window.confirm(`Delete ${unitDisplayName(favorite.unit)} from favorites?`) && props.onDeleteUnitFavorite(favorite.id)}><Trash2 size={14} /></button></div></article>)}
+        </FavoriteLibrarySection>
+        <FavoriteLibrarySection title="Favorite detachments" icon={<UsersRound size={18} />} empty="Rename a detachment to save its configured snapshot here.">
+          {props.detachmentFavorites.map((favorite) => <article className="ux-favorite-card" key={favorite.id}><span><strong>{forceDisplayName(favorite.force)}</strong><small>{favorite.force.detachment} · {favorite.force.points} pts · {favorite.force.sections.reduce((sum, section) => sum + section.units.length, 0)} units</small></span><div><button type="button" onClick={() => { props.onReuseDetachmentFavorite(favorite.id); props.onNavigate("overview"); }}><Plus size={14} />Add</button><button type="button" aria-label={`Delete ${forceDisplayName(favorite.force)}`} onClick={() => window.confirm(`Delete ${forceDisplayName(favorite.force)} from favorites?`) && props.onDeleteDetachmentFavorite(favorite.id)}><Trash2 size={14} /></button></div></article>)}
+        </FavoriteLibrarySection>
       </div>
+      {unitFavorite ? <UnitDestinationDialog props={props} title={`Add ${unitDisplayName(unitFavorite.unit)}`} sourceSectionName={unitFavorite.sourceSectionName} onClose={() => setUnitDestination(null)} onSelect={(sectionId) => { props.onReuseUnitFavorite(unitFavorite.id, sectionId); setUnitDestination(null); props.onNavigate("overview"); }} /> : null}
     </>
   );
 }
 
-function CollectionPlaceholder({ icon, title, description }: { icon: ReactNode; title: string; description: string }) {
+function FavoriteLibrarySection({ icon, title, empty, children }: { icon: ReactNode; title: string; empty: string; children: ReactNode }) {
+  const hasChildren = Array.isArray(children) ? children.length > 0 : Boolean(children);
   return (
-    <section className="ux-collection-placeholder">
-      <span className="ux-collection-icon">{icon}</span>
-      <strong>{title}</strong>
-      <p>{description}</p>
-      <small>Nothing saved yet</small>
+    <section className="ux-favorite-library-section">
+      <header><span className="ux-collection-icon">{icon}</span><strong>{title}</strong></header>
+      {hasChildren ? <div className="ux-favorite-card-list">{children}</div> : <div className="ux-favorite-empty"><Heart size={18} /><strong>Nothing saved yet</strong><small>{empty}</small></div>}
     </section>
   );
+}
+
+function FavoriteCreationSection({ title, children }: { title: string; children: ReactNode }) {
+  return <section className="ux-favorite-creation"><div className="ux-result-label"><Heart size={13} />{title}</div><div>{children}</div></section>;
 }
 
 /** Account and application-level navigation. */
@@ -1453,4 +1548,12 @@ function CommandBar({ props }: { props: ConceptProps }) {
       </button>
     </div>
   );
+}
+
+function unitDisplayName(unit: ConceptProps["selectedUnit"]) {
+  return unit.customName?.trim() || unit.name;
+}
+
+function forceDisplayName(force: ConceptProps["roster"]["forces"][number]) {
+  return force.customName?.trim() || force.name;
 }

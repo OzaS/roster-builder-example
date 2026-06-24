@@ -1,4 +1,4 @@
-import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, Cog, Command, Copy, CornerDownLeft, Database, Download, Ellipsis, FileInput, Filter, GripVertical, Hammer, Heart, Layers, LibraryBig, Maximize2, MessageCircle, Minus, PanelsTopLeft, Plus, RotateCcw, Rows3, Search, Share2, Smartphone, Sparkles, Split, StickyNote, Trash2, UserRound, UsersRound, X, Zap } from "lucide-react";
+import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, Cog, Command, Copy, Database, Download, Ellipsis, FileInput, GripVertical, Hammer, Heart, Layers, LibraryBig, Maximize2, MessageCircle, Minus, MoveRight, PanelsTopLeft, Pencil, Plus, RotateCcw, Rows3, Search, Smartphone, Sparkles, Split, Trash2, UserRound, X } from "lucide-react";
 import { PhoneStatusBar } from "../components/DeviceFrame";
 import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode } from "../types";
 import { BudgetMeter, Chip, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "../concepts/ux/uxShared";
@@ -32,8 +32,7 @@ export function DesignElementsPanel({
   onSelectUnit,
   onToggleOption,
 }: Props) {
-  const isWorkbench = concept.id === "ux-workbench";
-  const rootClass = `design-elements-panel ux-screen ${isWorkbench ? "ux-workbench" : "ux-command"} ${shellClass(themeMode, colorScheme)} ${platform}`;
+  const rootClass = `design-elements-panel ux-screen ux-workbench ${shellClass(themeMode, colorScheme)} ${platform}`;
 
   return (
     <section className={rootClass}>
@@ -41,7 +40,7 @@ export function DesignElementsPanel({
         <div>
           <small>{concept.eyebrow}</small>
           <h1>{concept.name} Elements</h1>
-          <p>{isWorkbench ? "Reusable tree, detail, validation, and dense editing primitives for the master-detail direction." : "Reusable command, search, result, and assistant primitives for the search-first direction."}</p>
+          <p>Reusable tree, detail, validation, and dense editing primitives for the master-detail direction.</p>
         </div>
         <div className="elements-hero-actions">
           <button type="button" aria-label="Search">
@@ -60,11 +59,7 @@ export function DesignElementsPanel({
           <PhoneStatusBar />
         </div>
       </ElementSection>
-      {isWorkbench ? (
-        <WorkbenchElements roster={roster} selectedSection={selectedSection} selectedUnit={selectedUnit} selectedSectionId={selectedSectionId} onSelectSection={onSelectSection} onSelectUnit={onSelectUnit} onToggleOption={onToggleOption} />
-      ) : (
-        <QuickstrikeElements roster={roster} selectedSection={selectedSection} selectedUnit={selectedUnit} onSelectUnit={onSelectUnit} onToggleOption={onToggleOption} />
-      )}
+      <WorkbenchElements roster={roster} selectedSection={selectedSection} selectedUnit={selectedUnit} selectedSectionId={selectedSectionId} onSelectSection={onSelectSection} onSelectUnit={onSelectUnit} onToggleOption={onToggleOption} />
     </section>
   );
 }
@@ -109,132 +104,6 @@ function TypographySection({ roster }: { roster: Roster }) {
   );
 }
 
-function QuickstrikeElements({
-  roster,
-  selectedSection,
-  selectedUnit,
-  onSelectUnit,
-  onToggleOption,
-}: {
-  roster: Roster;
-  selectedSection: RosterSection;
-  selectedUnit: RosterUnit;
-  onSelectUnit: (id: string) => void;
-  onToggleOption: (id: string) => void;
-}) {
-  const units = flattenUnits(roster);
-
-  return (
-    <>
-      <ElementSection title="Command Header">
-        <div className="ux-cmd-top">
-          <div className="ux-cmd-title">
-            <button type="button" className="ux-icon-btn" aria-label="Lists">
-              <Layers size={18} />
-            </button>
-            <span>
-              <strong>{roster.name}</strong>
-              <small>{roster.faction}</small>
-            </span>
-            <button type="button" className="ux-icon-btn" aria-label="Share">
-              <Share2 size={18} />
-            </button>
-          </div>
-          <BudgetMeter roster={roster} />
-          <div className="ux-cmd-stat-row">
-            <Chip tone="valid">{units.length} units</Chip>
-            <Chip tone="warning">{rosterChecks(roster).length} checks</Chip>
-            <Chip tone="neutral">{countSections(roster)} slots</Chip>
-          </div>
-        </div>
-      </ElementSection>
-
-      <ElementSection title="Command Input">
-        <div className="ux-palette-query">
-          <Command size={16} />
-          <span>Add a legal objective holder for HQ</span>
-          <kbd>
-            <CornerDownLeft size={13} />
-          </kbd>
-        </div>
-        <div className="ux-filter-row">
-          {["Legal only", "Affordable", "Battleline", "Characters"].map((label, index) => (
-            <button key={label} type="button" className={`ux-filter-pill ${index < 2 ? "on" : ""}`}>
-              <Filter size={12} />
-              {label}
-            </button>
-          ))}
-        </div>
-        <div className="ux-suggest">
-          <Sparkles size={14} />
-          <div className="ux-suggest-chips">
-            {["objective holder under 120", "second battleline squad", "anti-tank for elites"].map((label) => (
-              <button key={label} type="button" className="ux-suggest-chip">
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </ElementSection>
-
-      <ElementSection title="Result Rows">
-        {units.slice(0, 4).map((unit) => (
-          <button key={unit.id} type="button" className="ux-result-row" onClick={() => onSelectUnit(unit.id)}>
-            <span className="ux-result-icon" aria-hidden>
-              <Zap size={15} />
-            </span>
-            <span className="ux-result-main">
-              <strong>{unit.name}</strong>
-              <small>{unit.sectionName} · {unit.role}</small>
-            </span>
-            <span className="ux-result-meta">
-              <b>{unit.points}</b>
-              <Chip tone={unit.availability === "available" ? "valid" : unit.availability === "limited" ? "warning" : "error"}>{unit.availability}</Chip>
-            </span>
-            <Plus size={16} />
-          </button>
-        ))}
-      </ElementSection>
-
-      <ElementSection title="Roster Rows">
-        <div className="ux-cmd-group">
-          <div className="ux-cmd-group-head">
-            <strong>{selectedSection.name}</strong>
-            <small>{selectedSection.required ?? selectedSection.units.length}</small>
-          </div>
-          {selectedSection.units.map((unit) => (
-            <button key={unit.id} type="button" className={`ux-cmd-row ${unit.status ?? "valid"}`} onClick={() => onSelectUnit(unit.id)}>
-              <span className="ux-cmd-row-main">
-                <strong>{unit.name}</strong>
-                <small>{unit.role} · x{unit.count}</small>
-              </span>
-              {unit.status && unit.status !== "valid" ? <StatusGlyph status={unit.status} size={14} /> : null}
-              <b>{unit.points}</b>
-            </button>
-          ))}
-        </div>
-      </ElementSection>
-
-      <OptionsSection selectedUnit={selectedUnit} onToggleOption={onToggleOption} />
-      <ElementSection title="Thumb Command Bar">
-        <div className="ux-elements-command-wrap">
-          <div className="ux-cmd-bar">
-            <button type="button" className="ux-cmd-tab" aria-label="Build">
-              <Layers size={18} />
-            </button>
-            <button type="button" className="ux-cmd-input">
-              <Command size={16} />
-              <span>Add unit or ask for help...</span>
-            </button>
-            <button type="button" className="ux-cmd-send" aria-label="Run">
-              <ArrowUp size={18} />
-            </button>
-          </div>
-        </div>
-      </ElementSection>
-    </>
-  );
-}
 
 function WorkbenchElements({
   roster,
@@ -400,9 +269,9 @@ function WorkbenchElements({
       <ElementSection title="Unit Detail Toggle">
         <div className="ux-detail-mode-layer ux-elements-static">
           <div className="ux-detail-action-menu ux-elements-static" role="menu" aria-label="Unit actions">
+            <button type="button" role="menuitem"><Pencil size={15} />Rename & favorite</button>
             <button type="button" role="menuitem"><Copy size={15} />Duplicate</button>
-            <button type="button" role="menuitem"><StickyNote size={15} />Add note</button>
-            <button type="button" role="menuitem"><Share2 size={15} />Share</button>
+            <button type="button" role="menuitem"><MoveRight size={15} />Move</button>
           </div>
           <nav className="ux-detail-mode-bar ux-elements-static" aria-label="Unit detail view">
             <button type="button" className="ux-detail-mode-tab"><Cog size={18} /><span>Options</span></button>
@@ -410,6 +279,25 @@ function WorkbenchElements({
             <button type="button" className="ux-detail-mode-tab active"><BookOpen size={18} /><span>Profile</span></button>
           </nav>
         </div>
+      </ElementSection>
+
+      <ElementSection title="Entry Action Menus">
+        <div className="ux-force-action-menu" style={{ position: "static" }} role="menu"><button type="button"><Pencil size={14} />Rename & favorite</button></div>
+      </ElementSection>
+
+      <ElementSection title="Swipe Unit Actions">
+        <div className="ux-swipe-unit open" style={{ maxWidth: 360 }}>
+          <div className="ux-swipe-actions"><button type="button" className="delete"><Trash2 size={14} /><span>Delete</span></button><button type="button"><Pencil size={14} /><span>Rename</span></button><button type="button"><Copy size={14} /><span>Duplicate</span></button></div>
+          <button type="button" className="ux-tree-unit ux-swipe-unit-content active" style={{ transform: "translateX(-174px)" }}><span className="ux-tree-rail" /><span className="ux-tree-unit-main"><span>{selectedUnit.customName ?? selectedUnit.name}</span><small>×{selectedUnit.count}</small></span><b>{selectedUnit.points}</b></button>
+        </div>
+      </ElementSection>
+
+      <ElementSection title="Rename Dialog">
+        <section className="ux-entry-dialog" style={{ borderRadius: 12 }}><header><span><strong>Rename unit</strong><small>A reusable snapshot will be saved to your Library.</small></span><button type="button"><X size={17} /></button></header><label><span>Custom name</span><input value="Veteran Spearhead" readOnly /></label><footer><button type="button">Cancel</button><button type="button" className="primary">Save favorite</button></footer></section>
+      </ElementSection>
+
+      <ElementSection title="Move Unit Dialog">
+        <section className="ux-entry-dialog" style={{ borderRadius: 12 }}><header><span><strong>Move unit</strong><small>Compatible Battleline sections</small></span></header><div className="ux-destination-list"><button type="button"><span><strong>Dark Angels Auxiliary</strong><small>Unrestricted Collection · Battleline</small></span><MoveRight size={16} /></button></div></section>
       </ElementSection>
 
       <ElementSection title="Validation Rail">
@@ -451,6 +339,10 @@ function WorkbenchElements({
             <Plus size={16} />
           </button>
         ))}
+      </ElementSection>
+
+      <ElementSection title="Favorite Creation Sections">
+        <section className="ux-favorite-creation"><div className="ux-result-label"><Heart size={13} />Favorite units</div><div><button type="button"><Heart size={14} /><span><strong>Veteran Spearhead</strong><small>{selectedUnit.points} pts · configured</small></span><Plus size={14} /></button></div></section>
       </ElementSection>
 
       <ElementSection title="Smart Search (Settings)">
@@ -555,21 +447,8 @@ function WorkbenchElements({
         </section>
       </ElementSection>
 
-      <ElementSection title="Library Collections">
-        <div className="ux-elements-collection-grid">
-          <section className="ux-collection-placeholder">
-            <span className="ux-collection-icon"><UsersRound size={20} /></span>
-            <strong>Fan-built armies</strong>
-            <p>Represent your collection for downloaded game systems and catalogues.</p>
-            <small>Nothing saved yet</small>
-          </section>
-          <section className="ux-collection-placeholder">
-            <span className="ux-collection-icon"><Heart size={20} /></span>
-            <strong>Favorites & reusable entries</strong>
-            <p>Favorite units and force entries ready for future rosters.</p>
-            <small>Nothing saved yet</small>
-          </section>
-        </div>
+      <ElementSection title="Favorite Library Cards">
+        <section className="ux-favorite-library-section"><header><span className="ux-collection-icon"><Heart size={18} /></span><strong>Favorite units</strong></header><div className="ux-favorite-card-list"><article className="ux-favorite-card"><span><strong>Veteran Spearhead</strong><small>Battleline · {selectedUnit.points} pts</small></span><div><button type="button"><Plus size={14} />Add</button><button type="button"><Trash2 size={14} /></button></div></article></div></section>
       </ElementSection>
 
       <ElementSection title="App & Account">

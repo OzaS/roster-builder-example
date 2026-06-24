@@ -111,6 +111,7 @@ export type RosterUnitDetail = {
 export type RosterUnit = {
   id: string;
   name: string;
+  customName?: string;
   role: string;
   points: number;
   count: number;
@@ -136,6 +137,7 @@ export type RosterSection = {
 export type RosterForce = {
   id: string;
   name: string;
+  customName?: string;
   detachment: string;
   kind: "primary" | "auxiliary";
   points: number;
@@ -151,9 +153,26 @@ export type Roster = {
   forces: RosterForce[];
 };
 
-export type ConceptId =
-  | "ux-command"
-  | "ux-workbench";
+export type UnitFavorite = {
+  id: string;
+  createdAt: string;
+  sourceSectionName: string;
+  unit: RosterUnit;
+};
+
+export type DetachmentFavorite = {
+  id: string;
+  createdAt: string;
+  force: RosterForce;
+};
+
+export type FavoriteLibrary = {
+  version: 1;
+  units: UnitFavorite[];
+  detachments: DetachmentFavorite[];
+};
+
+export type ConceptId = "ux-workbench";
 
 export type PrototypeScreen =
   | "library"

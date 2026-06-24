@@ -129,12 +129,17 @@
           "Loadout Groups & Selector",
           "Unit Profiles",
           "Unit Detail Toggle",
+          "Entry Action Menus",
+          "Swipe Unit Actions",
+          "Rename Dialog",
+          "Move Unit Dialog",
           "Validation Rail",
           "Add Pool Rows",
+          "Favorite Creation Sections",
           "Smart Search (Settings)",
           "Lookup & Sources",
           "Tools Hub",
-          "Library Collections",
+          "Favorite Library Cards",
           "App & Account",
           "Main Tab Bar",
           "Designer Rail Controls",
@@ -165,92 +170,6 @@
           "createdAt": "2026-06-19T21:43:11.380Z"
         }
       ]
-    },
-    {
-      "id": "ux-command",
-      "status": "archived",
-      "name": "Quickstrike Command",
-      "eyebrow": "UX · search-first",
-      "icon": "Command",
-      "component": "QuickstrikeCommand",
-      "bestFor": "Experienced players who know what they want and hate tapping through menus.",
-      "direction": "Thumb-zone command bar, fuzzy results, smart legal/affordable filters, and assistant suggestions.",
-      "interaction": "Type to add any unit from anywhere instead of drilling system → catalogue → org → category → unit.",
-      "tradeoff": "Relies on strong search/AI; the value is invisible until the catalogue index is good.",
-      "screens": [
-        {
-          "id": "library",
-          "label": "Library"
-        },
-        {
-          "id": "overview",
-          "label": "Roster"
-        },
-        {
-          "id": "add-unit",
-          "label": "Add unit"
-        },
-        {
-          "id": "unit-detail",
-          "label": "Unit detail"
-        },
-        {
-          "id": "diagnostics",
-          "label": "Diagnostics"
-        },
-        {
-          "id": "export",
-          "label": "Export"
-        }
-      ],
-      "workflows": [
-        {
-          "id": "library",
-          "label": "Library",
-          "screens": [
-            "library"
-          ]
-        },
-        {
-          "id": "build",
-          "label": "Build",
-          "screens": [
-            "overview",
-            "add-unit",
-            "unit-detail"
-          ]
-        },
-        {
-          "id": "finish",
-          "label": "Finish",
-          "screens": [
-            "diagnostics",
-            "export"
-          ]
-        },
-        {
-          "id": "unsorted",
-          "label": "Unsorted",
-          "screens": []
-        }
-      ],
-      "trash": {
-        "screens": []
-      },
-      "elements": {
-        "sections": [
-          "Color Tokens",
-          "Typography",
-          "Phone Status Bar",
-          "Command Header",
-          "Command Input",
-          "Result Rows",
-          "Roster Rows",
-          "Options",
-          "Thumb Command Bar"
-        ]
-      },
-      "comments": []
     }
   ]
 }
