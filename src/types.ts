@@ -27,11 +27,15 @@ export const colorSchemes: Array<{ id: ColorScheme; label: string; short: string
 
 export type WorkflowScreen =
   | "library"
+  | "collections"
+  | "app"
+  | "subscription-main"
   | "create-roster"
   | "drafts"
   | "source"
   | "tools"
   | "overview"
+  | "subscription-edition"
   | "add-detachment"
   | "add-unit"
   | "unit-detail"
@@ -153,6 +157,8 @@ export type ConceptId =
 
 export type PrototypeScreen =
   | "library"
+  | "collections"
+  | "app"
   | "system"
   | "catalogue"
   | "detachment"

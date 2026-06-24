@@ -1,7 +1,7 @@
-import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, Cog, Command, Copy, CornerDownLeft, Database, Download, Ellipsis, FileInput, Filter, GripVertical, Hammer, Layers, Maximize2, MessageCircle, Minus, PanelsTopLeft, Plus, RotateCcw, Rows3, Search, Share2, Smartphone, Sparkles, Split, StickyNote, Trash2, X, Zap } from "lucide-react";
+import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, Cog, Command, Copy, CornerDownLeft, Database, Download, Ellipsis, FileInput, Filter, GripVertical, Hammer, Heart, Layers, LibraryBig, Maximize2, MessageCircle, Minus, PanelsTopLeft, Plus, RotateCcw, Rows3, Search, Share2, Smartphone, Sparkles, Split, StickyNote, Trash2, UserRound, UsersRound, X, Zap } from "lucide-react";
 import { PhoneStatusBar } from "../components/DeviceFrame";
 import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode } from "../types";
-import { BudgetMeter, Chip, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph } from "../concepts/ux/uxShared";
+import { BudgetMeter, Chip, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
 
 type Props = {
@@ -290,6 +290,12 @@ function WorkbenchElements({
         <BudgetMeter roster={roster} />
       </ElementSection>
 
+      <ElementSection title="Subscription Gate">
+        <div className="ux-elements-subscription-preview">
+          <SubscriptionGate />
+        </div>
+      </ElementSection>
+
       <TabletWorkspaceElement roster={roster} />
 
       <ElementSection title="Roster Creation">
@@ -549,6 +555,45 @@ function WorkbenchElements({
         </section>
       </ElementSection>
 
+      <ElementSection title="Library Collections">
+        <div className="ux-elements-collection-grid">
+          <section className="ux-collection-placeholder">
+            <span className="ux-collection-icon"><UsersRound size={20} /></span>
+            <strong>Fan-built armies</strong>
+            <p>Represent your collection for downloaded game systems and catalogues.</p>
+            <small>Nothing saved yet</small>
+          </section>
+          <section className="ux-collection-placeholder">
+            <span className="ux-collection-icon"><Heart size={20} /></span>
+            <strong>Favorites & reusable entries</strong>
+            <p>Favorite units and force entries ready for future rosters.</p>
+            <small>Nothing saved yet</small>
+          </section>
+        </div>
+      </ElementSection>
+
+      <ElementSection title="App & Account">
+        <section className="ux-account-card">
+          <span className="ux-account-avatar"><UserRound size={22} /></span>
+          <span>
+            <strong>Alex Morgan</strong>
+            <small>alex@example.com</small>
+          </span>
+        </section>
+        <button type="button" className="ux-app-nav-row">
+          <span className="ux-setting-icon"><Cog size={17} /></span>
+          <span>
+            <strong>Settings</strong>
+            <small>Search, assistance, and sources</small>
+          </span>
+          <ChevronRight size={17} />
+        </button>
+        <div className="ux-app-footer ux-elements-app-footer">
+          <strong>Roster Builder</strong>
+          <small>Version 1.0.0</small>
+        </div>
+      </ElementSection>
+
       <ElementSection title="Main Tab Bar">
         <div className="ux-elements-command-wrap">
           <nav className="ux-tabbar floating" aria-label="Main navigation">
@@ -568,8 +613,8 @@ function WorkbenchElements({
               <span>Tools</span>
             </button>
             <button type="button" className="ux-tab">
-              <Database size={20} />
-              <span>Settings</span>
+              <LibraryBig size={20} />
+              <span>Library</span>
             </button>
           </nav>
         </div>

@@ -126,6 +126,120 @@
   box-shadow: none;
 }
 
+/* ----------------------- subscription gate --------------------------- */
+
+.ux-subscription-layer {
+  position: absolute;
+  z-index: 70;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: color-mix(in srgb, #07090d 72%, transparent);
+  backdrop-filter: blur(5px) saturate(0.8);
+}
+
+.ux-subscription-card {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  width: min(360px, 100%);
+  padding: 28px 24px 22px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--ux-accent-2) 30%, var(--ux-line));
+  border-radius: var(--ux-r-xl);
+  background:
+    radial-gradient(90% 72% at 50% 0%, color-mix(in srgb, var(--ux-accent) 22%, transparent), transparent 72%),
+    var(--ux-surface);
+  box-shadow: 0 28px 72px rgba(0, 0, 0, 0.52), inset 0 1px rgba(255, 255, 255, 0.07);
+  text-align: center;
+}
+
+.ux-subscription-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid var(--ux-line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ux-surface-2) 82%, transparent);
+  color: var(--ux-muted);
+  cursor: pointer;
+}
+
+.ux-subscription-art {
+  position: relative;
+  display: grid;
+  width: 70px;
+  height: 70px;
+  margin-bottom: 16px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--ux-accent-2) 35%, transparent);
+  border-radius: 24px;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--ux-accent-2) 28%, var(--ux-surface-2)), var(--ux-surface-2));
+  box-shadow: 0 14px 34px color-mix(in srgb, var(--ux-accent) 22%, transparent);
+  transform: rotate(-4deg);
+}
+
+.ux-subscription-art span { transform: rotate(4deg); }
+.ux-subscription-art > svg { position: absolute; top: -7px; right: -8px; color: var(--ux-warn); transform: rotate(10deg); }
+
+.ux-subscription-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 8px;
+  color: var(--ux-accent-2);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.ux-subscription-card h2 { font-size: clamp(22px, 6vw, 28px); letter-spacing: -0.7px; }
+.ux-subscription-card > p { max-width: 290px; margin-top: 9px; color: var(--ux-muted); font-size: 13px; line-height: 1.55; }
+
+.ux-subscription-benefits {
+  display: grid;
+  width: 100%;
+  gap: 7px;
+  margin: 18px 0;
+  padding: 12px 14px;
+  border: 1px solid var(--ux-line);
+  border-radius: var(--ux-r-md);
+  background: color-mix(in srgb, var(--ux-surface-2) 72%, transparent);
+  text-align: left;
+}
+
+.ux-subscription-benefits span { display: flex; align-items: center; gap: 8px; color: var(--ux-ink); font-size: 11.5px; font-weight: 700; }
+.ux-subscription-benefits svg { flex: 0 0 auto; color: var(--ux-ok); }
+
+.ux-subscription-primary,
+.ux-subscription-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 45px;
+  border-radius: var(--ux-r-md);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.ux-subscription-primary { border: 0; background: linear-gradient(180deg, var(--ux-accent-2), var(--ux-accent)); color: var(--ux-accent-ink); box-shadow: 0 10px 24px color-mix(in srgb, var(--ux-accent) 30%, transparent); }
+.ux-subscription-secondary { min-height: 37px; border: 0; background: transparent; color: var(--ux-muted); }
+.ux-subscription-card > small { color: var(--ux-muted); font-size: 9.5px; }
+
+.device-frame.tablet .ux-subscription-card { width: min(390px, 100%); padding-inline: 30px; }
+.design-elements-panel .ux-elements-subscription-preview { position: relative; min-height: 520px; overflow: hidden; border-radius: var(--ux-r-lg); background: var(--ux-bg); }
+.design-elements-panel .ux-elements-subscription-preview .ux-subscription-layer { position: absolute; }
+
 .ux-ghost-btn {
   display: inline-flex;
   align-items: center;
@@ -2767,6 +2881,189 @@
   gap: 12px;
   padding: 16px 14px 24px;
   overflow-y: auto;
+}
+
+.ux-avatar-btn {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  justify-self: end;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--ux-accent-2) 38%, var(--ux-line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ux-accent) 15%, var(--ux-surface-2));
+  color: var(--ux-accent-2);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.ux-avatar-btn:hover {
+  border-color: var(--ux-accent-2);
+}
+
+.ux-collections-body {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.ux-collection-placeholder {
+  display: grid;
+  justify-items: start;
+  align-content: start;
+  min-height: 190px;
+  padding: 18px;
+  border: 1px dashed var(--ux-line-2);
+  border-radius: var(--ux-r-lg);
+  background: color-mix(in srgb, var(--ux-surface) 88%, transparent);
+}
+
+.ux-collection-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  margin-bottom: 22px;
+  place-items: center;
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--ux-accent) 14%, var(--ux-surface-2));
+  color: var(--ux-accent-2);
+}
+
+.ux-collection-placeholder > strong {
+  font-size: 15px;
+}
+
+.ux-collection-placeholder > p {
+  max-width: 360px;
+  margin-top: 6px;
+  color: var(--ux-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.ux-collection-placeholder > small {
+  margin-top: auto;
+  padding-top: 22px;
+  color: var(--ux-muted);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ux-app-body {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.ux-account-card {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--ux-line);
+  border-radius: var(--ux-r-lg);
+  background: var(--ux-surface);
+}
+
+.ux-account-avatar {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ux-accent) 18%, var(--ux-surface-2));
+  color: var(--ux-accent-2);
+}
+
+.ux-account-card strong,
+.ux-account-card small {
+  display: block;
+}
+
+.ux-account-card strong {
+  font-size: 14.5px;
+}
+
+.ux-account-card small {
+  margin-top: 3px;
+  color: var(--ux-muted);
+  font-size: 11.5px;
+}
+
+.ux-app-nav-row {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 13px;
+  border: 1px solid var(--ux-line);
+  border-radius: var(--ux-r-md);
+  background: var(--ux-surface);
+  color: var(--ux-ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.ux-app-nav-row:hover {
+  border-color: var(--ux-line-2);
+}
+
+.ux-app-nav-row strong,
+.ux-app-nav-row small {
+  display: block;
+}
+
+.ux-app-nav-row strong {
+  font-size: 13.5px;
+}
+
+.ux-app-nav-row small {
+  margin-top: 2px;
+  color: var(--ux-muted);
+  font-size: 11.5px;
+}
+
+.ux-app-nav-row > svg {
+  color: var(--ux-muted);
+}
+
+.ux-app-footer {
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  margin-top: auto;
+  padding: 28px 0 6px;
+  color: var(--ux-muted);
+  text-align: center;
+}
+
+.ux-app-footer strong {
+  color: var(--ux-ink);
+  font-size: 12px;
+}
+
+.ux-app-footer small {
+  font-size: 10px;
+}
+
+.ux-elements-collection-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.ux-elements-app-footer {
+  margin-top: 12px;
+  padding-bottom: 0;
+}
+
+.device-frame.tablet .ux-collections-body {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .ux-setting-row {

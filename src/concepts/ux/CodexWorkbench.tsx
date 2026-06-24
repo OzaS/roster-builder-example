@@ -1,8 +1,8 @@
 import { Fragment, useCallback, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject } from "react";
-import { AlertTriangle, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, ClipboardList, Cog, Command, Copy, Database, Download, Ellipsis, FileInput, GripVertical, Hammer, Layers, LibraryBig, Maximize2, Minimize2, Minus, PanelsTopLeft, Plus, RotateCcw, Search, Share2, ShieldCheck, Sparkles, Split, Star, StickyNote, Wand2, X } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, ClipboardList, Cog, Command, Copy, Database, Download, Ellipsis, FileInput, GripVertical, Hammer, Heart, Layers, LibraryBig, Maximize2, Minimize2, Minus, PanelsTopLeft, Plus, RotateCcw, Search, Share2, ShieldCheck, Sparkles, Split, Star, StickyNote, UserRound, UsersRound, Wand2, X } from "lucide-react";
 import { mockCatalogues, mockDetachments } from "../../data/mockRoster";
 import type { ConceptProps } from "../shared";
-import { BackOrTitle, BudgetMeter, Chip, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph } from "./uxShared";
+import { BackOrTitle, BudgetMeter, Chip, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "./uxShared";
 
 /**
  * Codex Workbench — the single merged design.
@@ -18,10 +18,10 @@ export function CodexWorkbench(props: ConceptProps) {
   const screen = props.screen;
   const isUnitDetail = screen === "unit-detail";
   const isMainTab = props.workflowScreen
-    ? (["library", "source", "tools", "settings"] as const).some((tab) => tab === props.workflowScreen)
-    : screen === "library" || screen === "catalogue" || screen === "tools" || screen === "settings";
+    ? (["library", "subscription-main", "source", "tools", "collections"] as const).some((tab) => tab === props.workflowScreen)
+    : screen === "library" || screen === "catalogue" || screen === "tools" || screen === "collections";
   const showTabBar = usesTabNavigation && isMainTab;
-  const isWorkbenchScreen = screen !== "library" && screen !== "catalogue" && screen !== "tools" && screen !== "settings" && screen !== "system";
+  const isWorkbenchScreen = screen !== "library" && screen !== "catalogue" && screen !== "tools" && screen !== "collections" && screen !== "app" && screen !== "settings" && screen !== "system";
   const [activeLoadoutSlot, setActiveLoadoutSlot] = useState<{ groupId: string; slotId: string } | null>(null);
   const [forceCreationOpen, setForceCreationOpen] = useState(false);
   const [rosterSearchOpen, setRosterSearchOpen] = useState(false);
@@ -89,10 +89,14 @@ export function CodexWorkbench(props: ConceptProps) {
 
   if (screen === "library") {
     body = <Library props={props} />;
+  } else if (screen === "collections") {
+    body = <CollectionsLibrary props={props} />;
   } else if (screen === "catalogue") {
     body = <LookupScreen props={props} />;
   } else if (screen === "tools") {
     body = <ToolsScreen props={props} />;
+  } else if (screen === "app") {
+    body = <AppScreen props={props} />;
   } else if (screen === "settings") {
     body = <SettingsScreen props={props} />;
   } else if (screen === "system") {
@@ -137,6 +141,7 @@ export function CodexWorkbench(props: ConceptProps) {
   }
 
   const showCommandBar = navStyle === "top" && smart && isWorkbenchScreen && !isUnitDetail;
+  const subscriptionVariant = props.workflowScreen === "subscription-main" ? "main" : props.workflowScreen === "subscription-edition" ? "edition" : null;
 
   const handleShellPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
     const target = event.target as HTMLElement;
@@ -148,6 +153,7 @@ export function CodexWorkbench(props: ConceptProps) {
   return (
     <div className={`${shell} ${modifier}`.trim()} onPointerDown={handleShellPointerDown}>
       {body}
+      {subscriptionVariant ? <SubscriptionGate variant={subscriptionVariant} onClose={() => props.onNavigate(subscriptionVariant === "main" ? "library" : "overview")} /> : null}
       {focusPane ? <EdgeHandle edge="top" expanded={focusChromeVisible} onReveal={() => setFocusChromeVisible(true)} /> : null}
       {forceCreationOpen && props.forceCreationMode !== "inline" ? <ForceSelector props={props} onClose={() => setForceCreationOpen(false)} /> : null}
       {activeLoadoutSlot ? <LoadoutSelector props={props} target={activeLoadoutSlot} onClose={closeLoadoutSelector} /> : null}
@@ -905,9 +911,7 @@ function Library({ props }: { props: ConceptProps }) {
           <strong>Roster Builder</strong>
           <small>{props.roster.system}</small>
         </div>
-        <button type="button" className="ux-icon-btn" aria-label="Settings" onClick={() => props.onNavigate("settings")}>
-          <Cog size={18} />
-        </button>
+        <AppAvatarButton props={props} />
       </header>
       <div className="ux-wb-home-body">
         <div className="ux-cmd-hero">
@@ -1120,9 +1124,7 @@ function LookupScreen({ props }: { props: ConceptProps }) {
           <strong>Lookup</strong>
           <small>Sources, units & rules</small>
         </div>
-        <button type="button" className="ux-icon-btn" aria-label="Settings" onClick={() => props.onNavigate("settings")}>
-          <Cog size={18} />
-        </button>
+        <AppAvatarButton props={props} />
       </header>
       <div className="ux-wb-home-body">
         <div className={`ux-wb-search ${props.smartSearch ? "smart" : ""}`}>
@@ -1203,9 +1205,7 @@ function ToolsScreen({ props }: { props: ConceptProps }) {
           <strong>Tools</strong>
           <small>{props.roster.name}</small>
         </div>
-        <button type="button" className="ux-icon-btn" aria-label="Roster" onClick={() => props.onNavigate("overview")}>
-          <Layers size={18} />
-        </button>
+        <AppAvatarButton props={props} />
       </header>
       <div className="ux-wb-home-body">
         <div className="ux-tools-summary">
@@ -1241,6 +1241,86 @@ function ToolsScreen({ props }: { props: ConceptProps }) {
             </button>
           ))}
         </section>
+      </div>
+    </>
+  );
+}
+
+function AppAvatarButton({ props }: { props: ConceptProps }) {
+  return <button type="button" className="ux-avatar-btn" aria-label="App" onClick={() => props.onNavigate("app")}>AM</button>;
+}
+
+/** Collection space for reusable fan armies and roster building blocks. */
+function CollectionsLibrary({ props }: { props: ConceptProps }) {
+  return (
+    <>
+      <header className="ux-wb-top ux-wb-home-top">
+        <div className="ux-wb-title">
+          <strong>Library</strong>
+          <small>Your collection</small>
+        </div>
+        <AppAvatarButton props={props} />
+      </header>
+      <div className="ux-wb-home-body ux-collections-body">
+        <CollectionPlaceholder
+          icon={<UsersRound size={20} />}
+          title="Fan-built armies"
+          description="Armies built to represent your collection for downloaded game systems and catalogues will live here."
+        />
+        <CollectionPlaceholder
+          icon={<Heart size={20} />}
+          title="Favorites & reusable entries"
+          description="Save favorite units and force entries from your rosters to reuse them in future lists."
+        />
+      </div>
+    </>
+  );
+}
+
+function CollectionPlaceholder({ icon, title, description }: { icon: ReactNode; title: string; description: string }) {
+  return (
+    <section className="ux-collection-placeholder">
+      <span className="ux-collection-icon">{icon}</span>
+      <strong>{title}</strong>
+      <p>{description}</p>
+      <small>Nothing saved yet</small>
+    </section>
+  );
+}
+
+/** Account and application-level navigation. */
+function AppScreen({ props }: { props: ConceptProps }) {
+  return (
+    <>
+      <header className="ux-wb-top ux-wb-home-top reversed">
+        <button type="button" className="ux-icon-btn" aria-label="Back" onClick={props.onBack}>
+          <ArrowLeft size={18} />
+        </button>
+        <div className="ux-wb-title">
+          <strong>App</strong>
+          <small>Account & preferences</small>
+        </div>
+      </header>
+      <div className="ux-wb-home-body ux-app-body">
+        <section className="ux-account-card">
+          <span className="ux-account-avatar"><UserRound size={22} /></span>
+          <span>
+            <strong>Alex Morgan</strong>
+            <small>alex@example.com</small>
+          </span>
+        </section>
+        <button type="button" className="ux-app-nav-row" onClick={() => props.onNavigate("settings")}>
+          <span className="ux-setting-icon"><Cog size={17} /></span>
+          <span>
+            <strong>Settings</strong>
+            <small>Search, assistance, and sources</small>
+          </span>
+          <ChevronRight size={17} />
+        </button>
+        <footer className="ux-app-footer">
+          <strong>Roster Builder</strong>
+          <small>Version 1.0.0</small>
+        </footer>
       </div>
     </>
   );
@@ -1322,7 +1402,7 @@ function TabBar({ props, onNavigate }: { props: ConceptProps; onNavigate?: Conce
     { id: "library", label: "Lists", icon: LibraryBig },
     { id: "catalogue", label: "Lookup", icon: Search },
     { id: "tools", label: "Tools", icon: Hammer },
-    { id: "settings", label: "Settings", icon: Cog },
+    { id: "collections", label: "Library", icon: LibraryBig },
   ] as const;
 
   const isActive = (id: string) => {

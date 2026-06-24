@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { AlertTriangle, ArrowLeft, CheckCircle2, Info, ShieldAlert } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Check, CheckCircle2, Heart, Info, LockKeyhole, ShieldAlert, Sparkles, X } from "lucide-react";
 import type { ColorScheme, PrototypeScreen, Roster, RosterUnit, ThemeMode } from "../../types";
 import type { ConceptProps } from "../shared";
 
@@ -61,6 +61,35 @@ export function BudgetMeter({ roster, label }: { roster: Roster; label?: string 
 
 export function Chip({ children, tone }: { children: ReactNode; tone?: "valid" | "warning" | "error" | "cool" | "neutral" }) {
   return <span className={`ux-chip ${tone ?? "neutral"}`}>{children}</span>;
+}
+
+export function SubscriptionGate({ variant = "edition", onClose }: { variant?: "main" | "edition"; onClose?: () => void }) {
+  const isMain = variant === "main";
+  return (
+    <div className="ux-subscription-layer">
+      <section className="ux-subscription-card" role="dialog" aria-modal="true" aria-labelledby={`subscription-title-${variant}`}>
+        {onClose ? <button type="button" className="ux-subscription-close" aria-label="Close" onClick={onClose}><X size={17} /></button> : null}
+        <div className="ux-subscription-art" aria-hidden>
+          <span><LockKeyhole size={24} /></span>
+          <Sparkles size={17} />
+        </div>
+        <div className="ux-subscription-kicker"><Heart size={12} /> Supporter feature</div>
+        <h2 id={`subscription-title-${variant}`}>{isMain ? "Keep your rosters close" : "Build smarter, faster"}</h2>
+        <p>
+          {isMain
+            ? "Cloud sync and cross-device access are included with a supporter subscription."
+            : "Smart roster suggestions and advanced building tools are included with a supporter subscription."}
+        </p>
+        <div className="ux-subscription-benefits">
+          <span><Check size={13} />{isMain ? "Sync every list" : "Context-aware suggestions"}</span>
+          <span><Check size={13} />Help fund ongoing development</span>
+        </div>
+        <button type="button" className="ux-subscription-primary"><Heart size={16} />Support development</button>
+        <button type="button" className="ux-subscription-secondary" onClick={onClose}>Maybe later</button>
+        <small>Cancel anytime. The core roster builder stays free.</small>
+      </section>
+    </div>
+  );
 }
 
 export function BackOrTitle({ props, fallback }: { props: ConceptProps; fallback: ReactNode }) {
