@@ -1,5 +1,6 @@
 import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, Cog, Command, Copy, Database, Download, Ellipsis, FileInput, GripVertical, Hammer, Heart, Layers, LibraryBig, Maximize2, MessageCircle, Minus, MoveRight, PanelsTopLeft, Pencil, Plus, RotateCcw, Rows3, Search, Smartphone, Sparkles, Split, Trash2, UserRound, X } from "lucide-react";
 import { PhoneStatusBar } from "../components/DeviceFrame";
+import { mockRosterReferences, referenceById } from "../data/mockRosterReferences";
 import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode } from "../types";
 import { BudgetMeter, Chip, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
@@ -266,6 +267,8 @@ function WorkbenchElements({
 
       <UnitProfilesElement unit={profileUnit} />
 
+      <ReferenceGlancesElement unit={profileUnit} />
+
       <ElementSection title="Unit Detail Toggle">
         <div className="ux-detail-mode-layer ux-elements-static">
           <div className="ux-detail-action-menu ux-elements-static" role="menu" aria-label="Unit actions">
@@ -288,7 +291,7 @@ function WorkbenchElements({
       <ElementSection title="Swipe Unit Actions">
         <div className="ux-swipe-unit open" style={{ maxWidth: 360 }}>
           <div className="ux-swipe-actions"><button type="button" className="delete"><Trash2 size={14} /><span>Delete</span></button><button type="button"><Pencil size={14} /><span>Rename</span></button><button type="button"><Copy size={14} /><span>Duplicate</span></button></div>
-          <button type="button" className="ux-tree-unit ux-swipe-unit-content active" style={{ transform: "translateX(-174px)" }}><span className="ux-tree-rail" /><span className="ux-tree-unit-main"><span>{selectedUnit.customName ?? selectedUnit.name}</span><small>×{selectedUnit.count}</small></span><b>{selectedUnit.points}</b></button>
+          <button type="button" className="ux-tree-unit ux-swipe-unit-content active" style={{ transform: "translateX(-200px)" }}><span className="ux-tree-rail" /><span className="ux-tree-unit-main"><span>{selectedUnit.customName ?? selectedUnit.name}</span><small>×{selectedUnit.count}</small></span><b>{selectedUnit.points}</b></button>
         </div>
       </ElementSection>
 
@@ -725,6 +728,30 @@ function UnitProfilesElement({ unit }: { unit: RosterUnit }) {
             </tr>
           </tbody>
         </table>
+      </div>
+    </ElementSection>
+  );
+}
+
+function ReferenceGlancesElement({ unit }: { unit: RosterUnit }) {
+  const reference = mockRosterReferences.find((item) => item.id === "pistol") ?? mockRosterReferences[0];
+  const related = (reference.relatedIds ?? []).map(referenceById).filter(Boolean);
+  return (
+    <ElementSection title="Reference Glances">
+      <div className="ux-reference-glance-stack ux-elements-static has-second">
+        <section className="ux-reference-glance-card unit under" aria-hidden="true">
+          <header><span><small>Unit profile</small><strong>{unit.customName ?? unit.name}</strong></span><button type="button" aria-label="Close unit glance"><X size={18} /></button></header>
+          <div className="ux-reference-glance-body">
+            <div className="ux-unit-profile in-glance">
+              <details className="ux-profile-section" open><summary><strong>Traits</strong><ChevronDown size={15} /></summary><div className="ux-profile-section-body"><div className="ux-profile-tag-list">{unit.detail?.traits.slice(0, 3).map((trait) => <button type="button" className="ux-reference-tag" key={trait}>{trait}</button>)}</div></div></details>
+              <details className="ux-profile-section" open><summary><strong>Rules</strong><ChevronDown size={15} /></summary><div className="ux-profile-section-body"><div className="ux-profile-tag-list">{unit.detail?.rules.slice(0, 5).map((rule) => <button type="button" className="ux-reference-tag" key={rule}>{rule}</button>)}</div></div></details>
+            </div>
+          </div>
+        </section>
+        <section className="ux-reference-glance-card reference active" role="dialog" aria-label={`${reference.label} reference glance`}>
+          <header><span><small>{reference.kind}</small><strong>{reference.label}</strong></span><button type="button" aria-label="Close reference glance"><X size={18} /></button></header>
+          <div className="ux-reference-glance-body"><article className="ux-reference-definition"><section><strong>Description</strong><p>{reference.description}</p></section><section><strong>Related</strong><div className="ux-profile-tag-list">{related.map((item) => item ? <button type="button" className="ux-reference-tag" key={item.id}>{item.label}</button> : null)}</div></section></article></div>
+        </section>
       </div>
     </ElementSection>
   );
