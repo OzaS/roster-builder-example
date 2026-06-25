@@ -2115,14 +2115,30 @@
   background: var(--ux-surface);
   will-change: transform;
 }
+.ux-swipe-unit.dragging .ux-swipe-unit-content {
+  transition: none;
+}
 .ux-swipe-unit:not(.open) .ux-swipe-unit-content:not(.active) { background: var(--ux-surface); }
 .ux-swipe-actions {
   position: absolute;
   inset: 0 0 0 auto;
   display: grid;
   grid-template-columns: repeat(3, 58px);
-  width: 174px;
-  background: var(--ux-surface-3);
+  gap: 8px;
+  width: 190px;
+  padding: 0;
+  background: transparent;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.12s ease, visibility 0s linear 0.12s;
+}
+.ux-swipe-unit.open .ux-swipe-actions,
+.ux-swipe-unit.dragging .ux-swipe-actions {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+  transition-delay: 0s;
 }
 .ux-swipe-actions button {
   display: grid;
@@ -2131,14 +2147,15 @@
   gap: 3px;
   padding: 0;
   border: 0;
-  border-left: 1px solid var(--ux-line);
-  background: color-mix(in srgb, var(--ux-accent) 10%, var(--ux-surface-2));
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--ux-accent) 72%, var(--ux-surface-2));
   color: var(--ux-ink);
   font-size: 8.5px;
   font-weight: 750;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.12);
   cursor: pointer;
 }
-.ux-swipe-actions button.delete { background: color-mix(in srgb, var(--ux-err) 78%, var(--ux-surface)); color: white; }
+.ux-swipe-actions button.delete { background: color-mix(in srgb, var(--ux-err) 82%, var(--ux-surface)); color: white; }
 .device-frame.tablet .ux-swipe-actions { display: none; }
 .device-frame.tablet .ux-swipe-unit-content { transform: none !important; }
 .ux-tree-unit {
@@ -2807,6 +2824,12 @@
   color: var(--ux-cool);
   font-size: 9px;
 }
+.ux-profile-row-tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  vertical-align: middle;
+}
 .ux-profile-row-stats td {
   background: color-mix(in srgb, var(--ux-surface-2) 72%, transparent);
 }
@@ -2815,14 +2838,53 @@
   flex-wrap: wrap;
   gap: 5px;
 }
-.ux-profile-tag-list span {
+.ux-reference-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 25px;
   padding: 4px 7px;
   border: 1px solid color-mix(in srgb, var(--ux-cool) 34%, transparent);
   border-radius: 6px;
   color: var(--ux-cool);
   background: color-mix(in srgb, var(--ux-cool) 9%, transparent);
+  font-family: inherit;
   font-size: 10px;
   font-weight: 700;
+  line-height: 1.1;
+  text-align: left;
+}
+button.ux-reference-tag {
+  cursor: pointer;
+}
+button.ux-reference-tag:hover,
+button.ux-reference-tag:focus-visible {
+  border-color: var(--ux-cool);
+  background: color-mix(in srgb, var(--ux-cool) 18%, transparent);
+  outline: none;
+}
+.ux-reference-tag.inert {
+  opacity: 0.72;
+}
+.ux-reference-tag.compact {
+  min-height: 18px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 8px;
+  white-space: nowrap;
+}
+.ux-profile-table-tags {
+  display: flex;
+  justify-content: center;
+  gap: 3px;
+}
+.ux-fit-table {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+.ux-fit-table-inner {
+  width: max-content;
+  transform-origin: top left;
 }
 .ux-profile-copy-list article {
   padding: 8px;
@@ -4657,6 +4719,186 @@
 .ux-destination-list small { margin-top: 3px; color: var(--ux-muted); font-size: 10px; }
 .device-frame.tablet .ux-entry-dialog-layer { align-items: center; justify-content: center; padding: 24px; }
 .device-frame.tablet .ux-entry-dialog { max-width: 480px; border-radius: 12px; }
+
+/* In-app unit and rules reference glances */
+.ux-reference-glance-layer {
+  position: absolute;
+  z-index: 90;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 14px;
+}
+.ux-reference-glance-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: rgba(2, 6, 10, 0.72);
+  backdrop-filter: blur(3px);
+  cursor: default;
+}
+.ux-reference-glance-stack {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: min(100%, 560px);
+  height: min(88%, 720px);
+  place-items: center;
+}
+.ux-reference-glance-card {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  border: 1px solid var(--ux-line-2);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--ux-surface) 97%, black);
+  color: var(--ux-ink);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.54);
+  transition: transform 160ms ease, opacity 160ms ease;
+}
+.ux-reference-glance-card.unit {
+  height: 100%;
+}
+.ux-reference-glance-card.reference {
+  align-self: center;
+}
+.ux-reference-glance-card.under {
+  pointer-events: none;
+  opacity: 0.48;
+  transform: translate(-7px, -9px) scale(0.985);
+}
+.ux-reference-glance-card.active {
+  transform: translate(7px, 9px);
+}
+.ux-reference-glance-layer:not(.has-second) .ux-reference-glance-card.active {
+  transform: none;
+}
+.ux-reference-glance-card > header {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
+  padding: 9px 11px;
+  border-bottom: 1px solid var(--ux-line);
+  background: var(--ux-surface-2);
+}
+.ux-reference-glance-card > header span,
+.ux-reference-glance-card > header strong,
+.ux-reference-glance-card > header small {
+  display: block;
+  min-width: 0;
+}
+.ux-reference-glance-card > header small {
+  margin-bottom: 2px;
+  color: var(--ux-cool);
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: 0.55px;
+  text-transform: uppercase;
+}
+.ux-reference-glance-card > header strong {
+  overflow: hidden;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ux-reference-glance-card > header button {
+  display: grid;
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid var(--ux-line);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--ux-muted);
+  cursor: pointer;
+}
+.ux-reference-glance-card > header button:focus-visible {
+  border-color: var(--ux-accent);
+  outline: 2px solid color-mix(in srgb, var(--ux-accent) 38%, transparent);
+}
+.ux-reference-glance-body {
+  min-height: 0;
+  padding: 9px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.ux-unit-profile.in-glance {
+  gap: 6px;
+}
+.ux-unit-profile.in-glance .ux-profile-section {
+  border-radius: 7px;
+}
+.ux-unit-profile.in-glance .ux-profile-section > summary {
+  min-height: 32px;
+  padding: 6px 8px;
+}
+.ux-unit-profile.in-glance .ux-profile-section-body {
+  padding: 6px;
+}
+.ux-reference-definition {
+  display: grid;
+  gap: 9px;
+}
+.ux-reference-definition > section {
+  padding: 10px;
+  border: 1px solid var(--ux-line);
+  border-radius: 8px;
+  background: var(--ux-surface-2);
+}
+.ux-reference-definition > section > strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--ux-cool);
+  font-size: 10px;
+  letter-spacing: 0.35px;
+  text-transform: uppercase;
+}
+.ux-reference-definition p {
+  color: var(--ux-ink);
+  font-size: 11.5px;
+  line-height: 1.55;
+}
+.ux-reference-empty {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  padding: 28px 16px;
+  color: var(--ux-muted);
+  text-align: center;
+}
+.ux-reference-empty strong {
+  color: var(--ux-ink);
+  font-size: 13px;
+}
+.ux-reference-empty small {
+  font-size: 10px;
+}
+.device-frame.phone .ux-reference-glance-stack {
+  width: 100%;
+  height: calc(100% - 10px);
+}
+.device-frame.phone .ux-reference-glance-card {
+  border-radius: 10px;
+}
+.device-frame.tablet .ux-reference-glance-layer {
+  padding: 24px;
+}
+
+.design-elements-panel .ux-reference-glance-stack.ux-elements-static {
+  height: 460px;
+  margin: 0 auto;
+}
 
 .ux-favorite-library-section { display: grid; gap: 10px; padding: 14px; border: 1px solid var(--ux-line); border-radius: var(--ux-r-lg); background: var(--ux-surface); }
 .ux-favorite-library-section > header { display: flex; align-items: center; gap: 9px; }

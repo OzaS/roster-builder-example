@@ -92,6 +92,17 @@ export type RosterProfileTable = {
   rows: RosterProfileRow[];
 };
 
+export type RosterReferenceKind = "trait" | "rule" | "category";
+
+export type RosterReferenceDefinition = {
+  id: string;
+  label: string;
+  kind: RosterReferenceKind;
+  description: string;
+  aliases?: string[];
+  relatedIds?: string[];
+};
+
 export type RosterUnitDetail = {
   loadoutGroups: RosterLoadoutGroup[];
   choiceGroups: Array<{

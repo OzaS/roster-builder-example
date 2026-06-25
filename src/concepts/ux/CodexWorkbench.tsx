@@ -1,8 +1,14 @@
-import { Fragment, useCallback, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject } from "react";
+import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject } from "react";
 import { AlertTriangle, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, ClipboardList, Cog, Command, Copy, Database, Download, Ellipsis, FileInput, GripVertical, Hammer, Heart, Layers, LibraryBig, Maximize2, Minimize2, Minus, MoveRight, PanelsTopLeft, Pencil, Plus, RotateCcw, Search, Share2, ShieldCheck, Sparkles, Split, Star, StickyNote, Trash2, UserRound, UsersRound, Wand2, X } from "lucide-react";
 import { mockCatalogues, mockDetachments } from "../../data/mockRoster";
+import { referenceById, resolveRosterReference } from "../../data/mockRosterReferences";
+import type { RosterReferenceDefinition, RosterUnit } from "../../types";
 import type { ConceptProps } from "../shared";
 import { BackOrTitle, BudgetMeter, Chip, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "./uxShared";
+
+type ReferenceGlance =
+  | { type: "unit"; unit: RosterUnit }
+  | { type: "reference"; reference: RosterReferenceDefinition };
 
 /**
  * Codex Workbench — the single merged design.
@@ -30,6 +36,8 @@ export function CodexWorkbench(props: ConceptProps) {
   const [focusPane, setFocusPane] = useState<"tree" | "detail" | "rail" | null>(null);
   const [focusChromeVisible, setFocusChromeVisible] = useState(false);
   const [dockOpen, setDockOpen] = useState(false);
+  const [referenceGlances, setReferenceGlances] = useState<ReferenceGlance[]>([]);
+  const glanceTriggerRef = useRef<HTMLElement | null>(null);
   const detailScrollRef = useRef<HTMLElement>(null);
   const loadoutScrollTopRef = useRef(0);
   const layoutRef = useRef<HTMLDivElement>(null);
@@ -55,6 +63,29 @@ export function CodexWorkbench(props: ConceptProps) {
     setActiveLoadoutSlot(null);
     restoreDetailScroll();
   }, [restoreDetailScroll]);
+
+  const rememberGlanceTrigger = useCallback(() => {
+    if (!referenceGlances.length) glanceTriggerRef.current = document.activeElement as HTMLElement | null;
+  }, [referenceGlances.length]);
+
+  const openReferenceGlance = useCallback((reference: RosterReferenceDefinition) => {
+    rememberGlanceTrigger();
+    setReferenceGlances([{ type: "reference", reference }]);
+  }, [rememberGlanceTrigger]);
+
+  const openUnitGlance = useCallback((unit: RosterUnit) => {
+    rememberGlanceTrigger();
+    setReferenceGlances([{ type: "unit", unit }]);
+  }, [rememberGlanceTrigger]);
+
+  const openNestedReferenceGlance = useCallback((reference: RosterReferenceDefinition) => {
+    setReferenceGlances((current) => current.length ? [current[0], { type: "reference", reference }] : [{ type: "reference", reference }]);
+  }, []);
+
+  const closeAllReferenceGlances = useCallback(() => {
+    setReferenceGlances([]);
+    window.requestAnimationFrame(() => glanceTriggerRef.current?.focus());
+  }, []);
 
   useEffect(() => {
     setActiveLoadoutSlot(null);
@@ -130,9 +161,9 @@ export function CodexWorkbench(props: ConceptProps) {
           </div>
         ) : null}
         <div className="ux-wb-layout" ref={layoutRef} style={panelStyle}>
-          <Tree props={props} query={rosterSearchQuery} onQueryChange={setRosterSearchQuery} creationOpen={forceCreationOpen} onCreationOpenChange={setForceCreationOpen} />
+          <Tree props={props} query={rosterSearchQuery} onQueryChange={setRosterSearchQuery} creationOpen={forceCreationOpen} onCreationOpenChange={setForceCreationOpen} onOpenUnitGlance={openUnitGlance} />
           <PaneDivider side="tree" props={props} layoutRef={layoutRef} />
-          <Detail props={props} scrollRef={detailScrollRef} onOpenLoadoutSlot={openLoadoutSelector} />
+          <Detail props={props} scrollRef={detailScrollRef} onOpenLoadoutSlot={openLoadoutSelector} onOpenReference={openReferenceGlance} />
           <PaneDivider side="rail" props={props} layoutRef={layoutRef} />
           <Rail props={props} />
         </div>
@@ -157,6 +188,7 @@ export function CodexWorkbench(props: ConceptProps) {
       {focusPane ? <EdgeHandle edge="top" expanded={focusChromeVisible} onReveal={() => setFocusChromeVisible(true)} /> : null}
       {forceCreationOpen && props.forceCreationMode !== "inline" ? <ForceSelector props={props} onClose={() => setForceCreationOpen(false)} /> : null}
       {activeLoadoutSlot ? <LoadoutSelector props={props} target={activeLoadoutSlot} onClose={closeLoadoutSelector} /> : null}
+      {referenceGlances.length ? <ReferenceGlanceStack glances={referenceGlances} onOpenReference={openNestedReferenceGlance} onCloseTop={() => referenceGlances.length === 1 ? closeAllReferenceGlances() : setReferenceGlances((current) => current.slice(0, -1))} onCloseAll={closeAllReferenceGlances} /> : null}
       {showTabBar ? <><EdgeHandle edge="bottom" expanded={dockOpen} onReveal={() => setDockOpen(true)} /><TabBar props={props} onNavigate={(next) => { setDockOpen(false); props.onNavigate(next); }} /></> : isUnitDetail ? <DetailModeBar props={props} /> : showCommandBar ? <CommandBar props={props} /> : null}
     </div>
   );
@@ -332,7 +364,7 @@ function WorkbenchHeader({
   );
 }
 
-function Tree({ props, query, onQueryChange, creationOpen, onCreationOpenChange }: { props: ConceptProps; query: string; onQueryChange: (query: string) => void; creationOpen: boolean; onCreationOpenChange: (open: boolean) => void }) {
+function Tree({ props, query, onQueryChange, creationOpen, onCreationOpenChange, onOpenUnitGlance }: { props: ConceptProps; query: string; onQueryChange: (query: string) => void; creationOpen: boolean; onCreationOpenChange: (open: boolean) => void; onOpenUnitGlance: (unit: RosterUnit) => void }) {
   const [renamingUnitId, setRenamingUnitId] = useState<string | null>(null);
   const renamingUnit = flattenUnits(props.roster).find((unit) => unit.id === renamingUnitId);
   const normalizedQuery = query.trim().toLowerCase();
@@ -382,7 +414,7 @@ function Tree({ props, query, onQueryChange, creationOpen, onCreationOpenChange 
                         </button>
                         {open ? (
                           <div className="ux-tree-units">
-                            {units.map((unit) => <SwipeableUnitRow key={unit.id} unit={unit} active={props.selectedUnit.id === unit.id} onSelect={() => props.onSelectUnit(unit.id)} onDelete={() => props.onDeleteUnit(unit.id)} onRename={() => setRenamingUnitId(unit.id)} onDuplicate={() => props.onDuplicateUnit(unit.id)} />)}
+                            {units.map((unit) => <SwipeableUnitRow key={unit.id} unit={unit} active={props.selectedUnit.id === unit.id} onSelect={() => props.onSelectUnit(unit.id)} onOpenGlance={() => onOpenUnitGlance(unit)} onDelete={() => props.onDeleteUnit(unit.id)} onRename={() => setRenamingUnitId(unit.id)} onDuplicate={() => props.onDuplicateUnit(unit.id)} />)}
                             {!normalizedQuery ? <button
                               type="button"
                               className="ux-tree-add"
@@ -418,14 +450,36 @@ function Tree({ props, query, onQueryChange, creationOpen, onCreationOpenChange 
   );
 }
 
-function SwipeableUnitRow({ unit, active, onSelect, onDelete, onRename, onDuplicate }: { unit: ConceptProps["selectedUnit"]; active: boolean; onSelect: () => void; onDelete: () => void; onRename: () => void; onDuplicate: () => void }) {
+const UNIT_SWIPE_ACTION_WIDTH = 58;
+const UNIT_SWIPE_ACTION_GAP = 8;
+const UNIT_SWIPE_ACTIONS_WIDTH = (UNIT_SWIPE_ACTION_WIDTH * 3) + (UNIT_SWIPE_ACTION_GAP * 2);
+const UNIT_SWIPE_CONTENT_GAP = 10;
+const UNIT_SWIPE_REVEAL = UNIT_SWIPE_ACTIONS_WIDTH + UNIT_SWIPE_CONTENT_GAP;
+
+function SwipeableUnitRow({ unit, active, onSelect, onOpenGlance, onDelete, onRename, onDuplicate }: { unit: ConceptProps["selectedUnit"]; active: boolean; onSelect: () => void; onOpenGlance: () => void; onDelete: () => void; onRename: () => void; onDuplicate: () => void }) {
   const [offset, setOffset] = useState(0);
+  const [dragging, setDragging] = useState(false);
   const startX = useRef<number | null>(null);
+  const startY = useRef<number | null>(null);
   const startOffset = useRef(0);
   const dragged = useRef(false);
+  const longPressed = useRef(false);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clearLongPress = () => {
+    if (longPressTimer.current) window.clearTimeout(longPressTimer.current);
+    longPressTimer.current = null;
+  };
   const close = () => setOffset(0);
+  useEffect(() => clearLongPress, []);
+  const settle = () => {
+    setDragging(false);
+    clearLongPress();
+    startX.current = null;
+    startY.current = null;
+    if (dragged.current) setOffset((current) => current < -(UNIT_SWIPE_REVEAL * 0.28) ? -UNIT_SWIPE_REVEAL : 0);
+  };
   return (
-    <div className={`ux-swipe-unit ${offset < 0 ? "open" : ""}`}>
+    <div className={`ux-swipe-unit ${offset < 0 ? "open" : ""} ${dragging ? "dragging" : ""}`}>
       <div className="ux-swipe-actions" aria-label={`Actions for ${unitDisplayName(unit)}`} aria-hidden={offset === 0}>
         <button type="button" tabIndex={offset < 0 ? 0 : -1} className="delete" onClick={() => { close(); onDelete(); }}><Trash2 size={14} /><span>Delete</span></button>
         <button type="button" tabIndex={offset < 0 ? 0 : -1} onClick={() => { close(); onRename(); }}><Pencil size={14} /><span>Rename</span></button>
@@ -434,17 +488,46 @@ function SwipeableUnitRow({ unit, active, onSelect, onDelete, onRename, onDuplic
       <button
         type="button"
         className={`ux-tree-unit ux-swipe-unit-content ${unit.status ?? "valid"} ${active ? "active" : ""}`}
+        aria-haspopup="dialog"
+        title="Long press for unit glance"
         style={{ transform: `translateX(${offset}px)` }}
-        onPointerDown={(event) => { startX.current = event.clientX; startOffset.current = offset; dragged.current = false; event.currentTarget.setPointerCapture(event.pointerId); }}
+        onPointerDown={(event) => {
+          startX.current = event.clientX;
+          startY.current = event.clientY;
+          startOffset.current = offset;
+          setDragging(false);
+          dragged.current = false;
+          longPressed.current = false;
+          clearLongPress();
+          if (offset === 0) longPressTimer.current = window.setTimeout(() => {
+            longPressed.current = true;
+            onOpenGlance();
+          }, 500);
+          event.currentTarget.setPointerCapture(event.pointerId);
+        }}
         onPointerMove={(event) => {
           if (startX.current === null) return;
           const delta = event.clientX - startX.current;
-          if (Math.abs(delta) > 6) dragged.current = true;
-          setOffset(Math.max(-174, Math.min(0, startOffset.current + delta)));
+          const deltaY = event.clientY - (startY.current ?? event.clientY);
+          const horizontal = Math.abs(delta);
+          const vertical = Math.abs(deltaY);
+          if (!dragged.current && horizontal > 8 && horizontal > vertical) {
+            clearLongPress();
+            dragged.current = true;
+            setDragging(true);
+          }
+          if (!dragged.current) {
+            if (vertical > 8) clearLongPress();
+            return;
+          }
+          event.preventDefault();
+          setOffset(Math.max(-UNIT_SWIPE_REVEAL, Math.min(0, startOffset.current + delta)));
         }}
-        onPointerUp={() => { startX.current = null; setOffset((current) => current < -42 ? -174 : 0); }}
-        onPointerCancel={() => { startX.current = null; setOffset((current) => current < -42 ? -174 : 0); }}
-        onClick={(event) => { if (dragged.current) { event.preventDefault(); dragged.current = false; return; } if (offset < 0) close(); else onSelect(); }}
+        onPointerUp={settle}
+        onPointerCancel={settle}
+        onContextMenu={(event) => { event.preventDefault(); clearLongPress(); longPressed.current = true; onOpenGlance(); }}
+        onKeyDown={(event) => { if (event.key === "Enter" && event.shiftKey) { event.preventDefault(); onOpenGlance(); } }}
+        onClick={(event) => { if (longPressed.current || dragged.current) { event.preventDefault(); longPressed.current = false; dragged.current = false; return; } if (offset < 0) close(); else onSelect(); }}
       >
         <span className="ux-tree-rail" aria-hidden />
         <span className="ux-tree-unit-main"><span>{unitDisplayName(unit)}</span><small>×{unit.count}</small></span>
@@ -580,7 +663,7 @@ function ForceSelector({ props, onClose }: { props: ConceptProps; onClose: () =>
   );
 }
 
-function Detail({ props, scrollRef, onOpenLoadoutSlot }: { props: ConceptProps; scrollRef: RefObject<HTMLElement | null>; onOpenLoadoutSlot: (groupId: string, slotId: string) => void }) {
+function Detail({ props, scrollRef, onOpenLoadoutSlot, onOpenReference }: { props: ConceptProps; scrollRef: RefObject<HTMLElement | null>; onOpenLoadoutSlot: (groupId: string, slotId: string) => void; onOpenReference: (reference: RosterReferenceDefinition) => void }) {
   if (props.screen === "add-unit") return <AddPane props={props} />;
   const unit = props.selectedUnit;
   return (
@@ -593,7 +676,7 @@ function Detail({ props, scrollRef, onOpenLoadoutSlot }: { props: ConceptProps; 
         ))}
       </div>
       {unit.note ? <p className="ux-config-note">{unit.note}</p> : null}
-      {props.unitDetailView === "profile" ? <UnitProfile props={props} /> : unit.detail ? <StructuredOptions props={props} onOpenLoadoutSlot={onOpenLoadoutSlot} /> : <FlatOptions props={props} />}
+      {props.unitDetailView === "profile" ? <UnitProfile unit={unit} onOpenReference={onOpenReference} /> : unit.detail ? <StructuredOptions props={props} onOpenLoadoutSlot={onOpenLoadoutSlot} /> : <FlatOptions props={props} />}
     </section>
   );
 }
@@ -773,8 +856,7 @@ function OptionButton({ option, onToggle }: { option: ConceptProps["selectedUnit
   );
 }
 
-function UnitProfile({ props }: { props: ConceptProps }) {
-  const unit = props.selectedUnit;
+function UnitProfile({ unit, onOpenReference, glance = false }: { unit: RosterUnit; onOpenReference: (reference: RosterReferenceDefinition) => void; glance?: boolean }) {
   const detail = unit.detail;
   if (!detail) {
     return (
@@ -803,7 +885,7 @@ function UnitProfile({ props }: { props: ConceptProps }) {
     };
   });
   return (
-    <div className="ux-unit-profile">
+    <div className={`ux-unit-profile ${glance ? "in-glance" : ""}`}>
       <ProfileSection title="Models" open>
         <div className="ux-profile-models">
           {detail.loadoutGroups.map((group) => {
@@ -824,21 +906,21 @@ function UnitProfile({ props }: { props: ConceptProps }) {
 
       {modelTable ? (
         <ProfileSection title="Profile" open>
-          <ProfileTable table={modelTable} unitCount={unit.count} />
+          <ProfileTable table={modelTable} unitCount={unit.count} onOpenReference={onOpenReference} fitToWidth={glance} />
         </ProfileSection>
       ) : null}
 
-      <ProfileSection title="Traits">
-        <div className="ux-profile-tag-list">{detail.traits.map((trait) => <span key={trait}>{trait}</span>)}</div>
+      <ProfileSection title="Traits" open={glance}>
+        <div className="ux-profile-tag-list">{detail.traits.map((trait) => <ReferenceTag key={trait} label={trait} onOpen={onOpenReference} />)}</div>
       </ProfileSection>
 
       {weaponTables.map((table) => (
-        <ProfileSection title={table.title} key={table.id}>
-          <ProfileTable table={table} unitCount={unit.count} />
+        <ProfileSection title={table.title} key={table.id} open={glance}>
+          <ProfileTable table={table} unitCount={unit.count} onOpenReference={onOpenReference} fitToWidth={glance} />
         </ProfileSection>
       ))}
 
-      <ProfileSection title="Wargear">
+      <ProfileSection title="Wargear" open={glance}>
         <div className="ux-profile-copy-list">
           {detail.wargear.map((item) => (
             <article key={item.id}>
@@ -849,12 +931,12 @@ function UnitProfile({ props }: { props: ConceptProps }) {
         </div>
       </ProfileSection>
 
-      <ProfileSection title="Rules">
-        <div className="ux-profile-tag-list">{detail.rules.map((rule) => <span key={rule}>{rule}</span>)}</div>
+      <ProfileSection title="Rules" open={glance}>
+        <div className="ux-profile-tag-list">{detail.rules.map((rule) => <ReferenceTag key={rule} label={rule} onOpen={onOpenReference} />)}</div>
       </ProfileSection>
 
-      <ProfileSection title="Categories">
-        <div className="ux-profile-tag-list">{detail.categories.map((category) => <span key={category}>{category}</span>)}</div>
+      <ProfileSection title="Categories" open={glance}>
+        <div className="ux-profile-tag-list">{detail.categories.map((category) => <ReferenceTag key={category} label={category} onOpen={onOpenReference} />)}</div>
       </ProfileSection>
     </div>
   );
@@ -872,11 +954,10 @@ function ProfileSection({ title, open = false, children }: { title: string; open
   );
 }
 
-function ProfileTable({ table, unitCount }: { table: NonNullable<ConceptProps["selectedUnit"]["detail"]>["profileTables"][number]; unitCount: number }) {
+function ProfileTable({ table, unitCount, onOpenReference, fitToWidth = false }: { table: NonNullable<ConceptProps["selectedUnit"]["detail"]>["profileTables"][number]; unitCount: number; onOpenReference: (reference: RosterReferenceDefinition) => void; fitToWidth?: boolean }) {
   const rowName = (row: typeof table.rows[number]) => row.id === "assault-legionary" ? `Assault Legionary (x${unitCount - 1})` : row.name.replace("(x10)", `(x${unitCount})`);
-  return (
-    <div className="ux-profile-table-scroll">
-      <table className="ux-profile-table">
+  const tableElement = (
+    <table className="ux-profile-table">
         <thead>
           <tr>
             {table.columns.map((column) => <th scope="col" key={column}>{column}</th>)}
@@ -887,16 +968,105 @@ function ProfileTable({ table, unitCount }: { table: NonNullable<ConceptProps["s
             <tr className="ux-profile-row-name">
               <th scope="rowgroup" colSpan={table.columns.length}>
                 <strong>{rowName(row)}</strong>
-                {row.tags ? <small>{row.tags.join(" · ")}</small> : null}
+                {row.tags ? <small className="ux-profile-row-tags">{row.tags.map((tag) => <ReferenceTag key={tag} label={tag} onOpen={onOpenReference} compact />)}</small> : null}
               </th>
             </tr>
             <tr className="ux-profile-row-stats">
-              {row.values.map((value, index) => <td key={`${row.id}-${table.columns[index]}`}>{value}</td>)}
+              {row.values.map((value, index) => <td key={`${row.id}-${table.columns[index]}`}><ProfileTableValue value={value} column={table.columns[index]} onOpenReference={onOpenReference} /></td>)}
             </tr>
           </tbody>
         ))}
-      </table>
+    </table>
+  );
+  return fitToWidth ? <FitWidthTable>{tableElement}</FitWidthTable> : <div className="ux-profile-table-scroll">{tableElement}</div>;
+}
+
+function ReferenceTag({ label, onOpen, compact = false }: { label: string; onOpen: (reference: RosterReferenceDefinition) => void; compact?: boolean }) {
+  const reference = resolveRosterReference(label);
+  if (!reference) return <span className={compact ? "ux-reference-tag compact inert" : "ux-reference-tag inert"}>{label}</span>;
+  return <button type="button" className={compact ? "ux-reference-tag compact" : "ux-reference-tag"} onClick={() => onOpen(reference)}>{label}</button>;
+}
+
+function ProfileTableValue({ value, column, onOpenReference }: { value: string; column: string; onOpenReference: (reference: RosterReferenceDefinition) => void }) {
+  if (!/rules|traits/i.test(column)) return <>{value}</>;
+  const tokens = value.split(",").map((token) => token.trim()).filter(Boolean);
+  if (!tokens.some((token) => resolveRosterReference(token))) return <>{value}</>;
+  return <span className="ux-profile-table-tags">{tokens.map((token) => <ReferenceTag key={token} label={token} onOpen={onOpenReference} compact />)}</span>;
+}
+
+function FitWidthTable({ children }: { children: ReactNode }) {
+  const outerRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
+  const [metrics, setMetrics] = useState({ scale: 1, height: 0 });
+  useLayoutEffect(() => {
+    const outer = outerRef.current;
+    const inner = innerRef.current;
+    if (!outer || !inner) return;
+    const measure = () => {
+      const naturalWidth = inner.scrollWidth;
+      const scale = naturalWidth ? Math.min(1, outer.clientWidth / naturalWidth) : 1;
+      setMetrics({ scale, height: inner.scrollHeight * scale });
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(outer);
+    observer.observe(inner);
+    return () => observer.disconnect();
+  }, [children]);
+  return <div className="ux-fit-table" ref={outerRef} style={{ height: metrics.height || undefined }}><div className="ux-fit-table-inner" ref={innerRef} style={{ transform: `scale(${metrics.scale})` }}>{children}</div></div>;
+}
+
+function ReferenceGlanceStack({ glances, onOpenReference, onCloseTop, onCloseAll }: { glances: ReferenceGlance[]; onOpenReference: (reference: RosterReferenceDefinition) => void; onCloseTop: () => void; onCloseAll: () => void }) {
+  const topCloseRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    topCloseRef.current?.focus();
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onCloseTop();
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [glances.length, onCloseTop]);
+  return (
+    <div className={`ux-reference-glance-layer ${glances.length === 2 ? "has-second" : ""}`}>
+      <button type="button" className="ux-reference-glance-backdrop" aria-label="Close reference glance" onClick={onCloseAll} />
+      <div className="ux-reference-glance-stack">
+        {glances.map((glance, index) => {
+          const active = index === glances.length - 1;
+          const title = glance.type === "unit" ? unitDisplayName(glance.unit) : glance.reference.label;
+          return (
+            <section className={`ux-reference-glance-card ${glance.type} ${active ? "active" : "under"}`} role={active ? "dialog" : undefined} aria-modal={active ? "true" : undefined} aria-hidden={active ? undefined : true} aria-labelledby={`reference-glance-title-${index}`} key={`${glance.type}-${glance.type === "unit" ? glance.unit.id : glance.reference.id}`}>
+              <header>
+                <span>
+                  <small>{glance.type === "unit" ? "Unit profile" : glance.reference.kind}</small>
+                  <strong id={`reference-glance-title-${index}`}>{title}</strong>
+                </span>
+                <button type="button" ref={active ? topCloseRef : undefined} aria-label={`Close ${title} glance`} onClick={active ? onCloseTop : onCloseAll}><X size={18} /></button>
+              </header>
+              <div className="ux-reference-glance-body">
+                {glance.type === "unit" ? (
+                  glance.unit.detail ? <UnitProfile unit={glance.unit} onOpenReference={onOpenReference} glance /> : <div className="ux-reference-empty"><BookOpen size={20} /><strong>Profile unavailable</strong><small>This unit has no reference data in the prototype.</small></div>
+                ) : (
+                  <ReferenceDefinition reference={glance.reference} onOpenReference={onOpenReference} />
+                )}
+              </div>
+            </section>
+          );
+        })}
+      </div>
     </div>
+  );
+}
+
+function ReferenceDefinition({ reference, onOpenReference }: { reference: RosterReferenceDefinition; onOpenReference: (reference: RosterReferenceDefinition) => void }) {
+  const related = (reference.relatedIds ?? []).map(referenceById).filter((item): item is RosterReferenceDefinition => Boolean(item));
+  return (
+    <article className="ux-reference-definition">
+      <section>
+        <strong>Description</strong>
+        <p>{reference.description}</p>
+      </section>
+      {related.length ? <section><strong>Related</strong><div className="ux-profile-tag-list">{related.map((item) => <ReferenceTag key={item.id} label={item.label} onOpen={onOpenReference} />)}</div></section> : null}
+    </article>
   );
 }
 
