@@ -1675,6 +1675,38 @@
   font: inherit;
   font-size: 12px;
 }
+.ux-roster-navbar-search {
+  grid-template-columns: 16px minmax(0, 1fr) 28px;
+  padding-right: 4px;
+}
+.ux-navbar-search-smart {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--ux-accent) 50%, transparent);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--ux-accent) 14%, transparent);
+  color: var(--ux-accent-2);
+  cursor: pointer;
+}
+.ux-navbar-search-smart:hover {
+  background: color-mix(in srgb, var(--ux-accent) 24%, transparent);
+  border-color: var(--ux-accent);
+}
+.ux-wb-top.roster-overview {
+  grid-template-columns: 40px minmax(0, 1fr) 40px 40px;
+}
+.ux-wb-top.roster-overview.search-open {
+  grid-template-columns: 40px minmax(0, 1fr) 40px;
+}
+.ux-wb-top.roster-overview.search-open .ux-roster-navbar-search {
+  grid-column: 2 / 3;
+}
+.ux-roster-search-toggle {
+  display: grid;
+}
 .ux-roster-header-points {
   align-items: baseline;
   gap: 3px;
@@ -4920,17 +4952,6 @@ button.ux-reference-tag:focus-visible {
 .ux-favorite-creation button small { margin-top: 2px; color: var(--ux-muted); font-size: 9px; }
 .ux-favorite-creation button:disabled { opacity: .48; cursor: not-allowed; }
 
-/* Smart Search wizard button (roster header) */
-.ux-icon-btn.ux-smart-wizard-btn {
-  border-color: color-mix(in srgb, var(--ux-accent) 55%, transparent);
-  background: color-mix(in srgb, var(--ux-accent) 16%, transparent);
-  color: var(--ux-accent-2);
-}
-.ux-icon-btn.ux-smart-wizard-btn:hover {
-  background: color-mix(in srgb, var(--ux-accent) 28%, transparent);
-  border-color: var(--ux-accent);
-}
-
 /* Smart Search screen */
 .ux-smart-search-top {
   grid-template-columns: 40px minmax(0, 1fr);
@@ -4997,34 +5018,37 @@ button.ux-reference-tag:focus-visible {
   background: linear-gradient(90deg, var(--ux-accent), var(--ux-accent-2));
 }
 .ux-smart-segment {
-  display: inline-flex;
-  justify-self: start;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  justify-self: center;
+  width: min(100%, 292px);
   gap: 4px;
-  padding: 3px;
-  border: 1px solid var(--ux-line);
-  border-radius: 8px;
-  background: var(--ux-surface-2);
+  padding: 5px;
+  border: 1px solid color-mix(in srgb, var(--ux-line) 80%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ux-surface-3) 72%, var(--ux-surface));
 }
 .ux-smart-segment button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-height: 29px;
-  padding: 0 10px;
+  min-height: 34px;
+  padding: 0 14px;
   border: 0;
-  border-radius: 6px;
+  border-radius: 999px;
   background: transparent;
   color: var(--ux-muted);
   font: inherit;
-  font-size: 11.5px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 750;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 .ux-smart-segment button.on {
-  background: color-mix(in srgb, var(--ux-accent) 16%, var(--ux-surface-3));
-  color: var(--ux-accent-2);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--ux-accent) 76%, var(--ux-surface)), var(--ux-accent-2));
+  color: var(--ux-accent-ink);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--ux-accent) 22%, transparent);
 }
 .ux-smart-scope {
   display: flex;
