@@ -1,4 +1,4 @@
-import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, Cog, Command, Copy, Database, Download, Ellipsis, FileInput, GripVertical, Hammer, Heart, Layers, LibraryBig, Maximize2, MessageCircle, Minus, MoveRight, PanelsTopLeft, Pencil, Plus, RotateCcw, Rows3, Search, Smartphone, Sparkles, Split, Trash2, UserRound, X } from "lucide-react";
+import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, Cog, Coins, Command, Copy, Database, Download, Ellipsis, FileInput, GripVertical, Hammer, Heart, Layers, LibraryBig, Maximize2, MessageCircle, Minus, MoveRight, PanelsTopLeft, Pencil, Plus, RotateCcw, Rows3, Search, Smartphone, Sparkles, Split, Trash2, UserRound, Wand2, X } from "lucide-react";
 import { PhoneStatusBar } from "../components/DeviceFrame";
 import { mockRosterReferences, referenceById } from "../data/mockRosterReferences";
 import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode } from "../types";
@@ -362,6 +362,46 @@ function WorkbenchElements({
               </button>
             ))}
           </div>
+        </div>
+      </ElementSection>
+
+      <ElementSection title="Smart Search">
+        <div className="ux-navbar-search ux-smart-search-input">
+          <Wand2 size={15} />
+          <input placeholder="Search units, upgrades, or ask…" readOnly />
+        </div>
+        <div className="ux-smart-segment">
+          <button type="button" className="on"><Search size={14} />Find units</button>
+          <button type="button"><Coins size={14} />Fill points</button>
+        </div>
+        <div className="ux-smart-scope">
+          <button type="button" className="ux-smart-scope-pill on"><Layers size={14} />Roster</button>
+          <button type="button" className="ux-smart-scope-pill"><LibraryBig size={14} />Library</button>
+          <button type="button" className="ux-smart-scope-pill on"><Heart size={14} />Favorites</button>
+        </div>
+        <div className="ux-smart-cost-filter">
+          <span className="ux-smart-cost-label">Cost</span>
+          <div className="ux-smart-cost-pills">
+            {["Any cost", "≤ 25", "≤ 50", "≤ 100"].map((label, index) => (
+              <button key={label} type="button" className={`ux-filter-pill ${index === 0 ? "on" : ""}`}>{label}</button>
+            ))}
+          </div>
+        </div>
+        <button type="button" className="ux-smart-autoadd on">
+          <span className="ux-smart-autoadd-dot" aria-hidden><Check size={11} /></span>
+          Auto-add to roster
+        </button>
+        <div className="ux-pool ux-smart-results">
+          <div className="ux-pool-row ux-smart-result">
+            <span><strong>{selectedUnit.name}</strong><small>{selectedUnit.role} · {selectedSection.name}</small></span>
+            <span className="ux-pool-meta"><b>{selectedUnit.points} pts</b></span>
+            <button type="button" className="ux-smart-add" aria-label="Add"><Plus size={16} /></button>
+          </div>
+          <button type="button" className="ux-pool-row ux-smart-fill-row">
+            <span><strong>Relic Shield</strong><small>{selectedUnit.name} · {selectedSection.name}</small></span>
+            <span className="ux-pool-meta"><b>+15 pts</b></span>
+            <ChevronRight size={16} />
+          </button>
         </div>
       </ElementSection>
 

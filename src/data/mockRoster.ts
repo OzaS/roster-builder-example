@@ -702,6 +702,26 @@ export const mockRoster: Roster = {
   ],
 };
 
+export type SystemUnitEntry = {
+  id: string;
+  name: string;
+  role: string;
+  points: number;
+  source: string;
+};
+
+/** Catalogue-wide units used by Smart Search when the scope reaches beyond the roster. */
+export const mockSystemUnits: SystemUnitEntry[] = [
+  { id: "system-intercessors", name: "Intercessor Squad", role: "Battleline", points: 80, source: "Dark Angels" },
+  { id: "system-inceptors", name: "Inceptor Squad", role: "Fast Attack", points: 120, source: "Dark Angels" },
+  { id: "system-redemptor", name: "Redemptor Dreadnought", role: "Heavy Support", points: 210, source: "Dark Angels" },
+  { id: "system-apothecary", name: "Apothecary Biologis", role: "HQ", points: 55, source: "Adeptus Astartes" },
+  { id: "system-scouts", name: "Scout Squad", role: "Battleline", points: 65, source: "Adeptus Astartes" },
+  { id: "system-eliminators", name: "Eliminator Squad", role: "Elites", points: 85, source: "Adeptus Astartes" },
+  { id: "system-ballistus", name: "Ballistus Dreadnought", role: "Heavy Support", points: 140, source: "Adeptus Astartes" },
+  { id: "system-librarian", name: "Librarian in Terminator Armour", role: "HQ", points: 95, source: "Dark Angels" },
+];
+
 export const mockSystems = [
   {
     id: "wh40k-10",
