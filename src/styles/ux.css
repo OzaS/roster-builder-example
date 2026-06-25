@@ -4919,3 +4919,221 @@ button.ux-reference-tag:focus-visible {
 .ux-favorite-creation button strong, .ux-favorite-creation button small { display: block; }
 .ux-favorite-creation button small { margin-top: 2px; color: var(--ux-muted); font-size: 9px; }
 .ux-favorite-creation button:disabled { opacity: .48; cursor: not-allowed; }
+
+/* Smart Search wizard button (roster header) */
+.ux-icon-btn.ux-smart-wizard-btn {
+  border-color: color-mix(in srgb, var(--ux-accent) 55%, transparent);
+  background: color-mix(in srgb, var(--ux-accent) 16%, transparent);
+  color: var(--ux-accent-2);
+}
+.ux-icon-btn.ux-smart-wizard-btn:hover {
+  background: color-mix(in srgb, var(--ux-accent) 28%, transparent);
+  border-color: var(--ux-accent);
+}
+
+/* Smart Search screen */
+.ux-smart-search-top {
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 10px;
+  border-bottom: 0;
+}
+.ux-smart-search-input {
+  width: 100%;
+}
+.ux-smart-search-body {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  padding: 14px;
+  overflow-y: auto;
+  animation: ux-smart-rise 0.18s ease;
+}
+@keyframes ux-smart-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.ux-smart-search-budget {
+  display: grid;
+  gap: 0;
+  margin: 2px 0 0;
+}
+.ux-smart-budget-readout {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.ux-smart-budget-readout strong {
+  font-size: 17px;
+  font-weight: 850;
+  color: var(--ux-ink);
+  line-height: 1;
+}
+.ux-smart-budget-readout strong small {
+  color: var(--ux-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.ux-smart-budget-readout em {
+  color: var(--ux-muted);
+  font-size: 11.5px;
+  font-style: normal;
+  font-weight: 600;
+}
+.ux-smart-progress {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: block;
+  height: 3px;
+  overflow: hidden;
+  background: var(--ux-surface-3);
+}
+.ux-smart-progress i {
+  display: block;
+  height: 100%;
+  border-radius: 0 999px 999px 0;
+  background: linear-gradient(90deg, var(--ux-accent), var(--ux-accent-2));
+}
+.ux-smart-segment {
+  display: inline-flex;
+  justify-self: start;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--ux-line);
+  border-radius: 8px;
+  background: var(--ux-surface-2);
+}
+.ux-smart-segment button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 29px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ux-muted);
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.ux-smart-segment button.on {
+  background: color-mix(in srgb, var(--ux-accent) 16%, var(--ux-surface-3));
+  color: var(--ux-accent-2);
+}
+.ux-smart-scope {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ux-smart-scope-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 11px;
+  border: 1px solid var(--ux-line-2);
+  border-radius: 999px;
+  background: var(--ux-surface);
+  color: var(--ux-ink);
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.ux-smart-scope-pill.on {
+  border-color: var(--ux-accent);
+  background: color-mix(in srgb, var(--ux-accent) 12%, var(--ux-surface));
+  color: var(--ux-accent-2);
+}
+.ux-smart-scope-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--ux-muted);
+  font-size: 11.5px;
+  line-height: 1.4;
+}
+.ux-smart-cost-filter {
+  display: grid;
+  gap: 7px;
+}
+.ux-smart-cost-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ux-muted);
+}
+.ux-smart-cost-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ux-smart-autoadd {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  justify-self: start;
+  padding: 6px 11px 6px 7px;
+  border: 1px solid var(--ux-line-2);
+  border-radius: 999px;
+  background: var(--ux-surface);
+  color: var(--ux-muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.ux-smart-autoadd.on {
+  border-color: var(--ux-accent);
+  background: color-mix(in srgb, var(--ux-accent) 12%, var(--ux-surface));
+  color: var(--ux-accent-2);
+}
+.ux-smart-autoadd-dot {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 1px solid var(--ux-line-2);
+  background: var(--ux-surface-2);
+  color: transparent;
+}
+.ux-smart-autoadd.on .ux-smart-autoadd-dot {
+  border-color: var(--ux-accent);
+  background: var(--ux-accent);
+  color: var(--ux-accent-ink);
+}
+.ux-smart-results {
+  display: grid;
+  gap: 8px;
+}
+.ux-smart-result,
+.ux-smart-fill-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+}
+.ux-smart-add {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  border: 1px solid color-mix(in srgb, var(--ux-accent) 45%, var(--ux-line));
+  background: color-mix(in srgb, var(--ux-accent) 12%, transparent);
+  color: var(--ux-accent-2);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.ux-smart-add:hover {
+  background: color-mix(in srgb, var(--ux-accent) 24%, transparent);
+  border-color: var(--ux-accent);
+}

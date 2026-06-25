@@ -1,6 +1,6 @@
 import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject } from "react";
-import { AlertTriangle, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, ClipboardList, Cog, Command, Copy, Database, Download, Ellipsis, FileInput, GripVertical, Hammer, Heart, Layers, LibraryBig, Maximize2, Minimize2, Minus, MoveRight, PanelsTopLeft, Pencil, Plus, RotateCcw, Search, Share2, ShieldCheck, Sparkles, Split, Star, StickyNote, Trash2, UserRound, UsersRound, Wand2, X } from "lucide-react";
-import { mockCatalogues, mockDetachments } from "../../data/mockRoster";
+import { AlertTriangle, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, ClipboardList, Cog, Coins, Command, Copy, Database, Download, Ellipsis, FileInput, GripVertical, Hammer, Heart, Layers, LibraryBig, Maximize2, Minimize2, Minus, MoveRight, PanelsTopLeft, Pencil, Plus, RotateCcw, Search, Share2, ShieldCheck, Sparkles, Split, Star, StickyNote, Trash2, UserRound, UsersRound, Wand2, X } from "lucide-react";
+import { mockCatalogues, mockDetachments, mockSystemUnits } from "../../data/mockRoster";
 import { referenceById, resolveRosterReference } from "../../data/mockRosterReferences";
 import type { RosterReferenceDefinition, RosterUnit } from "../../types";
 import type { ConceptProps } from "../shared";
@@ -36,6 +36,7 @@ export function CodexWorkbench(props: ConceptProps) {
   const [focusPane, setFocusPane] = useState<"tree" | "detail" | "rail" | null>(null);
   const [focusChromeVisible, setFocusChromeVisible] = useState(false);
   const [dockOpen, setDockOpen] = useState(false);
+  const [smartGateOpen, setSmartGateOpen] = useState(false);
   const [referenceGlances, setReferenceGlances] = useState<ReferenceGlance[]>([]);
   const glanceTriggerRef = useRef<HTMLElement | null>(null);
   const detailScrollRef = useRef<HTMLElement>(null);
@@ -87,6 +88,11 @@ export function CodexWorkbench(props: ConceptProps) {
     window.requestAnimationFrame(() => glanceTriggerRef.current?.focus());
   }, []);
 
+  const openSmartSearch = useCallback(() => {
+    if (smart) props.onNavigate("smart-search");
+    else setSmartGateOpen(true);
+  }, [smart, props]);
+
   useEffect(() => {
     setActiveLoadoutSlot(null);
   }, [screen, props.selectedUnit.id, props.unitDetailView]);
@@ -98,6 +104,7 @@ export function CodexWorkbench(props: ConceptProps) {
     setRosterSearchQuery("");
     setLayoutMenuOpen(false);
     setDockOpen(false);
+    setSmartGateOpen(false);
   }, [screen]);
 
   useEffect(() => {
@@ -132,6 +139,8 @@ export function CodexWorkbench(props: ConceptProps) {
     body = <SettingsScreen props={props} />;
   } else if (screen === "system") {
     body = <CreateScreen props={props} />;
+  } else if (screen === "smart-search") {
+    body = <SmartSearchScreen props={props} />;
   } else {
     const smartClass = navStyle === "top" && smart ? "ux-smart" : "";
     modifier = [isUnitDetail ? "show-detail has-detail-toggle" : "", screen === "overview" ? "roster-overview" : "", screen === "validation" ? "show-checks" : "", smartClass].filter(Boolean).join(" ");
@@ -143,6 +152,7 @@ export function CodexWorkbench(props: ConceptProps) {
           searchQuery={rosterSearchQuery}
           layoutMenuOpen={layoutMenuOpen}
           focusPane={focusPane}
+          onOpenSmartSearch={openSmartSearch}
           onSearchOpenChange={(open) => {
             setRosterSearchOpen(open);
             if (!open) setRosterSearchQuery("");
@@ -171,7 +181,7 @@ export function CodexWorkbench(props: ConceptProps) {
     );
   }
 
-  const showCommandBar = navStyle === "top" && smart && isWorkbenchScreen && !isUnitDetail;
+  const showCommandBar = navStyle === "top" && smart && isWorkbenchScreen && !isUnitDetail && screen !== "smart-search";
   const subscriptionVariant = props.workflowScreen === "subscription-main" ? "main" : props.workflowScreen === "subscription-edition" ? "edition" : null;
 
   const handleShellPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -185,6 +195,7 @@ export function CodexWorkbench(props: ConceptProps) {
     <div className={`${shell} ${modifier}`.trim()} onPointerDown={handleShellPointerDown}>
       {body}
       {subscriptionVariant ? <SubscriptionGate variant={subscriptionVariant} onClose={() => props.onNavigate(subscriptionVariant === "main" ? "library" : "overview")} /> : null}
+      {smartGateOpen ? <SubscriptionGate variant="edition" onClose={() => setSmartGateOpen(false)} /> : null}
       {focusPane ? <EdgeHandle edge="top" expanded={focusChromeVisible} onReveal={() => setFocusChromeVisible(true)} /> : null}
       {forceCreationOpen && props.forceCreationMode !== "inline" ? <ForceSelector props={props} onClose={() => setForceCreationOpen(false)} /> : null}
       {activeLoadoutSlot ? <LoadoutSelector props={props} target={activeLoadoutSlot} onClose={closeLoadoutSelector} /> : null}
@@ -288,6 +299,7 @@ function WorkbenchHeader({
   searchQuery,
   layoutMenuOpen,
   focusPane,
+  onOpenSmartSearch,
   onSearchOpenChange,
   onSearchQueryChange,
   onLayoutMenuOpenChange,
@@ -298,6 +310,7 @@ function WorkbenchHeader({
   searchQuery: string;
   layoutMenuOpen: boolean;
   focusPane: "tree" | "detail" | "rail" | null;
+  onOpenSmartSearch: () => void;
   onSearchOpenChange: (open: boolean) => void;
   onSearchQueryChange: (query: string) => void;
   onLayoutMenuOpenChange: (open: boolean) => void;
@@ -327,6 +340,7 @@ function WorkbenchHeader({
           {isOverview ? <><small className="ux-phone-overview-subtitle">{props.roster.faction} · {props.roster.system}</small><small className="ux-tablet-overview-subtitle">{props.roster.faction} · {remainingLabel}</small></> : <small>{isUnitDetail ? `${props.selectedSection.name} · ${remainingLabel}` : `${props.roster.faction} · ${props.roster.system}`}</small>}
         </div>
       )}
+      {isOverview ? <button type="button" className="ux-icon-btn ux-smart-wizard-btn" aria-label="Smart search" title="Smart search" onClick={onOpenSmartSearch}><Wand2 size={18} /></button> : null}
       {isOverview ? <button type="button" className="ux-icon-btn ux-tablet-header-control" aria-label={searchOpen ? "Close roster search" : "Search roster"} onClick={() => onSearchOpenChange(!searchOpen)}>{searchOpen ? <X size={17} /> : <Search size={17} />}</button> : null}
       <button type="button" className="ux-icon-btn ux-tablet-header-control ux-tablet-layout-button" aria-label="Tablet layout" aria-expanded={layoutMenuOpen} onClick={() => onLayoutMenuOpenChange(!layoutMenuOpen)}><PanelsTopLeft size={17} /></button>
       {isUnitDetail ? (
@@ -1363,6 +1377,181 @@ function CreateScreen({ props }: { props: ConceptProps }) {
           <Plus size={16} />
           Create roster
         </button>
+      </div>
+    </>
+  );
+}
+
+type SmartScope = "roster" | "system" | "favorites";
+type SmartMode = "find" | "fill";
+
+/**
+ * Smart search — a wizard-driven, gated companion to the roster edition screen.
+ * Reuses the roster chrome (search pinned top) and layers cross-scope search,
+ * auto-add, cost filtering, and a cost-filler mode that surfaces buyable upgrades.
+ */
+function SmartSearchScreen({ props }: { props: ConceptProps }) {
+  const remaining = Math.max(0, props.roster.pointsLimit - props.roster.pointsUsed);
+  const [scopes, setScopes] = useState<Record<SmartScope, boolean>>({ roster: true, system: true, favorites: false });
+  const [mode, setMode] = useState<SmartMode>("find");
+  const [query, setQuery] = useState("");
+  const [costCap, setCostCap] = useState<number | null>(null);
+  const [autoAdd, setAutoAdd] = useState(true);
+
+  const normalized = query.trim().toLowerCase();
+  const cap = costCap ?? Number.POSITIVE_INFINITY;
+  const matches = (text: string) => text.toLowerCase().includes(normalized);
+
+  const rosterResults = flattenUnits(props.roster).map((unit) => ({ id: unit.id, name: unitDisplayName(unit), role: unit.role, points: unit.points, sub: unit.sectionName }));
+  const favoriteResults = props.unitFavorites.map((favorite) => ({ id: favorite.id, name: unitDisplayName(favorite.unit), role: favorite.unit.role, points: favorite.unit.points, sub: favorite.sourceSectionName }));
+  const systemResults = mockSystemUnits.map((entry) => ({ id: entry.id, name: entry.name, role: entry.role, points: entry.points, sub: entry.source }));
+  const selectedScopes = (Object.keys(scopes) as SmartScope[]).filter((item) => scopes[item]);
+  const resultGroups: Record<SmartScope, Array<{ id: string; name: string; role: string; points: number; sub: string }>> = {
+    roster: rosterResults,
+    system: systemResults,
+    favorites: favoriteResults,
+  };
+  const results = selectedScopes
+    .flatMap((source) => resultGroups[source].map((item) => ({ ...item, source })))
+    .filter((item) => item.points <= cap && matches(`${item.name} ${item.role}`));
+
+  const fillResults = flattenUnits(props.roster)
+    .flatMap((unit) => unit.options
+      .filter((option) => !option.selected && option.points > 0)
+      .map((option) => ({ unitId: unit.id, unitName: unitDisplayName(unit), optionId: option.id, optionName: option.name, points: option.points, sub: unit.sectionName })))
+    .filter((item) => item.points <= cap && matches(`${item.optionName} ${item.unitName}`))
+    .sort((a, b) => a.points - b.points);
+
+  const costPills: Array<{ label: string; value: number | null }> = [
+    { label: "Any cost", value: null },
+    { label: "≤ 25", value: 25 },
+    { label: "≤ 50", value: 50 },
+    { label: "≤ 100", value: 100 },
+    { label: `Fits ${remaining}`, value: remaining },
+  ];
+
+  const toggleScope = (scope: SmartScope) => {
+    setScopes((value) => ({ ...value, [scope]: !value[scope] }));
+  };
+
+  const addFromScope = (source: SmartScope, id: string) => {
+    if (source === "roster") {
+      autoAdd ? props.onDuplicateUnit(id) : props.onSelectUnit(id);
+      return;
+    }
+    if (source === "favorites") {
+      const favorite = props.unitFavorites.find((item) => item.id === id);
+      const destination = favorite
+        ? flattenUnits(props.roster).find((unit) => unit.sectionName === favorite.sourceSectionName)?.sectionId
+        : undefined;
+      if (favorite && destination) {
+        props.onReuseUnitFavorite(favorite.id, destination);
+        props.onNavigate("overview");
+      }
+      return;
+    }
+    props.onNavigate("add-unit");
+  };
+
+  return (
+    <>
+      <header className="ux-wb-top workspace-header ux-smart-search-top">
+        <button type="button" className="ux-icon-btn" aria-label="Back to roster" onClick={props.onBack}>
+          <ArrowLeft size={18} />
+        </button>
+        <label className="ux-navbar-search ux-smart-search-input">
+          <Wand2 size={15} />
+          <input value={query} onChange={(event) => setQuery(event.currentTarget.value)} placeholder="Search units, upgrades, or ask…" autoFocus />
+        </label>
+        <span className="ux-smart-progress" role="progressbar" aria-label="Roster points used" aria-valuemin={0} aria-valuemax={props.roster.pointsLimit} aria-valuenow={props.roster.pointsUsed}>
+          <i style={{ width: `${Math.min(100, Math.round((props.roster.pointsUsed / props.roster.pointsLimit) * 100))}%` }} />
+        </span>
+      </header>
+      <div className="ux-smart-search-body">
+        <div className="ux-smart-search-budget">
+          <div className="ux-smart-budget-readout">
+            <strong>{props.roster.pointsUsed}<small> / {props.roster.pointsLimit}</small></strong>
+            <em>{remaining} pts open</em>
+          </div>
+        </div>
+
+        <div className="ux-smart-segment" role="tablist" aria-label="Smart search mode">
+          <button type="button" role="tab" aria-selected={mode === "find"} className={mode === "find" ? "on" : ""} onClick={() => setMode("find")}>
+            <Search size={14} />Find units
+          </button>
+          <button type="button" role="tab" aria-selected={mode === "fill"} className={mode === "fill" ? "on" : ""} onClick={() => setMode("fill")}>
+            <Coins size={14} />Fill points
+          </button>
+        </div>
+
+        {mode === "find" ? (
+          <>
+            <div className="ux-smart-scope" aria-label="Search sources">
+              <button type="button" role="checkbox" aria-checked={scopes.roster} className={`ux-smart-scope-pill ${scopes.roster ? "on" : ""}`} onClick={() => toggleScope("roster")}><Layers size={14} />Roster</button>
+              <button type="button" role="checkbox" aria-checked={scopes.system} className={`ux-smart-scope-pill ${scopes.system ? "on" : ""}`} onClick={() => toggleScope("system")}><LibraryBig size={14} />Library</button>
+              <button type="button" role="checkbox" aria-checked={scopes.favorites} className={`ux-smart-scope-pill ${scopes.favorites ? "on" : ""}`} onClick={() => toggleScope("favorites")}><Heart size={14} />Favorites</button>
+            </div>
+            <p className="ux-smart-scope-hint">
+              Searching {selectedScopes.length ? selectedScopes.map((item) => item === "system" ? "library" : item).join(", ") : "no sources"}.
+            </p>
+          </>
+        ) : (
+          <p className="ux-smart-scope-hint"><Coins size={13} /> Buyable upgrades across the roster that fit the selected cost.</p>
+        )}
+
+        <div className="ux-smart-cost-filter">
+          <span className="ux-smart-cost-label">Cost</span>
+          <div className="ux-smart-cost-pills">
+            {costPills.map((pill) => (
+              <button key={pill.label} type="button" className={`ux-filter-pill ${costCap === pill.value ? "on" : ""}`} onClick={() => setCostCap(pill.value)}>
+                {pill.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {mode === "find" ? (
+          <button type="button" className={`ux-smart-autoadd ${autoAdd ? "on" : ""}`} onClick={() => setAutoAdd((value) => !value)} role="switch" aria-checked={autoAdd}>
+            <span className="ux-smart-autoadd-dot" aria-hidden>{autoAdd ? <Check size={11} /> : null}</span>
+            Auto-add to roster
+          </button>
+        ) : null}
+
+        {mode === "find" ? (
+          results.length ? (
+            <div className="ux-pool ux-smart-results">
+              {results.map((item) => (
+                <div key={`${item.source}-${item.id}`} className="ux-pool-row ux-smart-result">
+                  <span>
+                    <strong>{item.name}</strong>
+                    <small>{item.role} · {item.sub}</small>
+                  </span>
+                  <span className="ux-pool-meta"><b>{item.points} pts</b></span>
+                  <button type="button" className="ux-smart-add" aria-label={`Add ${item.name}`} onClick={() => addFromScope(item.source, item.id)}>
+                    <Plus size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="ux-empty small"><Search size={18} /><strong>No matching units</strong><small>Try another scope or raise the cost cap.</small></div>
+          )
+        ) : fillResults.length ? (
+          <div className="ux-pool ux-smart-results">
+            {fillResults.map((item) => (
+              <button key={`${item.unitId}-${item.optionId}`} type="button" className="ux-pool-row ux-smart-fill-row" onClick={() => props.onSelectUnit(item.unitId)}>
+                <span>
+                  <strong>{item.optionName}</strong>
+                  <small>{item.unitName} · {item.sub}</small>
+                </span>
+                <span className="ux-pool-meta"><b>+{item.points} pts</b></span>
+                <ChevronRight size={16} />
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="ux-empty small"><Coins size={18} /><strong>Nothing fits the budget</strong><small>Raise the cost cap to see more upgrades.</small></div>
+        )}
       </div>
     </>
   );

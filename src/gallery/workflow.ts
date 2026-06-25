@@ -11,6 +11,7 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "tools", label: "Tools" },
   { id: "overview", label: "Overview" },
   { id: "subscription-edition", label: "Subscription · Edition" },
+  { id: "smart-search", label: "Smart search" },
   { id: "add-detachment", label: "Add Detachment" },
   { id: "add-unit", label: "Add Unit" },
   { id: "unit-detail", label: "Unit Detail" },

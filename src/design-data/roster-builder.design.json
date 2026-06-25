@@ -54,6 +54,10 @@
           "label": "Smart tools subscription"
         },
         {
+          "id": "smart-search",
+          "label": "Smart search"
+        },
+        {
           "id": "add-unit",
           "label": "Add unit"
         },
@@ -105,6 +109,13 @@
           ]
         },
         {
+          "id": "smart-search",
+          "label": "Smart search",
+          "screens": [
+            "smart-search"
+          ]
+        },
+        {
           "id": "unsorted",
           "label": "Unsorted",
           "screens": []
@@ -138,6 +149,7 @@
           "Add Pool Rows",
           "Favorite Creation Sections",
           "Smart Search (Settings)",
+          "Smart Search",
           "Lookup & Sources",
           "Tools Hub",
           "Favorite Library Cards",
