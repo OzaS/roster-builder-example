@@ -171,7 +171,7 @@ export function CodexWorkbench(props: ConceptProps) {
           </div>
         ) : null}
         <div className="ux-wb-layout" ref={layoutRef} style={panelStyle}>
-          <Tree props={props} query={rosterSearchQuery} onQueryChange={setRosterSearchQuery} creationOpen={forceCreationOpen} onCreationOpenChange={setForceCreationOpen} onOpenUnitGlance={openUnitGlance} />
+          <Tree props={props} query={rosterSearchQuery} onQueryChange={setRosterSearchQuery} searchInNavbar={rosterSearchOpen} creationOpen={forceCreationOpen} onCreationOpenChange={setForceCreationOpen} onOpenUnitGlance={openUnitGlance} />
           <PaneDivider side="tree" props={props} layoutRef={layoutRef} />
           <Detail props={props} scrollRef={detailScrollRef} onOpenLoadoutSlot={openLoadoutSelector} onOpenReference={openReferenceGlance} />
           <PaneDivider side="rail" props={props} layoutRef={layoutRef} />
@@ -323,7 +323,7 @@ function WorkbenchHeader({
   const remainingLabel = pointsRemaining >= 0 ? `${pointsRemaining} pts left` : `${Math.abs(pointsRemaining)} pts over`;
 
   return (
-    <header className={`ux-wb-top workspace-header ${isUnitDetail ? "unit-detail" : ""} ${isOverview ? "roster-overview" : ""}`}>
+    <header className={`ux-wb-top workspace-header ${isUnitDetail ? "unit-detail" : ""} ${isOverview ? "roster-overview" : ""} ${isOverview && searchOpen ? "search-open" : ""}`}>
       <BackOrTitle
         props={props}
         fallback={
@@ -333,15 +333,20 @@ function WorkbenchHeader({
         }
       />
       {searchOpen && isOverview ? (
-        <label className="ux-navbar-search"><Search size={15} /><input value={searchQuery} onChange={(event) => onSearchQueryChange(event.currentTarget.value)} placeholder="Search roster" autoFocus /></label>
+        <div className="ux-navbar-search ux-roster-navbar-search">
+          <Search size={15} />
+          <input value={searchQuery} onChange={(event) => onSearchQueryChange(event.currentTarget.value)} placeholder="Search roster" autoFocus />
+          <button type="button" className="ux-navbar-search-smart" aria-label="Smart search" title="Smart search" onClick={onOpenSmartSearch}>
+            <Wand2 size={15} />
+          </button>
+        </div>
       ) : (
         <div className="ux-wb-title">
           <strong>{isUnitDetail ? unitDisplayName(props.selectedUnit) : props.roster.name}</strong>
           {isOverview ? <><small className="ux-phone-overview-subtitle">{props.roster.faction} · {props.roster.system}</small><small className="ux-tablet-overview-subtitle">{props.roster.faction} · {remainingLabel}</small></> : <small>{isUnitDetail ? `${props.selectedSection.name} · ${remainingLabel}` : `${props.roster.faction} · ${props.roster.system}`}</small>}
         </div>
       )}
-      {isOverview ? <button type="button" className="ux-icon-btn ux-smart-wizard-btn" aria-label="Smart search" title="Smart search" onClick={onOpenSmartSearch}><Wand2 size={18} /></button> : null}
-      {isOverview ? <button type="button" className="ux-icon-btn ux-tablet-header-control" aria-label={searchOpen ? "Close roster search" : "Search roster"} onClick={() => onSearchOpenChange(!searchOpen)}>{searchOpen ? <X size={17} /> : <Search size={17} />}</button> : null}
+      {isOverview ? <button type="button" className="ux-icon-btn ux-roster-search-toggle" aria-label={searchOpen ? "Close roster search" : "Search roster"} onClick={() => onSearchOpenChange(!searchOpen)}>{searchOpen ? <X size={17} /> : <Search size={17} />}</button> : null}
       <button type="button" className="ux-icon-btn ux-tablet-header-control ux-tablet-layout-button" aria-label="Tablet layout" aria-expanded={layoutMenuOpen} onClick={() => onLayoutMenuOpenChange(!layoutMenuOpen)}><PanelsTopLeft size={17} /></button>
       {isUnitDetail ? (
         <span className="ux-wb-header-points" aria-label={`${props.selectedUnit.points} points`}>
@@ -351,7 +356,7 @@ function WorkbenchHeader({
       ) : isOverview ? (
         <span className="ux-roster-header-points" aria-label={`${props.roster.pointsUsed} of ${props.roster.pointsLimit} points`}><b>{props.roster.pointsUsed}</b><small>/ {props.roster.pointsLimit}</small></span>
       ) : null}
-      {!isUnitDetail ? (
+      {!isUnitDetail && !(isOverview && searchOpen) ? (
         <button type="button" className="ux-icon-btn" aria-label="Export" onClick={() => props.onNavigate("export")}>
           <Download size={18} />
         </button>
@@ -378,7 +383,7 @@ function WorkbenchHeader({
   );
 }
 
-function Tree({ props, query, onQueryChange, creationOpen, onCreationOpenChange, onOpenUnitGlance }: { props: ConceptProps; query: string; onQueryChange: (query: string) => void; creationOpen: boolean; onCreationOpenChange: (open: boolean) => void; onOpenUnitGlance: (unit: RosterUnit) => void }) {
+function Tree({ props, query, onQueryChange, searchInNavbar, creationOpen, onCreationOpenChange, onOpenUnitGlance }: { props: ConceptProps; query: string; onQueryChange: (query: string) => void; searchInNavbar: boolean; creationOpen: boolean; onCreationOpenChange: (open: boolean) => void; onOpenUnitGlance: (unit: RosterUnit) => void }) {
   const [renamingUnitId, setRenamingUnitId] = useState<string | null>(null);
   const renamingUnit = flattenUnits(props.roster).find((unit) => unit.id === renamingUnitId);
   const normalizedQuery = query.trim().toLowerCase();
@@ -395,10 +400,10 @@ function Tree({ props, query, onQueryChange, creationOpen, onCreationOpenChange,
   }).filter((item) => item.matches);
   return (
     <nav className="ux-wb-tree" aria-label="Roster tree">
-      <div className="ux-wb-search ux-tree-search">
+      {!searchInNavbar ? <div className="ux-wb-search ux-tree-search">
         <Search size={15} />
         <input placeholder="Filter units" value={query} onChange={(event) => onQueryChange(event.currentTarget.value)} />
-      </div>
+      </div> : null}
       <div className="ux-force-list">
         {visibleForces.map(({ force, sections }) => {
           const forceOpen = normalizedQuery ? true : props.expandedForceIds.includes(force.id);
