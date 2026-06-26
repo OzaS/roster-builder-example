@@ -46,6 +46,6 @@ function designDataMiddleware() {
 }
 
 export default defineConfig({
-  base: "/design-examples/",
+  base: "./",
   plugins: [react(), designDataMiddleware()],
 });
