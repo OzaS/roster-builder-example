@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject } from "react";
-import { AlertTriangle, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, ClipboardList, Cog, Coins, Command, Copy, Database, Download, Ellipsis, FileInput, GripVertical, Hammer, Heart, Layers, LibraryBig, Maximize2, Minimize2, Minus, MoveRight, PanelsTopLeft, Pencil, Plus, RotateCcw, Search, Share2, ShieldCheck, Sparkles, Split, Star, StickyNote, Trash2, UserRound, UsersRound, Wand2, X } from "lucide-react";
+import { Activity, AlertTriangle, ArrowLeft, ArrowUp, BarChart3, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, CircleDot, ClipboardList, Cog, Coins, Command, Copy, Database, Dice5, Download, Ellipsis, FileInput, Gamepad2, GripVertical, Hammer, Heart, ImagePlus, Layers, LibraryBig, Maximize2, Minimize2, Minus, MoveRight, PanelsTopLeft, Pencil, Plus, RotateCcw, Scale, Search, ShieldCheck, Sparkles, Split, Target, Timer, Trash2, UserRound, UsersRound, Wand2, X } from "lucide-react";
 import { mockCatalogues, mockDetachments, mockSystemUnits } from "../../data/mockRoster";
 import { referenceById, resolveRosterReference } from "../../data/mockRosterReferences";
 import type { RosterReferenceDefinition, RosterUnit } from "../../types";
@@ -133,6 +133,14 @@ export function CodexWorkbench(props: ConceptProps) {
     body = <LookupScreen props={props} />;
   } else if (screen === "tools") {
     body = <ToolsScreen props={props} />;
+  } else if (screen === "roster-analytics") {
+    body = <RosterAnalyticsScreen props={props} />;
+  } else if (screen === "comparison") {
+    body = <ComparisonScreen props={props} />;
+  } else if (screen === "game-tracker") {
+    body = <GameTrackerScreen props={props} />;
+  } else if (screen === "dice-simulator") {
+    body = <DiceSimulatorScreen props={props} />;
   } else if (screen === "app") {
     body = <AppScreen props={props} />;
   } else if (screen === "settings") {
@@ -1647,12 +1655,11 @@ function LookupGroup({ title, icon, children }: { title: string; icon: ReactNode
 
 /** Utility hub for roster-building extras. */
 function ToolsScreen({ props }: { props: ConceptProps }) {
-  const checks = rosterChecks(props.roster);
   const tools = [
-    { icon: <ShieldCheck size={18} />, title: checks.length ? `${checks.length} checks to resolve` : "Roster is legal", sub: `${props.roster.pointsLimit - props.roster.pointsUsed} points open`, action: () => props.onNavigate("validation") },
-    { icon: <Share2 size={18} />, title: "Export & share", sub: "Copy list, print, or hand off", action: () => props.onNavigate("export") },
-    { icon: <StickyNote size={18} />, title: "Matchup notes", sub: "Game plan and reminders", action: undefined },
-    { icon: <Star size={18} />, title: "Pinned rules", sub: "Oath of Moment, Deep Strike", action: () => props.onNavigate("catalogue") },
+    { icon: <BarChart3 size={18} />, title: "Roster analytics", sub: "Shape, totals, and matchup posture", action: () => props.onNavigate("roster-analytics") },
+    { icon: <Scale size={18} />, title: "Comparison", sub: "Compare several entries side by side", action: () => props.onNavigate("comparison") },
+    { icon: <Gamepad2 size={18} />, title: "Game tracker", sub: "Roster game mode, rounds, and notes", action: () => props.onNavigate("game-tracker") },
+    { icon: <Dice5 size={18} />, title: "Dice simulator", sub: "Roll N dice with any common side count", action: () => props.onNavigate("dice-simulator") },
   ];
 
   return (
@@ -1665,14 +1672,7 @@ function ToolsScreen({ props }: { props: ConceptProps }) {
         <AppAvatarButton props={props} />
       </header>
       <div className="ux-wb-home-body">
-        <div className="ux-tools-summary">
-          <BudgetMeter roster={props.roster} label="Current list" />
-          <div>
-            <strong>{flattenUnits(props.roster).length} units</strong>
-            <small>{countSections(props.roster)} roster sections</small>
-          </div>
-        </div>
-        <div className="ux-tools-grid">
+        <div className="ux-tools-grid ux-tools-grid-large">
           {tools.map((tool) => (
             <button key={tool.title} type="button" className="ux-tool-tile" onClick={tool.action}>
               <span className="ux-setting-icon">{tool.icon}</span>
@@ -1683,18 +1683,283 @@ function ToolsScreen({ props }: { props: ConceptProps }) {
             </button>
           ))}
         </div>
+      </div>
+    </>
+  );
+}
+
+function ToolScreenHeader({ props, title, subtitle }: { props: ConceptProps; title: string; subtitle: string }) {
+  return (
+    <header className="ux-wb-top ux-wb-home-top reversed">
+      <button type="button" className="ux-icon-btn" aria-label="Back to tools" onClick={() => props.onNavigate("tools")}>
+        <ArrowLeft size={18} />
+      </button>
+      <div className="ux-wb-title">
+        <strong>{title}</strong>
+        <small>{subtitle}</small>
+      </div>
+    </header>
+  );
+}
+
+function RosterAnalyticsScreen({ props }: { props: ConceptProps }) {
+  const unitCount = flattenUnits(props.roster).length;
+  const profiles = [
+    { label: "Speed/Agility", value: 64 },
+    { label: "Toughness", value: 56 },
+    { label: "Swarm", value: 78 },
+    { label: "Damage", value: 68 },
+    { label: "Micro", value: 42 },
+  ];
+
+  return (
+    <>
+      <ToolScreenHeader props={props} title="Roster analytics" subtitle="Compare roster shape" />
+      <div className="ux-wb-home-body ux-tool-page">
+        <button type="button" className="ux-select-field">
+          <span>
+            <strong>{props.roster.name}</strong>
+            <small>{props.roster.system} · {props.roster.faction}</small>
+          </span>
+          <ChevronDown size={16} />
+        </button>
+        <section className="ux-analytics-card">
+          <RosterRadar values={profiles.map((item) => item.value)} />
+          <div className="ux-radar-legend">
+            {profiles.map((item) => (
+              <span key={item.label}>
+                <strong>{item.label}</strong>
+                <small>{item.value}</small>
+              </span>
+            ))}
+          </div>
+        </section>
+        <div className="ux-stat-grid">
+          <ToolStat label="Units" value={unitCount} />
+          <ToolStat label="Detachments" value={props.roster.forces.length} />
+          <ToolStat label="Sections" value={countSections(props.roster)} />
+          <ToolStat label="Open points" value={props.roster.pointsLimit - props.roster.pointsUsed} />
+        </div>
+        <section className="ux-tools-panel">
+          <div className="ux-lookup-title">
+            <Activity size={15} />
+            <strong>Analysis queue</strong>
+          </div>
+          {["Damage by range band", "Objective control forecast", "Deployment footprint"].map((item) => (
+            <button key={item} type="button" className="ux-source-row">
+              <span>
+                <strong>{item}</strong>
+                <small>Placeholder metric</small>
+              </span>
+              <Chip tone="cool">Soon</Chip>
+            </button>
+          ))}
+        </section>
+      </div>
+    </>
+  );
+}
+
+function RosterRadar({ values }: { values: number[] }) {
+  const center = 92;
+  const radius = 70;
+  const angles = [-90, -18, 54, 126, 198];
+  const outer = angles.map((angle) => radarPoint(center, radius, angle));
+  const filled = angles.map((angle, index) => radarPoint(center, radius * (values[index] / 100), angle));
+  const rings = [0.33, 0.66, 1].map((scale) => angles.map((angle) => radarPoint(center, radius * scale, angle)).join(" "));
+
+  return (
+    <svg className="ux-radar-chart" viewBox="0 0 184 184" role="img" aria-label="Roster analytics radar">
+      {rings.map((points) => <polygon key={points} points={points} className="ux-radar-ring" />)}
+      {outer.map((point) => <line key={point} x1={center} y1={center} x2={point.split(",")[0]} y2={point.split(",")[1]} className="ux-radar-axis" />)}
+      <polygon points={filled.join(" ")} className="ux-radar-fill" />
+    </svg>
+  );
+}
+
+function radarPoint(center: number, radius: number, angle: number) {
+  const radians = (Math.PI / 180) * angle;
+  return `${center + Math.cos(radians) * radius},${center + Math.sin(radians) * radius}`;
+}
+
+function ToolStat({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="ux-tool-stat">
+      <strong>{value}</strong>
+      <small>{label}</small>
+    </div>
+  );
+}
+
+function ComparisonScreen({ props }: { props: ConceptProps }) {
+  const entries = flattenUnits(props.roster).slice(0, 4);
+  return (
+    <>
+      <ToolScreenHeader props={props} title="Comparison" subtitle={props.roster.system} />
+      <div className="ux-wb-home-body ux-tool-page">
+        <button type="button" className="ux-select-field">
+          <span>
+            <strong>{props.roster.system}</strong>
+            <small>One game system per comparison set</small>
+          </span>
+          <ChevronDown size={16} />
+        </button>
+        <div className="ux-compare-selector">
+          {entries.map((unit, index) => (
+            <button key={unit.id} type="button" className={`ux-filter-pill ${index < 3 ? "on" : ""}`}>
+              {unitDisplayName(unit)}
+            </button>
+          ))}
+        </div>
+        <section className="ux-compare-table" aria-label="Entry comparison">
+          <div className="ux-compare-head">
+            <span>Entry</span>
+            <span>Pts</span>
+            <span>Models</span>
+            <span>Status</span>
+          </div>
+          {entries.slice(0, 3).map((unit) => (
+            <button key={unit.id} type="button" className="ux-compare-row" onClick={() => props.onSelectUnit(unit.id)}>
+              <span>
+                <strong>{unitDisplayName(unit)}</strong>
+                <small>{unit.role} · {unit.keywords.slice(0, 2).join(", ")}</small>
+              </span>
+              <b>{unit.points}</b>
+              <b>{unit.count}</b>
+              <StatusGlyph status={unit.status} size={15} />
+            </button>
+          ))}
+        </section>
+        <section className="ux-tools-panel">
+          <div className="ux-lookup-title">
+            <Target size={15} />
+            <strong>Quick deltas</strong>
+          </div>
+          {["Lowest cost per model", "Most keywords", "Warnings to resolve"].map((item) => (
+            <button key={item} type="button" className="ux-source-row">
+              <span>
+                <strong>{item}</strong>
+                <small>Comparison insight</small>
+              </span>
+            </button>
+          ))}
+        </section>
+      </div>
+    </>
+  );
+}
+
+function GameTrackerScreen({ props }: { props: ConceptProps }) {
+  const units = flattenUnits(props.roster).slice(0, 4);
+  return (
+    <>
+      <ToolScreenHeader props={props} title="Game tracker" subtitle="Game mode" />
+      <div className="ux-wb-home-body ux-tool-page">
+        <button type="button" className="ux-select-field">
+          <span>
+            <strong>{props.roster.name}</strong>
+            <small>{props.roster.pointsUsed}/{props.roster.pointsLimit} pts · read-only roster</small>
+          </span>
+          <ChevronDown size={16} />
+        </button>
+        <button type="button" className="ux-primary ux-tool-launch" onClick={() => props.onNavigate("overview")}>
+          <Gamepad2 size={17} />
+          Open roster in game mode
+        </button>
+        <section className="ux-tools-panel">
+          <div className="ux-lookup-title">
+            <ShieldCheck size={15} />
+            <strong>Unit state</strong>
+          </div>
+          {units.map((unit, index) => (
+            <button key={unit.id} type="button" className={`ux-tracker-unit ${index === 2 ? "kia" : ""}`}>
+              <span className="ux-opt-check" aria-hidden />
+              <span>
+                <strong>{unitDisplayName(unit)}</strong>
+                <small>{index === 2 ? "KIA · 0 models left" : `${Math.max(1, unit.count - index)} / ${unit.count} models left`}</small>
+              </span>
+              <b>{unit.points}</b>
+            </button>
+          ))}
+        </section>
         <section className="ux-tools-panel">
           <div className="ux-lookup-title">
             <ClipboardList size={15} />
-            <strong>Table-side checklist</strong>
+            <strong>Game plan</strong>
           </div>
-          {["Confirm detachment rules", "Mark fixed secondary plan", "Review wargear swaps"].map((item, index) => (
-            <button key={item} type="button" className={`ux-source-row ${index === 0 ? "on" : ""}`}>
+          {["Pre-game: confirm mission and terrain", "Round 1: command phase sequence", "Round 2: score primary and mark reserves"].map((item, index) => (
+            <button key={item} type="button" className={`ux-source-row ${index < 2 ? "on" : ""}`}>
               <span className="ux-opt-check" aria-hidden />
               <span>
                 <strong>{item}</strong>
-                <small>{index === 0 ? "Ready for review" : "Saved for later"}</small>
+                <small>{index < 2 ? "Checked" : "Ready"}</small>
               </span>
+            </button>
+          ))}
+        </section>
+        <section className="ux-note-composer">
+          <span>
+            <strong>Round note</strong>
+            <small>Pin a note and attach table photos</small>
+          </span>
+          <button type="button" aria-label="Add image"><ImagePlus size={18} /></button>
+        </section>
+      </div>
+    </>
+  );
+}
+
+function DiceSimulatorScreen({ props }: { props: ConceptProps }) {
+  const dice = [6, 2, 5, 4, 1, 6];
+  return (
+    <>
+      <ToolScreenHeader props={props} title="Dice simulator" subtitle="Roll builder" />
+      <div className="ux-wb-home-body ux-tool-page">
+        <section className="ux-dice-controls">
+          <label>
+            <span>Dice</span>
+            <input value="6" readOnly />
+          </label>
+          <label>
+            <span>Sides</span>
+            <select value="6" aria-label="Dice sides" onChange={() => undefined}>
+              <option value="3">d3</option>
+              <option value="6">d6</option>
+              <option value="8">d8</option>
+              <option value="12">d12</option>
+              <option value="20">d20</option>
+            </select>
+          </label>
+          <button type="button" className="ux-primary">
+            <Dice5 size={17} />
+            Roll
+          </button>
+        </section>
+        <div className="ux-dice-stage" aria-label="Dice roll results">
+          {dice.map((value, index) => (
+            <span key={`${value}-${index}`} className="ux-die" style={{ "--die-delay": `${index * 70}ms` } as CSSProperties}>
+              {value}
+            </span>
+          ))}
+        </div>
+        <div className="ux-stat-grid">
+          <ToolStat label="Total" value={dice.reduce((sum, value) => sum + value, 0)} />
+          <ToolStat label="Highest" value={Math.max(...dice)} />
+          <ToolStat label="Successes 4+" value={dice.filter((value) => value >= 4).length} />
+          <ToolStat label="Rerolls" value={2} />
+        </div>
+        <section className="ux-tools-panel">
+          <div className="ux-lookup-title">
+            <Timer size={15} />
+            <strong>Recent rolls</strong>
+          </div>
+          {["6d6: 24 total", "2d12: 15 total", "4d3: 8 total"].map((item) => (
+            <button key={item} type="button" className="ux-source-row">
+              <span>
+                <strong>{item}</strong>
+                <small>Saved roll</small>
+              </span>
+              <CircleDot size={15} />
             </button>
           ))}
         </section>

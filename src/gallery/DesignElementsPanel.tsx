@@ -1,4 +1,4 @@
-import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, Cog, Coins, Command, Copy, Database, Download, Ellipsis, FileInput, GripVertical, Hammer, Heart, Layers, LibraryBig, Maximize2, MessageCircle, Minus, MoveRight, PanelsTopLeft, Pencil, Plus, RotateCcw, Rows3, Search, Smartphone, Sparkles, Split, Trash2, UserRound, Wand2, X } from "lucide-react";
+import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BarChart3, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, CircleDot, Cog, Coins, Command, Copy, Database, Dice5, Download, Ellipsis, FileInput, Gamepad2, GripVertical, Hammer, Heart, ImagePlus, Layers, LibraryBig, Maximize2, MessageCircle, Minus, MoveRight, PanelsTopLeft, Pencil, Plus, RotateCcw, Rows3, Scale, Search, Smartphone, Sparkles, Split, Trash2, UserRound, Wand2, X } from "lucide-react";
 import { PhoneStatusBar } from "../components/DeviceFrame";
 import { mockRosterReferences, referenceById } from "../data/mockRosterReferences";
 import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode } from "../types";
@@ -454,40 +454,58 @@ function WorkbenchElements({
         </details>
       </ElementSection>
 
-      <ElementSection title="Tools Hub">
-        <div className="ux-tools-summary">
-          <BudgetMeter roster={roster} label="Current list" />
-          <div>
-            <strong>{flattenUnits(roster).length} units</strong>
-            <small>{countSections(roster)} roster sections</small>
-          </div>
-        </div>
-        <div className="ux-tools-grid">
-          {["Validation snapshot", "Export & share"].map((label) => (
-            <button key={label} type="button" className="ux-tool-tile">
+      <ElementSection title="Tools Workflow">
+        <div className="ux-tools-grid ux-tools-grid-large">
+          {[
+            ["Roster analytics", "Shape, totals, and matchup posture", <BarChart3 size={18} />],
+            ["Comparison", "Compare several entries side by side", <Scale size={18} />],
+            ["Game tracker", "Roster game mode, rounds, and notes", <Gamepad2 size={18} />],
+            ["Dice simulator", "Roll N dice with common side counts", <Dice5 size={18} />],
+          ].map(([label, helper, icon]) => (
+            <button key={label as string} type="button" className="ux-tool-tile">
               <span className="ux-setting-icon">
-                <Hammer size={18} />
+                {icon}
               </span>
               <span>
                 <strong>{label}</strong>
-                <small>Roster utility</small>
+                <small>{helper}</small>
               </span>
             </button>
           ))}
         </div>
-        <section className="ux-tools-panel">
-          <div className="ux-lookup-title">
-            <Hammer size={15} />
-            <strong>Checklist</strong>
+        <div className="ux-analytics-card">
+          <svg className="ux-radar-chart" viewBox="0 0 184 184" role="img" aria-label="Roster analytics radar">
+            <polygon points="92,22 158.6,70.4 133.1,148.6 50.9,148.6 25.4,70.4" className="ux-radar-ring" />
+            <line x1="92" y1="92" x2="92" y2="22" className="ux-radar-axis" />
+            <line x1="92" y1="92" x2="158.6" y2="70.4" className="ux-radar-axis" />
+            <line x1="92" y1="92" x2="133.1" y2="148.6" className="ux-radar-axis" />
+            <line x1="92" y1="92" x2="50.9" y2="148.6" className="ux-radar-axis" />
+            <line x1="92" y1="92" x2="25.4" y2="70.4" className="ux-radar-axis" />
+            <polygon points="92,47 132,79 120,130 60,136 52,79" className="ux-radar-fill" />
+          </svg>
+          <div className="ux-stat-grid">
+            <div className="ux-tool-stat"><strong>{flattenUnits(roster).length}</strong><small>Units</small></div>
+            <div className="ux-tool-stat"><strong>{countSections(roster)}</strong><small>Sections</small></div>
           </div>
-          <button type="button" className="ux-source-row on">
-            <span className="ux-opt-check" aria-hidden />
-            <span>
-              <strong>Confirm detachment rules</strong>
-              <small>Ready for review</small>
-            </span>
-          </button>
+        </div>
+        <section className="ux-compare-table">
+          <div className="ux-compare-head"><span>Entry</span><span>Pts</span><span>Models</span><span>Status</span></div>
+          {[selectedUnit, roster.forces[0].sections[0].units[0]].filter(Boolean).map((unit) => (
+            <button key={unit.id} type="button" className="ux-compare-row">
+              <span><strong>{unit.name}</strong><small>{unit.role}</small></span>
+              <b>{unit.points}</b>
+              <b>{unit.count}</b>
+              <Check size={15} />
+            </button>
+          ))}
         </section>
+        <section className="ux-note-composer">
+          <span><strong>Round note</strong><small>Pin a note and attach table photos</small></span>
+          <button type="button" aria-label="Add image"><ImagePlus size={18} /></button>
+        </section>
+        <div className="ux-dice-stage">
+          {[6, 2, 5].map((value, index) => <span key={`${value}-${index}`} className="ux-die">{value}</span>)}
+        </div>
       </ElementSection>
 
       <ElementSection title="Favorite Library Cards">
