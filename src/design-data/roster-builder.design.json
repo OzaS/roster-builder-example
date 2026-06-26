@@ -1,0 +1,214 @@
+{
+  "version": 1,
+  "designs": [
+    {
+      "id": "ux-workbench",
+      "status": "active",
+      "name": "Codex Workbench",
+      "eyebrow": "UX · master-detail",
+      "icon": "PanelsTopLeft",
+      "component": "CodexWorkbench",
+      "bestFor": "Tablet power-editing and tuning loadouts without losing roster context.",
+      "direction": "Library → persistent roster tree, live detail pane and a validation rail; optional smart search overlays it.",
+      "interaction": "Select in the tree, edit on the right, watch legality update in the rail. Flip on smart search for type-to-add and AI suggestions.",
+      "tradeoff": "Shines on tablet; on phone it falls back to a more conventional drill-in.",
+      "screens": [
+        {
+          "id": "library",
+          "label": "Lists"
+        },
+        {
+          "id": "collections",
+          "label": "Library"
+        },
+        {
+          "id": "app",
+          "label": "App"
+        },
+        {
+          "id": "subscription-main",
+          "label": "Supporter feature"
+        },
+        {
+          "id": "source",
+          "label": "Lookup"
+        },
+        {
+          "id": "tools",
+          "label": "Tools"
+        },
+        {
+          "id": "roster-analytics",
+          "label": "Roster analytics"
+        },
+        {
+          "id": "comparison",
+          "label": "Comparison"
+        },
+        {
+          "id": "game-tracker",
+          "label": "Game tracker"
+        },
+        {
+          "id": "dice-simulator",
+          "label": "Dice simulator"
+        },
+        {
+          "id": "settings",
+          "label": "Settings"
+        },
+        {
+          "id": "create-roster",
+          "label": "Roster creation"
+        },
+        {
+          "id": "overview",
+          "label": "Roster edition"
+        },
+        {
+          "id": "subscription-edition",
+          "label": "Smart tools subscription"
+        },
+        {
+          "id": "smart-search",
+          "label": "Smart search"
+        },
+        {
+          "id": "add-unit",
+          "label": "Add unit"
+        },
+        {
+          "id": "unit-detail",
+          "label": "Unit detail"
+        },
+        {
+          "id": "diagnostics",
+          "label": "Diagnostics"
+        }
+      ],
+      "workflows": [
+        {
+          "id": "main",
+          "label": "Main screen",
+          "screens": [
+            "library",
+            "subscription-main",
+            "source",
+            "collections"
+          ]
+        },
+        {
+          "id": "tools",
+          "label": "Tools",
+          "screens": [
+            "tools",
+            "roster-analytics",
+            "comparison",
+            "game-tracker",
+            "dice-simulator"
+          ]
+        },
+        {
+          "id": "app",
+          "label": "App & settings",
+          "screens": [
+            "app",
+            "settings"
+          ]
+        },
+        {
+          "id": "creation",
+          "label": "Roster creation",
+          "screens": [
+            "create-roster"
+          ]
+        },
+        {
+          "id": "edition",
+          "label": "Roster edition",
+          "screens": [
+            "overview",
+            "subscription-edition",
+            "add-unit",
+            "unit-detail",
+            "diagnostics"
+          ]
+        },
+        {
+          "id": "smart-search",
+          "label": "Smart search",
+          "screens": [
+            "smart-search"
+          ]
+        },
+        {
+          "id": "unsorted",
+          "label": "Unsorted",
+          "screens": []
+        }
+      ],
+      "trash": {
+        "screens": []
+      },
+      "elements": {
+        "sections": [
+          "Color Tokens",
+          "Typography",
+          "Phone Status Bar",
+          "Workbench Chrome",
+          "Subscription Gate",
+          "Tablet Workspace Controls",
+          "Roster Creation",
+          "Roster Tree",
+          "Force Entries & Creation",
+          "Detail Pane",
+          "Options",
+          "Loadout Groups & Selector",
+          "Unit Profiles",
+          "Reference Glances",
+          "Unit Detail Toggle",
+          "Entry Action Menus",
+          "Swipe Unit Actions",
+          "Rename Dialog",
+          "Move Unit Dialog",
+          "Validation Rail",
+          "Add Pool Rows",
+          "Favorite Creation Sections",
+          "Smart Search (Settings)",
+          "Smart Search",
+          "Lookup & Sources",
+          "Tools Workflow",
+          "Favorite Library Cards",
+          "App & Account",
+          "Main Tab Bar",
+          "Designer Rail Controls",
+          "Workflow Board Group",
+          "Floating Command Bar"
+        ]
+      },
+      "comments": [
+        {
+          "id": "comment-1781735636507-4dvhf5",
+          "screen": "source",
+          "x": 72.70270270270271,
+          "y": 16.565533980582526,
+          "text": "New comment",
+          "mode": "point",
+          "status": "open",
+          "createdAt": "2026-06-17T22:33:56.507Z"
+        },
+        {
+          "id": "comment-1781905391380-tuime2",
+          "screen": "unit-detail",
+          "x": 51.02564102564102,
+          "y": 2.31042654028436,
+          "text": "New comment",
+          "mode": "element",
+          "status": "open",
+          "elementHint": "div .phone-status-bar \"Phone status: 9:41, connected, full battery\"",
+          "createdAt": "2026-06-19T21:43:11.380Z"
+        }
+      ]
+    }
+  ]
+}
