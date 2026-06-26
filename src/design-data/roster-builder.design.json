@@ -38,6 +38,22 @@
           "label": "Tools"
         },
         {
+          "id": "roster-analytics",
+          "label": "Roster analytics"
+        },
+        {
+          "id": "comparison",
+          "label": "Comparison"
+        },
+        {
+          "id": "game-tracker",
+          "label": "Game tracker"
+        },
+        {
+          "id": "dice-simulator",
+          "label": "Dice simulator"
+        },
+        {
           "id": "settings",
           "label": "Settings"
         },
@@ -78,8 +94,18 @@
             "library",
             "subscription-main",
             "source",
-            "tools",
             "collections"
+          ]
+        },
+        {
+          "id": "tools",
+          "label": "Tools",
+          "screens": [
+            "tools",
+            "roster-analytics",
+            "comparison",
+            "game-tracker",
+            "dice-simulator"
           ]
         },
         {
@@ -151,7 +177,7 @@
           "Smart Search (Settings)",
           "Smart Search",
           "Lookup & Sources",
-          "Tools Hub",
+          "Tools Workflow",
           "Favorite Library Cards",
           "App & Account",
           "Main Tab Bar",

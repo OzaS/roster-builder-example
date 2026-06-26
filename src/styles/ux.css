@@ -3447,6 +3447,10 @@ button.ux-reference-tag:focus-visible {
   gap: 10px;
 }
 
+.ux-tools-grid-large {
+  gap: 12px;
+}
+
 .ux-tool-tile {
   grid-template-columns: 38px minmax(0, 1fr);
   align-items: start;
@@ -3456,6 +3460,349 @@ button.ux-reference-tag:focus-visible {
 .ux-tools-panel .ux-source-row {
   grid-template-columns: 22px minmax(0, 1fr);
   cursor: default;
+}
+
+.ux-tool-page {
+  gap: 14px;
+}
+
+.ux-analytics-card {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--ux-line);
+  border-radius: var(--ux-r-md);
+  background: var(--ux-surface);
+}
+
+.ux-radar-chart {
+  width: min(230px, 100%);
+  aspect-ratio: 1;
+  justify-self: center;
+  overflow: visible;
+}
+
+.ux-radar-ring,
+.ux-radar-axis {
+  fill: none;
+  stroke: color-mix(in srgb, var(--ux-ink) 78%, transparent);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.ux-radar-ring:first-child,
+.ux-radar-ring:nth-child(2) {
+  stroke: var(--ux-line-2);
+  stroke-width: 1;
+}
+
+.ux-radar-fill {
+  fill: color-mix(in srgb, var(--ux-warn) 76%, transparent);
+  stroke: color-mix(in srgb, var(--ux-warn) 92%, var(--ux-ink));
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.ux-radar-legend {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.ux-radar-legend span,
+.ux-tool-stat {
+  display: grid;
+  gap: 3px;
+  padding: 10px;
+  border: 1px solid var(--ux-line);
+  border-radius: var(--ux-r-sm);
+  background: var(--ux-surface-2);
+}
+
+.ux-radar-legend strong {
+  font-size: 12px;
+}
+
+.ux-radar-legend small,
+.ux-tool-stat small {
+  color: var(--ux-muted);
+  font-size: 11px;
+}
+
+.ux-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.ux-tool-stat strong {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.ux-compare-selector {
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.ux-compare-selector .ux-filter-pill {
+  flex: 0 0 auto;
+}
+
+.ux-compare-table {
+  display: grid;
+  overflow: hidden;
+  border: 1px solid var(--ux-line);
+  border-radius: var(--ux-r-md);
+  background: var(--ux-surface);
+}
+
+.ux-compare-head,
+.ux-compare-row {
+  display: grid;
+  grid-template-columns: minmax(132px, 1fr) 44px 52px 38px;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.ux-compare-head {
+  padding: 10px 12px;
+  color: var(--ux-muted);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ux-compare-row {
+  padding: 12px;
+  border: 0;
+  border-top: 1px solid var(--ux-line);
+  background: transparent;
+  color: var(--ux-ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.ux-compare-row:hover {
+  background: var(--ux-surface-2);
+}
+
+.ux-compare-row strong,
+.ux-compare-row small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ux-compare-row strong {
+  font-size: 13px;
+}
+
+.ux-compare-row small {
+  margin-top: 2px;
+  color: var(--ux-muted);
+  font-size: 11px;
+}
+
+.ux-compare-row b {
+  font-size: 12.5px;
+}
+
+.ux-tool-launch {
+  width: 100%;
+}
+
+.ux-tracker-unit {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 11px;
+  border: 1px solid var(--ux-line);
+  border-radius: var(--ux-r-sm);
+  background: var(--ux-surface-2);
+  color: var(--ux-ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.ux-tracker-unit.kia {
+  border-color: color-mix(in srgb, var(--ux-err) 40%, var(--ux-line));
+  color: var(--ux-muted);
+}
+
+.ux-tracker-unit.kia .ux-opt-check {
+  background: var(--ux-err);
+  border-color: var(--ux-err);
+}
+
+.ux-tracker-unit strong,
+.ux-tracker-unit small {
+  display: block;
+}
+
+.ux-tracker-unit strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+.ux-tracker-unit small {
+  margin-top: 2px;
+  color: var(--ux-muted);
+  font-size: 11px;
+}
+
+.ux-note-composer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 40px;
+  align-items: center;
+  gap: 12px;
+  padding: 13px;
+  border: 1px solid var(--ux-line);
+  border-radius: var(--ux-r-md);
+  background: var(--ux-surface);
+}
+
+.ux-note-composer strong,
+.ux-note-composer small {
+  display: block;
+}
+
+.ux-note-composer strong {
+  font-size: 13.5px;
+}
+
+.ux-note-composer small {
+  margin-top: 2px;
+  color: var(--ux-muted);
+  font-size: 11px;
+}
+
+.ux-note-composer button {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 1px solid var(--ux-line);
+  border-radius: 12px;
+  background: var(--ux-surface-2);
+  color: var(--ux-accent-2);
+  cursor: pointer;
+}
+
+.ux-dice-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--ux-line);
+  border-radius: var(--ux-r-md);
+  background: var(--ux-surface);
+}
+
+.ux-dice-controls label {
+  display: grid;
+  gap: 6px;
+}
+
+.ux-dice-controls label span {
+  color: var(--ux-muted);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.ux-dice-controls input,
+.ux-dice-controls select {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 10px;
+  border: 1px solid var(--ux-line);
+  border-radius: 10px;
+  background: var(--ux-surface-2);
+  color: var(--ux-ink);
+  font: inherit;
+  font-weight: 750;
+}
+
+.ux-dice-controls .ux-primary {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-height: 44px;
+}
+
+.ux-dice-stage {
+  display: grid;
+  grid-template-columns: repeat(3, 52px);
+  justify-content: center;
+  gap: 12px;
+  min-height: 152px;
+  padding: 20px;
+  border: 1px solid var(--ux-line);
+  border-radius: var(--ux-r-md);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--ux-accent) 10%, transparent), transparent),
+    var(--ux-surface);
+}
+
+.ux-die {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--ux-accent-2) 38%, var(--ux-line));
+  border-radius: 13px;
+  background: linear-gradient(145deg, var(--ux-surface-3), var(--ux-surface-2));
+  color: var(--ux-ink);
+  font-size: 21px;
+  font-weight: 900;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.22);
+  animation: ux-die-roll 1.15s cubic-bezier(0.18, 0.86, 0.25, 1) both;
+  animation-delay: var(--die-delay, 0ms);
+}
+
+@keyframes ux-die-roll {
+  0% {
+    opacity: 0;
+    transform: translateY(-24px) rotate(-45deg) scale(0.74);
+  }
+  52% {
+    opacity: 1;
+    transform: translateY(8px) rotate(22deg) scale(1.08);
+  }
+  74% {
+    transform: translateY(-4px) rotate(-8deg) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+}
+
+.device-frame.tablet .ux-tools-grid-large,
+.device-frame.tablet .ux-stat-grid,
+.device-frame.tablet .ux-radar-legend {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.device-frame.tablet .ux-tool-page {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+}
+
+.device-frame.tablet .ux-tool-page > .ux-select-field,
+.device-frame.tablet .ux-tool-page > .ux-primary,
+.device-frame.tablet .ux-tool-page > .ux-stat-grid,
+.device-frame.tablet .ux-tool-page > .ux-dice-controls,
+.device-frame.tablet .ux-tool-page > .ux-dice-stage {
+  grid-column: 1 / -1;
 }
 
 /* keep the floating command bar from covering pane content */
