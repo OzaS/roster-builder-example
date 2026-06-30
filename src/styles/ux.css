@@ -11,15 +11,24 @@
   --ux-surface-3: #262b38;
   --ux-ink: #f0f2f7;
   --ux-muted: #98a1b3;
+  --ux-ink-primary: var(--ux-ink);
+  --ux-ink-secondary: var(--ux-muted);
+  --ux-ink-tertiary: #727c90;
   --ux-line: rgba(255, 255, 255, 0.08);
   --ux-line-2: rgba(255, 255, 255, 0.15);
   --ux-accent: #7c8cff;
   --ux-accent-2: #9aa6ff;
   --ux-accent-ink: #0a0e26;
+  --ux-accent-ink-primary: var(--ux-accent-ink);
+  --ux-accent-ink-secondary: #222b54;
+  --ux-accent-ink-tertiary: #35416d;
   --ux-ok: #57d98a;
   --ux-warn: #f6b73c;
+  --ux-warn-ink: #1b1303;
   --ux-err: #fb6f5e;
+  --ux-err-ink: #260704;
   --ux-cool: #62cdf2;
+  --ux-cool-ink: #06171e;
   --ux-r-sm: 10px;
   --ux-r-md: 14px;
   --ux-r-lg: 20px;
@@ -45,22 +54,31 @@
   --ux-surface-3: #e8edf5;
   --ux-ink: #141a26;
   --ux-muted: #5a6475;
+  --ux-ink-primary: var(--ux-ink);
+  --ux-ink-secondary: var(--ux-muted);
+  --ux-ink-tertiary: #737d8d;
   --ux-line: rgba(20, 28, 46, 0.1);
   --ux-line-2: rgba(20, 28, 46, 0.18);
   --ux-accent: #4a5bd6;
   --ux-accent-2: #5e6fe6;
   --ux-accent-ink: #ffffff;
+  --ux-accent-ink-primary: var(--ux-accent-ink);
+  --ux-accent-ink-secondary: #f2f4ff;
+  --ux-accent-ink-tertiary: #e4e8ff;
   --ux-ok: #1f9d57;
   --ux-warn: #b9791a;
+  --ux-warn-ink: #1b1303;
   --ux-err: #d8483a;
+  --ux-err-ink: #240604;
   --ux-cool: #1f8fb8;
+  --ux-cool-ink: #06171e;
 }
 
 .ux-screen * {
   box-sizing: border-box;
 }
 
-.ux-screen button {
+.ux-screen :where(button) {
   font-family: inherit;
   color: inherit;
 }
@@ -828,8 +846,11 @@
 }
 .ux-new-roster small {
   display: block;
+  color: var(--ux-accent-ink-secondary);
   font-size: 12px;
-  opacity: 0.85;
+}
+.ux-new-roster.ghost small {
+  color: var(--ux-ink-secondary);
 }
 
 /* canvas start flow + export reuse */
@@ -4610,6 +4631,8 @@ button.ux-reference-tag:focus-visible {
   --ux-accent: #d8392f;
   --ux-accent-2: #ef5b4d;
   --ux-accent-ink: #fff3f0;
+  --ux-accent-ink-secondary: #ffe3df;
+  --ux-accent-ink-tertiary: #ffd5cf;
   --ux-cool: #e0b145;
 }
 .ux-screen.ux-scheme-wh40k.dark {
@@ -4640,6 +4663,8 @@ button.ux-reference-tag:focus-visible {
   --ux-accent: #c69a44;
   --ux-accent-2: #e2c272;
   --ux-accent-ink: #241603;
+  --ux-accent-ink-secondary: #382307;
+  --ux-accent-ink-tertiary: #4a300d;
   --ux-cool: #d98a52;
 }
 .ux-screen.ux-scheme-horus-heresy.dark {
@@ -4660,9 +4685,11 @@ button.ux-reference-tag:focus-visible {
   --ux-muted: #7d6045;
   --ux-line: rgba(58, 37, 25, 0.16);
   --ux-line-2: rgba(58, 37, 25, 0.26);
-  --ux-accent: #9a6a1c;
+  --ux-accent: #a97620;
   --ux-accent-2: #b5842a;
-  --ux-accent-ink: #fff7e6;
+  --ux-accent-ink: #0b0600;
+  --ux-accent-ink-secondary: #120a02;
+  --ux-accent-ink-tertiary: #1a0e02;
   --ux-cool: #9c5a2a;
 }
 
@@ -4671,6 +4698,8 @@ button.ux-reference-tag:focus-visible {
   --ux-accent: #29b3e6;
   --ux-accent-2: #5ad0f6;
   --ux-accent-ink: #04141f;
+  --ux-accent-ink-secondary: #0b2737;
+  --ux-accent-ink-tertiary: #15394b;
   --ux-cool: #f3c63f;
 }
 .ux-screen.ux-scheme-age-of-sigmar.dark {
@@ -4693,6 +4722,8 @@ button.ux-reference-tag:focus-visible {
   --ux-accent: #1683b3;
   --ux-accent-2: #2299cc;
   --ux-accent-ink: #ffffff;
+  --ux-accent-ink-secondary: #effaff;
+  --ux-accent-ink-tertiary: #def4ff;
   --ux-cool: #b58420;
 }
 
@@ -4701,6 +4732,8 @@ button.ux-reference-tag:focus-visible {
   --ux-accent: #4f8a5b;
   --ux-accent-2: #6fae7b;
   --ux-accent-ink: #07140b;
+  --ux-accent-ink-secondary: #172b1b;
+  --ux-accent-ink-tertiary: #29422e;
   --ux-cool: #c2933f;
 }
 .ux-screen.ux-scheme-old-world.dark {
@@ -4724,10 +4757,53 @@ button.ux-reference-tag:focus-visible {
   --ux-accent: #3a6b46;
   --ux-accent-2: #4b855a;
   --ux-accent-ink: #ffffff;
+  --ux-accent-ink-secondary: #f1fff3;
+  --ux-accent-ink-tertiary: #e1f7e5;
   --ux-cool: #87672c;
 }
 
 /* ------------------------- current-design elements ------------------------- */
+
+.ux-catalog-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 0 0 18px; }
+.ux-catalog-summary > div { display: grid; gap: 3px; padding: 14px; border: 1px solid color-mix(in srgb, var(--ux-ink) 12%, transparent); border-radius: var(--ux-r-md); background: var(--ux-surface); }
+.ux-catalog-summary strong { font-size: 22px; color: var(--ux-ink); }
+.ux-catalog-summary small { color: var(--ux-muted); }
+.ux-catalog-group { display: contents; }
+.ux-catalog-group-head { margin: 22px 0 12px; padding: 20px; border: 1px solid color-mix(in srgb, var(--ux-accent) 30%, transparent); border-radius: var(--ux-r-lg); background: color-mix(in srgb, var(--ux-accent) 8%, var(--ux-surface)); }
+.ux-catalog-group.gallery-ui .ux-catalog-group-head { border-color: color-mix(in srgb, var(--ux-muted) 28%, transparent); background: var(--ux-surface-2); }
+.ux-catalog-group-head span { font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ux-accent); }
+.ux-catalog-group-head h2 { margin: 5px 0; font-size: 24px; }
+.ux-catalog-group-head p { max-width: 720px; margin: 0; color: var(--ux-muted); }
+.ux-element-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
+.design-elements-panel.ux-screen .ux-element-heading h2 { margin: 0 0 4px; }
+.ux-element-heading code, .ux-element-spec code { font-size: 11px; color: var(--ux-muted); }
+.ux-element-badges { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+.ux-element-badges span { padding: 4px 7px; border-radius: 999px; background: var(--ux-surface-3); color: var(--ux-muted); font-size: 10px; font-weight: 750; text-transform: capitalize; }
+.ux-element-badges .status-ready-for-rn { background: color-mix(in srgb, var(--ux-cool) 18%, var(--ux-surface)); color: var(--ux-cool); }
+.ux-element-badges .status-needs-review { background: color-mix(in srgb, var(--ux-warn) 18%, var(--ux-surface)); color: var(--ux-warn); }
+.ux-element-spec { margin: 0 0 16px; border-top: 1px solid color-mix(in srgb, var(--ux-ink) 10%, transparent); border-bottom: 1px solid color-mix(in srgb, var(--ux-ink) 10%, transparent); }
+.ux-element-spec summary { padding: 9px 0; color: var(--ux-muted); font-size: 12px; cursor: pointer; }
+.ux-element-spec > div { display: grid; gap: 8px; padding: 0 0 12px; }
+.ux-element-spec p { display: grid; grid-template-columns: 100px 1fr; gap: 10px; margin: 0; font-size: 12px; }
+.ux-element-spec p strong { color: var(--ux-ink); }
+.ux-element-spec p span { color: var(--ux-muted); }
+.ux-state-matrix { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.ux-state-card { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 4px 8px; min-height: 88px; padding: 12px; border: 1px solid color-mix(in srgb, var(--ux-ink) 12%, transparent); border-radius: var(--ux-r-md); background: var(--ux-surface-2); }
+.ux-state-card small, .ux-state-card button { grid-column: 2; }
+.ux-state-card small { color: var(--ux-muted); }
+.ux-state-card button { justify-self: start; border: 0; background: transparent; color: var(--ux-accent); font-weight: 750; }
+.ux-state-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ux-muted); }
+.ux-state-card.loading .ux-state-dot { background: var(--ux-cool); }
+.ux-state-card.offline .ux-state-dot, .ux-state-card.locked .ux-state-dot { background: var(--ux-warn); }
+.ux-state-card.error .ux-state-dot { background: var(--ux-err); }
+.ux-state-card.disabled { opacity: .58; }
+
+@media (max-width: 760px) {
+  .ux-catalog-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ux-element-heading { display: grid; }
+  .ux-element-badges { justify-content: flex-start; }
+  .ux-state-matrix { grid-template-columns: 1fr; }
+}
 
 .design-elements-panel.ux-screen {
   display: grid;
@@ -4857,7 +4933,8 @@ button.ux-reference-tag:focus-visible {
 }
 
 .design-elements-panel.ux-screen .ux-token-swatch small {
-  opacity: 0.72;
+  color: inherit;
+  opacity: 1;
 }
 
 .design-elements-panel.ux-screen .ux-type-stack .type-display {
