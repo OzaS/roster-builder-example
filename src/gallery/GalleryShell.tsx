@@ -377,7 +377,7 @@ export function GalleryShell({
               onOpenGlance={openGlance}
               {...boardProps}
             />
-          ) : navigatorView === "elements" ? (
+          ) : navigatorView === "elements" && selectedDesign ? (
             <DesignElementsPanel
               concept={concept}
               platform={platform}
@@ -391,6 +391,7 @@ export function GalleryShell({
               onSelectUnit={boardProps.onSelectUnit}
               onToggleOption={boardProps.onToggleOption}
               onCountChange={boardProps.onCountChange}
+              elements={selectedDesign.elements}
             />
           ) : (
             <div className="single-preview-shell" onClickCapture={handleSinglePreviewClick}>

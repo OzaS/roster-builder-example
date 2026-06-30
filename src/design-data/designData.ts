@@ -30,6 +30,37 @@ export type DesignComment = {
   updatedAt?: string;
 };
 
+export type DesignElementStatus = "specified" | "ready-for-rn" | "implemented" | "needs-review";
+export type DesignElementLevel = "foundation" | "primitive" | "composite" | "navigation" | "overlay" | "screen-composition" | "gallery-tooling";
+export type DesignElementPlatform = "phone" | "tablet" | "gallery";
+
+export type DesignElementSection = {
+  id: string;
+  title: string;
+  level: DesignElementLevel;
+  status: DesignElementStatus;
+  platforms: DesignElementPlatform[];
+  states: string[];
+  screens: WorkflowScreen[];
+  reactNative?: {
+    component: string;
+    behavior: string;
+    accessibility: string;
+  };
+};
+
+export type DesignElementGroup = {
+  id: "product-ui" | "gallery-ui";
+  label: string;
+  description: string;
+  sections: DesignElementSection[];
+};
+
+export type DesignElements = {
+  release: string;
+  groups: DesignElementGroup[];
+};
+
 export type EditableDesign = {
   id: ConceptId;
   status: DesignStatus;
@@ -45,7 +76,7 @@ export type EditableDesign = {
   workflows: DesignWorkflow[];
   trash: { screens: WorkflowScreen[] };
   comments: DesignComment[];
-  elements: { sections: string[] };
+  elements: DesignElements;
 };
 
 export type DesignData = {

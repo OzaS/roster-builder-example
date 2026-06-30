@@ -1,6 +1,8 @@
 import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BarChart3, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, CircleDot, Cog, Coins, Command, Copy, Database, Dice5, Download, Ellipsis, FileInput, Gamepad2, GripVertical, Hammer, Heart, ImagePlus, Layers, LibraryBig, Maximize2, MessageCircle, Minus, MoveRight, PanelsTopLeft, Pencil, Plus, RotateCcw, Rows3, Scale, Search, Smartphone, Sparkles, Split, Trash2, UserRound, Wand2, X } from "lucide-react";
+import { createContext, useContext } from "react";
 import { PhoneStatusBar } from "../components/DeviceFrame";
 import { mockRosterReferences, referenceById } from "../data/mockRosterReferences";
+import type { DesignElementGroup, DesignElements } from "../design-data/designData";
 import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode } from "../types";
 import { BudgetMeter, Chip, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
@@ -18,6 +20,7 @@ type Props = {
   onSelectUnit: (id: string) => void;
   onToggleOption: (id: string) => void;
   onCountChange: (id: string, delta: number) => void;
+  elements: DesignElements;
 };
 
 export function DesignElementsPanel({
@@ -32,16 +35,18 @@ export function DesignElementsPanel({
   onSelectSection,
   onSelectUnit,
   onToggleOption,
+  elements,
 }: Props) {
   const rootClass = `design-elements-panel ux-screen ux-workbench ${shellClass(themeMode, colorScheme)} ${platform}`;
 
   return (
+    <ElementCatalogContext.Provider value={elements}>
     <section className={rootClass}>
       <header className="elements-hero ux-elements-hero">
         <div>
-          <small>{concept.eyebrow}</small>
-          <h1>{concept.name} Elements</h1>
-          <p>Reusable tree, detail, validation, and dense editing primitives for the master-detail direction.</p>
+          <small>{concept.eyebrow} · {elements.release}</small>
+          <h1>{concept.name} Component Catalog</h1>
+          <p>React Native product specifications, separated from the web-only tools used to review them.</p>
         </div>
         <div className="elements-hero-actions">
           <button type="button" aria-label="Search">
@@ -53,6 +58,8 @@ export function DesignElementsPanel({
         </div>
       </header>
 
+      <CatalogSummary groups={elements.groups} />
+      <CatalogGroup groupId="product-ui">
       <TokenSection />
       <TypographySection roster={roster} />
       <ElementSection title="Phone Status Bar">
@@ -60,8 +67,10 @@ export function DesignElementsPanel({
           <PhoneStatusBar />
         </div>
       </ElementSection>
+      </CatalogGroup>
       <WorkbenchElements roster={roster} selectedSection={selectedSection} selectedUnit={selectedUnit} selectedSectionId={selectedSectionId} onSelectSection={onSelectSection} onSelectUnit={onSelectUnit} onToggleOption={onToggleOption} />
     </section>
+    </ElementCatalogContext.Provider>
   );
 }
 
@@ -69,12 +78,16 @@ function TokenSection() {
   const tokens = [
     ["Accent", "var(--ux-accent)", "var(--ux-accent-ink)"],
     ["Accent 2", "var(--ux-accent-2)", "var(--ux-accent-ink)"],
-    ["Surface", "var(--ux-surface)", "var(--ux-ink)"],
+    ["Accent · Secondary text", "var(--ux-accent)", "var(--ux-accent-ink-secondary)"],
+    ["Accent · Tertiary text", "var(--ux-accent)", "var(--ux-accent-ink-tertiary)"],
+    ["Surface", "var(--ux-surface)", "var(--ux-ink-primary)"],
+    ["Surface · Secondary text", "var(--ux-surface)", "var(--ux-ink-secondary)"],
+    ["Surface · Tertiary text", "var(--ux-surface)", "var(--ux-ink-tertiary)"],
     ["Surface 2", "var(--ux-surface-2)", "var(--ux-ink)"],
     ["Surface 3", "var(--ux-surface-3)", "var(--ux-ink)"],
-    ["Cool", "var(--ux-cool)", "var(--ux-accent-ink)"],
-    ["Warning", "var(--ux-warn)", "#1b1303"],
-    ["Error", "var(--ux-err)", "#fff7f5"],
+    ["Cool", "var(--ux-cool)", "var(--ux-cool-ink)"],
+    ["Warning", "var(--ux-warn)", "var(--ux-warn-ink)"],
+    ["Error", "var(--ux-err)", "var(--ux-err-ink)"],
   ];
 
   return (
@@ -128,6 +141,7 @@ function WorkbenchElements({
 
   return (
     <>
+      <CatalogGroup groupId="product-ui" continuation>
       <ElementSection title="Workbench Chrome">
         <header className="ux-wb-top ux-elements-static">
           <button type="button" className="ux-icon-btn" aria-label="Lists">
@@ -560,6 +574,10 @@ function WorkbenchElements({
         </div>
       </ElementSection>
 
+      <StateMatrixElement />
+      </CatalogGroup>
+
+      <CatalogGroup groupId="gallery-ui">
       <ElementSection title="Designer Rail Controls">
         <div className="rail-actions">
           <button className="rail-icon-button" type="button" aria-label="Screenshot">
@@ -684,6 +702,7 @@ function WorkbenchElements({
           </div>
         </div>
       </ElementSection>
+      </CatalogGroup>
     </>
   );
 }
@@ -904,10 +923,93 @@ function ForceEntriesElement({ roster }: { roster: Roster }) {
   );
 }
 
-function ElementSection({ title, children }: { title: string; children: React.ReactNode }) {
+const ElementCatalogContext = createContext<DesignElements | null>(null);
+
+function CatalogSummary({ groups }: { groups: DesignElementGroup[] }) {
+  const product = groups.find((group) => group.id === "product-ui");
+  const ready = product?.sections.filter((section) => section.status === "ready-for-rn").length ?? 0;
+  const coveredScreens = new Set(product?.sections.flatMap((section) => section.screens) ?? []);
   return (
-    <article className="element-section ux-element-section">
-      <h2>{title}</h2>
+    <aside className="ux-catalog-summary" aria-label="V1 React Native handoff summary">
+      <div><strong>{product?.sections.length ?? 0}</strong><small>Product specifications</small></div>
+      <div><strong>{ready}</strong><small>Ready for RN</small></div>
+      <div><strong>{coveredScreens.size}</strong><small>Screens covered</small></div>
+      <div><strong>{groups.find((group) => group.id === "gallery-ui")?.sections.length ?? 0}</strong><small>Gallery-only tools</small></div>
+    </aside>
+  );
+}
+
+function CatalogGroup({ groupId, continuation = false, children }: { groupId: DesignElementGroup["id"]; continuation?: boolean; children: React.ReactNode }) {
+  const catalog = useContext(ElementCatalogContext);
+  const group = catalog?.groups.find((candidate) => candidate.id === groupId);
+  return (
+    <section className={`ux-catalog-group ${groupId}`} aria-label={group?.label}>
+      {!continuation && group ? (
+        <header className="ux-catalog-group-head">
+          <span>{groupId === "product-ui" ? "React Native target" : "Web gallery only"}</span>
+          <h2>{group.label}</h2>
+          <p>{group.description}</p>
+        </header>
+      ) : null}
+      {children}
+    </section>
+  );
+}
+
+function StateMatrixElement() {
+  const states = [
+    ["Loading", "Updating roster…", "loading"],
+    ["Empty", "No units match these filters.", "empty"],
+    ["Offline", "Showing saved roster data.", "offline"],
+    ["Error", "Couldn’t update the roster.", "error"],
+    ["Disabled", "Unavailable for this force.", "disabled"],
+    ["Subscriber", "Supporter feature", "locked"],
+  ];
+  return (
+    <ElementSection title="Component State Matrix">
+      <div className="ux-state-matrix">
+        {states.map(([title, copy, state]) => (
+          <article className={`ux-state-card ${state}`} key={state}>
+            <span className="ux-state-dot" aria-hidden />
+            <strong>{title}</strong>
+            <small>{copy}</small>
+            {state === "error" || state === "offline" ? <button type="button">Try again</button> : null}
+          </article>
+        ))}
+      </div>
+    </ElementSection>
+  );
+}
+
+function ElementSection({ title, children }: { title: string; children: React.ReactNode }) {
+  const catalog = useContext(ElementCatalogContext);
+  const specification = catalog?.groups.flatMap((group) => group.sections).find((section) => section.title === title);
+  return (
+    <article className="element-section ux-element-section" data-element-id={specification?.id}>
+      <header className="ux-element-heading">
+        <div>
+          <h2>{title}</h2>
+          {specification ? <code>{specification.id}</code> : null}
+        </div>
+        {specification ? (
+          <div className="ux-element-badges" aria-label="Component specification status">
+            <span>{specification.level}</span>
+            <span className={`status-${specification.status}`}>{specification.status}</span>
+            <span>{specification.platforms.join(" + ")}</span>
+          </div>
+        ) : null}
+      </header>
+      {specification ? (
+        <details className="ux-element-spec">
+          <summary>React Native handoff · {specification.states.length} states · {specification.screens.length || "shared"} screen{specification.screens.length === 1 ? "" : "s"}</summary>
+          <div>
+            <p><strong>States</strong><span>{specification.states.join(" · ")}</span></p>
+            <p><strong>Coverage</strong><span>{specification.screens.length ? specification.screens.join(" · ") : "Shared foundation"}</span></p>
+            {specification.reactNative ? <p><strong>Component</strong><span><code>{specification.reactNative.component}</code> — {specification.reactNative.behavior}</span></p> : <p><strong>Implementation</strong><span>Gallery-only; exclude from the mobile application.</span></p>}
+            {specification.reactNative ? <p><strong>Accessibility</strong><span>{specification.reactNative.accessibility}</span></p> : null}
+          </div>
+        </details>
+      ) : null}
       {children}
     </article>
   );
