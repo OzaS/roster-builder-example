@@ -21,6 +21,7 @@ const forceCreationModes = ["selector", "inline"] satisfies ForceCreationMode[];
 const defaultTabletPanelLayout: TabletPanelLayout = { treeRatio: 0.3, railRatio: 0.26, treeVisible: true, railVisible: true };
 const workflowScreenIds = [
   "library",
+  "library-v2",
   "collections",
   "app",
   "subscription-main",

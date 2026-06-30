@@ -15,7 +15,11 @@
       "screens": [
         {
           "id": "library",
-          "label": "Lists"
+          "label": "Lists · V1"
+        },
+        {
+          "id": "library-v2",
+          "label": "Lists · V2"
         },
         {
           "id": "collections",
@@ -92,6 +96,7 @@
           "label": "Main screen",
           "screens": [
             "library",
+            "library-v2",
             "subscription-main",
             "source",
             "collections"
@@ -188,6 +193,7 @@
               { "id": "library.favorite-cards", "title": "Favorite Library Cards", "level": "composite", "status": "specified", "platforms": ["phone", "tablet"], "states": ["default", "empty", "adding", "removing"], "screens": ["collections"], "reactNative": { "component": "FavoriteLibraryCard", "behavior": "Confirm destructive removal and retain list position.", "accessibility": "Give add and remove actions distinct labels." } },
               { "id": "account.summary", "title": "App & Account", "level": "screen-composition", "status": "specified", "platforms": ["phone", "tablet"], "states": ["signed-in", "signed-out", "loading", "offline"], "screens": ["app", "settings"], "reactNative": { "component": "AccountScreen", "behavior": "Handle cached account data and sign-in transitions.", "accessibility": "Do not expose email as the sole account identifier." } },
               { "id": "navigation.main-tabs", "title": "Main Tab Bar", "level": "navigation", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["selected", "unselected", "badge", "keyboard-visible"], "screens": ["library", "source", "tools", "collections"], "reactNative": { "component": "MainTabNavigator", "behavior": "Use the native navigation library and safe-area insets.", "accessibility": "Expose tab role, selected state, and badge value." } },
+              { "id": "lists.organizer", "title": "Roster Organizer", "level": "composite", "status": "specified", "platforms": ["phone", "tablet"], "states": ["open", "closed", "searching", "filtered", "empty"], "screens": ["library-v2"], "reactNative": { "component": "RosterOrganizer", "behavior": "Keep the roster list available when organization controls are dismissed; adapt the organizer between an inline panel and a sheet.", "accessibility": "Name search, folder, game-system, and tag controls and preserve the active filter when the panel closes." } },
               { "id": "states.system", "title": "Component State Matrix", "level": "foundation", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["loading", "empty", "offline", "error", "disabled", "subscription-locked"], "screens": [], "reactNative": { "component": "AsyncState", "behavior": "Use consistent recovery actions and preserve content during refresh.", "accessibility": "Announce state transitions and make recovery actions reachable." } }
             ]
           },
