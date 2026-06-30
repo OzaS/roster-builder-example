@@ -29,6 +29,7 @@ export const colorSchemes: Array<{ id: ColorScheme; label: string; short: string
 
 export type WorkflowScreen =
   | "library"
+  | "library-v2"
   | "collections"
   | "app"
   | "subscription-main"

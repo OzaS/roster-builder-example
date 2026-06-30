@@ -2,6 +2,7 @@ import type { PrototypeScreen, WorkflowScreen } from "../types";
 
 export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "library", label: "Lists" },
+  { id: "library-v2", label: "Lists · V2" },
   { id: "collections", label: "Library" },
   { id: "app", label: "App" },
   { id: "subscription-main", label: "Subscription · Main" },
@@ -43,6 +44,7 @@ export function resolveWorkflow(workflow?: WorkflowScreen[]): Array<{ id: Workfl
 }
 
 export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScreen {
+  if (screen === "library-v2") return "library";
   if (screen === "subscription-main") return "library";
   if (screen === "subscription-edition") return "overview";
   if (screen === "create-roster") return "system";

@@ -3042,6 +3042,61 @@ button.ux-reference-tag:focus-visible {
   overflow-y: auto;
 }
 
+.ux-wb-home-body.ux-lists-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: stretch;
+  padding: 0;
+  gap: 0;
+}
+.ux-lists-main { display: grid; align-content: start; gap: 18px; min-width: 0; padding: 18px 14px 28px; overflow-y: auto; }
+.ux-lists-actions { display: flex; align-items: center; gap: 8px; }
+.ux-lists-actions > div:first-child { min-width: 0; margin-right: auto; }
+.ux-lists-actions > div > strong, .ux-lists-actions > div > small { display: block; }
+.ux-lists-actions > div > strong { font-size: 18px; letter-spacing: -0.02em; }
+.ux-lists-actions > div > small { margin-top: 2px; color: var(--ux-muted); font-size: 11px; }
+.ux-new-roster.ux-new-roster-compact { display: flex; min-height: 38px; padding: 8px 11px; border-radius: 10px; }
+.ux-new-roster-compact strong { font-size: 12px; }
+.ux-organizer-toggle { display: flex; align-items: center; gap: 6px; min-height: 38px; padding: 0 10px; border: 1px solid var(--ux-line-2); border-radius: 10px; background: var(--ux-surface); color: var(--ux-ink); font-size: 12px; font-weight: 750; cursor: pointer; }
+.ux-roster-organizer { display: grid; align-content: start; gap: 17px; padding: 16px 14px 20px; border-bottom: 1px solid var(--ux-line); background: color-mix(in srgb, var(--ux-surface-2) 76%, var(--ux-bg)); }
+.ux-roster-organizer > header { display: flex; align-items: center; justify-content: space-between; }
+.ux-roster-organizer > header small, .ux-roster-organizer > header strong { display: block; }
+.ux-roster-organizer > header small, .ux-organizer-group > small, .ux-organizer-tags > small { color: var(--ux-muted); font-size: 9px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+.ux-roster-organizer > header strong { margin-top: 2px; font-size: 16px; }
+.ux-roster-organizer > header button { display: grid; width: 30px; height: 30px; place-items: center; border: 0; border-radius: 9px; background: transparent; color: var(--ux-muted); cursor: pointer; }
+.ux-roster-organizer > header button:hover { background: var(--ux-surface); color: var(--ux-ink); }
+.ux-lists-search { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px; min-height: 38px; padding: 0 10px; border: 1px solid var(--ux-line); border-radius: 10px; background: var(--ux-surface); color: var(--ux-muted); }
+.ux-lists-search input { min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ux-ink); font: inherit; font-size: 12px; }
+.ux-lists-search kbd { padding: 2px 5px; border: 1px solid var(--ux-line); border-radius: 5px; font-size: 9px; }
+.ux-organizer-group { display: grid; gap: 4px; }
+.ux-organizer-group > small, .ux-organizer-tags > small { margin-bottom: 4px; }
+.ux-organizer-group button { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: center; gap: 7px; min-height: 34px; padding: 0 8px; border: 0; border-radius: 8px; background: transparent; color: var(--ux-muted); text-align: left; cursor: pointer; }
+.ux-organizer-group button span { overflow: hidden; font-size: 11.5px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.ux-organizer-group button b { font-size: 10px; }
+.ux-organizer-group button.active { background: color-mix(in srgb, var(--ux-accent) 14%, var(--ux-surface)); color: var(--ux-accent-2); }
+.ux-organizer-group button.ux-organizer-add { display: flex; margin-top: 3px; color: var(--ux-accent-2); }
+.ux-organizer-tags { display: grid; gap: 6px; }
+.ux-organizer-tags > div { display: flex; flex-wrap: wrap; gap: 5px; }
+.ux-organizer-tags button { display: flex; align-items: center; gap: 4px; padding: 6px 7px; border: 1px solid var(--ux-line); border-radius: 999px; background: var(--ux-surface); color: var(--ux-muted); font-size: 9.5px; cursor: pointer; }
+.ux-recent-section, .ux-all-rosters { display: grid; gap: 8px; }
+.ux-recent-empty { display: grid; justify-items: center; padding: 24px 18px; border: 1px dashed var(--ux-line-2); border-radius: var(--ux-r-lg); background: color-mix(in srgb, var(--ux-surface) 80%, transparent); text-align: center; }
+.ux-recent-empty > span { display: grid; width: 40px; height: 40px; margin-bottom: 10px; place-items: center; border-radius: 12px; background: color-mix(in srgb, var(--ux-accent) 14%, var(--ux-surface)); color: var(--ux-accent-2); }
+.ux-recent-empty > strong { font-size: 13.5px; }
+.ux-recent-empty > p { max-width: 260px; margin: 4px 0 12px; color: var(--ux-muted); font-size: 11px; line-height: 1.45; }
+.ux-recent-empty > button { border: 0; background: transparent; color: var(--ux-accent-2); font-size: 11px; font-weight: 800; cursor: pointer; }
+.ux-search-empty { display: grid; justify-items: center; gap: 5px; padding: 26px; color: var(--ux-muted); text-align: center; }
+.ux-search-empty strong { color: var(--ux-ink); font-size: 13px; }
+.ux-search-empty small { font-size: 11px; }
+
+@media (min-width: 700px) {
+  .ux-wb-home-body.ux-lists-body.organizer-open { grid-template-columns: minmax(190px, 26%) minmax(0, 1fr); }
+  .ux-roster-organizer { border-right: 1px solid var(--ux-line); border-bottom: 0; overflow-y: auto; }
+  .ux-lists-main { padding: 22px 24px 32px; }
+}
+.device-frame.phone .ux-wb-home-body.ux-lists-body.organizer-open { grid-template-columns: minmax(0, 1fr); }
+.device-frame.phone .ux-roster-organizer { border-right: 0; border-bottom: 1px solid var(--ux-line); overflow: visible; }
+.device-frame.phone .ux-lists-main { padding: 18px 14px 28px; }
+
 .ux-avatar-btn {
   display: grid;
   width: 32px;

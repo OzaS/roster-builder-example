@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject } from "react";
-import { Activity, AlertTriangle, ArrowLeft, ArrowUp, BarChart3, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, CircleDot, ClipboardList, Cog, Coins, Command, Copy, Database, Dice5, Download, Ellipsis, FileInput, Gamepad2, GripVertical, Hammer, Heart, ImagePlus, Languages, Layers, LibraryBig, Maximize2, Minimize2, Minus, Moon, MoveRight, Palette, PanelsTopLeft, Pencil, Plus, RotateCcw, Scale, Search, ShieldCheck, Sparkles, Split, Target, Timer, Trash2, Upload, UserRound, UsersRound, Wand2, X } from "lucide-react";
+import { Activity, AlertTriangle, ArrowLeft, ArrowUp, BarChart3, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, CircleDot, ClipboardList, Cog, Coins, Command, Copy, Database, Dice5, Download, Ellipsis, FileInput, Filter, Folder, FolderOpen, Gamepad2, GripVertical, Hammer, Heart, ImagePlus, Languages, Layers, LibraryBig, Maximize2, Minimize2, Minus, Moon, MoveRight, Palette, PanelsTopLeft, Pencil, Plus, RotateCcw, Scale, Search, ShieldCheck, Sparkles, Split, Tag, Target, Timer, Trash2, Upload, UserRound, UsersRound, Wand2, X } from "lucide-react";
 import { mockCatalogues, mockDetachments, mockSystemUnits } from "../../data/mockRoster";
 import { referenceById, resolveRosterReference } from "../../data/mockRosterReferences";
 import type { RosterReferenceDefinition, RosterUnit } from "../../types";
@@ -24,7 +24,7 @@ export function CodexWorkbench(props: ConceptProps) {
   const screen = props.screen;
   const isUnitDetail = screen === "unit-detail";
   const isMainTab = props.workflowScreen
-    ? (["library", "subscription-main", "source", "tools", "collections"] as const).some((tab) => tab === props.workflowScreen)
+    ? (["library", "library-v2", "subscription-main", "source", "tools", "collections"] as const).some((tab) => tab === props.workflowScreen)
     : screen === "library" || screen === "catalogue" || screen === "tools" || screen === "collections";
   const showTabBar = usesTabNavigation && isMainTab;
   const isWorkbenchScreen = screen !== "library" && screen !== "catalogue" && screen !== "tools" && screen !== "collections" && screen !== "app" && screen !== "settings" && screen !== "system";
@@ -1189,11 +1189,16 @@ function Rail({ props }: { props: ConceptProps }) {
 
 /** Library / home entry screen ("Main screen"). */
 function Library({ props }: { props: ConceptProps }) {
-  const recents = [
+  const isV2 = props.workflowScreen === "library-v2";
+  const [organizerOpen, setOrganizerOpen] = useState(true);
+  const [query, setQuery] = useState("");
+  const [activeFilter, setActiveFilter] = useState("All rosters");
+  const rosters = [
     { name: props.roster.name, sub: props.roster.faction, pts: `${props.roster.pointsUsed}/${props.roster.pointsLimit}` },
     { name: "Incursion Test List", sub: "Saved roster", pts: "500/1000" },
     { name: "Narrative Boarding Patrol", sub: "Saved roster", pts: "490/500" },
   ];
+  const filteredRosters = rosters.filter((roster) => `${roster.name} ${roster.sub}`.toLowerCase().includes(query.trim().toLowerCase()));
   return (
     <>
       <header className="ux-wb-top ux-wb-home-top">
@@ -1203,29 +1208,32 @@ function Library({ props }: { props: ConceptProps }) {
         </div>
         <AppAvatarButton props={props} />
       </header>
-      <div className="ux-wb-home-body">
-        <div className="ux-cmd-hero">
-          <Wand2 size={20} />
-          <h2>What do you want to build?</h2>
-          <p>Open a recent list or start fresh. Tap a roster to drop into the workbench.</p>
-        </div>
-        <button type="button" className="ux-new-roster" onClick={() => props.onNavigate("system")}>
-          <Plus size={22} />
-          <span>
-            <strong>New roster</strong>
-            <small>Pick a system and faction</small>
-          </span>
-        </button>
-        <div className="ux-result-label">Recent</div>
-        {recents.map((r) => (
-          <button key={r.name} type="button" className="ux-list-card" onClick={() => props.onNavigate("overview")}>
-            <span>
-              <strong>{r.name}</strong>
-              <small>{r.sub}</small>
-            </span>
-            <b>{r.pts}</b>
-          </button>
-        ))}
+      <div className={`ux-wb-home-body ux-lists-body ${isV2 ? "is-v2" : "is-v1"} ${isV2 && organizerOpen ? "organizer-open" : ""}`}>
+        {isV2 && organizerOpen ? (
+          <aside className="ux-roster-organizer" aria-label="Organize rosters">
+            <header><span><small>V2 workspace</small><strong>Organize</strong></span><button type="button" aria-label="Close organizer" onClick={() => setOrganizerOpen(false)}><X size={16} /></button></header>
+            <label className="ux-lists-search"><Search size={15} /><input value={query} onChange={(event) => setQuery(event.currentTarget.value)} placeholder="Search rosters" /><kbd>⌘ K</kbd></label>
+            <div className="ux-organizer-group"><small>Folders</small>{["All rosters", "Tournament prep", "Narrative league"].map((label, index) => <button type="button" className={activeFilter === label ? "active" : ""} key={label} onClick={() => setActiveFilter(label)}>{index ? <Folder size={15} /> : <FolderOpen size={15} />}<span>{label}</span><b>{index ? index + 1 : rosters.length}</b></button>)}<button type="button" className="ux-organizer-add"><Plus size={14} />New folder</button></div>
+            <div className="ux-organizer-group"><small>Game systems</small>{["Warhammer 40,000", "Horus Heresy"].map((label) => <button type="button" key={label} onClick={() => setActiveFilter(label)} className={activeFilter === label ? "active" : ""}><Gamepad2 size={15} /><span>{label}</span></button>)}</div>
+            <div className="ux-organizer-tags"><small>Tags</small><div><button type="button"><Tag size={12} />Competitive</button><button type="button"><Tag size={12} />Draft</button><button type="button"><Tag size={12} />Favourite</button></div></div>
+          </aside>
+        ) : null}
+        <main className="ux-lists-main">
+          {!isV2 ? <div className="ux-cmd-hero"><Wand2 size={20} /><h2>What do you want to build?</h2><p>Start a new roster. Lists you open will appear in Recent.</p></div> : null}
+          <div className="ux-lists-actions">
+            <div><strong>{isV2 ? "Your rosters" : "Lists"}</strong><small>{isV2 ? `${rosters.length} saved rosters` : "Your recent rosters"}</small></div>
+            {isV2 && !organizerOpen ? <button type="button" className="ux-organizer-toggle" onClick={() => setOrganizerOpen(true)}><Filter size={15} />Organize</button> : null}
+            <button type="button" className="ux-new-roster ux-new-roster-compact" onClick={() => props.onNavigate("system")}><Plus size={18} /><span><strong>New roster</strong></span></button>
+          </div>
+          {!isV2 ? <section className="ux-recent-section" aria-labelledby="recent-rosters-heading">
+            <div className="ux-result-label" id="recent-rosters-heading">Recent</div>
+            <div className="ux-recent-empty"><span><Wand2 size={20} /></span><strong>No recent rosters</strong><p>Rosters you open will stay within easy reach here.</p><button type="button" onClick={() => props.onNavigate("system")}>Create your first roster</button></div>
+          </section> : null}
+          {isV2 ? <section className="ux-all-rosters" aria-labelledby="all-rosters-heading">
+            <div className="ux-result-label" id="all-rosters-heading">{activeFilter}</div>
+            {filteredRosters.length ? filteredRosters.map((r) => <button key={r.name} type="button" className="ux-list-card" onClick={() => props.onNavigate("overview")}><span><strong>{r.name}</strong><small>{r.sub}</small></span><b>{r.pts}</b></button>) : <div className="ux-search-empty"><Search size={19} /><strong>No matching rosters</strong><small>Try a different name or filter.</small></div>}
+          </section> : null}
+        </main>
       </div>
     </>
   );
