@@ -4,13 +4,15 @@ import { GalleryShell } from "./gallery/GalleryShell";
 import { buildConceptGroups, bundledDesignData, designById, findConceptInData, firstScreenInDesign, normalizeDesignData, type DesignData } from "./design-data/designData";
 import { prototypeToWorkflowScreen, workflowToPrototypeScreen } from "./gallery/workflow";
 import { captureElementAsPng } from "./utils/captureStage";
-import type { ColorScheme, ConceptId, DetachmentFavorite, FavoriteLibrary, ForceCreationMode, NavigatorView, NavStyle, PlatformPreview, PrototypeScreen, Roster, RosterForce, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, UnitDetailView, UnitFavorite, WorkflowScreen } from "./types";
+import type { AppLanguage, ColorScheme, ConceptId, DetachmentFavorite, FavoriteLibrary, ForceCreationMode, NavigatorView, NavStyle, PlatformPreview, PrototypeScreen, Roster, RosterForce, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, ThemePreference, UnitDetailView, UnitFavorite, WorkflowScreen } from "./types";
 
 const GALLERY_STATE_KEY = "roster-builder.gallery-state.v1";
 const FAVORITES_KEY = "roster-builder.favorites.v1";
 const conceptIds = ["ux-workbench"] satisfies ConceptId[];
 const platformIds = ["phone", "tablet"] satisfies PlatformPreview[];
 const themeModes = ["dark", "light"] satisfies ThemeMode[];
+const themePreferences = ["system", "dark", "light"] satisfies ThemePreference[];
+const appLanguages = ["en", "fr"] satisfies AppLanguage[];
 const colorSchemeIds = ["generic", "wh40k", "horus-heresy", "age-of-sigmar", "old-world"] satisfies ColorScheme[];
 const navigatorViews = ["single", "all-screens", "elements"] satisfies NavigatorView[];
 const navStyles = ["top", "tabs", "floating"] satisfies NavStyle[];
@@ -66,6 +68,8 @@ type PersistedGalleryState = {
   selectedConcept?: ConceptId;
   platform?: PlatformPreview;
   themeMode?: ThemeMode;
+  themePreference?: ThemePreference;
+  language?: AppLanguage;
   colorScheme?: ColorScheme;
   navigatorView?: NavigatorView;
   workflowScreen?: WorkflowScreen;
@@ -84,7 +88,10 @@ function App() {
   const [designDataWritable, setDesignDataWritable] = useState(false);
   const [selectedConcept, setSelectedConcept] = useState<ConceptId>(initialState.selectedConcept ?? "ux-workbench");
   const [platform, setPlatform] = useState<PlatformPreview>(initialState.platform ?? "phone");
-  const [themeMode, setThemeMode] = useState<ThemeMode>(initialState.themeMode ?? "dark");
+  const [themePreference, setThemePreference] = useState<ThemePreference>(initialState.themePreference ?? initialState.themeMode ?? "dark");
+  const [systemTheme, setSystemTheme] = useState<ThemeMode>(() => preferredSystemTheme());
+  const [language, setLanguage] = useState<AppLanguage>(initialState.language ?? "en");
+  const themeMode: ThemeMode = themePreference === "system" ? systemTheme : themePreference;
   const [colorScheme, setColorScheme] = useState<ColorScheme>(initialState.colorScheme ?? "generic");
   const [navigatorView, setNavigatorView] = useState<NavigatorView>(initialState.navigatorView ?? "single");
   const [workflowScreen, setWorkflowScreen] = useState<WorkflowScreen>(initialState.workflowScreen ?? "library");
@@ -143,10 +150,21 @@ function App() {
   }, []);
 
   useEffect(() => {
+    if (themePreference !== "system" || typeof window === "undefined") return;
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const updateSystemTheme = (event: MediaQueryListEvent | MediaQueryList) => setSystemTheme(event.matches ? "dark" : "light");
+    updateSystemTheme(media);
+    media.addEventListener("change", updateSystemTheme);
+    return () => media.removeEventListener("change", updateSystemTheme);
+  }, [themePreference]);
+
+  useEffect(() => {
     persistGalleryState({
       selectedConcept,
       platform,
       themeMode,
+      themePreference,
+      language,
       colorScheme,
       navigatorView,
       workflowScreen,
@@ -158,7 +176,7 @@ function App() {
       tabletPanelLayout,
       screen,
     });
-  }, [selectedConcept, platform, themeMode, colorScheme, navigatorView, workflowScreen, smartSearch, navStyle, statusBarUsesDesignBackground, unitDetailView, forceCreationMode, tabletPanelLayout, screen]);
+  }, [selectedConcept, platform, themeMode, themePreference, language, colorScheme, navigatorView, workflowScreen, smartSearch, navStyle, statusBarUsesDesignBackground, unitDetailView, forceCreationMode, tabletPanelLayout, screen]);
 
   useEffect(() => {
     try {
@@ -527,7 +545,7 @@ function App() {
       captureRef={captureRef}
       onConceptChange={changeConcept}
       onPlatformChange={setPlatform}
-      onThemeModeChange={setThemeMode}
+      onThemeModeChange={(mode) => setThemePreference(mode)}
       onColorSchemeChange={setColorScheme}
       onNavigatorViewChange={setNavigatorView}
       onWorkflowScreenChange={selectWorkflowScreen}
@@ -594,7 +612,12 @@ function App() {
         screen={screen}
         workflowScreen={workflowScreen}
         themeMode={themeMode}
+        themePreference={themePreference}
+        onThemePreferenceChange={setThemePreference}
+        language={language}
+        onLanguageChange={setLanguage}
         colorScheme={colorScheme}
+        onColorSchemeChange={setColorScheme}
         smartSearch={smartSearch}
         onToggleSmartSearch={() => setSmartSearch((value) => !value)}
         navStyle={navStyle}
@@ -773,6 +796,8 @@ function readPersistedGalleryState(): PersistedGalleryState {
       selectedConcept: isOneOf(parsed.selectedConcept, conceptIds) ? parsed.selectedConcept : undefined,
       platform: isOneOf(parsed.platform, platformIds) ? parsed.platform : undefined,
       themeMode: isOneOf(parsed.themeMode, themeModes) ? parsed.themeMode : undefined,
+      themePreference: isOneOf(parsed.themePreference, themePreferences) ? parsed.themePreference : undefined,
+      language: isOneOf(parsed.language, appLanguages) ? parsed.language : undefined,
       colorScheme: isOneOf(parsed.colorScheme, colorSchemeIds) ? parsed.colorScheme : undefined,
       navigatorView: isOneOf(parsed.navigatorView, navigatorViews) ? parsed.navigatorView : undefined,
       workflowScreen: isOneOf(parsed.workflowScreen, workflowScreenIds) ? parsed.workflowScreen : undefined,
@@ -796,6 +821,11 @@ function persistGalleryState(state: PersistedGalleryState) {
   } catch {
     // Losing reload persistence should not block the gallery.
   }
+}
+
+function preferredSystemTheme(): ThemeMode {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return "dark";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
 function isOneOf<T extends string>(value: unknown, allowed: readonly T[]): value is T {

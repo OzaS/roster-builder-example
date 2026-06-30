@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { AlertTriangle, ArrowLeft, CheckCircle2, FileDown, Filter, Plus, Search, Shield, Swords } from "lucide-react";
-import type { ColorScheme, DetachmentFavorite, ForceCreationMode, NavStyle, PrototypeScreen, Roster, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, UnitDetailView, UnitFavorite, WorkflowScreen } from "../types";
+import type { AppLanguage, ColorScheme, DetachmentFavorite, ForceCreationMode, NavStyle, PrototypeScreen, Roster, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, ThemePreference, UnitDetailView, UnitFavorite, WorkflowScreen } from "../types";
 import { OptionRow } from "../components/OptionRow";
 import { RosterNav } from "../components/RosterNav";
 import { UnitCard } from "../components/UnitCard";
@@ -21,7 +21,12 @@ export type ConceptProps = {
   screen: PrototypeScreen;
   canGoBack: boolean;
   themeMode?: ThemeMode;
+  themePreference?: ThemePreference;
+  onThemePreferenceChange?: (theme: ThemePreference) => void;
+  language?: AppLanguage;
+  onLanguageChange?: (language: AppLanguage) => void;
   colorScheme?: ColorScheme;
+  onColorSchemeChange?: (scheme: ColorScheme) => void;
   workflowScreen?: WorkflowScreen;
   /** When true, the premium "smart search & suggestions" features are enabled. */
   smartSearch?: boolean;

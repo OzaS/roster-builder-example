@@ -2,6 +2,8 @@ import type { LucideIcon } from "lucide-react";
 
 export type PlatformPreview = "phone" | "tablet";
 export type ThemeMode = "dark" | "light";
+export type ThemePreference = "system" | ThemeMode;
+export type AppLanguage = "en" | "fr";
 export type NavigatorView = "single" | "all-screens" | "elements";
 
 /** In-prototype main navigation style for the merged design. */
