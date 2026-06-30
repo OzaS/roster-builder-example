@@ -3294,6 +3294,102 @@ button.ux-reference-tag:focus-visible {
   background: var(--ux-accent-ink);
 }
 
+.ux-preference-selector {
+  position: relative;
+}
+.ux-preference-row-wrap {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+}
+.ux-preference-row {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 38px minmax(0, 1fr) 20px;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--ux-line);
+  border-radius: var(--ux-r-md);
+  background: var(--ux-surface);
+  color: var(--ux-ink);
+  text-align: left;
+  cursor: pointer;
+  flex: 1;
+}
+.ux-preference-row:hover,
+.ux-preference-row:focus-visible,
+.ux-preference-selector.open .ux-preference-row {
+  border-color: var(--ux-accent);
+}
+.ux-preference-row > svg {
+  color: var(--ux-muted);
+  transition: transform 0.16s ease;
+}
+.ux-preference-selector.open .ux-preference-row > svg {
+  transform: rotate(180deg);
+}
+.ux-preference-upload {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  flex: 0 0 46px;
+  border: 1px solid var(--ux-line);
+  border-radius: var(--ux-r-md);
+  background: var(--ux-surface);
+  color: var(--ux-accent-2);
+  cursor: pointer;
+}
+.ux-preference-upload:hover,
+.ux-preference-upload:focus-within {
+  border-color: var(--ux-accent);
+  background: color-mix(in srgb, var(--ux-accent) 10%, var(--ux-surface));
+}
+.ux-preference-upload input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.ux-preference-options {
+  display: grid;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 6px;
+  border: 1px solid var(--ux-line);
+  border-radius: var(--ux-r-md);
+  background: var(--ux-surface-2);
+  box-shadow: 0 12px 30px color-mix(in srgb, #000 24%, transparent);
+}
+.ux-preference-options button {
+  display: flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--ux-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.ux-preference-options button:hover,
+.ux-preference-options button:focus-visible,
+.ux-preference-options button.selected {
+  background: color-mix(in srgb, var(--ux-accent) 12%, var(--ux-surface));
+}
+.ux-preference-options button.selected {
+  color: var(--ux-accent-2);
+  font-weight: 700;
+}
+.device-frame.tablet .ux-preference-selector {
+  max-width: 620px;
+}
+
 .ux-wb-search.smart {
   border-color: var(--ux-accent);
   background: color-mix(in srgb, var(--ux-accent) 10%, var(--ux-surface));

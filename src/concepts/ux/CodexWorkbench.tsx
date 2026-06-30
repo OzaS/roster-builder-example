@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject } from "react";
-import { Activity, AlertTriangle, ArrowLeft, ArrowUp, BarChart3, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, CircleDot, ClipboardList, Cog, Coins, Command, Copy, Database, Dice5, Download, Ellipsis, FileInput, Gamepad2, GripVertical, Hammer, Heart, ImagePlus, Layers, LibraryBig, Maximize2, Minimize2, Minus, MoveRight, PanelsTopLeft, Pencil, Plus, RotateCcw, Scale, Search, ShieldCheck, Sparkles, Split, Target, Timer, Trash2, UserRound, UsersRound, Wand2, X } from "lucide-react";
+import { Activity, AlertTriangle, ArrowLeft, ArrowUp, BarChart3, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, CircleDot, ClipboardList, Cog, Coins, Command, Copy, Database, Dice5, Download, Ellipsis, FileInput, Gamepad2, GripVertical, Hammer, Heart, ImagePlus, Languages, Layers, LibraryBig, Maximize2, Minimize2, Minus, Moon, MoveRight, Palette, PanelsTopLeft, Pencil, Plus, RotateCcw, Scale, Search, ShieldCheck, Sparkles, Split, Target, Timer, Trash2, Upload, UserRound, UsersRound, Wand2, X } from "lucide-react";
 import { mockCatalogues, mockDetachments, mockSystemUnits } from "../../data/mockRoster";
 import { referenceById, resolveRosterReference } from "../../data/mockRosterReferences";
 import type { RosterReferenceDefinition, RosterUnit } from "../../types";
@@ -2053,6 +2053,11 @@ function AppScreen({ props }: { props: ConceptProps }) {
 /** Settings screen housing the "Smart search & suggestions" toggle and sources. */
 function SettingsScreen({ props }: { props: ConceptProps }) {
   const smart = props.smartSearch ?? false;
+  const [openPreference, setOpenPreference] = useState<"language" | "theme" | "scheme" | null>(null);
+  const [uploadedLanguage, setUploadedLanguage] = useState("");
+  const [uploadedScheme, setUploadedScheme] = useState("");
+  const language = props.language ?? "en";
+  const theme = props.themePreference ?? props.themeMode ?? "dark";
   const sources = mockCatalogues.map((source, index) => ({
     ...source,
     system: index === 0 ? props.roster.system : "Warhammer 40,000",
@@ -2070,6 +2075,49 @@ function SettingsScreen({ props }: { props: ConceptProps }) {
         </div>
       </header>
       <div className="ux-wb-home-body">
+        <div className="ux-result-label">Appearance & language</div>
+        <PreferenceSelector
+          id="language"
+          icon={<Languages size={17} />}
+          label="Language"
+          value={language}
+          options={[{ id: "en", label: "English" }, { id: "fr", label: "Français" }]}
+          uploadLabel="Upload language pack"
+          uploadedFile={uploadedLanguage}
+          onUpload={setUploadedLanguage}
+          open={openPreference === "language"}
+          onToggle={() => setOpenPreference((current) => current === "language" ? null : "language")}
+          onChange={(value) => { props.onLanguageChange?.(value as "en" | "fr"); setOpenPreference(null); }}
+        />
+        <PreferenceSelector
+          id="dark-mode"
+          icon={<Moon size={17} />}
+          label="Dark mode"
+          value={theme}
+          options={[{ id: "system", label: "System" }, { id: "light", label: "Light" }, { id: "dark", label: "Dark" }]}
+          open={openPreference === "theme"}
+          onToggle={() => setOpenPreference((current) => current === "theme" ? null : "theme")}
+          onChange={(value) => { props.onThemePreferenceChange?.(value as "system" | "light" | "dark"); setOpenPreference(null); }}
+        />
+        <PreferenceSelector
+          id="color-scheme"
+          icon={<Palette size={17} />}
+          label="Color scheme"
+          value={props.colorScheme ?? "generic"}
+          options={[
+            { id: "generic", label: "Generic" },
+            { id: "wh40k", label: "Warhammer 40,000" },
+            { id: "horus-heresy", label: "Horus Heresy" },
+            { id: "age-of-sigmar", label: "Age of Sigmar" },
+            { id: "old-world", label: "The Old World" },
+          ]}
+          uploadLabel="Upload color scheme"
+          uploadedFile={uploadedScheme}
+          onUpload={setUploadedScheme}
+          open={openPreference === "scheme"}
+          onToggle={() => setOpenPreference((current) => current === "scheme" ? null : "scheme")}
+          onChange={(value) => { props.onColorSchemeChange?.(value as NonNullable<ConceptProps["colorScheme"]>); setOpenPreference(null); }}
+        />
         <div className="ux-result-label">Search & assistance</div>
         <button type="button" className={`ux-setting-row ${smart ? "on" : ""}`} onClick={props.onToggleSmartSearch}>
           <span className="ux-setting-icon">
@@ -2114,6 +2162,48 @@ function SettingsScreen({ props }: { props: ConceptProps }) {
         </details>
       </div>
     </>
+  );
+}
+
+function PreferenceSelector({ id, icon, label, value, options, uploadLabel, uploadedFile, onUpload, open, onToggle, onChange }: {
+  id: string;
+  icon: ReactNode;
+  label: string;
+  value: string;
+  options: Array<{ id: string; label: string }>;
+  uploadLabel?: string;
+  uploadedFile?: string;
+  onUpload?: (fileName: string) => void;
+  open: boolean;
+  onToggle: () => void;
+  onChange: (value: string) => void;
+}) {
+  const selected = options.find((option) => option.id === value) ?? options[0];
+  return (
+    <div className={`ux-preference-selector ${open ? "open" : ""}`}>
+      <div className="ux-preference-row-wrap">
+        <button type="button" className="ux-preference-row" aria-expanded={open} aria-controls={`${id}-choices`} onClick={onToggle}>
+          <span className="ux-setting-icon">{icon}</span>
+          <span className="ux-setting-text"><strong>{label}</strong><small>{selected.label}</small></span>
+          <ChevronDown size={17} aria-hidden />
+        </button>
+        {uploadLabel ? (
+          <label className="ux-preference-upload" title={uploadedFile ? `Uploaded: ${uploadedFile}` : uploadLabel} aria-label={uploadedFile ? `${uploadLabel}. Uploaded ${uploadedFile}` : uploadLabel}>
+            <Upload size={16} />
+            <input type="file" accept=".json,.zip" onChange={(event) => onUpload?.(event.target.files?.[0]?.name ?? "")} />
+          </label>
+        ) : null}
+      </div>
+      {open ? (
+        <div id={`${id}-choices`} className="ux-preference-options" role="radiogroup" aria-label={label}>
+          {options.map((option) => (
+            <button key={option.id} type="button" role="radio" aria-checked={option.id === value} className={option.id === value ? "selected" : ""} onClick={() => onChange(option.id)}>
+              <span>{option.label}</span>{option.id === value ? <Check size={16} aria-hidden /> : null}
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </div>
   );
 }
 
