@@ -1052,6 +1052,12 @@
   box-shadow: inset 4px 4px 10px rgba(122, 142, 150, 0.18), inset -4px -4px 10px rgba(255, 255, 255, 0.8);
 }
 
+.gallery-release-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 6px; border-radius: 12px; background: color-mix(in srgb, var(--surface-2) 80%, white); box-shadow: inset 4px 4px 10px rgba(122, 142, 150, 0.18), inset -4px -4px 10px rgba(255, 255, 255, 0.8); }
+.gallery-release-switch button { display: grid; gap: 1px; min-height: 42px; place-content: center; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--muted); cursor: pointer; }
+.gallery-release-switch button span { font-size: 13px; font-weight: 850; }
+.gallery-release-switch button small { font-size: 9px; font-weight: 700; }
+.gallery-release-switch button.active { color: var(--ink); background: var(--surface); box-shadow: 3px 4px 10px rgba(35, 54, 61, 0.12); }
+
 .view-icon-switch button {
   display: grid;
   min-height: 38px;

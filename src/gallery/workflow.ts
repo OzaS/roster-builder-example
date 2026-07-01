@@ -5,6 +5,8 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "library-v2", label: "Lists · V2" },
   { id: "collections", label: "Library" },
   { id: "app", label: "App" },
+  { id: "sources", label: "Sources" },
+  { id: "add-source", label: "Add Sources" },
   { id: "subscription-main", label: "Subscription · Main" },
   { id: "create-roster", label: "Create Roster" },
   { id: "drafts", label: "Drafts" },

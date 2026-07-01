@@ -493,6 +493,27 @@ function WorkbenchElements({
         </details>
       </ElementSection>
 
+      <ElementSection title="Sources Management">
+        <div className="ux-prototype-state"><small>Preview state</small><div><button type="button" className="active">Populated</button><button type="button">Empty</button></div></div>
+        <button type="button" className="ux-add-source-primary"><Plus size={18} /><span><strong>Add sources</strong><small>Connect a repository or choose a popular source</small></span><ChevronRight size={17} /></button>
+        <div className="ux-source-list ux-managed-source-list">
+          <article className="ux-source-row on"><span><strong>{roster.faction}</strong><small>{roster.system} · Imported today</small></span><Chip tone="valid">v42</Chip></article>
+        </div>
+        <section className="ux-sources-empty"><span><Database size={25} /></span><strong>No sources installed</strong><small>Add a catalogue or rules repository to start building rosters.</small><button type="button"><Plus size={16} />Add sources</button></section>
+      </ElementSection>
+
+      <ElementSection title="Source Addition">
+        <section className="ux-source-method">
+          <div className="ux-source-method-heading"><span className="ux-setting-icon"><FileInput size={18} /></span><span><strong>Repository URL</strong><small>Enter a Git repository containing a source.</small></span></div>
+          <div className="ux-source-url"><input aria-label="Repository URL example" placeholder="https://github.com/…" /><button type="button">Load</button></div>
+        </section>
+        <section className="ux-source-method">
+          <div className="ux-result-label">Trusted repositories</div>
+          <div className="ux-trusted-source-grid"><button type="button"><Database size={20} /><span><strong>BSData repositories</strong><small>Community catalogues</small></span><Plus size={16} /></button><button type="button"><Database size={20} /><span><strong>Official rules repository</strong><small>Verified catalogues</small></span><RotateCcw className="ux-spin" size={16} /></button></div>
+        </section>
+        <section className="ux-source-method"><div className="ux-result-label">Popular sources</div><div className="ux-popular-source-grid">{["Horus Heresy", "Warhammer 40,000", "Age of Sigmar", "The Old World"].map((source) => <button key={source} type="button"><Plus size={15} />{source}</button>)}</div></section>
+      </ElementSection>
+
       <ElementSection title="Tools Workflow">
         <div className="ux-tools-grid ux-tools-grid-large">
           {[

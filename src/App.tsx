@@ -4,7 +4,7 @@ import { GalleryShell } from "./gallery/GalleryShell";
 import { buildConceptGroups, bundledDesignData, designById, findConceptInData, firstScreenInDesign, normalizeDesignData, type DesignData } from "./design-data/designData";
 import { prototypeToWorkflowScreen, workflowToPrototypeScreen } from "./gallery/workflow";
 import { captureElementAsPng } from "./utils/captureStage";
-import type { AppLanguage, ColorScheme, ConceptId, DetachmentFavorite, FavoriteLibrary, ForceCreationMode, NavigatorView, NavStyle, PlatformPreview, PrototypeScreen, Roster, RosterForce, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, ThemePreference, UnitDetailView, UnitFavorite, WorkflowScreen } from "./types";
+import type { AppLanguage, ColorScheme, ConceptId, DetachmentFavorite, FavoriteLibrary, ForceCreationMode, GalleryRelease, NavigatorView, NavStyle, PlatformPreview, PrototypeScreen, Roster, RosterForce, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, ThemePreference, UnitDetailView, UnitFavorite, WorkflowScreen } from "./types";
 
 const GALLERY_STATE_KEY = "roster-builder.gallery-state.v1";
 const FAVORITES_KEY = "roster-builder.favorites.v1";
@@ -24,6 +24,8 @@ const workflowScreenIds = [
   "library-v2",
   "collections",
   "app",
+  "sources",
+  "add-source",
   "subscription-main",
   "create-roster",
   "drafts",
@@ -48,6 +50,8 @@ const prototypeScreenIds = [
   "library",
   "collections",
   "app",
+  "sources",
+  "add-source",
   "system",
   "catalogue",
   "detachment",
@@ -73,6 +77,7 @@ type PersistedGalleryState = {
   language?: AppLanguage;
   colorScheme?: ColorScheme;
   navigatorView?: NavigatorView;
+  galleryRelease?: GalleryRelease;
   workflowScreen?: WorkflowScreen;
   smartSearch?: boolean;
   navStyle?: NavStyle;
@@ -95,6 +100,7 @@ function App() {
   const themeMode: ThemeMode = themePreference === "system" ? systemTheme : themePreference;
   const [colorScheme, setColorScheme] = useState<ColorScheme>(initialState.colorScheme ?? "generic");
   const [navigatorView, setNavigatorView] = useState<NavigatorView>(initialState.navigatorView ?? "single");
+  const [galleryRelease, setGalleryRelease] = useState<GalleryRelease>(initialState.galleryRelease ?? "V1");
   const [workflowScreen, setWorkflowScreen] = useState<WorkflowScreen>(initialState.workflowScreen ?? "library");
   const [smartSearch, setSmartSearch] = useState(initialState.smartSearch ?? true);
   const [navStyle, setNavStyle] = useState<NavStyle>(initialState.navStyle ?? "floating");
@@ -168,6 +174,7 @@ function App() {
       language,
       colorScheme,
       navigatorView,
+      galleryRelease,
       workflowScreen,
       smartSearch,
       navStyle,
@@ -177,7 +184,7 @@ function App() {
       tabletPanelLayout,
       screen,
     });
-  }, [selectedConcept, platform, themeMode, themePreference, language, colorScheme, navigatorView, workflowScreen, smartSearch, navStyle, statusBarUsesDesignBackground, unitDetailView, forceCreationMode, tabletPanelLayout, screen]);
+  }, [selectedConcept, platform, themeMode, themePreference, language, colorScheme, navigatorView, galleryRelease, workflowScreen, smartSearch, navStyle, statusBarUsesDesignBackground, unitDetailView, forceCreationMode, tabletPanelLayout, screen]);
 
   useEffect(() => {
     try {
@@ -223,7 +230,7 @@ function App() {
 
   function navigate(screenId: PrototypeScreen) {
     setScreenHistory((current) => (screenId === screen ? current : [...current, screen]));
-    setWorkflowScreen(prototypeToWorkflowScreen(screenId));
+    setWorkflowScreen(screenId === "library" && galleryRelease === "V2" ? "library-v2" : prototypeToWorkflowScreen(screenId));
     setScreen(screenId);
   }
 
@@ -537,6 +544,7 @@ function App() {
       themeMode={themeMode}
       colorScheme={colorScheme}
       navigatorView={navigatorView}
+      galleryRelease={galleryRelease}
       workflowScreen={workflowScreen}
       concept={concept}
       designData={designData}
@@ -549,7 +557,12 @@ function App() {
       onThemeModeChange={(mode) => setThemePreference(mode)}
       onColorSchemeChange={setColorScheme}
       onNavigatorViewChange={setNavigatorView}
-      onWorkflowScreenChange={selectWorkflowScreen}
+      onGalleryReleaseChange={(release) => {
+        setGalleryRelease(release);
+        if (release === "V2" && workflowScreen === "library") selectWorkflowScreen("library-v2");
+        if (release === "V1" && workflowScreen === "library-v2") selectWorkflowScreen("library");
+      }}
+      onWorkflowScreenChange={(next) => selectWorkflowScreen(galleryRelease === "V2" && next === "library" ? "library-v2" : galleryRelease === "V1" && next === "library-v2" ? "library" : next)}
       navStyle={navStyle}
       onNavStyleChange={setNavStyle}
       forceCreationMode={forceCreationMode}
@@ -801,6 +814,7 @@ function readPersistedGalleryState(): PersistedGalleryState {
       language: isOneOf(parsed.language, appLanguages) ? parsed.language : undefined,
       colorScheme: isOneOf(parsed.colorScheme, colorSchemeIds) ? parsed.colorScheme : undefined,
       navigatorView: isOneOf(parsed.navigatorView, navigatorViews) ? parsed.navigatorView : undefined,
+      galleryRelease: parsed.galleryRelease === "V1" || parsed.galleryRelease === "V2" ? parsed.galleryRelease : undefined,
       workflowScreen: isOneOf(parsed.workflowScreen, workflowScreenIds) ? parsed.workflowScreen : undefined,
       smartSearch: typeof parsed.smartSearch === "boolean" ? parsed.smartSearch : undefined,
       navStyle: isOneOf(parsed.navStyle, navStyles) ? parsed.navStyle : undefined,

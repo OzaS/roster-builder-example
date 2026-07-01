@@ -5,6 +5,7 @@ export type ThemeMode = "dark" | "light";
 export type ThemePreference = "system" | ThemeMode;
 export type AppLanguage = "en" | "fr";
 export type NavigatorView = "single" | "all-screens" | "elements";
+export type GalleryRelease = "V1" | "V2";
 
 /** In-prototype main navigation style for the merged design. */
 export type NavStyle = "top" | "tabs" | "floating";
@@ -32,6 +33,8 @@ export type WorkflowScreen =
   | "library-v2"
   | "collections"
   | "app"
+  | "sources"
+  | "add-source"
   | "subscription-main"
   | "create-roster"
   | "drafts"
@@ -197,6 +200,8 @@ export type PrototypeScreen =
   | "library"
   | "collections"
   | "app"
+  | "sources"
+  | "add-source"
   | "system"
   | "catalogue"
   | "detachment"
