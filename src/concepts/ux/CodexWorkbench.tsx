@@ -10,6 +10,15 @@ type ReferenceGlance =
   | { type: "unit"; unit: RosterUnit }
   | { type: "reference"; reference: RosterReferenceDefinition };
 
+type InstalledSource = {
+  id: string;
+  name: string;
+  system: string;
+  imported: string;
+  updated: string;
+  status: string;
+};
+
 /**
  * Codex Workbench — the single merged design.
  * Master/detail workbench (tree + live detail + validation rail) with a library
@@ -27,7 +36,7 @@ export function CodexWorkbench(props: ConceptProps) {
     ? (["library", "library-v2", "subscription-main", "source", "tools", "collections"] as const).some((tab) => tab === props.workflowScreen)
     : screen === "library" || screen === "catalogue" || screen === "tools" || screen === "collections";
   const showTabBar = usesTabNavigation && isMainTab;
-  const isWorkbenchScreen = screen !== "library" && screen !== "catalogue" && screen !== "tools" && screen !== "collections" && screen !== "app" && screen !== "settings" && screen !== "system";
+  const isWorkbenchScreen = screen !== "library" && screen !== "catalogue" && screen !== "tools" && screen !== "collections" && screen !== "app" && screen !== "settings" && screen !== "sources" && screen !== "add-source" && screen !== "system";
   const [activeLoadoutSlot, setActiveLoadoutSlot] = useState<{ groupId: string; slotId: string } | null>(null);
   const [forceCreationOpen, setForceCreationOpen] = useState(false);
   const [rosterSearchOpen, setRosterSearchOpen] = useState(false);
@@ -38,6 +47,15 @@ export function CodexWorkbench(props: ConceptProps) {
   const [dockOpen, setDockOpen] = useState(false);
   const [smartGateOpen, setSmartGateOpen] = useState(false);
   const [referenceGlances, setReferenceGlances] = useState<ReferenceGlance[]>([]);
+  const [installedSources, setInstalledSources] = useState<InstalledSource[]>(() => mockCatalogues.map((source, index) => ({
+    ...source,
+    system: index === 0 ? props.roster.system : "Warhammer 40,000",
+    imported: index === 0 ? "Imported today" : index === 1 ? "Updated 2 days ago" : "Needs review",
+  })));
+  const [showEmptySources, setShowEmptySources] = useState(false);
+  const [sourceUrl, setSourceUrl] = useState("");
+  const [sourceUrlError, setSourceUrlError] = useState("");
+  const [loadingSourceId, setLoadingSourceId] = useState<string | null>(null);
   const glanceTriggerRef = useRef<HTMLElement | null>(null);
   const detailScrollRef = useRef<HTMLElement>(null);
   const loadoutScrollTopRef = useRef(0);
@@ -145,6 +163,33 @@ export function CodexWorkbench(props: ConceptProps) {
     body = <AppScreen props={props} />;
   } else if (screen === "settings") {
     body = <SettingsScreen props={props} />;
+  } else if (screen === "sources") {
+    body = <SourcesScreen props={props} sources={installedSources} showEmpty={showEmptySources} onShowEmptyChange={setShowEmptySources} />;
+  } else if (screen === "add-source") {
+    body = <AddSourceScreen
+      props={props}
+      url={sourceUrl}
+      urlError={sourceUrlError}
+      loadingSourceId={loadingSourceId}
+      onUrlChange={(value) => { setSourceUrl(value); setSourceUrlError(""); }}
+      onAdd={(source) => {
+        if (source.id === "repository-url" && !sourceUrl.trim()) {
+          setSourceUrlError("Enter a repository URL to continue.");
+          return;
+        }
+        setLoadingSourceId(source.id);
+        window.setTimeout(() => {
+          const resolved = source.id === "repository-url"
+            ? { ...source, id: `repo-${sourceUrl.trim().toLowerCase()}`, name: "Repository source", system: "Custom repository" }
+            : source;
+          setInstalledSources((current) => current.some((item) => item.id === resolved.id) ? current : [...current, resolved]);
+          setShowEmptySources(false);
+          setLoadingSourceId(null);
+          setSourceUrl("");
+          props.onNavigate("sources");
+        }, 700);
+      }}
+    />;
   } else if (screen === "system") {
     body = <CreateScreen props={props} />;
   } else if (screen === "smart-search") {
@@ -1190,6 +1235,7 @@ function Rail({ props }: { props: ConceptProps }) {
 /** Library / home entry screen ("Main screen"). */
 function Library({ props }: { props: ConceptProps }) {
   const isV2 = props.workflowScreen === "library-v2";
+  const [promptOpen, setPromptOpen] = useState(true);
   const [organizerOpen, setOrganizerOpen] = useState(true);
   const [query, setQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("All rosters");
@@ -1219,7 +1265,7 @@ function Library({ props }: { props: ConceptProps }) {
           </aside>
         ) : null}
         <main className="ux-lists-main">
-          {!isV2 ? <div className="ux-cmd-hero"><Wand2 size={20} /><h2>What do you want to build?</h2><p>Start a new roster. Lists you open will appear in Recent.</p></div> : null}
+          {!isV2 && promptOpen ? <div className="ux-cmd-hero"><button type="button" className="ux-cmd-hero-close" aria-label="Close getting started prompt" onClick={() => setPromptOpen(false)}><X size={16} /></button><Wand2 size={20} /><h2>What do you want to build?</h2><p>Start a new roster. Lists you open will appear in Recent.</p></div> : null}
           <div className="ux-lists-actions">
             <div><strong>{isV2 ? "Your rosters" : "Lists"}</strong><small>{isV2 ? `${rosters.length} saved rosters` : "Your recent rosters"}</small></div>
             {isV2 && !organizerOpen ? <button type="button" className="ux-organizer-toggle" onClick={() => setOrganizerOpen(true)}><Filter size={15} />Organize</button> : null}
@@ -2045,7 +2091,15 @@ function AppScreen({ props }: { props: ConceptProps }) {
           <span className="ux-setting-icon"><Cog size={17} /></span>
           <span>
             <strong>Settings</strong>
-            <small>Search, assistance, and sources</small>
+            <small>Appearance, language, and assistance</small>
+          </span>
+          <ChevronRight size={17} />
+        </button>
+        <button type="button" className="ux-app-nav-row" onClick={() => props.onNavigate("sources")}>
+          <span className="ux-setting-icon"><Database size={17} /></span>
+          <span>
+            <strong>Sources</strong>
+            <small>Manage catalogues and rules repositories</small>
           </span>
           <ChevronRight size={17} />
         </button>
@@ -2058,7 +2112,7 @@ function AppScreen({ props }: { props: ConceptProps }) {
   );
 }
 
-/** Settings screen housing the "Smart search & suggestions" toggle and sources. */
+/** Settings screen housing preferences and the smart-search toggle. */
 function SettingsScreen({ props }: { props: ConceptProps }) {
   const smart = props.smartSearch ?? false;
   const [openPreference, setOpenPreference] = useState<"language" | "theme" | "scheme" | null>(null);
@@ -2066,11 +2120,6 @@ function SettingsScreen({ props }: { props: ConceptProps }) {
   const [uploadedScheme, setUploadedScheme] = useState("");
   const language = props.language ?? "en";
   const theme = props.themePreference ?? props.themeMode ?? "dark";
-  const sources = mockCatalogues.map((source, index) => ({
-    ...source,
-    system: index === 0 ? props.roster.system : "Warhammer 40,000",
-    imported: index === 0 ? "Imported today" : index === 1 ? "Updated 2 days ago" : "Needs review",
-  }));
   return (
     <>
       <header className="ux-wb-top ux-wb-home-top reversed">
@@ -2141,33 +2190,97 @@ function SettingsScreen({ props }: { props: ConceptProps }) {
           <Sparkles size={14} />
           When on, the add-unit menu offers quick suggestions for the current slot. With the top-bar layout it also shows a floating command bar.
         </p>
-        <details className="ux-source-section" open>
-          <summary>
-            <span>
-              <Database size={16} />
-              <strong>Sources</strong>
-            </span>
-            <ChevronDown size={16} />
-          </summary>
-          <button type="button" className="ux-import-source">
-            <FileInput size={18} />
-            <span>
-              <strong>Import source</strong>
-              <small>Add catalogue files or rules packs</small>
-            </span>
-          </button>
-          <div className="ux-source-list">
-            {sources.map((source) => (
-              <button key={source.id} type="button" className={`ux-source-row ${source.status === "Current" ? "on" : ""}`}>
-                <span>
-                  <strong>{source.name}</strong>
-                  <small>{source.system} · {source.imported}</small>
-                </span>
+      </div>
+    </>
+  );
+}
+
+function SourcesScreen({ props, sources, showEmpty, onShowEmptyChange }: {
+  props: ConceptProps;
+  sources: InstalledSource[];
+  showEmpty: boolean;
+  onShowEmptyChange: (empty: boolean) => void;
+}) {
+  const visibleSources = showEmpty ? [] : sources;
+  return (
+    <>
+      <header className="ux-wb-top ux-wb-home-top reversed">
+        <button type="button" className="ux-icon-btn" aria-label="Back" onClick={props.onBack}><ArrowLeft size={18} /></button>
+        <div className="ux-wb-title"><strong>Sources</strong><small>Catalogues & rules repositories</small></div>
+      </header>
+      <div className="ux-wb-home-body ux-sources-body">
+        <div className="ux-prototype-state" aria-label="Preview source state">
+          <small>Preview state</small>
+          <div>
+            <button type="button" className={!showEmpty ? "active" : ""} onClick={() => onShowEmptyChange(false)}>Populated</button>
+            <button type="button" className={showEmpty ? "active" : ""} onClick={() => onShowEmptyChange(true)}>Empty</button>
+          </div>
+        </div>
+        <button type="button" className="ux-add-source-primary" onClick={() => props.onNavigate("add-source")}>
+          <Plus size={18} /><span><strong>Add sources</strong><small>Connect a repository or choose a popular source</small></span><ChevronRight size={17} />
+        </button>
+        {visibleSources.length ? (
+          <div className="ux-source-list ux-managed-source-list">
+            {visibleSources.map((source) => (
+              <article key={source.id} className={`ux-source-row ${source.status === "Current" ? "on" : ""}`}>
+                <span><strong>{source.name}</strong><small>{source.system} · {source.imported}</small></span>
                 <Chip tone={source.status === "Current" ? "valid" : "warning"}>{source.updated}</Chip>
-              </button>
+              </article>
             ))}
           </div>
-        </details>
+        ) : (
+          <section className="ux-sources-empty">
+            <span><Database size={25} /></span><strong>No sources installed</strong>
+            <small>Add a catalogue or rules repository to start building rosters.</small>
+            <button type="button" onClick={() => props.onNavigate("add-source")}><Plus size={16} />Add sources</button>
+          </section>
+        )}
+      </div>
+    </>
+  );
+}
+
+function AddSourceScreen({ props, url, urlError, loadingSourceId, onUrlChange, onAdd }: {
+  props: ConceptProps;
+  url: string;
+  urlError: string;
+  loadingSourceId: string | null;
+  onUrlChange: (value: string) => void;
+  onAdd: (source: InstalledSource) => void;
+}) {
+  const base = { imported: "Imported just now", updated: "Latest", status: "Current" };
+  const trusted = [
+    { ...base, id: "trusted-bsdata", name: "BSData repositories", system: "Community catalogues" },
+    { ...base, id: "trusted-official", name: "Official rules repository", system: "Verified catalogues" },
+  ];
+  const popular = [
+    { ...base, id: "popular-hh", name: "Horus Heresy", system: "Horus Heresy" },
+    { ...base, id: "popular-wh40k", name: "Warhammer 40,000", system: "Warhammer 40,000" },
+    { ...base, id: "popular-aos", name: "Age of Sigmar", system: "Age of Sigmar" },
+    { ...base, id: "popular-old-world", name: "The Old World", system: "The Old World" },
+  ];
+  const busy = loadingSourceId !== null;
+  const loadingLabel = (id: string, idle: string) => loadingSourceId === id ? "Loading…" : idle;
+  return (
+    <>
+      <header className="ux-wb-top ux-wb-home-top reversed">
+        <button type="button" className="ux-icon-btn" aria-label="Back" onClick={props.onBack} disabled={busy}><ArrowLeft size={18} /></button>
+        <div className="ux-wb-title"><strong>Add sources</strong><small>Choose how to connect</small></div>
+      </header>
+      <div className="ux-wb-home-body ux-add-source-body" aria-busy={busy}>
+        <section className="ux-source-method">
+          <div className="ux-source-method-heading"><span className="ux-setting-icon"><FileInput size={18} /></span><span><strong>Repository URL</strong><small>Enter a Git repository containing a source.</small></span></div>
+          <div className={`ux-source-url ${urlError ? "invalid" : ""}`}><input aria-label="Repository URL" aria-invalid={Boolean(urlError)} aria-describedby={urlError ? "source-url-error" : undefined} placeholder="https://github.com/…" value={url} onChange={(event) => onUrlChange(event.currentTarget.value)} disabled={busy} /><button type="button" onClick={() => onAdd({ ...base, id: "repository-url", name: "Repository source", system: "Custom repository" })} disabled={busy}>{loadingSourceId === "repository-url" ? <RotateCcw className="ux-spin" size={15} /> : null}{loadingLabel("repository-url", "Load")}</button></div>
+          {urlError ? <small id="source-url-error" className="ux-source-error">{urlError}</small> : null}
+        </section>
+        <section className="ux-source-method">
+          <div className="ux-result-label">Trusted repositories</div>
+          <div className="ux-trusted-source-grid">{trusted.map((source) => <button key={source.id} type="button" onClick={() => onAdd(source)} disabled={busy}><Database size={20} /><span><strong>{source.name}</strong><small>{source.system}</small></span>{loadingSourceId === source.id ? <RotateCcw className="ux-spin" size={16} /> : <Plus size={16} />}</button>)}</div>
+        </section>
+        <section className="ux-source-method">
+          <div className="ux-result-label">Popular sources</div>
+          <div className="ux-popular-source-grid">{popular.map((source) => <button key={source.id} type="button" onClick={() => onAdd(source)} disabled={busy}>{loadingSourceId === source.id ? <RotateCcw className="ux-spin" size={15} /> : <Plus size={15} />}{loadingLabel(source.id, source.name)}</button>)}</div>
+        </section>
       </div>
     </>
   );

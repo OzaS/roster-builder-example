@@ -30,6 +30,14 @@
           "label": "App"
         },
         {
+          "id": "sources",
+          "label": "Sources"
+        },
+        {
+          "id": "add-source",
+          "label": "Add sources"
+        },
+        {
           "id": "subscription-main",
           "label": "Supporter feature"
         },
@@ -118,7 +126,9 @@
           "label": "App & settings",
           "screens": [
             "app",
-            "settings"
+            "settings",
+            "sources",
+            "add-source"
           ]
         },
         {
@@ -187,6 +197,8 @@
               { "id": "favorites.creation", "title": "Favorite Creation Sections", "level": "composite", "status": "specified", "platforms": ["phone", "tablet"], "states": ["default", "empty", "adding"], "screens": ["add-unit"], "reactNative": { "component": "FavoriteUnitSection", "behavior": "Optimistically add reusable configurations.", "accessibility": "Differentiate favorite name from base unit name." } },
               { "id": "smart-search.settings", "title": "Smart Search (Settings)", "level": "primitive", "status": "specified", "platforms": ["phone", "tablet"], "states": ["enabled", "disabled", "subscription-locked"], "screens": ["settings"], "reactNative": { "component": "SmartSearchSetting", "behavior": "Persist preference and expose entitlement state.", "accessibility": "Describe the effect of enabling assistance." } },
               { "id": "settings.preference-selectors", "title": "Preference Selectors", "level": "primitive", "status": "specified", "platforms": ["phone", "tablet"], "states": ["closed", "open", "selected", "upload"], "screens": ["settings"], "reactNative": { "component": "PreferenceSelector", "behavior": "Persist language, dark-mode, and color-scheme preferences; allow language packs and color schemes to be imported from files.", "accessibility": "Expose the current value, expanded state, selected option, and a named upload action." } },
+              { "id": "sources.management", "title": "Sources Management", "level": "screen-composition", "status": "specified", "platforms": ["phone", "tablet"], "states": ["populated", "empty", "adding"], "screens": ["sources"], "reactNative": { "component": "SourcesScreen", "behavior": "List installed sources and provide a route to source addition; the gallery-only state control previews populated and empty states.", "accessibility": "Announce source status and expose a named add action in every state." } },
+              { "id": "sources.addition", "title": "Source Addition", "level": "screen-composition", "status": "specified", "platforms": ["phone", "tablet"], "states": ["idle", "invalid", "loading", "complete"], "screens": ["add-source"], "reactNative": { "component": "AddSourceScreen", "behavior": "Add a repository URL, trusted repository, or popular source with visible progress and duplicate prevention.", "accessibility": "Associate URL errors with the field and announce loading and completion states." } },
               { "id": "smart-search.main", "title": "Smart Search", "level": "screen-composition", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["idle", "searching", "results", "empty", "offline", "error"], "screens": ["smart-search"], "reactNative": { "component": "SmartSearchScreen", "behavior": "Debounce queries, cancel stale requests, and preserve scope filters.", "accessibility": "Announce result counts and async failures without stealing focus." } },
               { "id": "lookup.sources", "title": "Lookup & Sources", "level": "screen-composition", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["results", "empty", "importing", "offline", "error"], "screens": ["source"], "reactNative": { "component": "LookupScreen", "behavior": "Support local results while offline and report import progress.", "accessibility": "Group results by type and announce import status." } },
               { "id": "tools.workflow", "title": "Tools Workflow", "level": "screen-composition", "status": "specified", "platforms": ["phone", "tablet"], "states": ["default", "empty", "active"], "screens": ["tools", "roster-analytics", "comparison", "game-tracker", "dice-simulator"], "reactNative": { "component": "ToolsNavigator", "behavior": "Use nested navigation with restorable tool state.", "accessibility": "Provide text alternatives for charts and dice results." } },
@@ -194,6 +206,7 @@
               { "id": "account.summary", "title": "App & Account", "level": "screen-composition", "status": "specified", "platforms": ["phone", "tablet"], "states": ["signed-in", "signed-out", "loading", "offline"], "screens": ["app", "settings"], "reactNative": { "component": "AccountScreen", "behavior": "Handle cached account data and sign-in transitions.", "accessibility": "Do not expose email as the sole account identifier." } },
               { "id": "navigation.main-tabs", "title": "Main Tab Bar", "level": "navigation", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["selected", "unselected", "badge", "keyboard-visible"], "screens": ["library", "source", "tools", "collections"], "reactNative": { "component": "MainTabNavigator", "behavior": "Use the native navigation library and safe-area insets.", "accessibility": "Expose tab role, selected state, and badge value." } },
               { "id": "lists.organizer", "title": "Roster Organizer", "level": "composite", "status": "specified", "platforms": ["phone", "tablet"], "states": ["open", "closed", "searching", "filtered", "empty"], "screens": ["library-v2"], "reactNative": { "component": "RosterOrganizer", "behavior": "Keep the roster list available when organization controls are dismissed; adapt the organizer between an inline panel and a sheet.", "accessibility": "Name search, folder, game-system, and tag controls and preserve the active filter when the panel closes." } },
+              { "id": "lists.getting-started-prompt", "title": "Lists Getting Started Prompt", "level": "composite", "status": "specified", "platforms": ["phone", "tablet"], "states": ["visible", "dismissed"], "screens": ["library"], "reactNative": { "component": "GettingStartedPrompt", "behavior": "Allow the introductory prompt to be dismissed without hiding the empty roster state or creation action.", "accessibility": "Give the close button a descriptive label and retain logical focus after dismissal." } },
               { "id": "states.system", "title": "Component State Matrix", "level": "foundation", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["loading", "empty", "offline", "error", "disabled", "subscription-locked"], "screens": [], "reactNative": { "component": "AsyncState", "behavior": "Use consistent recovery actions and preserve content during refresh.", "accessibility": "Announce state transitions and make recovery actions reachable." } }
             ]
           },

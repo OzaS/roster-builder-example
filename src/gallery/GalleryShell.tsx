@@ -3,7 +3,7 @@ import { Archive, Component, MonitorSmartphone, Moon, Navigation, Palette, Panel
 import { DeviceFrame } from "../components/DeviceFrame";
 import { ScreenshotButton } from "../components/v2/ScreenshotButton";
 import { WorkflowScreenPicker, type WorkflowPickerSelection } from "../components/v2/WorkflowScreenPicker";
-import type { ColorScheme, ConceptId, DetachmentFavorite, ForceCreationMode, NavigatorView, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, UnitDetailView, UnitFavorite, WorkflowScreen } from "../types";
+import type { ColorScheme, ConceptId, DetachmentFavorite, ForceCreationMode, GalleryRelease, NavigatorView, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, UnitDetailView, UnitFavorite, WorkflowScreen } from "../types";
 import { colorSchemes } from "../types";
 import type { GalleryConcept } from "./galleryTypes";
 import { WorkflowBoard } from "./WorkflowBoard";
@@ -19,6 +19,7 @@ type Props = {
   themeMode: ThemeMode;
   colorScheme: ColorScheme;
   navigatorView: NavigatorView;
+  galleryRelease: GalleryRelease;
   workflowScreen: WorkflowScreen;
   navStyle: NavStyle;
   forceCreationMode: ForceCreationMode;
@@ -76,6 +77,7 @@ type Props = {
   onThemeModeChange: (mode: ThemeMode) => void;
   onColorSchemeChange: (scheme: ColorScheme) => void;
   onNavigatorViewChange: (view: NavigatorView) => void;
+  onGalleryReleaseChange: (release: GalleryRelease) => void;
   onWorkflowScreenChange: (screen: WorkflowScreen) => void;
   onNavStyleChange: (style: NavStyle) => void;
   onForceCreationModeChange: (mode: ForceCreationMode) => void;
@@ -95,6 +97,7 @@ export function GalleryShell({
   themeMode,
   colorScheme,
   navigatorView,
+  galleryRelease,
   workflowScreen,
   navStyle,
   forceCreationMode,
@@ -112,6 +115,7 @@ export function GalleryShell({
   onThemeModeChange,
   onColorSchemeChange,
   onNavigatorViewChange,
+  onGalleryReleaseChange,
   onWorkflowScreenChange,
   onNavStyleChange,
   onForceCreationModeChange,
@@ -279,6 +283,10 @@ export function GalleryShell({
           </div>
         </div>
         <ConceptGroup title="Designs" concepts={activeConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
+        <div className="gallery-release-switch" role="group" aria-label="Design version">
+          <button className={galleryRelease === "V1" ? "active" : ""} type="button" onClick={() => onGalleryReleaseChange("V1")}><span>V1</span><small>Current</small></button>
+          <button className={galleryRelease === "V2" ? "active" : ""} type="button" onClick={() => onGalleryReleaseChange("V2")}><span>V2</span><small>Future</small></button>
+        </div>
         <div className="view-icon-switch" role="group" aria-label="View">
           <button className={navigatorView === "single" ? "active" : ""} type="button" onClick={() => selectNavigatorView("single")} aria-label="Single" title="Single">
             <Smartphone size={18} />
@@ -370,6 +378,7 @@ export function GalleryShell({
               concept={concept}
               design={selectedDesign}
               activeWorkflow={workflowSelection}
+              galleryRelease={galleryRelease}
               platform={platform}
               themeMode={themeMode}
               colorScheme={colorScheme}

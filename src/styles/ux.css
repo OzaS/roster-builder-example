@@ -1195,6 +1195,7 @@
 }
 
 .ux-cmd-hero {
+  position: relative;
   display: grid;
   gap: 8px;
   padding: 26px 18px;
@@ -1202,6 +1203,8 @@
   background: linear-gradient(155deg, color-mix(in srgb, var(--ux-accent) 22%, var(--ux-surface)), var(--ux-surface));
   border: 1px solid var(--ux-line);
 }
+.ux-cmd-hero-close { position: absolute; top: 10px; right: 10px; display: grid; width: 32px; height: 32px; place-items: center; padding: 0; border: 0; border-radius: 9px; background: transparent; color: var(--ux-muted); cursor: pointer; }
+.ux-cmd-hero-close:hover { background: color-mix(in srgb, var(--ux-ink) 8%, transparent); color: var(--ux-ink); }
 .ux-cmd-hero h2 {
   font-size: 22px;
   font-weight: 850;
@@ -3274,6 +3277,131 @@ button.ux-reference-tag:focus-visible {
 .ux-elements-app-footer {
   margin-top: 12px;
   padding-bottom: 0;
+}
+
+.ux-sources-body,
+.ux-add-source-body {
+  gap: 12px;
+}
+
+.ux-prototype-state {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  border: 1px dashed var(--ux-line-2);
+  border-radius: var(--ux-r-sm);
+  color: var(--ux-muted);
+}
+.ux-prototype-state > div {
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  border-radius: 9px;
+  background: var(--ux-surface-2);
+}
+.ux-prototype-state button {
+  padding: 6px 9px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--ux-muted);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+.ux-prototype-state button.active {
+  background: var(--ux-surface);
+  color: var(--ux-ink);
+  box-shadow: 0 1px 4px color-mix(in srgb, #000 18%, transparent);
+}
+.ux-add-source-primary {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 13px;
+  border: 1px solid color-mix(in srgb, var(--ux-accent) 48%, var(--ux-line));
+  border-radius: var(--ux-r-md);
+  background: color-mix(in srgb, var(--ux-accent) 10%, var(--ux-surface));
+  color: var(--ux-ink);
+  text-align: left;
+  cursor: pointer;
+}
+.ux-add-source-primary > svg:first-child {
+  box-sizing: content-box;
+  padding: 10px;
+  border-radius: 11px;
+  background: var(--ux-accent);
+  color: var(--ux-accent-ink);
+}
+.ux-add-source-primary strong,
+.ux-add-source-primary small { display: block; }
+.ux-add-source-primary small { margin-top: 2px; color: var(--ux-muted); font-size: 11.5px; }
+.ux-managed-source-list { padding: 0; }
+.ux-managed-source-list .ux-source-row { cursor: default; }
+.ux-sources-empty {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  min-height: 220px;
+  align-content: center;
+  padding: 28px;
+  border: 1px dashed var(--ux-line-2);
+  border-radius: var(--ux-r-md);
+  background: var(--ux-surface);
+  text-align: center;
+}
+.ux-sources-empty > span { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 16px; background: color-mix(in srgb, var(--ux-accent) 14%, transparent); color: var(--ux-accent-2); }
+.ux-sources-empty small { max-width: 280px; color: var(--ux-muted); line-height: 1.45; }
+.ux-sources-empty button {
+  display: flex; align-items: center; gap: 6px; margin-top: 5px; padding: 9px 12px;
+  border: 0; border-radius: 9px; background: var(--ux-accent); color: var(--ux-accent-ink); font: inherit; font-weight: 700; cursor: pointer;
+}
+.ux-source-method {
+  display: grid;
+  gap: 10px;
+  padding: 13px;
+  border: 1px solid var(--ux-line);
+  border-radius: var(--ux-r-md);
+  background: var(--ux-surface);
+}
+.ux-source-method-heading { display: flex; align-items: center; gap: 11px; }
+.ux-source-method-heading strong,
+.ux-source-method-heading small { display: block; }
+.ux-source-method-heading small { margin-top: 2px; color: var(--ux-muted); font-size: 11.5px; }
+.ux-source-url { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 7px; }
+.ux-source-url input {
+  min-width: 0; padding: 10px 11px; border: 1px solid var(--ux-line-2); border-radius: 9px; background: var(--ux-surface-2); color: var(--ux-ink); font: inherit;
+}
+.ux-source-url.invalid input { border-color: var(--ux-err); }
+.ux-source-url button,
+.ux-popular-source-grid button {
+  display: flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 12px; border: 1px solid var(--ux-line-2); border-radius: 9px; background: var(--ux-surface-2); color: var(--ux-ink); font: inherit; font-weight: 700; cursor: pointer;
+}
+.ux-source-error { color: var(--ux-err); }
+.ux-trusted-source-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.ux-trusted-source-grid button {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 9px; padding: 12px; border: 1px solid var(--ux-line); border-radius: var(--ux-r-sm); background: var(--ux-surface-2); color: var(--ux-ink); text-align: left; cursor: pointer;
+}
+.ux-trusted-source-grid button > svg:first-child { color: var(--ux-accent-2); }
+.ux-trusted-source-grid strong,
+.ux-trusted-source-grid small { display: block; }
+.ux-trusted-source-grid small { margin-top: 2px; color: var(--ux-muted); font-size: 10.5px; }
+.ux-popular-source-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+.ux-source-method button:disabled,
+.ux-icon-btn:disabled { opacity: 0.62; cursor: wait; }
+.ux-spin { animation: ux-spin 0.75s linear infinite; }
+@keyframes ux-spin { to { transform: rotate(360deg); } }
+
+.device-frame.tablet .ux-sources-body,
+.device-frame.tablet .ux-add-source-body { max-width: 720px; }
+
+@media (max-width: 520px) {
+  .ux-trusted-source-grid { grid-template-columns: 1fr; }
+  .ux-source-url { grid-template-columns: 1fr; }
 }
 
 .device-frame.tablet .ux-collections-body {
