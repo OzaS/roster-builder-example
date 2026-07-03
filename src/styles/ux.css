@@ -4838,7 +4838,6 @@ button.ux-reference-tag:focus-visible {
 .device-frame.tablet .ux-pane-divider.collapsed > svg {
   opacity: 0.2;
 }
-.device-frame.tablet .ux-workbench.roster-overview .ux-tree-search,
 .device-frame.tablet .ux-workbench.roster-overview .tablet-overview-budget {
   display: none;
 }

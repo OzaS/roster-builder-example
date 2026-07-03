@@ -224,7 +224,7 @@ export function CodexWorkbench(props: ConceptProps) {
           </div>
         ) : null}
         <div className="ux-wb-layout" ref={layoutRef} style={panelStyle}>
-          <Tree props={props} query={rosterSearchQuery} onQueryChange={setRosterSearchQuery} searchInNavbar={rosterSearchOpen} creationOpen={forceCreationOpen} onCreationOpenChange={setForceCreationOpen} onOpenUnitGlance={openUnitGlance} />
+          <Tree props={props} query={rosterSearchQuery} creationOpen={forceCreationOpen} onCreationOpenChange={setForceCreationOpen} onOpenUnitGlance={openUnitGlance} />
           <PaneDivider side="tree" props={props} layoutRef={layoutRef} />
           <Detail props={props} scrollRef={detailScrollRef} onOpenLoadoutSlot={openLoadoutSelector} onOpenReference={openReferenceGlance} />
           <PaneDivider side="rail" props={props} layoutRef={layoutRef} />
@@ -436,7 +436,7 @@ function WorkbenchHeader({
   );
 }
 
-function Tree({ props, query, onQueryChange, searchInNavbar, creationOpen, onCreationOpenChange, onOpenUnitGlance }: { props: ConceptProps; query: string; onQueryChange: (query: string) => void; searchInNavbar: boolean; creationOpen: boolean; onCreationOpenChange: (open: boolean) => void; onOpenUnitGlance: (unit: RosterUnit) => void }) {
+function Tree({ props, query, creationOpen, onCreationOpenChange, onOpenUnitGlance }: { props: ConceptProps; query: string; creationOpen: boolean; onCreationOpenChange: (open: boolean) => void; onOpenUnitGlance: (unit: RosterUnit) => void }) {
   const [renamingUnitId, setRenamingUnitId] = useState<string | null>(null);
   const renamingUnit = flattenUnits(props.roster).find((unit) => unit.id === renamingUnitId);
   const normalizedQuery = query.trim().toLowerCase();
@@ -453,10 +453,6 @@ function Tree({ props, query, onQueryChange, searchInNavbar, creationOpen, onCre
   }).filter((item) => item.matches);
   return (
     <nav className="ux-wb-tree" aria-label="Roster tree">
-      {!searchInNavbar ? <div className="ux-wb-search ux-tree-search">
-        <Search size={15} />
-        <input placeholder="Filter units" value={query} onChange={(event) => onQueryChange(event.currentTarget.value)} />
-      </div> : null}
       <div className="ux-force-list">
         {visibleForces.map(({ force, sections }) => {
           const forceOpen = normalizedQuery ? true : props.expandedForceIds.includes(force.id);
