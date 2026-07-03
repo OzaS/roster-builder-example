@@ -201,34 +201,25 @@ function WorkbenchElements({
           <input value="1500" aria-label="Custom points limit" readOnly />
           <span>pts</span>
         </label>
-        <div className="ux-select-field-wrap">
-          <button type="button" className="ux-select-field open">
-            <span>
-              <strong>Select force</strong>
-              <small>Choose from available armies</small>
-            </span>
-            <ChevronDown size={16} />
-          </button>
-          <div className="ux-select-popover" style={{ position: "relative", top: 8 }}>
-            <div className="ux-wb-search">
-              <Search size={15} />
-              <input placeholder="Search forces" readOnly />
+        <button type="button" className="ux-select-field">
+          <span><strong>Adeptus Astartes</strong><small>Warhammer 40,000</small></span><ChevronDown size={16} />
+        </button>
+        <button type="button" className="ux-select-field">
+          <span><strong>Strike Force</strong><small>Adeptus Astartes · 1500 pts</small></span><ChevronDown size={16} />
+        </button>
+        <label className="ux-start-group ux-roster-name">
+          <h4>Roster name</h4><input value="New roster" aria-label="Roster name" readOnly />
+        </label>
+        <div className="ux-loadout-selector-layer ux-elements-static">
+          <section className="ux-loadout-selector" role="dialog" aria-label="Choose faction">
+            <header><span><strong>Choose faction</strong><small>Warhammer 40,000 · 1500 pts</small></span><button type="button" aria-label="Close picker"><X size={18} /></button></header>
+            <label className="ux-loadout-selector-search"><Search size={15} /><input placeholder="Search factions" readOnly /></label>
+            <div className="ux-loadout-choice-list">
+              {[['Adeptus Astartes', 'Imperium'], ['Astra Militarum', 'Imperium'], ['Aeldari', 'Xenos']].map(([name, group], index) => (
+                <button type="button" className={`ux-loadout-choice ${index === 0 ? "selected" : ""}`} key={name}><span><strong>{name}</strong><small>{group}</small></span><span className="ux-loadout-choice-check" aria-hidden>{index === 0 ? <Check size={15} /> : null}</span></button>
+              ))}
             </div>
-            <details className="ux-force-group" open>
-              <summary>
-                <span>Imperium</span>
-                <ChevronDown size={14} />
-              </summary>
-              <div>
-                {["Adeptus Astartes", "Astra Militarum", "Adepta Sororitas"].map((force, index) => (
-                  <button key={force} type="button" className={`ux-force-option ${index === 0 ? "on" : ""}`}>
-                    <span>{force}</span>
-                    {index === 0 ? <Check size={15} /> : null}
-                  </button>
-                ))}
-              </div>
-            </details>
-          </div>
+          </section>
         </div>
       </ElementSection>
 

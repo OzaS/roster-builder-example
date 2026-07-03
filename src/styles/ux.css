@@ -919,6 +919,21 @@
   font-weight: 850;
   outline: none;
 }
+.ux-roster-name input {
+  min-height: 46px;
+  padding: 0 13px;
+  border: 1px solid var(--ux-line);
+  border-radius: var(--ux-r-md);
+  outline: none;
+  background: var(--ux-surface);
+  color: var(--ux-ink);
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 750;
+}
+.ux-roster-name input:focus {
+  border-color: var(--ux-accent);
+}
 .ux-select-field-wrap {
   position: relative;
 }
