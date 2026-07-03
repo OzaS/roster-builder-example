@@ -1291,26 +1291,31 @@ function CreateScreen({ props }: { props: ConceptProps }) {
     {
       name: "Warhammer 40,000",
       sub: "Matched play · Incursion to Onslaught",
-      groups: [
-        { label: "Imperium", forces: ["Adeptus Astartes", "Astra Militarum", "Adepta Sororitas", "Adeptus Custodes"] },
-        { label: "Xenos", forces: ["Aeldari", "Necrons", "T'au Empire", "Tyranids"] },
-        { label: "Chaos", forces: ["Chaos Space Marines", "Death Guard", "World Eaters", "Thousand Sons"] },
+      factions: [
+        { name: "Adeptus Astartes", sub: "Imperium", forces: ["Strike Force", "Incursion Force", "Boarding Patrol"] },
+        { name: "Astra Militarum", sub: "Imperium", forces: ["Combined Regiment", "Armoured Company", "Boarding Patrol"] },
+        { name: "Aeldari", sub: "Xenos", forces: ["Warhost", "Battle Host", "Boarding Patrol"] },
+        { name: "Chaos Space Marines", sub: "Chaos", forces: ["Slaves to Darkness", "Veterans of the Long War", "Boarding Patrol"] },
       ],
     },
     {
       name: "Horus Heresy",
       sub: "Age of Darkness · Crusade armies",
-      groups: [
-        { label: "Legiones Astartes", forces: ["Dark Angels", "Sons of Horus", "Imperial Fists", "Emperor's Children"] },
-        { label: "Auxilia", forces: ["Solar Auxilia", "Mechanicum", "Talons of the Emperor"] },
+      factions: [
+        { name: "Dark Angels", sub: "Legiones Astartes", forces: ["Crusade Force Organisation Chart", "Allied Detachment", "Fury of the Ancients"] },
+        { name: "Sons of Horus", sub: "Legiones Astartes", forces: ["Crusade Force Organisation Chart", "Allied Detachment", "The Black Reaving"] },
+        { name: "Solar Auxilia", sub: "Auxilia", forces: ["Crusade Force Organisation Chart", "Allied Detachment", "Armoured Fist Pattern"] },
+        { name: "Mechanicum", sub: "Mechanicum", forces: ["Crusade Force Organisation Chart", "Allied Detachment", "Cybernetica Cohort"] },
       ],
     },
     {
       name: "Age of Sigmar",
       sub: "Battlepack · Spearhead to Battlehost",
-      groups: [
-        { label: "Grand Alliances", forces: ["Stormcast Eternals", "Soulblight Gravelords", "Orruk Warclans", "Seraphon"] },
-        { label: "Chaos", forces: ["Slaves to Darkness", "Disciples of Tzeentch", "Blades of Khorne"] },
+      factions: [
+        { name: "Stormcast Eternals", sub: "Order", forces: ["Battlehost", "Spearhead", "Vanguard Chamber"] },
+        { name: "Soulblight Gravelords", sub: "Death", forces: ["Battlehost", "Spearhead", "Legion of Blood"] },
+        { name: "Orruk Warclans", sub: "Destruction", forces: ["Battlehost", "Spearhead", "Ironjawz Brawl"] },
+        { name: "Slaves to Darkness", sub: "Chaos", forces: ["Battlehost", "Spearhead", "Legion of Chaos"] },
       ],
     },
   ];
@@ -1318,23 +1323,28 @@ function CreateScreen({ props }: { props: ConceptProps }) {
   const [selectedSystem, setSelectedSystem] = useState<string | null>(null);
   const [selectedPoints, setSelectedPoints] = useState<string | null>(null);
   const [customPoints, setCustomPoints] = useState("1500");
+  const [selectedFaction, setSelectedFaction] = useState<string | null>(null);
   const [selectedForce, setSelectedForce] = useState<string | null>(null);
-  const [forceOpen, setForceOpen] = useState(false);
+  const [picker, setPicker] = useState<"faction" | "force" | null>(null);
+  const [rosterName, setRosterName] = useState("New roster");
   const system = systems.find((item) => item.name === selectedSystem);
+  const faction = system?.factions.find((item) => item.name === selectedFaction);
   const resolvedPoints = selectedPoints === "custom" ? customPoints : selectedPoints;
   const hasPoints = Boolean(resolvedPoints && Number(resolvedPoints) > 0);
 
   function chooseSystem(name: string) {
     setSelectedSystem(name);
     setSelectedPoints(null);
+    setSelectedFaction(null);
     setSelectedForce(null);
-    setForceOpen(false);
+    setPicker(null);
   }
 
   function choosePoints(value: string) {
     setSelectedPoints(value);
+    setSelectedFaction(null);
     setSelectedForce(null);
-    setForceOpen(false);
+    setPicker(null);
   }
 
   return (
@@ -1383,8 +1393,9 @@ function CreateScreen({ props }: { props: ConceptProps }) {
                   aria-label="Custom points limit"
                   onChange={(event) => {
                     setCustomPoints(event.currentTarget.value.replace(/\D/g, "").slice(0, 5));
+                    setSelectedFaction(null);
                     setSelectedForce(null);
-                    setForceOpen(false);
+                    setPicker(null);
                   }}
                 />
                 <span>pts</span>
@@ -1395,57 +1406,76 @@ function CreateScreen({ props }: { props: ConceptProps }) {
 
         {system && hasPoints ? (
           <div className="ux-start-group ux-start-step">
-            <h4>Force</h4>
-            <div className="ux-select-field-wrap">
-              <button type="button" className={`ux-select-field ${forceOpen ? "open" : ""}`} onClick={() => setForceOpen((value) => !value)}>
-                <span>
-                  <strong>{selectedForce ?? "Select force"}</strong>
-                  <small>{selectedForce ? `${selectedSystem} · ${resolvedPoints} pts` : "Choose from available armies"}</small>
-                </span>
-                <ChevronDown size={16} />
-              </button>
-              {forceOpen ? (
-                <div className="ux-select-popover">
-                  <div className="ux-wb-search">
-                    <Search size={15} />
-                    <input placeholder="Search forces" readOnly />
-                  </div>
-                  {system.groups.map((group, index) => (
-                    <details key={group.label} className="ux-force-group" open={index === 0}>
-                      <summary>
-                        <span>{group.label}</span>
-                        <ChevronDown size={14} />
-                      </summary>
-                      <div>
-                        {group.forces.map((force) => (
-                          <button
-                            key={force}
-                            type="button"
-                            className={`ux-force-option ${selectedForce === force ? "on" : ""}`}
-                            onClick={() => {
-                              setSelectedForce(force);
-                              setForceOpen(false);
-                            }}
-                          >
-                            <span>{force}</span>
-                            {selectedForce === force ? <Check size={15} /> : null}
-                          </button>
-                        ))}
-                      </div>
-                    </details>
-                  ))}
-                </div>
-              ) : null}
-            </div>
+            <h4>Faction</h4>
+            <button type="button" className="ux-select-field" aria-haspopup="dialog" onClick={() => setPicker("faction")}>
+              <span>
+                <strong>{selectedFaction ?? "Select faction"}</strong>
+                <small>{selectedFaction ? system.name : "Choose from available factions"}</small>
+              </span>
+              <ChevronDown size={16} />
+            </button>
           </div>
         ) : null}
 
-        <button type="button" className="ux-primary" disabled={!selectedSystem || !hasPoints || !selectedForce} onClick={() => props.onNavigate("overview")}>
+        {faction ? (
+          <div className="ux-start-group ux-start-step">
+            <h4>Force</h4>
+              <button type="button" className="ux-select-field" aria-haspopup="dialog" onClick={() => setPicker("force")}>
+                <span>
+                  <strong>{selectedForce ?? "Select force"}</strong>
+                  <small>{selectedForce ? `${selectedFaction} · ${resolvedPoints} pts` : "Choose a force organisation"}</small>
+                </span>
+                <ChevronDown size={16} />
+              </button>
+          </div>
+        ) : null}
+
+        {selectedForce ? (
+          <label className="ux-start-group ux-start-step ux-roster-name">
+            <h4>Roster name</h4>
+            <input value={rosterName} maxLength={60} onChange={(event) => setRosterName(event.currentTarget.value)} placeholder="Name your roster" />
+          </label>
+        ) : null}
+
+        <button type="button" className="ux-primary" disabled={!selectedSystem || !hasPoints || !selectedFaction || !selectedForce || !rosterName.trim()} onClick={() => props.onNavigate("overview")}>
           <Plus size={16} />
           Create roster
         </button>
       </div>
+      {picker === "faction" && system ? (
+        <RosterChoicePicker title="Choose faction" context={`${system.name} · ${resolvedPoints} pts`} searchLabel="factions" options={system.factions.map((item) => ({ name: item.name, sub: item.sub }))} selected={selectedFaction} onClose={() => setPicker(null)} onSelect={(name) => { setSelectedFaction(name); setSelectedForce(null); setPicker(null); }} />
+      ) : null}
+      {picker === "force" && faction ? (
+        <RosterChoicePicker title="Choose force" context={faction.name} searchLabel="forces" options={faction.forces.map((name) => ({ name, sub: `${resolvedPoints} pts` }))} selected={selectedForce} onClose={() => setPicker(null)} onSelect={(name) => { setSelectedForce(name); setPicker(null); }} />
+      ) : null}
     </>
+  );
+}
+
+function RosterChoicePicker({ title, context, searchLabel, options, selected, onClose, onSelect }: { title: string; context: string; searchLabel: string; options: { name: string; sub: string }[]; selected: string | null; onClose: () => void; onSelect: (name: string) => void }) {
+  const [query, setQuery] = useState("");
+  const filtered = options.filter((option) => `${option.name} ${option.sub}`.toLowerCase().includes(query.trim().toLowerCase()));
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => event.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onClose]);
+
+  return (
+    <div className="ux-loadout-selector-layer" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+      <section className="ux-loadout-selector" role="dialog" aria-modal="true" aria-labelledby="roster-picker-title">
+        <header><span><strong id="roster-picker-title">{title}</strong><small>{context}</small></span><button type="button" aria-label="Close picker" onClick={onClose}><X size={18} /></button></header>
+        <label className="ux-loadout-selector-search"><Search size={15} /><input value={query} onChange={(event) => setQuery(event.currentTarget.value)} placeholder={`Search ${searchLabel}`} autoFocus /></label>
+        <div className="ux-loadout-choice-list">
+          {filtered.map((option) => {
+            const isSelected = option.name === selected;
+            return <button type="button" className={`ux-loadout-choice ${isSelected ? "selected" : ""}`} key={option.name} onClick={() => onSelect(option.name)}><span><strong>{option.name}</strong><small>{option.sub}</small></span><span className="ux-loadout-choice-check" aria-hidden>{isSelected ? <Check size={15} /> : null}</span></button>;
+          })}
+          {!filtered.length ? <div className="ux-loadout-selector-empty"><Search size={18} /><strong>No matching choices</strong><small>Try a different search.</small></div> : null}
+        </div>
+      </section>
+    </div>
   );
 }
 
