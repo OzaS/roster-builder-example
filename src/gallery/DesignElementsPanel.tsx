@@ -569,6 +569,13 @@ function WorkbenchElements({
         </div>
       </ElementSection>
 
+      <ElementSection title="Export Sheet">
+        <div className="ux-prototype-state"><small>Format</small><div><button type="button">New Recruit JSON</button><button type="button" className="active">Text</button></div></div>
+        <article className="ux-state-card offline"><span className="ux-state-dot" aria-hidden /><strong>This roster has 2 errors</strong><small>You can still export it.</small></article>
+        <pre style={{ maxHeight: 180, overflow: "auto", margin: "10px 0", padding: 10, borderRadius: 10, background: "var(--ux-surface)", border: "1px solid var(--ux-line-2)", fontSize: 11, whiteSpace: "pre-wrap" }}>{`${roster.name} [${roster.system}]\n\n## ${roster.faction}\n\nUnit one [120 pts]\n• Option A\n• Option B\n\n… 1,240 more characters`}</pre>
+        <div className="ux-lists-actions"><div><strong>{roster.name}.txt</strong><small>Share or copy the full text</small></div><button type="button" className="ux-organizer-toggle"><Copy size={15} />Copy</button><button type="button" className="ux-new-roster ux-new-roster-compact"><Upload size={18} /><span><strong>Share</strong></span></button></div>
+      </ElementSection>
+
       <ElementSection title="Favorite Library Cards">
         <section className="ux-favorite-library-section"><header><span className="ux-collection-icon"><Heart size={18} /></span><strong>Favorite units</strong></header><div className="ux-favorite-card-list"><article className="ux-favorite-card"><span><strong>Veteran Spearhead</strong><small>Battleline · {selectedUnit.points} pts</small></span><div><button type="button"><Plus size={14} />Add</button><button type="button"><Trash2 size={14} /></button></div></article></div></section>
       </ElementSection>
