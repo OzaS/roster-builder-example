@@ -6,6 +6,7 @@ import type { DesignElementGroup, DesignElements } from "../design-data/designDa
 import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode } from "../types";
 import { BudgetMeter, Chip, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
+import { EXAMPLE_SYSTEM, installSteps, JobModal, JobOutcomeNotice, JobPill, JobToast } from "../concepts/ux/SourceJobs";
 
 type Props = {
   concept: GalleryConcept;
@@ -503,6 +504,44 @@ function WorkbenchElements({
           <div className="ux-trusted-source-grid"><button type="button"><Database size={20} /><span><strong>BSData repositories</strong><small>Community catalogues</small></span><Plus size={16} /></button><button type="button"><Database size={20} /><span><strong>Official rules repository</strong><small>Verified catalogues</small></span><RotateCcw className="ux-spin" size={16} /></button></div>
         </section>
         <section className="ux-source-method"><div className="ux-result-label">Popular sources</div><div className="ux-popular-source-grid">{["Horus Heresy", "Warhammer 40,000", "Age of Sigmar", "The Old World"].map((source) => <button key={source} type="button"><Plus size={15} />{source}</button>)}</div></section>
+      </ElementSection>
+
+      <ElementSection title="Background Job Modal">
+        <JobModal inline title={`Installing ${EXAMPLE_SYSTEM.name}`} subtitle={`${EXAMPLE_SYSTEM.repo} · ${EXAMPLE_SYSTEM.version}`} percent={46} stepLabel="Step 3 of 4" steps={installSteps("import")} queue={["Updating Example System Two"]} />
+        <JobOutcomeNotice outcome="done" title={`Installed ${EXAMPLE_SYSTEM.name}`} body="23 factions · 41 MB. Ready to use." />
+        <JobOutcomeNotice outcome="failed" title={`Could not install ${EXAMPLE_SYSTEM.name}`} body="GitHub could not be reached. Check the connection and try again." />
+        <JobOutcomeNotice outcome="cancelled" title="Install cancelled" body="Nothing was installed." />
+      </ElementSection>
+
+      <ElementSection title="Global Job Indicator">
+        <div className="ux-elements-job-stage">
+          <div className="ux-job-float">
+            <JobPill inline label={`Installing ${EXAMPLE_SYSTEM.name}`} percent={46} />
+            <JobPill inline label={`Installing ${EXAMPLE_SYSTEM.name}`} percent={46} count={2} />
+            <JobPill inline needsYou label={`Choose factions for ${EXAMPLE_SYSTEM.name}`} />
+          </div>
+          <small className="ux-hint">Placement: 12 pt above the tab bar on tab screens; above the bottom safe area on pushed screens and in the roster workbench.</small>
+          <div className="ux-elements-command-wrap ux-elements-job-placement">
+            <div className="ux-job-float"><JobPill inline label={`Installing ${EXAMPLE_SYSTEM.name}`} percent={46} /></div>
+            <nav className="ux-tabbar floating" aria-label="Main navigation (placement example)">
+              <button type="button" className="ux-tab active"><Layers size={20} /><span>Lists</span></button>
+              <button type="button" className="ux-tab"><Search size={20} /><span>Lookup</span></button>
+              <button type="button" className="ux-tab ux-tab-fab" aria-label="New roster"><Plus size={22} /></button>
+              <button type="button" className="ux-tab"><Hammer size={20} /><span>Tools</span></button>
+              <button type="button" className="ux-tab"><LibraryBig size={20} /><span>Library</span></button>
+            </nav>
+          </div>
+        </div>
+      </ElementSection>
+
+      <ElementSection title="Job Toasts">
+        <div className="ux-elements-job-stage">
+          <div className="ux-job-float">
+            <JobToast tone="ok" message={`Installed ${EXAMPLE_SYSTEM.name}`} action="View" />
+            <JobToast tone="ok" message="Updated Example System Two" action="Report" />
+            <JobToast tone="err" message={`Could not install ${EXAMPLE_SYSTEM.name}`} action="Details" />
+          </div>
+        </div>
       </ElementSection>
 
       <ElementSection title="Tools Workflow">

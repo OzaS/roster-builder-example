@@ -4,7 +4,11 @@ import { mockCatalogues, mockDetachments, mockSystemUnits } from "../../data/moc
 import { referenceById, resolveRosterReference } from "../../data/mockRosterReferences";
 import type { RosterReferenceDefinition, RosterUnit } from "../../types";
 import type { ConceptProps } from "../shared";
+import { InstallJobScreen } from "./SourceJobs";
 import { BackOrTitle, BudgetMeter, Chip, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "./uxShared";
+
+/** Screens of the source-data flow designed in Battle Augur plan 2D (SourceJobs.tsx). */
+const SOURCE_FLOW_SCREENS: readonly string[] = ["install-job"];
 
 type ReferenceGlance =
   | { type: "unit"; unit: RosterUnit }
@@ -36,7 +40,7 @@ export function CodexWorkbench(props: ConceptProps) {
     ? (["library", "library-v2", "subscription-main", "source", "tools", "collections"] as const).some((tab) => tab === props.workflowScreen)
     : screen === "library" || screen === "catalogue" || screen === "tools" || screen === "collections";
   const showTabBar = usesTabNavigation && isMainTab;
-  const isWorkbenchScreen = screen !== "library" && screen !== "catalogue" && screen !== "tools" && screen !== "collections" && screen !== "app" && screen !== "settings" && screen !== "sources" && screen !== "add-source" && screen !== "system";
+  const isWorkbenchScreen = screen !== "library" && screen !== "catalogue" && screen !== "tools" && screen !== "collections" && screen !== "app" && screen !== "settings" && screen !== "sources" && screen !== "add-source" && !SOURCE_FLOW_SCREENS.includes(screen) && screen !== "system";
   const [activeLoadoutSlot, setActiveLoadoutSlot] = useState<{ groupId: string; slotId: string } | null>(null);
   const [forceCreationOpen, setForceCreationOpen] = useState(false);
   const [rosterSearchOpen, setRosterSearchOpen] = useState(false);
@@ -190,6 +194,8 @@ export function CodexWorkbench(props: ConceptProps) {
         }, 700);
       }}
     />;
+  } else if (screen === "install-job") {
+    body = <InstallJobScreen props={props} />;
   } else if (screen === "system") {
     body = <CreateScreen props={props} />;
   } else if (screen === "smart-search") {

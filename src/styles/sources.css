@@ -1,0 +1,127 @@
+/* Source data and background jobs (Battle Augur plan 2D, DEC-022/023). */
+
+/* gallery preview control stays clickable above the job scrim */
+.ux-job-preview { position: relative; z-index: 30; flex-wrap: wrap; }
+.ux-job-preview > div { flex-wrap: wrap; }
+
+/* ---- job sheet ---- */
+.ux-job-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: color-mix(in srgb, #000 46%, transparent);
+}
+.ux-job-sheet {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  max-height: 80%;
+  overflow-y: auto;
+  padding: 10px 16px 18px;
+  border: 1px solid var(--ux-line);
+  border-bottom: 0;
+  border-radius: var(--ux-r-xl) var(--ux-r-xl) 0 0;
+  background: var(--ux-surface);
+  box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.35);
+}
+.ux-job-sheet.inline { max-height: none; border-bottom: 1px solid var(--ux-line); border-radius: var(--ux-r-lg); box-shadow: none; }
+.ux-job-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; }
+.ux-job-head strong, .ux-job-head small { display: block; }
+.ux-job-head strong { font-size: 16px; }
+.ux-job-head small { margin-top: 2px; color: var(--ux-muted); font-size: 11.5px; }
+.ux-job-hide {
+  display: inline-flex; align-items: center; gap: 4px; min-height: 36px; padding: 0 10px;
+  border: 1px solid var(--ux-line-2); border-radius: 999px; background: var(--ux-surface-2); color: var(--ux-ink); font: inherit; font-size: 12.5px; font-weight: 750; cursor: pointer;
+}
+.ux-job-overall { display: grid; gap: 6px; }
+.ux-job-overall small { color: var(--ux-muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+
+.ux-job-bar { position: relative; height: 6px; overflow: hidden; border-radius: 999px; background: var(--ux-surface-3); }
+.ux-job-bar > span { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: var(--ux-accent); }
+.ux-job-bar.ok > span { background: var(--ux-ok); }
+.ux-job-bar.err > span { background: var(--ux-err); }
+.ux-job-bar.indeterminate > span { width: 35%; animation: ux-job-slide 1.2s ease-in-out infinite; }
+@keyframes ux-job-slide { from { left: -35%; } to { left: 100%; } }
+
+.ux-job-steps { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; border: 1px solid var(--ux-line); border-radius: var(--ux-r-md); background: var(--ux-surface-2); overflow: hidden; }
+.ux-job-step { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; align-items: start; padding: 11px 12px; }
+.ux-job-step + .ux-job-step { border-top: 1px solid var(--ux-line); }
+.ux-job-step > span { display: grid; gap: 5px; min-width: 0; }
+.ux-job-step strong { font-size: 13.5px; }
+.ux-job-step small { color: var(--ux-muted); font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.ux-job-step.waiting strong { color: var(--ux-muted); }
+.ux-job-step.needs { background: color-mix(in srgb, var(--ux-accent) 10%, transparent); }
+.ux-job-step-icon { margin-top: 1px; }
+.ux-job-step-icon.ok { color: var(--ux-ok); }
+.ux-job-step-icon.accent { color: var(--ux-accent-2); }
+.ux-job-step-icon.err { color: var(--ux-err); }
+.ux-job-step-icon.muted { color: var(--ux-ink-tertiary); }
+.ux-job-link { justify-self: start; display: inline-flex; align-items: center; gap: 3px; padding: 0; border: 0; background: transparent; color: var(--ux-accent-2); font: inherit; font-size: 12px; font-weight: 750; cursor: pointer; }
+
+.ux-job-notice { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 10px; align-items: start; padding: 12px; border: 1px solid var(--ux-line); border-radius: var(--ux-r-md); background: var(--ux-surface-2); }
+.ux-job-notice strong, .ux-job-notice small { display: block; }
+.ux-job-notice small { margin-top: 3px; color: var(--ux-muted); font-size: 12px; line-height: 1.4; }
+.ux-job-notice.ok { border-color: color-mix(in srgb, var(--ux-ok) 40%, var(--ux-line)); }
+.ux-job-notice.ok > svg { color: var(--ux-ok); }
+.ux-job-notice.error { border-color: color-mix(in srgb, var(--ux-err) 45%, var(--ux-line)); }
+.ux-job-notice.error > svg { color: var(--ux-err); }
+.ux-job-notice.warning { border-color: color-mix(in srgb, var(--ux-warn) 45%, var(--ux-line)); }
+.ux-job-notice.warning > svg { color: var(--ux-warn); }
+.ux-job-notice.info > svg { color: var(--ux-cool); }
+
+.ux-job-queue { display: grid; gap: 6px; }
+.ux-job-queue-row { display: grid; grid-template-columns: 18px minmax(0, 1fr) 28px; align-items: center; gap: 8px; padding: 9px 10px; border: 1px dashed var(--ux-line-2); border-radius: var(--ux-r-sm); color: var(--ux-muted); font-size: 12.5px; }
+.ux-job-queue-row button { display: grid; place-items: center; width: 28px; height: 28px; border: 0; border-radius: 8px; background: var(--ux-surface-2); color: var(--ux-muted); cursor: pointer; }
+
+.ux-job-footer { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ux-job-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 12px;
+  border: 1px solid var(--ux-line-2); border-radius: 12px; background: var(--ux-surface-2); color: var(--ux-ink); font: inherit; font-size: 13.5px; font-weight: 750; cursor: pointer;
+}
+.ux-job-btn.primary { border-color: var(--ux-accent); background: var(--ux-accent); color: var(--ux-accent-ink); }
+.ux-job-btn.destructive { border-color: transparent; background: transparent; color: var(--ux-err); }
+.ux-job-btn.block { grid-column: 1 / -1; width: 100%; }
+.ux-job-btn:disabled { opacity: 0.5; cursor: default; }
+
+/* ---- global indicator and toasts ---- */
+.ux-job-float {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 18px;
+  z-index: 15;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.ux-workbench.has-tabs .ux-job-float { bottom: 96px; }
+.ux-job-float > * { pointer-events: auto; }
+.ux-job-pill {
+  display: inline-flex; align-items: center; gap: 8px; max-width: 100%; min-height: 40px; padding: 0 12px 0 8px;
+  border: 1px solid var(--ux-line-2); border-radius: 999px; background: var(--ux-surface-3); color: var(--ux-ink);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32); font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer;
+}
+.ux-job-pill > span:not(.ux-job-ring) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ux-job-pill b { padding: 2px 7px; border-radius: 999px; background: color-mix(in srgb, var(--ux-accent) 22%, transparent); color: var(--ux-accent-2); font-size: 11px; white-space: nowrap; }
+.ux-job-pill.needs { border-color: var(--ux-accent); background: var(--ux-accent); color: var(--ux-accent-ink); padding-left: 12px; }
+.ux-job-pill.inline { box-shadow: none; }
+.ux-job-ring { display: grid; place-items: center; flex: none; width: 24px; height: 24px; border-radius: 999px; }
+.ux-job-ring > span { width: 16px; height: 16px; border-radius: 999px; background: var(--ux-surface-3); }
+.ux-job-toast {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; width: 100%; padding: 12px 14px;
+  border: 1px solid var(--ux-line-2); border-radius: var(--ux-r-md); background: var(--ux-surface-3); box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25); font-size: 13px;
+}
+.ux-job-toast.neutral { grid-template-columns: minmax(0, 1fr) auto; }
+.ux-job-toast.ok > svg { color: var(--ux-ok); }
+.ux-job-toast.err > svg { color: var(--ux-err); }
+.ux-job-toast button { border: 0; background: transparent; color: var(--ux-accent-2); font: inherit; font-weight: 800; cursor: pointer; }
+.ux-job-backdrop { padding-bottom: 80px; }
+
+.ux-elements-job-stage { position: relative; display: grid; gap: 10px; }
+.ux-elements-job-stage .ux-job-float { position: static; }
+.design-elements-panel.ux-screen .ux-elements-job-placement { min-height: 150px; }
+.design-elements-panel.ux-screen .ux-elements-job-placement .ux-job-float { position: absolute; bottom: 80px; }

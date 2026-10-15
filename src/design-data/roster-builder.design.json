@@ -38,6 +38,10 @@
           "label": "Add sources"
         },
         {
+          "id": "install-job",
+          "label": "Install job"
+        },
+        {
           "id": "subscription-main",
           "label": "Supporter feature"
         },
@@ -128,7 +132,8 @@
             "app",
             "settings",
             "sources",
-            "add-source"
+            "add-source",
+            "install-job"
           ]
         },
         {
@@ -199,6 +204,9 @@
               { "id": "settings.preference-selectors", "title": "Preference Selectors", "level": "primitive", "status": "specified", "platforms": ["phone", "tablet"], "states": ["closed", "open", "selected", "upload"], "screens": ["settings"], "reactNative": { "component": "PreferenceSelector", "behavior": "Persist language, dark-mode, and color-scheme preferences; allow language packs and color schemes to be imported from files.", "accessibility": "Expose the current value, expanded state, selected option, and a named upload action." } },
               { "id": "sources.management", "title": "Sources Management", "level": "screen-composition", "status": "specified", "platforms": ["phone", "tablet"], "states": ["populated", "empty", "adding"], "screens": ["sources"], "reactNative": { "component": "SourcesScreen", "behavior": "List installed sources and provide a route to source addition; the gallery-only state control previews populated and empty states.", "accessibility": "Announce source status and expose a named add action in every state." } },
               { "id": "sources.addition", "title": "Source Addition", "level": "screen-composition", "status": "specified", "platforms": ["phone", "tablet"], "states": ["idle", "invalid", "loading", "complete"], "screens": ["add-source"], "reactNative": { "component": "AddSourceScreen", "behavior": "Add a repository URL, trusted repository, or popular source with visible progress and duplicate prevention.", "accessibility": "Associate URL errors with the field and announce loading and completion states." } },
+              { "id": "jobs.modal", "title": "Background Job Modal", "level": "overlay", "status": "specified", "platforms": ["phone", "tablet"], "states": ["running", "queued", "needs-you", "done", "updated", "failed", "cancelled"], "screens": ["install-job"], "reactNative": { "component": "JobSheet", "behavior": "Native form sheet opened when an install or update starts: overall progress, steps (download, read, choose factions, import per faction, write, move rosters) with per-step progress, an Up next queue, Cancel (confirmed) and Hide. Hide, swipe down and Android back keep the job running in the worker (DEC-018, DEC-023).", "accessibility": "Never show step state by colour alone (icon per state); announce step changes and the outcome, not every percent; Hide is labelled as continuing the work." } },
+              { "id": "jobs.indicator", "title": "Global Job Indicator", "level": "navigation", "status": "specified", "platforms": ["phone", "tablet"], "states": ["running", "queued", "needs-you"], "screens": ["install-job"], "reactNative": { "component": "JobPill", "behavior": "Floating pill on every screen while a job runs: 12 pt above the tab bar, or above the bottom safe area on pushed screens and the roster workbench; screens add a bottom inset. Shows a progress ring, the job and its percent, '2 jobs' with a queue, and an accent 'needs you' state. Tap reopens the job sheet. Hidden while a sheet or the keyboard is open.", "accessibility": "One button: job, percent, and 'Opens the progress'; announce only step changes and the end." } },
+              { "id": "jobs.toasts", "title": "Job Toasts", "level": "primitive", "status": "specified", "platforms": ["phone", "tablet"], "states": ["installed", "updated", "failed"], "screens": ["install-job"], "reactNative": { "component": "Toast (ds)", "behavior": "End of a hidden job: success with View (or Report after an update that changed rosters), failure with Details (reopens the sheet in its failed state). Uses the built toast with an action (6 s); stacks above the job pill.", "accessibility": "Announced without taking focus; the action is a named button." } },
               { "id": "smart-search.main", "title": "Smart Search", "level": "screen-composition", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["idle", "searching", "results", "empty", "offline", "error"], "screens": ["smart-search"], "reactNative": { "component": "SmartSearchScreen", "behavior": "Debounce queries, cancel stale requests, and preserve scope filters.", "accessibility": "Announce result counts and async failures without stealing focus." } },
               { "id": "lookup.sources", "title": "Lookup & Sources", "level": "screen-composition", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["results", "empty", "importing", "offline", "error"], "screens": ["source"], "reactNative": { "component": "LookupScreen", "behavior": "Support local results while offline and report import progress.", "accessibility": "Group results by type and announce import status." } },
               { "id": "tools.workflow", "title": "Tools Workflow", "level": "screen-composition", "status": "specified", "platforms": ["phone", "tablet"], "states": ["default", "empty", "active"], "screens": ["tools", "roster-analytics", "comparison", "game-tracker", "dice-simulator"], "reactNative": { "component": "ToolsNavigator", "behavior": "Use nested navigation with restorable tool state.", "accessibility": "Provide text alternatives for charts and dice results." } },
