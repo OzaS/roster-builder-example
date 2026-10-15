@@ -6,6 +6,7 @@ import type { DesignElementGroup, DesignElements } from "../design-data/designDa
 import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode } from "../types";
 import { BudgetMeter, Chip, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
+import { ComingSoonCard, DeveloperOptionsPreview } from "../concepts/ux/AppExtras";
 import { AddCollectionSheet, AdvancedInstallSetting, CollectionSourceRow, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, SourceRow, SourceStatusChip, SourceUpdateCard, UpdatesNotice } from "../concepts/ux/SourceJobs";
 
 type Props = {
@@ -673,6 +674,14 @@ function WorkbenchElements({
           <strong>Roster Builder</strong>
           <small>Version 1.0.0</small>
         </div>
+      </ElementSection>
+
+      <ElementSection title="Coming Soon Placeholder">
+        <ComingSoonCard />
+      </ElementSection>
+
+      <ElementSection title="Developer Options">
+        <DeveloperOptionsPreview />
       </ElementSection>
 
       <ElementSection title="Main Tab Bar">

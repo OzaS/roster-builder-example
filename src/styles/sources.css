@@ -218,3 +218,14 @@
 .ux-job-sheet { display: flex; flex-direction: column; }
 .ux-job-sheet > * { flex: none; }
 .ux-job-sheet > .ux-sheet-grip { align-self: center; }
+
+/* ---- coming soon placeholder and developer options (built in plan 1A) ---- */
+.ux-cs-card { display: grid; justify-items: center; gap: 8px; padding: 28px 18px; border: 1px solid var(--ux-line); border-radius: var(--ux-r-lg); background: var(--ux-surface); text-align: center; }
+.ux-cs-icon { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 16px; background: color-mix(in srgb, var(--ux-accent) 16%, transparent); color: var(--ux-accent-2); }
+.ux-cs-overline { margin-top: 6px; color: var(--ux-accent-2); font-size: 11px; font-weight: 850; letter-spacing: 0.7px; text-transform: uppercase; }
+.ux-cs-card > strong { font-size: 20px; }
+.ux-cs-card > p { max-width: 340px; margin: 0; color: var(--ux-muted); font-size: 13.5px; line-height: 1.45; }
+.ux-cs-chips { justify-content: center; margin-top: 4px; }
+.ux-cs-note { margin-top: 8px; padding: 12px; border-radius: var(--ux-r-md); background: var(--ux-surface-2); color: var(--ux-muted); font-size: 12px; line-height: 1.4; }
+.ux-dev-preview { display: grid; gap: 10px; }
+.ux-dev-row { border: 0; border-radius: 0; }
