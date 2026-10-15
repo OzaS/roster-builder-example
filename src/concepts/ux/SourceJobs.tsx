@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { ArrowLeft, Check, ChevronDown, ChevronRight, Circle, CircleArrowUp, CircleCheck, Database, Hand, History, LoaderCircle, OctagonAlert, Plus, TriangleAlert, X } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, ChevronRight, Circle, CircleArrowUp, CircleCheck, Database, Download, Ellipsis, FileInput, FolderGit2, Globe, Hand, History, Info, Library, LoaderCircle, OctagonAlert, Plus, Search, Star, TriangleAlert, X } from "lucide-react";
 import type { ConceptProps } from "../shared";
 import { Chip } from "./uxShared";
 
@@ -464,6 +464,148 @@ export function MigrationReportBody() {
       <div className="ux-src-group"><DetailRow label="Weekend practice" value="Northern Realms" /><DetailRow label="Club night" value="Tidewardens" /></div>
       <div className="ux-result-label">Data changes</div>
       <div className="ux-src-group"><DetailRow label="Glass Legion" value="r12 → r14" /><DetailRow label="Northern Realms" value="r30 → r31" /><DetailRow label="Hollow Crown" value="New" /><DetailRow label="Salt Kings" value="Removed" /></div>
+    </>
+  );
+}
+
+// ---------------------------------------------------------------- collections (plan 2C)
+
+type RowAction = "install" | "installed" | "update" | "queued" | "running";
+type CollectionEntry = { name: string; description: string; repo: string; supported?: boolean; archived?: boolean; action: RowAction };
+
+export const DEFAULT_COLLECTION: CollectionEntry[] = [
+  { name: EXAMPLE_SYSTEM.name, description: "Skirmish rules with campaign play", repo: EXAMPLE_SYSTEM.repo, supported: true, action: "update" },
+  { name: "Example System Two", description: "Mass battles, points-based", repo: "example-org/example-system-two", supported: true, action: "installed" },
+  { name: "Example System Three", description: "Small squads, card activation", repo: "example-org/example-system-three", supported: true, action: "install" },
+  { name: "Example System Four", description: "Naval engagements", repo: "another-org/example-system-four", action: "queued" },
+  { name: "Example System Five", description: "Fantasy regiments", repo: "another-org/example-system-five", action: "install" },
+];
+
+function RowActionButton({ action, onInstall }: { action: RowAction; onInstall?: () => void }) {
+  if (action === "installed") return <button type="button" className="ux-src-action done" disabled><Check size={13} />Installed</button>;
+  if (action === "update") return <button type="button" className="ux-src-action">Update</button>;
+  if (action === "queued") return <button type="button" className="ux-src-action quiet">Queued</button>;
+  if (action === "running") return <button type="button" className="ux-src-action quiet"><LoaderCircle size={13} className="ux-spin" />46%</button>;
+  return <button type="button" className="ux-src-action primary" onClick={onInstall}><Download size={13} />Install</button>;
+}
+
+export function CollectionSourceRow({ entry, onInstall }: { entry: CollectionEntry; onInstall?: () => void }) {
+  return (
+    <article className={`ux-source-row ux-src-row ux-col-row ${entry.archived ? "dimmed" : ""}`}>
+      <span>
+        <strong>{entry.name}</strong>
+        <small>{entry.description}</small>
+        <small>{entry.repo}</small>
+        <span className="ux-src-chips">
+          {entry.supported ? <Chip tone="valid"><Star size={10} /> Supported</Chip> : null}
+          {entry.action === "update" ? <Chip tone="cool"><CircleArrowUp size={10} /> Update available</Chip> : null}
+          {entry.archived ? <Chip tone="neutral">Archived</Chip> : null}
+        </span>
+      </span>
+      <RowActionButton action={entry.action} onInstall={onInstall} />
+    </article>
+  );
+}
+
+export function DefaultCollectionCard({ onInstall, onShowAll }: { onInstall?: () => void; onShowAll?: () => void }) {
+  return (
+    <section className="ux-src-card ux-col-card">
+      <header><Library size={18} /><span><strong>Battle Augur sources</strong><small>12 sources · updated 2026-10-14</small></span><Chip tone="neutral">Default</Chip></header>
+      <div className="ux-source-list ux-managed-source-list ux-src-list">
+        {DEFAULT_COLLECTION.slice(0, 3).map((entry) => <CollectionSourceRow key={entry.repo} entry={entry} onInstall={onInstall} />)}
+      </div>
+      <button type="button" className="ux-job-link ux-col-more" onClick={onShowAll}>Show all 12<ChevronRight size={13} /></button>
+    </section>
+  );
+}
+
+export function UserCollectionRows({ onOpen }: { onOpen?: () => void }) {
+  return (
+    <div className="ux-src-group">
+      <button type="button" className="ux-col-nav" onClick={onOpen}><FolderGit2 size={17} /><span><strong>Club picks</strong><small>6 sources · collection</small></span><ChevronRight size={16} /></button>
+      <button type="button" className="ux-col-nav" onClick={onOpen}><Globe size={17} /><span><strong>community-data</strong><small>48 repositories · GitHub organisation</small></span><ChevronRight size={16} /></button>
+      <button type="button" className="ux-col-nav add"><Plus size={17} /><span><strong>Add a collection or library</strong><small>A collection file or a GitHub organisation</small></span><ChevronRight size={16} /></button>
+    </div>
+  );
+}
+
+type AddSheetState = "idle" | "found" | "invalid" | "repository";
+
+export function AddCollectionSheet({ state, inline = false }: { state: AddSheetState; inline?: boolean }) {
+  const value = state === "idle" ? "" : state === "repository" ? "github.com/example-org/example-system-six" : state === "invalid" ? "example.com/notes.txt" : "github.com/club-org/club-picks";
+  const sheet = (
+    <section className={`ux-job-sheet ${inline ? "inline" : ""}`} role="dialog" aria-label="Add a collection or library">
+      <span className="ux-sheet-grip" aria-hidden />
+      <header className="ux-job-head"><span><strong>Add a collection or library</strong><small>Lists of repositories to install from</small></span><button type="button" className="ux-icon-btn" aria-label="Close"><X size={17} /></button></header>
+      <label className="ux-col-field">
+        <span>Collection or library link</span>
+        <div className={`ux-source-url ${state === "invalid" ? "invalid" : ""}`}><input aria-label="Collection or library link" placeholder="https://… or github.com/name" defaultValue={value} key={value} /><button type="button">Find</button></div>
+        <small className={state === "invalid" ? "ux-source-error" : ""}>{state === "invalid" ? "That link does not lead to a collection file or a GitHub organisation." : "A collection file (.json) or a GitHub organisation or user (github.com/name)."}</small>
+      </label>
+      {state === "found" ? (
+        <div className="ux-src-card">
+          <header><FolderGit2 size={18} /><span><strong>Club picks</strong><small>Collection · by club-org · 6 sources</small></span></header>
+          <small className="ux-col-desc">The systems our club plays, with the repositories we trust.</small>
+        </div>
+      ) : null}
+      {state === "repository" ? <div className="ux-job-notice info"><Info size={18} /><span><strong>That is a repository, not a collection.</strong><small>Install it directly instead.</small></span><button type="button" className="ux-job-btn primary">Install it</button></div> : null}
+      <small className="ux-src-footer">Collections only list repositories. Nothing is downloaded until you install.</small>
+      <footer className="ux-job-footer"><button type="button" className="ux-job-btn secondary">Cancel</button><button type="button" className="ux-job-btn primary" disabled={state !== "found"}>Add collection</button></footer>
+    </section>
+  );
+  return inline ? sheet : <div className="ux-job-scrim">{sheet}</div>;
+}
+
+type AddPreview = "collections" | "add" | "invalid" | "repository";
+
+export function AddGameDataScreen({ props }: { props: ConceptProps }) {
+  const [preview, setPreview] = useState<AddPreview>("collections");
+  const install = () => props.onNavigate("install-job");
+  return (
+    <>
+      <SourceScreenHeader props={props} title="Add game data" subtitle="Collections, a link, or GitHub search" />
+      <div className="ux-wb-home-body ux-add-source-body ux-src-body">
+        <PreviewState value={preview} options={[["collections", "Collections"], ["add", "Add collection"], ["invalid", "Invalid link"], ["repository", "Repository link"]]} onChange={setPreview} />
+        <div className="ux-result-label">Collections</div>
+        <DefaultCollectionCard onInstall={install} onShowAll={() => props.onNavigate("collection")} />
+        <UserCollectionRows onOpen={() => props.onNavigate("collection")} />
+        <div className="ux-result-label">Repository</div>
+        <section className="ux-source-method">
+          <div className="ux-source-method-heading"><span className="ux-setting-icon"><FileInput size={18} /></span><span><strong>Have a link?</strong><small>Any GitHub repository with roster data files (.gst and .cat, or their JSON form).</small></span></div>
+          <div className="ux-source-url"><input aria-label="Repository" placeholder="owner/name or a GitHub link" /><button type="button" onClick={install}>Continue</button></div>
+        </section>
+        <div className="ux-src-group"><button type="button" className="ux-col-nav"><Search size={17} /><span><strong>Search GitHub</strong><small>Repositories with game data, by name or organisation</small></span><ChevronRight size={16} /></button></div>
+      </div>
+      {preview !== "collections" ? <AddCollectionSheet state={preview === "add" ? "found" : preview} /> : null}
+    </>
+  );
+}
+
+type CollectionPreview = "collection" | "library" | "offline";
+
+export function CollectionScreen({ props }: { props: ConceptProps }) {
+  const [preview, setPreview] = useState<CollectionPreview>("collection");
+  const library = preview === "library";
+  const entries: CollectionEntry[] = library
+    ? [
+        { name: "example-system-six", description: "Community data for a skirmish game", repo: "community-data/example-system-six", action: "install" },
+        { name: "example-system-two", description: "Mass battles, points-based", repo: "community-data/example-system-two", action: "installed" },
+        { name: "example-system-seven", description: "Older edition, no longer maintained", repo: "community-data/example-system-seven", archived: true, action: "install" },
+      ]
+    : [...DEFAULT_COLLECTION.slice(0, 4), { ...DEFAULT_COLLECTION[4], action: "running" }];
+  return (
+    <>
+      <SourceScreenHeader props={props} title={library ? "community-data" : "Battle Augur sources"} subtitle={library ? "GitHub organisation · 48 repositories" : "Collection · Default"} right={<button type="button" className="ux-icon-btn" aria-label="More"><Ellipsis size={18} /></button>} />
+      <div className="ux-wb-home-body ux-add-source-body ux-src-body">
+        <PreviewState value={preview} options={[["collection", "Collection"], ["library", "Library"], ["offline", "Offline"]]} onChange={setPreview} />
+        {preview === "offline" ? <div className="ux-job-notice warning"><TriangleAlert size={18} /><span><strong>Showing the copy from 2026-10-14</strong><small>No connection. Installing needs one.</small></span></div> : null}
+        <small className="ux-col-desc">{library ? "Repositories of this organisation that hold game data." : "Game systems we test with Battle Augur. Maintained in a public repository; updated without an app release."}</small>
+        <div className="ux-search-field ux-col-search"><Search size={15} /><input aria-label="Search this collection" placeholder={library ? "Search 48 repositories" : "Search 12 sources"} /></div>
+        <div className="ux-source-list ux-managed-source-list ux-src-list">
+          {entries.map((entry) => <CollectionSourceRow key={entry.repo} entry={entry} onInstall={() => props.onNavigate("install-job")} />)}
+        </div>
+        {library ? <button type="button" className="ux-job-link ux-col-more">Show archived (3)</button> : null}
+      </div>
     </>
   );
 }

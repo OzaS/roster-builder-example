@@ -6,7 +6,7 @@ import type { DesignElementGroup, DesignElements } from "../design-data/designDa
 import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode } from "../types";
 import { BudgetMeter, Chip, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
-import { EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, SourceRow, SourceStatusChip, SourceUpdateCard, UpdatesNotice } from "../concepts/ux/SourceJobs";
+import { AddCollectionSheet, CollectionSourceRow, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, SourceRow, SourceStatusChip, SourceUpdateCard, UpdatesNotice } from "../concepts/ux/SourceJobs";
 
 type Props = {
   concept: GalleryConcept;
@@ -509,15 +509,25 @@ function WorkbenchElements({
       </ElementSection>
 
       <ElementSection title="Source Addition">
+        <div className="ux-result-label">Collections</div>
+        <DefaultCollectionCard />
+        <UserCollectionRows />
         <section className="ux-source-method">
-          <div className="ux-source-method-heading"><span className="ux-setting-icon"><FileInput size={18} /></span><span><strong>Repository URL</strong><small>Enter a Git repository containing a source.</small></span></div>
-          <div className="ux-source-url"><input aria-label="Repository URL example" placeholder="https://github.com/…" /><button type="button">Load</button></div>
+          <div className="ux-source-method-heading"><span className="ux-setting-icon"><FileInput size={18} /></span><span><strong>Have a link?</strong><small>Any GitHub repository with roster data files.</small></span></div>
+          <div className="ux-source-url"><input aria-label="Repository example" placeholder="owner/name or a GitHub link" /><button type="button">Continue</button></div>
         </section>
-        <section className="ux-source-method">
-          <div className="ux-result-label">Trusted repositories</div>
-          <div className="ux-trusted-source-grid"><button type="button"><Database size={20} /><span><strong>BSData repositories</strong><small>Community catalogues</small></span><Plus size={16} /></button><button type="button"><Database size={20} /><span><strong>Official rules repository</strong><small>Verified catalogues</small></span><RotateCcw className="ux-spin" size={16} /></button></div>
-        </section>
-        <section className="ux-source-method"><div className="ux-result-label">Popular sources</div><div className="ux-popular-source-grid">{["Horus Heresy", "Warhammer 40,000", "Age of Sigmar", "The Old World"].map((source) => <button key={source} type="button"><Plus size={15} />{source}</button>)}</div></section>
+      </ElementSection>
+
+      <ElementSection title="Collection Page">
+        <div className="ux-source-list ux-managed-source-list ux-src-list">
+          {DEFAULT_COLLECTION.map((entry) => <CollectionSourceRow key={entry.repo} entry={entry} />)}
+          <CollectionSourceRow entry={{ name: "example-system-seven", description: "Older edition, no longer maintained", repo: "community-data/example-system-seven", archived: true, action: "install" }} />
+        </div>
+      </ElementSection>
+
+      <ElementSection title="Add Collection Sheet">
+        <AddCollectionSheet inline state="found" />
+        <AddCollectionSheet inline state="repository" />
       </ElementSection>
 
       <ElementSection title="Background Job Modal">

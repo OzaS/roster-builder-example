@@ -165,3 +165,32 @@
 .ux-job-notice > .ux-job-btn { grid-column: 2; justify-self: start; min-height: 36px; }
 .ux-wb-home-body.ux-src-body { display: flex; flex-direction: column; gap: 12px; }
 .ux-src-body > * { flex: none; }
+
+/* ---- collections ---- */
+.ux-col-card > header > svg:first-child { color: var(--ux-accent-2); }
+.ux-col-row { grid-template-columns: minmax(0, 1fr) auto; align-items: start; cursor: default; }
+.ux-col-row > span { display: grid; gap: 1px; min-width: 0; }
+.ux-col-row .ux-src-chips { margin-top: 5px; }
+.ux-col-row .ux-src-chips:empty { display: none; }
+.ux-col-more { justify-self: center; align-self: center; }
+.ux-src-action {
+  display: inline-flex; align-items: center; gap: 5px; min-height: 34px; padding: 0 11px; white-space: nowrap;
+  border: 1px solid var(--ux-line-2); border-radius: 999px; background: var(--ux-surface-3); color: var(--ux-ink); font: inherit; font-size: 12px; font-weight: 750; cursor: pointer;
+}
+.ux-src-action.primary { border-color: var(--ux-accent); background: var(--ux-accent); color: var(--ux-accent-ink); }
+.ux-src-action.done { border-color: transparent; background: transparent; color: var(--ux-ok); cursor: default; }
+.ux-src-action.quiet { color: var(--ux-muted); }
+.ux-col-nav { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; gap: 10px; width: 100%; padding: 12px 13px; border: 0; background: transparent; color: var(--ux-ink); font: inherit; text-align: left; cursor: pointer; }
+.ux-col-nav + .ux-col-nav { border-top: 1px solid var(--ux-line); }
+.ux-col-nav > svg:first-child { color: var(--ux-accent-2); }
+.ux-col-nav strong, .ux-col-nav small { display: block; }
+.ux-col-nav strong { font-size: 13.5px; }
+.ux-col-nav small { margin-top: 2px; color: var(--ux-muted); font-size: 11.5px; }
+.ux-col-nav.add strong { color: var(--ux-accent-2); }
+.ux-col-field { display: grid; gap: 6px; }
+.ux-col-field > span { font-size: 12.5px; font-weight: 750; }
+.ux-col-field > small { color: var(--ux-muted); font-size: 11.5px; }
+.ux-col-field > small.ux-source-error { color: var(--ux-err); }
+.ux-col-desc { color: var(--ux-muted); font-size: 12.5px; line-height: 1.45; }
+.ux-col-search { display: grid; grid-template-columns: 18px minmax(0, 1fr); align-items: center; gap: 8px; padding: 9px 11px; border: 1px solid var(--ux-line-2); border-radius: 10px; background: var(--ux-surface-2); color: var(--ux-muted); }
+.ux-col-search input { min-width: 0; border: 0; background: transparent; color: var(--ux-ink); font: inherit; outline: none; }
