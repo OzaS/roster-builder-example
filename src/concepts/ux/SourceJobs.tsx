@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { ArrowLeft, Check, ChevronDown, ChevronRight, Circle, CircleArrowUp, CircleCheck, Database, Download, Ellipsis, FileInput, FolderGit2, Globe, Hand, History, Info, Library, LoaderCircle, OctagonAlert, Plus, Search, Star, TriangleAlert, X } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, ChevronRight, Circle, CircleArrowUp, CircleCheck, Database, Download, Ellipsis, FileInput, FolderGit2, Globe, Hand, History, Info, Library, ListChecks, LoaderCircle, Minus, OctagonAlert, Plus, Search, Star, TriangleAlert, X } from "lucide-react";
 import type { ConceptProps } from "../shared";
 import { Chip } from "./uxShared";
 
@@ -168,14 +168,67 @@ export function installSteps(stage: "download" | "import" | "failed" | "done", i
   ];
 }
 
+// ---------------------------------------------------------------- advanced installation (plan 2B)
+
+/** Settings → Game data → Advanced installation (a user preference, off by default). */
+export function AdvancedInstallSetting({ on, onToggle }: { on: boolean; onToggle?: () => void }) {
+  return (
+    <button type="button" className={`ux-setting-row ${on ? "on" : ""}`} role="switch" aria-checked={on} onClick={onToggle}>
+      <span className="ux-setting-icon"><ListChecks size={17} /></span>
+      <span className="ux-setting-text"><strong>Advanced installation</strong><small>Choose which factions to install when you add game data. Off: everything is installed.</small></span>
+      <span className="ux-switch" aria-hidden />
+    </button>
+  );
+}
+
+const PICKER_FACTIONS = EXAMPLE_FACTIONS.map((name, index) => ({ name, documents: 1 + (index % 3), size: `${(0.4 + index * 0.17).toFixed(1)} MB`, installed: index === 2 }));
+
+/** The faction picker shown in the job sheet at "Choose factions" (Advanced installation on). */
+export function FactionPicker({ initial = ["Northern Realms", "Tidewardens"] }: { initial?: string[] }) {
+  const [selected, setSelected] = useState<string[]>(initial);
+  const choosable = PICKER_FACTIONS.filter((f) => !f.installed).map((f) => f.name);
+  const all = choosable.every((name) => selected.includes(name));
+  const some = selected.length > 0 && !all;
+  const toggle = (name: string) => setSelected((cur) => (cur.includes(name) ? cur.filter((n) => n !== name) : [...cur, name]));
+  return (
+    <div className="ux-fp">
+      <div className="ux-fp-head"><strong>Choose factions</strong><small>Only the factions you pick are installed, with the shared data they need.</small></div>
+      <button type="button" className={`ux-fp-all ${all ? "all" : some ? "some" : ""}`} role="checkbox" aria-checked={all ? true : some ? "mixed" : false} onClick={() => setSelected(all ? [] : choosable)}>
+        <span className="ux-src-check" aria-hidden>{all ? <Check size={14} /> : some ? <Minus size={14} /> : null}</span>
+        <strong>{all ? "Deselect all" : "Select all"}</strong>
+        <small>{selected.length} of {choosable.length} selected</small>
+      </button>
+      <div className="ux-col-search"><Search size={15} /><input aria-label="Search factions" placeholder="Search factions" /></div>
+      <div className="ux-fp-list">
+        {PICKER_FACTIONS.map((f) => {
+          const on = selected.includes(f.name);
+          return (
+            <button key={f.name} type="button" className={`ux-fp-row ${on ? "selected" : ""} ${f.installed ? "installed" : ""}`} role="checkbox" aria-checked={on || f.installed} disabled={f.installed} onClick={() => toggle(f.name)}>
+              <span className="ux-src-check" aria-hidden>{on || f.installed ? <Check size={14} /> : null}</span>
+              <span><strong>{f.name}</strong><small>{f.documents} {f.documents === 1 ? "document" : "documents"} · {f.size}</small></span>
+              {f.installed ? <Chip tone="valid">Installed</Chip> : null}
+            </button>
+          );
+        })}
+      </div>
+      <footer className="ux-job-footer">
+        <button type="button" className="ux-job-btn destructive">Cancel install</button>
+        <button type="button" className="ux-job-btn primary" disabled={selected.length === 0}>{selected.length === 0 ? "Select factions to install" : `Install ${selected.length} ${selected.length === 1 ? "faction" : "factions"}`}</button>
+      </footer>
+    </div>
+  );
+}
+
 // ---------------------------------------------------------------- gallery screen: install job
 
-type InstallPreview = "running" | "hidden" | "queued" | "done" | "failed" | "cancelled" | "toasts";
+type InstallPreview = "running" | "hidden" | "queued" | "choose" | "choose-hidden" | "done" | "failed" | "cancelled" | "toasts";
 
 const INSTALL_PREVIEWS: Array<[InstallPreview, string]> = [
   ["running", "Running"],
   ["hidden", "Hidden"],
   ["queued", "2 jobs"],
+  ["choose", "Choose factions"],
+  ["choose-hidden", "Needs you"],
   ["done", "Done"],
   ["failed", "Failed"],
   ["cancelled", "Cancelled"],
@@ -219,6 +272,29 @@ export function InstallJobScreen({ props }: { props: ConceptProps }) {
   const control = <PreviewState value={preview} options={INSTALL_PREVIEWS} onChange={setPreview} />;
   const subtitle = `${EXAMPLE_SYSTEM.repo} · ${EXAMPLE_SYSTEM.version}`;
   const title = `Installing ${EXAMPLE_SYSTEM.name}`;
+  if (preview === "choose-hidden") {
+    return (
+      <>
+        <SourcesBackdrop props={props}>{control}</SourcesBackdrop>
+        <div className="ux-job-float"><JobPill needsYou label={`Choose factions for ${EXAMPLE_SYSTEM.name}`} /></div>
+      </>
+    );
+  }
+  if (preview === "choose") {
+    return (
+      <>
+        <SourcesBackdrop props={props}>{control}</SourcesBackdrop>
+        <div className="ux-job-scrim">
+          <section className="ux-job-sheet tall" role="dialog" aria-label={title}>
+            <span className="ux-sheet-grip" aria-hidden />
+            <header className="ux-job-head"><span><strong>{title}</strong><small>{subtitle}</small></span><button type="button" className="ux-job-hide" aria-label="Hide. The install waits for your choice."><ChevronDown size={16} />Hide</button></header>
+            <JobSteps steps={[{ id: "download", title: "Download", detail: "18.0 MB", state: "done" }, { id: "read", title: "Read", detail: "412 files", state: "done" }, { id: "choose", title: "Choose factions", detail: "Waiting for you", state: "needs" }]} />
+            <FactionPicker />
+          </section>
+        </div>
+      </>
+    );
+  }
   if (preview === "hidden" || preview === "toasts") {
     return (
       <>

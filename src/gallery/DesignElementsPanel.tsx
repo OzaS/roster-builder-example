@@ -6,7 +6,7 @@ import type { DesignElementGroup, DesignElements } from "../design-data/designDa
 import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode } from "../types";
 import { BudgetMeter, Chip, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
-import { AddCollectionSheet, CollectionSourceRow, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, SourceRow, SourceStatusChip, SourceUpdateCard, UpdatesNotice } from "../concepts/ux/SourceJobs";
+import { AddCollectionSheet, AdvancedInstallSetting, CollectionSourceRow, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, SourceRow, SourceStatusChip, SourceUpdateCard, UpdatesNotice } from "../concepts/ux/SourceJobs";
 
 type Props = {
   concept: GalleryConcept;
@@ -528,6 +528,16 @@ function WorkbenchElements({
       <ElementSection title="Add Collection Sheet">
         <AddCollectionSheet inline state="found" />
         <AddCollectionSheet inline state="repository" />
+      </ElementSection>
+
+      <ElementSection title="Advanced Installation Setting">
+        <div className="ux-result-label">Game data</div>
+        <AdvancedInstallSetting on={false} />
+        <AdvancedInstallSetting on />
+      </ElementSection>
+
+      <ElementSection title="Faction Picker">
+        <FactionPicker />
       </ElementSection>
 
       <ElementSection title="Background Job Modal">

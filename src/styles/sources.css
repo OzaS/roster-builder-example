@@ -194,3 +194,27 @@
 .ux-col-desc { color: var(--ux-muted); font-size: 12.5px; line-height: 1.45; }
 .ux-col-search { display: grid; grid-template-columns: 18px minmax(0, 1fr); align-items: center; gap: 8px; padding: 9px 11px; border: 1px solid var(--ux-line-2); border-radius: 10px; background: var(--ux-surface-2); color: var(--ux-muted); }
 .ux-col-search input { min-width: 0; border: 0; background: transparent; color: var(--ux-ink); font: inherit; outline: none; }
+
+/* ---- faction picker (advanced installation) ---- */
+.ux-job-sheet.tall { max-height: 72%; }
+.ux-fp { display: grid; gap: 10px; }
+.ux-fp-head strong, .ux-fp-head small { display: block; }
+.ux-fp-head strong { font-size: 15px; }
+.ux-fp-head small { margin-top: 2px; color: var(--ux-muted); font-size: 12px; }
+.ux-fp-all, .ux-fp-row { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; border: 1px solid var(--ux-line); border-radius: var(--ux-r-sm); background: var(--ux-surface-2); color: var(--ux-ink); font: inherit; text-align: left; cursor: pointer; }
+.ux-fp-all small { color: var(--ux-muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.ux-fp-all.all .ux-src-check, .ux-fp-all.some .ux-src-check, .ux-fp-row.selected .ux-src-check { border-color: var(--ux-accent); background: var(--ux-accent); }
+.ux-fp-list { display: grid; border: 1px solid var(--ux-line); border-radius: var(--ux-r-md); overflow: hidden; }
+.ux-fp-list .ux-fp-row { border: 0; border-radius: 0; background: var(--ux-surface); }
+.ux-fp-list .ux-fp-row + .ux-fp-row { border-top: 1px solid var(--ux-line); }
+.ux-fp-row.selected { background: color-mix(in srgb, var(--ux-accent) 12%, var(--ux-surface)) !important; }
+.ux-fp-row.installed { cursor: default; }
+.ux-fp-row.installed strong { color: var(--ux-muted); }
+.ux-fp-row.installed .ux-src-check { border-color: color-mix(in srgb, var(--ux-accent) 50%, transparent); color: var(--ux-accent-2); opacity: 0.6; }
+.ux-fp-row strong, .ux-fp-row small { display: block; }
+.ux-fp-row strong { font-size: 13.5px; }
+.ux-fp-row small { margin-top: 2px; color: var(--ux-muted); font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.ux-fp .ux-job-footer { position: sticky; bottom: -18px; padding: 10px 0 4px; background: var(--ux-surface); }
+.ux-job-sheet { display: flex; flex-direction: column; }
+.ux-job-sheet > * { flex: none; }
+.ux-job-sheet > .ux-sheet-grip { align-self: center; }

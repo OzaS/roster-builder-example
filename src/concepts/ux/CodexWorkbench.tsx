@@ -4,7 +4,7 @@ import { mockCatalogues, mockDetachments, mockSystemUnits } from "../../data/moc
 import { referenceById, resolveRosterReference } from "../../data/mockRosterReferences";
 import type { RosterReferenceDefinition, RosterUnit } from "../../types";
 import type { ConceptProps } from "../shared";
-import { AddGameDataScreen, CollectionScreen, InstallJobScreen, MigrationReportScreen, SourceDetailScreen, SourcesManageScreen } from "./SourceJobs";
+import { AddGameDataScreen, AdvancedInstallSetting, CollectionScreen, InstallJobScreen, MigrationReportScreen, SourceDetailScreen, SourcesManageScreen } from "./SourceJobs";
 import { BackOrTitle, BudgetMeter, Chip, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "./uxShared";
 
 /** Screens of the source-data flow designed in Battle Augur plan 2D (SourceJobs.tsx). */
@@ -2116,6 +2116,7 @@ function SettingsScreen({ props }: { props: ConceptProps }) {
   const [openPreference, setOpenPreference] = useState<"language" | "theme" | "scheme" | null>(null);
   const [uploadedLanguage, setUploadedLanguage] = useState("");
   const [uploadedScheme, setUploadedScheme] = useState("");
+  const [advancedInstall, setAdvancedInstall] = useState(false);
   const language = props.language ?? "en";
   const theme = props.themePreference ?? props.themeMode ?? "dark";
   return (
@@ -2188,6 +2189,8 @@ function SettingsScreen({ props }: { props: ConceptProps }) {
           <Sparkles size={14} />
           When on, the add-unit menu offers quick suggestions for the current slot. With the top-bar layout it also shows a floating command bar.
         </p>
+        <div className="ux-result-label">Game data</div>
+        <AdvancedInstallSetting on={advancedInstall} onToggle={() => setAdvancedInstall((value) => !value)} />
       </div>
     </>
   );
