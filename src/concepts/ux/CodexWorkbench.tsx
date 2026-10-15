@@ -1265,6 +1265,7 @@ function Library({ props }: { props: ConceptProps }) {
           <div className="ux-lists-actions">
             <div><strong>{isV2 ? "Your rosters" : "Lists"}</strong><small>{isV2 ? `${rosters.length} saved rosters` : "Your recent rosters"}</small></div>
             {isV2 && !organizerOpen ? <button type="button" className="ux-organizer-toggle" onClick={() => setOrganizerOpen(true)}><Filter size={15} />Organize</button> : null}
+            <button type="button" className="ux-organizer-toggle" aria-label="Import a roster file"><Upload size={15} />Import</button>
             <button type="button" className="ux-new-roster ux-new-roster-compact" onClick={() => props.onNavigate("system")}><Plus size={18} /><span><strong>New roster</strong></span></button>
           </div>
           {!isV2 ? <section className="ux-recent-section" aria-labelledby="recent-rosters-heading">

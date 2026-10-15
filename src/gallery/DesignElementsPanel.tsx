@@ -559,6 +559,16 @@ function WorkbenchElements({
         </div>
       </ElementSection>
 
+      <ElementSection title="Roster Import">
+        <div className="ux-lists-actions"><div><strong>Your rosters</strong><small>Import a New Recruit JSON file</small></div><button type="button" className="ux-organizer-toggle" aria-label="Import a roster file"><Upload size={15} />Import</button><button type="button" className="ux-organizer-toggle" disabled aria-busy="true"><RotateCcw className="ux-spin" size={15} />Importing…</button></div>
+        <div className="ux-state-matrix">
+          <article className="ux-state-card"><span className="ux-state-dot" aria-hidden /><strong>Imported</strong><small>The roster opens in the editor.</small></article>
+          <article className="ux-state-card offline"><span className="ux-state-dot" aria-hidden /><strong>Imported with gaps</strong><small>3 parts could not be matched to the installed data.</small></article>
+          <article className="ux-state-card error"><span className="ux-state-dot" aria-hidden /><strong>Data missing</strong><small>Install this roster's game system in Sources first.</small></article>
+          <article className="ux-state-card error"><span className="ux-state-dot" aria-hidden /><strong>Not a roster file</strong><small>Choose a New Recruit JSON export.</small><button type="button">Try again</button></article>
+        </div>
+      </ElementSection>
+
       <ElementSection title="Favorite Library Cards">
         <section className="ux-favorite-library-section"><header><span className="ux-collection-icon"><Heart size={18} /></span><strong>Favorite units</strong></header><div className="ux-favorite-card-list"><article className="ux-favorite-card"><span><strong>Veteran Spearhead</strong><small>Battleline · {selectedUnit.points} pts</small></span><div><button type="button"><Plus size={14} />Add</button><button type="button"><Trash2 size={14} /></button></div></article></div></section>
       </ElementSection>
