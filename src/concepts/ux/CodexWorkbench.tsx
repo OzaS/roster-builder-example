@@ -4,11 +4,11 @@ import { mockCatalogues, mockDetachments, mockSystemUnits } from "../../data/moc
 import { referenceById, resolveRosterReference } from "../../data/mockRosterReferences";
 import type { RosterReferenceDefinition, RosterUnit } from "../../types";
 import type { ConceptProps } from "../shared";
-import { InstallJobScreen } from "./SourceJobs";
+import { InstallJobScreen, MigrationReportScreen, SourceDetailScreen, SourcesManageScreen } from "./SourceJobs";
 import { BackOrTitle, BudgetMeter, Chip, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "./uxShared";
 
 /** Screens of the source-data flow designed in Battle Augur plan 2D (SourceJobs.tsx). */
-const SOURCE_FLOW_SCREENS: readonly string[] = ["install-job"];
+const SOURCE_FLOW_SCREENS: readonly string[] = ["install-job", "source-detail", "migration-report"];
 
 type ReferenceGlance =
   | { type: "unit"; unit: RosterUnit }
@@ -168,7 +168,7 @@ export function CodexWorkbench(props: ConceptProps) {
   } else if (screen === "settings") {
     body = <SettingsScreen props={props} />;
   } else if (screen === "sources") {
-    body = <SourcesScreen props={props} sources={installedSources} showEmpty={showEmptySources} onShowEmptyChange={setShowEmptySources} />;
+    body = <SourcesManageScreen props={props} />;
   } else if (screen === "add-source") {
     body = <AddSourceScreen
       props={props}
@@ -196,6 +196,10 @@ export function CodexWorkbench(props: ConceptProps) {
     />;
   } else if (screen === "install-job") {
     body = <InstallJobScreen props={props} />;
+  } else if (screen === "source-detail") {
+    body = <SourceDetailScreen props={props} />;
+  } else if (screen === "migration-report") {
+    body = <MigrationReportScreen props={props} />;
   } else if (screen === "system") {
     body = <CreateScreen props={props} />;
   } else if (screen === "smart-search") {
@@ -2223,51 +2227,6 @@ function SettingsScreen({ props }: { props: ConceptProps }) {
           <Sparkles size={14} />
           When on, the add-unit menu offers quick suggestions for the current slot. With the top-bar layout it also shows a floating command bar.
         </p>
-      </div>
-    </>
-  );
-}
-
-function SourcesScreen({ props, sources, showEmpty, onShowEmptyChange }: {
-  props: ConceptProps;
-  sources: InstalledSource[];
-  showEmpty: boolean;
-  onShowEmptyChange: (empty: boolean) => void;
-}) {
-  const visibleSources = showEmpty ? [] : sources;
-  return (
-    <>
-      <header className="ux-wb-top ux-wb-home-top reversed">
-        <button type="button" className="ux-icon-btn" aria-label="Back" onClick={props.onBack}><ArrowLeft size={18} /></button>
-        <div className="ux-wb-title"><strong>Sources</strong><small>Catalogues & rules repositories</small></div>
-      </header>
-      <div className="ux-wb-home-body ux-sources-body">
-        <div className="ux-prototype-state" aria-label="Preview source state">
-          <small>Preview state</small>
-          <div>
-            <button type="button" className={!showEmpty ? "active" : ""} onClick={() => onShowEmptyChange(false)}>Populated</button>
-            <button type="button" className={showEmpty ? "active" : ""} onClick={() => onShowEmptyChange(true)}>Empty</button>
-          </div>
-        </div>
-        <button type="button" className="ux-add-source-primary" onClick={() => props.onNavigate("add-source")}>
-          <Plus size={18} /><span><strong>Add sources</strong><small>Connect a repository or choose a popular source</small></span><ChevronRight size={17} />
-        </button>
-        {visibleSources.length ? (
-          <div className="ux-source-list ux-managed-source-list">
-            {visibleSources.map((source) => (
-              <article key={source.id} className={`ux-source-row ${source.status === "Current" ? "on" : ""}`}>
-                <span><strong>{source.name}</strong><small>{source.system} · {source.imported}</small></span>
-                <Chip tone={source.status === "Current" ? "valid" : "warning"}>{source.updated}</Chip>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <section className="ux-sources-empty">
-            <span><Database size={25} /></span><strong>No sources installed</strong>
-            <small>Add a catalogue or rules repository to start building rosters.</small>
-            <button type="button" onClick={() => props.onNavigate("add-source")}><Plus size={16} />Add sources</button>
-          </section>
-        )}
       </div>
     </>
   );

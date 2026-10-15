@@ -8,6 +8,8 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "sources", label: "Sources" },
   { id: "add-source", label: "Add Sources" },
   { id: "install-job", label: "Install job" },
+  { id: "source-detail", label: "Source detail" },
+  { id: "migration-report", label: "Update report" },
   { id: "subscription-main", label: "Subscription · Main" },
   { id: "create-roster", label: "Create Roster" },
   { id: "drafts", label: "Drafts" },

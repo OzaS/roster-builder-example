@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { ArrowLeft, ChevronDown, ChevronRight, Circle, CircleCheck, Database, Hand, LoaderCircle, OctagonAlert, Plus, X } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, ChevronRight, Circle, CircleArrowUp, CircleCheck, Database, Hand, History, LoaderCircle, OctagonAlert, Plus, TriangleAlert, X } from "lucide-react";
 import type { ConceptProps } from "../shared";
 import { Chip } from "./uxShared";
 
@@ -199,7 +199,7 @@ function SourcesBackdrop({ props, children }: { props: ConceptProps; children?: 
         <button type="button" className="ux-icon-btn" aria-label="Back" onClick={props.onBack}><ArrowLeft size={18} /></button>
         <div className="ux-wb-title"><strong>Sources</strong><small>Installed game data</small></div>
       </header>
-      <div className="ux-wb-home-body ux-sources-body ux-job-backdrop">
+      <div className="ux-wb-home-body ux-sources-body ux-src-body ux-job-backdrop">
         {children}
         <button type="button" className="ux-add-source-primary" onClick={() => props.onNavigate("add-source")}>
           <Plus size={18} /><span><strong>Add game data</strong><small>Collections, a repository link, or GitHub search</small></span><ChevronRight size={17} />
@@ -260,6 +260,222 @@ export function InstallJobScreen({ props }: { props: ConceptProps }) {
     <>
       <SourcesBackdrop props={props}>{control}</SourcesBackdrop>
       {modal}
+    </>
+  );
+}
+
+// ---------------------------------------------------------------- shared screen chrome
+
+export function SourceScreenHeader({ props, title, subtitle, right }: { props: ConceptProps; title: string; subtitle: string; right?: ReactNode }) {
+  return (
+    <header className={`ux-wb-top ux-wb-home-top reversed ${right ? "ux-src-top-actions" : ""}`}>
+      <button type="button" className="ux-icon-btn" aria-label="Back" onClick={props.onBack}><ArrowLeft size={18} /></button>
+      <div className="ux-wb-title"><strong>{title}</strong><small>{subtitle}</small></div>
+      {right}
+    </header>
+  );
+}
+
+// ---------------------------------------------------------------- sources list with update states
+
+type SourceStatus = "ready" | "update" | "review" | "broken" | "updating";
+type ExampleSource = { name: string; factions: number; names: string; meta: string; status: SourceStatus };
+
+export const EXAMPLE_SOURCES: ExampleSource[] = [
+  { name: EXAMPLE_SYSTEM.name, factions: 23, names: "Northern Realms, Ember Covenant, Glass Legion…", meta: "Version a1b2c3d · changed upstream 2026-09-30 · 41 MB", status: "update" },
+  { name: "Example System Two", factions: 14, names: "Tidewardens, Ashen Court, Verdant Host…", meta: "Version e4f5a6b · changed upstream 2026-10-02 · 29 MB", status: "update" },
+  { name: "Example System Three", factions: 6, names: "Iron Choir, Salt Kings, Lantern Guild…", meta: "Version 9c8d7e6 · changed upstream 2026-10-11 · 12 MB", status: "ready" },
+  { name: "Example System Four", factions: 9, names: "Hollow Crown, Glass Legion, Ember Covenant…", meta: "Version 0f1e2d3 · changed upstream 2026-08-21 · 18 MB", status: "review" },
+];
+
+export function SourceStatusChip({ status, percent = 46 }: { status: SourceStatus; percent?: number }) {
+  if (status === "updating") return <Chip tone="cool"><LoaderCircle size={11} className="ux-spin" /> Updating {percent}%</Chip>;
+  if (status === "update") return <Chip tone="cool"><CircleArrowUp size={11} /> Update available</Chip>;
+  if (status === "review") return <Chip tone="warning"><TriangleAlert size={11} /> Needs review</Chip>;
+  if (status === "broken") return <Chip tone="error"><OctagonAlert size={11} /> Unreadable</Chip>;
+  return <Chip tone="valid"><CircleCheck size={11} /> Ready</Chip>;
+}
+
+export function SourceRow({ source, selecting = false, selected = false, onClick }: { source: ExampleSource; selecting?: boolean; selected?: boolean; onClick?: () => void }) {
+  const selectable = source.status === "update";
+  return (
+    <article className={`ux-source-row ux-src-row ${selecting ? "selecting" : ""} ${selecting && !selectable ? "dimmed" : ""} ${selected ? "selected" : ""}`} onClick={onClick} role={selecting ? "checkbox" : "button"} aria-checked={selecting ? selected : undefined}>
+      {selecting ? <span className="ux-src-check" aria-hidden>{selected ? <Check size={14} /> : null}</span> : null}
+      <span><strong>{source.name}</strong><small>{source.factions} factions · {source.names}</small><small>{source.meta}</small></span>
+      {selecting && !selectable ? <Chip tone="neutral">Up to date</Chip> : <SourceStatusChip status={source.status} />}
+    </article>
+  );
+}
+
+export function UpdatesNotice({ count = 2 }: { count?: number }) {
+  return (
+    <div className="ux-job-notice info ux-src-updates" role="status">
+      <CircleArrowUp size={18} />
+      <span><strong>{count} updates available</strong><small>New data for {EXAMPLE_SYSTEM.name} and Example System Two.</small></span>
+      <button type="button" className="ux-job-btn primary">Update all</button>
+    </div>
+  );
+}
+
+type SourcesPreview = "installed" | "updates" | "selecting" | "updating" | "failed" | "empty";
+
+export function SourcesManageScreen({ props }: { props: ConceptProps }) {
+  const [preview, setPreview] = useState<SourcesPreview>("updates");
+  const [selected, setSelected] = useState<string[]>([EXAMPLE_SYSTEM.name]);
+  const selecting = preview === "selecting";
+  const sources = EXAMPLE_SOURCES.map((s) => {
+    if (preview === "installed") return { ...s, status: (s.status === "update" ? "ready" : s.status) as SourceStatus };
+    if (preview === "updating" && s.name === EXAMPLE_SYSTEM.name) return { ...s, status: "updating" as SourceStatus };
+    return s;
+  });
+  const toggle = (name: string) => setSelected((cur) => (cur.includes(name) ? cur.filter((n) => n !== name) : [...cur, name]));
+  return (
+    <>
+      <SourceScreenHeader props={props} title={selecting ? `${selected.length} selected` : "Sources"} subtitle={selecting ? "Choose sources to update" : "Installed game data"} right={selecting ? <button type="button" className="ux-job-hide" onClick={() => setPreview("updates")}>Cancel</button> : undefined} />
+      <div className="ux-wb-home-body ux-sources-body ux-src-body">
+        <PreviewState value={preview} options={[["installed", "Installed"], ["updates", "Updates"], ["selecting", "Selecting"], ["updating", "Updating"], ["failed", "Install failed"], ["empty", "Empty"]]} onChange={setPreview} />
+        {!selecting ? (
+          <button type="button" className="ux-add-source-primary" onClick={() => props.onNavigate("add-source")}>
+            <Plus size={18} /><span><strong>Add game data</strong><small>Collections, a repository link, or GitHub search</small></span><ChevronRight size={17} />
+          </button>
+        ) : null}
+        {preview === "updates" ? <UpdatesNotice /> : null}
+        {preview === "empty" ? (
+          <section className="ux-sources-empty">
+            <span><Database size={25} /></span><strong>No game data yet</strong>
+            <small>Add game data from a collection, a repository link or GitHub search. Everything in a source is installed unless Advanced installation is on.</small>
+            <button type="button" onClick={() => props.onNavigate("add-source")}><Plus size={16} />Add game data</button>
+          </section>
+        ) : (
+          <>
+            <div className="ux-src-section-head"><span className="ux-result-label">Installed</span>{!selecting ? <button type="button" className="ux-job-link" onClick={() => setPreview("selecting")}>Select</button> : null}</div>
+            {preview === "failed" ? (
+              <div className="ux-job-notice error ux-src-failed">
+                <OctagonAlert size={18} />
+                <span><strong>Example System Five · Install failed</strong><small>GitHub could not be reached. Nothing was installed.</small></span>
+                <div className="ux-src-inline-actions"><button type="button" className="ux-job-link">Dismiss</button><button type="button" className="ux-job-btn primary">Try again</button></div>
+              </div>
+            ) : null}
+            <div className="ux-source-list ux-managed-source-list ux-src-list">
+              {sources.map((s) => <SourceRow key={s.name} source={s} selecting={selecting} selected={selected.includes(s.name)} onClick={selecting ? () => { if (s.status === "update") toggle(s.name); } : () => props.onNavigate("source-detail")} />)}
+            </div>
+            <small className="ux-src-footer">{preview === "installed" ? "Checked 2 min ago · pull to check again" : "Checked just now"}</small>
+          </>
+        )}
+      </div>
+      {selecting ? (
+        <footer className="ux-src-selection-bar">
+          <button type="button" className="ux-job-btn secondary" onClick={() => setSelected(EXAMPLE_SOURCES.filter((s) => s.status === "update").map((s) => s.name))}>Select all updates</button>
+          <button type="button" className="ux-job-btn primary" disabled={selected.length === 0}>Update {selected.length} {selected.length === 1 ? "source" : "sources"}</button>
+        </footer>
+      ) : null}
+      {preview === "updating" ? <div className="ux-job-float"><JobPill label={`Updating ${EXAMPLE_SYSTEM.name}`} percent={46} count={2} /></div> : null}
+    </>
+  );
+}
+
+// ---------------------------------------------------------------- source detail with update states
+
+export function SourceUpdateCard() {
+  return (
+    <section className="ux-src-card update">
+      <header><CircleArrowUp size={18} /><span><strong>Update available</strong><small>Version 7d6c5b4 · 2026-10-14</small></span></header>
+      <ul className="ux-src-changes">
+        <li><b>Changed</b>Northern Realms, Glass Legion, Tidewardens</li>
+        <li><b>New</b>Hollow Crown</li>
+        <li><b>Removed</b>Salt Kings</li>
+        <li><b>Game system</b>file changed</li>
+      </ul>
+      <div className="ux-job-notice warning"><TriangleAlert size={18} /><span><strong>2 rosters use Salt Kings, which this update removes.</strong><small>They will not open after the update. (Open: the handling of removed factions.)</small></span></div>
+      <div className="ux-job-footer"><button type="button" className="ux-job-btn ux-src-ghost">View on GitHub</button><button type="button" className="ux-job-btn primary">Update</button></div>
+    </section>
+  );
+}
+
+export function LastUpdateCard({ onReport }: { onReport?: () => void }) {
+  return (
+    <section className="ux-src-card">
+      <header><History size={18} /><span><strong>Updated today from 1a2b3c4 to a1b2c3d</strong><small>3 rosters moved: 2 unchanged, 1 with changes</small></span></header>
+      <button type="button" className="ux-job-btn secondary block" onClick={onReport}>View report</button>
+    </section>
+  );
+}
+
+type DetailPreview = "update" | "current" | "updating" | "updated" | "failed";
+
+function DetailRow({ label, value, action }: { label: string; value: string; action?: string }) {
+  return <div className="ux-src-kv"><span>{label}</span><b>{value}</b>{action ? <button type="button" className="ux-job-link">{action}</button> : null}</div>;
+}
+
+export function SourceDetailScreen({ props }: { props: ConceptProps }) {
+  const [preview, setPreview] = useState<DetailPreview>("update");
+  return (
+    <>
+      <SourceScreenHeader props={props} title={EXAMPLE_SYSTEM.name} subtitle={EXAMPLE_SYSTEM.repo} />
+      <div className="ux-wb-home-body ux-sources-body ux-src-body">
+        <PreviewState value={preview} options={[["update", "Update available"], ["current", "Up to date"], ["updating", "Updating"], ["updated", "Updated"], ["failed", "Update failed"]]} onChange={setPreview} />
+        {preview === "update" ? <SourceUpdateCard /> : null}
+        {preview === "current" ? <div className="ux-job-notice ok"><CircleCheck size={18} /><span><strong>Up to date · checked 5 min ago</strong></span></div> : null}
+        {preview === "updating" ? (
+          <button type="button" className="ux-src-card ux-src-progress" aria-label="Updating, 46 percent. Opens the progress.">
+            <header><LoaderCircle size={18} className="ux-spin" /><span><strong>Updating · 46%</strong><small>Import · Faction 7 of 23</small></span><ChevronRight size={16} /></header>
+            <JobProgressBar value={0.46} />
+          </button>
+        ) : null}
+        {preview === "updated" ? <LastUpdateCard onReport={() => props.onNavigate("migration-report")} /> : null}
+        {preview === "failed" ? (
+          <div className="ux-job-notice error"><OctagonAlert size={18} /><span><strong>The last update failed</strong><small>GitHub could not be reached. The previous version is still in use.</small></span><button type="button" className="ux-job-btn primary">Try again</button></div>
+        ) : null}
+        <div className="ux-src-group">
+          <DetailRow label="Repository" value={EXAMPLE_SYSTEM.repo} />
+          <DetailRow label="Version" value={preview === "updated" ? "a1b2c3d" : "1a2b3c4"} />
+          <DetailRow label="Changed upstream" value="2026-09-30" />
+          <DetailRow label="Installed" value="12 days ago" />
+          <DetailRow label="Last checked" value={preview === "failed" ? "1 h ago" : "5 min ago"} action="Check now" />
+          <DetailRow label="Size on this phone" value="41 MB" />
+        </div>
+        <div className="ux-result-label">Installed factions</div>
+        <div className="ux-src-group">{EXAMPLE_FACTIONS.slice(0, 4).map((f) => <DetailRow key={f} label={f} value="r14" />)}<DetailRow label="…and 19 more" value="" /></div>
+        <button type="button" className="ux-job-btn destructive block ux-src-remove" disabled={preview === "updating"}>Remove this data</button>
+        {preview === "updating" ? <small className="ux-src-footer">This data is being updated. Try again when it finishes.</small> : null}
+      </div>
+    </>
+  );
+}
+
+// ---------------------------------------------------------------- migration report
+
+export function MigrationReportBody() {
+  return (
+    <>
+      <div className="ux-src-chips"><Chip tone="neutral">3 rosters</Chip><Chip tone="valid">2 unchanged</Chip><Chip tone="warning">1 changed</Chip><Chip tone="neutral">0 not moved</Chip></div>
+      <div className="ux-result-label">Changed</div>
+      <section className="ux-src-card">
+        <header><TriangleAlert size={18} className="warn" /><span><strong>Spring league list</strong><small>Glass Legion</small></span></header>
+        <ul className="ux-src-changes">
+          <li><b>Removed</b>Lantern Bearers (no longer in the data)</li>
+          <li><b>Cost</b>Shield Wardens: 120 → 135</li>
+          <li><b>Renamed</b>Scout Riders → Outriders</li>
+          <li><b>Errors</b>1 new error</li>
+        </ul>
+        <button type="button" className="ux-job-btn secondary block">Open roster</button>
+      </section>
+      <div className="ux-result-label">Unchanged</div>
+      <div className="ux-src-group"><DetailRow label="Weekend practice" value="Northern Realms" /><DetailRow label="Club night" value="Tidewardens" /></div>
+      <div className="ux-result-label">Data changes</div>
+      <div className="ux-src-group"><DetailRow label="Glass Legion" value="r12 → r14" /><DetailRow label="Northern Realms" value="r30 → r31" /><DetailRow label="Hollow Crown" value="New" /><DetailRow label="Salt Kings" value="Removed" /></div>
+    </>
+  );
+}
+
+export function MigrationReportScreen({ props }: { props: ConceptProps }) {
+  return (
+    <>
+      <SourceScreenHeader props={props} title="Update report" subtitle={`${EXAMPLE_SYSTEM.name} · 1a2b3c4 → a1b2c3d · today`} />
+      <div className="ux-wb-home-body ux-sources-body ux-src-body">
+        <MigrationReportBody />
+        <small className="ux-src-footer">What the engine reports per roster is Open (plan 2F). Kept until the next update of this source.</small>
+      </div>
     </>
   );
 }

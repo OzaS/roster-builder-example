@@ -6,7 +6,7 @@ import type { DesignElementGroup, DesignElements } from "../design-data/designDa
 import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode } from "../types";
 import { BudgetMeter, Chip, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
-import { EXAMPLE_SYSTEM, installSteps, JobModal, JobOutcomeNotice, JobPill, JobToast } from "../concepts/ux/SourceJobs";
+import { EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, SourceRow, SourceStatusChip, SourceUpdateCard, UpdatesNotice } from "../concepts/ux/SourceJobs";
 
 type Props = {
   concept: GalleryConcept;
@@ -486,12 +486,26 @@ function WorkbenchElements({
       </ElementSection>
 
       <ElementSection title="Sources Management">
-        <div className="ux-prototype-state"><small>Preview state</small><div><button type="button" className="active">Populated</button><button type="button">Empty</button></div></div>
-        <button type="button" className="ux-add-source-primary"><Plus size={18} /><span><strong>Add sources</strong><small>Connect a repository or choose a popular source</small></span><ChevronRight size={17} /></button>
-        <div className="ux-source-list ux-managed-source-list">
-          <article className="ux-source-row on"><span><strong>{roster.faction}</strong><small>{roster.system} · Imported today</small></span><Chip tone="valid">v42</Chip></article>
+        <UpdatesNotice />
+        <div className="ux-src-section-head"><span className="ux-result-label">Installed</span><button type="button" className="ux-job-link">Select</button></div>
+        <div className="ux-source-list ux-managed-source-list ux-src-list">
+          <SourceRow source={EXAMPLE_SOURCES[0]} />
+          <SourceRow source={{ ...EXAMPLE_SOURCES[1], status: "updating" }} />
+          <SourceRow source={EXAMPLE_SOURCES[3]} />
+          <SourceRow source={EXAMPLE_SOURCES[0]} selecting selected />
+          <SourceRow source={EXAMPLE_SOURCES[2]} selecting />
         </div>
-        <section className="ux-sources-empty"><span><Database size={25} /></span><strong>No sources installed</strong><small>Add a catalogue or rules repository to start building rosters.</small><button type="button"><Plus size={16} />Add sources</button></section>
+        <div className="ux-src-chips"><SourceStatusChip status="ready" /><SourceStatusChip status="update" /><SourceStatusChip status="updating" /><SourceStatusChip status="review" /><SourceStatusChip status="broken" /></div>
+        <section className="ux-sources-empty"><span><Database size={25} /></span><strong>No game data yet</strong><small>Add game data from a collection, a repository link or GitHub search.</small><button type="button"><Plus size={16} />Add game data</button></section>
+      </ElementSection>
+
+      <ElementSection title="Source Update Card">
+        <SourceUpdateCard />
+        <LastUpdateCard />
+      </ElementSection>
+
+      <ElementSection title="Migration Report">
+        <MigrationReportBody />
       </ElementSection>
 
       <ElementSection title="Source Addition">
