@@ -1300,7 +1300,8 @@ function CreateScreen({ props }: { props: ConceptProps }) {
   const system = systems.find((item) => item.name === selectedSystem);
   const faction = system?.factions.find((item) => item.name === selectedFaction);
   const resolvedPoints = selectedPoints === "custom" ? customPoints : selectedPoints;
-  const hasPoints = Boolean(resolvedPoints && Number(resolvedPoints) > 0);
+  const hasPoints = selectedPoints === "unlimited" || Boolean(resolvedPoints && Number(resolvedPoints) > 0);
+  const pointsLabel = selectedPoints === "unlimited" ? "Unlimited" : `${resolvedPoints} pts`;
 
   function chooseSystem(name: string) {
     setSelectedSystem(name);
@@ -1354,6 +1355,9 @@ function CreateScreen({ props }: { props: ConceptProps }) {
               <button type="button" className={`ux-filter-pill ${selectedPoints === "custom" ? "on" : ""}`} onClick={() => choosePoints("custom")}>
                 Custom
               </button>
+              <button type="button" className={`ux-filter-pill ${selectedPoints === "unlimited" ? "on" : ""}`} onClick={() => choosePoints("unlimited")}>
+                Unlimited
+              </button>
             </div>
             {selectedPoints === "custom" ? (
               <label className="ux-custom-points">
@@ -1393,7 +1397,7 @@ function CreateScreen({ props }: { props: ConceptProps }) {
               <button type="button" className="ux-select-field" aria-haspopup="dialog" onClick={() => setPicker("force")}>
                 <span>
                   <strong>{selectedForce ?? "Select force"}</strong>
-                  <small>{selectedForce ? `${selectedFaction} · ${resolvedPoints} pts` : "Choose a force organisation"}</small>
+                  <small>{selectedForce ? `${selectedFaction} · ${pointsLabel}` : "Choose a force organisation"}</small>
                 </span>
                 <ChevronDown size={16} />
               </button>
@@ -1413,10 +1417,10 @@ function CreateScreen({ props }: { props: ConceptProps }) {
         </button>
       </div>
       {picker === "faction" && system ? (
-        <RosterChoicePicker title="Choose faction" context={`${system.name} · ${resolvedPoints} pts`} searchLabel="factions" options={system.factions.map((item) => ({ name: item.name, sub: item.sub }))} selected={selectedFaction} onClose={() => setPicker(null)} onSelect={(name) => { setSelectedFaction(name); setSelectedForce(null); setPicker(null); }} />
+        <RosterChoicePicker title="Choose faction" context={`${system.name} · ${pointsLabel}`} searchLabel="factions" options={system.factions.map((item) => ({ name: item.name, sub: item.sub }))} selected={selectedFaction} onClose={() => setPicker(null)} onSelect={(name) => { setSelectedFaction(name); setSelectedForce(null); setPicker(null); }} />
       ) : null}
       {picker === "force" && faction ? (
-        <RosterChoicePicker title="Choose force" context={faction.name} searchLabel="forces" options={faction.forces.map((name) => ({ name, sub: `${resolvedPoints} pts` }))} selected={selectedForce} onClose={() => setPicker(null)} onSelect={(name) => { setSelectedForce(name); setPicker(null); }} />
+        <RosterChoicePicker title="Choose force" context={faction.name} searchLabel="forces" options={faction.forces.map((name) => ({ name, sub: pointsLabel }))} selected={selectedForce} onClose={() => setPicker(null)} onSelect={(name) => { setSelectedForce(name); setPicker(null); }} />
       ) : null}
     </>
   );
