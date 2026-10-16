@@ -1,5 +1,5 @@
-import type { CSSProperties, ReactNode } from "react";
-import { AlertTriangle, ArrowLeft, Check, CheckCircle2, Heart, Info, LockKeyhole, ShieldAlert, Sparkles, X } from "lucide-react";
+import { type CSSProperties, type ReactNode, useState } from "react";
+import { AlertTriangle, ArrowLeft, Check, CheckCircle2, ChevronDown, Heart, Info, LockKeyhole, ShieldAlert, Sparkles, X } from "lucide-react";
 import type { ColorScheme, PrototypeScreen, Roster, RosterUnit, ThemeMode } from "../../types";
 import type { ConceptProps } from "../shared";
 
@@ -56,6 +56,39 @@ export function BudgetMeter({ roster, label }: { roster: Roster; label?: string 
         <em>{label ?? (b.over ? `${b.used - b.limit} over` : `${b.open} open`)}</em>
       </div>
     </div>
+  );
+}
+
+/**
+ * The roster's main budget; when the roster has other limited costs, tapping it expands them
+ * (battle-augur plan 3C-2). Limits of 0 with nothing used are left out.
+ */
+export function ExpandableBudget({ roster }: { roster: Roster }) {
+  const [open, setOpen] = useState(false);
+  const limits = (roster.limits ?? []).filter((limit) => limit.limit !== 0 || limit.used !== 0);
+  if (!limits.length) return <BudgetMeter roster={roster} />;
+  return (
+    <button type="button" className={`ux-budget-toggle ${open ? "open" : ""}`} aria-expanded={open} aria-label={open ? "Hide other limits" : `Show ${limits.length} other limits`} onClick={() => setOpen((value) => !value)}>
+      <BudgetMeter roster={roster} />
+      <ChevronDown size={14} className="ux-budget-caret" aria-hidden />
+      {open ? (
+        <ul className="ux-budget-limits">
+          {limits.map((limit) => <li key={limit.id} className={limit.used > limit.limit ? "over" : ""}><b>{limit.used}</b> / {limit.limit} {limit.label}</li>)}
+        </ul>
+      ) : null}
+    </button>
+  );
+}
+
+/** A tree unit's name line: ×count only above 1, non-point cost in accent, configuration summary below. */
+export function TreeUnitMain({ unit, name }: { unit: RosterUnit; name: string }) {
+  return (
+    <span className={`ux-tree-unit-main ${unit.summary ? "with-summary" : ""}`}>
+      <span>{name}</span>
+      {unit.extraCost ? <em className="ux-tree-unit-cost">· {unit.extraCost}</em> : null}
+      {unit.count > 1 ? <small>×{unit.count}</small> : null}
+      {unit.summary ? <small className="ux-tree-unit-summary">{unit.summary}</small> : null}
+    </span>
   );
 }
 

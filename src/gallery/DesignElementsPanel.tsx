@@ -4,7 +4,7 @@ import { PhoneStatusBar } from "../components/DeviceFrame";
 import { mockRosterReferences, referenceById } from "../data/mockRosterReferences";
 import type { DesignElementGroup, DesignElements } from "../design-data/designData";
 import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode } from "../types";
-import { BudgetMeter, Chip, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "../concepts/ux/uxShared";
+import { BudgetMeter, Chip, ExpandableBudget, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
 import { ComingSoonCard, DeveloperOptionsPreview } from "../concepts/ux/AppExtras";
 import { AddCollectionSheet, AdvancedInstallSetting, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OsJobNotifications, ReadOnlyBanner, ReadOnlyExportSheet, ReadOnlyOutline, RemoveSourceAlert, RosterDataTag, SourceRow, SourceStatusChip, SourceUpdateCard, SourceVersions, TaggedRosterRows, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
@@ -174,6 +174,7 @@ function WorkbenchElements({
           </span>
         </header>
         <BudgetMeter roster={roster} />
+        <ExpandableBudget roster={roster} />
       </ElementSection>
 
       <ElementSection title="Subscription Gate">
@@ -242,11 +243,8 @@ function WorkbenchElements({
                 {section.units.map((unit) => (
                   <button key={unit.id} type="button" className={`ux-tree-unit ${unit.status ?? "valid"} ${selectedUnit.id === unit.id ? "active" : ""}`} onClick={() => onSelectUnit(unit.id)}>
                     <span className="ux-tree-rail" aria-hidden />
-                    <span className="ux-tree-unit-main">
-                      <span>{unit.name}</span>
-                      <small>x{unit.count}</small>
-                    </span>
-                    {unit.status && unit.status !== "valid" ? <StatusGlyph status={unit.status} size={13} /> : <b>{unit.points}</b>}
+                    <TreeUnitMain unit={unit} name={unit.name} />
+                    {unit.status && unit.status !== "valid" ? <StatusGlyph status={unit.status} size={13} /> : unit.points ? <b>{unit.points}</b> : null}
                   </button>
                 ))}
               </div>

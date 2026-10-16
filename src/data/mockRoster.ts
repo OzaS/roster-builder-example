@@ -168,6 +168,11 @@ export const mockRoster: Roster = {
   system: "10th Edition",
   pointsUsed: 885,
   pointsLimit: 1000,
+  limits: [
+    { id: "detachment-points", label: "Detachment Points", used: 1, limit: 3 },
+    { id: "enhancements", label: "Enhancements", used: 1, limit: 3 },
+    { id: "reserve", label: "Reserve Slots", used: 0, limit: 0 },
+  ],
   forces: [
     {
       id: "primary-force",
@@ -176,6 +181,41 @@ export const mockRoster: Roster = {
       kind: "primary",
       points: 780,
       sections: [
+        {
+          id: "configuration",
+          name: "Configuration",
+          required: "2",
+          configuration: true,
+          units: [
+            {
+              id: "battle-size",
+              name: "Battle Size",
+              role: "Configuration",
+              points: 0,
+              count: 1,
+              status: "valid",
+              summary: "Standard (1000 point limit)",
+              keywords: [],
+              availability: "available",
+              slotImpact: "Configuration",
+              options: [],
+            },
+            {
+              id: "organisation",
+              name: "Organisation",
+              role: "Configuration",
+              points: 0,
+              count: 1,
+              status: "valid",
+              summary: "Strike Group, Vanguard Doctrine",
+              extraCost: "1 Detachment Point",
+              keywords: [],
+              availability: "available",
+              slotImpact: "Configuration",
+              options: [],
+            },
+          ],
+        },
         {
           id: "hq",
           name: "HQ",

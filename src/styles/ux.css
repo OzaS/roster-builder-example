@@ -5878,3 +5878,58 @@ button.ux-reference-tag:focus-visible {
   background: color-mix(in srgb, var(--ux-accent) 24%, transparent);
   border-color: var(--ux-accent);
 }
+
+/* battle-augur plan 3C-2: configuration summaries, accent non-point costs, expandable limits */
+.ux-tree-unit-main.with-summary {
+  flex-wrap: wrap;
+  row-gap: 2px;
+}
+.ux-tree-unit-main .ux-tree-unit-summary {
+  flex-basis: 100%;
+  white-space: normal;
+  line-height: 1.3;
+}
+.ux-tree-unit-main .ux-tree-unit-cost {
+  color: var(--ux-accent);
+  font-size: 11px;
+  font-style: normal;
+  white-space: nowrap;
+}
+.ux-budget-toggle {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.ux-budget-toggle .ux-budget-caret {
+  position: absolute;
+  top: 2px;
+  right: 0;
+  color: var(--ux-muted);
+  transition: transform 120ms ease;
+}
+.ux-budget-toggle.open .ux-budget-caret {
+  transform: rotate(180deg);
+}
+.ux-budget-limits {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 2px;
+  color: var(--ux-muted);
+  font-size: 12px;
+}
+.ux-budget-limits b {
+  color: var(--ux-ink);
+}
+.ux-budget-limits li.over,
+.ux-budget-limits li.over b {
+  color: var(--ux-err);
+}

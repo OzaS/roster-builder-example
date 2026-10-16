@@ -5,7 +5,7 @@ import { referenceById, resolveRosterReference } from "../../data/mockRosterRefe
 import type { RosterReferenceDefinition, RosterUnit } from "../../types";
 import type { ConceptProps } from "../shared";
 import { AddGameDataScreen, AdvancedInstallSetting, CollectionScreen, InstallJobScreen, KeepVersionsSetting, MigrationReportScreen, NotificationsSetting, ReadOnlyRosterScreen, SourceDetailScreen, SourcesManageScreen, WifiOnlySetting } from "./SourceJobs";
-import { BackOrTitle, BudgetMeter, Chip, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "./uxShared";
+import { BackOrTitle, BudgetMeter, Chip, ExpandableBudget, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "./uxShared";
 
 /** Screens of the source-data flow designed in Battle Augur plan 2D (SourceJobs.tsx). */
 const SOURCE_FLOW_SCREENS: readonly string[] = ["install-job", "source-detail", "migration-report", "collection", "roster-read-only"];
@@ -193,7 +193,7 @@ export function CodexWorkbench(props: ConceptProps) {
         />
         {!isUnitDetail ? (
           <div className={`ux-wb-budget ${screen === "overview" ? "tablet-overview-budget" : ""}`}>
-            <BudgetMeter roster={props.roster} />
+            {screen === "overview" ? <ExpandableBudget roster={props.roster} /> : <BudgetMeter roster={props.roster} />}
           </div>
         ) : null}
         <div className="ux-wb-layout" ref={layoutRef} style={panelStyle}>
@@ -571,8 +571,8 @@ function SwipeableUnitRow({ unit, active, onSelect, onOpenGlance, onDelete, onRe
         onClick={(event) => { if (longPressed.current || dragged.current) { event.preventDefault(); longPressed.current = false; dragged.current = false; return; } if (offset < 0) close(); else onSelect(); }}
       >
         <span className="ux-tree-rail" aria-hidden />
-        <span className="ux-tree-unit-main"><span>{unitDisplayName(unit)}</span><small>×{unit.count}</small></span>
-        {unit.status && unit.status !== "valid" ? <StatusGlyph status={unit.status} size={13} /> : <b>{unit.points}</b>}
+        <TreeUnitMain unit={unit} name={unitDisplayName(unit)} />
+        {unit.status && unit.status !== "valid" ? <StatusGlyph status={unit.status} size={13} /> : unit.points ? <b>{unit.points}</b> : null}
       </button>
     </div>
   );

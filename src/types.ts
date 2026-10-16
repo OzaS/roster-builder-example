@@ -152,11 +152,17 @@ export type RosterUnit = {
   maxCount?: number;
   pointsPerAdditionalModel?: number;
   detail?: RosterUnitDetail;
+  /** What was chosen inside it (configuration picks), shown under the name, New Recruit style. */
+  summary?: string;
+  /** A non-zero cost other than points, shown in accent text beside the name (e.g. "1 Detachment Point"). */
+  extraCost?: string;
 };
 
 export type RosterSection = {
   id: string;
   name: string;
+  /** A force-level configuration section (picks that are not units); looks like any other section. */
+  configuration?: boolean;
   required?: string;
   units: RosterUnit[];
 };
@@ -177,6 +183,8 @@ export type Roster = {
   system: string;
   pointsUsed: number;
   pointsLimit: number;
+  /** Other limited costs; shown when the budget block is expanded (limits of 0 with nothing used are left out). */
+  limits?: Array<{ id: string; label: string; used: number; limit: number }>;
   forces: RosterForce[];
 };
 
