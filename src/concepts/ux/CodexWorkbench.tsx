@@ -678,6 +678,7 @@ function ForceSelector({ props, onClose }: { props: ConceptProps; onClose: () =>
   const [query, setQuery] = useState("");
   const [catalogueId, setCatalogueId] = useState(mockCatalogues[0]?.id ?? "");
   const [showHidden, setShowHidden] = useState(false);
+  const [choosingFaction, setChoosingFaction] = useState(false);
   const match = (name: string) => name.toLowerCase().includes(query.trim().toLowerCase());
   const detachments = mockDetachments.filter((item) => match(item.name));
   const currentForce = props.roster.forces.find((force) => force.id === props.selectedForceId) ?? props.roster.forces[0];
@@ -703,11 +704,12 @@ function ForceSelector({ props, onClose }: { props: ConceptProps; onClose: () =>
             <strong>Detachments in {forceDisplayName(currentForce)}</strong>
             {detachments.map((item, index) => <button type="button" key={item.id} onClick={() => add(item.id)}><span><b>{item.name}{index === 0 ? <em className="ux-force-required" aria-label="Required"> !</em> : null}</b><small>{index === 0 ? "Required · 0/1" : index === 1 ? "At maximum · 1/1: adding breaks its limit" : item.slots}</small></span><Plus size={15} /></button>)}
           </div> : null}
-          <div className="ux-force-factions" role="radiogroup" aria-label="Faction">
-            {mockCatalogues.map((item) => <button type="button" role="radio" aria-checked={catalogueId === item.id} className={catalogueId === item.id ? "selected" : ""} key={item.id} onClick={() => setCatalogueId(item.id)}>{item.name}{index0(item.id) ? " · current" : ""}</button>)}
-          </div>
+          {/* Plan 4C: the faction list is long (dozens per game system): one selector row opens it in place. */}
+          <button type="button" className="ux-force-faction-select" aria-expanded={choosingFaction} onClick={() => setChoosingFaction((value) => !value)}><span><strong>Faction</strong><small>{mockCatalogues.find((item) => item.id === catalogueId)?.name}</small></span>{choosingFaction ? <ChevronDown size={16} /> : <ChevronRight size={16} />}</button>
+          {choosingFaction ? <div className="ux-force-choice-list" aria-label="Factions">{mockCatalogues.filter((item) => match(item.name)).map((item) => <button type="button" className={catalogueId === item.id ? "selected" : ""} key={item.id} onClick={() => { setCatalogueId(item.id); setChoosingFaction(false); }}><span><strong>{item.name}</strong></span>{catalogueId === item.id ? <Check size={15} /> : null}</button>)}</div> : null}
+          <strong className="ux-force-section-title">Organization</strong>
           <div className="ux-force-choice-list" aria-label="Top-level forces">
-            {detachments.length ? detachments.map((item, index) => <button type="button" key={item.id} onClick={() => add(item.id)}><span><strong>{item.name} {index === 0 ? "(1)" : "(0)"}</strong><small>{item.fit}</small></span><Plus size={15} /></button>) : <div className="ux-loadout-selector-empty"><strong>No matching forces</strong><small>Try another name.</small></div>}
+            {detachments.length ? detachments.map((item, index) => <button type="button" key={item.id} onClick={() => add(item.id)}><span><strong>{item.name} {index === 0 ? "(1)" : "(0)"}</strong>{index === 0 ? null : <small>{item.fit}</small>}</span><Plus size={15} /></button>) : <div className="ux-loadout-selector-empty"><strong>No matching forces</strong><small>Try another name.</small></div>}
           </div>
           <button type="button" className="ux-pool-hidden" aria-pressed={showHidden} onClick={() => setShowHidden((value) => !value)}>{showHidden ? "Hide hidden entries" : "Show hidden (3)"}</button>
         </div>
@@ -716,8 +718,6 @@ function ForceSelector({ props, onClose }: { props: ConceptProps; onClose: () =>
     </div>
   );
 }
-
-const index0 = (catalogueId: string) => mockCatalogues[0]?.id === catalogueId;
 
 function Detail({ props, scrollRef, onOpenLoadoutSlot, onOpenReference }: { props: ConceptProps; scrollRef: RefObject<HTMLElement | null>; onOpenLoadoutSlot: (groupId: string, slotId: string) => void; onOpenReference: (reference: RosterReferenceDefinition) => void }) {
   if (props.screen === "add-unit") return <AddPane props={props} />;

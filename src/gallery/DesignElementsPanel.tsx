@@ -1099,7 +1099,8 @@ function ForceEntriesElement({ roster }: { roster: Roster }) {
             <label className="ux-loadout-selector-search"><Search size={15} /><input placeholder="Search forces" readOnly /></label>
             {/* Plan 4C: one tap adds and closes. */}
             <div className="ux-force-detachments"><strong>Detachments in Primary Force</strong><button type="button"><span><b>Core Detachment<em className="ux-force-required" aria-label="Required"> !</em></b><small>Required · 0/1</small></span><Plus size={15} /></button><button type="button"><span><b>Support Detachment</b><small>At maximum · 1/1: adding breaks its limit</small></span><Plus size={15} /></button></div>
-            <div className="ux-force-factions" role="radiogroup" aria-label="Faction"><button type="button" role="radio" aria-checked className="selected">Faction A · current</button><button type="button" role="radio" aria-checked={false}>Faction B</button></div>
+            <button type="button" className="ux-force-faction-select" aria-expanded={false}><span><strong>Faction</strong><small>Faction A</small></span><ChevronRight size={16} /></button>
+            <strong className="ux-force-section-title">Organization</strong>
             <div className="ux-force-choice-list"><button type="button"><span><strong>Standard Force (1)</strong><small>Recommended</small></span><Plus size={15} /></button><button type="button"><span><strong>Open Force (0)</strong><small>Sandbox</small></span><Plus size={15} /></button></div>
             <button type="button" className="ux-pool-hidden">Show hidden (3)</button>
           </div>
