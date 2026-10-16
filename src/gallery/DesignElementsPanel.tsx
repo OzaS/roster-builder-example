@@ -545,6 +545,7 @@ function WorkbenchElements({
         <JobModal inline title={`Installing ${EXAMPLE_SYSTEM.name}`} subtitle={`${EXAMPLE_SYSTEM.repo} · ${EXAMPLE_SYSTEM.version}`} percent={46} stepLabel="Step 3 of 4" steps={installSteps("import")} queue={["Updating Example System Two"]} />
         <JobOutcomeNotice outcome="done" title={`Installed ${EXAMPLE_SYSTEM.name}`} body="23 factions · 41 MB. Ready to use." />
         <JobOutcomeNotice outcome="failed" title={`Could not install ${EXAMPLE_SYSTEM.name}`} body="GitHub could not be reached. Check the connection and try again." />
+        <JobOutcomeNotice outcome="cancelled" title="Install stopped" body="7 of 23 factions were installed." />
         <JobOutcomeNotice outcome="cancelled" title="Install cancelled" body="Nothing was installed." />
       </ElementSection>
 
