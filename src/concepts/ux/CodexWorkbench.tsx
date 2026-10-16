@@ -4,11 +4,11 @@ import { mockCatalogues, mockDetachments, mockSystemUnits } from "../../data/moc
 import { referenceById, resolveRosterReference } from "../../data/mockRosterReferences";
 import type { RosterReferenceDefinition, RosterUnit } from "../../types";
 import type { ConceptProps } from "../shared";
-import { AddGameDataScreen, AdvancedInstallSetting, CollectionScreen, InstallJobScreen, MigrationReportScreen, SourceDetailScreen, SourcesManageScreen } from "./SourceJobs";
+import { AddGameDataScreen, AdvancedInstallSetting, CollectionScreen, InstallJobScreen, KeepVersionsSetting, MigrationReportScreen, NotificationsSetting, ReadOnlyRosterScreen, SourceDetailScreen, SourcesManageScreen, WifiOnlySetting } from "./SourceJobs";
 import { BackOrTitle, BudgetMeter, Chip, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "./uxShared";
 
 /** Screens of the source-data flow designed in Battle Augur plan 2D (SourceJobs.tsx). */
-const SOURCE_FLOW_SCREENS: readonly string[] = ["install-job", "source-detail", "migration-report", "collection"];
+const SOURCE_FLOW_SCREENS: readonly string[] = ["install-job", "source-detail", "migration-report", "collection", "roster-read-only"];
 
 type ReferenceGlance =
   | { type: "unit"; unit: RosterUnit }
@@ -159,6 +159,8 @@ export function CodexWorkbench(props: ConceptProps) {
     body = <SourceDetailScreen props={props} />;
   } else if (screen === "migration-report") {
     body = <MigrationReportScreen props={props} />;
+  } else if (screen === "roster-read-only") {
+    body = <ReadOnlyRosterScreen props={props} />;
   } else if (screen === "collection") {
     body = <CollectionScreen props={props} />;
   } else if (screen === "system") {
@@ -2117,6 +2119,7 @@ function SettingsScreen({ props }: { props: ConceptProps }) {
   const [uploadedLanguage, setUploadedLanguage] = useState("");
   const [uploadedScheme, setUploadedScheme] = useState("");
   const [advancedInstall, setAdvancedInstall] = useState(false);
+  const [wifiOnly, setWifiOnly] = useState(false);
   const language = props.language ?? "en";
   const theme = props.themePreference ?? props.themeMode ?? "dark";
   return (
@@ -2191,6 +2194,9 @@ function SettingsScreen({ props }: { props: ConceptProps }) {
         </p>
         <div className="ux-result-label">Game data</div>
         <AdvancedInstallSetting on={advancedInstall} onToggle={() => setAdvancedInstall((value) => !value)} />
+        <WifiOnlySetting on={wifiOnly} onToggle={() => setWifiOnly((value) => !value)} />
+        <KeepVersionsSetting />
+        <NotificationsSetting />
       </div>
     </>
   );

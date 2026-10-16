@@ -7,7 +7,7 @@ import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, T
 import { BudgetMeter, Chip, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
 import { ComingSoonCard, DeveloperOptionsPreview } from "../concepts/ux/AppExtras";
-import { AddCollectionSheet, AdvancedInstallSetting, CollectionSourceRow, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, SourceRow, SourceStatusChip, SourceUpdateCard, UpdatesNotice } from "../concepts/ux/SourceJobs";
+import { AddCollectionSheet, AdvancedInstallSetting, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OsJobNotifications, ReadOnlyBanner, ReadOnlyExportSheet, ReadOnlyOutline, RemoveSourceAlert, RosterDataTag, SourceRow, SourceStatusChip, SourceUpdateCard, SourceVersions, TaggedRosterRows, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
 
 type Props = {
   concept: GalleryConcept;
@@ -502,16 +502,25 @@ function WorkbenchElements({
 
       <ElementSection title="Source Update Card">
         <SourceUpdateCard />
+        <LastUpdateCard checked={false} />
         <LastUpdateCard />
       </ElementSection>
 
+      <ElementSection title="Source Versions">
+        <SourceVersions />
+        <SourceVersions older />
+        <RemoveSourceAlert inline />
+      </ElementSection>
+
       <ElementSection title="Migration Report">
+        <MigrationReportBody checked={false} />
         <MigrationReportBody />
       </ElementSection>
 
       <ElementSection title="Source Addition">
         <div className="ux-result-label">Collections</div>
         <DefaultCollectionCard />
+        <DefaultListingRows />
         <UserCollectionRows />
         <section className="ux-source-method">
           <div className="ux-source-method-heading"><span className="ux-setting-icon"><FileInput size={18} /></span><span><strong>Have a link?</strong><small>Any GitHub repository with roster data files.</small></span></div>
@@ -537,12 +546,26 @@ function WorkbenchElements({
         <AdvancedInstallSetting on />
       </ElementSection>
 
+      <ElementSection title="Game Data Settings">
+        <div className="ux-result-label">Game data</div>
+        <WifiOnlySetting on={false} />
+        <WifiOnlySetting on />
+        <KeepVersionsSetting />
+        <KeepVersionsSetting value="2" size="77 MB" />
+        <NotificationsSetting />
+        <NotificationsSetting on />
+      </ElementSection>
+
       <ElementSection title="Faction Picker">
         <FactionPicker />
       </ElementSection>
 
       <ElementSection title="Background Job Modal">
-        <JobModal inline title={`Installing ${EXAMPLE_SYSTEM.name}`} subtitle={`${EXAMPLE_SYSTEM.repo} · ${EXAMPLE_SYSTEM.version}`} percent={46} stepLabel="Step 3 of 4" steps={installSteps("import")} queue={["Updating Example System Two"]} />
+        <JobModal inline title={`Installing ${EXAMPLE_SYSTEM.name}`} subtitle={`${EXAMPLE_SYSTEM.repo} · ${EXAMPLE_SYSTEM.version}`} percent={46} stepLabel="Step 3 of 4" steps={installSteps("import")} notify />
+        <JobModal inline title={`Installing ${EXAMPLE_SYSTEM.name}`} subtitle={`${EXAMPLE_SYSTEM.repo} · ${EXAMPLE_SYSTEM.version}`} percent={46} stepLabel="Step 3 of 4" steps={installSteps("import")} overall={38} others={[{ title: "Updating Example System Two", detail: "Download · 4.1 MB of 29 MB", percent: 14 }, { title: "Installing Example System Three", detail: "Waiting for another install", waiting: true }]} />
+        <MobileDataNotice />
+        <WifiWaitNotice />
+        <JobOutcomeNotice outcome="updated" title="Updated Example System Two" body="3 rosters use this data. Check them to see which changed." />
         <JobOutcomeNotice outcome="done" title={`Installed ${EXAMPLE_SYSTEM.name}`} body="23 factions · 41 MB. Ready to use." />
         <JobOutcomeNotice outcome="failed" title={`Could not install ${EXAMPLE_SYSTEM.name}`} body="GitHub could not be reached. Check the connection and try again." />
         <JobOutcomeNotice outcome="cancelled" title="Install stopped" body="7 of 23 factions were installed." />
@@ -553,8 +576,9 @@ function WorkbenchElements({
         <div className="ux-elements-job-stage">
           <div className="ux-job-float">
             <JobPill inline label={`Installing ${EXAMPLE_SYSTEM.name}`} percent={46} />
-            <JobPill inline label={`Installing ${EXAMPLE_SYSTEM.name}`} percent={46} count={2} />
+            <JobPill inline label={`Installing ${EXAMPLE_SYSTEM.name}`} percent={38} count={2} />
             <JobPill inline needsYou label={`Choose factions for ${EXAMPLE_SYSTEM.name}`} />
+            <JobPill inline wifi label={`Waiting for Wi-Fi · ${EXAMPLE_SYSTEM.name}`} />
           </div>
           <small className="ux-hint">Placement: 12 pt above the tab bar on tab screens; above the bottom safe area on pushed screens and in the roster workbench.</small>
           <div className="ux-elements-command-wrap ux-elements-job-placement">
@@ -574,10 +598,30 @@ function WorkbenchElements({
         <div className="ux-elements-job-stage">
           <div className="ux-job-float">
             <JobToast tone="ok" message={`Installed ${EXAMPLE_SYSTEM.name}`} action="View" />
-            <JobToast tone="ok" message="Updated Example System Two" action="Report" />
+            <JobToast tone="ok" message="Updated Example System Two" action="Check rosters" />
+            <JobToast tone="ok" message="Checked 3 rosters · 1 changed" action="Report" />
             <JobToast tone="err" message={`Could not install ${EXAMPLE_SYSTEM.name}`} action="Details" />
+            <JobToast tone="neutral" message="Using mobile data · 18.0 MB. You can limit downloads to Wi-Fi in Settings." action="Wi-Fi only" />
           </div>
         </div>
+      </ElementSection>
+
+      <ElementSection title="OS Job Progress">
+        <div className="ux-os-stage ux-os-inline"><OsJobNotifications /></div>
+      </ElementSection>
+
+      <ElementSection title="Read-only Roster Banner">
+        <ReadOnlyBanner kind="source" />
+        <ReadOnlyBanner kind="faction" />
+        <ReadOnlyBanner kind="changed" expanded />
+        <ReadOnlyOutline kind="changed" />
+        <ReadOnlyExportSheet inline />
+        <ReadOnlyExportSheet inline snapshot={false} />
+      </ElementSection>
+
+      <ElementSection title="Roster Data Tags">
+        <div className="ux-src-chips"><RosterDataTag kind="changed" /><RosterDataTag kind="faction" /><RosterDataTag kind="source" /></div>
+        <TaggedRosterRows />
       </ElementSection>
 
       <ElementSection title="Tools Workflow">
