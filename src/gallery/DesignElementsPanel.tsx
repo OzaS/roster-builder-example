@@ -347,6 +347,11 @@ function WorkbenchElements({
             <Plus size={16} />
           </button>
         ))}
+        {/* Plan 4B: multi-add feedback, an added count, a refused row and the hidden toggle. */}
+        <div className="ux-pool-added" role="status"><Check size={14} />Added {flattenUnits(roster)[0]?.name}</div>
+        <button type="button" className="ux-pool-row"><span><strong>{flattenUnits(roster)[0]?.name}<em className="ux-pool-count"> (1/3)</em></strong><small>{flattenUnits(roster)[0]?.role}</small></span><span className="ux-pool-meta"><b>{flattenUnits(roster)[0]?.points} pts</b><Chip tone="valid">available</Chip></span><Plus size={16} /></button>
+        <button type="button" className="ux-pool-row locked" disabled><span><strong>{flattenUnits(roster)[1]?.name}</strong><small>Maximum reached</small></span><span className="ux-pool-meta"><b>{flattenUnits(roster)[1]?.points} pts</b><Chip tone="error">locked</Chip></span><Plus size={16} /></button>
+        <button type="button" className="ux-pool-hidden">Show hidden (2)</button>
       </ElementSection>
 
       <ElementSection title="Favorite Creation Sections">
@@ -1089,13 +1094,16 @@ function ForceEntriesElement({ roster }: { roster: Roster }) {
       </section>
       <div className="ux-force-selector-layer ux-elements-static">
         <section className="ux-force-selector" role="dialog" aria-modal="true" aria-label="Add force">
-          <header><span><strong>Add force</strong><small>Choose a source and organization</small></span><button type="button" aria-label="Close force selector"><X size={18} /></button></header>
+          <header><span><strong>Add force</strong><small>To Primary Force</small></span><button type="button" aria-label="Close force selector"><X size={18} /></button></header>
           <div className="ux-force-selector-body">
             <label className="ux-loadout-selector-search"><Search size={15} /><input placeholder="Search forces" readOnly /></label>
-            <div className="ux-force-choice-list"><button type="button" className="selected"><span><strong>Dark Angels</strong><small>v42 · Current</small></span><Check size={15} /></button><button type="button"><span><strong>Adeptus Astartes</strong><small>v19 · Current</small></span></button></div>
-            <div className="ux-force-detachments"><strong>Organization</strong><button type="button" className="selected"><span><b>Crusade Force Organization Chart</b><small>11 slots · Recommended</small></span><Check size={15} /></button></div>
+            {/* Plan 4C: one tap adds and closes. */}
+            <div className="ux-force-detachments"><strong>Detachments in Primary Force</strong><button type="button"><span><b>Core Detachment<em className="ux-force-required" aria-label="Required"> !</em></b><small>Required · 0/1</small></span><Plus size={15} /></button><button type="button"><span><b>Support Detachment</b><small>At maximum · 1/1: adding breaks its limit</small></span><Plus size={15} /></button></div>
+            <div className="ux-force-factions" role="radiogroup" aria-label="Faction"><button type="button" role="radio" aria-checked className="selected">Faction A · current</button><button type="button" role="radio" aria-checked={false}>Faction B</button></div>
+            <div className="ux-force-choice-list"><button type="button"><span><strong>Standard Force (1)</strong><small>Recommended</small></span><Plus size={15} /></button><button type="button"><span><strong>Open Force (0)</strong><small>Sandbox</small></span><Plus size={15} /></button></div>
+            <button type="button" className="ux-pool-hidden">Show hidden (3)</button>
           </div>
-          <footer><button type="button">Cancel</button><button type="button" className="primary">Add force</button></footer>
+          <footer><button type="button">Close</button></footer>
         </section>
       </div>
     </ElementSection>

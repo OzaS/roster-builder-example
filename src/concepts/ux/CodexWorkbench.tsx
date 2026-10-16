@@ -669,11 +669,18 @@ function InlineForceDraft({ props, onClose }: { props: ConceptProps; onClose: ()
   );
 }
 
+/**
+ * Add force (Battle Augur plan 4C): one tap adds and closes. Detachments of the current force
+ * (required "!", at-max state), then a faction chip row (allies of the same game system) and
+ * that faction's top-level forces with how many the roster has.
+ */
 function ForceSelector({ props, onClose }: { props: ConceptProps; onClose: () => void }) {
   const [query, setQuery] = useState("");
-  const [catalogueId, setCatalogueId] = useState("");
-  const [detachmentId, setDetachmentId] = useState("");
-  const catalogues = mockCatalogues.filter((item) => item.name.toLowerCase().includes(query.trim().toLowerCase()));
+  const [catalogueId, setCatalogueId] = useState(mockCatalogues[0]?.id ?? "");
+  const [showHidden, setShowHidden] = useState(false);
+  const match = (name: string) => name.toLowerCase().includes(query.trim().toLowerCase());
+  const detachments = mockDetachments.filter((item) => match(item.name));
+  const currentForce = props.roster.forces.find((force) => force.id === props.selectedForceId) ?? props.roster.forces[0];
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
@@ -681,28 +688,36 @@ function ForceSelector({ props, onClose }: { props: ConceptProps; onClose: () =>
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [onClose]);
-  const submit = () => {
-    if (!catalogueId || !detachmentId) return;
+  const add = (detachmentId: string) => {
     props.onCreateForce(catalogueId, detachmentId);
     onClose();
   };
   return (
     <div className="ux-force-selector-layer" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
       <section className="ux-force-selector" role="dialog" aria-modal="true" aria-labelledby="force-selector-title">
-        <header><span><strong id="force-selector-title">Add force</strong><small>Choose a source and organization</small></span><button type="button" aria-label="Close force selector" onClick={onClose}><X size={18} /></button></header>
+        <header><span><strong id="force-selector-title">Add force</strong><small>{currentForce ? `To ${forceDisplayName(currentForce)}` : "Choose a force"}</small></span><button type="button" aria-label="Close force selector" onClick={onClose}><X size={18} /></button></header>
         <div className="ux-force-selector-body">
           <label className="ux-loadout-selector-search"><Search size={15} /><input value={query} onChange={(event) => setQuery(event.currentTarget.value)} placeholder="Search forces" autoFocus /></label>
           {props.detachmentFavorites.length ? <FavoriteCreationSection title="Favorite detachments">{props.detachmentFavorites.map((favorite) => <button type="button" key={favorite.id} onClick={() => { props.onReuseDetachmentFavorite(favorite.id); onClose(); }}><Heart size={14} /><span><strong>{forceDisplayName(favorite.force)}</strong><small>{favorite.force.points} pts · configured</small></span><Plus size={14} /></button>)}</FavoriteCreationSection> : null}
-          <div className="ux-force-choice-list" aria-label="Available forces">
-            {catalogues.length ? catalogues.map((item) => <button type="button" className={catalogueId === item.id ? "selected" : ""} key={item.id} onClick={() => setCatalogueId(item.id)}><span><strong>{item.name}</strong><small>{item.updated} · {item.status}</small></span>{catalogueId === item.id ? <Check size={15} /> : null}</button>) : <div className="ux-loadout-selector-empty"><strong>No matching forces</strong><small>Try another name.</small></div>}
+          {currentForce ? <div className="ux-force-detachments" aria-label="Detachments">
+            <strong>Detachments in {forceDisplayName(currentForce)}</strong>
+            {detachments.map((item, index) => <button type="button" key={item.id} onClick={() => add(item.id)}><span><b>{item.name}{index === 0 ? <em className="ux-force-required" aria-label="Required"> !</em> : null}</b><small>{index === 0 ? "Required · 0/1" : index === 1 ? "At maximum · 1/1: adding breaks its limit" : item.slots}</small></span><Plus size={15} /></button>)}
+          </div> : null}
+          <div className="ux-force-factions" role="radiogroup" aria-label="Faction">
+            {mockCatalogues.map((item) => <button type="button" role="radio" aria-checked={catalogueId === item.id} className={catalogueId === item.id ? "selected" : ""} key={item.id} onClick={() => setCatalogueId(item.id)}>{item.name}{index0(item.id) ? " · current" : ""}</button>)}
           </div>
-          <div className="ux-force-detachments"><strong>Organization</strong>{mockDetachments.map((item) => <button type="button" className={detachmentId === item.id ? "selected" : ""} key={item.id} onClick={() => setDetachmentId(item.id)}><span><b>{item.name}</b><small>{item.slots} · {item.fit}</small></span>{detachmentId === item.id ? <Check size={15} /> : null}</button>)}</div>
+          <div className="ux-force-choice-list" aria-label="Top-level forces">
+            {detachments.length ? detachments.map((item, index) => <button type="button" key={item.id} onClick={() => add(item.id)}><span><strong>{item.name} {index === 0 ? "(1)" : "(0)"}</strong><small>{item.fit}</small></span><Plus size={15} /></button>) : <div className="ux-loadout-selector-empty"><strong>No matching forces</strong><small>Try another name.</small></div>}
+          </div>
+          <button type="button" className="ux-pool-hidden" aria-pressed={showHidden} onClick={() => setShowHidden((value) => !value)}>{showHidden ? "Hide hidden entries" : "Show hidden (3)"}</button>
         </div>
-        <footer><button type="button" onClick={onClose}>Cancel</button><button type="button" className="primary" disabled={!catalogueId || !detachmentId} onClick={submit}>Add force</button></footer>
+        <footer><button type="button" onClick={onClose}>Close</button></footer>
       </section>
     </div>
   );
 }
+
+const index0 = (catalogueId: string) => mockCatalogues[0]?.id === catalogueId;
 
 function Detail({ props, scrollRef, onOpenLoadoutSlot, onOpenReference }: { props: ConceptProps; scrollRef: RefObject<HTMLElement | null>; onOpenLoadoutSlot: (groupId: string, slotId: string) => void; onOpenReference: (reference: RosterReferenceDefinition) => void }) {
   if (props.screen === "add-unit") return <AddPane props={props} />;
@@ -1112,6 +1127,9 @@ function ReferenceDefinition({ reference, onOpenReference }: { reference: Roster
 }
 
 function AddPane({ props }: { props: ConceptProps }) {
+  const [added, setAdded] = useState<Record<string, number>>({});
+  const [lastAdded, setLastAdded] = useState<string | null>(null);
+  const [showHidden, setShowHidden] = useState(false);
   const pool = flattenUnits(props.roster).filter((u) => u.sectionId === props.selectedSectionId);
   const smart = props.smartSearch ?? false;
   const section = props.selectedSection.name;
@@ -1149,21 +1167,29 @@ function AddPane({ props }: { props: ConceptProps }) {
         const compatible = favorite.sourceSectionName === section;
         return <button type="button" key={favorite.id} disabled={!compatible} title={compatible ? undefined : `Requires a ${favorite.sourceSectionName} section`} onClick={() => { props.onReuseUnitFavorite(favorite.id, props.selectedSectionId); props.onNavigate("unit-detail"); }}><Heart size={14} /><span><strong>{unitDisplayName(favorite.unit)}</strong><small>{compatible ? `${favorite.unit.points} pts · configured` : `Requires ${favorite.sourceSectionName}`}</small></span><Plus size={14} /></button>;
       })}</FavoriteCreationSection> : null}
+      {/* Battle Augur plan 4B: tapping a row adds it and the sheet stays open (multi-add); the row counts what was added. */}
+      {lastAdded ? <div className="ux-pool-added" role="status"><Check size={14} />Added {lastAdded}</div> : null}
       <div className="ux-pool">
-        {(pool.length ? pool : flattenUnits(props.roster)).map((unit) => (
-          <button key={unit.id} type="button" className="ux-pool-row" onClick={() => props.onSelectUnit(unit.id)}>
-            <span>
-              <strong>{unitDisplayName(unit)}</strong>
-              <small>{unit.role}</small>
-            </span>
-            <span className="ux-pool-meta">
-              <b>{unit.points} pts</b>
-              <Chip tone={unit.availability === "available" ? "valid" : unit.availability === "limited" ? "warning" : "error"}>{unit.availability}</Chip>
-            </span>
-            <Plus size={16} />
-          </button>
-        ))}
+        {(pool.length ? pool : flattenUnits(props.roster)).map((unit) => {
+          const locked = unit.availability === "locked";
+          const count = added[unit.id] ?? 0;
+          const reason = unit.availability === "limited" ? "Slot full: adding breaks its limit" : locked ? "Maximum reached" : undefined;
+          return (
+            <button key={unit.id} type="button" className={`ux-pool-row ${unit.availability}`} disabled={locked} onClick={() => { setAdded((current) => ({ ...current, [unit.id]: count + 1 })); setLastAdded(unitDisplayName(unit)); }}>
+              <span>
+                <strong>{unitDisplayName(unit)}{count ? <em className="ux-pool-count"> ({count}/3)</em> : null}</strong>
+                <small>{reason ?? unit.role}</small>
+              </span>
+              <span className="ux-pool-meta">
+                <b>{unit.points} pts</b>
+                <Chip tone={unit.availability === "available" ? "valid" : unit.availability === "limited" ? "warning" : "error"}>{unit.availability}</Chip>
+              </span>
+              <Plus size={16} />
+            </button>
+          );
+        })}
       </div>
+      <button type="button" className="ux-pool-hidden" aria-pressed={showHidden} onClick={() => setShowHidden((value) => !value)}>{showHidden ? "Hide hidden entries" : "Show hidden (2)"}</button>
     </section>
   );
 }
