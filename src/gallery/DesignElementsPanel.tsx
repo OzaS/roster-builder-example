@@ -1,6 +1,6 @@
 import { MobileUnitOptions } from "../concepts/ux/MobileUnitOptions";
 import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BarChart3, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, CircleDot, Cog, Coins, Command, Copy, Database, Dice5, Download, Ellipsis, FileInput, Gamepad2, GripVertical, Hammer, Heart, ImagePlus, Languages, Layers, LibraryBig, Maximize2, MessageCircle, Minus, Moon, MoveRight, Palette, PanelsTopLeft, Pencil, Plus, RotateCcw, Rows3, Scale, Search, Smartphone, Sparkles, Split, Trash2, Upload, UserRound, Wand2, X } from "lucide-react";
-import { createContext, useContext } from "react";
+import { createContext, useContext, useState } from "react";
 import { PhoneStatusBar } from "../components/DeviceFrame";
 import { mockRosterReferences, referenceById } from "../data/mockRosterReferences";
 import type { DesignElementGroup, DesignElements } from "../design-data/designData";
@@ -252,6 +252,10 @@ function WorkbenchElements({
             ) : null}
           </div>
         ))}
+      </ElementSection>
+
+      <ElementSection title="Slot Visibility">
+        <ManySlotsElement />
       </ElementSection>
 
       <ForceEntriesElement roster={roster} />
@@ -1226,4 +1230,25 @@ function ElementSection({ title, children }: { title: string; children: React.Re
       {children}
     </article>
   );
+}
+
+/** Plan 3D: synthetic 58-slot force. Unavailable empty slots never become rows. */
+function ManySlotsElement() {
+  const [expanded, setExpanded] = useState(false);
+  const slots = [
+    { name: "Configuration", usage: "1/1", note: "Option A", shown: true },
+    { name: "Required slot", usage: "0/1", note: "Below minimum", shown: true },
+    { name: "Occupied slot", usage: "1/0", note: "Above maximum · Unit A", shown: true },
+    { name: "Cost-limited slot", usage: "0/0", note: "Cost limit exceeded", shown: true },
+    ...Array.from({ length: 11 }, (_, i) => ({ name: `Optional slot ${i + 1}`, usage: "0/4", note: "", shown: false })),
+  ];
+  return <div className="ux-force-sections" aria-label="Many-slot force">
+    <p>58 slots: occupied, required and broken slots stay visible. The 43 empty unavailable slots stay hidden, including with Show all.</p>
+    {slots.filter(slot => slot.shown || expanded).map(slot => <div className="ux-tree-branch" key={slot.name}>
+      <div className="ux-tree-section"><ChevronRight size={14} /><strong>{slot.name}</strong><small>{slot.usage}</small></div>
+      {slot.note ? <small>{slot.note}</small> : null}
+    </div>)}
+    <button type="button" className="ux-pool-hidden" aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>{expanded ? "Show fewer slots" : "Show all slots (11)"}</button>
+    <p>Each force has its own toggle; configuration and nested forces retain their order. Expansion survives model updates while the roster is open.</p>
+  </div>;
 }
