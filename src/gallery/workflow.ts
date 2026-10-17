@@ -27,6 +27,7 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "add-detachment", label: "Add Detachment" },
   { id: "add-unit", label: "Add Unit" },
   { id: "unit-detail", label: "Unit Detail" },
+  { id: "unit-options-mobile", label: "Unit options · Mobile 5A" },
   { id: "option-drilldown", label: "Option Drilldown" },
   { id: "diagnostics", label: "Diagnostics" },
   { id: "settings", label: "Settings" },

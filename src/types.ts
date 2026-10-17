@@ -55,6 +55,7 @@ export type WorkflowScreen =
   | "add-detachment"
   | "add-unit"
   | "unit-detail"
+  | "unit-options-mobile"
   | "option-drilldown"
   | "diagnostics"
   | "settings"
@@ -232,6 +233,7 @@ export type PrototypeScreen =
   | "smart-search"
   | "add-unit"
   | "unit-detail"
+  | "unit-options-mobile"
   | "validation"
   | "settings"
   | "export";

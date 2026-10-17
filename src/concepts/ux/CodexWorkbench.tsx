@@ -5,6 +5,7 @@ import { referenceById, resolveRosterReference } from "../../data/mockRosterRefe
 import type { RosterReferenceDefinition, RosterUnit } from "../../types";
 import type { ConceptProps } from "../shared";
 import { AddGameDataScreen, AdvancedInstallSetting, CollectionScreen, InstallJobScreen, KeepVersionsSetting, MigrationReportScreen, NotificationsSetting, ReadOnlyRosterScreen, SourceDetailScreen, SourcesManageScreen, WifiOnlySetting } from "./SourceJobs";
+import { MobileUnitOptions } from "./MobileUnitOptions";
 import { BackOrTitle, BudgetMeter, Chip, ExpandableBudget, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "./uxShared";
 
 /** Screens of the source-data flow designed in Battle Augur plan 2D (SourceJobs.tsx). */
@@ -129,7 +130,9 @@ export function CodexWorkbench(props: ConceptProps) {
   let body: ReactNode;
   let modifier = "";
 
-  if (screen === "library") {
+  if (screen === "unit-options-mobile") {
+    body = <MobileUnitOptions onBack={() => props.onNavigate("overview")} />;
+  } else if (screen === "library") {
     body = <Library props={props} />;
   } else if (screen === "collections") {
     body = <CollectionsLibrary props={props} />;

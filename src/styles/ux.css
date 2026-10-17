@@ -6000,3 +6000,42 @@ button.ux-reference-tag:focus-visible {
 .ux-force-section-title {
   font-size: 13px;
 }
+
+/* Mobile Unit Detail, plan 5A: scoped to the implemented options surface. */
+.ux-mobile-unit-options { display: flex; flex-direction: column; gap: 12px; padding: 16px; color: var(--ux-ink); background: var(--ux-bg); overflow-y: auto; min-height: 0; flex: 1; }
+.ux-mobile-unit-options.compact { max-height: 640px; border: 1px solid var(--ux-line); border-radius: 16px; }
+.ux-mobile-unit-options h4 { margin: 10px 0 0; color: var(--ux-ink-secondary); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+.ux-mobile-unit-options small { display: block; color: var(--ux-ink-secondary); font-size: 12px; line-height: 1.5; }
+.ux-mobile-unit-options button { color: inherit; background: none; border: none; cursor: pointer; }
+.ux-mobile-unit-options button:disabled { opacity: .45; cursor: default; }
+.ux-5a-header, .ux-5a-context, .ux-5a-section-title { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.ux-5a-header { justify-content: flex-start; font-size: 18px; }
+.ux-5a-header button, .ux-mobile-unit-options nav button { min-height: 44px; }
+.ux-mobile-unit-options nav { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.ux-mobile-unit-options nav button, .ux-mobile-unit-options .ux-5a-link { color: var(--ux-accent); }
+.ux-5a-context { color: var(--ux-ink-secondary); font-size: 13px; }
+.ux-5a-context strong, .ux-5a-chips span { border-radius: 99px; background: var(--ux-surface-2); padding: 5px 10px; font-size: 12px; }
+.ux-5a-budget { height: 5px; border-radius: 99px; background: var(--ux-surface-3); overflow: hidden; }
+.ux-5a-budget > div { height: 100%; background: var(--ux-accent); }
+.ux-5a-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.ux-5a-card { display: flex; flex-direction: column; gap: 10px; padding: 16px; background: var(--ux-surface); border: 1px solid var(--ux-line); border-radius: 18px; }
+.ux-mobile-unit-options .ux-5a-model-title { display: flex; justify-content: space-between; gap: 12px; text-align: left; min-height: 44px; }
+.ux-mobile-unit-options .ux-5a-model-title strong { font-size: 16px; }
+.ux-5a-choice { min-height: 52px; display: flex; align-items: center; gap: 12px; text-align: left; border-top: 1px solid var(--ux-line) !important; padding: 10px 0; width: 100%; }
+.ux-5a-choice > span { flex: 1; }
+.ux-5a-choice strong { font-size: 14px; }
+.ux-5a-choice > svg { color: var(--ux-accent); flex-shrink: 0; }
+.ux-5a-count { display: flex; align-items: center; gap: 4px; padding: 4px; width: max-content; border: 1px solid var(--ux-line); border-radius: 99px; background: var(--ux-surface-2); }
+.ux-5a-count strong { display: flex; align-items: center; justify-content: center; gap: 2px; min-width: 34px; }
+.ux-5a-count button { display: grid; place-items: center; height: 36px; width: 36px; border-radius: 50%; background: var(--ux-surface-3); }
+.ux-mobile-unit-options .ux-5a-invalid { display: flex; align-items: center; gap: 4px; color: var(--ux-err); }
+.ux-mobile-unit-options .ux-5a-switch { border-radius: 99px; padding: 3px; width: 48px; height: 28px; background: var(--ux-surface-3); }
+.ux-mobile-unit-options .ux-5a-switch span { display: block; height: 22px; width: 22px; background: var(--ux-ink); border-radius: 50%; }
+.ux-mobile-unit-options .ux-5a-switch.on { background: var(--ux-accent); }
+.ux-mobile-unit-options .ux-5a-switch.on span { transform: translateX(20px); background: var(--ux-accent-ink); }
+.ux-5a-link { display: flex; align-items: center; gap: 6px; min-height: 44px; font-size: 13px; }
+.ux-5a-notice { display: flex; align-items: flex-start; gap: 10px; padding: 14px; border: 1px solid var(--ux-line); border-radius: 14px; background: var(--ux-surface-2); }
+.ux-5a-notice svg { color: var(--ux-err); flex-shrink: 0; }
+.ux-5a-notice button { min-height: 44px; color: var(--ux-accent); }
+.ux-5a-skeleton { height: 54px; background: var(--ux-surface-2); border-radius: 12px; }
+.ux-mobile-unit-options > * { flex-shrink: 0; }

@@ -1,3 +1,4 @@
+import { MobileUnitOptions } from "../concepts/ux/MobileUnitOptions";
 import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BarChart3, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, CircleDot, Cog, Coins, Command, Copy, Database, Dice5, Download, Ellipsis, FileInput, Gamepad2, GripVertical, Hammer, Heart, ImagePlus, Languages, Layers, LibraryBig, Maximize2, MessageCircle, Minus, Moon, MoveRight, Palette, PanelsTopLeft, Pencil, Plus, RotateCcw, Rows3, Scale, Search, Smartphone, Sparkles, Split, Trash2, Upload, UserRound, Wand2, X } from "lucide-react";
 import { createContext, useContext } from "react";
 import { PhoneStatusBar } from "../components/DeviceFrame";
@@ -266,6 +267,9 @@ function WorkbenchElements({
         {selectedUnit.note ? <p className="ux-config-note">{selectedUnit.note}</p> : null}
       </ElementSection>
 
+      <ElementSection title="Unit Options · Mobile 5A">
+        <div className="ux-elements-stack"><MobileUnitOptions compact /><MobileUnitOptions state="loading" compact /><MobileUnitOptions state="error" compact /><MobileUnitOptions state="gone" compact /></div>
+      </ElementSection>
       <OptionsSection selectedUnit={selectedUnit} onToggleOption={onToggleOption} />
 
       <LoadoutEditorElement unit={profileUnit} />
