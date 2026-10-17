@@ -495,7 +495,7 @@ export function UpdatesNotice({ count = 2 }: { count?: number }) {
   );
 }
 
-type SourcesPreview = "installed" | "updates" | "selecting" | "updating" | "failed" | "interrupted" | "empty";
+type SourcesPreview = "installed" | "updates" | "selecting" | "updating" | "failed" | "interrupted" | "update-interrupted" | "empty";
 
 export function SourcesManageScreen({ props }: { props: ConceptProps }) {
   const [preview, setPreview] = useState<SourcesPreview>("updates");
@@ -511,7 +511,7 @@ export function SourcesManageScreen({ props }: { props: ConceptProps }) {
     <>
       <SourceScreenHeader props={props} title={selecting ? `${selected.length} selected` : "Sources"} subtitle={selecting ? "Choose sources to update" : "Installed game data"} right={selecting ? <button type="button" className="ux-job-hide" onClick={() => setPreview("updates")}>Cancel</button> : undefined} />
       <div className="ux-wb-home-body ux-sources-body ux-src-body">
-        <PreviewState value={preview} options={[["installed", "Installed"], ["updates", "Updates"], ["selecting", "Selecting"], ["updating", "Updating"], ["failed", "Install failed"], ["interrupted", "Install interrupted"], ["empty", "Empty"]]} onChange={setPreview} />
+        <PreviewState value={preview} options={[["installed", "Installed"], ["updates", "Updates"], ["selecting", "Selecting"], ["updating", "Updating"], ["failed", "Install failed"], ["interrupted", "Install interrupted"], ["update-interrupted", "Update interrupted"], ["empty", "Empty"]]} onChange={setPreview} />
         {!selecting ? (
           <button type="button" className="ux-add-source-primary" onClick={() => props.onNavigate("add-source")}>
             <Plus size={18} /><span><strong>Add game data</strong><small>Collections, a repository link, or GitHub search</small></span><ChevronRight size={17} />
@@ -539,6 +539,13 @@ export function SourcesManageScreen({ props }: { props: ConceptProps }) {
                 <TriangleAlert size={18} />
                 <span><strong>Example System Five · Install interrupted</strong><small>The install of Example System Five was interrupted. 3 of 9 factions were installed.</small></span>
                 <div className="ux-src-inline-actions"><button type="button" className="ux-job-link">Dismiss</button><button type="button" className="ux-job-btn primary">Install the rest</button></div>
+              </div>
+            ) : null}
+            {preview === "update-interrupted" ? (
+              <div className="ux-job-notice warning ux-src-failed">
+                <TriangleAlert size={18} />
+                <span><strong>Example System Five · Update interrupted</strong><small>The update of Example System Five was interrupted. The previous version stays in use.</small></span>
+                <div className="ux-src-inline-actions"><button type="button" className="ux-job-link">Dismiss</button><button type="button" className="ux-job-btn primary">Try again</button></div>
               </div>
             ) : null}
             <div className="ux-source-list ux-managed-source-list ux-src-list">
