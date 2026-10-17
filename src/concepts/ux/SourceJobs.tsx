@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { Archive, ArrowLeft, Bell, Check, ChevronDown, ChevronRight, Circle, CircleArrowUp, CircleCheck, Clock, Copy, Database, Download, Ellipsis, FileInput, FileText, FolderGit2, Globe, Hand, History, Info, Library, ListChecks, LoaderCircle, Lock, Minus, OctagonAlert, Plus, Search, Share2, Star, TriangleAlert, Upload, Wifi, X } from "lucide-react";
+import { Archive, ArrowLeft, Bell, Check, ChevronDown, ChevronRight, Circle, CircleArrowUp, CircleCheck, Clock, Copy, Database, Download, Ellipsis, FileInput, FileText, FolderGit2, Globe, Hand, History, Info, Library, ListChecks, LoaderCircle, Lock, Minus, OctagonAlert, Plus, Search, Star, Trash2, TriangleAlert, Upload, Wifi, X } from "lucide-react";
 import type { ConceptProps } from "../shared";
 import { Chip } from "./uxShared";
 
@@ -593,30 +593,58 @@ export function LastUpdateCard({ onReport, checked = true }: { onReport?: () => 
   );
 }
 
-/** Source detail → Versions (Keep previous versions on, DEC-024). */
-export function SourceVersions({ older = false }: { older?: boolean }) {
-  const versions = [
-    { commit: "a1b2c3d", date: "2026-10-12", size: "41 MB" },
-    { commit: "1a2b3c4", date: "2026-09-30", size: "39 MB" },
-    { commit: "5e6f7a8", date: "2026-09-02", size: "38 MB" },
-  ];
-  const inUse = older ? "1a2b3c4" : "a1b2c3d";
+type ExampleVersion = { commit: string; date: string; size: string };
+
+/** The versions of the example source; `isoDate` shows commit dates relative to today (2026-10-17). */
+const VERSION_NEWEST: ExampleVersion = { commit: "a1b2c3d", date: "5 days ago", size: "41 MB" };
+const VERSION_PREVIOUS: ExampleVersion = { commit: "1a2b3c4", date: "17 days ago", size: "39 MB" };
+const VERSION_OLDEST: ExampleVersion = { commit: "5e6f7a8", date: "Sep 2, 2026", size: "38 MB" };
+
+/**
+ * Source detail → Versions, shown while kept versions exist (Keep previous versions on, DEC-024; built in battle-augur plan 2G part 2):
+ * the version in use first ("· In use"), then each kept version, newest first, with its line and Switch to this version / Delete.
+ */
+export function SourceVersions({ older = false, onDelete }: { older?: boolean; onDelete?: () => void }) {
+  const inUse = older ? VERSION_PREVIOUS : VERSION_NEWEST;
+  const kept = older ? [VERSION_NEWEST, VERSION_OLDEST] : [VERSION_PREVIOUS, VERSION_OLDEST];
   return (
     <>
       <div className="ux-result-label">Versions</div>
       <div className="ux-src-group">
-        {versions.map((v) => (
-          <div key={v.commit} className="ux-src-kv ux-src-version">
-            <span><strong>Version {v.commit}{v.commit === "a1b2c3d" ? " · newest" : ""}</strong><small>{v.date} · {v.size}</small></span>
-            {v.commit === inUse ? <Chip tone="valid"><CircleCheck size={10} /> In use</Chip> : (
-              <span className="ux-src-version-actions"><button type="button" className="ux-job-link">Delete</button><button type="button" className="ux-src-action">Switch to this version</button></span>
-            )}
+        <div className="ux-src-kv ux-src-version in-use"><span><CircleCheck size={17} />Version {inUse.commit} · {inUse.date} · In use</span></div>
+        {kept.map((v) => (
+          <div key={v.commit} className="ux-src-kv ux-src-version kept">
+            <strong>Version {v.commit} · {v.date} · {v.size}</strong>
+            <span className="ux-src-version-actions">
+              <button type="button" className="ux-job-btn sm"><History size={14} />Switch to this version</button>
+              <button type="button" className="ux-job-btn sm destructive-outline" onClick={onDelete}><Trash2 size={14} />Delete</button>
+            </span>
           </div>
         ))}
       </div>
-      <small className="ux-src-footer">Keeping 2 previous versions (Settings → Game data) · 77 MB</small>
     </>
   );
+}
+
+/** Top of the source detail when the version in use is older than a kept one: one row that switches to the newest kept version. */
+export function OlderVersionRow({ commit = VERSION_NEWEST.commit }: { commit?: string }) {
+  return (
+    <button type="button" className="ux-src-card ux-src-older" aria-label={`Using an older version. Switch to ${commit}`}>
+      <header><History size={18} /><span><strong>Using an older version · Switch to {commit}</strong></span><ChevronRight size={16} /></header>
+    </button>
+  );
+}
+
+/** The native confirmation before deleting a kept version: the space it frees, and that it cannot be undone. */
+export function DeleteVersionAlert({ inline = false, version = VERSION_PREVIOUS }: { inline?: boolean; version?: ExampleVersion }) {
+  const alert = (
+    <div className="ux-native-alert" role="alertdialog" aria-label={`Delete version ${version.commit}?`}>
+      <strong>Delete version {version.commit}?</strong>
+      <small>Frees {version.size}. This cannot be undone.</small>
+      <div><button type="button">Cancel</button><button type="button" className="destructive">Delete</button></div>
+    </div>
+  );
+  return inline ? alert : <div className="ux-job-scrim ux-alert-scrim">{alert}</div>;
 }
 
 /** The native confirmation before Remove: rosters stay, read-only (DEC-024). */
@@ -631,7 +659,7 @@ export function RemoveSourceAlert({ inline = false }: { inline?: boolean }) {
   return inline ? alert : <div className="ux-job-scrim ux-alert-scrim">{alert}</div>;
 }
 
-type DetailPreview = "update" | "current" | "updating" | "updated" | "not-checked" | "failed" | "versions" | "older" | "remove";
+type DetailPreview = "update" | "current" | "updating" | "updated" | "not-checked" | "failed" | "versions" | "older" | "switched" | "delete-version" | "remove";
 
 function DetailRow({ label, value, action }: { label: string; value: string; action?: string }) {
   return <div className="ux-src-kv"><span>{label}</span><b>{value}</b>{action ? <button type="button" className="ux-job-link">{action}</button> : null}</div>;
@@ -639,13 +667,16 @@ function DetailRow({ label, value, action }: { label: string; value: string; act
 
 export function SourceDetailScreen({ props }: { props: ConceptProps }) {
   const [preview, setPreview] = useState<DetailPreview>("update");
+  // Switching back to 1a2b3c4 makes the source use an older version than a kept one.
+  const older = preview === "older" || preview === "switched";
+  const newest = preview === "updated" || preview === "not-checked" || preview === "versions" || preview === "delete-version";
   return (
     <>
       <SourceScreenHeader props={props} title={EXAMPLE_SYSTEM.name} subtitle={EXAMPLE_SYSTEM.repo} />
       <div className="ux-wb-home-body ux-sources-body ux-src-body">
-        <PreviewState value={preview} options={[["update", "Update available"], ["current", "Up to date"], ["updating", "Updating"], ["updated", "Updated"], ["not-checked", "Rosters not checked"], ["failed", "Update failed"], ["versions", "Versions"], ["older", "Older version"], ["remove", "Remove"]]} onChange={setPreview} />
+        <PreviewState value={preview} options={[["update", "Update available"], ["current", "Up to date"], ["updating", "Updating"], ["updated", "Updated"], ["not-checked", "Rosters not checked"], ["failed", "Update failed"], ["versions", "Versions"], ["older", "Older version"], ["switched", "Switched"], ["delete-version", "Delete version"], ["remove", "Remove"]]} onChange={setPreview} />
         {preview === "update" ? <SourceUpdateCard /> : null}
-        {preview === "older" ? <div className="ux-job-notice info"><History size={18} /><span><strong>Using an older version</strong><small>Version 1a2b3c4 from 2026-09-30. Its rosters use it too.</small></span><button type="button" className="ux-job-btn">Switch to a1b2c3d</button></div> : null}
+        {older ? <OlderVersionRow /> : null}
         {preview === "not-checked" ? <LastUpdateCard checked={false} /> : null}
         {preview === "current" ? <div className="ux-job-notice ok"><CircleCheck size={18} /><span><strong>Up to date · checked 5 min ago</strong></span></div> : null}
         {preview === "updating" ? (
@@ -660,19 +691,21 @@ export function SourceDetailScreen({ props }: { props: ConceptProps }) {
         ) : null}
         <div className="ux-src-group">
           <DetailRow label="Repository" value={EXAMPLE_SYSTEM.repo} />
-          <DetailRow label="Version" value={preview === "updated" || preview === "not-checked" || preview === "versions" ? "a1b2c3d" : "1a2b3c4"} />
-          <DetailRow label="Changed upstream" value="2026-09-30" />
+          <DetailRow label="Version" value={newest ? VERSION_NEWEST.commit : VERSION_PREVIOUS.commit} />
+          <DetailRow label="Changed upstream" value={newest ? VERSION_NEWEST.date : VERSION_PREVIOUS.date} />
           <DetailRow label="Installed" value="12 days ago" />
           <DetailRow label="Last checked" value={preview === "failed" ? "1 h ago" : "5 min ago"} action="Check now" />
-          <DetailRow label="Size on this phone" value="41 MB" />
+          <DetailRow label="Size on this phone" value={older ? VERSION_PREVIOUS.size : VERSION_NEWEST.size} />
         </div>
-        {preview === "versions" || preview === "older" ? <SourceVersions older={preview === "older"} /> : null}
+        {preview === "versions" || preview === "delete-version" || older ? <SourceVersions older={older} onDelete={() => setPreview("delete-version")} /> : null}
         <div className="ux-result-label">Installed factions</div>
         <div className="ux-src-group">{EXAMPLE_FACTIONS.slice(0, 4).map((f) => <DetailRow key={f} label={f} value="r14" />)}<DetailRow label="…and 19 more" value="" /></div>
         <button type="button" className="ux-job-btn destructive block ux-src-remove" disabled={preview === "updating"}>Remove this data</button>
         {preview === "updating" ? <small className="ux-src-footer">This data is being updated. Try again when it finishes.</small> : null}
       </div>
       {preview === "remove" ? <RemoveSourceAlert /> : null}
+      {preview === "delete-version" ? <DeleteVersionAlert /> : null}
+      {preview === "switched" ? <div className="ux-job-float"><JobToast tone="neutral" message={`Switched to version ${VERSION_PREVIOUS.commit}`} /></div> : null}
     </>
   );
 }
@@ -897,13 +930,25 @@ export function WifiOnlySetting({ on, onToggle }: { on: boolean; onToggle?: () =
   );
 }
 
-export function KeepVersionsSetting({ value = "Off", size = "0 MB" }: { value?: string; size?: string }) {
+const KEEP_OPTIONS = ["Off", "1", "2", "3"] as const;
+export type KeepVersionsValue = (typeof KEEP_OPTIONS)[number];
+
+/**
+ * Settings → Game data → Keep previous versions (built in battle-augur plan 2G part 2): a padded block like Theme, with the size of
+ * the kept versions (the sum of the kept stores) and a segmented control Off / 1 / 2 / 3 per source.
+ */
+export function KeepVersionsSetting({ value = "Off", size = "0 B" }: { value?: KeepVersionsValue; size?: string }) {
+  const [current, setCurrent] = useState<KeepVersionsValue>(value);
   return (
-    <button type="button" className="ux-setting-row ux-setting-value">
-      <span className="ux-setting-icon"><History size={17} /></span>
-      <span className="ux-setting-text"><strong>Keep previous versions</strong><small>Keep older versions of each source so you can switch back. Uses about {size} now.</small></span>
-      <span className="ux-setting-current">{value}<ChevronRight size={14} /></span>
-    </button>
+    <div className="ux-setting-block">
+      <div className="ux-setting-block-head"><History size={18} /><strong role="heading" aria-level={3}>Keep previous versions</strong></div>
+      <small>Keep older versions of each source so you can switch back. Uses about {size} now.</small>
+      <div className="ux-segmented" role="radiogroup" aria-label="Keep previous versions">
+        {KEEP_OPTIONS.map((option) => (
+          <button key={option} type="button" role="radio" aria-checked={current === option} className={current === option ? "on" : ""} onClick={() => setCurrent(option)}>{option}</button>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -922,120 +967,194 @@ export function NotificationsSetting({ on = false }: { on?: boolean }) {
 
 export type ReadOnlyKind = "source" | "faction" | "changed";
 
+/** The roster's data tag (Lists rows and the chip row under the roster's navigation bar): words and an icon, not only colour. */
 export function RosterDataTag({ kind }: { kind: ReadOnlyKind }) {
   if (kind === "changed") return <Chip tone="cool"><CircleArrowUp size={10} /> Changed by update</Chip>;
   return <Chip tone="neutral"><Archive size={10} /> {kind === "source" ? "Source removed" : "Faction removed"}</Chip>;
 }
 
+/**
+ * The chip row under the navigation bar (built in battle-augur plan 2G part 1): the Read only chip and the data tag in one wrapping
+ * row (either may be absent). The navigation bar keeps only the name; "read only" is in its screen reader label.
+ */
+export function ReadOnlyChips({ readOnly = true, kind }: { readOnly?: boolean; kind?: ReadOnlyKind }) {
+  if (!readOnly && kind === undefined) return null;
+  return (
+    <div className="ux-ro-chips">
+      {readOnly ? <Chip tone="neutral"><Lock size={10} /> Read only</Chip> : null}
+      {kind ? <RosterDataTag kind={kind} /> : null}
+    </div>
+  );
+}
+
+const KEPT_COMMIT = "1a2b3c4";
+
 const READ_ONLY_COPY: Record<ReadOnlyKind, { title: string; body: string }> = {
   source: { title: "Read only · the data for this roster was removed", body: `${EXAMPLE_SYSTEM.name} is no longer on this phone. The roster is kept as it was last saved.` },
-  faction: { title: "Read only · Salt Kings is no longer in the data", body: "The update to version a1b2c3d removed this faction." },
-  changed: { title: "The data for this roster changed in an update", body: "Version 1a2b3c4 → a1b2c3d · 4 changes. Read only until you choose." },
+  faction: { title: "Read only · Salt Kings is no longer in the data", body: "The update to version a1b2c3d removed this faction. The roster is kept as it was last saved." },
+  changed: { title: "The data for this roster changed in an update", body: `Version ${KEPT_COMMIT} → a1b2c3d · 3 changes. Read only until you choose.` },
 };
 
-/** The banner under the roster header while a roster is read-only. */
-export function ReadOnlyBanner({ kind, expanded = false, onExport }: { kind: ReadOnlyKind; expanded?: boolean; onExport?: () => void }) {
+/** "Changed by update": the check's lines at summary level (entries no longer in the data, totals before → after, new errors). */
+const CHANGE_LINES = ["Removed: Lantern Bearers", "pts: 1,985 → 1,895", "1 new error"];
+
+/**
+ * The banner under the chip row while a roster is read-only (built in battle-augur plan 2G parts 1–2): icon, reason, the choices
+ * (primary first). "Open with version {commit}" goes last when a kept version holds the roster's data (`kept`).
+ */
+export function ReadOnlyBanner({ kind, expanded = false, kept = true, onExport, onOpenWithVersion }: { kind: ReadOnlyKind; expanded?: boolean; kept?: boolean; onExport?: () => void; onOpenWithVersion?: () => void }) {
   const [open, setOpen] = useState(expanded);
   const copy = READ_ONLY_COPY[kind];
+  const openWithVersion = kind !== "source" && kept ? <button type="button" className="ux-job-btn sm" onClick={onOpenWithVersion}><History size={14} />Open with version {KEPT_COMMIT}</button> : null;
   return (
     <section className={`ux-src-card ux-ro-banner ${kind}`} role="status">
       <header>{kind === "changed" ? <CircleArrowUp size={18} /> : <Lock size={18} />}<span><strong>{copy.title}</strong><small>{copy.body}</small></span></header>
       {kind === "changed" ? (
         <>
-          <button type="button" className="ux-job-link" aria-expanded={open} onClick={() => setOpen((v) => !v)}>{open ? "Hide changes" : "Show changes (4)"}<ChevronDown size={13} /></button>
-          {open ? (
-            <ul className="ux-src-changes">
-              <li><b>Removed</b>Lantern Bearers (no longer in the data)</li>
-              <li><b>Cost</b>Shield Wardens: 120 → 135</li>
-              <li><b>Renamed</b>Scout Riders → Outriders</li>
-              <li><b>Errors</b>1 new error</li>
-            </ul>
-          ) : null}
+          <button type="button" className="ux-job-link ux-ro-show" aria-expanded={open} onClick={() => setOpen((v) => !v)}>{open ? "Hide changes" : `Show changes (${CHANGE_LINES.length})`}{open ? <ChevronDown size={13} /> : <ChevronRight size={13} />}</button>
+          {open ? <ul className="ux-ro-change-lines">{CHANGE_LINES.map((line) => <li key={line}>{line}</li>)}</ul> : null}
         </>
       ) : null}
       <div className="ux-ro-actions">
-        {kind === "changed" ? <button type="button" className="ux-job-btn primary"><FileText size={15} />Edit with the new data</button> : <button type="button" className="ux-job-btn primary" onClick={onExport}><Upload size={15} />Export</button>}
-        {kind === "changed" ? <button type="button" className="ux-job-btn" onClick={onExport}><Upload size={15} />Export as it was</button> : null}
-        {kind === "source" ? <button type="button" className="ux-job-btn"><Download size={15} />Add the data again</button> : <button type="button" className="ux-job-btn"><History size={15} />Open with version 1a2b3c4</button>}
+        {kind === "changed" ? (
+          <>
+            <button type="button" className="ux-job-btn sm primary"><FileText size={14} />Edit with the new data</button>
+            <button type="button" className="ux-job-btn sm" onClick={onExport}><Upload size={14} />Export as it was</button>
+            {openWithVersion}
+          </>
+        ) : (
+          <>
+            <button type="button" className="ux-job-btn sm primary" onClick={onExport}><Upload size={14} />Export</button>
+            {kind === "source" ? <button type="button" className="ux-job-btn sm"><Download size={14} />Add the data again</button> : openWithVersion}
+          </>
+        )}
       </div>
     </section>
   );
 }
 
-type OutlineUnit = { name: string; count: number; options: string; cost?: string; change?: string; removed?: boolean };
-
-const OUTLINE: Record<ReadOnlyKind, { force: string; units: OutlineUnit[] }[]> = {
-  source: [
-    { force: "Glass Legion · Vanguard", units: [{ name: "Shield Wardens", count: 2, options: "Banner, Long spears", cost: "240" }, { name: "Scout Riders", count: 1, options: "Lances", cost: "65" }, { name: "Lantern Bearers", count: 3, options: "", cost: "90" }] },
-    { force: "Glass Legion · Reserve", units: [{ name: "Iron Sentinels", count: 1, options: "Heavy shields", cost: "210" }] },
-  ],
-  faction: [
-    { force: "Salt Kings · Harbour host", units: [{ name: "Tide Callers", count: 2, options: "Nets" }, { name: "Brine Guard", count: 5, options: "Hooks, Standard" }, { name: "Reef Stalker", count: 1, options: "" }] },
-  ],
-  changed: [
-    { force: "Glass Legion · Vanguard", units: [{ name: "Shield Wardens", count: 2, options: "Banner, Long spears", cost: "270", change: "Cost 120 → 135" }, { name: "Outriders", count: 1, options: "Lances", cost: "65", change: "Renamed" }, { name: "Lantern Bearers", count: 3, options: "", removed: true }] },
-    { force: "Glass Legion · Reserve", units: [{ name: "Iron Sentinels", count: 1, options: "Heavy shields", cost: "210" }] },
-  ],
-};
-
-/** The read-only outline: forces and units from the roster document (names, counts), costs only from the data or a saved snapshot. */
-export function ReadOnlyOutline({ kind }: { kind: ReadOnlyKind }) {
+/** Over a roster opened editable on a kept version (plan 2G part 2): no banner, this notice with the way back. */
+export function OpenedWithVersionNotice({ onUseNewest }: { onUseNewest?: () => void }) {
   return (
-    <>
-      {OUTLINE[kind].map((force) => (
-        <div key={force.force} className="ux-ro-force">
-          <div className="ux-result-label">{force.force}</div>
-          <div className="ux-src-group">
-            {force.units.map((unit) => (
-              <div key={unit.name} className={`ux-src-kv ux-ro-unit ${unit.removed ? "removed" : ""}`}>
-                <span>
-                  <strong>{unit.count > 1 ? `${unit.count}× ` : ""}{unit.name}</strong>
-                  {unit.options ? <small>{unit.options}</small> : null}
-                  {unit.change ? <Chip tone="cool">{unit.change}</Chip> : null}
-                  {unit.removed ? <Chip tone="warning"><TriangleAlert size={10} /> Not in the data</Chip> : null}
-                </span>
-                <b>{unit.removed ? "" : unit.cost ?? "—"}</b>
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
-    </>
+    <div className="ux-job-notice info ux-ro-opened"><History size={18} /><span><strong>Opened with version {KEPT_COMMIT}</strong></span><button type="button" className="ux-job-btn sm" onClick={onUseNewest}>Use the newest data</button></div>
   );
 }
 
-/** The export sheet of a read-only roster: the Battle Augur file always; text and New Recruit JSON from the saved snapshot. */
+type StoredRow =
+  | { kind: "force"; title: string; subtitle?: string }
+  | { kind: "selection"; title: string; count?: number; detail?: string; cost?: string };
+
+/** Stored rosters are shown from the roster document and its saved snapshot: catalogue as the force title, units with ×count, options, saved cost. */
+const STORED: Record<"source" | "faction", StoredRow[]> = {
+  source: [
+    { kind: "force", title: "Glass Legion", subtitle: "Vanguard" },
+    { kind: "selection", title: "Shield Wardens", count: 2, detail: "Banner, Long spears", cost: "240 pts" },
+    { kind: "selection", title: "Scout Riders", detail: "Lances", cost: "65 pts" },
+    { kind: "selection", title: "Lantern Bearers", count: 3, cost: "90 pts" },
+    { kind: "force", title: "Glass Legion", subtitle: "Reserve" },
+    { kind: "selection", title: "Iron Sentinels", detail: "Heavy shields", cost: "210 pts" },
+  ],
+  faction: [
+    { kind: "force", title: "Salt Kings", subtitle: "Harbour host" },
+    { kind: "selection", title: "Tide Callers", count: 2, detail: "Nets" },
+    { kind: "selection", title: "Brine Guard", count: 5, detail: "Hooks, Standard" },
+    { kind: "selection", title: "Reef Stalker" },
+  ],
+};
+
+/** The stored outline (no engine, no session): force rows with an accent edge, selection rows with their saved costs when the snapshot has them. */
+export function StoredOutline({ kind }: { kind: "source" | "faction" }) {
+  return (
+    <div className="ux-ro-outline">
+      {STORED[kind].map((row, index) => row.kind === "force" ? (
+        <div key={index} className="ux-ro-force-row"><strong>{row.title}</strong>{row.subtitle ? <small>{row.subtitle}</small> : null}</div>
+      ) : (
+        <div key={index} className="ux-ro-selection">
+          <span><strong>{row.title}{row.count ? <small> ×{row.count}</small> : null}</strong>{row.detail ? <small>{row.detail}</small> : null}</span>
+          {row.cost ? <b>{row.cost}</b> : null}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** The saved totals and checks above a stored outline ("as last saved", a relative date). */
+export function StoredTotals({ kind }: { kind: "source" | "faction" }) {
+  return (
+    <div className="ux-src-group">
+      <div className="ux-src-kv"><span>Total · as last saved {kind === "source" ? "yesterday" : "3 days ago"}</span><b className="ux-ro-total">{kind === "source" ? "1,985 / 2,000 pts" : "1,480 / 1,500 pts"}</b></div>
+      <div className="ux-src-kv"><span>Checks · as last saved</span><b>No errors</b></div>
+    </div>
+  );
+}
+
+/** A roster on the new data, read-only (Changed by update), or opened editable on a kept version: the live editor header and rows. */
+function LiveEditorHeader({ readOnly, kind }: { readOnly: boolean; kind: ReadOnlyKind }) {
+  const kept = !readOnly;
+  return (
+    <div className="ux-ro-live-head">
+      <div className="ux-ro-meter" role="progressbar" aria-label="Budget" aria-valuemin={0} aria-valuemax={2000} aria-valuenow={kept ? 1985 : 1895}><span style={{ width: `${((kept ? 1985 : 1895) / 2000) * 100}%` }} /></div>
+      <div className="ux-ro-budget"><strong>{kept ? "1,985" : "1,895"}<small> / 2,000 pts</small></strong><em>{kept ? "15 open" : "105 open"}</em></div>
+      <div className={`ux-ro-status ${kept ? "ok" : "err"}`}>{kept ? <CircleCheck size={13} /> : <OctagonAlert size={13} />}{kept ? "No problems" : "1 error"}</div>
+      <ReadOnlyChips readOnly={readOnly} kind={kind} />
+    </div>
+  );
+}
+
+function LiveEditorRows({ editable }: { editable: boolean }) {
+  const units = editable
+    ? [{ name: "Shield Wardens", count: 2, cost: "240" }, { name: "Scout Riders", cost: "65" }, { name: "Lantern Bearers", count: 3, cost: "90" }]
+    : [{ name: "Shield Wardens", count: 2, cost: "240" }, { name: "Scout Riders", cost: "65" }, { name: "Lantern Bearers", count: 3, error: true }];
+  return (
+    <div className="ux-ro-outline">
+      <div className="ux-ro-force-row live"><span><strong>Glass Legion</strong><small>Vanguard</small></span><b>{editable ? "395" : "305"}</b></div>
+      {units.map((unit) => (
+        <div key={unit.name} className={`ux-ro-selection live ${"error" in unit ? "error" : ""}`}>
+          <span><strong>{unit.name}{unit.count ? <small> ×{unit.count}</small> : null}</strong></span>
+          {"error" in unit ? <OctagonAlert size={15} aria-label="Error" /> : <b>{unit.cost}</b>}
+        </div>
+      ))}
+      {editable ? <button type="button" className="ux-job-link ux-ro-add"><Plus size={13} />Add unit</button> : null}
+      <div className="ux-ro-force-row live"><span><strong>Glass Legion</strong><small>Reserve</small></span><b>210</b></div>
+      <div className="ux-ro-selection live"><span><strong>Iron Sentinels</strong></span><b>210</b></div>
+    </div>
+  );
+}
+
+/** The export sheet of a stored roster (built in battle-augur plan 2G part 1): the Battle Augur file always; text and New Recruit JSON from the saved snapshot. */
 export function ReadOnlyExportSheet({ snapshot = true, inline = false }: { snapshot?: boolean; inline?: boolean }) {
   const formats = [
     { id: "file", title: "Battle Augur roster file", body: "The roster as stored. It opens fully once the data is back.", ok: true },
-    { id: "text", title: "Text", body: snapshot ? "As last saved on 2026-10-10" : "Needs the game data", ok: snapshot },
-    { id: "json", title: "New Recruit JSON", body: snapshot ? "As last saved on 2026-10-10" : "Needs the game data", ok: snapshot },
+    { id: "text", title: "Text", body: snapshot ? "As last saved yesterday" : "Needs the game data", ok: snapshot },
+    { id: "json", title: "New Recruit JSON", body: snapshot ? "As last saved yesterday" : "Needs the game data", ok: snapshot },
   ];
+  const name = snapshot ? "Spring league list" : "Harbour raid";
   const sheet = (
-    <section className={`ux-job-sheet ${inline ? "inline" : ""}`} role="dialog" aria-label="Export">
+    <section className={`ux-job-sheet ${inline ? "inline" : ""}`} role="dialog" aria-label="Export roster">
       <span className="ux-sheet-grip" aria-hidden />
-      <header className="ux-job-head"><span><strong>Export</strong><small>Spring league list · read only</small></span><button type="button" className="ux-icon-btn" aria-label="Close"><X size={17} /></button></header>
-      <div className="ux-fp-list" role="radiogroup" aria-label="Format">
+      <header className="ux-job-head"><span><strong>Export roster</strong><small>{name} · read only</small></span><button type="button" className="ux-icon-btn" aria-label="Close"><X size={17} /></button></header>
+      <div className="ux-fp-list ux-ro-formats" role="radiogroup" aria-label="Format">
         {formats.map((f, index) => (
           <button key={f.id} type="button" role="radio" aria-checked={index === 0} disabled={!f.ok} className={`ux-fp-row ${index === 0 ? "selected" : ""} ${f.ok ? "" : "installed"}`}>
-            <span className="ux-src-check" aria-hidden>{index === 0 ? <Check size={14} /> : null}</span>
+            <span className={`ux-ro-radio ${index === 0 ? "on" : ""}`} aria-hidden>{index === 0 ? <CircleCheck size={20} /> : <Circle size={20} />}</span>
             <span><strong>{f.title}</strong><small>{f.body}</small></span>
           </button>
         ))}
       </div>
-      <footer className="ux-job-footer"><button type="button" className="ux-job-btn"><Copy size={15} />Copy</button><button type="button" className="ux-job-btn primary"><Share2 size={15} />Share</button></footer>
+      <pre className="ux-ro-preview">{`{\n  "format": "battle-augur-roster",\n  "name": "${name}",\n  "forces": [ … ]\n}\n\n… 2,140 more characters`}</pre>
+      <footer className="ux-job-footer"><button type="button" className="ux-job-btn"><Copy size={15} />Copy</button><button type="button" className="ux-job-btn primary"><Upload size={15} />Share</button></footer>
     </section>
   );
   return inline ? sheet : <div className="ux-job-scrim">{sheet}</div>;
 }
 
-/** Lists rows with data tags and the "Needs attention" filter. */
+/** Lists rows with data tags and the "Needs attention" filter: name, factions · system, the relative date, points and the tag. */
 export function TaggedRosterRows() {
-  const rows: Array<{ name: string; meta: string; kind?: ReadOnlyKind }> = [
-    { name: "Spring league list", meta: `Glass Legion · ${EXAMPLE_SYSTEM.name} · Opened yesterday`, kind: "changed" },
-    { name: "Harbour raid", meta: `Salt Kings · ${EXAMPLE_SYSTEM.name} · Changed 3 days ago`, kind: "faction" },
-    { name: "Old campaign", meta: "Iron Choir · Example System Six · Opened last month", kind: "source" },
-    { name: "Weekend practice", meta: `Northern Realms · ${EXAMPLE_SYSTEM.name} · Opened today` },
+  const rows: Array<{ name: string; faction: string; system: string; when: string; points?: string; kind?: ReadOnlyKind }> = [
+    { name: "Spring league list", faction: "Glass Legion", system: EXAMPLE_SYSTEM.name, when: "Opened yesterday", points: "1,895 / 2,000 pts", kind: "changed" },
+    { name: "Harbour raid", faction: "Salt Kings", system: EXAMPLE_SYSTEM.name, when: "Changed 3 days ago", points: "1,480 / 1,500 pts", kind: "faction" },
+    { name: "Old campaign", faction: "Iron Choir", system: "Example System Six", when: "Opened Sep 12, 2026", points: "980 / 1,000 pts", kind: "source" },
+    { name: "Weekend practice", faction: "Northern Realms", system: EXAMPLE_SYSTEM.name, when: "Opened today", points: "1,240 / 1,500 pts" },
   ];
   return (
     <>
@@ -1043,8 +1162,8 @@ export function TaggedRosterRows() {
       <div className="ux-source-list ux-managed-source-list ux-src-list">
         {rows.map((r) => (
           <article key={r.name} className="ux-source-row ux-src-row">
-            <span><strong>{r.name}</strong><small>{r.meta}</small></span>
-            {r.kind ? <RosterDataTag kind={r.kind} /> : <span />}
+            <span><strong>{r.name}</strong><small>{r.faction} · {r.system}</small><small>{r.when}</small></span>
+            <span className="ux-ro-list-trailing">{r.points ? <b>{r.points}</b> : null}{r.kind ? <RosterDataTag kind={r.kind} /> : null}</span>
           </article>
         ))}
       </div>
@@ -1052,25 +1171,26 @@ export function TaggedRosterRows() {
   );
 }
 
-type ReadOnlyPreview = ReadOnlyKind | "export" | "export-none";
+type ReadOnlyPreview = ReadOnlyKind | "kept" | "export" | "export-none";
 
 export function ReadOnlyRosterScreen({ props }: { props: ConceptProps }) {
   const [preview, setPreview] = useState<ReadOnlyPreview>("source");
-  const kind: ReadOnlyKind = preview === "export" ? "source" : preview === "export-none" ? "faction" : preview;
+  const kind: ReadOnlyKind = preview === "export" ? "source" : preview === "export-none" ? "faction" : preview === "kept" ? "changed" : preview;
+  const stored = kind === "source" || kind === "faction" ? kind : undefined;
+  const live = stored === undefined;
   const faction = kind === "faction" ? "Salt Kings" : "Glass Legion";
   const name = kind === "faction" ? "Harbour raid" : "Spring league list";
+  const openExport = () => setPreview(kind === "faction" ? "export-none" : "export");
   return (
     <>
-      <SourceScreenHeader props={props} title={name} subtitle={`${faction} · ${EXAMPLE_SYSTEM.name}`} right={<span className="ux-ro-head-actions">{kind === "changed" ? null : <Chip tone="neutral"><Lock size={10} /> Read only</Chip>}<button type="button" className="ux-icon-btn" aria-label="Export" onClick={() => setPreview(kind === "faction" ? "export-none" : "export")}><Upload size={17} /></button></span>} />
+      <SourceScreenHeader props={props} title={name} subtitle={`${faction} · ${EXAMPLE_SYSTEM.name}`} right={<span className="ux-ro-head-actions">{live ? <button type="button" className="ux-icon-btn" aria-label="Search roster"><Search size={17} /></button> : null}<button type="button" className="ux-icon-btn" aria-label="Export" onClick={openExport}><Upload size={17} /></button></span>} />
       <div className="ux-wb-home-body ux-sources-body ux-src-body">
-        <PreviewState value={preview} options={[["source", "Source removed"], ["faction", "Faction removed"], ["changed", "Changed by update"], ["export", "Export (snapshot)"], ["export-none", "Export (no snapshot)"]]} onChange={setPreview} />
-        <ReadOnlyBanner key={kind} kind={kind} onExport={() => setPreview(kind === "faction" ? "export-none" : "export")} />
-        <div className="ux-src-group">
-          {kind === "changed" ? <DetailRow label="Total" value="1,935 / 2,000 pts" /> : <DetailRow label="Total · as last saved 2026-10-10" value={kind === "faction" ? "1,480 / 1,500 pts" : "1,985 / 2,000 pts"} />}
-          <DetailRow label={kind === "changed" ? "Checks" : "Checks · as last saved"} value={kind === "changed" ? "1 error" : "No errors"} />
-        </div>
-        <ReadOnlyOutline kind={kind} />
-        {kind === "changed" ? null : <small className="ux-src-footer">{kind === "source" ? "Costs as last saved. Profiles and rules need the game data." : "No saved costs for this roster. Profiles and rules need the game data."}</small>}
+        <PreviewState value={preview} options={[["source", "Source removed"], ["faction", "Faction removed"], ["changed", "Changed by update"], ["kept", "Opened with version"], ["export", "Export (snapshot)"], ["export-none", "Export (no snapshot)"]]} onChange={setPreview} />
+        {live ? <LiveEditorHeader readOnly={preview !== "kept"} kind={kind} /> : <ReadOnlyChips kind={kind} />}
+        {preview === "kept" ? <OpenedWithVersionNotice onUseNewest={() => setPreview("changed")} /> : <ReadOnlyBanner key={kind} kind={kind} onExport={openExport} onOpenWithVersion={() => setPreview("kept")} />}
+        {stored ? <StoredTotals kind={stored} /> : null}
+        {stored ? <StoredOutline kind={stored} /> : <LiveEditorRows editable={preview === "kept"} />}
+        {stored ? <small className="ux-src-footer">{stored === "source" ? "Costs as last saved. Profiles and rules need the game data." : "No saved costs for this roster. Profiles and rules need the game data."}</small> : null}
       </div>
       {preview === "export" || preview === "export-none" ? <ReadOnlyExportSheet snapshot={preview === "export"} /> : null}
     </>

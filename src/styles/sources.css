@@ -277,9 +277,65 @@
 .ux-ro-banner.changed { border-color: color-mix(in srgb, var(--ux-cool) 45%, var(--ux-line)); }
 .ux-ro-banner.changed > header > svg:first-child { color: var(--ux-cool); }
 .ux-ro-banner header small { line-height: 1.4; }
-.ux-ro-actions { display: grid; gap: 8px; }
-.ux-ro-force { display: grid; gap: 6px; }
-.ux-ro-unit > span { display: grid; gap: 3px; justify-items: start; min-width: 0; }
-.ux-ro-unit small { color: var(--ux-muted); font-size: 11.5px; }
-.ux-ro-unit.removed strong { color: var(--ux-muted); text-decoration: line-through; }
 .ux-os-stage.ux-os-inline { position: static; padding: 14px 12px; border-radius: var(--ux-r-lg); }
+
+/* ---- previous versions (battle-augur plan 2G part 2) ---- */
+.ux-src-version.in-use > span { display: inline-flex; align-items: center; gap: 10px; font-variant-numeric: tabular-nums; }
+.ux-src-version.in-use > span > svg { color: var(--ux-ok); flex: none; }
+.ux-src-version.kept { grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 14px; }
+.ux-src-version.kept strong { font-size: 13.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.ux-src-version.kept .ux-src-version-actions { flex-wrap: wrap; gap: 8px; }
+.ux-job-btn.sm { min-height: 34px; padding: 0 10px; border-radius: 10px; font-size: 12.5px; }
+.ux-job-btn.destructive-outline { border-color: color-mix(in srgb, var(--ux-err) 45%, var(--ux-line)); background: transparent; color: var(--ux-err); }
+.ux-src-older { cursor: pointer; }
+.ux-src-older > header { align-items: center; }
+.ux-src-older > header > svg:last-child { color: var(--ux-muted); }
+.ux-setting-block { display: grid; gap: 10px; padding: 14px; border: 1px solid var(--ux-line); border-radius: var(--ux-r-md); background: var(--ux-surface); }
+.ux-setting-block-head { display: flex; align-items: center; gap: 8px; }
+.ux-setting-block-head > svg { color: var(--ux-accent-2); }
+.ux-setting-block-head strong { font-size: 14.5px; }
+.ux-setting-block > small { color: var(--ux-muted); font-size: 12px; line-height: 1.35; }
+.ux-segmented { display: grid; grid-auto-columns: minmax(0, 1fr); grid-auto-flow: column; gap: 2px; padding: 2px; border-radius: 10px; background: var(--ux-surface-3); }
+.ux-segmented button { min-height: 32px; border: 0; border-radius: 8px; background: transparent; color: var(--ux-muted); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.ux-segmented button.on { background: var(--ux-surface); color: var(--ux-ink); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25); }
+
+/* ---- rosters without their data, as built (battle-augur plan 2G part 1) ---- */
+.ux-ro-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.ux-ro-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.ux-ro-show { min-height: 32px; font-size: 13px; }
+.ux-ro-change-lines { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; font-size: 12.5px; }
+.ux-ro-banner.changed { background: color-mix(in srgb, var(--ux-cool) 10%, var(--ux-surface)); }
+.ux-ro-opened { grid-template-columns: 20px minmax(0, 1fr) auto; align-items: center; }
+.ux-ro-total { color: var(--ux-ink) !important; font-weight: 750 !important; }
+.ux-ro-outline { display: grid; }
+.ux-ro-force-row { display: grid; gap: 2px; min-height: 52px; margin-top: 8px; padding: 8px; border-left: 3px solid var(--ux-accent); border-radius: 4px; background: var(--ux-surface-2); align-content: center; }
+.ux-ro-force-row strong { font-size: 15px; }
+.ux-ro-force-row small { color: var(--ux-muted); font-size: 11.5px; }
+.ux-ro-force-row.live { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+.ux-ro-force-row.live > span { display: grid; gap: 2px; }
+.ux-ro-force-row.live b { color: var(--ux-accent-2); font-variant-numeric: tabular-nums; }
+.ux-ro-selection { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; min-height: 44px; padding: 8px 12px; border-bottom: 1px solid var(--ux-line); }
+.ux-ro-selection > span { display: grid; gap: 2px; min-width: 0; }
+.ux-ro-selection strong { font-size: 13.5px; font-weight: 600; }
+.ux-ro-selection strong small, .ux-ro-selection > span > small { color: var(--ux-muted); font-size: 11.5px; font-weight: 500; }
+.ux-ro-selection b { color: var(--ux-muted); font-size: 12.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.ux-ro-selection.live { border-left: 3px solid var(--ux-ok); border-bottom: 0; margin-top: 4px; border-radius: 4px; background: var(--ux-surface); }
+.ux-ro-selection.live.error { border-left-color: var(--ux-err); }
+.ux-ro-selection.live.error > svg { color: var(--ux-err); }
+.ux-ro-add { margin: 6px 0 2px 12px; font-size: 12.5px; }
+.ux-ro-live-head { display: grid; gap: 6px; }
+.ux-ro-meter { height: 4px; border-radius: 999px; background: var(--ux-line); overflow: hidden; }
+.ux-ro-meter > span { display: block; height: 4px; background: var(--ux-accent); }
+.ux-ro-budget { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.ux-ro-budget strong { font-size: 22px; font-variant-numeric: tabular-nums; }
+.ux-ro-budget strong small { color: var(--ux-muted); font-size: 13px; font-weight: 600; }
+.ux-ro-budget em { color: var(--ux-muted); font-size: 12px; font-style: normal; font-variant-numeric: tabular-nums; }
+.ux-ro-status { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; }
+.ux-ro-status.ok { color: var(--ux-ok); }
+.ux-ro-status.err { color: var(--ux-err); }
+.ux-ro-formats .ux-fp-row { grid-template-columns: 24px minmax(0, 1fr); min-height: 56px; }
+.ux-ro-radio { display: grid; place-items: center; color: var(--ux-muted); }
+.ux-ro-radio.on { color: var(--ux-accent-2); }
+.ux-ro-preview { max-height: 140px; margin: 0; padding: 12px; overflow: auto; border: 1px solid var(--ux-line); border-radius: var(--ux-r-md); background: var(--ux-surface-2); font-size: 11px; white-space: pre-wrap; }
+.ux-ro-list-trailing { display: grid; justify-items: end; gap: 6px; }
+.ux-ro-list-trailing b { color: var(--ux-accent-2); font-size: 12.5px; font-variant-numeric: tabular-nums; }

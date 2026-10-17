@@ -8,7 +8,7 @@ import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, T
 import { BudgetMeter, Chip, ExpandableBudget, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
 import { ComingSoonCard, DeveloperOptionsPreview } from "../concepts/ux/AppExtras";
-import { AddCollectionSheet, AdvancedInstallSetting, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OsJobNotifications, ReadOnlyBanner, ReadOnlyExportSheet, ReadOnlyOutline, RemoveSourceAlert, RosterDataTag, SourceRow, SourceStatusChip, SourceUpdateCard, SourceVersions, TaggedRosterRows, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
+import { AddCollectionSheet, AdvancedInstallSetting, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceUpdateCard, SourceVersions, TaggedRosterRows, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
 
 type Props = {
   concept: GalleryConcept;
@@ -515,7 +515,10 @@ function WorkbenchElements({
 
       <ElementSection title="Source Versions">
         <SourceVersions />
+        <OlderVersionRow />
         <SourceVersions older />
+        <DeleteVersionAlert inline />
+        <JobToast tone="neutral" message="Switched to version 1a2b3c4" />
         <RemoveSourceAlert inline />
       </ElementSection>
 
@@ -557,10 +560,14 @@ function WorkbenchElements({
         <div className="ux-result-label">Game data</div>
         <WifiOnlySetting on={false} />
         <WifiOnlySetting on />
-        <KeepVersionsSetting />
-        <KeepVersionsSetting value="2" size="77 MB" />
         <NotificationsSetting />
         <NotificationsSetting on />
+      </ElementSection>
+
+      <ElementSection title="Keep Previous Versions Setting">
+        <div className="ux-result-label">Game data</div>
+        <KeepVersionsSetting />
+        <KeepVersionsSetting value="2" size="77 MB" />
       </ElementSection>
 
       <ElementSection title="Faction Picker">
@@ -620,10 +627,22 @@ function WorkbenchElements({
       <ElementSection title="Read-only Roster Banner">
         <ReadOnlyBanner kind="source" />
         <ReadOnlyBanner kind="faction" />
+        <ReadOnlyBanner kind="faction" kept={false} />
         <ReadOnlyBanner kind="changed" expanded />
-        <ReadOnlyOutline kind="changed" />
-        <ReadOnlyExportSheet inline />
-        <ReadOnlyExportSheet inline snapshot={false} />
+        <OpenedWithVersionNotice />
+      </ElementSection>
+
+      <ElementSection title="Read-only Chip Row">
+        <ReadOnlyChips kind="source" />
+        <ReadOnlyChips kind="faction" />
+        <ReadOnlyChips kind="changed" />
+        <ReadOnlyChips readOnly={false} kind="changed" />
+      </ElementSection>
+
+      <ElementSection title="Stored Roster Outline">
+        <StoredTotals kind="source" />
+        <StoredOutline kind="source" />
+        <StoredOutline kind="faction" />
       </ElementSection>
 
       <ElementSection title="Roster Data Tags">
@@ -700,6 +719,8 @@ function WorkbenchElements({
         <article className="ux-state-card offline"><span className="ux-state-dot" aria-hidden /><strong>This roster has 2 errors</strong><small>You can still export it.</small></article>
         <pre style={{ maxHeight: 180, overflow: "auto", margin: "10px 0", padding: 10, borderRadius: 10, background: "var(--ux-surface)", border: "1px solid var(--ux-line-2)", fontSize: 11, whiteSpace: "pre-wrap" }}>{`${roster.name} [${roster.system}]\n\n## ${roster.faction}\n\nUnit one [120 pts]\n• Option A\n• Option B\n\n… 1,240 more characters`}</pre>
         <div className="ux-lists-actions"><div><strong>{roster.name}.txt</strong><small>Share or copy the full text</small></div><button type="button" className="ux-organizer-toggle"><Copy size={15} />Copy</button><button type="button" className="ux-new-roster ux-new-roster-compact"><Upload size={18} /><span><strong>Share</strong></span></button></div>
+        <ReadOnlyExportSheet inline />
+        <ReadOnlyExportSheet inline snapshot={false} />
       </ElementSection>
 
       <ElementSection title="Favorite Library Cards">
