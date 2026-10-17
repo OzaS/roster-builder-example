@@ -578,7 +578,7 @@ export function SourceUpdateCard() {
         <li><b>Removed</b>Salt Kings</li>
         <li><b>Game system</b>file changed</li>
       </ul>
-      <div className="ux-job-notice warning"><TriangleAlert size={18} /><span><strong>2 rosters use Salt Kings, which this update removes.</strong><small>They will open read-only after the update, with export.</small></span></div>
+      <div className="ux-job-notice warning"><TriangleAlert size={18} /><span><strong>2 rosters use Salt Kings, which this update removes.</strong><small>They will be marked Faction removed after the update.</small></span></div>
       <div className="ux-job-footer"><button type="button" className="ux-job-btn ux-src-ghost">View on GitHub</button><button type="button" className="ux-job-btn primary">Update</button></div>
     </section>
   );
@@ -587,7 +587,7 @@ export function SourceUpdateCard() {
 export function LastUpdateCard({ onReport, checked = true }: { onReport?: () => void; checked?: boolean }) {
   return (
     <section className="ux-src-card">
-      <header><History size={18} /><span><strong>Updated today from 1a2b3c4 to a1b2c3d</strong><small>{checked ? "3 rosters checked: 1 unchanged, 1 changed, 1 read-only" : "3 rosters not checked yet. Each is checked when opened."}</small></span></header>
+      <header><History size={18} /><span><strong>Updated today from 1a2b3c4 to a1b2c3d</strong><small>{checked ? "3 rosters checked: 1 unchanged, 2 changed" : "3 rosters not checked yet"}</small></span></header>
       {checked ? <button type="button" className="ux-job-btn secondary block" onClick={onReport}>View report</button> : <button type="button" className="ux-job-btn primary block">Check rosters</button>}
     </section>
   );
@@ -685,7 +685,7 @@ export function MigrationReportBody({ checked = true }: { checked?: boolean }) {
   if (!checked) {
     return (
       <>
-        <div className="ux-job-notice info"><Info size={18} /><span><strong>3 rosters not checked yet</strong><small>Checking opens each roster on the new data and tags the ones that changed. Rosters not checked are checked when opened.</small></span><button type="button" className="ux-job-btn primary">Check rosters</button></div>
+        <div className="ux-job-notice info"><Info size={18} /><span><strong>3 rosters not checked yet</strong><small>Checking evaluates each roster on the new data and tags the ones that changed.</small></span><button type="button" className="ux-job-btn primary">Check rosters</button></div>
         <div className="ux-result-label">Data changes</div>
         {DATA_CHANGES}
       </>
@@ -693,22 +693,21 @@ export function MigrationReportBody({ checked = true }: { checked?: boolean }) {
   }
   return (
     <>
-      <div className="ux-src-chips"><Chip tone="neutral">3 rosters</Chip><Chip tone="valid">1 unchanged</Chip><Chip tone="warning">1 changed</Chip><Chip tone="neutral">1 read-only</Chip></div>
+      <div className="ux-src-chips"><Chip tone="neutral">3 rosters</Chip><Chip tone="valid">1 unchanged</Chip><Chip tone="warning">1 changed</Chip><Chip tone="neutral">1 faction removed</Chip></div>
       <div className="ux-result-label">Changed</div>
       <section className="ux-src-card">
         <header><TriangleAlert size={18} className="warn" /><span><strong>Spring league list</strong><small>Glass Legion</small></span><RosterDataTag kind="changed" /></header>
         <ul className="ux-src-changes">
           <li><b>Removed</b>Lantern Bearers (no longer in the data)</li>
-          <li><b>Cost</b>Shield Wardens: 120 → 135</li>
-          <li><b>Renamed</b>Scout Riders → Outriders</li>
+          <li><b>Total</b>pts: 1,980 → 1,995</li>
           <li><b>Errors</b>1 new error</li>
         </ul>
         <button type="button" className="ux-job-btn secondary block">Open roster</button>
       </section>
-      <div className="ux-result-label">Read-only</div>
+      <div className="ux-result-label">Faction removed</div>
       <section className="ux-src-card">
         <header><Lock size={18} className="warn" /><span><strong>Harbour raid</strong><small>Salt Kings</small></span><RosterDataTag kind="faction" /></header>
-        <small className="ux-col-desc">Salt Kings is no longer in the data. The roster opens read-only: export it, or open it with a kept version.</small>
+        <small className="ux-col-desc">Faction removed: the installed data no longer has Salt Kings.</small>
         <button type="button" className="ux-job-btn secondary block">Open roster</button>
       </section>
       <div className="ux-result-label">Unchanged</div>
