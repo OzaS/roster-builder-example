@@ -297,6 +297,27 @@ function WorkbenchElements({
           <button type="button" className="ux-tree-unit"><span className="ux-tree-rail" /><span className="ux-tree-unit-main"><span>Squad A <small>×5</small></span><span className="ux-tree-link-caption">Linked from Escort leader (Escorting) +1</span></span><b>90</b></button>
         </div>
       </ElementSection>
+
+      <ElementSection title="Grouped Units · Nested Rows">
+        <div style={{ display: "grid", gap: 10, maxWidth: 360 }}>
+          <small className="ux-elements-note">Built: a unit whose own link has the data's "group" action is drawn under the unit it links to, inside that unit's slot card, indented with a corner connector, right after it (several in roster order). Its points and limits still count in its own slot; that slot keeps its header with a muted line "N shown under linked units". The nesting link is left out of both captions; other links still show. Same tap, swipe and accessibility actions; the label adds "Attached to {"{unit}"} ({"{association}"})". Falls back to its own slot when the target is missing, hidden, in another force or itself nested.</small>
+          <div className="ux-tree-slot-head"><strong>Core</strong><span>1/3 · 150</span></div>
+          <button type="button" className="ux-tree-unit"><span className="ux-tree-rail" /><span className="ux-tree-unit-main"><span>Squad A <small>×5</small></span></span><b>90</b></button>
+          <button type="button" className="ux-tree-unit ux-tree-nested"><span className="ux-tree-connector" aria-hidden /><span className="ux-tree-rail" /><span className="ux-tree-unit-main"><span>Escort leader</span></span><b>60</b></button>
+          <div className="ux-tree-slot-head"><strong>Command</strong><span>1/2 · 60<small className="ux-tree-elsewhere">1 shown under linked units</small></span></div>
+        </div>
+      </ElementSection>
+
+      <ElementSection title="Formatted Data Text">
+        <div style={{ display: "grid", gap: 10, maxWidth: 360 }}>
+          <small className="ux-elements-note">Built: rule descriptions and profile table cells render the data's formatting codes: **bold**, *italic*, ^^keyword^^ (accent tone, semibold), line breaks and paragraph gaps, and "- " / "■ " lines as bullets with a hanging indent. Unmatched markers stay as written. Screen readers hear the text without markers; column widths use the plain text. Exports keep the codes as written.</small>
+          <div className="ux-rich-text">
+            <p><b><span className="kw">Alpha</span></b> units in range gain <i>Steady</i>.</p>
+            <p className="bullet">Re-roll one test each turn.</p>
+            <p className="bullet">Add 1 to the next roll for <span className="kw">Beta</span> units.</p>
+          </div>
+        </div>
+      </ElementSection>
       <OptionsSection selectedUnit={selectedUnit} onToggleOption={onToggleOption} />
 
       <LoadoutEditorElement unit={profileUnit} />
