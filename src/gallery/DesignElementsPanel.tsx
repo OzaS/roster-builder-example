@@ -274,6 +274,21 @@ function WorkbenchElements({
       <ElementSection title="Unit Options · Mobile 5A">
         <div className="ux-elements-stack"><MobileUnitOptions compact /><MobileUnitOptions state="loading" compact /><MobileUnitOptions state="error" compact /><MobileUnitOptions state="gone" compact /></div>
       </ElementSection>
+
+      <ElementSection title="Unit Profile Tab · Mobile 5B">
+        <div style={{ display: "grid", gap: 10 }}>
+          <small className="ux-elements-note">Built (plan 5B): Options | Profile tabs under the header chips. Profile: one card per profile type, horizontal scroll when wide, columns sized to their text; text columns (descriptions) are left-aligned and take the room left. Rules open on tap when they have a description. Categories close the tab. On Options a category chip opens Profile with that category marked.</small>
+          <div className="ux-elements-stack"><MobileUnitOptions compact initialTab="profile" /></div>
+        </div>
+      </ElementSection>
+
+      <ElementSection title="Unit Links (associations)">
+        <div style={{ display: "grid", gap: 10, maxWidth: 360 }}>
+          <small className="ux-elements-note">Built: below the options, one section per association of the shown unit, named after it, with "linked/max linked" and "Needs n more link(s)" when a minimum is unmet. Max 1: radio rows, tapping another unit moves the link in one step, tapping the linked one unlinks it. Several: check rows, still editable at the maximum ("Limit reached · can exceed"). Ineligible units are not listed; a linked unit that is no longer eligible stays, marked, so it can be unlinked. Roster rows show the first link as a one-line caption ("Linked to Squad A (Escorting)", "+N" for more).</small>
+          <button type="button" className="ux-tree-unit"><span className="ux-tree-rail" /><span className="ux-tree-unit-main"><span>Escort leader</span><span className="ux-tree-link-caption">Linked to Squad A (Escorting)</span></span><b>60</b></button>
+          <button type="button" className="ux-tree-unit"><span className="ux-tree-rail" /><span className="ux-tree-unit-main"><span>Squad A <small>×5</small></span><span className="ux-tree-link-caption">Linked from Escort leader (Escorting) +1</span></span><b>90</b></button>
+        </div>
+      </ElementSection>
       <OptionsSection selectedUnit={selectedUnit} onToggleOption={onToggleOption} />
 
       <LoadoutEditorElement unit={profileUnit} />

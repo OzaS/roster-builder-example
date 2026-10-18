@@ -1,8 +1,8 @@
-import { AlertTriangle, ArrowLeft, Check, ChevronDown, ChevronRight, Circle, CircleDot, Minus, Plus } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Check, CheckCircle2, ChevronDown, ChevronRight, Circle, CircleDot, Minus, Plus } from "lucide-react";
 import { useState } from "react";
 
-/** Implemented mobile 5A surface. Synthetic names and costs; later detail features stay in the original design. */
-export function MobileUnitOptions({ onBack, state = "ready", compact = false }: { onBack?: () => void; state?: "ready" | "loading" | "error" | "gone"; compact?: boolean }) {
+/** Implemented mobile unit detail: 5A options, 5B Profile tab and chips, and links (associations). Synthetic names and costs; later detail features stay in the original design. */
+export function MobileUnitOptions({ onBack, state = "ready", compact = false, initialTab = "options" }: { onBack?: () => void; state?: "ready" | "loading" | "error" | "gone"; compact?: boolean; initialTab?: "options" | "profile" }) {
   const [models, setModels] = useState(5);
   const [guns, setGuns] = useState(2);
   const [sidearm, setSidearm] = useState("Pistol");
@@ -15,6 +15,9 @@ export function MobileUnitOptions({ onBack, state = "ready", compact = false }: 
   const [showHidden, setShowHidden] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(state === "error");
+  const [tab, setTab] = useState(initialTab);
+  const [marked, setMarked] = useState<string | undefined>();
+  const [escort, setEscort] = useState<string | undefined>("Squad A");
   const change = (apply: () => void) => {
     if (busy) return;
     setBusy(true);
@@ -29,9 +32,10 @@ export function MobileUnitOptions({ onBack, state = "ready", compact = false }: 
     <div className="ux-5a-context"><span>Line</span><strong>{drilled ? (drillA ? 5 : 0) + (drillB ? 5 : 0) : total} Credits</strong></div>
     <div className="ux-5a-budget"><div style={{ width: `${Math.min(100, total / 2)}%` }} /></div>
     <small>{total} / 200 Credits · {200 - total} left</small>
-    <div className="ux-5a-chips"><span>Line</span><span>Mounted</span></div>
+    <div className="ux-5a-chips">{["Line", "Mounted"].map(name => tab === "options" ? <button type="button" key={name} aria-label={name} title="Shows this category on the Profile tab" onClick={() => { setMarked(name); setTab("profile"); }}>{name}</button> : <span key={name}>{name}</span>)}</div>
+    <div className="ux-5b-tabs" role="tablist" aria-label="Unit view">{(["options", "profile"] as const).map(id => <button type="button" role="tab" key={id} aria-selected={tab === id} onClick={() => setTab(id)}>{id === "options" ? "Options" : "Profile"}</button>)}</div>
     {busy ? <p role="status">Updating options…</p> : null}
-    {error ? <div className="ux-5a-notice" role="alert"><AlertTriangle size={18} /><span><strong>Could not load options</strong><small>Connection interrupted</small><button type="button" onClick={() => setError(false)}>Try again</button></span></div> : <>
+    {error ? <div className="ux-5a-notice" role="alert"><AlertTriangle size={18} /><span><strong>Could not load options</strong><small>Connection interrupted</small><button type="button" onClick={() => setError(false)}>Try again</button></span></div> : tab === "profile" ? <MobileUnitProfile marked={marked} /> : <>
       {models < 3 || models > 10 ? <div className="ux-5a-notice" role="alert"><AlertTriangle size={18} /><span>Selection issues: Lancer count {models}, expected 3–10</span></div> : null}
       {drilled ? <div className="ux-5a-card"><h4>Other options</h4><ToggleRow name="Drill A" cost="+5 Credits" value={drillA} disabled={busy} onChange={() => change(() => setDrillA(!drillA))} /><ToggleRow name="Drill B" cost="+5 Credits" value={drillB} disabled={busy} onChange={() => change(() => setDrillB(!drillB))} /></div> : <>
         <h4>Model loadouts</h4>
@@ -44,6 +48,8 @@ export function MobileUnitOptions({ onBack, state = "ready", compact = false }: 
         </article>
         <div className="ux-5a-card"><h4>Other options</h4><ToggleRow name="Banner" cost="+10 Credits" value={banner} disabled={busy} onChange={() => change(() => setBanner(!banner))} /><ToggleRow name="Drills" cost="No added cost" value={drills} disabled={busy} onChange={() => change(() => setDrills(!drills))} />{drills ? <button className="ux-5a-link" type="button" disabled={busy} onClick={() => setDrilled(true)}>Configure Drills <ChevronRight size={15} /></button> : null}</div>
         <div className="ux-5a-card"><div className="ux-5a-section-title"><h4>Guns</h4><small>{guns}/2 selections</small></div><div className="ux-5a-choice"><span><strong>Cannon</strong><small>No added cost</small>{guns === 2 ? <small>Maximum 2 · 2 selected</small> : null}</span></div><small>Up to 2 · Hard limit</small><Count name="Cannon" value={guns} min={0} max={2} disabled={busy} onChange={value => change(() => setGuns(value))} /></div>
+        <h4>Links</h4>
+        <div className="ux-5a-card"><h4>Escorting</h4><small className={escort ? "" : "ux-5a-invalid"}>{escort ? "1/1 linked" : <><AlertTriangle size={13} />0/1 linked · Needs 1 more link</>}</small><div role="radiogroup" aria-label="Escorting">{["Squad A", "Squad B"].map(name => <button type="button" role="radio" aria-checked={escort === name} disabled={busy} className="ux-5a-choice" key={name} onClick={() => change(() => setEscort(escort === name ? undefined : name))}>{escort === name ? <CheckCircle2 size={21} /> : <Circle size={21} />}<span><strong>{name}</strong></span></button>)}<div className="ux-5a-choice"><Circle size={21} /><span><strong>Squad C</strong><small className="ux-5b-warn">No longer eligible</small></span></div></div></div>
         <button className="ux-5a-link" type="button" disabled={busy} onClick={() => setShowHidden(!showHidden)}>{showHidden ? "Hide hidden options" : "Show hidden options (1)"}</button>
         {showHidden ? <div className="ux-5a-card"><strong>Secret option</strong><small>Hidden</small><small>No added cost</small><Count name="Secret option" value={0} min={0} disabled={true} onChange={() => {}} /></div> : null}
       </>}
@@ -58,4 +64,18 @@ function Count({ name, value, min, max, over, disabled, onChange }: { name: stri
 }
 function ToggleRow({ name, cost, value, disabled, onChange }: { name: string; cost: string; value: boolean; disabled: boolean; onChange: () => void }) {
   return <div className="ux-5a-choice"><span><strong>{name}</strong><small>{cost}</small></span><button type="button" className={`ux-5a-switch ${value ? "on" : ""}`} role="switch" aria-label={name} aria-checked={value} disabled={disabled} onClick={onChange}><span /></button></div>;
+}
+
+/** 5B Profile tab: one table per profile type (horizontal scroll, text columns left-aligned and widest), rules that open, categories. */
+function MobileUnitProfile({ marked }: { marked?: string }) {
+  const [open, setOpen] = useState<string | undefined>();
+  const rules = [{ name: "Charge", text: "Each time this unit charges, add 1 to its move." }, { name: "Steady" }];
+  return <>
+    <div className="ux-5a-card ux-5b-table-card"><strong>Unit</strong><div className="ux-5b-table"><table><thead><tr><th /><th>Mv</th><th>Gr</th><th>Wd</th><th>Ld</th><th>Sv</th><th>Arm</th></tr></thead><tbody><tr aria-label="Lancer, Mv: 8, Gr: 3+, Wd: 2, Ld: 7, Sv: 4+, Arm: 1"><th>Lancer</th><td>8"</td><td>3+</td><td>2</td><td>7</td><td>4+</td><td>1</td></tr></tbody></table></div></div>
+    <div className="ux-5a-card ux-5b-table-card"><strong>Abilities</strong><div className="ux-5b-table"><table><thead><tr><th /><th className="text">Description</th></tr></thead><tbody><tr><th>Escort</th><td className="text">This unit can be linked to one squad. While linked, both move together and share their cover.</td></tr></tbody></table></div></div>
+    <h4>Rules</h4>
+    <div className="ux-5a-card">{rules.map(rule => rule.text ? <div key={rule.name}><button type="button" className="ux-5a-choice" aria-expanded={open === rule.name} onClick={() => setOpen(open === rule.name ? undefined : rule.name)}><span><strong>{rule.name}</strong></span>{open === rule.name ? <ChevronDown size={18} /> : <ChevronRight size={18} />}</button>{open === rule.name ? <small>{rule.text}</small> : null}</div> : <div className="ux-5a-choice" key={rule.name}><span><strong>{rule.name}</strong></span></div>)}</div>
+    <h4>Categories</h4>
+    <div className="ux-5a-chips">{["Line", "Mounted"].map(name => <span key={name} className={marked === name ? "marked" : ""}>{marked === name ? <Check size={11} /> : null}{name}</span>)}</div>
+  </>;
 }
