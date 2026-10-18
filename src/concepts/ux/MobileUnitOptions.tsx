@@ -1,5 +1,5 @@
 import { AlertTriangle, ArrowLeft, Check, CheckCircle2, ChevronDown, ChevronRight, Circle, CircleDot, Minus, Plus } from "lucide-react";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 
 /** Implemented mobile unit detail: 5A options, 5B Profile tab and chips, and links (associations). Synthetic names and costs; later detail features stay in the original design. */
 export function MobileUnitOptions({ onBack, state = "ready", compact = false, initialTab = "options" }: { onBack?: () => void; state?: "ready" | "loading" | "error" | "gone"; compact?: boolean; initialTab?: "options" | "profile" }) {
@@ -18,12 +18,18 @@ export function MobileUnitOptions({ onBack, state = "ready", compact = false, in
   const [tab, setTab] = useState(initialTab);
   const [marked, setMarked] = useState<string | undefined>();
   const [escort, setEscort] = useState<string | undefined>("Squad A");
+  const [scope, setScope] = useState(false);
+  const [belt, setBelt] = useState(true);
+  // Folds are presentation only and keyed per section (selection + group path); everything starts expanded and a parent keeps its descendants' folds.
+  const [folded, setFolded] = useState<string[]>([]);
+  const fold = (key: string) => setFolded(keys => keys.includes(key) ? keys.filter(k => k !== key) : [...keys, key]);
+  const section = (key: string) => ({ folded: folded.includes(key), onFold: () => fold(key) });
   const change = (apply: () => void) => {
     if (busy) return;
     setBusy(true);
     window.setTimeout(() => { apply(); setBusy(false); }, 180);
   };
-  const total = models * (sidearm === "Pistol" ? 14 : sidearm === "Axe" ? 13 : 12) + (banner ? 10 : 0) + (drillA ? 5 : 0) + (drillB ? 5 : 0);
+  const total = models * (sidearm === "Pistol" ? 14 : sidearm === "Axe" ? 13 : 12) + (scope ? models : 0) + (banner ? 10 : 0) + (drillA ? 5 : 0) + (drillB ? 5 : 0);
   if (state === "loading") return <section className="ux-mobile-unit-options"><p role="status">Loading options…</p><div className="ux-5a-skeleton" /><div className="ux-5a-skeleton" /><div className="ux-5a-skeleton" /></section>;
   if (state === "gone") return <section className="ux-mobile-unit-options"><div className="ux-5a-notice" role="alert"><AlertTriangle size={18} /><strong>This selection is no longer in the roster</strong></div><button type="button" onClick={onBack}>Back to roster</button></section>;
   return <section className={`ux-mobile-unit-options ${compact ? "compact" : ""}`}>
@@ -44,10 +50,19 @@ export function MobileUnitOptions({ onBack, state = "ready", compact = false, in
           <small>At least 3 · Up to 10 · Soft limit · can exceed</small>
           <Count name="Lancer" value={models} min={0} over={models < 3 || models > 10} disabled={busy} onChange={value => change(() => setModels(value))} />
           {models < 3 || models > 10 ? <small className="ux-5a-invalid"><AlertTriangle size={13} />{models < 3 ? "Below minimum" : "Over maximum"}</small> : null}
-          {expanded ? <><div className="ux-5a-section-title"><h4>Sidearm</h4><small>{sidearm ? models : 0}/{models} selections</small></div><div role="radiogroup" aria-label="Sidearm">{["", "Pistol", "Axe"].map(name => <button type="button" role="radio" aria-checked={sidearm === name} disabled={busy} className="ux-5a-choice" key={name} onClick={() => change(() => setSidearm(name))}>{sidearm === name ? <CircleDot size={21} /> : <Circle size={21} />}<span><strong>{name || "None"}</strong><small>{name ? `+${name === "Pistol" ? 2 : 1} Credits per model` : "No added cost"}</small>{name && sidearm === name ? <small>1 per model</small> : null}</span></button>)}</div><h4>Other options</h4><div className="ux-5a-choice"><Check size={19} /><span><strong>Lance</strong><small>Included · 1 per model</small></span></div></> : null}
+          {expanded ? <>
+            <FoldSection title="Sidearm" counter={`${sidearm ? models : 0}/${models} selections`} {...section("lancer/sidearm")}>
+              <div role="radiogroup" aria-label="Sidearm">{["", "Pistol", "Axe"].map(name => <button type="button" role="radio" aria-checked={sidearm === name} disabled={busy} className="ux-5a-choice" key={name} onClick={() => change(() => setSidearm(name))}>{sidearm === name ? <CircleDot size={21} /> : <Circle size={21} />}<span><strong>{name || "None"}</strong><small>{name ? `+${name === "Pistol" ? 2 : 1} Credits per model` : "No added cost"}</small>{name && sidearm === name ? <small>1 per model</small> : null}</span></button>)}</div>
+              <div className="ux-fold-nested"><FoldSection title="Exchange its scope" counter={`${scope ? models : 0}/${models} selections`} {...section("lancer/sidearm/scope")}><ToggleRow name="Long scope" cost="+1 Credits per model" value={scope} disabled={busy} onChange={() => change(() => setScope(!scope))} /></FoldSection></div>
+            </FoldSection>
+            <FoldSection title="Other options" {...section("lancer/other")}><div className="ux-5a-choice"><Check size={19} /><span><strong>Lance</strong><small>Included · 1 per model</small></span></div></FoldSection>
+          </> : null}
         </article>
-        <div className="ux-5a-card"><h4>Other options</h4><ToggleRow name="Banner" cost="+10 Credits" value={banner} disabled={busy} onChange={() => change(() => setBanner(!banner))} /><ToggleRow name="Drills" cost="No added cost" value={drills} disabled={busy} onChange={() => change(() => setDrills(!drills))} />{drills ? <button className="ux-5a-link" type="button" disabled={busy} onClick={() => setDrilled(true)}>Configure Drills <ChevronRight size={15} /></button> : null}</div>
-        <div className="ux-5a-card"><div className="ux-5a-section-title"><h4>Guns</h4><small>{guns}/2 selections</small></div><div className="ux-5a-choice"><span><strong>Cannon</strong><small>No added cost</small>{guns === 2 ? <small>Maximum 2 · 2 selected</small> : null}</span></div><small>Up to 2 · Hard limit</small><Count name="Cannon" value={guns} min={0} max={2} disabled={busy} onChange={value => change(() => setGuns(value))} /></div>
+        <div className="ux-5a-card"><FoldSection title="Other options" {...section("unit/other")}><ToggleRow name="Banner" cost="+10 Credits" value={banner} disabled={busy} onChange={() => change(() => setBanner(!banner))} /><ToggleRow name="Drills" cost="No added cost" value={drills} disabled={busy} onChange={() => change(() => setDrills(!drills))} />{drills ? <button className="ux-5a-link" type="button" disabled={busy} onClick={() => setDrilled(true)}>Configure Drills <ChevronRight size={15} /></button> : null}</FoldSection></div>
+        <div className="ux-5a-card"><FoldSection title="Guns" counter={`${guns}/2 selections`} inner={!belt} {...section("unit/guns")}>
+          <div className="ux-5a-choice"><span><strong>Cannon</strong><small>No added cost</small>{guns === 2 ? <small>Maximum 2 · 2 selected</small> : null}</span></div><small>Up to 2 · Hard limit</small><Count name="Cannon" value={guns} min={0} max={2} disabled={busy} onChange={value => change(() => setGuns(value))} />
+          <div className="ux-fold-nested"><FoldSection title="Ammunition" counter={`${belt ? 1 : 0}/1 selections · At least 1`} invalid={!belt} {...section("unit/guns/ammo")}><ToggleRow name="Belt feed" cost="No added cost" value={belt} disabled={busy} onChange={() => change(() => setBelt(!belt))} /></FoldSection></div>
+        </FoldSection></div>
         <h4>Links</h4>
         <div className="ux-5a-card"><h4>Escorting</h4><small className={escort ? "" : "ux-5a-invalid"}>{escort ? "1/1 linked" : <><AlertTriangle size={13} />0/1 linked · Needs 1 more link</>}</small><div role="radiogroup" aria-label="Escorting">{["Squad A", "Squad B"].map(name => <button type="button" role="radio" aria-checked={escort === name} disabled={busy} className="ux-5a-choice" key={name} onClick={() => change(() => setEscort(escort === name ? undefined : name))}>{escort === name ? <CheckCircle2 size={21} /> : <Circle size={21} />}<span><strong>{name}</strong></span></button>)}<div className="ux-5a-choice"><Circle size={21} /><span><strong>Squad C</strong><small className="ux-5b-warn">No longer eligible</small></span></div></div></div>
         <button className="ux-5a-link" type="button" disabled={busy} onClick={() => setShowHidden(!showHidden)}>{showHidden ? "Hide hidden options" : "Show hidden options (1)"}</button>
@@ -78,4 +93,29 @@ function MobileUnitProfile({ marked }: { marked?: string }) {
     <h4>Categories</h4>
     <div className="ux-5a-chips">{["Line", "Mounted"].map(name => <span key={name} className={marked === name ? "marked" : ""}>{marked === name ? <Check size={11} /> : null}{name}</span>)}</div>
   </>;
+}
+
+/** Option sections fold independently at every level: the header (name, counter, limits, errors) is a 44 px button and stays when the body folds; a folded header says when an error is inside. */
+function FoldSection({ title, counter, invalid, inner, folded, onFold, children }: { title: string; counter?: string; invalid?: boolean; inner?: boolean; folded?: boolean; onFold?: () => void; children?: ReactNode }) {
+  const buried = folded && inner;
+  return <div className="ux-fold">
+    <button type="button" className="ux-fold-head" aria-expanded={!folded} aria-label={[title, counter, buried ? "Issues inside" : ""].filter(Boolean).join(", ")} title={`${folded ? "Shows" : "Hides"} the options of ${title}`} onClick={onFold}>
+      <span><strong>{title}</strong>{counter || buried ? <small className={invalid || buried ? "ux-5a-invalid" : ""}>{invalid || buried ? <AlertTriangle size={13} /> : null}{counter}{buried ? <>{counter ? " · " : ""}Issues inside</> : null}</small> : null}</span>
+      {folded ? <ChevronRight size={18} /> : <ChevronDown size={18} />}
+    </button>
+    {folded ? null : children}
+  </div>;
+}
+
+/** Elements sample: the three header states of a foldable section (expanded, folded, folded with an error inside). */
+export function OptionFoldSamples() {
+  const [open, setOpen] = useState<Record<string, boolean>>({ expanded: true });
+  const toggle = (key: string) => setOpen(value => ({ ...value, [key]: !value[key] }));
+  return <section className="ux-mobile-unit-options compact" style={{ maxHeight: "none" }}>
+    <div className="ux-5a-card">
+      <FoldSection title="Every model may exchange its sidearm" counter="2/5 selections" folded={!open.expanded} onFold={() => toggle("expanded")}><ToggleRow name="Axe" cost="+1 Credits per model" value disabled={false} onChange={() => {}} /></FoldSection>
+      <FoldSection title="Heavy weapons" counter="0/1 selections" folded={!open.folded} onFold={() => toggle("folded")} />
+      <FoldSection title="Guns" counter="1/2 selections" inner folded={!open.inner} onFold={() => toggle("inner")}><div className="ux-5a-choice"><span><strong>Cannon</strong><small>No added cost</small></span></div></FoldSection>
+    </div>
+  </section>;
 }

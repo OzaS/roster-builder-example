@@ -6053,6 +6053,12 @@ button.ux-reference-tag:focus-visible {
 .ux-5b-table tbody th { text-align: left; white-space: normal; min-width: 100px; }
 .ux-5b-table .text { text-align: left; white-space: normal; width: 100%; }
 .ux-mobile-unit-options .ux-5b-warn { color: var(--ux-warn, var(--ux-ink-secondary)); }
+.ux-fold { display: flex; flex-direction: column; gap: 6px; }
+.ux-mobile-unit-options .ux-fold-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 44px; text-align: left; }
+.ux-fold-head > span { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.ux-fold-head strong { color: var(--ux-ink-secondary); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+.ux-fold-head svg { flex-shrink: 0; color: var(--ux-ink-secondary); }
+.ux-fold-nested { border-left: 2px solid var(--ux-line); padding-left: 12px; }
 .ux-tree-link-caption { display: block; color: var(--ux-ink-secondary); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* Plan 4A/4D as built: one action per side, undo toast, header history buttons and save caption. */

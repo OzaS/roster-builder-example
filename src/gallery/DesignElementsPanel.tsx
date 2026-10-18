@@ -1,4 +1,4 @@
-import { MobileUnitOptions } from "../concepts/ux/MobileUnitOptions";
+import { MobileUnitOptions, OptionFoldSamples } from "../concepts/ux/MobileUnitOptions";
 import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BarChart3, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, CircleDot, Cog, Coins, Command, Copy, Database, Dice5, Download, Ellipsis, FileInput, Gamepad2, GripVertical, Hammer, Heart, ImagePlus, Languages, Layers, LibraryBig, Maximize2, MessageCircle, Minus, Moon, MoveRight, Palette, PanelsTopLeft, Pencil, Plus, RotateCcw, Rows3, Scale, Search, Smartphone, Sparkles, Split, Trash2, Upload, UserRound, Wand2, X } from "lucide-react";
 import { createContext, useContext, useState } from "react";
 import { PhoneStatusBar } from "../components/DeviceFrame";
@@ -273,6 +273,14 @@ function WorkbenchElements({
 
       <ElementSection title="Unit Options · Mobile 5A">
         <div className="ux-elements-stack"><MobileUnitOptions compact /><MobileUnitOptions state="loading" compact /><MobileUnitOptions state="error" compact /><MobileUnitOptions state="gone" compact /></div>
+      </ElementSection>
+
+      <ElementSection title="Foldable Option Sections">
+        <div style={{ display: "grid", gap: 10, maxWidth: 360 }}>
+          <small className="ux-elements-note">Built (UX-005): every option section is a header button (44 pt, expanded state) that folds its own body, at every nesting level and in model loadouts. Sections start expanded. The header keeps the name, "x/y selections", limits and errors; a folded header with an error beneath it adds "Issues inside". Folding a parent keeps its descendants' folds. Folds are kept while the screen is open (Profile tab, collapsed model card, refreshes) and are never shared between selections.</small>
+          <OptionFoldSamples />
+          <div className="ux-elements-stack"><MobileUnitOptions compact /></div>
+        </div>
       </ElementSection>
 
       <ElementSection title="Unit Profile Tab · Mobile 5B">
