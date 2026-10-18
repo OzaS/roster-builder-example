@@ -6101,3 +6101,12 @@ button.ux-reference-tag:focus-visible {
 .ux-rich-text b .kw { font-weight: 700; }
 .ux-rich-text .bullet { padding-left: 14px; text-indent: -14px; }
 .ux-rich-text .bullet::before { content: "•"; display: inline-block; width: 14px; text-indent: 0; color: var(--ux-ink-secondary); }
+
+/* Battle Augur 6C: native Settings appearance rows and import outcome previews. */
+.ux-appearance-preferences .ux-result-label { display: flex; align-items: center; gap: 6px; }
+.ux-appearance-preferences .ux-setting-row { display: flex; width: 100%; min-height: 52px; border: 0; border-bottom: 1px solid var(--ux-line); border-radius: 0; }
+.ux-appearance-preferences .ux-setting-row > svg { flex-shrink: 0; color: var(--ux-accent-2); }
+.ux-appearance-action { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 12px; border: 1px solid var(--ux-line-2); border-radius: 10px; background: var(--ux-surface-2); color: var(--ux-ink); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.ux-appearance-action[aria-checked="true"] { border-color: var(--ux-accent); color: var(--ux-accent-2); background: color-mix(in srgb, var(--ux-accent) 12%, var(--ux-surface)); }
+.ux-appearance-action:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px; }
+.ux-appearance-action:disabled { opacity: .5; cursor: wait; }

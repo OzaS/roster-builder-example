@@ -1,3 +1,4 @@
+import { AppearancePreferences } from "../concepts/ux/AppearanceSettings";
 import { MobileUnitOptions, OptionFoldSamples } from "../concepts/ux/MobileUnitOptions";
 import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BarChart3, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, CircleDot, Cog, Coins, Command, Copy, Database, Dice5, Download, Ellipsis, FileInput, Gamepad2, GripVertical, Hammer, Heart, ImagePlus, Languages, Layers, LibraryBig, Maximize2, MessageCircle, Minus, Moon, MoveRight, Palette, PanelsTopLeft, Pencil, Plus, RotateCcw, Rows3, Scale, Search, Smartphone, Sparkles, Split, Trash2, Upload, UserRound, Wand2, X } from "lucide-react";
 import { createContext, useContext, useState } from "react";
@@ -459,28 +460,10 @@ function WorkbenchElements({
       </ElementSection>
 
       <ElementSection title="Preference Selectors">
-        <div className="ux-preference-selector">
-          <div className="ux-preference-row-wrap">
-            <button type="button" className="ux-preference-row"><span className="ux-setting-icon"><Languages size={17} /></span><span className="ux-setting-text"><strong>Language</strong><small>English</small></span><ChevronDown size={17} /></button>
-            <button type="button" className="ux-preference-upload" aria-label="Upload language pack"><Upload size={16} /></button>
-          </div>
-        </div>
-        <div className="ux-preference-selector open">
-          <div className="ux-preference-row-wrap"><button type="button" className="ux-preference-row" aria-expanded="true">
-            <span className="ux-setting-icon"><Moon size={17} /></span>
-            <span className="ux-setting-text"><strong>Dark mode</strong><small>System</small></span>
-            <ChevronDown size={17} />
-          </button></div>
-          <div className="ux-preference-options" role="radiogroup" aria-label="Dark mode preview">
-            <button type="button" role="radio" aria-checked="true" className="selected"><span>System</span><Check size={16} /></button>
-            <button type="button" role="radio" aria-checked="false"><span>Light</span></button>
-            <button type="button" role="radio" aria-checked="false"><span>Dark</span></button>
-          </div>
-        </div>
-        <div className="ux-preference-selector"><div className="ux-preference-row-wrap">
-          <button type="button" className="ux-preference-row"><span className="ux-setting-icon"><Palette size={17} /></span><span className="ux-setting-text"><strong>Color scheme</strong><small>Horus Heresy</small></span><ChevronDown size={17} /></button>
-          <button type="button" className="ux-preference-upload" aria-label="Upload color scheme"><Upload size={16} /></button>
-        </div></div>
+        <AppearancePreferences />
+      </ElementSection>
+      <ElementSection title="Appearance Import Feedback">
+        <AppearancePreferences states />
       </ElementSection>
 
       <ElementSection title="Smart Search">
