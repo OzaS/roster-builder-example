@@ -6054,3 +6054,16 @@ button.ux-reference-tag:focus-visible {
 .ux-history-buttons button:disabled { color: var(--ux-ink-muted, var(--ux-muted)); opacity: 0.5; cursor: default; }
 .ux-history-status { grid-column: 1 / -1; display: flex; justify-content: space-between; }
 .ux-history-status small.failed { color: var(--ux-err); }
+
+/* Plan 6A as built: header check line, grouped issues, unevaluated-rules section, jump highlight. */
+.ux-issue-status { display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 8px; border: 0; border-radius: 8px; background: transparent; color: var(--ux-err); font-size: 12px; text-align: left; cursor: pointer; }
+.ux-issue-group { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.ux-issue-group span { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 750; }
+.ux-issue-group span.error { color: var(--ux-err); background: color-mix(in srgb, var(--ux-err) 14%, var(--ux-surface)); }
+.ux-issue-group span.warning { color: var(--ux-warn); background: color-mix(in srgb, var(--ux-warn) 14%, var(--ux-surface)); }
+.ux-issue-group small { color: var(--ux-ink-muted, var(--ux-muted)); font-size: 11px; }
+.ux-issue-incomplete { display: flex; gap: 10px; padding: 12px; border-radius: 10px; background: color-mix(in srgb, var(--ux-accent) 10%, var(--ux-surface)); font-size: 12px; }
+.ux-issue-incomplete span { display: grid; gap: 2px; }
+.ux-issue-incomplete small, .ux-issue-target small, .ux-issue-empty small { color: var(--ux-ink-muted, var(--ux-muted)); font-size: 11px; }
+.ux-issue-target { display: grid; gap: 2px; padding: 10px 12px; border-radius: 8px; border-left: 3px solid var(--ux-accent); background: color-mix(in srgb, var(--ux-accent) 14%, var(--ux-surface)); font-size: 12px; }
+.ux-issue-empty { display: grid; justify-items: center; gap: 4px; padding: 20px; border: 1px dashed var(--ux-line, #ccc); border-radius: 12px; font-size: 13px; }

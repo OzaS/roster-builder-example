@@ -354,6 +354,20 @@ function WorkbenchElements({
         </div>
       </ElementSection>
 
+      <ElementSection title="Issues List · Jump to Entry">
+        <div style={{ display: "grid", gap: 10, maxWidth: 360 }}>
+          <small className="ux-elements-note">Built (plan 6A): the roster header's check line opens the list (chevron). Severity is an icon shape plus its word, never colour alone. A tap goes to the entry: a unit opens its options at the issue's path (the issues outlined); a slot, force or the roster is opened, scrolled to and highlighted for 3 seconds. Rules the app does not evaluate yet are one separate section at the end. While rules are being checked the list says so instead of showing "Roster is legal".</small>
+          <button type="button" className="ux-issue-status"><AlertTriangle size={13} /><span>1 error, 2 warnings</span><ChevronRight size={13} /></button>
+          <div className="ux-issue-group"><span className="error"><CircleDot size={13} />2 errors</span><small>Force name</small></div>
+          <button type="button" className="ux-rail-item error"><StatusGlyph status="error" size={15} /><span><strong>Error · Slot name</strong><small>Roster exceeds the slot maximum</small></span><ChevronRight size={14} /></button>
+          <div className="ux-issue-group"><span className="warning"><AlertTriangle size={13} />1 warning</span><small>Force name</small></div>
+          <button type="button" className="ux-rail-item warning"><StatusGlyph status="warning" size={15} /><span><strong>Warning · Unit name</strong><small>Missing attached bodyguard</small></span><ChevronRight size={14} /></button>
+          <div className="ux-issue-incomplete"><AlertTriangle size={14} /><span><strong>Rules not evaluated yet</strong><small>Battle Augur does not evaluate these rules yet, so the result may differ from New Recruit. They are not problems with the roster.</small></span></div>
+          <div className="ux-issue-target"><strong>Slot name</strong><small>1 / 1 · highlighted after a jump</small></div>
+          <div className="ux-issue-empty"><Check size={18} /><strong>Roster is legal</strong><small>No errors or warnings.</small></div>
+        </div>
+      </ElementSection>
+
       <ElementSection title="Add Pool Rows">
         <div className="ux-wb-search">
           <Search size={15} />
