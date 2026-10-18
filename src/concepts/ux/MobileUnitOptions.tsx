@@ -1,7 +1,8 @@
-import { AlertTriangle, ArrowLeft, Check, CheckCircle2, ChevronDown, ChevronRight, Circle, CircleDot, Minus, Plus } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Check, CheckCircle2, ChevronDown, ChevronRight, Circle, CircleDot, LoaderCircle, Minus, Plus } from "lucide-react";
 import { type ReactNode, useState } from "react";
 
-/** Implemented mobile unit detail: 5A options, 5B Profile tab and chips, and links (associations). Synthetic names and costs; later detail features stay in the original design. */
+/** Implemented mobile unit detail: 5A options, 5B Profile tab and chips, and links (associations). Synthetic names and costs; later detail features stay in the original design.
+ * UX-004: a command in flight shows only a spinner in room kept next to the cost and never dims or inserts rows; optional one-of groups always list None first. UX-003: a count pinned at min = max has no stepper. */
 export function MobileUnitOptions({ onBack, state = "ready", compact = false, initialTab = "options" }: { onBack?: () => void; state?: "ready" | "loading" | "error" | "gone"; compact?: boolean; initialTab?: "options" | "profile" }) {
   const [models, setModels] = useState(5);
   const [guns, setGuns] = useState(2);
@@ -29,43 +30,46 @@ export function MobileUnitOptions({ onBack, state = "ready", compact = false, in
     setBusy(true);
     window.setTimeout(() => { apply(); setBusy(false); }, 180);
   };
-  const total = models * (sidearm === "Pistol" ? 14 : sidearm === "Axe" ? 13 : 12) + (scope ? models : 0) + (banner ? 10 : 0) + (drillA ? 5 : 0) + (drillB ? 5 : 0);
+  const total = 16 + models * (sidearm === "Pistol" ? 14 : sidearm === "Axe" ? 13 : 12) + (scope ? models : 0) + (banner ? 10 : 0) + (drillA ? 5 : 0) + (drillB ? 5 : 0);
   if (state === "loading") return <section className="ux-mobile-unit-options"><p role="status">Loading options…</p><div className="ux-5a-skeleton" /><div className="ux-5a-skeleton" /><div className="ux-5a-skeleton" /></section>;
   if (state === "gone") return <section className="ux-mobile-unit-options"><div className="ux-5a-notice" role="alert"><AlertTriangle size={18} /><strong>This selection is no longer in the roster</strong></div><button type="button" onClick={onBack}>Back to roster</button></section>;
   return <section className={`ux-mobile-unit-options ${compact ? "compact" : ""}`}>
     {!compact ? <header className="ux-5a-header"><button type="button" onClick={onBack} aria-label="Back to roster"><ArrowLeft size={20} /></button><strong>{drilled ? "Drills" : "Lancers"}</strong></header> : null}
-    {drilled ? <nav aria-label="Selection path"><button type="button" disabled={busy} onClick={() => setDrilled(false)}>Lancers</button><ChevronRight size={13} /><span>Drills</span></nav> : null}
-    <div className="ux-5a-context"><span>Line</span><strong>{drilled ? (drillA ? 5 : 0) + (drillB ? 5 : 0) : total} Credits</strong></div>
+    {drilled ? <nav aria-label="Selection path"><button type="button" onClick={() => setDrilled(false)}>Lancers</button><ChevronRight size={13} /><span>Drills</span></nav> : null}
+    <div className="ux-5a-context"><span>Line</span><span className="ux-5a-progress" role="status" aria-label={busy ? "Updating options" : undefined}>{busy ? <LoaderCircle size={16} /> : null}</span><strong>{drilled ? (drillA ? 5 : 0) + (drillB ? 5 : 0) : total} Credits</strong></div>
     <div className="ux-5a-budget"><div style={{ width: `${Math.min(100, total / 2)}%` }} /></div>
     <small>{total} / 200 Credits · {200 - total} left</small>
     <div className="ux-5a-chips">{["Line", "Mounted"].map(name => tab === "options" ? <button type="button" key={name} aria-label={name} title="Shows this category on the Profile tab" onClick={() => { setMarked(name); setTab("profile"); }}>{name}</button> : <span key={name}>{name}</span>)}</div>
     <div className="ux-5b-tabs" role="tablist" aria-label="Unit view">{(["options", "profile"] as const).map(id => <button type="button" role="tab" key={id} aria-selected={tab === id} onClick={() => setTab(id)}>{id === "options" ? "Options" : "Profile"}</button>)}</div>
-    {busy ? <p role="status">Updating options…</p> : null}
     {error ? <div className="ux-5a-notice" role="alert"><AlertTriangle size={18} /><span><strong>Could not load options</strong><small>Connection interrupted</small><button type="button" onClick={() => setError(false)}>Try again</button></span></div> : tab === "profile" ? <MobileUnitProfile marked={marked} /> : <>
       {models < 3 || models > 10 ? <div className="ux-5a-notice" role="alert"><AlertTriangle size={18} /><span>Selection issues: Lancer count {models}, expected 3–10</span></div> : null}
-      {drilled ? <div className="ux-5a-card"><h4>Other options</h4><ToggleRow name="Drill A" cost="+5 Credits" value={drillA} disabled={busy} onChange={() => change(() => setDrillA(!drillA))} /><ToggleRow name="Drill B" cost="+5 Credits" value={drillB} disabled={busy} onChange={() => change(() => setDrillB(!drillB))} /></div> : <>
+      {drilled ? <div className="ux-5a-card"><h4>Other options</h4><ToggleRow name="Drill A" cost="+5 Credits" value={drillA} disabled={false} onChange={() => change(() => setDrillA(!drillA))} /><ToggleRow name="Drill B" cost="+5 Credits" value={drillB} disabled={false} onChange={() => change(() => setDrillB(!drillB))} /></div> : <>
         <h4>Model loadouts</h4>
         <article className="ux-5a-card">
           <button type="button" className="ux-5a-model-title" aria-expanded={expanded} onClick={() => setExpanded(!expanded)}><span><strong>Lancer ×{models}</strong><small>{sidearm === "Pistol" ? 14 : sidearm === "Axe" ? 13 : 12} Credits per model</small></span>{expanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}</button>
           <small>At least 3 · Up to 10 · Soft limit · can exceed</small>
-          <Count name="Lancer" value={models} min={0} over={models < 3 || models > 10} disabled={busy} onChange={value => change(() => setModels(value))} />
+          <Count name="Lancer" value={models} min={0} over={models < 3 || models > 10} disabled={false} onChange={value => change(() => setModels(value))} />
           {models < 3 || models > 10 ? <small className="ux-5a-invalid"><AlertTriangle size={13} />{models < 3 ? "Below minimum" : "Over maximum"}</small> : null}
           {expanded ? <>
             <FoldSection title="Sidearm" counter={`${sidearm ? models : 0}/${models} selections`} {...section("lancer/sidearm")}>
-              <div role="radiogroup" aria-label="Sidearm">{["", "Pistol", "Axe"].map(name => <button type="button" role="radio" aria-checked={sidearm === name} disabled={busy} className="ux-5a-choice" key={name} onClick={() => change(() => setSidearm(name))}>{sidearm === name ? <CircleDot size={21} /> : <Circle size={21} />}<span><strong>{name || "None"}</strong><small>{name ? `+${name === "Pistol" ? 2 : 1} Credits per model` : "No added cost"}</small>{name && sidearm === name ? <small>1 per model</small> : null}</span></button>)}</div>
-              <div className="ux-fold-nested"><FoldSection title="Exchange its scope" counter={`${scope ? models : 0}/${models} selections`} {...section("lancer/sidearm/scope")}><ToggleRow name="Long scope" cost="+1 Credits per model" value={scope} disabled={busy} onChange={() => change(() => setScope(!scope))} /></FoldSection></div>
+              <div role="radiogroup" aria-label="Sidearm">{["", "Pistol", "Axe"].map(name => <button type="button" role="radio" aria-checked={sidearm === name} className="ux-5a-choice" key={name} onClick={() => change(() => setSidearm(name))}>{sidearm === name ? <CircleDot size={21} /> : <Circle size={21} />}<span><strong>{name || "None"}</strong><small>{name ? `+${name === "Pistol" ? 2 : 1} Credits per model` : "No added cost"}</small>{name && sidearm === name ? <small>1 per model</small> : null}</span></button>)}</div>
+              <div className="ux-fold-nested"><FoldSection title="Exchange its scope" counter={`${scope ? models : 0}/${models} selections`} {...section("lancer/sidearm/scope")}><ToggleRow name="Long scope" cost="+1 Credits per model" value={scope} disabled={false} onChange={() => change(() => setScope(!scope))} /></FoldSection></div>
             </FoldSection>
             <FoldSection title="Other options" {...section("lancer/other")}><div className="ux-5a-choice"><Check size={19} /><span><strong>Lance</strong><small>Included · 1 per model</small></span></div></FoldSection>
           </> : null}
         </article>
-        <div className="ux-5a-card"><FoldSection title="Other options" {...section("unit/other")}><ToggleRow name="Banner" cost="+10 Credits" value={banner} disabled={busy} onChange={() => change(() => setBanner(!banner))} /><ToggleRow name="Drills" cost="No added cost" value={drills} disabled={busy} onChange={() => change(() => setDrills(!drills))} />{drills ? <button className="ux-5a-link" type="button" disabled={busy} onClick={() => setDrilled(true)}>Configure Drills <ChevronRight size={15} /></button> : null}</FoldSection></div>
+        <article className="ux-5a-card">
+          <div className="ux-5a-model-title"><span><strong>Lance Leader ×1</strong><small>16 Credits per model</small></span></div>
+          <small>At least 1 · Up to 1 · Soft limit · can exceed</small>
+        </article>
+        <div className="ux-5a-card"><FoldSection title="Other options" {...section("unit/other")}><ToggleRow name="Banner" cost="+10 Credits" value={banner} disabled={false} onChange={() => change(() => setBanner(!banner))} /><ToggleRow name="Drills" cost="No added cost" value={drills} disabled={false} onChange={() => change(() => setDrills(!drills))} />{drills ? <button className="ux-5a-link" type="button" onClick={() => setDrilled(true)}>Configure Drills <ChevronRight size={15} /></button> : null}</FoldSection></div>
         <div className="ux-5a-card"><FoldSection title="Guns" counter={`${guns}/2 selections`} inner={!belt} {...section("unit/guns")}>
-          <div className="ux-5a-choice"><span><strong>Cannon</strong><small>No added cost</small>{guns === 2 ? <small>Maximum 2 · 2 selected</small> : null}</span></div><small>Up to 2 · Hard limit</small><Count name="Cannon" value={guns} min={0} max={2} disabled={busy} onChange={value => change(() => setGuns(value))} />
-          <div className="ux-fold-nested"><FoldSection title="Ammunition" counter={`${belt ? 1 : 0}/1 selections · At least 1`} invalid={!belt} {...section("unit/guns/ammo")}><ToggleRow name="Belt feed" cost="No added cost" value={belt} disabled={busy} onChange={() => change(() => setBelt(!belt))} /></FoldSection></div>
+          <div className="ux-5a-choice"><span><strong>Cannon</strong><small>No added cost</small>{guns === 2 ? <small>Maximum 2 · 2 selected</small> : null}</span></div><small>Up to 2 · Hard limit</small><Count name="Cannon" value={guns} min={0} max={2} disabled={false} onChange={value => change(() => setGuns(value))} />
+          <div className="ux-fold-nested"><FoldSection title="Ammunition" counter={`${belt ? 1 : 0}/1 selections · At least 1`} invalid={!belt} {...section("unit/guns/ammo")}><ToggleRow name="Belt feed" cost="No added cost" value={belt} disabled={false} onChange={() => change(() => setBelt(!belt))} /></FoldSection></div>
         </FoldSection></div>
         <h4>Links</h4>
-        <div className="ux-5a-card"><h4>Escorting</h4><small className={escort ? "" : "ux-5a-invalid"}>{escort ? "1/1 linked" : <><AlertTriangle size={13} />0/1 linked · Needs 1 more link</>}</small><div role="radiogroup" aria-label="Escorting">{["Squad A", "Squad B"].map(name => <button type="button" role="radio" aria-checked={escort === name} disabled={busy} className="ux-5a-choice" key={name} onClick={() => change(() => setEscort(escort === name ? undefined : name))}>{escort === name ? <CheckCircle2 size={21} /> : <Circle size={21} />}<span><strong>{name}</strong></span></button>)}<div className="ux-5a-choice"><Circle size={21} /><span><strong>Squad C</strong><small className="ux-5b-warn">No longer eligible</small></span></div></div></div>
-        <button className="ux-5a-link" type="button" disabled={busy} onClick={() => setShowHidden(!showHidden)}>{showHidden ? "Hide hidden options" : "Show hidden options (1)"}</button>
+        <div className="ux-5a-card"><h4>Escorting</h4><small className={escort ? "" : "ux-5a-invalid"}>{escort ? "1/1 linked" : <><AlertTriangle size={13} />0/1 linked · Needs 1 more link</>}</small><div role="radiogroup" aria-label="Escorting">{["Squad A", "Squad B"].map(name => <button type="button" role="radio" aria-checked={escort === name} className="ux-5a-choice" key={name} onClick={() => change(() => setEscort(escort === name ? undefined : name))}>{escort === name ? <CheckCircle2 size={21} /> : <Circle size={21} />}<span><strong>{name}</strong></span></button>)}<div className="ux-5a-choice"><Circle size={21} /><span><strong>Squad C</strong><small className="ux-5b-warn">No longer eligible</small></span></div></div></div>
+        <button className="ux-5a-link" type="button" onClick={() => setShowHidden(!showHidden)}>{showHidden ? "Hide hidden options" : "Show hidden options (1)"}</button>
         {showHidden ? <div className="ux-5a-card"><strong>Secret option</strong><small>Hidden</small><small>No added cost</small><Count name="Secret option" value={0} min={0} disabled={true} onChange={() => {}} /></div> : null}
       </>}
     </>}

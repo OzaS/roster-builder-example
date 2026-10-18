@@ -6014,6 +6014,10 @@ button.ux-reference-tag:focus-visible {
 .ux-mobile-unit-options nav { display: flex; align-items: center; gap: 8px; font-size: 12px; }
 .ux-mobile-unit-options nav button, .ux-mobile-unit-options .ux-5a-link { color: var(--ux-accent); }
 .ux-5a-context { color: var(--ux-ink-secondary); font-size: 13px; }
+.ux-5a-context > span:first-child { flex: 1; }
+.ux-5a-progress { display: inline-flex; width: 16px; height: 16px; color: var(--ux-ink-secondary); }
+.ux-5a-progress svg { animation: ux-5a-spin 0.9s linear infinite; }
+@keyframes ux-5a-spin { to { transform: rotate(360deg); } }
 .ux-5a-context strong, .ux-5a-chips span { border-radius: 99px; background: var(--ux-surface-2); padding: 5px 10px; font-size: 12px; }
 .ux-5a-budget { height: 5px; border-radius: 99px; background: var(--ux-surface-3); overflow: hidden; }
 .ux-5a-budget > div { height: 100%; background: var(--ux-accent); }
