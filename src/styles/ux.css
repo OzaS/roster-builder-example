@@ -6039,3 +6039,18 @@ button.ux-reference-tag:focus-visible {
 .ux-5a-notice button { min-height: 44px; color: var(--ux-accent); }
 .ux-5a-skeleton { height: 54px; background: var(--ux-surface-2); border-radius: 12px; }
 .ux-mobile-unit-options > * { flex-shrink: 0; }
+
+/* Plan 4A/4D as built: one action per side, undo toast, header history buttons and save caption. */
+.ux-swipe-actions.leading, .ux-swipe-actions.trailing { grid-template-columns: 80px; width: 80px; }
+.ux-swipe-actions.leading { inset: 0 auto 0 0; }
+.ux-swipe-actions button.duplicate { background: color-mix(in srgb, var(--ux-ok) 82%, var(--ux-surface)); color: white; }
+.ux-undo-toast { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; border-radius: 10px; background: var(--ux-ink); color: var(--ux-surface); font-size: 12px; }
+.ux-undo-toast button { border: 0; background: transparent; color: var(--ux-accent); font-weight: 750; cursor: pointer; }
+.ux-history-header { display: grid; grid-template-columns: 1fr auto; gap: 6px 8px; padding: 10px 12px; border-radius: 10px; background: var(--ux-surface); }
+.ux-history-title { display: grid; min-width: 0; }
+.ux-history-title small, .ux-history-status small { color: var(--ux-ink-muted, var(--ux-muted)); font-size: 11px; }
+.ux-history-buttons { display: flex; gap: 2px; }
+.ux-history-buttons button { display: grid; place-items: center; width: 32px; height: 32px; border: 0; border-radius: 8px; background: transparent; color: var(--ux-accent); cursor: pointer; }
+.ux-history-buttons button:disabled { color: var(--ux-ink-muted, var(--ux-muted)); opacity: 0.5; cursor: default; }
+.ux-history-status { grid-column: 1 / -1; display: flex; justify-content: space-between; }
+.ux-history-status small.failed { color: var(--ux-err); }

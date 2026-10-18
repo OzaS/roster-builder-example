@@ -302,9 +302,26 @@ function WorkbenchElements({
       </ElementSection>
 
       <ElementSection title="Swipe Unit Actions">
-        <div className="ux-swipe-unit open" style={{ maxWidth: 360 }}>
-          <div className="ux-swipe-actions"><button type="button" className="delete"><Trash2 size={14} /><span>Delete</span></button><button type="button"><Pencil size={14} /><span>Rename</span></button><button type="button"><Copy size={14} /><span>Duplicate</span></button></div>
-          <button type="button" className="ux-tree-unit ux-swipe-unit-content active" style={{ transform: "translateX(-200px)" }}><span className="ux-tree-rail" /><span className="ux-tree-unit-main"><span>{selectedUnit.customName ?? selectedUnit.name}</span><small>×{selectedUnit.count}</small></span><b>{selectedUnit.points}</b></button>
+        <div style={{ display: "grid", gap: 10, maxWidth: 360 }}>
+          <small className="ux-elements-note">Built (plan 4A): swipe right reveals Duplicate, swipe left reveals Delete (as New Recruit). A full swipe or a tap on the revealed action runs it; one row open at a time; scrolling closes it. No confirmation: the Undo toast brings a deleted unit back.</small>
+          <div className="ux-swipe-unit open">
+            <div className="ux-swipe-actions leading"><button type="button" className="duplicate"><Copy size={14} /><span>Duplicate</span></button></div>
+            <button type="button" className="ux-tree-unit ux-swipe-unit-content active" style={{ transform: "translateX(88px)" }}><span className="ux-tree-rail" /><span className="ux-tree-unit-main"><span>{selectedUnit.customName ?? selectedUnit.name}</span><small>×{selectedUnit.count}</small></span><b>{selectedUnit.points}</b></button>
+          </div>
+          <div className="ux-swipe-unit open">
+            <div className="ux-swipe-actions trailing"><button type="button" className="delete"><Trash2 size={14} /><span>Delete</span></button></div>
+            <button type="button" className="ux-tree-unit ux-swipe-unit-content active" style={{ transform: "translateX(-88px)" }}><span className="ux-tree-rail" /><span className="ux-tree-unit-main"><span>{selectedUnit.customName ?? selectedUnit.name}</span><small>×{selectedUnit.count}</small></span><b>{selectedUnit.points}</b></button>
+          </div>
+          <div className="ux-undo-toast" role="status"><span>Deleted {selectedUnit.customName ?? selectedUnit.name}</span><button type="button">Undo</button></div>
+        </div>
+      </ElementSection>
+
+      <ElementSection title="Roster Undo / Redo · Saved">
+        <div className="ux-history-header" style={{ maxWidth: 360 }}>
+          <span className="ux-history-title"><strong>Roster name</strong><small>Faction · Game system</small></span>
+          <span className="ux-history-buttons"><button type="button" aria-label="Undo"><RotateCcw size={16} /></button><button type="button" aria-label="Redo" disabled><RotateCcw size={16} style={{ transform: "scaleX(-1)" }} /></button><button type="button" aria-label="Search"><Search size={16} /></button><button type="button" aria-label="Export"><Upload size={16} /></button></span>
+          <span className="ux-history-status"><small>885 / 1000 · 115 open</small><small className="saved">Saved</small></span>
+          <span className="ux-history-status"><small>885 / 1000 · 115 open</small><small className="failed">Not saved</small></span>
         </div>
       </ElementSection>
 
