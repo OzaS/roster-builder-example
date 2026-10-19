@@ -1,5 +1,5 @@
 import { AppearancePreferences } from "../concepts/ux/AppearanceSettings";
-import { MobileUnitOptions, OptionFoldSamples } from "../concepts/ux/MobileUnitOptions";
+import { MobileUnitOptions, ModelStackSamples, OptionFoldSamples } from "../concepts/ux/MobileUnitOptions";
 import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BarChart3, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, CircleDot, Cog, Coins, Command, Copy, Database, Dice5, Download, Ellipsis, FileInput, Gamepad2, GripVertical, Hammer, Heart, ImagePlus, Languages, Layers, LibraryBig, Maximize2, MessageCircle, Minus, Moon, MoveRight, Palette, PanelsTopLeft, Pencil, Plus, RotateCcw, Rows3, Scale, Search, Smartphone, Sparkles, Split, Trash2, Upload, UserRound, Wand2, X } from "lucide-react";
 import { createContext, useContext, useState } from "react";
 import { PhoneStatusBar } from "../components/DeviceFrame";
@@ -282,6 +282,11 @@ function WorkbenchElements({
           <OptionFoldSamples />
           <div className="ux-elements-stack"><MobileUnitOptions compact /></div>
         </div>
+      </ElementSection>
+
+      <ElementSection title="Model Stack Split and Selection Controls">
+        <small>Radio: one of several, optional None. Checkbox: independent optional picks, including a single option or nothing. Switch: immediate Settings only. Stepper: counts. Visible glyphs 21–22 px; target 48 px (≥44 pt / 48 dp). Restart restores selection, tab, category, hidden entries and folds; pending edits and split drafts reset. Controls reload from the worker.</small>
+        <div className="ux-mobile-unit-options"><ModelStackSamples /></div>
       </ElementSection>
 
       <ElementSection title="Unit Profile Tab · Mobile 5B">

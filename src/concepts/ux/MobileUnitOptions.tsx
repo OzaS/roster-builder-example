@@ -1,25 +1,22 @@
-import { AlertTriangle, ArrowLeft, Check, CheckCircle2, ChevronDown, ChevronRight, Circle, CircleDot, LoaderCircle, Minus, Plus } from "lucide-react";
-import { type ReactNode, useState } from "react";
+import { AlertTriangle, ArrowLeft, Check, CheckCircle2, ChevronDown, ChevronRight, Circle, CircleDot, Square, SquareCheck, LoaderCircle, Minus, Plus } from "lucide-react";
+import { type ReactNode, useEffect, useState } from "react";
 
 /** Implemented mobile unit detail: 5A options, 5B Profile tab and chips, and links (associations). Synthetic names and costs; later detail features stay in the original design.
  * UX-004: a command in flight shows only a spinner in room kept next to the cost and never dims or inserts rows; optional one-of groups always list None first. UX-003: a count pinned at min = max has no stepper. */
 export function MobileUnitOptions({ onBack, state = "ready", compact = false, initialTab = "options" }: { onBack?: () => void; state?: "ready" | "loading" | "error" | "gone"; compact?: boolean; initialTab?: "options" | "profile" }) {
-  const [models, setModels] = useState(5);
+  const [modelCost, setModelCost] = useState(70);
   const [guns, setGuns] = useState(2);
-  const [sidearm, setSidearm] = useState("Pistol");
   const [banner, setBanner] = useState(true);
   const [drills, setDrills] = useState(true);
   const [drilled, setDrilled] = useState(false);
   const [drillA, setDrillA] = useState(true);
   const [drillB, setDrillB] = useState(false);
-  const [expanded, setExpanded] = useState(true);
   const [showHidden, setShowHidden] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(state === "error");
   const [tab, setTab] = useState(initialTab);
   const [marked, setMarked] = useState<string | undefined>();
   const [escort, setEscort] = useState<string | undefined>("Squad A");
-  const [scope, setScope] = useState(false);
   const [belt, setBelt] = useState(true);
   // Folds are presentation only and keyed per section (selection + group path); everything starts expanded and a parent keeps its descendants' folds.
   const [folded, setFolded] = useState<string[]>([]);
@@ -30,7 +27,7 @@ export function MobileUnitOptions({ onBack, state = "ready", compact = false, in
     setBusy(true);
     window.setTimeout(() => { apply(); setBusy(false); }, 180);
   };
-  const total = 16 + models * (sidearm === "Pistol" ? 14 : sidearm === "Axe" ? 13 : 12) + (scope ? models : 0) + (banner ? 10 : 0) + (drillA ? 5 : 0) + (drillB ? 5 : 0);
+  const total = 16 + modelCost + (banner ? 10 : 0) + (drillA ? 5 : 0) + (drillB ? 5 : 0);
   if (state === "loading") return <section className="ux-mobile-unit-options"><p role="status">Loading options…</p><div className="ux-5a-skeleton" /><div className="ux-5a-skeleton" /><div className="ux-5a-skeleton" /></section>;
   if (state === "gone") return <section className="ux-mobile-unit-options"><div className="ux-5a-notice" role="alert"><AlertTriangle size={18} /><strong>This selection is no longer in the roster</strong></div><button type="button" onClick={onBack}>Back to roster</button></section>;
   return <section className={`ux-mobile-unit-options ${compact ? "compact" : ""}`}>
@@ -42,22 +39,10 @@ export function MobileUnitOptions({ onBack, state = "ready", compact = false, in
     <div className="ux-5a-chips">{["Line", "Mounted"].map(name => tab === "options" ? <button type="button" key={name} aria-label={name} title="Shows this category on the Profile tab" onClick={() => { setMarked(name); setTab("profile"); }}>{name}</button> : <span key={name}>{name}</span>)}</div>
     <div className="ux-5b-tabs" role="tablist" aria-label="Unit view">{(["options", "profile"] as const).map(id => <button type="button" role="tab" key={id} aria-selected={tab === id} onClick={() => setTab(id)}>{id === "options" ? "Options" : "Profile"}</button>)}</div>
     {error ? <div className="ux-5a-notice" role="alert"><AlertTriangle size={18} /><span><strong>Could not load options</strong><small>Connection interrupted</small><button type="button" onClick={() => setError(false)}>Try again</button></span></div> : tab === "profile" ? <MobileUnitProfile marked={marked} /> : <>
-      {models < 3 || models > 10 ? <div className="ux-5a-notice" role="alert"><AlertTriangle size={18} /><span>Selection issues: Lancer count {models}, expected 3–10</span></div> : null}
+
       {drilled ? <div className="ux-5a-card"><h4>Other options</h4><ToggleRow name="Drill A" cost="+5 Credits" value={drillA} disabled={false} onChange={() => change(() => setDrillA(!drillA))} /><ToggleRow name="Drill B" cost="+5 Credits" value={drillB} disabled={false} onChange={() => change(() => setDrillB(!drillB))} /></div> : <>
         <h4>Model loadouts</h4>
-        <article className="ux-5a-card">
-          <button type="button" className="ux-5a-model-title" aria-expanded={expanded} onClick={() => setExpanded(!expanded)}><span><strong>Lancer ×{models}</strong><small>{sidearm === "Pistol" ? 14 : sidearm === "Axe" ? 13 : 12} Credits per model</small></span>{expanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}</button>
-          <small>At least 3 · Up to 10 · Soft limit · can exceed</small>
-          <Count name="Lancer" value={models} min={0} over={models < 3 || models > 10} disabled={false} onChange={value => change(() => setModels(value))} />
-          {models < 3 || models > 10 ? <small className="ux-5a-invalid"><AlertTriangle size={13} />{models < 3 ? "Below minimum" : "Over maximum"}</small> : null}
-          {expanded ? <>
-            <FoldSection title="Sidearm" counter={`${sidearm ? models : 0}/${models} selections`} {...section("lancer/sidearm")}>
-              <div role="radiogroup" aria-label="Sidearm">{["", "Pistol", "Axe"].map(name => <button type="button" role="radio" aria-checked={sidearm === name} className="ux-5a-choice" key={name} onClick={() => change(() => setSidearm(name))}>{sidearm === name ? <CircleDot size={21} /> : <Circle size={21} />}<span><strong>{name || "None"}</strong><small>{name ? `+${name === "Pistol" ? 2 : 1} Credits per model` : "No added cost"}</small>{name && sidearm === name ? <small>1 per model</small> : null}</span></button>)}</div>
-              <div className="ux-fold-nested"><FoldSection title="Exchange its scope" counter={`${scope ? models : 0}/${models} selections`} {...section("lancer/sidearm/scope")}><ToggleRow name="Long scope" cost="+1 Credits per model" value={scope} disabled={false} onChange={() => change(() => setScope(!scope))} /></FoldSection></div>
-            </FoldSection>
-            <FoldSection title="Other options" {...section("lancer/other")}><div className="ux-5a-choice"><Check size={19} /><span><strong>Lance</strong><small>Included · 1 per model</small></span></div></FoldSection>
-          </> : null}
-        </article>
+        <ModelStackSamples onCost={setModelCost} />
         <article className="ux-5a-card">
           <div className="ux-5a-model-title"><span><strong>Lance Leader ×1</strong><small>16 Credits per model</small></span></div>
           <small>At least 1 · Up to 1 · Soft limit · can exceed</small>
@@ -82,7 +67,7 @@ function Count({ name, value, min, max, over, disabled, onChange }: { name: stri
   </div>;
 }
 function ToggleRow({ name, cost, value, disabled, onChange }: { name: string; cost: string; value: boolean; disabled: boolean; onChange: () => void }) {
-  return <div className="ux-5a-choice"><span><strong>{name}</strong><small>{cost}</small></span><button type="button" className={`ux-5a-switch ${value ? "on" : ""}`} role="switch" aria-label={name} aria-checked={value} disabled={disabled} onClick={onChange}><span /></button></div>;
+  return <button type="button" className="ux-5a-choice" role="checkbox" aria-label={name} aria-checked={value} disabled={disabled} onClick={onChange}>{value ? <SquareCheck size={22} /> : <Square size={22} />}<span><strong>{name}</strong><small>{cost}</small></span></button>;
 }
 
 /** 5B Profile tab: one table per profile type (horizontal scroll, text columns left-aligned and widest), rules that open, categories. */
@@ -122,4 +107,23 @@ export function OptionFoldSamples() {
       <FoldSection title="Guns" counter="1/2 selections" inner folded={!open.inner} onFold={() => toggle("inner")}><div className="ux-5a-choice"><span><strong>Cannon</strong><small>No added cost</small></span></div></FoldSection>
     </div>
   </section>;
+}
+
+/** UX-007: each resulting model stack owns its editable loadout. */
+export function ModelStackSamples({ onCost }: { onCost?: (cost: number) => void }) {
+  const [stacks, setStacks] = useState([{ id: 1, count: 5, sidearm: "Pistol", scope: false }]);
+  const [split, setSplit] = useState<{ id: number; count: number }>();
+  const [folds, setFolds] = useState<string[]>([]);
+  const fold = (key: string) => ({ folded: folds.includes(key), onFold: () => setFolds(all => all.includes(key) ? all.filter(x => x !== key) : [...all, key]) });
+  const total = stacks.reduce((n, s) => n + s.count, 0);
+  const cost = stacks.reduce((n, s) => n + s.count * (s.sidearm === "Pistol" ? 14 : s.sidearm === "Axe" ? 13 : 12) + (s.scope ? s.count : 0), 0);
+  useEffect(() => onCost?.(cost), [onCost, cost]);
+  const update = (id: number, values: Partial<(typeof stacks)[number]>) => setStacks(all => all.map(s => s.id === id ? { ...s, ...values } : s));
+  return <><small>{total} models total · At least 3 · Up to 10 · Soft limit</small>{stacks.map(s => <article key={s.id} className="ux-5a-card">
+    <strong>Lancer ×{s.count}</strong>
+    <Count name="Lancer" value={s.count} min={0} disabled={false} onChange={count => update(s.id, { count })} />
+    {s.count > 1 ? split?.id === s.id ? <div><small>Move models into a separate stack with the same loadout. Total model count stays the same.</small><Count name="Models to split" value={Math.min(split.count, s.count - 1)} min={1} max={s.count - 1} disabled={false} onChange={count => setSplit({ id: s.id, count })} /><button type="button" onClick={() => { const count = Math.min(split.count, s.count - 1); setStacks(all => [...all.map(x => x.id === s.id ? { ...x, count: x.count - count } : x), { ...s, id: Math.max(...all.map(x => x.id)) + 1, count }]); setSplit(undefined); }}>Split {Math.min(split.count, s.count - 1)} model(s)</button><button type="button" onClick={() => setSplit(undefined)}>Cancel</button></div> : <button type="button" onClick={() => setSplit({ id: s.id, count: 1 })}>Split models</button> : null}
+    <FoldSection title="Sidearm" counter={`${s.sidearm ? s.count : 0}/${s.count} selections`} {...fold(`${s.id}/sidearm`)}><div role="radiogroup" aria-label="Sidearm">{["", "Pistol", "Axe"].map(name => <button type="button" role="radio" aria-checked={s.sidearm === name} className="ux-5a-choice" key={name} onClick={() => update(s.id, { sidearm: name })}>{s.sidearm === name ? <CircleDot size={22} /> : <Circle size={22} />}<span><strong>{name || "None"}</strong><small>{name ? `+${name === "Pistol" ? 2 : 1} Credits per model` : "No added cost"}</small></span></button>)}</div>
+    <div className="ux-fold-nested"><FoldSection title="Exchange its scope" {...fold(`${s.id}/scope`)}><ToggleRow name="Long scope" cost="+1 Credits per model" value={s.scope} disabled={false} onChange={() => update(s.id, { scope: !s.scope })} /></FoldSection></div></FoldSection>
+  </article>)}</>;
 }

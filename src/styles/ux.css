@@ -6114,3 +6114,7 @@ button.ux-reference-tag:focus-visible {
 .ux-appearance-action[aria-checked="true"] { border-color: var(--ux-accent); color: var(--ux-accent-2); background: color-mix(in srgb, var(--ux-accent) 12%, var(--ux-surface)); }
 .ux-appearance-action:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px; }
 .ux-appearance-action:disabled { opacity: .5; cursor: wait; }
+
+/* UX-006: roster checks are checkboxes; all selection/count targets meet phone minima. */
+.ux-mobile-unit-options button, .ux-5a-count button { min-width: 48px; min-height: 48px; }
+.ux-5a-choice[role="checkbox"] { width: 100%; text-align: left; background: transparent; color: inherit; }
