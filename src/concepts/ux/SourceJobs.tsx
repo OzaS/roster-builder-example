@@ -430,8 +430,8 @@ export function InstallJobScreen({ props }: { props: ConceptProps }) {
   } else {
     modal = (
       <JobModal title={title} subtitle={subtitle} steps={installSteps("failed").map((s) => (s.state === "failed" ? { ...s, state: "waiting", detail: "Cancelled" } : s))} outcome="cancelled"
-        notice={<JobOutcomeNotice outcome="cancelled" title="Install stopped" body="7 of 23 factions were installed." />}
-        footer={<><button type="button" className="ux-job-btn secondary">Close</button><button type="button" className="ux-job-btn primary">Install the rest</button></>} />
+        notice={<JobOutcomeNotice outcome="cancelled" title="Install cancelled" body="Nothing was installed." />}
+        footer={<><button type="button" className="ux-job-btn secondary">Close</button><button type="button" className="ux-job-btn primary">Try again</button></>} />
     );
   }
   return (

@@ -658,8 +658,11 @@ function WorkbenchElements({
         <JobOutcomeNotice outcome="updated" title="Updated Example System Two" body="3 rosters use this data. Check them to see which changed." />
         <JobOutcomeNotice outcome="done" title={`Installed ${EXAMPLE_SYSTEM.name}`} body="23 factions · 41 MB. Ready to use." />
         <JobOutcomeNotice outcome="failed" title={`Could not install ${EXAMPLE_SYSTEM.name}`} body="GitHub could not be reached. Check the connection and try again." />
-        <JobOutcomeNotice outcome="cancelled" title="Install stopped" body="7 of 23 factions were installed." />
+        {/* A cancelled install keeps nothing (DEC-027): one cancelled notice, no "Install stopped · N of M" variant. */}
         <JobOutcomeNotice outcome="cancelled" title="Install cancelled" body="Nothing was installed." />
+        {/* Cancel tapped: "Cancelling…" replaces the action (disabled, with a spinner) until the worker has stopped and discarded what it wrote. */}
+        <JobModal inline title={`Installing ${EXAMPLE_SYSTEM.name}`} subtitle={`${EXAMPLE_SYSTEM.repo} · ${EXAMPLE_SYSTEM.version}`} percent={52} stepLabel="Step 4 of 4" steps={installSteps("import")}
+          footer={<><button type="button" className="ux-job-btn destructive" disabled aria-disabled><RotateCcw size={15} className="ux-spin" aria-hidden />Cancelling…</button><button type="button" className="ux-job-btn secondary"><ChevronDown size={15} />Hide</button></>} />
       </ElementSection>
 
       <ElementSection title="Global Job Indicator">
