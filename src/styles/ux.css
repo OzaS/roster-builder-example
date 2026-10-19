@@ -6058,7 +6058,7 @@ button.ux-reference-tag:focus-visible {
 .ux-5b-table .text { text-align: left; white-space: normal; width: 100%; }
 .ux-mobile-unit-options .ux-5b-warn { color: var(--ux-warn, var(--ux-ink-secondary)); }
 .ux-fold { display: flex; flex-direction: column; gap: 6px; }
-.ux-mobile-unit-options .ux-fold-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 44px; text-align: left; }
+.ux-mobile-unit-options .ux-fold-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 48px; text-align: left; }
 .ux-fold-head > span { flex: 1; display: flex; flex-direction: column; gap: 2px; }
 .ux-fold-head strong { color: var(--ux-ink-secondary); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
 .ux-fold-head svg { flex-shrink: 0; color: var(--ux-ink-secondary); }
