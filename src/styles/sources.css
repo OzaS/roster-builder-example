@@ -240,6 +240,8 @@
 .ux-job-other-main { display: grid; gap: 4px; min-width: 0; padding: 0; border: 0; background: transparent; color: var(--ux-ink); font: inherit; text-align: left; cursor: pointer; }
 .ux-job-other-main strong { font-size: 13px; }
 .ux-job-other-main small { color: var(--ux-muted); font-size: 11.5px; }
+.ux-job-other.done > svg { color: var(--ux-ok); }
+.ux-job-other.failed > svg { color: var(--ux-err); }
 .ux-job-other-cancel { display: grid; place-items: center; width: 30px; height: 30px; border: 0; border-radius: 8px; background: var(--ux-surface-3); color: var(--ux-muted); cursor: pointer; }
 .ux-job-notify { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 10px 12px; border: 1px dashed var(--ux-line-2); border-radius: var(--ux-r-sm); background: transparent; color: var(--ux-accent-2); font: inherit; font-size: 13px; font-weight: 700; text-align: left; cursor: pointer; }
 .ux-job-notice > .ux-src-inline-actions .ux-job-btn { min-height: 36px; }

@@ -62,7 +62,7 @@ export function JobOutcomeNotice({ outcome, title, body }: { outcome: JobOutcome
   );
 }
 
-export type OtherJob = { title: string; detail: string; percent?: number; waiting?: boolean };
+export type OtherJob = { title: string; detail: string; percent?: number; waiting?: boolean; ended?: "done" | "failed" | "cancelled" };
 
 /** The other running or waiting jobs, collapsed under the expanded one (several jobs at once, DEC-024). */
 export function OtherJobs({ jobs }: { jobs: OtherJob[] }) {
@@ -70,14 +70,14 @@ export function OtherJobs({ jobs }: { jobs: OtherJob[] }) {
     <div className="ux-job-others">
       <div className="ux-result-label">Other jobs</div>
       {jobs.map((job) => (
-        <div key={job.title} className={`ux-job-other ${job.waiting ? "waiting" : ""}`}>
-          {job.waiting ? <Clock size={16} aria-label="Waiting" /> : <LoaderCircle size={16} className="ux-spin" aria-label="In progress" />}
+        <div key={job.title} className={`ux-job-other ${job.waiting ? "waiting" : ""} ${job.ended ?? ""}`}>
+          {job.ended === "done" ? <CircleCheck size={16} aria-label="Done" /> : job.ended === "failed" ? <OctagonAlert size={16} aria-label="Failed" /> : job.ended === "cancelled" ? <X size={16} aria-label="Cancelled" /> : job.waiting ? <Clock size={16} aria-label="Waiting" /> : <LoaderCircle size={16} className="ux-spin" aria-label="In progress" />}
           <button type="button" className="ux-job-other-main" aria-label={`${job.title}, ${job.detail}. Show its steps.`}>
-            <strong>{job.title}{job.percent === undefined ? "" : ` · ${job.percent}%`}</strong>
+            <strong>{job.title}{job.percent === undefined || job.ended ? "" : ` · ${job.percent}%`}</strong>
             <small>{job.detail}</small>
-            {job.waiting ? null : <JobProgressBar value={job.percent === undefined ? undefined : job.percent / 100} />}
+            {job.waiting || job.ended ? null : <JobProgressBar value={job.percent === undefined ? undefined : job.percent / 100} />}
           </button>
-          <button type="button" className="ux-job-other-cancel" aria-label={`Cancel ${job.title}`}><X size={14} /></button>
+          {job.ended ? null : <button type="button" className="ux-job-other-cancel" aria-label={`Cancel ${job.title}`}><X size={14} /></button>}
         </div>
       ))}
     </div>
@@ -404,7 +404,7 @@ export function InstallJobScreen({ props }: { props: ConceptProps }) {
   if (preview === "running") {
     modal = <JobModal title={title} subtitle={subtitle} percent={46} stepLabel="Step 3 of 4" steps={installSteps("import")} notify />;
   } else if (preview === "several") {
-    modal = <JobModal title={title} subtitle={subtitle} percent={46} stepLabel="Step 3 of 4" steps={installSteps("import")} overall={38} others={[{ title: "Updating Example System Two", detail: "Download · 4.1 MB of 29 MB", percent: 14 }, { title: "Installing Example System Three", detail: "Waiting for another install", waiting: true }]} />;
+    modal = <JobModal title={title} subtitle={subtitle} percent={46} stepLabel="Step 3 of 4" steps={installSteps("import")} overall={38} others={[{ title: "Updating Example System Two", detail: "Download · 4.1 MB of 29 MB", percent: 14 }, { title: "Installing Example System Three", detail: "Waiting for another install", waiting: true }, { title: "Installed Example System Four", detail: "12 factions. Ready to use.", ended: "done" }]} />;
   } else if (preview === "mobile-data") {
     modal = <JobModal title={title} subtitle={subtitle} percent={8} stepLabel="Step 1 of 4" steps={installSteps("download")} notice={<MobileDataNotice />} />;
   } else if (preview === "wifi") {

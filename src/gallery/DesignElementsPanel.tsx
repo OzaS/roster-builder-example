@@ -652,7 +652,7 @@ function WorkbenchElements({
 
       <ElementSection title="Background Job Modal">
         <JobModal inline title={`Installing ${EXAMPLE_SYSTEM.name}`} subtitle={`${EXAMPLE_SYSTEM.repo} · ${EXAMPLE_SYSTEM.version}`} percent={46} stepLabel="Step 3 of 4" steps={installSteps("import")} notify />
-        <JobModal inline title={`Installing ${EXAMPLE_SYSTEM.name}`} subtitle={`${EXAMPLE_SYSTEM.repo} · ${EXAMPLE_SYSTEM.version}`} percent={46} stepLabel="Step 3 of 4" steps={installSteps("import")} overall={38} others={[{ title: "Updating Example System Two", detail: "Download · 4.1 MB of 29 MB", percent: 14 }, { title: "Installing Example System Three", detail: "Waiting for another install", waiting: true }]} />
+        <JobModal inline title={`Installing ${EXAMPLE_SYSTEM.name}`} subtitle={`${EXAMPLE_SYSTEM.repo} · ${EXAMPLE_SYSTEM.version}`} percent={46} stepLabel="Step 3 of 4" steps={installSteps("import")} overall={38} others={[{ title: "Updating Example System Two", detail: "Download · 4.1 MB of 29 MB", percent: 14 }, { title: "Installing Example System Three", detail: "Waiting for another install", waiting: true }, { title: "Installed Example System Four", detail: "12 factions. Ready to use.", ended: "done" }]} />
         <MobileDataNotice />
         <WifiWaitNotice />
         <JobOutcomeNotice outcome="updated" title="Updated Example System Two" body="3 rosters use this data. Check them to see which changed." />
