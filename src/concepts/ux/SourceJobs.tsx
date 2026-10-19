@@ -635,28 +635,61 @@ export function OlderVersionRow({ commit = VERSION_NEWEST.commit }: { commit?: s
   );
 }
 
-/** The native confirmation before deleting a kept version: the space it frees, and that it cannot be undone. */
-export function DeleteVersionAlert({ inline = false, version = VERSION_PREVIOUS }: { inline?: boolean; version?: ExampleVersion }) {
-  const alert = (
-    <div className="ux-native-alert" role="alertdialog" aria-label={`Delete version ${version.commit}?`}>
-      <strong>Delete version {version.commit}?</strong>
-      <small>Frees {version.size}. This cannot be undone.</small>
-      <div><button type="button">Cancel</button><button type="button" className="destructive">Delete</button></div>
+/**
+ * The app's own dialog (UX-013, DEC-027), replacing the system alerts: centred on a dimmed backdrop, title, message and actions.
+ * Confirm: Cancel (secondary) beside the action, which is red when it destroys something. Menu: a vertical list of actions and a Cancel row.
+ * Built in battle-augur apps/mobile/src/ds/dialog.
+ */
+export function AppDialog({ title, message, actions, layout = "row", inline = false }: { title: string; message?: string; actions: Array<{ label: string; tone?: "primary" | "destructive" | "secondary"; icon?: ReactNode }>; layout?: "row" | "column"; inline?: boolean }) {
+  const dialog = (
+    <div className="ux-dialog" role="alertdialog" aria-modal="true" aria-label={title}>
+      <strong>{title}</strong>
+      {message ? <small>{message}</small> : null}
+      <div className={`ux-dialog-actions ${layout}`}>
+        {actions.map((a) => <button key={a.label} type="button" className={`ux-dialog-btn ${a.tone ?? "secondary"}`}>{a.icon}{a.label}</button>)}
+      </div>
     </div>
   );
-  return inline ? alert : <div className="ux-job-scrim ux-alert-scrim">{alert}</div>;
+  return inline ? <div className="ux-dialog-inline">{dialog}</div> : <div className="ux-job-scrim ux-alert-scrim">{dialog}</div>;
 }
 
-/** The native confirmation before Remove: rosters stay, read-only (DEC-024). */
+/** Confirmation before deleting a kept version: the space it frees, and that it cannot be undone. */
+export function DeleteVersionAlert({ inline = false, version = VERSION_PREVIOUS }: { inline?: boolean; version?: ExampleVersion }) {
+  return <AppDialog inline={inline} title={`Delete version ${version.commit}?`} message={`Frees ${version.size}. This cannot be undone.`} actions={[{ label: "Cancel" }, { label: "Delete", tone: "destructive" }]} />;
+}
+
+/** Confirmation before Remove: rosters stay, read-only (DEC-024). */
 export function RemoveSourceAlert({ inline = false }: { inline?: boolean }) {
-  const alert = (
-    <div className="ux-native-alert" role="alertdialog" aria-label={`Remove ${EXAMPLE_SYSTEM.name}?`}>
-      <strong>Remove {EXAMPLE_SYSTEM.name}?</strong>
-      <small>3 rosters will open read-only until this data is added again. Frees 41 MB.</small>
-      <div><button type="button">Cancel</button><button type="button" className="destructive">Remove</button></div>
-    </div>
+  return <AppDialog inline={inline} title={`Remove ${EXAMPLE_SYSTEM.name}?`} message="3 rosters will open read-only until this data is added again. Frees 41 MB." actions={[{ label: "Cancel" }, { label: "Remove", tone: "destructive" }]} />;
+}
+
+/** A short action menu (the ⋯ buttons): the same dialog with the actions stacked; Cancel last. */
+export function ActionMenuDialog({ inline = false }: { inline?: boolean }) {
+  return <AppDialog inline={inline} layout="column" title="Example unit" actions={[{ label: "Duplicate", icon: <Copy size={15} /> }, { label: "Delete", tone: "destructive", icon: <Trash2 size={15} /> }, { label: "Cancel" }]} />;
+}
+
+/**
+ * Import report on the source detail (UX-014, DEC-027): the counts by severity stay visible, the groups of messages
+ * (unresolved references, duplicate IDs …) start folded behind "Show {n}" and unfold on request.
+ */
+export function ImportReportGroups({ expanded = false, onToggle }: { expanded?: boolean; onToggle?: () => void }) {
+  return (
+    <>
+      <div className="ux-src-section-head"><span className="ux-result-label">Import report</span><button type="button" className="ux-job-link" aria-expanded={expanded} onClick={onToggle}>{expanded ? "Hide" : "Show 3"}</button></div>
+      <div className="ux-src-chips"><SeverityCount tone="error" label="2 errors" /><SeverityCount tone="warning" label="14 warnings" /><SeverityCount tone="info" label="1 note" /></div>
+      {expanded ? (
+        <div className="ux-src-group">
+          <DetailRow label="Unresolved reference · missing-target" value="11" />
+          <DetailRow label="Duplicate ID · duplicate-id" value="3" />
+          <DetailRow label="Unused entry · unused-entry" value="1" />
+        </div>
+      ) : null}
+    </>
   );
-  return inline ? alert : <div className="ux-job-scrim ux-alert-scrim">{alert}</div>;
+}
+
+function SeverityCount({ tone, label }: { tone: "error" | "warning" | "info"; label: string }) {
+  return <span className={`ux-src-sev ${tone}`}>{label}</span>;
 }
 
 type DetailPreview = "update" | "current" | "updating" | "updated" | "not-checked" | "failed" | "versions" | "older" | "switched" | "delete-version" | "remove";
@@ -667,6 +700,7 @@ function DetailRow({ label, value, action }: { label: string; value: string; act
 
 export function SourceDetailScreen({ props }: { props: ConceptProps }) {
   const [preview, setPreview] = useState<DetailPreview>("update");
+  const [reportOpen, setReportOpen] = useState(false);
   // Switching back to 1a2b3c4 makes the source use an older version than a kept one.
   const older = preview === "older" || preview === "switched";
   const newest = preview === "updated" || preview === "not-checked" || preview === "versions" || preview === "delete-version";
@@ -700,6 +734,7 @@ export function SourceDetailScreen({ props }: { props: ConceptProps }) {
         {preview === "versions" || preview === "delete-version" || older ? <SourceVersions older={older} onDelete={() => setPreview("delete-version")} /> : null}
         <div className="ux-result-label">Installed factions</div>
         <div className="ux-src-group">{EXAMPLE_FACTIONS.slice(0, 4).map((f) => <DetailRow key={f} label={f} value="r14" />)}<DetailRow label="…and 19 more" value="" /></div>
+        <ImportReportGroups expanded={reportOpen} onToggle={() => setReportOpen((v) => !v)} />
         <button type="button" className="ux-job-btn destructive block ux-src-remove" disabled={preview === "updating"}>Remove this data</button>
         {preview === "updating" ? <small className="ux-src-footer">This data is being updated. Try again when it finishes.</small> : null}
       </div>

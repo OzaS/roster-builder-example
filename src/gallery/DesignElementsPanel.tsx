@@ -9,7 +9,7 @@ import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, T
 import { BudgetMeter, Chip, ExpandableBudget, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
 import { ComingSoonCard, DeveloperOptionsPreview } from "../concepts/ux/AppExtras";
-import { AddCollectionSheet, AdvancedInstallSetting, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceUpdateCard, SourceVersions, TaggedRosterRows, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
+import { ActionMenuDialog, AddCollectionSheet, AdvancedInstallSetting, AppDialog, ImportReportGroups, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceUpdateCard, SourceVersions, TaggedRosterRows, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
 
 type Props = {
   concept: GalleryConcept;
@@ -582,6 +582,20 @@ function WorkbenchElements({
         <DeleteVersionAlert inline />
         <JobToast tone="neutral" message="Switched to version 1a2b3c4" />
         <RemoveSourceAlert inline />
+      </ElementSection>
+
+      <ElementSection title="App Dialog · Menu">
+        <RemoveSourceAlert inline />
+        <DeleteVersionAlert inline />
+        <AppDialog inline title="Remove Example System One?" message="3 rosters will open read-only until this data is added again. Frees 41 MB. A long message wraps and the dialog scrolls instead of growing past the screen when the text size is large." actions={[{ label: "Cancel" }, { label: "Remove", tone: "destructive" }]} />
+        <ActionMenuDialog inline />
+        <small className="ux-elements-note">Built from UX-013 (DEC-027): replaces every system alert and action sheet. Centred on a dimmed backdrop in the theme (light, dark, imported schemes); Cancel (secondary) is first, the destructive action is filled in the error colour, other actions are primary or secondary. Menus stack the actions with Cancel last. Backdrop tap and Android back cancel, except a dialog that must be answered.</small>
+      </ElementSection>
+
+      <ElementSection title="Import Report Groups">
+        <ImportReportGroups />
+        <ImportReportGroups expanded />
+        <small className="ux-elements-note">UX-014 (DEC-027): on the source detail the severity counts stay visible and the groups of messages start folded behind Show; Hide folds them again.</small>
       </ElementSection>
 
       <ElementSection title="Migration Report">
