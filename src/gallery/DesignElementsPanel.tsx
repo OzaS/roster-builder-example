@@ -1,6 +1,6 @@
 import { AppearancePreferences } from "../concepts/ux/AppearanceSettings";
 import { MobileUnitOptions, OptionFoldSamples } from "../concepts/ux/MobileUnitOptions";
-import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BarChart3, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, CircleDot, Cog, Coins, Command, Copy, Database, Dice5, Download, Ellipsis, FileInput, Gamepad2, GripVertical, Hammer, Heart, ImagePlus, Languages, Layers, LibraryBig, Maximize2, MessageCircle, Minus, Moon, MoveRight, Palette, PanelsTopLeft, Pencil, Plus, RotateCcw, Rows3, Scale, Search, Smartphone, Sparkles, Split, Trash2, Upload, UserRound, Wand2, X } from "lucide-react";
+import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BarChart3, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, Circle, CircleDot, Cog, Coins, Command, Copy, Database, Dice5, Download, Ellipsis, FileInput, Gamepad2, GripVertical, Hammer, Heart, ImagePlus, Languages, Layers, LibraryBig, Maximize2, MessageCircle, Minus, Moon, MoveRight, Palette, PanelsTopLeft, Pencil, Plus, RotateCcw, Rows3, Scale, Search, Smartphone, Sparkles, Split, Trash2, Upload, UserRound, Wand2, X, SquareCheck } from "lucide-react";
 import { createContext, useContext, useState } from "react";
 import { PhoneStatusBar } from "../components/DeviceFrame";
 import { mockRosterReferences, referenceById } from "../data/mockRosterReferences";
@@ -190,37 +190,55 @@ function WorkbenchElements({
       <ElementSection title="Roster Creation">
         <button type="button" className="ux-start-row on">
           <span>
-            <strong>Warhammer 40,000</strong>
-            <small>Matched play · Incursion to Onslaught</small>
+            <strong>Example System</strong>
+            <small>Modes with guided configuration</small>
           </span>
           <Check size={18} />
         </button>
-        <div className="ux-filter-row">
-          {["1000 pts", "2000 pts", "Custom"].map((label) => (
-            <button key={label} type="button" className={`ux-filter-pill ${label === "Custom" ? "on" : ""}`}>
-              {label}
+        <button type="button" className="ux-select-field">
+          <span><strong>Faction A</strong><small>Example System</small></span><ChevronDown size={16} />
+        </button>
+        <button type="button" className="ux-select-field">
+          <span><strong>Mode A</strong><small>Faction A</small></span><ChevronDown size={16} />
+        </button>
+        <div className="ux-start-group ux-guided-step" role="radiogroup" aria-label="Size">
+          <h4>Size</h4>
+          <small className="ux-guided-note">Sets the Credits limit</small>
+          {[["Option A", "Limit 1000 Credits", false], ["Option B", "Limit 2000 Credits", true]].map(([name, limit, on]) => (
+            <button key={String(name)} type="button" role="radio" aria-checked={Boolean(on)} className={`ux-guided-option ${on ? "on" : ""}`}>
+              {on ? <CircleDot size={20} /> : <Circle size={20} />}<span><strong>{String(name)}</strong><em className="ux-guided-cost">{String(limit)}</em></span>
             </button>
           ))}
         </div>
-        <label className="ux-custom-points">
-          <input value="1500" aria-label="Custom points limit" readOnly />
-          <span>pts</span>
-        </label>
-        <button type="button" className="ux-select-field">
-          <span><strong>Adeptus Astartes</strong><small>Warhammer 40,000</small></span><ChevronDown size={16} />
-        </button>
-        <button type="button" className="ux-select-field">
-          <span><strong>Strike Force</strong><small>Adeptus Astartes · 1500 pts</small></span><ChevronDown size={16} />
-        </button>
+        <div className="ux-start-group ux-guided-step" role="group" aria-label="Extras">
+          <h4>Extras · optional</h4>
+          <small className="ux-guided-budget">1 / 2 selections</small>
+          <button type="button" role="checkbox" aria-checked className="ux-guided-option on"><SquareCheck size={20} /><span><strong>Option A</strong><em className="ux-guided-cost">+1 Resource A</em></span></button>
+          <div className="ux-guided-option"><span><strong>Option B</strong><em className="ux-guided-cost">+2 Resource B</em><small>Up to 2</small></span><span className="ux-stepper"><button type="button" aria-label="Fewer Option B"><Minus size={14} /></button><b>0</b><button type="button" aria-label="More Option B"><Plus size={14} /></button></span></div>
+        </div>
+        <div className="ux-start-group">
+          <h4>Credits limit</h4>
+          <div className="ux-filter-row">
+            {["1000 Credits", "2000 Credits", "Custom", "Unlimited"].map((label) => (
+              <button key={label} type="button" className={`ux-filter-pill ${label === "Custom" ? "on" : ""}`}>{label}</button>
+            ))}
+          </div>
+          <label className="ux-custom-points">
+            <input value="999" aria-label="Custom Credits limit" readOnly />
+            <span>Credits</span>
+          </label>
+          <small className="ux-guided-note">At most 999 Credits · shown only when no choice sets the limit</small>
+        </div>
         <label className="ux-start-group ux-roster-name">
           <h4>Roster name</h4><input value="New roster" aria-label="Roster name" readOnly />
         </label>
+        <button type="button" className="ux-ghost-btn ux-guided-skip">Skip guided setup</button>
         <div className="ux-loadout-selector-layer ux-elements-static">
           <section className="ux-loadout-selector" role="dialog" aria-label="Choose faction">
-            <header><span><strong>Choose faction</strong><small>Warhammer 40,000 · 1500 pts</small></span><button type="button" aria-label="Close picker"><X size={18} /></button></header>
+            <header><span><strong>Choose faction</strong><small>Example System</small></span><button type="button" aria-label="Close picker"><X size={18} /></button></header>
             <label className="ux-loadout-selector-search"><Search size={15} /><input placeholder="Search factions" readOnly /></label>
             <div className="ux-loadout-choice-list">
-              {[['Adeptus Astartes', 'Imperium'], ['Astra Militarum', 'Imperium'], ['Aeldari', 'Xenos']].map(([name, group], index) => (
+              {[['Faction A', 'Group A'], ['Faction B', 'Group B'], ['Faction C', 'Group C']].map(([name, group], index) => (
                 <button type="button" className={`ux-loadout-choice ${index === 0 ? "selected" : ""}`} key={name}><span><strong>{name}</strong><small>{group}</small></span><span className="ux-loadout-choice-check" aria-hidden>{index === 0 ? <Check size={15} /> : null}</span></button>
               ))}
             </div>

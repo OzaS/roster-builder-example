@@ -1,6 +1,6 @@
 import { AppearancePreferences } from "./AppearanceSettings";
 import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject } from "react";
-import { Activity, AlertTriangle, ArrowLeft, ArrowUp, BarChart3, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, CircleDot, ClipboardList, Cog, Coins, Command, Copy, Database, Dice5, Download, Ellipsis, FileInput, Filter, Folder, FolderOpen, Gamepad2, GripVertical, Hammer, Heart, ImagePlus, Languages, Layers, LibraryBig, Maximize2, Minimize2, Minus, Moon, MoveRight, Palette, PanelsTopLeft, Pencil, Plus, RotateCcw, Scale, Search, ShieldCheck, Sparkles, Split, Tag, Target, Timer, Trash2, Upload, UserRound, UsersRound, Wand2, X } from "lucide-react";
+import { Activity, AlertTriangle, ArrowLeft, ArrowUp, BarChart3, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, Circle, CircleDot, ClipboardList, Cog, Coins, Command, Copy, Database, Dice5, Download, Ellipsis, FileInput, Filter, Folder, FolderOpen, Gamepad2, GripVertical, Hammer, Heart, ImagePlus, Languages, Layers, LibraryBig, Maximize2, Minimize2, Minus, Moon, MoveRight, Palette, PanelsTopLeft, Pencil, Plus, RotateCcw, Scale, Search, ShieldCheck, Sparkles, Split, Square, SquareCheck, Tag, Target, Timer, Trash2, Upload, UserRound, UsersRound, Wand2, X } from "lucide-react";
 import { mockCatalogues, mockDetachments, mockSystemUnits } from "../../data/mockRoster";
 import { referenceById, resolveRosterReference } from "../../data/mockRosterReferences";
 import type { RosterReferenceDefinition, RosterUnit } from "../../types";
@@ -1285,68 +1285,89 @@ function Library({ props }: { props: ConceptProps }) {
   );
 }
 
-/** Roster creation flow ("Roster creation"). */
+/** Roster creation flow ("Roster creation", DEC-028): system → faction → mode → the data's configuration steps (a limit-setting step first) → a limit field only when no choice sets it → name. */
+type GuidedOption = { name: string; cost?: number; limit?: number; max?: number };
+type GuidedStep = { key: string; name: string; control: "single" | "multiple" | "quantity"; required: boolean; setsLimit?: boolean; budget?: { label: string; limit?: number; kind: "cost" | "selections" }; options: GuidedOption[] };
+type GuidedMode = { name: string; sub: string; steps: GuidedStep[] };
+const GUIDED_SYSTEMS: { name: string; sub: string; unit: string; limitMax?: number; factions: { name: string; sub: string; modes: GuidedMode[] }[] }[] = [
+  {
+    name: "Example System",
+    sub: "Modes with guided configuration",
+    unit: "Credits",
+    factions: [
+      {
+        name: "Faction A",
+        sub: "Group A",
+        modes: [
+          {
+            name: "Mode A",
+            sub: "Size, detachment and extras",
+            steps: [
+              { key: "size", name: "Size", control: "single", required: true, setsLimit: true, options: [{ name: "Option A", limit: 1000 }, { name: "Option B", limit: 2000 }, { name: "Option C", limit: 3000 }] },
+              { key: "detachment", name: "Detachment", control: "single", required: true, budget: { label: "Resource A", limit: 3, kind: "cost" }, options: [{ name: "Option A", cost: 1 }, { name: "Option B", cost: 2 }, { name: "Option C", cost: 3 }] },
+              { key: "extras", name: "Extras", control: "multiple", required: false, budget: { label: "selections", limit: 2, kind: "selections" }, options: [{ name: "Option A", cost: 1 }, { name: "Option B", cost: 1 }, { name: "Option C", cost: 2 }] },
+              { key: "banner", name: "Banner", control: "multiple", required: false, options: [{ name: "Option A", cost: 0 }] },
+              { key: "support", name: "Support", control: "quantity", required: false, budget: { label: "Resource B", limit: 4, kind: "cost" }, options: [{ name: "Option A", cost: 1, max: 4 }, { name: "Option B", cost: 2, max: 2 }] },
+            ],
+          },
+          { name: "Mode B", sub: "No configuration choices", steps: [] },
+        ],
+      },
+      { name: "Faction B", sub: "Group B", modes: [{ name: "Mode A", sub: "Size and extras", steps: [{ key: "size", name: "Size", control: "single", required: true, setsLimit: true, options: [{ name: "Option A", limit: 500 }, { name: "Option B", limit: 1500 }] }] }] },
+    ],
+  },
+  {
+    name: "Example System B",
+    sub: "The data sets no limit",
+    unit: "Points",
+    limitMax: 999,
+    factions: [{ name: "Faction A", sub: "Group A", modes: [{ name: "Mode A", sub: "Numeric limit", steps: [{ key: "pair", name: "Pair", control: "multiple", required: true, budget: { label: "selections", limit: 2, kind: "selections" }, options: [{ name: "Option A", cost: 0 }, { name: "Option B", cost: 0 }, { name: "Option C", cost: 0 }] }] }] }],
+  },
+];
+
 function CreateScreen({ props }: { props: ConceptProps }) {
-  const systems = [
-    {
-      name: "Warhammer 40,000",
-      sub: "Matched play · Incursion to Onslaught",
-      factions: [
-        { name: "Adeptus Astartes", sub: "Imperium", forces: ["Strike Force", "Incursion Force", "Boarding Patrol"] },
-        { name: "Astra Militarum", sub: "Imperium", forces: ["Combined Regiment", "Armoured Company", "Boarding Patrol"] },
-        { name: "Aeldari", sub: "Xenos", forces: ["Warhost", "Battle Host", "Boarding Patrol"] },
-        { name: "Chaos Space Marines", sub: "Chaos", forces: ["Slaves to Darkness", "Veterans of the Long War", "Boarding Patrol"] },
-      ],
-    },
-    {
-      name: "Horus Heresy",
-      sub: "Age of Darkness · Crusade armies",
-      factions: [
-        { name: "Dark Angels", sub: "Legiones Astartes", forces: ["Crusade Force Organisation Chart", "Allied Detachment", "Fury of the Ancients"] },
-        { name: "Sons of Horus", sub: "Legiones Astartes", forces: ["Crusade Force Organisation Chart", "Allied Detachment", "The Black Reaving"] },
-        { name: "Solar Auxilia", sub: "Auxilia", forces: ["Crusade Force Organisation Chart", "Allied Detachment", "Armoured Fist Pattern"] },
-        { name: "Mechanicum", sub: "Mechanicum", forces: ["Crusade Force Organisation Chart", "Allied Detachment", "Cybernetica Cohort"] },
-      ],
-    },
-    {
-      name: "Age of Sigmar",
-      sub: "Battlepack · Spearhead to Battlehost",
-      factions: [
-        { name: "Stormcast Eternals", sub: "Order", forces: ["Battlehost", "Spearhead", "Vanguard Chamber"] },
-        { name: "Soulblight Gravelords", sub: "Death", forces: ["Battlehost", "Spearhead", "Legion of Blood"] },
-        { name: "Orruk Warclans", sub: "Destruction", forces: ["Battlehost", "Spearhead", "Ironjawz Brawl"] },
-        { name: "Slaves to Darkness", sub: "Chaos", forces: ["Battlehost", "Spearhead", "Legion of Chaos"] },
-      ],
-    },
-  ];
-  const points = ["1000", "2000", "3000"];
   const [selectedSystem, setSelectedSystem] = useState<string | null>(null);
-  const [selectedPoints, setSelectedPoints] = useState<string | null>(null);
-  const [customPoints, setCustomPoints] = useState("1500");
   const [selectedFaction, setSelectedFaction] = useState<string | null>(null);
-  const [selectedForce, setSelectedForce] = useState<string | null>(null);
-  const [picker, setPicker] = useState<"faction" | "force" | null>(null);
+  const [selectedMode, setSelectedMode] = useState<string | null>(null);
+  const [picker, setPicker] = useState<"faction" | "mode" | null>(null);
+  const [answers, setAnswers] = useState<Record<string, Record<string, number>>>({});
+  const [limitText, setLimitText] = useState("");
   const [rosterName, setRosterName] = useState("New roster");
-  const system = systems.find((item) => item.name === selectedSystem);
+  const system = GUIDED_SYSTEMS.find((item) => item.name === selectedSystem);
   const faction = system?.factions.find((item) => item.name === selectedFaction);
-  const resolvedPoints = selectedPoints === "custom" ? customPoints : selectedPoints;
-  const hasPoints = selectedPoints === "unlimited" || Boolean(resolvedPoints && Number(resolvedPoints) > 0);
-  const pointsLabel = selectedPoints === "unlimited" ? "Unlimited" : `${resolvedPoints} pts`;
+  const mode = faction?.modes.find((item) => item.name === selectedMode);
+  const steps = mode?.steps ?? [];
+  const guided = steps.some((step) => step.setsLimit);
+  // A step is shown once every earlier required step is answered.
+  const shown: GuidedStep[] = [];
+  for (const step of steps) { shown.push(step); if (step.required && answers[step.key] === undefined) break; }
+  const configured = shown.length === steps.length && steps.every((step) => !step.required || answers[step.key] !== undefined);
+  const limitStep = steps.find((step) => step.setsLimit);
+  const chosenLimit = limitStep ? limitStep.options.find((option) => answers[limitStep.key]?.[option.name])?.limit : undefined;
+  const limitNumber = Number(limitText);
+  const limitOk = guided || (limitText !== "" && limitNumber > 0 && (system?.limitMax === undefined || limitNumber <= system.limitMax));
+  const showLimit = Boolean(mode) && !guided && configured;
+  const showName = Boolean(mode) && configured && limitOk;
+  const unit = system?.unit ?? "";
 
-  function chooseSystem(name: string) {
-    setSelectedSystem(name);
-    setSelectedPoints(null);
-    setSelectedFaction(null);
-    setSelectedForce(null);
-    setPicker(null);
+  function resetAfter(index: number) { setAnswers((prev) => Object.fromEntries(Object.entries(prev).filter(([key]) => steps.findIndex((step) => step.key === key) <= index))); setLimitText(""); }
+  function answer(step: GuidedStep, index: number, option: GuidedOption, on?: boolean) {
+    resetAfter(index);
+    setAnswers((prev) => {
+      const current = prev[step.key] ?? {};
+      if (step.control === "single") return { ...prev, [step.key]: on === false ? {} : { [option.name]: 1 } };
+      return { ...prev, [step.key]: { ...current, [option.name]: on === undefined ? current[option.name] ?? 0 : on ? 1 : 0 } };
+    });
   }
-
-  function choosePoints(value: string) {
-    setSelectedPoints(value);
-    setSelectedFaction(null);
-    setSelectedForce(null);
-    setPicker(null);
+  function setQuantity(step: GuidedStep, index: number, option: GuidedOption, value: number) {
+    resetAfter(index);
+    setAnswers((prev) => ({ ...prev, [step.key]: { ...(prev[step.key] ?? {}), [option.name]: Math.max(0, Math.min(option.max ?? value, value)) } }));
   }
+  function used(step: GuidedStep) {
+    const picked = answers[step.key] ?? {};
+    return step.options.reduce((sum, option) => sum + (picked[option.name] ?? 0) * (step.budget?.kind === "selections" ? 1 : option.cost ?? 0), 0);
+  }
+  const reset = (system?: string) => { setSelectedSystem(system ?? null); setSelectedFaction(null); setSelectedMode(null); setPicker(null); setAnswers({}); setLimitText(""); };
 
   return (
     <>
@@ -1356,66 +1377,25 @@ function CreateScreen({ props }: { props: ConceptProps }) {
         </button>
         <div className="ux-wb-title">
           <strong>New roster</strong>
-          <small>Pick system, faction & size</small>
+          <small>Pick system, faction, mode & setup</small>
         </div>
       </header>
       <div className="ux-wb-home-body">
         <div className="ux-start-group">
           <h4>Game system</h4>
-          {systems.map(({ name, sub }) => (
-            <button key={name} type="button" className={`ux-start-row ${selectedSystem === name ? "on" : ""}`} onClick={() => chooseSystem(name)}>
-              <span>
-                <strong>{name}</strong>
-                <small>{sub}</small>
-              </span>
+          {GUIDED_SYSTEMS.map(({ name, sub }) => (
+            <button key={name} type="button" className={`ux-start-row ${selectedSystem === name ? "on" : ""}`} onClick={() => name !== selectedSystem && reset(name)}>
+              <span><strong>{name}</strong><small>{sub}</small></span>
               {selectedSystem === name ? <Check size={18} /> : null}
             </button>
           ))}
         </div>
 
-        {selectedSystem ? (
-          <div className="ux-start-group ux-start-step">
-            <h4>Points limit</h4>
-            <div className="ux-filter-row">
-              {points.map((value) => (
-                <button key={value} type="button" className={`ux-filter-pill ${selectedPoints === value ? "on" : ""}`} onClick={() => choosePoints(value)}>
-                  {value} pts
-                </button>
-              ))}
-              <button type="button" className={`ux-filter-pill ${selectedPoints === "custom" ? "on" : ""}`} onClick={() => choosePoints("custom")}>
-                Custom
-              </button>
-              <button type="button" className={`ux-filter-pill ${selectedPoints === "unlimited" ? "on" : ""}`} onClick={() => choosePoints("unlimited")}>
-                Unlimited
-              </button>
-            </div>
-            {selectedPoints === "custom" ? (
-              <label className="ux-custom-points">
-                <input
-                  value={customPoints}
-                  inputMode="numeric"
-                  aria-label="Custom points limit"
-                  onChange={(event) => {
-                    setCustomPoints(event.currentTarget.value.replace(/\D/g, "").slice(0, 5));
-                    setSelectedFaction(null);
-                    setSelectedForce(null);
-                    setPicker(null);
-                  }}
-                />
-                <span>pts</span>
-              </label>
-            ) : null}
-          </div>
-        ) : null}
-
-        {system && hasPoints ? (
+        {system ? (
           <div className="ux-start-group ux-start-step">
             <h4>Faction</h4>
             <button type="button" className="ux-select-field" aria-haspopup="dialog" onClick={() => setPicker("faction")}>
-              <span>
-                <strong>{selectedFaction ?? "Select faction"}</strong>
-                <small>{selectedFaction ? system.name : "Choose from available factions"}</small>
-              </span>
+              <span><strong>{selectedFaction ?? "Select faction"}</strong><small>{selectedFaction ? system.name : "Choose from available factions"}</small></span>
               <ChevronDown size={16} />
             </button>
           </div>
@@ -1423,34 +1403,94 @@ function CreateScreen({ props }: { props: ConceptProps }) {
 
         {faction ? (
           <div className="ux-start-group ux-start-step">
-            <h4>Force</h4>
-              <button type="button" className="ux-select-field" aria-haspopup="dialog" onClick={() => setPicker("force")}>
-                <span>
-                  <strong>{selectedForce ?? "Select force"}</strong>
-                  <small>{selectedForce ? `${selectedFaction} · ${pointsLabel}` : "Choose a force organisation"}</small>
-                </span>
-                <ChevronDown size={16} />
-              </button>
+            <h4>Game mode</h4>
+            <button type="button" className="ux-select-field" aria-haspopup="dialog" onClick={() => setPicker("mode")}>
+              <span><strong>{selectedMode ?? "Select game mode"}</strong><small>{selectedMode ? faction.name : "Choose a game mode"}</small></span>
+              <ChevronDown size={16} />
+            </button>
           </div>
         ) : null}
 
-        {selectedForce ? (
+        {mode ? shown.map((step, index) => {
+          const picked = answers[step.key] ?? {};
+          const total = used(step);
+          const over = step.budget?.limit !== undefined && total > step.budget.limit;
+          const answered = answers[step.key] !== undefined;
+          const single = step.control === "multiple" && step.options.length === 1;
+          return (
+            <div className="ux-start-group ux-start-step ux-guided-step" key={step.key} role={step.control === "single" ? "radiogroup" : "group"} aria-label={step.name}>
+              <h4>{step.name}{step.required ? "" : " · optional"}</h4>
+              {step.budget ? <small className={`ux-guided-budget ${over ? "over" : ""}`}>{over ? <AlertTriangle size={12} /> : null}{total} / {step.budget.limit ?? "–"} {step.budget.kind === "cost" ? step.budget.label : "selections"}</small> : null}
+              {step.setsLimit ? <small className="ux-guided-note">Sets the {unit} limit</small> : null}
+              {step.control === "single" && !step.required ? (
+                <button type="button" role="radio" aria-checked={answered && Object.keys(picked).length === 0} className="ux-guided-option" onClick={() => answer(step, index, step.options[0]!, false)}>
+                  {answered && Object.keys(picked).length === 0 ? <CircleDot size={20} /> : <Circle size={20} />}<span><strong>None</strong></span>
+                </button>
+              ) : null}
+              {step.options.map((option) => {
+                const count = picked[option.name] ?? 0;
+                const on = count > 0;
+                const cost = option.cost === undefined ? null : <em className="ux-guided-cost">{option.cost === 0 ? "Free" : `+${option.cost} ${step.budget?.kind === "cost" ? step.budget.label : unit}`}</em>;
+                const limit = option.limit === undefined ? null : <em className="ux-guided-cost">Limit {option.limit} {unit}</em>;
+                if (step.control === "quantity") {
+                  return (
+                    <div className="ux-guided-option" key={option.name}>
+                      <span><strong>{option.name}</strong>{cost}{option.max !== undefined ? <small>Up to {option.max}</small> : null}</span>
+                      <span className="ux-stepper"><button type="button" aria-label={`Fewer ${option.name}`} disabled={count === 0} onClick={() => setQuantity(step, index, option, count - 1)}><Minus size={14} /></button><b>{count}</b><button type="button" aria-label={`More ${option.name}`} disabled={count >= (option.max ?? Infinity)} onClick={() => setQuantity(step, index, option, count + 1)}><Plus size={14} /></button></span>
+                    </div>
+                  );
+                }
+                const radio = step.control === "single";
+                return (
+                  <button key={option.name} type="button" role={radio ? "radio" : "checkbox"} aria-checked={on} className={`ux-guided-option ${on ? "on" : ""}`} onClick={() => answer(step, index, option, radio ? true : !on)}>
+                    {radio ? (on ? <CircleDot size={20} /> : <Circle size={20} />) : on ? <SquareCheck size={20} /> : <Square size={20} />}
+                    <span><strong>{single ? `Take ${option.name}` : option.name}</strong>{cost}{limit}</span>
+                  </button>
+                );
+              })}
+              {step.required && !answered ? <small className="ux-guided-note">Choose one to continue</small> : null}
+            </div>
+          );
+        }) : null}
+
+        {showLimit ? (
+          <div className="ux-start-group ux-start-step">
+            <h4>{unit} limit</h4>
+            <div className="ux-filter-row">
+              {["1000", "2000", "3000"].filter((value) => system?.limitMax === undefined || Number(value) <= system.limitMax).map((value) => (
+                <button key={value} type="button" className={`ux-filter-pill ${limitText === value ? "on" : ""}`} onClick={() => setLimitText(value)}>{value} {unit}</button>
+              ))}
+              <button type="button" className="ux-filter-pill" onClick={() => setLimitText("")}>Custom</button>
+              <button type="button" className="ux-filter-pill" onClick={() => setLimitText("")}>Unlimited</button>
+            </div>
+            <label className="ux-custom-points">
+              <input value={limitText} inputMode="numeric" aria-label={`Custom ${unit} limit`} onChange={(event) => setLimitText(event.currentTarget.value.replace(/\D/g, "").slice(0, 5))} />
+              <span>{unit}</span>
+            </label>
+            {system?.limitMax !== undefined ? <small className="ux-guided-note">At most {system.limitMax} {unit}</small> : null}
+          </div>
+        ) : null}
+        {guided && configured && chosenLimit !== undefined ? <small className="ux-guided-note">Limit {chosenLimit} {unit}, set by {limitStep?.name}</small> : null}
+
+        {showName ? (
           <label className="ux-start-group ux-start-step ux-roster-name">
             <h4>Roster name</h4>
             <input value={rosterName} maxLength={60} onChange={(event) => setRosterName(event.currentTarget.value)} placeholder="Name your roster" />
           </label>
         ) : null}
 
-        <button type="button" className="ux-primary" disabled={!selectedSystem || !hasPoints || !selectedFaction || !selectedForce || !rosterName.trim()} onClick={() => props.onNavigate("overview")}>
+        <button type="button" className="ux-primary" disabled={!showName || !rosterName.trim()} onClick={() => props.onNavigate("overview")}>
           <Plus size={16} />
           Create roster
         </button>
+        {mode ? <button type="button" className="ux-ghost-btn ux-guided-skip" onClick={() => props.onNavigate("overview")}>Skip guided setup</button> : null}
+        {mode ? <small className="ux-guided-note">Skip creates the roster with the data’s defaults; configure it in the editor.</small> : null}
       </div>
       {picker === "faction" && system ? (
-        <RosterChoicePicker title="Choose faction" context={`${system.name} · ${pointsLabel}`} searchLabel="factions" options={system.factions.map((item) => ({ name: item.name, sub: item.sub }))} selected={selectedFaction} onClose={() => setPicker(null)} onSelect={(name) => { setSelectedFaction(name); setSelectedForce(null); setPicker(null); }} />
+        <RosterChoicePicker title="Choose faction" context={system.name} searchLabel="factions" options={system.factions.map((item) => ({ name: item.name, sub: item.sub }))} selected={selectedFaction} onClose={() => setPicker(null)} onSelect={(name) => { setSelectedFaction(name); setSelectedMode(null); setAnswers({}); setLimitText(""); setPicker(null); }} />
       ) : null}
-      {picker === "force" && faction ? (
-        <RosterChoicePicker title="Choose force" context={faction.name} searchLabel="forces" options={faction.forces.map((name) => ({ name, sub: pointsLabel }))} selected={selectedForce} onClose={() => setPicker(null)} onSelect={(name) => { setSelectedForce(name); setPicker(null); }} />
+      {picker === "mode" && faction ? (
+        <RosterChoicePicker title="Choose game mode" context={faction.name} searchLabel="game modes" options={faction.modes.map((item) => ({ name: item.name, sub: item.sub }))} selected={selectedMode} onClose={() => setPicker(null)} onSelect={(name) => { setSelectedMode(name); setAnswers({}); setLimitText(""); setPicker(null); }} />
       ) : null}
     </>
   );
