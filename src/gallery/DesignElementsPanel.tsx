@@ -9,7 +9,7 @@ import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, T
 import { BudgetMeter, Chip, ExpandableBudget, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
 import { ComingSoonCard, DeveloperOptionsPreview } from "../concepts/ux/AppExtras";
-import { ActionMenuDialog, AddCollectionSheet, AdvancedInstallSetting, AppDialog, ImportReportGroups, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceUpdateCard, SourceVersions, TaggedRosterRows, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
+import { ActionMenuDialog, AddCollectionSheet, AdvancedInstallSetting, AppDialog, ImportReportGroups, CollectionMenuDialog, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceUpdateCard, SourceVersions, TaggedRosterRows, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
 
 type Props = {
   concept: GalleryConcept;
@@ -626,6 +626,8 @@ function WorkbenchElements({
         <DefaultCollectionCard />
         <DefaultListingRows />
         <UserCollectionRows />
+        <small className="ux-elements-note">Default collection hidden (DEC-028): no card or default listings; this row in the user's group shows it again.</small>
+        <UserCollectionRows defaultHidden />
         <section className="ux-source-method">
           <div className="ux-source-method-heading"><span className="ux-setting-icon"><FileInput size={18} /></span><span><strong>Have a link?</strong><small>Any GitHub repository with roster data files.</small></span></div>
           <div className="ux-source-url"><input aria-label="Repository example" placeholder="owner/name or a GitHub link" /><button type="button">Continue</button></div>
@@ -637,10 +639,23 @@ function WorkbenchElements({
           {DEFAULT_COLLECTION.map((entry) => <CollectionSourceRow key={entry.repo} entry={entry} />)}
           <CollectionSourceRow entry={{ name: "example-system-seven", description: "Older edition, no longer maintained", repo: "community-data/example-system-seven", archived: true, action: "install" }} />
         </div>
+        <CollectionMenuDialog inline kind="default" />
+        <CollectionMenuDialog inline kind="user" />
+        <small className="ux-elements-note">The ⋯ menu: Hide collection only on the default collection (DEC-028, undone from Add game data); Remove collection only on the user's own entries, confirmed ("Installed game data stays"). Listings of the default collection and entries opened from another collection offer neither.</small>
+      </ElementSection>
+
+      <ElementSection title="Search GitHub">
+        <div className="ux-search-field ux-col-search"><Search size={15} /><input aria-label="Repository name or topic" placeholder="Repository name or topic" defaultValue="example system" /></div>
+        <div className="ux-source-list ux-managed-source-list ux-src-list">
+          <CollectionSourceRow entry={{ name: "example-system-eight", description: "Fan-made data for a skirmish game", repo: "someone/example-system-eight", action: "install" }} />
+        </div>
+        <small className="ux-elements-note">Plan 2C: GitHub-wide search on its own screen, run on submit; the same rows and actions as a collection page.</small>
       </ElementSection>
 
       <ElementSection title="Add Collection Sheet">
         <AddCollectionSheet inline state="found" />
+        <AddCollectionSheet inline state="library" />
+        <AddCollectionSheet inline state="duplicate" />
         <AddCollectionSheet inline state="repository" />
       </ElementSection>
 

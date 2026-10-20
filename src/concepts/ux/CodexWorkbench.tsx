@@ -5,12 +5,12 @@ import { mockCatalogues, mockDetachments, mockSystemUnits } from "../../data/moc
 import { referenceById, resolveRosterReference } from "../../data/mockRosterReferences";
 import type { RosterReferenceDefinition, RosterUnit } from "../../types";
 import type { ConceptProps } from "../shared";
-import { AddGameDataScreen, AdvancedInstallSetting, CollectionScreen, InstallJobScreen, KeepVersionsSetting, MigrationReportScreen, NotificationsSetting, ReadOnlyRosterScreen, SourceDetailScreen, SourcesManageScreen, WifiOnlySetting } from "./SourceJobs";
+import { AddGameDataScreen, AdvancedInstallSetting, CollectionScreen, InstallJobScreen, KeepVersionsSetting, MigrationReportScreen, NotificationsSetting, ReadOnlyRosterScreen, SearchGitHubScreen, SourceDetailScreen, SourcesManageScreen, WifiOnlySetting } from "./SourceJobs";
 import { MobileUnitOptions } from "./MobileUnitOptions";
 import { BackOrTitle, BudgetMeter, Chip, ExpandableBudget, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "./uxShared";
 
 /** Screens of the source-data flow designed in Battle Augur plan 2D (SourceJobs.tsx). */
-const SOURCE_FLOW_SCREENS: readonly string[] = ["install-job", "source-detail", "migration-report", "collection", "roster-read-only"];
+const SOURCE_FLOW_SCREENS: readonly string[] = ["install-job", "source-detail", "migration-report", "collection", "search-github", "roster-read-only"];
 
 type ReferenceGlance =
   | { type: "unit"; unit: RosterUnit }
@@ -167,6 +167,8 @@ export function CodexWorkbench(props: ConceptProps) {
     body = <ReadOnlyRosterScreen props={props} />;
   } else if (screen === "collection") {
     body = <CollectionScreen props={props} />;
+  } else if (screen === "search-github") {
+    body = <SearchGitHubScreen props={props} />;
   } else if (screen === "system") {
     body = <CreateScreen props={props} />;
   } else if (screen === "smart-search") {

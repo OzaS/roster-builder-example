@@ -187,6 +187,12 @@
 .ux-col-nav strong { font-size: 13.5px; }
 .ux-col-nav small { margin-top: 2px; color: var(--ux-muted); font-size: 11.5px; }
 .ux-col-nav.add strong { color: var(--ux-accent-2); }
+.ux-col-nav.quiet > svg:first-child { color: var(--ux-muted); }
+.ux-col-nav.quiet strong { color: var(--ux-muted); font-weight: 600; }
+.ux-skeleton-row strong, .ux-skeleton-row small { display: block; border-radius: 6px; background: var(--ux-line); }
+.ux-skeleton-row strong { width: 55%; height: 13px; }
+.ux-skeleton-row small { width: 80%; height: 10px; margin-top: 6px; }
+.ux-job-btn.block svg { vertical-align: -2px; margin-right: 6px; }
 .ux-col-field { display: grid; gap: 6px; }
 .ux-col-field > span { font-size: 12.5px; font-weight: 750; }
 .ux-col-field > small { color: var(--ux-muted); font-size: 11.5px; }
