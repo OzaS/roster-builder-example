@@ -245,6 +245,17 @@ export function installSteps(stage: "download" | "import" | "failed" | "done", i
 
 // ---------------------------------------------------------------- advanced installation (plan 2B)
 
+/** Settings → Rosters → Remember option sections (UX-005, DEC-035; a user preference, on by default). */
+export function RememberSectionsSetting({ on, onToggle }: { on: boolean; onToggle?: () => void }) {
+  return (
+    <button type="button" className={`ux-setting-row ${on ? "on" : ""}`} role="switch" aria-checked={on} onClick={onToggle}>
+      <span className="ux-setting-icon"><ChevronDown size={17} /></span>
+      <span className="ux-setting-text"><strong>Remember option sections</strong><small>Reopen a unit's option sections as you left them. Off: every visit starts folded; you can still open sections while you are there.</small></span>
+      <span className="ux-switch" aria-hidden />
+    </button>
+  );
+}
+
 /** Settings → Game data → Advanced installation (a user preference, off by default). */
 export function AdvancedInstallSetting({ on, onToggle }: { on: boolean; onToggle?: () => void }) {
   return (

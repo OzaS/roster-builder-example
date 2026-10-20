@@ -5,7 +5,7 @@ import { mockCatalogues, mockDetachments, mockSystemUnits } from "../../data/moc
 import { referenceById, resolveRosterReference } from "../../data/mockRosterReferences";
 import type { RosterReferenceDefinition, RosterUnit } from "../../types";
 import type { ConceptProps } from "../shared";
-import { AddGameDataScreen, AdvancedInstallSetting, CollectionScreen, InstallJobScreen, KeepVersionsSetting, MigrationReportScreen, NotificationsSetting, ReadOnlyRosterScreen, SourceDetailScreen, SourcesManageScreen, WifiOnlySetting } from "./SourceJobs";
+import { AddGameDataScreen, AdvancedInstallSetting, CollectionScreen, InstallJobScreen, KeepVersionsSetting, MigrationReportScreen, NotificationsSetting, ReadOnlyRosterScreen, RememberSectionsSetting, SourceDetailScreen, SourcesManageScreen, WifiOnlySetting } from "./SourceJobs";
 import { MobileUnitOptions } from "./MobileUnitOptions";
 import { BackOrTitle, BudgetMeter, Chip, ExpandableBudget, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "./uxShared";
 
@@ -2149,6 +2149,7 @@ function AppScreen({ props }: { props: ConceptProps }) {
 /** Settings screen housing preferences and the smart-search toggle. */
 function SettingsScreen({ props }: { props: ConceptProps }) {
   const smart = props.smartSearch ?? false;
+  const [rememberSections, setRememberSections] = useState(true);
   const [advancedInstall, setAdvancedInstall] = useState(false);
   const [wifiOnly, setWifiOnly] = useState(false);
   return (
@@ -2179,6 +2180,8 @@ function SettingsScreen({ props }: { props: ConceptProps }) {
           <Sparkles size={14} />
           When on, the add-unit menu offers quick suggestions for the current slot. With the top-bar layout it also shows a floating command bar.
         </p>
+        <div className="ux-result-label">Rosters</div>
+        <RememberSectionsSetting on={rememberSections} onToggle={() => setRememberSections((value) => !value)} />
         <div className="ux-result-label">Game data</div>
         <AdvancedInstallSetting on={advancedInstall} onToggle={() => setAdvancedInstall((value) => !value)} />
         <WifiOnlySetting on={wifiOnly} onToggle={() => setWifiOnly((value) => !value)} />

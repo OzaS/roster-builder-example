@@ -18,10 +18,10 @@ export function MobileUnitOptions({ onBack, state = "ready", compact = false, in
   const [marked, setMarked] = useState<string | undefined>();
   const [escort, setEscort] = useState<string | undefined>("Squad A");
   const [belt, setBelt] = useState(true);
-  // Folds are presentation only and keyed per section (selection + group path); everything starts expanded and a parent keeps its descendants' folds.
-  const [folded, setFolded] = useState<string[]>([]);
-  const fold = (key: string) => setFolded(keys => keys.includes(key) ? keys.filter(k => k !== key) : [...keys, key]);
-  const section = (key: string) => ({ folded: folded.includes(key), onFold: () => fold(key) });
+  // Open sections are presentation only and keyed per section (selection + group path); everything starts folded, opening a parent leaves its descendants folded, and the app remembers what is open (Settings → Remember option sections).
+  const [opened, setOpened] = useState<string[]>([]);
+  const fold = (key: string) => setOpened(keys => keys.includes(key) ? keys.filter(k => k !== key) : [...keys, key]);
+  const section = (key: string) => ({ folded: !opened.includes(key), onFold: () => fold(key) });
   const change = (apply: () => void) => {
     if (busy) return;
     setBusy(true);
@@ -96,15 +96,17 @@ function FoldSection({ title, counter, invalid, inner, folded, onFold, children 
   </div>;
 }
 
-/** Elements sample: the three header states of a foldable section (expanded, folded, folded with an error inside). */
+/** Elements sample: the header states of a foldable section (all folded at first; open one to see it, and that opening a parent leaves its nested section folded). */
 export function OptionFoldSamples() {
-  const [open, setOpen] = useState<Record<string, boolean>>({ expanded: true });
+  const [open, setOpen] = useState<Record<string, boolean>>({});
   const toggle = (key: string) => setOpen(value => ({ ...value, [key]: !value[key] }));
   return <section className="ux-mobile-unit-options compact" style={{ maxHeight: "none" }}>
     <div className="ux-5a-card">
       <FoldSection title="Every model may exchange its sidearm" counter="2/5 selections" folded={!open.expanded} onFold={() => toggle("expanded")}><ToggleRow name="Axe" cost="+1 Credits per model" value disabled={false} onChange={() => {}} /></FoldSection>
       <FoldSection title="Heavy weapons" counter="0/1 selections" folded={!open.folded} onFold={() => toggle("folded")} />
-      <FoldSection title="Guns" counter="1/2 selections" inner folded={!open.inner} onFold={() => toggle("inner")}><div className="ux-5a-choice"><span><strong>Cannon</strong><small>No added cost</small></span></div></FoldSection>
+      <FoldSection title="Guns" counter="1/2 selections" inner folded={!open.inner} onFold={() => toggle("inner")}><div className="ux-5a-choice"><span><strong>Cannon</strong><small>No added cost</small></span></div>
+        <div className="ux-fold-nested"><FoldSection title="Ammunition" counter="1/1 selections" folded={!open.nested} onFold={() => toggle("nested")}><div className="ux-5a-choice"><span><strong>Belt feed</strong><small>No added cost</small></span></div></FoldSection></div>
+      </FoldSection>
     </div>
   </section>;
 }
@@ -113,8 +115,8 @@ export function OptionFoldSamples() {
 export function ModelStackSamples({ onCost }: { onCost?: (cost: number) => void }) {
   const [stacks, setStacks] = useState([{ id: 1, count: 5, sidearm: "Pistol", scope: false }]);
   const [split, setSplit] = useState<{ id: number; count: number }>();
-  const [folds, setFolds] = useState<string[]>([]);
-  const fold = (key: string) => ({ folded: folds.includes(key), onFold: () => setFolds(all => all.includes(key) ? all.filter(x => x !== key) : [...all, key]) });
+  const [opened, setOpened] = useState<string[]>([]);
+  const fold = (key: string) => ({ folded: !opened.includes(key), onFold: () => setOpened(all => all.includes(key) ? all.filter(x => x !== key) : [...all, key]) });
   const total = stacks.reduce((n, s) => n + s.count, 0);
   const cost = stacks.reduce((n, s) => n + s.count * (s.sidearm === "Pistol" ? 14 : s.sidearm === "Axe" ? 13 : 12) + (s.scope ? s.count : 0), 0);
   useEffect(() => onCost?.(cost), [onCost, cost]);

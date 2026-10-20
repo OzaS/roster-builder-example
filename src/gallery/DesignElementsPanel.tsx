@@ -9,7 +9,7 @@ import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, T
 import { BudgetMeter, Chip, ExpandableBudget, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
 import { ComingSoonCard, DeveloperOptionsPreview } from "../concepts/ux/AppExtras";
-import { AddCollectionSheet, AdvancedInstallSetting, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceUpdateCard, SourceVersions, TaggedRosterRows, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
+import { AddCollectionSheet, AdvancedInstallSetting, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RememberSectionsSetting, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceUpdateCard, SourceVersions, TaggedRosterRows, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
 
 type Props = {
   concept: GalleryConcept;
@@ -278,7 +278,7 @@ function WorkbenchElements({
 
       <ElementSection title="Foldable Option Sections">
         <div style={{ display: "grid", gap: 10, maxWidth: 360 }}>
-          <small className="ux-elements-note">Built (UX-005): every option section is a header button (44 pt, expanded state) that folds its own body, at every nesting level and in model loadouts. Sections start expanded. The header keeps the name, "x/y selections", limits and errors; a folded header with an error beneath it adds "Issues inside". Folding a parent keeps its descendants' folds. Folds are kept while the screen is open (Profile tab, collapsed model card, refreshes) and are never shared between selections.</small>
+          <small className="ux-elements-note">Built (UX-005): every option section is a header button (44 pt, expanded state) that folds its own body, at every nesting level and in model loadouts. Sections start folded at every level; opening a parent leaves its nested sections folded and never closes another section. The header keeps the name, "x/y selections", limits and errors; a folded header with an error beneath it adds "Issues inside". Open sections are kept per roster (Profile tab, collapsed model card, refreshes, drill-down, later visits, restart) and are never shared between selections; Settings → Rosters → Remember option sections turns that off (new visits then start folded). Model cards are separate and start expanded.</small>
           <OptionFoldSamples />
           <div className="ux-elements-stack"><MobileUnitOptions compact /></div>
         </div>
@@ -629,6 +629,12 @@ function WorkbenchElements({
         <WifiOnlySetting on />
         <NotificationsSetting />
         <NotificationsSetting on />
+      </ElementSection>
+
+      <ElementSection title="Remember Option Sections Setting">
+        <div className="ux-result-label">Rosters</div>
+        <RememberSectionsSetting on />
+        <RememberSectionsSetting on={false} />
       </ElementSection>
 
       <ElementSection title="Keep Previous Versions Setting">
