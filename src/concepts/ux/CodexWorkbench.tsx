@@ -5,7 +5,7 @@ import { mockCatalogues, mockDetachments, mockSystemUnits } from "../../data/moc
 import { referenceById, resolveRosterReference } from "../../data/mockRosterReferences";
 import type { RosterReferenceDefinition, RosterUnit } from "../../types";
 import type { ConceptProps } from "../shared";
-import { AddGameDataScreen, AdvancedInstallSetting, CollectionScreen, InstallJobScreen, KeepVersionsSetting, MigrationReportScreen, NotificationsSetting, ReadOnlyRosterScreen, SearchGitHubScreen, SourceDetailScreen, SourcesManageScreen, WifiOnlySetting } from "./SourceJobs";
+import { AddGameDataScreen, AdvancedInstallSetting, AutoUpdateChecksSetting, CollectionScreen, InstallJobScreen, KeepVersionsSetting, MigrationReportScreen, NotificationsSetting, ReadOnlyRosterScreen, SearchGitHubScreen, SourceDetailScreen, SourcesManageScreen, SourcesNavRow, UpdateAvatarButton, WifiOnlySetting } from "./SourceJobs";
 import { MobileUnitOptions } from "./MobileUnitOptions";
 import { BackOrTitle, BudgetMeter, Chip, ExpandableBudget, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "./uxShared";
 
@@ -2098,8 +2098,11 @@ function DiceSimulatorScreen({ props }: { props: ConceptProps }) {
   );
 }
 
+/** The gallery shows the "updates known" state (the example sources have two); the badge is absent without updates. */
+const EXAMPLE_UPDATES = 2;
+
 function AppAvatarButton({ props }: { props: ConceptProps }) {
-  return <button type="button" className="ux-avatar-btn" aria-label="App" onClick={() => props.onNavigate("app")}>AM</button>;
+  return <UpdateAvatarButton updates={EXAMPLE_UPDATES} onClick={() => props.onNavigate("app")} />;
 }
 
 /** Collection space for reusable fan armies and roster building blocks. */
@@ -2171,14 +2174,7 @@ function AppScreen({ props }: { props: ConceptProps }) {
           </span>
           <ChevronRight size={17} />
         </button>
-        <button type="button" className="ux-app-nav-row" onClick={() => props.onNavigate("sources")}>
-          <span className="ux-setting-icon"><Database size={17} /></span>
-          <span>
-            <strong>Sources</strong>
-            <small>Manage catalogues and rules repositories</small>
-          </span>
-          <ChevronRight size={17} />
-        </button>
+        <SourcesNavRow updates={EXAMPLE_UPDATES} onClick={() => props.onNavigate("sources")} />
         <footer className="ux-app-footer">
           <strong>Roster Builder</strong>
           <small>Version 1.0.0</small>
@@ -2193,6 +2189,7 @@ function SettingsScreen({ props }: { props: ConceptProps }) {
   const smart = props.smartSearch ?? false;
   const [advancedInstall, setAdvancedInstall] = useState(false);
   const [wifiOnly, setWifiOnly] = useState(false);
+  const [autoChecks, setAutoChecks] = useState(true);
   return (
     <>
       <header className="ux-wb-top ux-wb-home-top reversed">
@@ -2224,6 +2221,7 @@ function SettingsScreen({ props }: { props: ConceptProps }) {
         <div className="ux-result-label">Game data</div>
         <AdvancedInstallSetting on={advancedInstall} onToggle={() => setAdvancedInstall((value) => !value)} />
         <WifiOnlySetting on={wifiOnly} onToggle={() => setWifiOnly((value) => !value)} />
+        <AutoUpdateChecksSetting on={autoChecks} onToggle={() => setAutoChecks((value) => !value)} />
         <KeepVersionsSetting />
         <NotificationsSetting />
       </div>

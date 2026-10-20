@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { Archive, ArrowLeft, Bell, Check, ChevronDown, ChevronRight, Circle, CircleArrowUp, CircleCheck, Clock, Copy, Database, Download, Ellipsis, FileInput, FileText, FolderGit2, Globe, Hand, History, Info, Library, ListChecks, LoaderCircle, Lock, Minus, OctagonAlert, Plus, Search, Star, Trash2, TriangleAlert, Upload, Wifi, X } from "lucide-react";
+import { Archive, ArrowLeft, Bell, Check, ChevronDown, ChevronRight, Circle, CircleArrowUp, CircleCheck, Clock, Copy, Database, Download, Ellipsis, FileInput, FileText, FolderGit2, Globe, Hand, History, Info, Library, ListChecks, LoaderCircle, Lock, Minus, OctagonAlert, Plus, RefreshCw, Search, Star, Trash2, TriangleAlert, Upload, Wifi, X } from "lucide-react";
 import type { ConceptProps } from "../shared";
 import { Chip } from "./uxShared";
 
@@ -1045,6 +1045,48 @@ export function WifiOnlySetting({ on, onToggle }: { on: boolean; onToggle?: () =
       <span className="ux-setting-icon"><Wifi size={17} /></span>
       <span className="ux-setting-text"><strong>Download on Wi-Fi only</strong><small>Wait for Wi-Fi before downloading game data. Update checks still use mobile data.</small></span>
       <span className="ux-switch" aria-hidden />
+    </button>
+  );
+}
+
+/**
+ * Settings → Game data → Check for updates automatically (battle-augur UX-008, DEC-027). On by default; shown while the update flag is
+ * on. Off stops the automatic checks (start, foreground, hourly) and the check on opening Sources; manual checks stay.
+ */
+export function AutoUpdateChecksSetting({ on, onToggle }: { on: boolean; onToggle?: () => void }) {
+  return (
+    <button type="button" className={`ux-setting-row ${on ? "on" : ""}`} role="switch" aria-checked={on} onClick={onToggle}>
+      <span className="ux-setting-icon"><RefreshCw size={17} /></span>
+      <span className="ux-setting-text"><strong>Check for updates automatically</strong><small>Looks for newer game data while the app is open and shows a badge. Never installs on its own.</small></span>
+      <span className="ux-switch" aria-hidden />
+    </button>
+  );
+}
+
+/** The tab header's avatar button; with updates known a dot (info colour, ringed in the header colour) and the count in the label. */
+export function UpdateAvatarButton({ updates = 0, onClick }: { updates?: number; onClick?: () => void }) {
+  const label = updates > 0 ? `App, settings and sources, ${updates} ${updates === 1 ? "update" : "updates"} available` : "App, settings and sources";
+  return (
+    <button type="button" className="ux-avatar-btn" aria-label={label} onClick={onClick}>
+      AM
+      {updates > 0 ? <span className="ux-avatar-badge" aria-hidden /> : null}
+    </button>
+  );
+}
+
+/** App → Sources row; with updates known a chip (icon + words, never colour alone) sits before the chevron. */
+export function SourcesNavRow({ updates = 0, onClick }: { updates?: number; onClick?: () => void }) {
+  return (
+    <button type="button" className="ux-app-nav-row" onClick={onClick} aria-label={updates > 0 ? `Sources, Installed game data and where it comes from, ${updates} ${updates === 1 ? "update" : "updates"}` : undefined}>
+      <span className="ux-setting-icon"><Database size={17} /></span>
+      <span>
+        <strong>Sources</strong>
+        <small>Installed game data and where it comes from</small>
+      </span>
+      <span className="ux-nav-trail">
+        {updates > 0 ? <Chip tone="cool"><CircleArrowUp size={11} /> {updates} {updates === 1 ? "update" : "updates"}</Chip> : null}
+        <ChevronRight size={17} />
+      </span>
     </button>
   );
 }

@@ -9,7 +9,7 @@ import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, T
 import { BudgetMeter, Chip, ExpandableBudget, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
 import { ComingSoonCard, DeveloperOptionsPreview } from "../concepts/ux/AppExtras";
-import { ActionMenuDialog, AddCollectionSheet, AdvancedInstallSetting, AppDialog, ImportReportGroups, CollectionMenuDialog, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceUpdateCard, SourceVersions, TaggedRosterRows, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
+import { ActionMenuDialog, AddCollectionSheet, AdvancedInstallSetting, AppDialog, AutoUpdateChecksSetting, ImportReportGroups, CollectionMenuDialog, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceUpdateCard, SourceVersions, SourcesNavRow, TaggedRosterRows, UpdateAvatarButton, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
 
 type Props = {
   concept: GalleryConcept;
@@ -673,6 +673,13 @@ function WorkbenchElements({
         <NotificationsSetting on />
       </ElementSection>
 
+      <ElementSection title="Automatic Update Checks Setting">
+        <div className="ux-result-label">Game data</div>
+        <AutoUpdateChecksSetting on />
+        <AutoUpdateChecksSetting on={false} />
+        <small className="ux-elements-note">UX-008 (DEC-027): on by default, shown while the update flag is on. Off stops the checks at start, on return to the app and hourly, and the check on opening Sources; pull to refresh and Check now still work.</small>
+      </ElementSection>
+
       <ElementSection title="Keep Previous Versions Setting">
         <div className="ux-result-label">Game data</div>
         <KeepVersionsSetting />
@@ -859,6 +866,22 @@ function WorkbenchElements({
           <strong>Roster Builder</strong>
           <small>Version 1.0.0</small>
         </div>
+      </ElementSection>
+
+      <ElementSection title="Avatar Update Badge">
+        <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
+          <UpdateAvatarButton />
+          <UpdateAvatarButton updates={1} />
+          <UpdateAvatarButton updates={3} />
+        </div>
+        <small className="ux-elements-note">Tab header avatar: no dot without updates; with updates a dot in the info colour ringed in the header colour. The dot is a hint only: the button's label says the count ("App, settings and sources, 3 updates available").</small>
+      </ElementSection>
+
+      <ElementSection title="App Sources Row Count">
+        <SourcesNavRow />
+        <SourcesNavRow updates={1} />
+        <SourcesNavRow updates={3} />
+        <small className="ux-elements-note">App → Sources: with updates, a chip with the update icon and the words "1 update" / "3 updates" before the chevron. Shown whichever check found the updates.</small>
       </ElementSection>
 
       <ElementSection title="Coming Soon Placeholder">
