@@ -9,7 +9,7 @@ import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, T
 import { BudgetMeter, Chip, ExpandableBudget, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
 import { ComingSoonCard, DeveloperOptionsPreview } from "../concepts/ux/AppExtras";
-import { ActionMenuDialog, AddCollectionSheet, AdvancedInstallSetting, AppDialog, AutoUpdateChecksSetting, ImportReportGroups, CollectionMenuDialog, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceUpdateCard, SourceVersions, SourcesNavRow, TaggedRosterRows, UpdateAvatarButton, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
+import { ActionMenuDialog, AddCollectionSheet, LOCAL_ERRORS, LOCAL_FILE, LOCAL_SOURCE, LocalImportChoiceDialog, LocalImportError, LocalImportRow, LocalInterruptedNotice, LocalSourceNote, LocalSourceRows, localSteps, AdvancedInstallSetting, AppDialog, AutoUpdateChecksSetting, ImportReportGroups, CollectionMenuDialog, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceUpdateCard, SourceVersions, SourcesNavRow, TaggedRosterRows, UpdateAvatarButton, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
 
 type Props = {
   concept: GalleryConcept;
@@ -657,6 +657,18 @@ function WorkbenchElements({
         <AddCollectionSheet inline state="library" />
         <AddCollectionSheet inline state="duplicate" />
         <AddCollectionSheet inline state="repository" />
+      </ElementSection>
+
+      <ElementSection title="Install From A File">
+        <LocalImportRow />
+        <LocalImportChoiceDialog inline />
+        <JobModal inline title={`Installing ${LOCAL_FILE.label}`} subtitle={`From a file · ${LOCAL_FILE.files} files · ${LOCAL_FILE.size}`} percent={8} stepLabel="Step 1 of 4" steps={localSteps("files")} />
+        {LOCAL_ERRORS.map(([id]) => <LocalImportError key={id} kind={id} />)}
+        <div className="ux-source-list ux-managed-source-list ux-src-list"><SourceRow source={LOCAL_SOURCE} /></div>
+        <LocalInterruptedNotice />
+        <LocalSourceNote />
+        <LocalSourceRows />
+        <small className="ux-elements-note">DS-3 (DEC-035): archives (.zip, .bsr), .gst/.cat (also .gstz/.catz), data .json or a folder. Files and folder are two actions of the app's own menu dialog. The job has Reading files in place of Download and no Try again; after a restart the interrupted notice offers Dismiss only. A local source shows "From a file · " and the picked name, and its import date, and has no update check, GitHub link or Install more factions.</small>
       </ElementSection>
 
       <ElementSection title="Advanced Installation Setting">

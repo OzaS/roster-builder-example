@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { Archive, ArrowLeft, Bell, Check, ChevronDown, ChevronRight, Circle, CircleArrowUp, CircleCheck, Clock, Copy, Database, Download, Ellipsis, FileInput, FileText, FolderGit2, Globe, Hand, History, Info, Library, ListChecks, LoaderCircle, Lock, Minus, OctagonAlert, Plus, RefreshCw, Search, Star, Trash2, TriangleAlert, Upload, Wifi, X } from "lucide-react";
+import { Archive, ArrowLeft, Bell, Check, ChevronDown, ChevronRight, Circle, CircleArrowUp, CircleCheck, Clock, Copy, Database, Download, Ellipsis, FileArchive, FileInput, FileText, FolderGit2, FolderOpen, Globe, Hand, History, Info, Library, ListChecks, LoaderCircle, Lock, Minus, OctagonAlert, Plus, RefreshCw, Search, Star, Trash2, TriangleAlert, Upload, Wifi, X } from "lucide-react";
 import type { ConceptProps } from "../shared";
 import { Chip } from "./uxShared";
 
@@ -296,7 +296,7 @@ export function FactionPicker({ initial = ["Northern Realms", "Tidewardens"] }: 
 
 // ---------------------------------------------------------------- gallery screen: install job
 
-type InstallPreview = "running" | "hidden" | "several" | "several-hidden" | "mobile-data" | "wifi" | "background" | "choose" | "choose-hidden" | "done" | "updated" | "failed" | "cancelled" | "toasts";
+type InstallPreview = "running" | "hidden" | "several" | "several-hidden" | "mobile-data" | "wifi" | "background" | "choose" | "choose-hidden" | "done" | "updated" | "failed" | "cancelled" | "toasts" | "local" | "local-done" | "local-failed";
 
 const INSTALL_PREVIEWS: Array<[InstallPreview, string]> = [
   ["running", "Running"],
@@ -313,6 +313,9 @@ const INSTALL_PREVIEWS: Array<[InstallPreview, string]> = [
   ["failed", "Failed"],
   ["cancelled", "Cancelled"],
   ["toasts", "Toasts"],
+  ["local", "From a file"],
+  ["local-done", "From a file · done"],
+  ["local-failed", "From a file · errors"],
 ];
 
 export function PreviewState<T extends string>({ label = "Preview state", value, options, onChange }: { label?: string; value: T; options: Array<[T, string]>; onChange: (value: T) => void }) {
@@ -349,6 +352,7 @@ function SourcesBackdrop({ props, children }: { props: ConceptProps; children?: 
 
 export function InstallJobScreen({ props }: { props: ConceptProps }) {
   const [preview, setPreview] = useState<InstallPreview>("running");
+  const [localError, setLocalError] = useState<LocalError>("too-large");
   const control = <PreviewState value={preview} options={INSTALL_PREVIEWS} onChange={setPreview} />;
   const subtitle = `${EXAMPLE_SYSTEM.repo} · ${EXAMPLE_SYSTEM.version}`;
   const title = `Installing ${EXAMPLE_SYSTEM.name}`;
@@ -401,7 +405,25 @@ export function InstallJobScreen({ props }: { props: ConceptProps }) {
     );
   }
   let modal: ReactNode;
-  if (preview === "running") {
+  // DS-3: a job from files on the phone. No repository or version under the title, "Reading files" in place of
+  // Download; Cancel discards everything. Ended, it offers no Try again (the picked files are gone).
+  const localTitle = `Installing ${LOCAL_FILE.label}`;
+  const localSubtitle = `From a file · ${LOCAL_FILE.files} files · ${LOCAL_FILE.size}`;
+  if (preview === "local") {
+    modal = <JobModal title={localTitle} subtitle={localSubtitle} percent={8} stepLabel="Step 1 of 4" steps={localSteps("files")} notify />;
+  } else if (preview === "local-done") {
+    modal = (
+      <JobModal title={`Installing ${LOCAL_SOURCE.name}`} subtitle={`From a file · ${LOCAL_FILE.label}`} steps={localSteps("done")} outcome="done"
+        notice={<JobOutcomeNotice outcome="done" title={`Installed ${LOCAL_SOURCE.name}`} body="9 factions. Ready to use. It replaced the data installed from a file before; rosters use the new data." />}
+        footer={<><button type="button" className="ux-job-btn secondary">View</button><button type="button" className="ux-job-btn primary">Done</button></>} />
+    );
+  } else if (preview === "local-failed") {
+    modal = (
+      <JobModal title={`Could not install ${LOCAL_FILE.label}`} subtitle={localSubtitle} steps={localSteps("failed")} outcome="failed"
+        notice={<><PreviewState label="Error" value={localError} options={LOCAL_ERRORS.map(([id, label]) => [id, label] as [LocalError, string])} onChange={setLocalError} /><LocalImportError kind={localError} /></>}
+        footer={<button type="button" className="ux-job-btn primary">Close</button>} />
+    );
+  } else if (preview === "running") {
     modal = <JobModal title={title} subtitle={subtitle} percent={46} stepLabel="Step 3 of 4" steps={installSteps("import")} notify />;
   } else if (preview === "several") {
     modal = <JobModal title={title} subtitle={subtitle} percent={46} stepLabel="Step 3 of 4" steps={installSteps("import")} overall={38} others={[{ title: "Updating Example System Two", detail: "Download · 4.1 MB of 29 MB", percent: 14 }, { title: "Installing Example System Three", detail: "Waiting for another install", waiting: true }, { title: "Installed Example System Four", detail: "12 factions. Ready to use.", ended: "done" }]} />;
@@ -495,7 +517,7 @@ export function UpdatesNotice({ count = 2 }: { count?: number }) {
   );
 }
 
-type SourcesPreview = "installed" | "updates" | "selecting" | "updating" | "failed" | "interrupted" | "update-interrupted" | "empty";
+type SourcesPreview = "installed" | "updates" | "selecting" | "updating" | "failed" | "interrupted" | "update-interrupted" | "local-choice" | "local" | "local-interrupted" | "empty";
 
 export function SourcesManageScreen({ props }: { props: ConceptProps }) {
   const [preview, setPreview] = useState<SourcesPreview>("updates");
@@ -504,6 +526,8 @@ export function SourcesManageScreen({ props }: { props: ConceptProps }) {
   const sources = EXAMPLE_SOURCES.map((s) => {
     if (preview === "installed") return { ...s, status: (s.status === "update" ? "ready" : s.status) as SourceStatus };
     if (preview === "updating" && s.name === EXAMPLE_SYSTEM.name) return { ...s, status: "updating" as SourceStatus };
+    // DS-3: a source installed from a file shows where it came from and is never offered an update.
+    if ((preview === "local" || preview === "local-choice") && s.name === LOCAL_SOURCE.name) return LOCAL_SOURCE;
     return s;
   });
   const toggle = (name: string) => setSelected((cur) => (cur.includes(name) ? cur.filter((n) => n !== name) : [...cur, name]));
@@ -511,12 +535,13 @@ export function SourcesManageScreen({ props }: { props: ConceptProps }) {
     <>
       <SourceScreenHeader props={props} title={selecting ? `${selected.length} selected` : "Sources"} subtitle={selecting ? "Choose sources to update" : "Installed game data"} right={selecting ? <button type="button" className="ux-job-hide" onClick={() => setPreview("updates")}>Cancel</button> : undefined} />
       <div className="ux-wb-home-body ux-sources-body ux-src-body">
-        <PreviewState value={preview} options={[["installed", "Installed"], ["updates", "Updates"], ["selecting", "Selecting"], ["updating", "Updating"], ["failed", "Install failed"], ["interrupted", "Install interrupted"], ["update-interrupted", "Update interrupted"], ["empty", "Empty"]]} onChange={setPreview} />
+        <PreviewState value={preview} options={[["installed", "Installed"], ["updates", "Updates"], ["selecting", "Selecting"], ["updating", "Updating"], ["failed", "Install failed"], ["interrupted", "Install interrupted"], ["update-interrupted", "Update interrupted"], ["local-choice", "From a file · choose"], ["local", "From a file · installed"], ["local-interrupted", "From a file · interrupted"], ["empty", "Empty"]]} onChange={setPreview} />
         {!selecting ? (
           <button type="button" className="ux-add-source-primary" onClick={() => props.onNavigate("add-source")}>
             <Plus size={18} /><span><strong>Add game data</strong><small>Collections, a repository link, or GitHub search</small></span><ChevronRight size={17} />
           </button>
         ) : null}
+        {!selecting ? <LocalImportRow onClick={() => setPreview("local-choice")} /> : null}
         {preview === "updates" ? <UpdatesNotice /> : null}
         {preview === "empty" ? (
           <section className="ux-sources-empty">
@@ -541,6 +566,7 @@ export function SourcesManageScreen({ props }: { props: ConceptProps }) {
                 <div className="ux-src-inline-actions"><button type="button" className="ux-job-link">Dismiss</button><button type="button" className="ux-job-btn primary">Install the rest</button></div>
               </div>
             ) : null}
+            {preview === "local-interrupted" ? <LocalInterruptedNotice /> : null}
             {preview === "update-interrupted" ? (
               <div className="ux-job-notice warning ux-src-failed">
                 <TriangleAlert size={18} />
@@ -562,8 +588,105 @@ export function SourcesManageScreen({ props }: { props: ConceptProps }) {
         </footer>
       ) : null}
       {preview === "updating" ? <div className="ux-job-float"><JobPill label={`Updating ${EXAMPLE_SYSTEM.name}`} percent={46} count={2} /></div> : null}
+      {preview === "local-choice" ? <LocalImportChoiceDialog /> : null}
     </>
   );
+}
+
+// ---------------------------------------------------------------- install from a file (DS-3, DEC-035)
+
+/**
+ * Sources → "Install from a file on this phone" (battle-augur DS-3): archives (.zip, .bsr), data files
+ * (.gst/.cat, .gstz/.catz, data .json) or a folder, read on the phone and installed through the same job
+ * sheet as a download. The file names below are invented placeholders (DEC-001).
+ */
+export const LOCAL_FILE = { label: "example-data.zip", files: 12, size: "12 MB" };
+
+/** The entry row under Add game data (a neutral icon tile: it is the second way in). */
+export function LocalImportRow({ onClick }: { onClick?: () => void }) {
+  return (
+    <button type="button" className="ux-add-source-primary ux-src-local-entry" onClick={onClick}>
+      <FileArchive size={18} /><span><strong>Install from a file on this phone</strong><small>An archive, data files or a folder</small></span><ChevronRight size={17} />
+    </button>
+  );
+}
+
+/** The choice after tapping the row: the app's own menu dialog (UX-013), never a system alert. */
+export function LocalImportChoiceDialog({ inline = false }: { inline?: boolean }) {
+  return (
+    <AppDialog
+      inline={inline}
+      layout="column"
+      title="Install from a file"
+      message="Pick archives or data files, or a whole folder. Hidden folders and other files are skipped."
+      actions={[{ label: "Choose files", icon: <FileInput size={15} /> }, { label: "Choose a folder", icon: <FolderOpen size={15} /> }, { label: "Cancel" }]}
+    />
+  );
+}
+
+/** The job's steps: "Reading files" in place of Download (the bytes go to the engine one file at a time). */
+export function localSteps(stage: "files" | "import" | "failed" | "done"): JobStep[] {
+  const order = ["files", "read", "import", "write"];
+  const at = (id: string): JobStepState => {
+    if (stage === "done") return "done";
+    if (stage === "failed") return id === "read" ? "failed" : order.indexOf(id) < 1 ? "done" : "waiting";
+    const cur = order.indexOf(stage);
+    const i = order.indexOf(id);
+    return i < cur ? "done" : i === cur ? "active" : "waiting";
+  };
+  return [
+    { id: "files", title: "Reading files", detail: stage === "files" ? "File 4 of 12 · example-faction.cat" : `${LOCAL_FILE.files} files · ${LOCAL_FILE.size}`, state: at("files"), progress: 4 / 12 },
+    { id: "read", title: "Read", detail: at("read") === "done" ? "64 documents" : undefined, state: at("read") },
+    { id: "import", title: "Import", detail: stage === "import" ? `Faction 3 of 9 · ${EXAMPLE_FACTIONS[1]}` : stage === "done" ? "9 factions" : undefined, state: at("import"), progress: 3 / 9 },
+    { id: "write", title: "Write", state: at("write") },
+  ];
+}
+
+export type LocalError = "too-large" | "no-data" | "no-system" | "two-systems" | "damaged" | "permission";
+
+/** What a refused or failed pick says. Nothing is installed and the data already on the phone stays as it was. */
+export const LOCAL_ERRORS: Array<[LocalError, string, string, string]> = [
+  ["too-large", "Too large", "These files are too large", "Each file can be up to 50 MB and all of them together up to 200 MB, in at most 2000 files. Nothing was installed."],
+  ["no-data", "No data files", "No game data in these files", "Pick .zip or .bsr archives, .gst or .cat files (also .gstz, .catz) or data .json files. Nothing was installed."],
+  ["no-system", "No game system", "The game system file is missing", "The files have factions but not the game system they belong to. Add its .gst file and try again."],
+  ["two-systems", "Two game systems", "These files hold two game systems", "Install one game system at a time: Example System One and Example System Two were found."],
+  ["damaged", "Damaged archive", "This archive could not be read", "example-data.zip is damaged or not a supported archive. Nothing was installed."],
+  ["permission", "Permission lost", "The phone no longer allows reading these files", "Pick the files again. If they are in a cloud folder, make sure they are downloaded first."],
+];
+
+export function LocalImportError({ kind }: { kind: LocalError }) {
+  const [, , title, body] = LOCAL_ERRORS.find(([id]) => id === kind)!;
+  return <JobOutcomeNotice outcome="failed" title={title} body={body} />;
+}
+
+/** A local source in the Sources list: where it came from instead of a version, and when it was imported. */
+export const LOCAL_SOURCE: ExampleSource = { name: "Example System Three", factions: 9, names: "Iron Choir, Salt Kings, Lantern Guild…", meta: `From a file · ${LOCAL_FILE.label} · imported today · ${LOCAL_FILE.size}`, status: "ready" };
+
+/** After a restart: the picked files are gone, so the only action is Dismiss. */
+export function LocalInterruptedNotice() {
+  return (
+    <div className="ux-job-notice warning ux-src-failed">
+      <TriangleAlert size={18} />
+      <span><strong>{LOCAL_FILE.label} · Install interrupted</strong><small>The install from {LOCAL_FILE.label} was interrupted. Nothing was kept. Pick the files again to install them.</small></span>
+      <div className="ux-src-inline-actions"><button type="button" className="ux-job-btn">Dismiss</button></div>
+    </div>
+  );
+}
+
+/** Source detail of a local source: no repository, version, update check, GitHub link or Install more factions. */
+export function LocalSourceRows() {
+  return (
+    <div className="ux-src-group">
+      <DetailRow label="From a file" value={LOCAL_FILE.label} />
+      <DetailRow label="Imported" value="today" />
+      <DetailRow label="Size on this phone" value={LOCAL_FILE.size} />
+      <DetailRow label="Documents" value="64" />
+    </div>
+  );
+}
+
+export function LocalSourceNote() {
+  return <div className="ux-job-notice info"><Info size={18} /><span><strong>Installed from a file</strong><small>It is never checked for updates. Install a newer file of the same game system to replace it; rosters move to the new data.</small></span></div>;
 }
 
 // ---------------------------------------------------------------- source detail with update states
@@ -692,7 +815,7 @@ function SeverityCount({ tone, label }: { tone: "error" | "warning" | "info"; la
   return <span className={`ux-src-sev ${tone}`}>{label}</span>;
 }
 
-type DetailPreview = "update" | "current" | "updating" | "updated" | "not-checked" | "failed" | "versions" | "older" | "switched" | "delete-version" | "remove";
+type DetailPreview = "update" | "current" | "updating" | "updated" | "not-checked" | "failed" | "versions" | "older" | "switched" | "delete-version" | "remove" | "local";
 
 function DetailRow({ label, value, action }: { label: string; value: string; action?: string }) {
   return <div className="ux-src-kv"><span>{label}</span><b>{value}</b>{action ? <button type="button" className="ux-job-link">{action}</button> : null}</div>;
@@ -706,9 +829,9 @@ export function SourceDetailScreen({ props }: { props: ConceptProps }) {
   const newest = preview === "updated" || preview === "not-checked" || preview === "versions" || preview === "delete-version";
   return (
     <>
-      <SourceScreenHeader props={props} title={EXAMPLE_SYSTEM.name} subtitle={EXAMPLE_SYSTEM.repo} />
+      <SourceScreenHeader props={props} title={preview === "local" ? LOCAL_SOURCE.name : EXAMPLE_SYSTEM.name} subtitle={preview === "local" ? `From a file · ${LOCAL_FILE.label}` : EXAMPLE_SYSTEM.repo} />
       <div className="ux-wb-home-body ux-sources-body ux-src-body">
-        <PreviewState value={preview} options={[["update", "Update available"], ["current", "Up to date"], ["updating", "Updating"], ["updated", "Updated"], ["not-checked", "Rosters not checked"], ["failed", "Update failed"], ["versions", "Versions"], ["older", "Older version"], ["switched", "Switched"], ["delete-version", "Delete version"], ["remove", "Remove"]]} onChange={setPreview} />
+        <PreviewState value={preview} options={[["update", "Update available"], ["current", "Up to date"], ["updating", "Updating"], ["updated", "Updated"], ["not-checked", "Rosters not checked"], ["failed", "Update failed"], ["versions", "Versions"], ["older", "Older version"], ["switched", "Switched"], ["delete-version", "Delete version"], ["remove", "Remove"], ["local", "From a file"]]} onChange={setPreview} />
         {preview === "update" ? <SourceUpdateCard /> : null}
         {older ? <OlderVersionRow /> : null}
         {preview === "not-checked" ? <LastUpdateCard checked={false} /> : null}
@@ -723,14 +846,14 @@ export function SourceDetailScreen({ props }: { props: ConceptProps }) {
         {preview === "failed" ? (
           <div className="ux-job-notice error"><OctagonAlert size={18} /><span><strong>The last update failed</strong><small>GitHub could not be reached. The previous version is still in use.</small></span><button type="button" className="ux-job-btn primary">Try again</button></div>
         ) : null}
-        <div className="ux-src-group">
+        {preview === "local" ? <><LocalSourceNote /><LocalSourceRows /></> : <div className="ux-src-group">
           <DetailRow label="Repository" value={EXAMPLE_SYSTEM.repo} />
           <DetailRow label="Version" value={newest ? VERSION_NEWEST.commit : VERSION_PREVIOUS.commit} />
           <DetailRow label="Changed upstream" value={newest ? VERSION_NEWEST.date : VERSION_PREVIOUS.date} />
           <DetailRow label="Installed" value="12 days ago" />
           <DetailRow label="Last checked" value={preview === "failed" ? "1 h ago" : "5 min ago"} action="Check now" />
           <DetailRow label="Size on this phone" value={older ? VERSION_PREVIOUS.size : VERSION_NEWEST.size} />
-        </div>
+        </div>}
         {preview === "versions" || preview === "delete-version" || older ? <SourceVersions older={older} onDelete={() => setPreview("delete-version")} /> : null}
         <div className="ux-result-label">Installed factions</div>
         <div className="ux-src-group">{EXAMPLE_FACTIONS.slice(0, 4).map((f) => <DetailRow key={f} label={f} value="r14" />)}<DetailRow label="…and 19 more" value="" /></div>
