@@ -430,7 +430,8 @@
                   "activity rail on hub pages",
                   "roster summary popover",
                   "points line under tabs",
-                  "over limit"
+                  "over limit",
+                  "page actions in the tab row (no page titles)"
                 ],
                 "screens": [
                   "desktop-welcome",
@@ -536,12 +537,21 @@
                 ]
               },
               {
+                "id": "desktop.toasts",
+                "title": "Toasts & Notifications",
+                "level": "overlay",
+                "status": "needs-review",
+                "platforms": ["desktop"],
+                "states": ["functional toast top right", "undo action", "notification bottom right", "dismiss"],
+                "screens": ["desktop-editor", "desktop-rosters", "desktop-sources"]
+              },
+              {
                 "id": "desktop.rosters",
                 "title": "Roster List & Details",
                 "level": "screen-composition",
                 "status": "needs-review",
                 "platforms": ["desktop"],
-                "states": ["selected", "search", "needs attention", "system filter", "sort", "no matches", "rename", "duplicate", "delete confirm", "issues", "data changed", "faction removed", "over limit"],
+                "states": ["selected", "search", "needs attention", "system filter", "sort", "no matches", "rename", "duplicate", "delete confirm", "undo delete", "issues", "data changed", "faction removed", "over limit"],
                 "screens": ["desktop-rosters"]
               },
               {
@@ -568,7 +578,7 @@
                 "level": "screen-composition",
                 "status": "needs-review",
                 "platforms": ["desktop"],
-                "states": ["theme", "colour scheme", "import scheme", "language", "switches", "keep versions", "storage", "shortcuts", "about"],
+                "states": ["theme", "colour scheme", "import scheme", "language", "switches", "keep versions", "storage", "key bindings", "recording", "needs a modifier", "conflict replace", "reset", "about", "scroll-tracked section list"],
                 "screens": ["desktop-settings"]
               }
             ]

@@ -18,14 +18,14 @@ export type TabletPanelLayout = {
   railVisible: boolean;
 };
 
-export type ColorScheme = "generic" | "wh40k" | "horus-heresy" | "age-of-sigmar" | "old-world";
+export type ColorScheme = "default" | "crimson" | "gilded" | "azure" | "verdant";
 
 export const colorSchemes: Array<{ id: ColorScheme; label: string; short: string }> = [
-  { id: "generic", label: "Generic", short: "GEN" },
-  { id: "wh40k", label: "Warhammer 40,000", short: "40K" },
-  { id: "horus-heresy", label: "Horus Heresy", short: "HH" },
-  { id: "age-of-sigmar", label: "Age of Sigmar", short: "AoS" },
-  { id: "old-world", label: "The Old World", short: "TOW" },
+  { id: "default", label: "Default", short: "DEF" },
+  { id: "crimson", label: "Crimson", short: "CRI" },
+  { id: "gilded", label: "Gilded", short: "GIL" },
+  { id: "azure", label: "Azure", short: "AZU" },
+  { id: "verdant", label: "Verdant", short: "VER" },
 ];
 
 export type WorkflowScreen =

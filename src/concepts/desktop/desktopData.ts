@@ -46,9 +46,9 @@ export const collectionSources = [
 ];
 
 export const colourSchemes = [
-  { id: 'generic', name: 'Default', accent: '#7c8cff' },
-  { id: 'wh40k', name: 'Crimson', accent: '#d8392f' },
-  { id: 'horus-heresy', name: 'Gilded', accent: '#c69a44' },
-  { id: 'age-of-sigmar', name: 'Azure', accent: '#29b3e6' },
-  { id: 'old-world', name: 'Verdant', accent: '#5d9c69' },
+  { id: 'default', name: 'Default', accent: '#7c8cff' },
+  { id: 'crimson', name: 'Crimson', accent: '#d8392f' },
+  { id: 'gilded', name: 'Gilded', accent: '#c69a44' },
+  { id: 'azure', name: 'Azure', accent: '#29b3e6' },
+  { id: 'verdant', name: 'Verdant', accent: '#5d9c69' },
 ] as const;

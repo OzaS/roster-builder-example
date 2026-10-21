@@ -196,3 +196,10 @@
 .dtp-shortcuts div:first-child { border-top: 0 }
 .dtp-shortcuts dd { margin: 0 }
 .dt-app .dtp-cost small { display: inline }
+.dtp-keys-head { display: flex; align-items: center; justify-content: space-between }
+.dt-app .dtp-keys-group h3 { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--dt-faint); font-weight: 600; margin: 16px 0 8px }
+.dt-app .dtp-key { min-width: 92px; height: 30px; padding: 0 10px; border-radius: 9px; border: 1px solid var(--dt-border); font-size: 12px; justify-content: center }
+.dt-app .dtp-key kbd { font-size: 12px; border: 0; padding: 0; color: var(--dt-text) }
+.dt-app .dtp-key.recording { border-color: var(--dt-fill); background: var(--dt-selected); color: var(--dt-accent) }
+.dtp-key-error { color: var(--dt-warn) !important }
+.dtp-page { padding-top: 66px }

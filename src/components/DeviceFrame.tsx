@@ -10,7 +10,7 @@ type Props = {
   children: React.ReactNode;
 };
 
-export function DeviceFrame({ desktop = false, platform, themeMode = "dark", colorScheme = "generic", statusBarUsesDesignBackground = false, children }: Props) {
+export function DeviceFrame({ desktop = false, platform, themeMode = "dark", colorScheme = "default", statusBarUsesDesignBackground = false, children }: Props) {
   const statusBarClass = statusBarUsesDesignBackground ? "status-bar-design" : "status-bar-device";
 
   return (

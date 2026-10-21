@@ -14,7 +14,7 @@ const platformIds = ["phone", "tablet"] satisfies PlatformPreview[];
 const themeModes = ["dark", "light"] satisfies ThemeMode[];
 const themePreferences = ["system", "dark", "light"] satisfies ThemePreference[];
 const appLanguages = ["en", "fr"] satisfies AppLanguage[];
-const colorSchemeIds = ["generic", "wh40k", "horus-heresy", "age-of-sigmar", "old-world"] satisfies ColorScheme[];
+const colorSchemeIds = ["default", "crimson", "gilded", "azure", "verdant"] satisfies ColorScheme[];
 const navigatorViews = ["single", "all-screens", "elements"] satisfies NavigatorView[];
 const navStyles = ["top", "tabs", "floating"] satisfies NavStyle[];
 const unitDetailViews = ["options", "profile"] satisfies UnitDetailView[];
@@ -124,7 +124,7 @@ function App() {
   const [systemTheme, setSystemTheme] = useState<ThemeMode>(() => preferredSystemTheme());
   const [language, setLanguage] = useState<AppLanguage>(initialState.language ?? "en");
   const themeMode: ThemeMode = themePreference === "system" ? systemTheme : themePreference;
-  const [colorScheme, setColorScheme] = useState<ColorScheme>(initialState.colorScheme ?? "generic");
+  const [colorScheme, setColorScheme] = useState<ColorScheme>(initialState.colorScheme ?? "default");
   const [navigatorView, setNavigatorView] = useState<NavigatorView>(initialState.navigatorView ?? "single");
   const [galleryRelease, setGalleryRelease] = useState<GalleryRelease>(initialState.galleryRelease ?? "V1");
   const [workflowScreen, setWorkflowScreen] = useState<WorkflowScreen>(initialState.workflowScreen ?? "library");

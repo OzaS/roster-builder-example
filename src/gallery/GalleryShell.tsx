@@ -352,7 +352,7 @@ export function GalleryShell({
               <span className="display-switch" aria-hidden="true" />
             </button>
           </ControlGroup>
-          <ControlGroup title="Game scheme">
+          <ControlGroup title="Colour scheme">
             {colorSchemes.map((scheme) => (
               <button key={scheme.id} className={colorScheme === scheme.id ? "active" : ""} type="button" onClick={() => onColorSchemeChange(scheme.id)}>
                 <Palette size={16} />

@@ -201,7 +201,7 @@ export function themeClass(themeMode?: ThemeMode) {
 }
 
 export function schemeClass(colorScheme?: ColorScheme) {
-  return `ux-scheme-${colorScheme ?? "generic"}`;
+  return `ux-scheme-${colorScheme ?? "default"}`;
 }
 
 /** Combined root class helper: theme mode + game color scheme. */

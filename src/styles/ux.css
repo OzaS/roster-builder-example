@@ -4981,17 +4981,17 @@ button.ux-reference-tag:focus-visible {
 }
 
 /* =====================================================================
-   GAME COLOR SCHEMES
+   COLOUR SCHEMES
    Each scheme retints the accent/cool tokens (both modes) plus the
    background atmosphere per mode. Status colors stay constant for
-   legibility. `generic` intentionally has no overrides (uses base tokens).
+   legibility. `default` intentionally has no overrides (uses base tokens).
    Scheme rules come last so they win the equal-specificity battle with
    the `.ux-screen.light` accent rule; mode-specific tints use the higher
    `.ux-scheme-*.dark|.light` specificity to override base backgrounds.
    ===================================================================== */
 
-/* ---- Warhammer 40,000 — gothic imperial crimson + bone & gold ---- */
-.ux-screen.ux-scheme-wh40k {
+/* ---- Crimson — deep crimson + bone & gold ---- */
+.ux-screen.ux-scheme-crimson {
   --ux-accent: #d8392f;
   --ux-accent-2: #ef5b4d;
   --ux-accent-ink: #fff3f0;
@@ -4999,7 +4999,7 @@ button.ux-reference-tag:focus-visible {
   --ux-accent-ink-tertiary: #ffd5cf;
   --ux-cool: #e0b145;
 }
-.ux-screen.ux-scheme-wh40k.dark {
+.ux-screen.ux-scheme-crimson.dark {
   --ux-bg: #0b0a0c;
   --ux-surface: #161418;
   --ux-surface-2: #1f1c22;
@@ -5007,7 +5007,7 @@ button.ux-reference-tag:focus-visible {
   --ux-line: rgba(224, 177, 69, 0.12);
   --ux-line-2: rgba(224, 177, 69, 0.24);
 }
-.ux-screen.ux-scheme-wh40k.light {
+.ux-screen.ux-scheme-crimson.light {
   --ux-bg: #efe7df;
   --ux-surface: #fbf6f0;
   --ux-surface-2: #f1e8df;
@@ -5022,8 +5022,8 @@ button.ux-reference-tag:focus-visible {
   --ux-cool: #8a6a1f;
 }
 
-/* ---- Horus Heresy — gold on oxblood (dark) / aged parchment (light) ---- */
-.ux-screen.ux-scheme-horus-heresy {
+/* ---- Gilded — gold on oxblood (dark) / aged parchment (light) ---- */
+.ux-screen.ux-scheme-gilded {
   --ux-accent: #c69a44;
   --ux-accent-2: #e2c272;
   --ux-accent-ink: #241603;
@@ -5031,7 +5031,7 @@ button.ux-reference-tag:focus-visible {
   --ux-accent-ink-tertiary: #4a300d;
   --ux-cool: #d98a52;
 }
-.ux-screen.ux-scheme-horus-heresy.dark {
+.ux-screen.ux-scheme-gilded.dark {
   --ux-bg: #190809;
   --ux-surface: #270d10;
   --ux-surface-2: #321216;
@@ -5040,7 +5040,7 @@ button.ux-reference-tag:focus-visible {
   --ux-line: rgba(214, 164, 82, 0.16);
   --ux-line-2: rgba(214, 164, 82, 0.3);
 }
-.ux-screen.ux-scheme-horus-heresy.light {
+.ux-screen.ux-scheme-gilded.light {
   --ux-bg: #e9dcc4;
   --ux-surface: #f6ecd8;
   --ux-surface-2: #efe1c8;
@@ -5057,8 +5057,8 @@ button.ux-reference-tag:focus-visible {
   --ux-cool: #9c5a2a;
 }
 
-/* ---- Age of Sigmar — celestial azure + sigmarite gold ---- */
-.ux-screen.ux-scheme-age-of-sigmar {
+/* ---- Azure — celestial azure + warm gold ---- */
+.ux-screen.ux-scheme-azure {
   --ux-accent: #29b3e6;
   --ux-accent-2: #5ad0f6;
   --ux-accent-ink: #04141f;
@@ -5066,7 +5066,7 @@ button.ux-reference-tag:focus-visible {
   --ux-accent-ink-tertiary: #15394b;
   --ux-cool: #f3c63f;
 }
-.ux-screen.ux-scheme-age-of-sigmar.dark {
+.ux-screen.ux-scheme-azure.dark {
   --ux-bg: #060f1d;
   --ux-surface: #0d1a2c;
   --ux-surface-2: #122438;
@@ -5074,7 +5074,7 @@ button.ux-reference-tag:focus-visible {
   --ux-line: rgba(90, 208, 246, 0.14);
   --ux-line-2: rgba(90, 208, 246, 0.28);
 }
-.ux-screen.ux-scheme-age-of-sigmar.light {
+.ux-screen.ux-scheme-azure.light {
   --ux-bg: #e4eef6;
   --ux-surface: #ffffff;
   --ux-surface-2: #eef4fa;
@@ -5091,8 +5091,8 @@ button.ux-reference-tag:focus-visible {
   --ux-cool: #b58420;
 }
 
-/* ---- The Old World — muted bottle-green + bronze, antique ---- */
-.ux-screen.ux-scheme-old-world {
+/* ---- Verdant — muted bottle-green + bronze, antique ---- */
+.ux-screen.ux-scheme-verdant {
   --ux-accent: #4f8a5b;
   --ux-accent-2: #6fae7b;
   --ux-accent-ink: #07140b;
@@ -5100,7 +5100,7 @@ button.ux-reference-tag:focus-visible {
   --ux-accent-ink-tertiary: #29422e;
   --ux-cool: #c2933f;
 }
-.ux-screen.ux-scheme-old-world.dark {
+.ux-screen.ux-scheme-verdant.dark {
   --ux-bg: #0b110d;
   --ux-surface: #141d16;
   --ux-surface-2: #1b271e;
@@ -5109,7 +5109,7 @@ button.ux-reference-tag:focus-visible {
   --ux-line: rgba(194, 147, 63, 0.12);
   --ux-line-2: rgba(194, 147, 63, 0.24);
 }
-.ux-screen.ux-scheme-old-world.light {
+.ux-screen.ux-scheme-verdant.light {
   --ux-bg: #e7e3d4;
   --ux-surface: #f5f1e6;
   --ux-surface-2: #ece7d7;
@@ -5196,43 +5196,43 @@ button.ux-reference-tag:focus-visible {
   background: #101416;
 }
 
-.device-frame.ux-scheme-wh40k.theme-dark .phone-status-bar,
-.ux-phone-status-preview.ux-scheme-wh40k.theme-dark .phone-status-bar {
+.device-frame.ux-scheme-crimson.theme-dark .phone-status-bar,
+.ux-phone-status-preview.ux-scheme-crimson.theme-dark .phone-status-bar {
   --phone-status-design-bg: #0b0a0c;
 }
 
-.device-frame.ux-scheme-wh40k.theme-light .phone-status-bar,
-.ux-phone-status-preview.ux-scheme-wh40k.theme-light .phone-status-bar {
+.device-frame.ux-scheme-crimson.theme-light .phone-status-bar,
+.ux-phone-status-preview.ux-scheme-crimson.theme-light .phone-status-bar {
   --phone-status-design-bg: #efe7df;
 }
 
-.device-frame.ux-scheme-horus-heresy.theme-dark .phone-status-bar,
-.ux-phone-status-preview.ux-scheme-horus-heresy.theme-dark .phone-status-bar {
+.device-frame.ux-scheme-gilded.theme-dark .phone-status-bar,
+.ux-phone-status-preview.ux-scheme-gilded.theme-dark .phone-status-bar {
   --phone-status-design-bg: #190809;
 }
 
-.device-frame.ux-scheme-horus-heresy.theme-light .phone-status-bar,
-.ux-phone-status-preview.ux-scheme-horus-heresy.theme-light .phone-status-bar {
+.device-frame.ux-scheme-gilded.theme-light .phone-status-bar,
+.ux-phone-status-preview.ux-scheme-gilded.theme-light .phone-status-bar {
   --phone-status-design-bg: #e9dcc4;
 }
 
-.device-frame.ux-scheme-age-of-sigmar.theme-dark .phone-status-bar,
-.ux-phone-status-preview.ux-scheme-age-of-sigmar.theme-dark .phone-status-bar {
+.device-frame.ux-scheme-azure.theme-dark .phone-status-bar,
+.ux-phone-status-preview.ux-scheme-azure.theme-dark .phone-status-bar {
   --phone-status-design-bg: #060f1d;
 }
 
-.device-frame.ux-scheme-age-of-sigmar.theme-light .phone-status-bar,
-.ux-phone-status-preview.ux-scheme-age-of-sigmar.theme-light .phone-status-bar {
+.device-frame.ux-scheme-azure.theme-light .phone-status-bar,
+.ux-phone-status-preview.ux-scheme-azure.theme-light .phone-status-bar {
   --phone-status-design-bg: #e4eef6;
 }
 
-.device-frame.ux-scheme-old-world.theme-dark .phone-status-bar,
-.ux-phone-status-preview.ux-scheme-old-world.theme-dark .phone-status-bar {
+.device-frame.ux-scheme-verdant.theme-dark .phone-status-bar,
+.ux-phone-status-preview.ux-scheme-verdant.theme-dark .phone-status-bar {
   --phone-status-design-bg: #0b110d;
 }
 
-.device-frame.ux-scheme-old-world.theme-light .phone-status-bar,
-.ux-phone-status-preview.ux-scheme-old-world.theme-light .phone-status-bar {
+.device-frame.ux-scheme-verdant.theme-light .phone-status-bar,
+.ux-phone-status-preview.ux-scheme-verdant.theme-light .phone-status-bar {
   --phone-status-design-bg: #e7e3d4;
 }
 

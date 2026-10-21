@@ -1,13 +1,17 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { AlertTriangle, ArrowDownToLine, ArrowRight, ArrowUpCircle, BookOpen, Check, ChevronRight, CircleAlert, Copy, Database, ExternalLink, FileUp, FolderOpen, Github, HardDrive, Info, Keyboard, Languages, Layers3, Link2, ListFilter, Palette, Pencil, Plus, RefreshCcw, Search, Shield, SlidersHorizontal, Trash2, Upload, Users, X } from 'lucide-react';
 import type { ColorScheme } from '../../types';
 import { collectionSources, colourSchemes, installedSources, lookupEntries, rosterLibrary, type LookupKind, type RosterSummary, type SourceInfo } from './desktopData';
+import { comboFromEvent, defaultBindings, formatCombo, hasCommandModifier, keyActions, type KeyAction, type KeyBindings } from './desktopKeys';
 import './desktop-pages.css';
 
-type Notify = (message: string) => void;
+export type ToastOptions = { kind?: 'action' | 'notification'; action?: { label: string; run: () => void } };
+type Notify = (message: string, options?: ToastOptions) => void;
 
-function PageHeader({ title, subtitle, children }: { title: string; subtitle: string; children?: ReactNode }) {
-  return <header className="dtp-header"><div><h1>{title}</h1><p>{subtitle}</p></div>{children && <div className="dtp-header-actions">{children}</div>}</header>;
+/** Page actions render into the window chrome next to the tabs; desktop pages have no title header. */
+function PageActions({ slot, children }: { slot: HTMLElement | null; children: ReactNode }) {
+  return slot ? createPortal(children, slot) : null;
 }
 
 function Chip({ tone = 'neutral', children }: { tone?: 'neutral' | 'ok' | 'warn' | 'err' | 'accent'; children: ReactNode }) {
@@ -31,7 +35,7 @@ const statusChip = (r: RosterSummary) => r.status === 'issues' ? <Chip tone="war
 
 /* ------------------------------ Rosters ------------------------------ */
 
-export function DesktopRosters({ onOpen, onCreate, onImport, notify }: { onOpen: (name: string) => void; onCreate: () => void; onImport: () => void; notify: Notify }) {
+export function DesktopRosters({ onOpen, onCreate, onImport, notify, actionSlot }: { onOpen: (name: string) => void; onCreate: () => void; onImport: () => void; notify: Notify; actionSlot: HTMLElement | null }) {
   const [rosters, setRosters] = useState(rosterLibrary);
   const [query, setQuery] = useState('');
   const [attention, setAttention] = useState(false);
@@ -51,12 +55,12 @@ export function DesktopRosters({ onOpen, onCreate, onImport, notify }: { onOpen:
   useEffect(() => { setRenaming(false); setConfirmDelete(false); }, [selected]);
   const attentionCount = rosters.filter(needsAttention).length;
   const duplicate = (r: RosterSummary) => { const copy = { ...r, name: `Copy of ${r.name}`, opened: 'Just now', mark: r.mark }; setRosters(list => [copy, ...list]); setSelected(copy.name); notify(`Duplicated as “${copy.name}”`); };
-  const remove = (r: RosterSummary) => { setRosters(list => list.filter(x => x.name !== r.name)); setSelected(rosters.find(x => x.name !== r.name)?.name ?? ''); notify(`Deleted “${r.name}”`); };
+  const remove = (r: RosterSummary) => { const before = rosters; setRosters(list => list.filter(x => x.name !== r.name)); setSelected(rosters.find(x => x.name !== r.name)?.name ?? ''); notify(`Deleted “${r.name}”`, { action: { label: 'Undo', run: () => { setRosters(before); setSelected(r.name); } } }); };
   return <main className="dtp-page">
-    <PageHeader title="Rosters" subtitle={`${rosters.length} rosters · stored on this device`}>
-      <button className="dtp-btn" onClick={onImport}><FileUp size={15} />Import</button>
-      <button className="dtp-btn primary" onClick={onCreate}><Plus size={15} />New roster<kbd>⌘ N</kbd></button>
-    </PageHeader>
+    <PageActions slot={actionSlot}>
+      <button className="dtp-btn" onClick={onImport} title="Import a roster from a file"><FileUp size={15} />Import</button>
+      <button className="dtp-btn primary" onClick={onCreate} title="Create a roster"><Plus size={15} />New roster</button>
+    </PageActions>
     <div className="dtp-toolbar">
       <label className="dtp-search"><Search size={15} /><input placeholder="Find a roster or faction…" aria-label="Find a roster" value={query} onChange={e => setQuery(e.target.value)} />{query && <button aria-label="Clear search" onClick={() => setQuery('')}><X size={13} /></button>}</label>
       <div className="dtp-chips"><button className={!attention ? 'active' : ''} onClick={() => setAttention(false)}>All <b>{rosters.length}</b></button>{attentionCount > 0 && <button className={attention ? 'active' : ''} onClick={() => setAttention(true)}><CircleAlert size={13} />Needs attention <b>{attentionCount}</b></button>}</div>
@@ -75,7 +79,7 @@ export function DesktopRosters({ onOpen, onCreate, onImport, notify }: { onOpen:
           </button>)}
           {!visible.length && <div className="dtp-empty"><Search size={22} /><strong>No rosters match</strong><p>Try another name, or clear the filters.</p><button className="dtp-btn" onClick={() => { setQuery(''); setAttention(false); setSystem('All game systems'); }}>Clear filters</button></div>}
         </div>
-        <footer className="dtp-list-foot">Double-click a roster to open it in a tab.</footer>
+        <footer className="dtp-list-foot">{rosters.length} rosters stored on this device · double-click a roster to open it in a tab</footer>
       </section>
       <aside className="dtp-card dtp-detail" aria-label="Roster details">{current ? <>
         <div className="dtp-detail-title">
@@ -113,9 +117,8 @@ export function DesktopLookup({ onOpenRoster }: { onOpenRoster: (name: string) =
   const selected = results.find(e => e.id === selectedId) ?? results[0];
   const groups: Array<{ kind: LookupKind; label: string; icon: ReactNode }> = [{ kind: 'Unit', label: 'Units', icon: <Users size={14} /> }, { kind: 'Rule', label: 'Rules', icon: <BookOpen size={14} /> }, { kind: 'Equipment', label: 'Equipment', icon: <Shield size={14} /> }];
   return <main className="dtp-page">
-    <PageHeader title="Lookup" subtitle="Search the installed game data without opening a roster" />
     <div className="dtp-toolbar">
-      <label className="dtp-search large"><Search size={17} /><input ref={searchRef} placeholder="Search units, rules and equipment…" aria-label="Search game data" value={query} onChange={e => setQuery(e.target.value)} />{query ? <button aria-label="Clear search" onClick={() => setQuery('')}><X size={14} /></button> : <kbd>⌘ F</kbd>}</label>
+      <label className="dtp-search large"><Search size={17} /><input ref={searchRef} placeholder="Search units, rules and equipment in the installed data…" aria-label="Search game data" value={query} onChange={e => setQuery(e.target.value)} />{query && <button aria-label="Clear search" onClick={() => setQuery('')}><X size={14} /></button>}</label>
     </div>
     <div className="dtp-toolbar tight"><span className="dtp-muted">Open Field v1.4</span><div className="dtp-chips">{scopes.map(s => <button key={s} className={scope === s ? 'active' : ''} onClick={() => setScope(s)}>{s}</button>)}</div><span className="dtp-muted dtp-push">{results.length} results</span></div>
     <div className="dtp-split lookup">
@@ -140,7 +143,7 @@ export function DesktopLookup({ onOpenRoster }: { onOpenRoster: (name: string) =
 
 /* ------------------------------ Sources ------------------------------ */
 
-export function DesktopSources({ notify }: { notify: Notify }) {
+export function DesktopSources({ notify, actionSlot }: { notify: Notify; actionSlot: HTMLElement | null }) {
   const [sources, setSources] = useState(installedSources);
   const [selectedId, setSelectedId] = useState<string>('open-field');
   const [progress, setProgress] = useState<Record<string, number>>({});
@@ -152,7 +155,7 @@ export function DesktopSources({ notify }: { notify: Notify }) {
     if (!running.length) return;
     const timer = setTimeout(() => {
       const next: Record<string, number> = {};
-      running.forEach(id => { const p = progress[id] + 20; if (p < 100) next[id] = p; else { setSources(list => list.map(s => s.id === id ? { ...s, version: s.next ?? s.version, next: undefined, status: 'ready', kept: [s.version, ...(s.kept ?? [])].slice(0, 2), installed: 'Just now' } : s)); notify(`${sources.find(s => s.id === id)?.name} updated. 5 rosters checked, 1 changed.`); } });
+      running.forEach(id => { const p = progress[id] + 20; if (p < 100) next[id] = p; else { setSources(list => list.map(s => s.id === id ? { ...s, version: s.next ?? s.version, next: undefined, status: 'ready', kept: [s.version, ...(s.kept ?? [])].slice(0, 2), installed: 'Just now' } : s)); notify(`${sources.find(s => s.id === id)?.name} updated. 5 rosters checked, 1 changed.`, { kind: 'notification' }); } });
       setProgress(next);
     }, 450);
     return () => clearTimeout(timer);
@@ -162,10 +165,10 @@ export function DesktopSources({ notify }: { notify: Notify }) {
   const selected = sources.find(s => s.id === selectedId);
   const chip = (s: SourceInfo) => progress[s.id] !== undefined ? <Chip tone="accent">Updating {progress[s.id]}%</Chip> : s.status === 'update' ? <Chip tone="accent"><ArrowUpCircle size={11} />Update</Chip> : s.status === 'review' ? <Chip tone="warn"><AlertTriangle size={11} />Review</Chip> : <Chip tone="ok"><Check size={11} />Ready</Chip>;
   return <main className="dtp-page">
-    <PageHeader title="Sources" subtitle={`Installed game data · ${sources.length} sources · ${(53.9).toFixed(1)} MB`}>
-      <button className="dtp-btn" onClick={() => notify('Choose an archive, data files or a folder')}><FolderOpen size={15} />Install from a file</button>
-      <button className="dtp-btn primary" onClick={() => setSelectedId('add')}><Plus size={15} />Add game data</button>
-    </PageHeader>
+    <PageActions slot={actionSlot}>
+      <button className="dtp-btn" onClick={() => notify('Choose an archive, data files or a folder')} title="Install game data from an archive, data files or a folder"><FolderOpen size={15} />Install from a file</button>
+      <button className="dtp-btn primary" onClick={() => setSelectedId('add')} title="Install from a collection, a repository link or GitHub search"><Plus size={15} />Add game data</button>
+    </PageActions>
     {updates.length > 0 && <div className="dtp-banner"><ArrowUpCircle size={17} /><span><strong>{updates.length} {updates.length === 1 ? 'update' : 'updates'} available</strong><small>New data for {updates.map(s => s.name).join(', ')}. Last checked 8 minutes ago.</small></span><button className="dtp-btn primary small" onClick={() => update(updates.map(s => s.id))}>Update all</button></div>}
     <div className="dtp-split sources">
       <section className="dtp-card dtp-list" aria-label="Installed sources"><div className="dtp-scroll">
@@ -211,11 +214,11 @@ const settingsSections = [
   { id: 'rosters', label: 'Rosters', icon: Layers3 },
   { id: 'data', label: 'Game data', icon: Database },
   { id: 'storage', label: 'Storage', icon: HardDrive },
-  { id: 'shortcuts', label: 'Keyboard shortcuts', icon: Keyboard },
+  { id: 'keys', label: 'Key bindings', icon: Keyboard },
   { id: 'about', label: 'About', icon: Info },
 ] as const;
 
-export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, notify }: { themePref: 'system' | 'light' | 'dark'; onThemePref: (v: 'system' | 'light' | 'dark') => void; scheme: ColorScheme; onScheme: (v: ColorScheme) => void; notify: Notify }) {
+export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, bindings, onBindings, notify }: { themePref: 'system' | 'light' | 'dark'; onThemePref: (v: 'system' | 'light' | 'dark') => void; scheme: ColorScheme; onScheme: (v: ColorScheme) => void; bindings: KeyBindings; onBindings: (next: KeyBindings) => void; notify: Notify }) {
   const [active, setActive] = useState<string>('appearance');
   const [language, setLanguage] = useState('en');
   const [toggles, setToggles] = useState({ rememberSections: true, restoreTabs: true, chooseFactions: false, autoChecks: true });
@@ -224,10 +227,9 @@ export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, noti
   const flip = (key: keyof typeof toggles) => (v: boolean) => setToggles(t => ({ ...t, [key]: v }));
   const go = (id: string) => { setActive(id); scrollRef.current?.querySelector(`#dtp-set-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
   return <main className="dtp-page">
-    <PageHeader title="Settings" subtitle="Saved on this device" />
     <div className="dtp-settings">
       <nav className="dtp-settings-nav" aria-label="Settings sections">{settingsSections.map(s => <button key={s.id} className={active === s.id ? 'active' : ''} aria-current={active === s.id ? 'true' : undefined} onClick={() => go(s.id)}><s.icon size={15} />{s.label}</button>)}</nav>
-      <div className="dtp-settings-body" ref={scrollRef}>
+      <div className="dtp-settings-body" ref={scrollRef} onScroll={e => { const top = e.currentTarget.getBoundingClientRect().top + 48; const current = settingsSections.filter(sec => (e.currentTarget.querySelector(`#dtp-set-${sec.id}`)?.getBoundingClientRect().top ?? Infinity) <= top).pop(); if (current) setActive(current.id); }}>
         <section id="dtp-set-appearance" className="dtp-card dtp-settings-card"><h2>Appearance</h2>
           <div className="dtp-setting-line"><span><strong>Theme</strong><small>System follows your desktop setting.</small></span><Segmented label="Theme" value={themePref} onChange={onThemePref} options={[{ value: 'system', label: 'System' }, { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }]} /></div>
           <div className="dtp-setting-block"><strong>Colour scheme</strong><div className="dtp-scheme-grid" role="radiogroup" aria-label="Colour scheme">{colourSchemes.map(c => <button key={c.id} role="radio" aria-checked={scheme === c.id} className={scheme === c.id ? 'active' : ''} onClick={() => onScheme(c.id)}><span className="dtp-swatch"><i style={{ background: 'var(--ux-bg)' }} /><i style={{ background: c.accent }} /><i style={{ background: 'var(--ux-surface-2)' }} /></span>{c.name}{scheme === c.id && <Check size={14} />}</button>)}<button onClick={() => notify('Choose a colour scheme file (JSON)')}><Upload size={15} />Import scheme</button></div></div>
@@ -250,9 +252,7 @@ export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, noti
           <div className="dtp-storage-bar" aria-label="Storage used"><i style={{ width: '62%' }} /><i style={{ width: '8%' }} /><i style={{ width: '4%' }} /></div>
           <div className="dtp-legend"><span><i />Game data 53.9 MB</span><span><i />Kept versions 12.8 MB</span><span><i />Rosters 0.4 MB</span></div>
         </section>
-        <section id="dtp-set-shortcuts" className="dtp-card dtp-settings-card"><h2>Keyboard shortcuts</h2>
-          <dl className="dtp-shortcuts">{[['Command palette', '⌘ K'], ['New roster', '⌘ N'], ['Settings', '⌘ ,'], ['Lookup', '⌘ F'], ['Close summary or dialog', 'Esc']].map(([a, k]) => <div key={a}><dt>{a}</dt><dd><kbd>{k}</kbd></dd></div>)}</dl>
-        </section>
+        <section id="dtp-set-keys" className="dtp-card dtp-settings-card"><KeyBindingsEditor bindings={bindings} onBindings={onBindings} /></section>
         <section id="dtp-set-about" className="dtp-card dtp-settings-card"><h2>About</h2>
           <dl className="dtp-facts four"><div><dt>Version</dt><dd>1.0.0 · desktop preview</dd></div><div><dt>Engine</dt><dd>0.9.4</dd></div><div><dt>Protocol</dt><dd>12</dd></div><div><dt>SQLite</dt><dd>3.46</dd></div></dl>
           <p className="dtp-muted">Game data and rosters stay on this device.</p>
@@ -260,4 +260,43 @@ export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, noti
       </div>
     </div>
   </main>;
+}
+
+/* ---------------------------- Key bindings ---------------------------- */
+
+function KeyBindingsEditor({ bindings, onBindings }: { bindings: KeyBindings; onBindings: (next: KeyBindings) => void }) {
+  const [recording, setRecording] = useState<KeyAction | null>(null);
+  const [message, setMessage] = useState('');
+  const [conflict, setConflict] = useState<{ action: KeyAction; combo: string; other: KeyAction } | null>(null);
+  const labelOf = (id: KeyAction) => keyActions.find(a => a.id === id)?.label ?? id;
+  useEffect(() => {
+    if (!recording) return;
+    // Capture phase on window, so the app's own shortcuts do not fire while a binding is recorded.
+    const onKey = (e: KeyboardEvent) => {
+      e.preventDefault(); e.stopImmediatePropagation();
+      if (e.key === 'Escape') { setRecording(null); setMessage(''); return; }
+      const combo = comboFromEvent(e);
+      if (!combo) return;
+      if (!hasCommandModifier(combo)) { setMessage('Use ⌘ or ⌥ with a key, so typing is never captured.'); return; }
+      const other = keyActions.find(a => a.id !== recording && bindings[a.id] === combo)?.id;
+      if (other) setConflict({ action: recording, combo, other });
+      else onBindings({ ...bindings, [recording]: combo });
+      setRecording(null); setMessage('');
+    };
+    window.addEventListener('keydown', onKey, true);
+    return () => window.removeEventListener('keydown', onKey, true);
+  }, [recording, bindings, onBindings]);
+  const changed = keyActions.some(a => bindings[a.id] !== defaultBindings[a.id]);
+  return <>
+    <div className="dtp-keys-head"><h2>Key bindings</h2>{changed && <button className="dtp-btn small" onClick={() => { onBindings(defaultBindings); setConflict(null); }}><RefreshCcw size={13} />Reset all</button>}</div>
+    <p className="dtp-muted">Select a binding and press the new keys. Esc cancels. Esc also closes dialogs and the roster summary; that key is fixed.</p>
+    {conflict && <div className="dtp-notice warn" role="alert"><AlertTriangle size={16} /><span><strong>{formatCombo(conflict.combo)} is already used by {labelOf(conflict.other)}</strong><small>Replace it, and {labelOf(conflict.other)} has no binding until you set one.</small></span><span className="dtp-row-actions"><button className="dtp-btn small" onClick={() => { onBindings({ ...bindings, [conflict.action]: conflict.combo, [conflict.other]: '' }); setConflict(null); }}>Replace</button><button className="dtp-btn small" onClick={() => setConflict(null)}>Cancel</button></span></div>}
+    {(['General', 'Roster editor'] as const).map(group => <div key={group} className="dtp-keys-group"><h3>{group}</h3><div className="dtp-rows">{keyActions.filter(a => a.group === group).map(a => <div className="dtp-collection-row" key={a.id}>
+      <span><strong>{a.label}</strong>{recording === a.id && message && <small className="dtp-key-error">{message}</small>}</span>
+      <span className="dtp-row-actions">
+        {bindings[a.id] !== defaultBindings[a.id] && <button className="dtp-icon" aria-label={`Reset ${a.label} to ${formatCombo(defaultBindings[a.id])}`} title={`Reset to ${formatCombo(defaultBindings[a.id])}`} onClick={() => onBindings({ ...bindings, [a.id]: defaultBindings[a.id] })}><RefreshCcw size={13} /></button>}
+        <button className={`dtp-key ${recording === a.id ? 'recording' : ''}`} aria-label={`${a.label}: ${bindings[a.id] ? formatCombo(bindings[a.id]) : 'no binding'}. Change binding`} onClick={() => { setRecording(recording === a.id ? null : a.id); setMessage(''); setConflict(null); }}>{recording === a.id ? 'Press keys…' : bindings[a.id] ? <kbd>{formatCombo(bindings[a.id])}</kbd> : <span className="dtp-faint">Not set</span>}</button>
+      </span>
+    </div>)}</div></div>)}
+  </>;
 }

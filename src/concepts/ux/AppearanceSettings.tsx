@@ -5,21 +5,21 @@ import type { ConceptProps } from "../shared";
 // Battle Augur 6C: a design preview of the shipped local import flow, not a file validator.
 // State buttons make the native picker's outcomes reviewable in the web gallery.
 const schemes = [
-  { id: "generic", name: "Default", accent: "#7c8cff" },
-  { id: "wh40k", name: "Crimson", accent: "#d8392f" },
-  { id: "horus-heresy", name: "Gilded", accent: "#c69a44" },
-  { id: "age-of-sigmar", name: "Azure", accent: "#29b3e6" },
-  { id: "old-world", name: "Verdant", accent: "#5d9c69" },
+  { id: "default", name: "Default", accent: "#7c8cff" },
+  { id: "crimson", name: "Crimson", accent: "#d8392f" },
+  { id: "gilded", name: "Gilded", accent: "#c69a44" },
+  { id: "azure", name: "Azure", accent: "#29b3e6" },
+  { id: "verdant", name: "Verdant", accent: "#5d9c69" },
   { id: "slate", name: "Slate · imported", accent: "#7c8cff" },
 ];
 type Outcome = "idle" | "importing" | "scheme" | "language" | "error";
 export function AppearancePreferences({ props, states = false }: { props?: ConceptProps; states?: boolean }) {
-  const [scheme, setScheme] = useState<string>(props?.colorScheme ?? "generic");
+  const [scheme, setScheme] = useState<string>(props?.colorScheme ?? "default");
   const [language, setLanguage] = useState(props?.language ?? "en");
   const [mode, setMode] = useState(props?.themePreference ?? props?.themeMode ?? "system");
   const [outcome, setOutcome] = useState<Outcome>("idle");
   const busy = outcome === "importing";
-  const importScheme = () => { setScheme("slate"); props?.onColorSchemeChange?.("generic"); setOutcome("scheme"); };
+  const importScheme = () => { setScheme("slate"); props?.onColorSchemeChange?.("default"); setOutcome("scheme"); };
   const importLanguage = () => { setLanguage("fr"); props?.onLanguageChange?.("fr"); setOutcome("language"); };
   const feedback = outcome !== "idle" && <div role="status" style={{ display: "flex", gap: 10, padding: 14, borderRadius: 10, border: "1px solid var(--ux-line)", background: "var(--ux-surface-2)" }}>
       {busy ? <LoaderCircle size={18} /> : outcome === "error" || outcome === "language" ? <AlertTriangle size={18} /> : <Check size={18} />}
@@ -37,7 +37,7 @@ export function AppearancePreferences({ props, states = false }: { props?: Conce
     </div>
     <div className="ux-result-label"><Palette size={14} />Colour scheme</div>
     <div role="radiogroup" aria-label="Colour scheme" style={{ background: "var(--ux-surface)", borderRadius: 14, overflow: "hidden" }}>
-      {schemes.map(item => <button key={item.id} type="button" role="radio" aria-checked={scheme === item.id} className="ux-setting-row" style={{ minHeight: 52 }} onClick={() => { setScheme(item.id); props?.onColorSchemeChange?.(item.id === "slate" ? "generic" : item.id as NonNullable<ConceptProps["colorScheme"]>); }}>
+      {schemes.map(item => <button key={item.id} type="button" role="radio" aria-checked={scheme === item.id} className="ux-setting-row" style={{ minHeight: 52 }} onClick={() => { setScheme(item.id); props?.onColorSchemeChange?.(item.id === "slate" ? "default" : item.id as NonNullable<ConceptProps["colorScheme"]>); }}>
         <span aria-hidden style={{ display: "flex", width: 46, height: 28, overflow: "hidden", borderRadius: 8, border: "1px solid var(--ux-line)" }}>{["var(--ux-bg)", item.accent, "var(--ux-cool)"].map((color, i) => <span key={i} style={{ flex: 1, background: color }} />)}</span>
         <span style={{ flex: 1, textAlign: "left" }}>{item.name}</span>{scheme === item.id && <Check size={18} />}
       </button>)}
