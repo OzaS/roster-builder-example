@@ -1734,8 +1734,72 @@
   background: color-mix(in srgb, var(--ux-accent) 24%, transparent);
   border-color: var(--ux-accent);
 }
+/* UX-020: the phone roster bar keeps Back, a one-line name and More; search and export leave it (tablet keeps them). */
 .ux-wb-top.roster-overview {
-  grid-template-columns: 40px minmax(0, 1fr) 40px 40px;
+  grid-template-columns: 40px minmax(0, 1fr) 40px;
+}
+.ux-wb-top.roster-overview .ux-roster-export {
+  display: none;
+}
+.ux-phone-overview-identity {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--ux-muted);
+  font-size: 11.5px;
+  line-height: 1.35;
+}
+.ux-roster-more {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+.ux-roster-more-menu {
+  position: absolute;
+  z-index: 45;
+  top: calc(100% + 6px);
+  right: 0;
+  display: grid;
+  width: 200px;
+  padding: 6px 0;
+  border: 1px solid var(--ux-line-2);
+  border-radius: 12px;
+  background: var(--ux-surface);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.32);
+}
+.ux-roster-more.inline {
+  justify-items: end;
+}
+.ux-roster-more.inline .ux-roster-more-menu {
+  position: static;
+  margin-top: 6px;
+}
+.ux-elements-more-menus {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-start;
+}
+.ux-roster-more-menu button {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  background: transparent;
+  color: var(--ux-ink);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+.ux-roster-more-menu button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--ux-accent) 12%, transparent);
+}
+.ux-roster-more-menu button:disabled {
+  opacity: 0.38;
+  cursor: default;
 }
 .ux-wb-top.roster-overview.search-open {
   grid-template-columns: 40px minmax(0, 1fr) 40px;
@@ -1744,7 +1808,7 @@
   grid-column: 2 / 3;
 }
 .ux-roster-search-toggle {
-  display: grid;
+  display: none;
 }
 .ux-roster-header-points {
   align-items: baseline;
@@ -4858,8 +4922,13 @@ button.ux-reference-tag:focus-visible {
 .device-frame.tablet .ux-roster-header-points {
   display: flex;
 }
-.device-frame.tablet .ux-phone-overview-subtitle {
+.device-frame.tablet .ux-phone-overview-subtitle,
+.device-frame.tablet .ux-wb-top.roster-overview .ux-roster-more {
   display: none;
+}
+.device-frame.tablet .ux-roster-search-toggle,
+.device-frame.tablet .ux-wb-top.roster-overview .ux-roster-export {
+  display: grid;
 }
 .device-frame.tablet .ux-tablet-overview-subtitle {
   display: block !important;

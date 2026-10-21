@@ -7,7 +7,7 @@ import type { RosterReferenceDefinition, RosterUnit } from "../../types";
 import type { ConceptProps } from "../shared";
 import { AddGameDataScreen, AdvancedInstallSetting, AutoUpdateChecksSetting, CollectionScreen, InstallJobScreen, KeepVersionsSetting, MigrationReportScreen, NotificationsSetting, ReadOnlyRosterScreen, RememberSectionsSetting, SearchGitHubScreen, SourceDetailScreen, SourcesManageScreen, SourcesNavRow, UpdateAvatarButton, WifiOnlySetting } from "./SourceJobs";
 import { MobileUnitOptions } from "./MobileUnitOptions";
-import { BackOrTitle, BudgetMeter, Chip, ExpandableBudget, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "./uxShared";
+import { BackOrTitle, BudgetMeter, Chip, ExpandableBudget, RosterMoreMenu, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "./uxShared";
 
 /** Screens of the source-data flow designed in Battle Augur plan 2D (SourceJobs.tsx). */
 const SOURCE_FLOW_SCREENS: readonly string[] = ["install-job", "source-detail", "migration-report", "collection", "search-github", "roster-read-only"];
@@ -199,7 +199,7 @@ export function CodexWorkbench(props: ConceptProps) {
         />
         {!isUnitDetail ? (
           <div className={`ux-wb-budget ${screen === "overview" ? "tablet-overview-budget" : ""}`}>
-            {screen === "overview" ? <ExpandableBudget roster={props.roster} /> : <BudgetMeter roster={props.roster} />}
+            {screen === "overview" ? <><small className="ux-phone-overview-identity">{props.roster.faction} · {props.roster.system}</small><ExpandableBudget roster={props.roster} /></> : <BudgetMeter roster={props.roster} />}
           </div>
         ) : null}
         <div className="ux-wb-layout" ref={layoutRef} style={panelStyle}>
@@ -353,6 +353,7 @@ function WorkbenchHeader({
   const pointsRemaining = props.roster.pointsLimit - props.roster.pointsUsed;
   const progress = Math.min(100, Math.max(0, (props.roster.pointsUsed / props.roster.pointsLimit) * 100));
   const remainingLabel = pointsRemaining >= 0 ? `${pointsRemaining} pts left` : `${Math.abs(pointsRemaining)} pts over`;
+  const [moreOpen, setMoreOpen] = useState(false);
 
   return (
     <header className={`ux-wb-top workspace-header ${isUnitDetail ? "unit-detail" : ""} ${isOverview ? "roster-overview" : ""} ${isOverview && searchOpen ? "search-open" : ""}`}>
@@ -375,7 +376,7 @@ function WorkbenchHeader({
       ) : (
         <div className="ux-wb-title">
           <strong>{isUnitDetail ? unitDisplayName(props.selectedUnit) : props.roster.name}</strong>
-          {isOverview ? <><small className="ux-phone-overview-subtitle">{props.roster.faction} · {props.roster.system}</small><small className="ux-tablet-overview-subtitle">{props.roster.faction} · {remainingLabel}</small></> : <small>{isUnitDetail ? `${props.selectedSection.name} · ${remainingLabel}` : `${props.roster.faction} · ${props.roster.system}`}</small>}
+          {isOverview ? <small className="ux-tablet-overview-subtitle">{props.roster.faction} · {remainingLabel}</small> : <small>{isUnitDetail ? `${props.selectedSection.name} · ${remainingLabel}` : `${props.roster.faction} · ${props.roster.system}`}</small>}
         </div>
       )}
       {isOverview ? <button type="button" className="ux-icon-btn ux-roster-search-toggle" aria-label={searchOpen ? "Close roster search" : "Search roster"} onClick={() => onSearchOpenChange(!searchOpen)}>{searchOpen ? <X size={17} /> : <Search size={17} />}</button> : null}
@@ -389,10 +390,11 @@ function WorkbenchHeader({
         <span className="ux-roster-header-points" aria-label={`${props.roster.pointsUsed} of ${props.roster.pointsLimit} points`}><b>{props.roster.pointsUsed}</b><small>/ {props.roster.pointsLimit}</small></span>
       ) : null}
       {!isUnitDetail && !(isOverview && searchOpen) ? (
-        <button type="button" className="ux-icon-btn" aria-label="Export" onClick={() => props.onNavigate("export")}>
+        <button type="button" className={`ux-icon-btn ${isOverview ? "ux-roster-export" : ""}`} aria-label="Export" onClick={() => props.onNavigate("export")}>
           <Download size={18} />
         </button>
       ) : null}
+      {isOverview ? <RosterMoreMenu open={moreOpen} onOpenChange={setMoreOpen} canUndo onExport={() => props.onNavigate("export")} /> : null}
       {isUnitDetail || isOverview ? (
         <span className={`ux-detail-progress ${isOverview ? "ux-overview-progress" : ""}`} role="progressbar" aria-label="Roster points used" aria-valuemin={0} aria-valuemax={props.roster.pointsLimit} aria-valuenow={props.roster.pointsUsed}>
           <i style={{ width: `${progress}%` }} />

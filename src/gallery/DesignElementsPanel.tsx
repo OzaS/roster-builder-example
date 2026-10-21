@@ -6,7 +6,7 @@ import { PhoneStatusBar } from "../components/DeviceFrame";
 import { mockRosterReferences, referenceById } from "../data/mockRosterReferences";
 import type { DesignElementGroup, DesignElements } from "../design-data/designData";
 import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode } from "../types";
-import { BudgetMeter, Chip, ExpandableBudget, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "../concepts/ux/uxShared";
+import { BudgetMeter, Chip, ExpandableBudget, RosterMoreMenu, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
 import { ComingSoonCard, DeveloperOptionsPreview } from "../concepts/ux/AppExtras";
 import { ActionMenuDialog, AddCollectionSheet, LOCAL_ERRORS, LOCAL_FILE, LOCAL_SOURCE, LocalImportChoiceDialog, LocalImportError, LocalImportRow, LocalInterruptedNotice, LocalRefusedNotice, LocalSourceNote, LocalSourceRows, localSteps, AdvancedInstallSetting, AppDialog, AutoUpdateChecksSetting, ImportReportGroups, CollectionMenuDialog, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RememberSectionsSetting, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceUpdateCard, SourceVersions, SourcesNavRow, TaggedRosterRows, UpdateAvatarButton, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
@@ -148,17 +148,15 @@ function WorkbenchElements({
       <CatalogGroup groupId="product-ui" continuation>
       <ElementSection title="Workbench Chrome">
         <header className="ux-wb-top ux-elements-static">
-          <button type="button" className="ux-icon-btn" aria-label="Lists">
-            <Layers size={18} />
+          <button type="button" className="ux-icon-btn" aria-label="Back">
+            <ArrowLeft size={18} />
           </button>
           <div className="ux-wb-title">
             <strong>{roster.name}</strong>
-            <small>{roster.faction} · {roster.system}</small>
           </div>
-          <button type="button" className="ux-icon-btn" aria-label="Export">
-            <Download size={18} />
-          </button>
+          <RosterMoreMenu open={false} onOpenChange={() => undefined} />
         </header>
+        <small className="ux-phone-overview-identity">{roster.faction} · {roster.system}</small>
         <header className="ux-wb-top unit-detail ux-elements-static">
           <button type="button" className="ux-icon-btn" aria-label="Back">
             <ArrowLeft size={18} />
@@ -177,6 +175,15 @@ function WorkbenchElements({
         </header>
         <BudgetMeter roster={roster} />
         <ExpandableBudget roster={roster} />
+      </ElementSection>
+
+      <ElementSection title="Roster More Menu">
+        <small className="ux-hint">UX-020: the menu of the roster bar's More button, anchored to it. Before an edit, after an edit, and on a read-only roster.</small>
+        <div className="ux-elements-more-menus">
+          <RosterMoreMenu open inline onOpenChange={() => undefined} />
+          <RosterMoreMenu open inline canUndo onOpenChange={() => undefined} />
+          <RosterMoreMenu open inline readOnly onOpenChange={() => undefined} />
+        </div>
       </ElementSection>
 
       <ElementSection title="Subscription Gate">

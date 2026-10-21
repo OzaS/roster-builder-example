@@ -1,5 +1,5 @@
 import { type CSSProperties, type ReactNode, useState } from "react";
-import { AlertTriangle, ArrowLeft, Check, CheckCircle2, ChevronDown, Heart, Info, LockKeyhole, ShieldAlert, Sparkles, X } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Check, CheckCircle2, ChevronDown, Ellipsis, Heart, Info, LockKeyhole, Redo2, ShieldAlert, Sparkles, Undo2, Upload, X } from "lucide-react";
 import type { ColorScheme, PrototypeScreen, Roster, RosterUnit, ThemeMode } from "../../types";
 import type { ConceptProps } from "../shared";
 
@@ -63,6 +63,41 @@ export function BudgetMeter({ roster, label }: { roster: Roster; label?: string 
  * The roster's main budget; when the roster has other limited costs, tapping it expands them
  * (battle-augur plan 3C-2). Limits of 0 with nothing used are left out.
  */
+/**
+ * UX-020 (user decision 2026-10-21): the phone roster bar keeps Back, a one-line roster name and this More button.
+ * Its menu opens anchored to the button (iOS: the native bar button menu; Android: a Material menu) and lists Undo,
+ * Redo and Export or share with their availability; a read-only roster lists only Export. `inline`: drawn in the
+ * flow, for the Elements view.
+ */
+export function RosterMoreMenu({ open, onOpenChange, onExport, canUndo = false, canRedo = false, readOnly = false, inline = false }: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onExport?: () => void;
+  canUndo?: boolean;
+  canRedo?: boolean;
+  readOnly?: boolean;
+  inline?: boolean;
+}) {
+  return (
+    <div className={`ux-roster-more ${inline ? "inline" : ""}`}>
+      <button type="button" className="ux-icon-btn" aria-label="More actions" aria-haspopup="menu" aria-expanded={open} onClick={() => onOpenChange(!open)}>
+        <Ellipsis size={18} />
+      </button>
+      {open ? (
+        <div className="ux-roster-more-menu" role="menu" aria-label="More actions">
+          {readOnly ? null : (
+            <>
+              <button type="button" role="menuitem" disabled={!canUndo} onClick={() => onOpenChange(false)}><Undo2 size={16} />Undo</button>
+              <button type="button" role="menuitem" disabled={!canRedo} onClick={() => onOpenChange(false)}><Redo2 size={16} />Redo</button>
+            </>
+          )}
+          <button type="button" role="menuitem" onClick={() => { onOpenChange(false); onExport?.(); }}><Upload size={16} />Export or share</button>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export function ExpandableBudget({ roster }: { roster: Roster }) {
   const [open, setOpen] = useState(false);
   const limits = (roster.limits ?? []).filter((limit) => limit.limit !== 0 || limit.used !== 0);
