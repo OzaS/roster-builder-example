@@ -405,7 +405,7 @@ export function InstallJobScreen({ props }: { props: ConceptProps }) {
     );
   }
   let modal: ReactNode;
-  // DS-3: a job from files on the phone. No repository or version under the title, "Reading files" in place of
+  // DS-3: a job from files on the phone. No repository or version under the title, "Copying files" in place of
   // Download; Cancel discards everything. Ended, it offers no Try again (the picked files are gone).
   const localTitle = `Installing ${LOCAL_FILE.label}`;
   const localSubtitle = `From a file · ${LOCAL_FILE.files} files · ${LOCAL_FILE.size}`;
@@ -625,7 +625,7 @@ export function LocalImportChoiceDialog({ inline = false }: { inline?: boolean }
   );
 }
 
-/** The job's steps: "Reading files" in place of Download (the bytes go to the engine one file at a time). */
+/** The job's steps: "Copying files" in place of Download (the bytes go to the engine one file at a time). */
 export function localSteps(stage: "files" | "import" | "failed" | "done"): JobStep[] {
   const order = ["files", "read", "import", "write"];
   const at = (id: string): JobStepState => {
@@ -636,7 +636,7 @@ export function localSteps(stage: "files" | "import" | "failed" | "done"): JobSt
     return i < cur ? "done" : i === cur ? "active" : "waiting";
   };
   return [
-    { id: "files", title: "Reading files", detail: stage === "files" ? "File 4 of 12 · example-faction.cat" : `${LOCAL_FILE.files} files · ${LOCAL_FILE.size}`, state: at("files"), progress: 4 / 12 },
+    { id: "files", title: "Copying files", detail: stage === "files" ? "File 4 of 12 · example-faction.cat" : `${LOCAL_FILE.files} files · ${LOCAL_FILE.size}`, state: at("files"), progress: 4 / 12 },
     { id: "read", title: "Read", detail: at("read") === "done" ? "64 documents" : undefined, state: at("read") },
     { id: "import", title: "Import", detail: stage === "import" ? `Faction 3 of 9 · ${EXAMPLE_FACTIONS[1]}` : stage === "done" ? "9 factions" : undefined, state: at("import"), progress: 3 / 9 },
     { id: "write", title: "Write", state: at("write") },

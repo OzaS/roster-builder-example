@@ -669,7 +669,7 @@ function WorkbenchElements({
         <LocalInterruptedNotice />
         <LocalSourceNote />
         <LocalSourceRows />
-        <small className="ux-elements-note">DS-3 (DEC-035): archives (.zip, .bsr), .gst/.cat (also .gstz/.catz), data .json or a folder. Files and folder are two actions of the app's own menu dialog. The job has Reading files in place of Download and no Try again; after a restart the interrupted notice offers Dismiss only. A local source shows "From a file · " and the picked name, and its import date, and has no update check, GitHub link or Install more factions.</small>
+        <small className="ux-elements-note">DS-3 (DEC-035): archives (.zip, .bsr), .gst/.cat (also .gstz/.catz), data .json or a folder. Files and folder are two actions of the app's own menu dialog. The job has Copying files in place of Download and no Try again; after a restart the interrupted notice offers Dismiss only. A local source shows "From a file · " and the picked name, and its import date, and has no update check, GitHub link or Install more factions.</small>
       </ElementSection>
 
       <ElementSection title="Advanced Installation Setting">
