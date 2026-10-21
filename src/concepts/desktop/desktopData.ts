@@ -8,7 +8,7 @@ export const rosterLibrary: RosterSummary[] = [
   { name: 'Northern Watch', faction: 'Frontier Coalition', system: 'Open Field', used: 1500, limit: 1500, opened: 'Yesterday', forces: 1, units: 10, status: 'ready', mark: 'NW' },
   { name: 'Operation First Light', faction: 'Free Cities', system: 'Open Field', used: 985, limit: 1000, opened: 'Monday', forces: 1, units: 8, status: 'issues', issues: 2, mark: 'FL' },
   { name: 'Weekend skirmish', faction: 'Frontier Coalition', system: 'Open Field', used: 495, limit: 500, opened: 'Oct 16', forces: 1, units: 4, status: 'ready', mark: 'WS' },
-  { name: 'Harbour defence', faction: 'Free Cities', system: 'Open Field', used: 1240, limit: 1000, opened: 'Oct 12', forces: 2, units: 11, status: 'issues', issues: 1, mark: 'HD' },
+  { name: 'Harbour defence', faction: 'Free Cities', system: 'Open Field', used: 1240, limit: 1000, opened: 'Oct 12', forces: 2, units: 11, status: 'issues', issues: 2, mark: 'HD' },
   { name: 'Glass Legion trial', faction: 'Glass Legion', system: 'Example System Two', used: 600, limit: 750, opened: 'Oct 3', forces: 1, units: 5, status: 'data-changed', mark: 'GL' },
   { name: 'Ember patrol', faction: 'Ember Covenant', system: 'Example System Two', used: 340, limit: 500, opened: 'Sep 28', forces: 1, units: 3, status: 'faction-removed', mark: 'EP' },
 ];

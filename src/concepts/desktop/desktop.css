@@ -139,3 +139,4 @@
   filter:blur(70px) saturate(1.2);opacity:.5}
 .dt-ambient-on .dt-app.light::before{opacity:.3}
 .dt-dot.idle{background:var(--dt-faint)}
+.dt-app .dt-validation.paused{color:var(--dt-muted)!important;border-color:var(--dt-border)!important;background:var(--dt-hover)!important}
