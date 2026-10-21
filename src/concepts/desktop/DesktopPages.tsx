@@ -4,9 +4,10 @@ import { AlertTriangle, ArrowDownToLine, ArrowRight, ArrowUpCircle, BookOpen, Ch
 import type { ColorScheme } from '../../types';
 import { collectionSources, colourSchemes, installedSources, lookupEntries, rosterLibrary, type LookupKind, type RosterSummary, type SourceInfo } from './desktopData';
 import { comboFromEvent, defaultBindings, formatCombo, hasCommandModifier, keyActions, type KeyAction, type KeyBindings } from './desktopKeys';
-import type { DesktopJobs, InstallEntry } from './DesktopJobs';
+import type { DesktopJobs } from './DesktopJobs';
 import { jobPercent } from './DesktopJobs';
 import './desktop-pages.css';
+import { AddCollectionDialog, AddDataCollections, CollectionView, GitHubSearchView, LastUpdateCard, LastUpdateStates, UpdateReportView, flowSourceId, isAddFlow, useRosterChecks } from './DesktopSourceFlows';
 
 export type ToastOptions = { kind?: 'action' | 'notification'; action?: { label: string; run: () => void } };
 type Notify = (message: string, options?: ToastOptions) => void;
@@ -146,18 +147,20 @@ export function DesktopLookup({ onOpenRoster }: { onOpenRoster: (name: string) =
 
 /* ------------------------------ Sources ------------------------------ */
 
-export function DesktopSources({ notify, actionSlot, jobs, selectedId, onSelect, onOpenJobs }: { notify: Notify; actionSlot: HTMLElement | null; jobs: DesktopJobs; selectedId: string; onSelect: (id: string) => void; onOpenJobs: () => void }) {
+export function DesktopSources({ notify, actionSlot, jobs, selectedId, onSelect, onOpenJobs, onOpenRoster }: { notify: Notify; actionSlot: HTMLElement | null; jobs: DesktopJobs; selectedId: string; onSelect: (id: string) => void; onOpenJobs: () => void; onOpenRoster?: (name: string) => void }) {
   const { sources, setSources } = jobs;
   const setSelectedId = onSelect;
   const progress: Record<string, number> = Object.fromEntries(sources.flatMap(s => { const p = jobs.progressOf(s.id); return p ? [[s.id, p.percent]] : []; }));
   const [link, setLink] = useState('');
   const [confirmRemove, setConfirmRemove] = useState(false);
+  const [addingCollection, setAddingCollection] = useState(false);
   useEffect(() => { setConfirmRemove(false); }, [selectedId]);
+  useRosterChecks(jobs, notify, setSelectedId);
   const update = (ids: string[]) => { jobs.startUpdate(ids); onOpenJobs(); };
-  const install = (entry: InstallEntry) => { jobs.startInstall(entry); onOpenJobs(); };
   const installing = jobs.jobs.filter(j => j.kind === 'install' && (j.status === 'running' || j.status === 'needs-you') && !sources.some(s => s.id === j.sourceId));
   const updates = sources.filter(s => s.next && progress[s.id] === undefined);
   const selected = sources.find(s => s.id === selectedId);
+  const flow = { jobs, notify, go: setSelectedId, onOpenJobs };
   const chip = (s: SourceInfo) => progress[s.id] !== undefined ? <Chip tone="accent">Updating {progress[s.id]}%</Chip> : s.status === 'update' ? <Chip tone="accent"><ArrowUpCircle size={11} />Update</Chip> : s.status === 'review' ? <Chip tone="warn"><AlertTriangle size={11} />Review</Chip> : <Chip tone="ok"><Check size={11} />Ready</Chip>;
   return <main className="dtp-page">
     <PageActions slot={actionSlot}>
@@ -168,37 +171,42 @@ export function DesktopSources({ notify, actionSlot, jobs, selectedId, onSelect,
     <div className="dtp-split sources">
       <section className="dtp-card dtp-list" aria-label="Installed sources"><div className="dtp-scroll">
         <div className="dtp-group"><h3><Database size={14} />Installed<span>{sources.length}</span></h3>
-          {sources.map(s => <button key={s.id} className={`dtp-row dtp-source ${selectedId === s.id ? 'selected' : ''}`} onClick={() => setSelectedId(s.id)}>
+          {sources.map(s => <button key={s.id} className={`dtp-row dtp-source ${flowSourceId(selectedId) === s.id ? 'selected' : ''}`} onClick={() => setSelectedId(s.id)}>
             <span><strong>{s.name}</strong><small>{s.factions.length} factions · {s.factions.slice(0, 2).join(', ')}{s.factions.length > 2 ? '…' : ''}</small><small className="dtp-faint">{s.fromFile ? `From a file · imported ${s.installed}` : `${s.repo}@${s.version} · ${s.installed} · ${s.size}`}</small>{progress[s.id] !== undefined && <i className="dtp-progress"><em style={{ width: `${progress[s.id]}%` }} /></i>}</span>
             {chip(s)}
           </button>)}
           {installing.map(j => <button key={j.id} className="dtp-row dtp-source" onClick={onOpenJobs}><span><strong>{j.name}</strong><small>{j.status === 'needs-you' ? 'Waiting for you to choose factions' : `${j.factions.length} factions available`}</small><i className="dtp-progress"><em style={{ width: `${jobPercent(j)}%` }} /></i></span>{j.status === 'needs-you' ? <Chip tone="warn"><AlertTriangle size={11} />Needs you</Chip> : <Chip tone="accent">Installing {jobPercent(j)}%</Chip>}</button>)}
         </div>
-        <button className={`dtp-row dtp-add-row ${selectedId === 'add' ? 'selected' : ''}`} onClick={() => setSelectedId('add')}><span className="dtp-add-icon"><Plus size={16} /></span><span><strong>Add game data</strong><small>Collections, a repository link, or GitHub search</small></span><ChevronRight size={15} /></button>
+        <button className={`dtp-row dtp-add-row ${isAddFlow(selectedId) ? 'selected' : ''}`} onClick={() => setSelectedId('add')}><span className="dtp-add-icon"><Plus size={16} /></span><span><strong>Add game data</strong><small>Collections, a repository link, or GitHub search</small></span><ChevronRight size={15} /></button>
       </div><footer className="dtp-list-foot"><RefreshCcw size={12} />Checked for updates 8 minutes ago<button onClick={() => notify('Checked for updates. Nothing new.')}>Check now</button></footer></section>
       {selectedId === 'add' ? <section className="dtp-card dtp-detail" aria-label="Add game data">
         <span className="dtp-eyebrow">Add game data</span><h2>Choose a game system</h2><p className="dtp-muted">Install from a collection, paste a repository link, or search GitHub.</p>
-        <h3>Default collection</h3>
-        <div className="dtp-rows">{collectionSources.map(c => { const live = jobs.jobs.find(j => j.sourceId === c.id && (j.status === 'running' || j.status === 'needs-you')); return <div className="dtp-collection-row" key={c.id}><span><strong>{c.name}</strong><small>{c.detail}</small></span>{sources.some(s => s.id === c.id) ? <Chip tone="ok"><Check size={11} />Installed</Chip> : live ? <button className="dtp-btn small" onClick={onOpenJobs}>{live.status === 'needs-you' ? 'Choose factions' : `Installing ${jobPercent(live)}%`}</button> : <button className="dtp-btn small" onClick={() => install(c)}>Install</button>}</div>; })}</div>
+        <AddDataCollections jobs={jobs} go={setSelectedId} onOpenJobs={onOpenJobs} />
         <h3>Repository link</h3>
         <form className="dtp-inline-form" onSubmit={e => { e.preventDefault(); notify(link ? 'Looking up the repository…' : 'Paste a repository link first'); }}><label className="dtp-search"><Link2 size={15} /><input placeholder="https://github.com/owner/repository" aria-label="Repository link" value={link} onChange={e => setLink(e.target.value)} /></label><button className="dtp-btn" type="submit">Continue</button></form>
-        <button className="dtp-link-row" onClick={() => notify('Search GitHub opens here')}><Github size={16} /><span><strong>Search GitHub</strong><small>Find data repositories by name</small></span><ChevronRight size={15} /></button>
-        <button className="dtp-link-row" onClick={() => notify('Add a collection or library by link')}><Plus size={16} /><span><strong>Add a collection or library</strong><small>Lists of sources kept by the community</small></span><ChevronRight size={15} /></button>
-      </section> : selected ? <section className="dtp-card dtp-detail" aria-label={`${selected.name} details`}>
+        <button className="dtp-link-row" onClick={() => setSelectedId('github')}><Github size={16} /><span><strong>Search GitHub</strong><small>Find data repositories by name</small></span><ChevronRight size={15} /></button>
+        <button className="dtp-link-row" onClick={() => setAddingCollection(true)}><Plus size={16} /><span><strong>Add a collection or library</strong><small>Lists of sources kept by the community</small></span><ChevronRight size={15} /></button>
+      </section> : selectedId === 'github' ? <GitHubSearchView {...flow} />
+        : selectedId.startsWith('collection:') ? <CollectionView key={selectedId} pageId={selectedId.slice(11)} {...flow} />
+          : selectedId.startsWith('report:') ? <UpdateReportView key={selectedId} sourceId={flowSourceId(selectedId)} onOpenRoster={onOpenRoster} {...flow} />
+            : selected ? <section className="dtp-card dtp-detail" aria-label={`${selected.name} details`}>
         <span className="dtp-eyebrow">{selected.fromFile ? 'Installed from a file' : selected.repo}</span>
         <div className="dtp-entry-title"><h2>{selected.name}</h2>{chip(selected)}</div>
         <p className="dtp-muted">{selected.factions.length} factions · {selected.documents} documents · {selected.size}</p>
         {selected.next && progress[selected.id] === undefined && <div className="dtp-update-card"><div><ArrowUpCircle size={18} /><span><strong>Update available · {selected.version} → {selected.next}</strong><small>Changed upstream {selected.upstream}</small></span></div><ul><li><b>+2</b> units added</li><li><b>~5</b> costs changed</li><li><b>−1</b> rule removed</li></ul><div className="dtp-update-actions"><button className="dtp-btn primary" onClick={() => update([selected.id])}>Update</button><button className="dtp-btn" onClick={() => notify('Opens the repository in your browser')}><ExternalLink size={14} />View on GitHub</button></div></div>}
         {progress[selected.id] !== undefined && <div className="dtp-update-card"><div><RefreshCcw size={18} /><span><strong>Updating to {selected.next}</strong><small>Downloading and checking data · {progress[selected.id]}%</small></span></div><i className="dtp-progress"><em style={{ width: `${progress[selected.id]}%` }} /></i></div>}
+        <LastUpdateCard source={selected} {...flow} />
         {selected.status === 'review' && <div className="dtp-notice warn"><AlertTriangle size={16} /><span><strong>3 import warnings</strong><small>Some entries reference missing data. Rosters still open; affected entries are marked.</small></span></div>}
         {!selected.next && selected.status === 'ready' && progress[selected.id] === undefined && <div className="dtp-notice ok"><Check size={16} /><span><strong>{selected.fromFile ? 'Installed from a file' : 'Up to date'}</strong><small>{selected.fromFile ? 'Files are not checked for updates. Import a newer file to replace it.' : `Last checked ${selected.checked}.`}</small></span></div>}
         <dl className="dtp-facts four"><div><dt>Version</dt><dd>{selected.version}</dd></div><div><dt>Installed</dt><dd>{selected.installed}</dd></div><div><dt>Changed upstream</dt><dd>{selected.upstream}</dd></div><div><dt>Last checked</dt><dd>{selected.checked}</dd></div></dl>
         {selected.kept?.length ? <><h3>Versions</h3><div className="dtp-rows"><div className="dtp-collection-row"><span><strong>{selected.version}</strong><small>Current</small></span><Chip tone="ok">In use</Chip></div>{selected.kept.map(v => <div className="dtp-collection-row" key={v}><span><strong>{v}</strong><small>Kept · 12.8 MB</small></span><span className="dtp-row-actions"><button className="dtp-btn small" onClick={() => notify(`Switched to ${v}`)}>Switch</button><button className="dtp-icon" aria-label={`Delete ${v}`} onClick={() => notify(`${v} deleted`)}><Trash2 size={13} /></button></span></div>)}</div></> : null}
         <h3>Factions</h3><div className="dtp-tags">{selected.factions.map(f => <Chip key={f}>{f}</Chip>)}<button className="dtp-chip add" onClick={() => notify('Choose more factions to install')}><Plus size={11} />Install more</button></div>
-        <h3>Rosters using it</h3>{selected.rosters.length ? <div className="dtp-links">{selected.rosters.map(r => <button key={r}><Layers3 size={14} />{r}<ChevronRight size={14} /></button>)}</div> : <p className="dtp-muted">No rosters use this source yet.</p>}
+        <h3>Rosters using it</h3>{selected.rosters.length ? <div className="dtp-links">{selected.rosters.map(r => <button key={r} onClick={() => onOpenRoster ? onOpenRoster(r) : notify(`Opens “${r}” in a tab`)}><Layers3 size={14} />{r}<ChevronRight size={14} /></button>)}</div> : <p className="dtp-muted">No rosters use this source yet.</p>}
         <div className="dtp-danger-zone"><span><strong>Remove {selected.name}</strong><small>{selected.rosters.length ? `${selected.rosters.length} rosters will open read-only.` : 'No rosters are affected.'} Frees {selected.size}.</small></span><button className={`dtp-btn danger ${confirmRemove ? 'confirm' : ''}`} onClick={() => { if (!confirmRemove) return setConfirmRemove(true); setSources(list => list.filter(s => s.id !== selected.id)); setSelectedId(sources.find(s => s.id !== selected.id)?.id ?? 'add'); notify(`${selected.name} removed`); }}><Trash2 size={14} />{confirmRemove ? 'Remove for good?' : 'Remove'}</button></div>
+        <LastUpdateStates source={selected} jobs={jobs} />
       </section> : null}
     </div>
+    {addingCollection && <AddCollectionDialog {...flow} onClose={() => setAddingCollection(false)} />}
   </main>;
 }
 
