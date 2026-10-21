@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { Archive, ArrowLeft, Bell, Check, ChevronDown, ChevronRight, Circle, CircleArrowUp, CircleCheck, Clock, Copy, Database, Download, Ellipsis, FileInput, FileText, FolderGit2, Globe, Hand, History, Info, Library, ListChecks, LoaderCircle, Lock, Minus, OctagonAlert, Plus, Search, Star, Trash2, TriangleAlert, Upload, Wifi, X } from "lucide-react";
+import { Archive, ArrowLeft, Bell, Check, ChevronDown, ChevronRight, Circle, CircleArrowUp, CircleCheck, Clock, Copy, Database, Download, Ellipsis, FileArchive, FileInput, FileText, FolderGit2, FolderOpen, Globe, Hand, History, Info, Library, ListChecks, LoaderCircle, Lock, Minus, OctagonAlert, Plus, RefreshCw, Search, Star, Trash2, TriangleAlert, Upload, Wifi, X } from "lucide-react";
 import type { ConceptProps } from "../shared";
 import { Chip } from "./uxShared";
 
@@ -62,7 +62,7 @@ export function JobOutcomeNotice({ outcome, title, body }: { outcome: JobOutcome
   );
 }
 
-export type OtherJob = { title: string; detail: string; percent?: number; waiting?: boolean };
+export type OtherJob = { title: string; detail: string; percent?: number; waiting?: boolean; ended?: "done" | "failed" | "cancelled" };
 
 /** The other running or waiting jobs, collapsed under the expanded one (several jobs at once, DEC-024). */
 export function OtherJobs({ jobs }: { jobs: OtherJob[] }) {
@@ -70,14 +70,14 @@ export function OtherJobs({ jobs }: { jobs: OtherJob[] }) {
     <div className="ux-job-others">
       <div className="ux-result-label">Other jobs</div>
       {jobs.map((job) => (
-        <div key={job.title} className={`ux-job-other ${job.waiting ? "waiting" : ""}`}>
-          {job.waiting ? <Clock size={16} aria-label="Waiting" /> : <LoaderCircle size={16} className="ux-spin" aria-label="In progress" />}
+        <div key={job.title} className={`ux-job-other ${job.waiting ? "waiting" : ""} ${job.ended ?? ""}`}>
+          {job.ended === "done" ? <CircleCheck size={16} aria-label="Done" /> : job.ended === "failed" ? <OctagonAlert size={16} aria-label="Failed" /> : job.ended === "cancelled" ? <X size={16} aria-label="Cancelled" /> : job.waiting ? <Clock size={16} aria-label="Waiting" /> : <LoaderCircle size={16} className="ux-spin" aria-label="In progress" />}
           <button type="button" className="ux-job-other-main" aria-label={`${job.title}, ${job.detail}. Show its steps.`}>
-            <strong>{job.title}{job.percent === undefined ? "" : ` · ${job.percent}%`}</strong>
+            <strong>{job.title}{job.percent === undefined || job.ended ? "" : ` · ${job.percent}%`}</strong>
             <small>{job.detail}</small>
-            {job.waiting ? null : <JobProgressBar value={job.percent === undefined ? undefined : job.percent / 100} />}
+            {job.waiting || job.ended ? null : <JobProgressBar value={job.percent === undefined ? undefined : job.percent / 100} />}
           </button>
-          <button type="button" className="ux-job-other-cancel" aria-label={`Cancel ${job.title}`}><X size={14} /></button>
+          {job.ended ? null : <button type="button" className="ux-job-other-cancel" aria-label={`Cancel ${job.title}`}><X size={14} /></button>}
         </div>
       ))}
     </div>
@@ -307,7 +307,7 @@ export function FactionPicker({ initial = ["Northern Realms", "Tidewardens"] }: 
 
 // ---------------------------------------------------------------- gallery screen: install job
 
-type InstallPreview = "running" | "hidden" | "several" | "several-hidden" | "mobile-data" | "wifi" | "background" | "choose" | "choose-hidden" | "done" | "updated" | "failed" | "cancelled" | "toasts";
+type InstallPreview = "running" | "hidden" | "several" | "several-hidden" | "mobile-data" | "wifi" | "background" | "choose" | "choose-hidden" | "done" | "updated" | "failed" | "cancelled" | "toasts" | "local" | "local-done" | "local-failed";
 
 const INSTALL_PREVIEWS: Array<[InstallPreview, string]> = [
   ["running", "Running"],
@@ -324,6 +324,9 @@ const INSTALL_PREVIEWS: Array<[InstallPreview, string]> = [
   ["failed", "Failed"],
   ["cancelled", "Cancelled"],
   ["toasts", "Toasts"],
+  ["local", "From a file"],
+  ["local-done", "From a file · done"],
+  ["local-failed", "From a file · errors"],
 ];
 
 export function PreviewState<T extends string>({ label = "Preview state", value, options, onChange }: { label?: string; value: T; options: Array<[T, string]>; onChange: (value: T) => void }) {
@@ -360,6 +363,7 @@ function SourcesBackdrop({ props, children }: { props: ConceptProps; children?: 
 
 export function InstallJobScreen({ props }: { props: ConceptProps }) {
   const [preview, setPreview] = useState<InstallPreview>("running");
+  const [localError, setLocalError] = useState<LocalError>("too-large");
   const control = <PreviewState value={preview} options={INSTALL_PREVIEWS} onChange={setPreview} />;
   const subtitle = `${EXAMPLE_SYSTEM.repo} · ${EXAMPLE_SYSTEM.version}`;
   const title = `Installing ${EXAMPLE_SYSTEM.name}`;
@@ -412,10 +416,28 @@ export function InstallJobScreen({ props }: { props: ConceptProps }) {
     );
   }
   let modal: ReactNode;
-  if (preview === "running") {
+  // DS-3: a job from files on the phone. No repository or version under the title, "Copying files" in place of
+  // Download; Cancel discards everything. Ended, it offers no Try again (the picked files are gone).
+  const localTitle = `Installing ${LOCAL_FILE.label}`;
+  const localSubtitle = `From a file · ${LOCAL_FILE.files} files · ${LOCAL_FILE.size}`;
+  if (preview === "local") {
+    modal = <JobModal title={localTitle} subtitle={localSubtitle} percent={8} stepLabel="Step 1 of 4" steps={localSteps("files")} notify />;
+  } else if (preview === "local-done") {
+    modal = (
+      <JobModal title={`Installing ${LOCAL_SOURCE.name}`} subtitle={`From a file · ${LOCAL_FILE.label}`} steps={localSteps("done")} outcome="done"
+        notice={<JobOutcomeNotice outcome="done" title={`Installed ${LOCAL_SOURCE.name}`} body="9 factions. Ready to use. It replaced the data installed from a file before; rosters use the new data." />}
+        footer={<><button type="button" className="ux-job-btn secondary">View</button><button type="button" className="ux-job-btn primary">Done</button></>} />
+    );
+  } else if (preview === "local-failed") {
+    modal = (
+      <JobModal title={`Could not install ${LOCAL_FILE.label}`} subtitle={localSubtitle} steps={localSteps("failed")} outcome="failed"
+        notice={<><PreviewState label="Error" value={localError} options={LOCAL_ERRORS.map(([id, label]) => [id, label] as [LocalError, string])} onChange={setLocalError} /><LocalImportError kind={localError} /></>}
+        footer={<button type="button" className="ux-job-btn primary">Close</button>} />
+    );
+  } else if (preview === "running") {
     modal = <JobModal title={title} subtitle={subtitle} percent={46} stepLabel="Step 3 of 4" steps={installSteps("import")} notify />;
   } else if (preview === "several") {
-    modal = <JobModal title={title} subtitle={subtitle} percent={46} stepLabel="Step 3 of 4" steps={installSteps("import")} overall={38} others={[{ title: "Updating Example System Two", detail: "Download · 4.1 MB of 29 MB", percent: 14 }, { title: "Installing Example System Three", detail: "Waiting for another install", waiting: true }]} />;
+    modal = <JobModal title={title} subtitle={subtitle} percent={46} stepLabel="Step 3 of 4" steps={installSteps("import")} overall={38} others={[{ title: "Updating Example System Two", detail: "Download · 4.1 MB of 29 MB", percent: 14 }, { title: "Installing Example System Three", detail: "Waiting for another install", waiting: true }, { title: "Installed Example System Four", detail: "12 factions. Ready to use.", ended: "done" }]} />;
   } else if (preview === "mobile-data") {
     modal = <JobModal title={title} subtitle={subtitle} percent={8} stepLabel="Step 1 of 4" steps={installSteps("download")} notice={<MobileDataNotice />} />;
   } else if (preview === "wifi") {
@@ -441,8 +463,8 @@ export function InstallJobScreen({ props }: { props: ConceptProps }) {
   } else {
     modal = (
       <JobModal title={title} subtitle={subtitle} steps={installSteps("failed").map((s) => (s.state === "failed" ? { ...s, state: "waiting", detail: "Cancelled" } : s))} outcome="cancelled"
-        notice={<JobOutcomeNotice outcome="cancelled" title="Install stopped" body="7 of 23 factions were installed." />}
-        footer={<><button type="button" className="ux-job-btn secondary">Close</button><button type="button" className="ux-job-btn primary">Install the rest</button></>} />
+        notice={<JobOutcomeNotice outcome="cancelled" title="Install cancelled" body="Nothing was installed." />}
+        footer={<><button type="button" className="ux-job-btn secondary">Close</button><button type="button" className="ux-job-btn primary">Try again</button></>} />
     );
   }
   return (
@@ -506,7 +528,7 @@ export function UpdatesNotice({ count = 2 }: { count?: number }) {
   );
 }
 
-type SourcesPreview = "installed" | "updates" | "selecting" | "updating" | "failed" | "interrupted" | "update-interrupted" | "empty";
+type SourcesPreview = "installed" | "updates" | "selecting" | "updating" | "failed" | "interrupted" | "update-interrupted" | "local-choice" | "local-refused" | "local" | "local-interrupted" | "empty";
 
 export function SourcesManageScreen({ props }: { props: ConceptProps }) {
   const [preview, setPreview] = useState<SourcesPreview>("updates");
@@ -515,6 +537,8 @@ export function SourcesManageScreen({ props }: { props: ConceptProps }) {
   const sources = EXAMPLE_SOURCES.map((s) => {
     if (preview === "installed") return { ...s, status: (s.status === "update" ? "ready" : s.status) as SourceStatus };
     if (preview === "updating" && s.name === EXAMPLE_SYSTEM.name) return { ...s, status: "updating" as SourceStatus };
+    // DS-3: a source installed from a file shows where it came from and is never offered an update.
+    if ((preview === "local" || preview === "local-choice") && s.name === LOCAL_SOURCE.name) return LOCAL_SOURCE;
     return s;
   });
   const toggle = (name: string) => setSelected((cur) => (cur.includes(name) ? cur.filter((n) => n !== name) : [...cur, name]));
@@ -522,12 +546,14 @@ export function SourcesManageScreen({ props }: { props: ConceptProps }) {
     <>
       <SourceScreenHeader props={props} title={selecting ? `${selected.length} selected` : "Sources"} subtitle={selecting ? "Choose sources to update" : "Installed game data"} right={selecting ? <button type="button" className="ux-job-hide" onClick={() => setPreview("updates")}>Cancel</button> : undefined} />
       <div className="ux-wb-home-body ux-sources-body ux-src-body">
-        <PreviewState value={preview} options={[["installed", "Installed"], ["updates", "Updates"], ["selecting", "Selecting"], ["updating", "Updating"], ["failed", "Install failed"], ["interrupted", "Install interrupted"], ["update-interrupted", "Update interrupted"], ["empty", "Empty"]]} onChange={setPreview} />
+        <PreviewState value={preview} options={[["installed", "Installed"], ["updates", "Updates"], ["selecting", "Selecting"], ["updating", "Updating"], ["failed", "Install failed"], ["interrupted", "Install interrupted"], ["update-interrupted", "Update interrupted"], ["local-choice", "From a file · choose"], ["local-refused", "From a file · refused"], ["local", "From a file · installed"], ["local-interrupted", "From a file · interrupted"], ["empty", "Empty"]]} onChange={setPreview} />
         {!selecting ? (
           <button type="button" className="ux-add-source-primary" onClick={() => props.onNavigate("add-source")}>
             <Plus size={18} /><span><strong>Add game data</strong><small>Collections, a repository link, or GitHub search</small></span><ChevronRight size={17} />
           </button>
         ) : null}
+        {!selecting ? <LocalImportRow onClick={() => setPreview("local-choice")} /> : null}
+        {preview === "local-refused" ? <LocalRefusedNotice /> : null}
         {preview === "updates" ? <UpdatesNotice /> : null}
         {preview === "empty" ? (
           <section className="ux-sources-empty">
@@ -552,6 +578,7 @@ export function SourcesManageScreen({ props }: { props: ConceptProps }) {
                 <div className="ux-src-inline-actions"><button type="button" className="ux-job-link">Dismiss</button><button type="button" className="ux-job-btn primary">Install the rest</button></div>
               </div>
             ) : null}
+            {preview === "local-interrupted" ? <LocalInterruptedNotice /> : null}
             {preview === "update-interrupted" ? (
               <div className="ux-job-notice warning ux-src-failed">
                 <TriangleAlert size={18} />
@@ -573,8 +600,116 @@ export function SourcesManageScreen({ props }: { props: ConceptProps }) {
         </footer>
       ) : null}
       {preview === "updating" ? <div className="ux-job-float"><JobPill label={`Updating ${EXAMPLE_SYSTEM.name}`} percent={46} count={2} /></div> : null}
+      {preview === "local-choice" ? <LocalImportChoiceDialog /> : null}
     </>
   );
+}
+
+// ---------------------------------------------------------------- install from a file (DS-3, DEC-035)
+
+/**
+ * Sources → "Install from a file on this phone" (battle-augur DS-3): archives (.zip, .bsr), data files
+ * (.gst/.cat, .gstz/.catz, data .json) or a folder, read on the phone and installed through the same job
+ * sheet as a download. The file names below are invented placeholders (DEC-001).
+ */
+export const LOCAL_FILE = { label: "example-data.zip", files: 12, size: "12 MB" };
+
+/** The entry row under Add game data (a neutral icon tile: it is the second way in). */
+export function LocalImportRow({ onClick }: { onClick?: () => void }) {
+  return (
+    <button type="button" className="ux-add-source-primary ux-src-local-entry" onClick={onClick}>
+      <FileArchive size={18} /><span><strong>Install from a file on this phone</strong><small>An archive, data files or a folder</small></span><ChevronRight size={17} />
+    </button>
+  );
+}
+
+/** The choice after tapping the row: the app's own menu dialog (UX-013), never a system alert. */
+export function LocalImportChoiceDialog({ inline = false }: { inline?: boolean }) {
+  return (
+    <AppDialog
+      inline={inline}
+      layout="column"
+      title="Install from a file"
+      message="Pick archives or data files, or a whole folder. Hidden folders and other files are skipped."
+      actions={[{ label: "Choose files", icon: <FileInput size={15} /> }, { label: "Choose a folder", icon: <FolderOpen size={15} /> }, { label: "Cancel" }]}
+    />
+  );
+}
+
+/** The job's steps: "Copying files" in place of Download (the bytes go to the engine one file at a time). */
+export function localSteps(stage: "files" | "import" | "failed" | "done"): JobStep[] {
+  const order = ["files", "read", "import", "write"];
+  const at = (id: string): JobStepState => {
+    if (stage === "done") return "done";
+    if (stage === "failed") return id === "read" ? "failed" : order.indexOf(id) < 1 ? "done" : "waiting";
+    const cur = order.indexOf(stage);
+    const i = order.indexOf(id);
+    return i < cur ? "done" : i === cur ? "active" : "waiting";
+  };
+  return [
+    { id: "files", title: "Copying files", detail: stage === "files" ? "File 4 of 12 · example-faction.cat" : `${LOCAL_FILE.files} files · ${LOCAL_FILE.size}`, state: at("files"), progress: 4 / 12 },
+    { id: "read", title: "Read", detail: at("read") === "done" ? "64 documents" : undefined, state: at("read") },
+    { id: "import", title: "Import", detail: stage === "import" ? `Faction 3 of 9 · ${EXAMPLE_FACTIONS[1]}` : stage === "done" ? "9 factions" : undefined, state: at("import"), progress: 3 / 9 },
+    { id: "write", title: "Write", state: at("write") },
+  ];
+}
+
+export type LocalError = "too-large" | "no-data" | "no-system" | "two-systems" | "damaged" | "permission";
+
+/** What a refused or failed pick says. Nothing is installed and the data already on the phone stays as it was. */
+export const LOCAL_ERRORS: Array<[LocalError, string, string, string]> = [
+  ["too-large", "Too large", "These files are too large", "Each file can be up to 50 MB and all of them together up to 200 MB, in at most 2000 files. Nothing was installed."],
+  ["no-data", "No data files", "No game data in these files", "Pick .zip or .bsr archives, .gst or .cat files (also .gstz, .catz) or data .json files. Nothing was installed."],
+  ["no-system", "No game system", "The game system file is missing", "The files have factions but not the game system they belong to. Add its .gst file and try again."],
+  ["two-systems", "Two game systems", "These files hold two game systems", "Install one game system at a time: Example System One and Example System Two were found."],
+  ["damaged", "Damaged archive", "This archive could not be read", "example-data.zip is damaged or not a supported archive. Nothing was installed."],
+  ["permission", "Permission lost", "The phone no longer allows reading these files", "Pick the files again. If they are in a cloud folder, make sure they are downloaded first."],
+];
+
+export function LocalImportError({ kind }: { kind: LocalError }) {
+  const [, , title, body] = LOCAL_ERRORS.find(([id]) => id === kind)!;
+  return <JobOutcomeNotice outcome="failed" title={title} body={body} />;
+}
+
+/** A local source in the Sources list: where it came from instead of a version, and when it was imported. */
+export const LOCAL_SOURCE: ExampleSource = { name: "Example System Three", factions: 9, names: "Iron Choir, Salt Kings, Lantern Guild…", meta: `From a file · ${LOCAL_FILE.label} · imported today · ${LOCAL_FILE.size}`, status: "ready" };
+
+/** A pick refused before its job starts (too large, no data files, a folder the phone will not list): a notice under the row. */
+export function LocalRefusedNotice() {
+  return (
+    <div className="ux-job-notice error ux-src-failed">
+      <OctagonAlert size={18} />
+      <span><strong>Could not install these files</strong><small>These files are too large: at most 2,000 files, 50 MB each and 200 MB together. Nothing was installed.</small></span>
+      <div className="ux-src-inline-actions"><button type="button" className="ux-job-btn">Dismiss</button></div>
+    </div>
+  );
+}
+
+/** After a restart: the picked files are gone, so the only action is Dismiss. */
+export function LocalInterruptedNotice() {
+  return (
+    <div className="ux-job-notice warning ux-src-failed">
+      <TriangleAlert size={18} />
+      <span><strong>{LOCAL_FILE.label} · Install interrupted</strong><small>The install from {LOCAL_FILE.label} was interrupted. Nothing was kept. Pick the files again to install them.</small></span>
+      <div className="ux-src-inline-actions"><button type="button" className="ux-job-btn">Dismiss</button></div>
+    </div>
+  );
+}
+
+/** Source detail of a local source: no repository, version, update check, GitHub link or Install more factions. */
+export function LocalSourceRows() {
+  return (
+    <div className="ux-src-group">
+      <DetailRow label="From a file" value={LOCAL_FILE.label} />
+      <DetailRow label="Imported" value="today" />
+      <DetailRow label="Size on this phone" value={LOCAL_FILE.size} />
+      <DetailRow label="Documents" value="64" />
+    </div>
+  );
+}
+
+export function LocalSourceNote() {
+  return <div className="ux-job-notice info"><Info size={18} /><span><strong>Installed from a file</strong><small>It is never checked for updates. Install a newer file of the same game system to replace it; rosters move to the new data.</small></span></div>;
 }
 
 // ---------------------------------------------------------------- source detail with update states
@@ -646,31 +781,64 @@ export function OlderVersionRow({ commit = VERSION_NEWEST.commit }: { commit?: s
   );
 }
 
-/** The native confirmation before deleting a kept version: the space it frees, and that it cannot be undone. */
+/**
+ * The app's own dialog (UX-013, DEC-027), replacing the system alerts: centred on a dimmed backdrop, title, message and actions.
+ * Confirm: Cancel (secondary) beside the action, which is red when it destroys something. Menu: a vertical list of actions and a Cancel row.
+ * Built in battle-augur apps/mobile/src/ds/dialog.
+ */
+export function AppDialog({ title, message, actions, layout = "row", inline = false }: { title: string; message?: string; actions: Array<{ label: string; tone?: "primary" | "destructive" | "secondary"; icon?: ReactNode }>; layout?: "row" | "column"; inline?: boolean }) {
+  const dialog = (
+    <div className="ux-dialog" role="alertdialog" aria-modal="true" aria-label={title}>
+      <strong>{title}</strong>
+      {message ? <small>{message}</small> : null}
+      <div className={`ux-dialog-actions ${layout}`}>
+        {actions.map((a) => <button key={a.label} type="button" className={`ux-dialog-btn ${a.tone ?? "secondary"}`}>{a.icon}{a.label}</button>)}
+      </div>
+    </div>
+  );
+  return inline ? <div className="ux-dialog-inline">{dialog}</div> : <div className="ux-job-scrim ux-alert-scrim">{dialog}</div>;
+}
+
+/** Confirmation before deleting a kept version: the space it frees, and that it cannot be undone. */
 export function DeleteVersionAlert({ inline = false, version = VERSION_PREVIOUS }: { inline?: boolean; version?: ExampleVersion }) {
-  const alert = (
-    <div className="ux-native-alert" role="alertdialog" aria-label={`Delete version ${version.commit}?`}>
-      <strong>Delete version {version.commit}?</strong>
-      <small>Frees {version.size}. This cannot be undone.</small>
-      <div><button type="button">Cancel</button><button type="button" className="destructive">Delete</button></div>
-    </div>
-  );
-  return inline ? alert : <div className="ux-job-scrim ux-alert-scrim">{alert}</div>;
+  return <AppDialog inline={inline} title={`Delete version ${version.commit}?`} message={`Frees ${version.size}. This cannot be undone.`} actions={[{ label: "Cancel" }, { label: "Delete", tone: "destructive" }]} />;
 }
 
-/** The native confirmation before Remove: rosters stay, read-only (DEC-024). */
+/** Confirmation before Remove: rosters stay, read-only (DEC-024). */
 export function RemoveSourceAlert({ inline = false }: { inline?: boolean }) {
-  const alert = (
-    <div className="ux-native-alert" role="alertdialog" aria-label={`Remove ${EXAMPLE_SYSTEM.name}?`}>
-      <strong>Remove {EXAMPLE_SYSTEM.name}?</strong>
-      <small>3 rosters will open read-only until this data is added again. Frees 41 MB.</small>
-      <div><button type="button">Cancel</button><button type="button" className="destructive">Remove</button></div>
-    </div>
-  );
-  return inline ? alert : <div className="ux-job-scrim ux-alert-scrim">{alert}</div>;
+  return <AppDialog inline={inline} title={`Remove ${EXAMPLE_SYSTEM.name}?`} message="3 rosters will open read-only until this data is added again. Frees 41 MB." actions={[{ label: "Cancel" }, { label: "Remove", tone: "destructive" }]} />;
 }
 
-type DetailPreview = "update" | "current" | "updating" | "updated" | "not-checked" | "failed" | "versions" | "older" | "switched" | "delete-version" | "remove";
+/** A short action menu (the ⋯ buttons): the same dialog with the actions stacked; Cancel last. */
+export function ActionMenuDialog({ inline = false }: { inline?: boolean }) {
+  return <AppDialog inline={inline} layout="column" title="Example unit" actions={[{ label: "Duplicate", icon: <Copy size={15} /> }, { label: "Delete", tone: "destructive", icon: <Trash2 size={15} /> }, { label: "Cancel" }]} />;
+}
+
+/**
+ * Import report on the source detail (UX-014, DEC-027): the counts by severity stay visible, the groups of messages
+ * (unresolved references, duplicate IDs …) start folded behind "Show {n}" and unfold on request.
+ */
+export function ImportReportGroups({ expanded = false, onToggle }: { expanded?: boolean; onToggle?: () => void }) {
+  return (
+    <>
+      <div className="ux-src-section-head"><span className="ux-result-label">Import report</span><button type="button" className="ux-job-link" aria-expanded={expanded} onClick={onToggle}>{expanded ? "Hide" : "Show 3"}</button></div>
+      <div className="ux-src-chips"><SeverityCount tone="error" label="2 errors" /><SeverityCount tone="warning" label="14 warnings" /><SeverityCount tone="info" label="1 note" /></div>
+      {expanded ? (
+        <div className="ux-src-group">
+          <DetailRow label="Unresolved reference · missing-target" value="11" />
+          <DetailRow label="Duplicate ID · duplicate-id" value="3" />
+          <DetailRow label="Unused entry · unused-entry" value="1" />
+        </div>
+      ) : null}
+    </>
+  );
+}
+
+function SeverityCount({ tone, label }: { tone: "error" | "warning" | "info"; label: string }) {
+  return <span className={`ux-src-sev ${tone}`}>{label}</span>;
+}
+
+type DetailPreview = "update" | "current" | "updating" | "updated" | "not-checked" | "failed" | "versions" | "older" | "switched" | "delete-version" | "remove" | "local";
 
 function DetailRow({ label, value, action }: { label: string; value: string; action?: string }) {
   return <div className="ux-src-kv"><span>{label}</span><b>{value}</b>{action ? <button type="button" className="ux-job-link">{action}</button> : null}</div>;
@@ -678,14 +846,15 @@ function DetailRow({ label, value, action }: { label: string; value: string; act
 
 export function SourceDetailScreen({ props }: { props: ConceptProps }) {
   const [preview, setPreview] = useState<DetailPreview>("update");
+  const [reportOpen, setReportOpen] = useState(false);
   // Switching back to 1a2b3c4 makes the source use an older version than a kept one.
   const older = preview === "older" || preview === "switched";
   const newest = preview === "updated" || preview === "not-checked" || preview === "versions" || preview === "delete-version";
   return (
     <>
-      <SourceScreenHeader props={props} title={EXAMPLE_SYSTEM.name} subtitle={EXAMPLE_SYSTEM.repo} />
+      <SourceScreenHeader props={props} title={preview === "local" ? LOCAL_SOURCE.name : EXAMPLE_SYSTEM.name} subtitle={preview === "local" ? `From a file · ${LOCAL_FILE.label}` : EXAMPLE_SYSTEM.repo} />
       <div className="ux-wb-home-body ux-sources-body ux-src-body">
-        <PreviewState value={preview} options={[["update", "Update available"], ["current", "Up to date"], ["updating", "Updating"], ["updated", "Updated"], ["not-checked", "Rosters not checked"], ["failed", "Update failed"], ["versions", "Versions"], ["older", "Older version"], ["switched", "Switched"], ["delete-version", "Delete version"], ["remove", "Remove"]]} onChange={setPreview} />
+        <PreviewState value={preview} options={[["update", "Update available"], ["current", "Up to date"], ["updating", "Updating"], ["updated", "Updated"], ["not-checked", "Rosters not checked"], ["failed", "Update failed"], ["versions", "Versions"], ["older", "Older version"], ["switched", "Switched"], ["delete-version", "Delete version"], ["remove", "Remove"], ["local", "From a file"]]} onChange={setPreview} />
         {preview === "update" ? <SourceUpdateCard /> : null}
         {older ? <OlderVersionRow /> : null}
         {preview === "not-checked" ? <LastUpdateCard checked={false} /> : null}
@@ -700,17 +869,18 @@ export function SourceDetailScreen({ props }: { props: ConceptProps }) {
         {preview === "failed" ? (
           <div className="ux-job-notice error"><OctagonAlert size={18} /><span><strong>The last update failed</strong><small>GitHub could not be reached. The previous version is still in use.</small></span><button type="button" className="ux-job-btn primary">Try again</button></div>
         ) : null}
-        <div className="ux-src-group">
+        {preview === "local" ? <><LocalSourceNote /><LocalSourceRows /></> : <div className="ux-src-group">
           <DetailRow label="Repository" value={EXAMPLE_SYSTEM.repo} />
           <DetailRow label="Version" value={newest ? VERSION_NEWEST.commit : VERSION_PREVIOUS.commit} />
           <DetailRow label="Changed upstream" value={newest ? VERSION_NEWEST.date : VERSION_PREVIOUS.date} />
           <DetailRow label="Installed" value="12 days ago" />
           <DetailRow label="Last checked" value={preview === "failed" ? "1 h ago" : "5 min ago"} action="Check now" />
           <DetailRow label="Size on this phone" value={older ? VERSION_PREVIOUS.size : VERSION_NEWEST.size} />
-        </div>
+        </div>}
         {preview === "versions" || preview === "delete-version" || older ? <SourceVersions older={older} onDelete={() => setPreview("delete-version")} /> : null}
         <div className="ux-result-label">Installed factions</div>
         <div className="ux-src-group">{EXAMPLE_FACTIONS.slice(0, 4).map((f) => <DetailRow key={f} label={f} value="r14" />)}<DetailRow label="…and 19 more" value="" /></div>
+        <ImportReportGroups expanded={reportOpen} onToggle={() => setReportOpen((v) => !v)} />
         <button type="button" className="ux-job-btn destructive block ux-src-remove" disabled={preview === "updating"}>Remove this data</button>
         {preview === "updating" ? <small className="ux-src-footer">This data is being updated. Try again when it finishes.</small> : null}
       </div>
@@ -823,74 +993,98 @@ export function DefaultListingRows({ onOpen }: { onOpen?: () => void }) {
   );
 }
 
-export function UserCollectionRows({ onOpen }: { onOpen?: () => void }) {
+export function UserCollectionRows({ onOpen, onAdd, defaultHidden = false, onShowDefault }: { onOpen?: () => void; onAdd?: () => void; defaultHidden?: boolean; onShowDefault?: () => void }) {
   return (
     <div className="ux-src-group">
       <button type="button" className="ux-col-nav" onClick={onOpen}><FolderGit2 size={17} /><span><strong>Club picks</strong><small>6 sources · collection</small></span><ChevronRight size={16} /></button>
-      <button type="button" className="ux-col-nav" onClick={onOpen}><Globe size={17} /><span><strong>community-data</strong><small>48 repositories · GitHub organisation</small></span><ChevronRight size={16} /></button>
-      <button type="button" className="ux-col-nav add"><Plus size={17} /><span><strong>Add a collection or library</strong><small>A collection file or a GitHub organisation</small></span><ChevronRight size={16} /></button>
+      {/* No repository count on a library row: it would cost a GitHub API request per row (plan 2C). */}
+      <button type="button" className="ux-col-nav" onClick={onOpen}><Globe size={17} /><span><strong>community-data</strong><small>GitHub organisation or user</small></span><ChevronRight size={16} /></button>
+      {defaultHidden ? <ShowDefaultCollectionRow onShow={onShowDefault} /> : null}
+      <button type="button" className="ux-col-nav add" onClick={onAdd}><Plus size={17} /><span><strong>Add a collection or library</strong><small>A collection file or a GitHub organisation</small></span><ChevronRight size={16} /></button>
     </div>
   );
 }
 
-type AddSheetState = "idle" | "found" | "invalid" | "repository";
+/** The default collection hidden (DEC-028: hidden, never removed): a quiet row in the user's group shows it again at once. */
+export function ShowDefaultCollectionRow({ onShow }: { onShow?: () => void }) {
+  return <button type="button" className="ux-col-nav quiet" onClick={onShow}><Library size={17} /><span><strong>Show the default collection</strong><small>You hid it. It lists sources tested with this app.</small></span></button>;
+}
+
+type AddSheetState = "idle" | "found" | "library" | "invalid" | "duplicate" | "repository";
 
 export function AddCollectionSheet({ state, inline = false }: { state: AddSheetState; inline?: boolean }) {
-  const value = state === "idle" ? "" : state === "repository" ? "github.com/example-org/example-system-six" : state === "invalid" ? "example.com/notes.txt" : "github.com/club-org/club-picks";
+  const value = state === "idle" ? "" : state === "repository" ? "github.com/example-org/example-system-six" : state === "invalid" ? "example.com/notes.txt" : state === "library" ? "github.com/club-org" : "github.com/club-org/club-picks/blob/main/collection.json";
+  const error = state === "invalid" ? "That link does not lead to a collection file or a GitHub organisation." : state === "duplicate" ? "This collection is already in your list." : undefined;
   const sheet = (
     <section className={`ux-job-sheet ${inline ? "inline" : ""}`} role="dialog" aria-label="Add a collection or library">
       <span className="ux-sheet-grip" aria-hidden />
       <header className="ux-job-head"><span><strong>Add a collection or library</strong><small>Lists of repositories to install from</small></span><button type="button" className="ux-icon-btn" aria-label="Close"><X size={17} /></button></header>
       <label className="ux-col-field">
         <span>Collection or library link</span>
-        <div className={`ux-source-url ${state === "invalid" ? "invalid" : ""}`}><input aria-label="Collection or library link" placeholder="https://… or github.com/name" defaultValue={value} key={value} /><button type="button">Find</button></div>
-        <small className={state === "invalid" ? "ux-source-error" : ""}>{state === "invalid" ? "That link does not lead to a collection file or a GitHub organisation." : "A collection file (.json) or a GitHub organisation or user (github.com/name)."}</small>
+        <div className={`ux-source-url ${error ? "invalid" : ""}`}><input aria-label="Collection or library link" placeholder="https://… or github.com/name" defaultValue={value} key={value} /></div>
+        <small className={error ? "ux-source-error" : ""}>{error ?? "A collection file (.json) or a GitHub organisation or user (github.com/name)."}</small>
       </label>
+      {/* Find sits under the field as its own button, like Continue on Add game data (built 2C). */}
+      <button type="button" className="ux-job-btn secondary block"><Search size={15} />Find</button>
       {state === "found" ? (
         <div className="ux-src-card">
           <header><FolderGit2 size={18} /><span><strong>Club picks</strong><small>Collection · by club-org · 6 sources</small></span></header>
           <small className="ux-col-desc">The systems our club plays, with the repositories we trust.</small>
         </div>
       ) : null}
+      {state === "library" ? (
+        <div className="ux-src-card">
+          <header><Globe size={18} /><span><strong>Club organisation</strong><small>48 repositories · GitHub organisation</small></span></header>
+          <small className="ux-col-desc">From the organisation's GitHub profile. A user reads "GitHub user".</small>
+        </div>
+      ) : null}
       {state === "repository" ? <div className="ux-job-notice info"><Info size={18} /><span><strong>That is a repository, not a collection.</strong><small>Install it directly instead.</small></span><button type="button" className="ux-job-btn primary">Install it</button></div> : null}
       <small className="ux-src-footer">Collections only list repositories. Nothing is downloaded until you install.</small>
-      <footer className="ux-job-footer"><button type="button" className="ux-job-btn secondary">Cancel</button><button type="button" className="ux-job-btn primary" disabled={state !== "found"}>Add collection</button></footer>
+      <footer className="ux-job-footer"><button type="button" className="ux-job-btn secondary">Cancel</button><button type="button" className="ux-job-btn primary" disabled={state !== "found" && state !== "library"}>Add collection</button></footer>
     </section>
   );
   return inline ? sheet : <div className="ux-job-scrim">{sheet}</div>;
 }
 
-type AddPreview = "collections" | "add" | "invalid" | "repository";
+type AddPreview = "collections" | "hidden" | "add" | "library" | "invalid" | "duplicate" | "repository";
 
 export function AddGameDataScreen({ props }: { props: ConceptProps }) {
   const [preview, setPreview] = useState<AddPreview>("collections");
   const install = () => props.onNavigate("install-job");
+  const hidden = preview === "hidden";
+  const sheet: AddSheetState | undefined = preview === "add" ? "found" : preview === "collections" || preview === "hidden" ? undefined : preview;
   return (
     <>
       <SourceScreenHeader props={props} title="Add game data" subtitle="Collections, a link, or GitHub search" />
       <div className="ux-wb-home-body ux-add-source-body ux-src-body">
-        <PreviewState value={preview} options={[["collections", "Collections"], ["add", "Add collection"], ["invalid", "Invalid link"], ["repository", "Repository link"]]} onChange={setPreview} />
+        <PreviewState value={preview} options={[["collections", "Collections"], ["hidden", "Default hidden"], ["add", "Add collection"], ["library", "Add library"], ["invalid", "Invalid link"], ["duplicate", "Already added"], ["repository", "Repository link"]]} onChange={setPreview} />
         <div className="ux-result-label">Collections</div>
-        <DefaultCollectionCard onInstall={install} onShowAll={() => props.onNavigate("collection")} />
-        <DefaultListingRows onOpen={() => props.onNavigate("collection")} />
-        <UserCollectionRows onOpen={() => props.onNavigate("collection")} />
+        {hidden ? null : <DefaultCollectionCard onInstall={install} onShowAll={() => props.onNavigate("collection")} />}
+        {hidden ? null : <DefaultListingRows onOpen={() => props.onNavigate("collection")} />}
+        <UserCollectionRows onOpen={() => props.onNavigate("collection")} onAdd={() => setPreview("add")} defaultHidden={hidden} onShowDefault={() => setPreview("collections")} />
         <div className="ux-result-label">Repository</div>
         <section className="ux-source-method">
           <div className="ux-source-method-heading"><span className="ux-setting-icon"><FileInput size={18} /></span><span><strong>Have a link?</strong><small>Any GitHub repository with roster data files (.gst and .cat, or their JSON form).</small></span></div>
           <div className="ux-source-url"><input aria-label="Repository" placeholder="owner/name or a GitHub link" /><button type="button" onClick={install}>Continue</button></div>
         </section>
-        <div className="ux-src-group"><button type="button" className="ux-col-nav"><Search size={17} /><span><strong>Search GitHub</strong><small>Any GitHub repository with game data, by name</small></span><ChevronRight size={16} /></button></div>
+        <div className="ux-src-group"><button type="button" className="ux-col-nav" onClick={() => props.onNavigate("search-github")}><Search size={17} /><span><strong>Search GitHub</strong><small>Any GitHub repository with game data, by name</small></span><ChevronRight size={16} /></button></div>
       </div>
-      {preview !== "collections" ? <AddCollectionSheet state={preview === "add" ? "found" : preview} /> : null}
+      {sheet ? <AddCollectionSheet state={sheet} /> : null}
     </>
   );
 }
 
-type CollectionPreview = "collection" | "library" | "offline";
+/** The ⋯ menu of a Collection page: Hide collection for the default collection only (DEC-028), Remove collection for the user's own. */
+export function CollectionMenuDialog({ kind = "user", inline = false }: { kind?: "default" | "user"; inline?: boolean }) {
+  return <AppDialog inline={inline} layout="column" title={kind === "default" ? "Battle Augur sources" : "Club picks"} actions={[{ label: "Refresh" }, { label: "Copy link", icon: <Copy size={15} /> }, kind === "default" ? { label: "Hide collection" } : { label: "Remove collection", tone: "destructive", icon: <Trash2 size={15} /> }, { label: "Cancel" }]} />;
+}
+
+type CollectionPreview = "collection" | "library" | "offline" | "loading" | "error" | "empty" | "menu-default" | "menu-user" | "remove";
 
 export function CollectionScreen({ props }: { props: ConceptProps }) {
   const [preview, setPreview] = useState<CollectionPreview>("collection");
   const library = preview === "library";
+  const user = preview === "menu-user" || preview === "remove" || preview === "error" || preview === "empty";
   const entries: CollectionEntry[] = library
     ? [
         { name: "example-system-six", description: "Community data for a skirmish game", repo: "community-data/example-system-six", action: "install" },
@@ -898,18 +1092,78 @@ export function CollectionScreen({ props }: { props: ConceptProps }) {
         { name: "example-system-seven", description: "Older edition, no longer maintained", repo: "community-data/example-system-seven", archived: true, action: "install" },
       ]
     : [...DEFAULT_COLLECTION.slice(0, 4), { ...DEFAULT_COLLECTION[4], action: "running" }];
+  const title = library ? "community-data" : user ? "Club picks" : "Battle Augur sources";
+  const subtitle = library ? "48 repositories on GitHub" : user ? "Collection · by club-org" : "Collection · by Battle Augur";
+  const body = preview === "loading" ? (
+    <div className="ux-source-list ux-managed-source-list ux-src-list" aria-busy="true">{[0, 1, 2].map((i) => <article key={i} className="ux-source-row ux-src-row ux-col-row ux-skeleton-row"><span><strong>&nbsp;</strong><small>&nbsp;</small></span></article>)}</div>
+  ) : preview === "error" ? (
+    <>
+      <div className="ux-job-notice error"><OctagonAlert size={18} /><span><strong>This is not a collection</strong><small>The file at this link is not a collection file.</small></span><button type="button" className="ux-job-btn secondary">Try again</button></div>
+      <button type="button" className="ux-job-link ux-col-more"><Trash2 size={13} />Remove collection</button>
+      <small className="ux-src-footer">Other errors: "This collection is too new" (a newer format), the network copy, "There is no collection file at this link any more", "There is no GitHub organisation or user with this name".</small>
+    </>
+  ) : preview === "empty" ? (
+    <section className="ux-sources-empty"><span><Database size={25} /></span><strong>This collection lists no sources yet</strong></section>
+  ) : (
+    <>
+      <div className="ux-search-field ux-col-search"><Search size={15} /><input aria-label="Search this collection" placeholder={library ? "Search 48 sources" : "Search 12 sources"} /></div>
+      <div className="ux-source-list ux-managed-source-list ux-src-list">
+        {entries.map((entry) => <CollectionSourceRow key={entry.repo} entry={entry} onInstall={() => props.onNavigate("install-job")} />)}
+      </div>
+      {library ? <button type="button" className="ux-job-link ux-col-more">Show archived (3)</button> : null}
+      {!library ? (
+        <>
+          <div className="ux-result-label">Listed here</div>
+          <DefaultListingRows onOpen={() => props.onNavigate("collection")} />
+          <small className="ux-src-footer">A collection opened from another collection lists its libraries only: nested collections are followed one level deep.</small>
+        </>
+      ) : null}
+    </>
+  );
   return (
     <>
-      <SourceScreenHeader props={props} title={library ? "community-data" : "Battle Augur sources"} subtitle={library ? "GitHub organisation · 48 repositories" : "Collection · Default"} right={<button type="button" className="ux-icon-btn" aria-label="More"><Ellipsis size={18} /></button>} />
+      <SourceScreenHeader props={props} title={title} subtitle={subtitle} right={<button type="button" className="ux-icon-btn" aria-label="More" onClick={() => setPreview(user ? "menu-user" : "menu-default")}><Ellipsis size={18} /></button>} />
       <div className="ux-wb-home-body ux-add-source-body ux-src-body">
-        <PreviewState value={preview} options={[["collection", "Collection"], ["library", "Library"], ["offline", "Offline"]]} onChange={setPreview} />
+        <PreviewState value={preview} options={[["collection", "Collection"], ["library", "Library"], ["offline", "Offline"], ["loading", "Loading"], ["error", "Error"], ["empty", "Empty"], ["menu-default", "Menu · default"], ["menu-user", "Menu · yours"], ["remove", "Remove"]]} onChange={setPreview} />
         {preview === "offline" ? <div className="ux-job-notice warning"><TriangleAlert size={18} /><span><strong>Showing the copy from 2026-10-14</strong><small>No connection. Installing needs one.</small></span></div> : null}
         <small className="ux-col-desc">{library ? "Repositories of this organisation that hold game data." : "Game systems we test with Battle Augur. Maintained in a public repository; updated without an app release."}</small>
-        <div className="ux-search-field ux-col-search"><Search size={15} /><input aria-label="Search this collection" placeholder={library ? "Search 48 repositories" : "Search 12 sources"} /></div>
-        <div className="ux-source-list ux-managed-source-list ux-src-list">
-          {entries.map((entry) => <CollectionSourceRow key={entry.repo} entry={entry} onInstall={() => props.onNavigate("install-job")} />)}
-        </div>
-        {library ? <button type="button" className="ux-job-link ux-col-more">Show archived (3)</button> : null}
+        {library ? <small className="ux-col-desc">github.com/community-data</small> : <small className="ux-col-desc">Updated 2026-10-14</small>}
+        {body}
+      </div>
+      {preview === "menu-default" ? <CollectionMenuDialog kind="default" /> : null}
+      {preview === "menu-user" ? <CollectionMenuDialog kind="user" /> : null}
+      {preview === "remove" ? <AppDialog title="Remove Club picks?" message="It leaves your list of collections. Installed game data stays." actions={[{ label: "Cancel" }, { label: "Remove", tone: "destructive" }]} /> : null}
+    </>
+  );
+}
+
+type SearchPreview = "results" | "prompt" | "none" | "error";
+
+/** Search GitHub (DS-1, plan 2C): GitHub-wide repository search on its own screen; runs on submit. */
+export function SearchGitHubScreen({ props }: { props: ConceptProps }) {
+  const [preview, setPreview] = useState<SearchPreview>("results");
+  const results: CollectionEntry[] = [
+    { name: "example-system-two", description: "Mass battles, points-based", repo: "example-org/example-system-two", action: "installed" },
+    { name: "example-system-eight", description: "Fan-made data for a skirmish game", repo: "someone/example-system-eight", action: "install" },
+    { name: "example-system-nine", description: "A fork with house rules", repo: "club-org/example-system-nine", action: "running" },
+  ];
+  return (
+    <>
+      <SourceScreenHeader props={props} title="Search GitHub" subtitle="Any GitHub repository with game data" />
+      <div className="ux-wb-home-body ux-add-source-body ux-src-body">
+        <PreviewState value={preview} options={[["results", "Results"], ["prompt", "Before searching"], ["none", "No matches"], ["error", "Rate limited"]]} onChange={setPreview} />
+        <div className="ux-search-field ux-col-search"><Search size={15} /><input aria-label="Repository name or topic" placeholder="Repository name or topic" defaultValue={preview === "prompt" ? "" : "example system"} key={preview} /></div>
+        <button type="button" className="ux-job-btn secondary block"><Search size={15} />Search GitHub</button>
+        {preview === "error" ? <div className="ux-job-notice error"><OctagonAlert size={18} /><span><strong>The search did not finish</strong><small>GitHub is limiting requests from this network. Try again in about 12 min.</small></span><button type="button" className="ux-job-btn secondary">Try again</button></div> : null}
+        {preview === "prompt" ? <section className="ux-sources-empty"><span><Search size={25} /></span><strong>Search all of GitHub</strong><small>Type a name and search. Results show repositories that may hold game data; check before you install.</small></section> : null}
+        {preview === "none" ? <section className="ux-sources-empty"><span><Search size={25} /></span><strong>No repository matches “example system”</strong><small>Try another name, or enter the repository on Add game data.</small></section> : null}
+        {preview === "results" ? (
+          <>
+            <small className="ux-col-desc">3 repositories</small>
+            <div className="ux-source-list ux-managed-source-list ux-src-list">{results.map((entry) => <CollectionSourceRow key={entry.repo} entry={entry} onInstall={() => props.onNavigate("install-job")} />)}</div>
+            <button type="button" className="ux-job-link ux-col-more">Show archived (1)</button>
+          </>
+        ) : null}
       </div>
     </>
   );
@@ -937,6 +1191,48 @@ export function WifiOnlySetting({ on, onToggle }: { on: boolean; onToggle?: () =
       <span className="ux-setting-icon"><Wifi size={17} /></span>
       <span className="ux-setting-text"><strong>Download on Wi-Fi only</strong><small>Wait for Wi-Fi before downloading game data. Update checks still use mobile data.</small></span>
       <span className="ux-switch" aria-hidden />
+    </button>
+  );
+}
+
+/**
+ * Settings → Game data → Check for updates automatically (battle-augur UX-008, DEC-027). On by default; shown while the update flag is
+ * on. Off stops the automatic checks (start, foreground, hourly) and the check on opening Sources; manual checks stay.
+ */
+export function AutoUpdateChecksSetting({ on, onToggle }: { on: boolean; onToggle?: () => void }) {
+  return (
+    <button type="button" className={`ux-setting-row ${on ? "on" : ""}`} role="switch" aria-checked={on} onClick={onToggle}>
+      <span className="ux-setting-icon"><RefreshCw size={17} /></span>
+      <span className="ux-setting-text"><strong>Check for updates automatically</strong><small>Looks for newer game data while the app is open and shows a badge. Never installs on its own.</small></span>
+      <span className="ux-switch" aria-hidden />
+    </button>
+  );
+}
+
+/** The tab header's avatar button; with updates known a dot (info colour, ringed in the header colour) and the count in the label. */
+export function UpdateAvatarButton({ updates = 0, onClick }: { updates?: number; onClick?: () => void }) {
+  const label = updates > 0 ? `App, settings and sources, ${updates} ${updates === 1 ? "update" : "updates"} available` : "App, settings and sources";
+  return (
+    <button type="button" className="ux-avatar-btn" aria-label={label} onClick={onClick}>
+      AM
+      {updates > 0 ? <span className="ux-avatar-badge" aria-hidden /> : null}
+    </button>
+  );
+}
+
+/** App → Sources row; with updates known a chip (icon + words, never colour alone) sits before the chevron. */
+export function SourcesNavRow({ updates = 0, onClick }: { updates?: number; onClick?: () => void }) {
+  return (
+    <button type="button" className="ux-app-nav-row" onClick={onClick} aria-label={updates > 0 ? `Sources, Installed game data and where it comes from, ${updates} ${updates === 1 ? "update" : "updates"}` : undefined}>
+      <span className="ux-setting-icon"><Database size={17} /></span>
+      <span>
+        <strong>Sources</strong>
+        <small>Installed game data and where it comes from</small>
+      </span>
+      <span className="ux-nav-trail">
+        {updates > 0 ? <Chip tone="cool"><CircleArrowUp size={11} /> {updates} {updates === 1 ? "update" : "updates"}</Chip> : null}
+        <ChevronRight size={17} />
+      </span>
     </button>
   );
 }

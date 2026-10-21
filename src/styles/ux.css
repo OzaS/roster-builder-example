@@ -6118,6 +6118,39 @@ button.ux-reference-tag:focus-visible {
 .ux-appearance-action:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px; }
 .ux-appearance-action:disabled { opacity: .5; cursor: wait; }
 
+/* guided roster creation (DEC-028): configuration steps */
+.ux-guided-step { gap: 4px; }
+.ux-guided-budget {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--ux-muted);
+  font-size: 12px;
+  font-weight: 750;
+}
+.ux-guided-budget.over { color: var(--ux-err); }
+.ux-guided-note { color: var(--ux-muted); font-size: 12px; line-height: 1.4; }
+.ux-guided-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
+  padding: 8px 13px;
+  border: 1px solid var(--ux-line);
+  border-radius: var(--ux-r-md);
+  background: var(--ux-surface);
+  text-align: left;
+  cursor: pointer;
+}
+button.ux-guided-option { justify-content: flex-start; }
+.ux-guided-option.on { border-color: var(--ux-accent); background: color-mix(in srgb, var(--ux-accent) 10%, transparent); }
+.ux-guided-option > span:not(.ux-stepper) { display: grid; gap: 1px; flex: 1; min-width: 0; }
+.ux-guided-option strong { font-size: 14.5px; }
+.ux-guided-option small { color: var(--ux-muted); font-size: 12px; }
+.ux-guided-cost { color: var(--ux-muted); font-size: 12px; font-style: normal; font-weight: 750; }
+.ux-guided-skip { min-height: 44px; }
+
 /* UX-006: roster checks are checkboxes; all selection/count targets meet phone minima. */
 .ux-mobile-unit-options button, .ux-5a-count button { min-width: 48px; min-height: 48px; }
 .ux-5a-choice[role="checkbox"] { width: 100%; text-align: left; background: transparent; color: inherit; }

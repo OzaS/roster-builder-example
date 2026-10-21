@@ -1,6 +1,6 @@
 import { AppearancePreferences } from "../concepts/ux/AppearanceSettings";
 import { MobileUnitOptions, ModelStackSamples, OptionFoldSamples } from "../concepts/ux/MobileUnitOptions";
-import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BarChart3, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, CircleDot, Cog, Coins, Command, Copy, Database, Dice5, Download, Ellipsis, FileInput, Gamepad2, GripVertical, Hammer, Heart, ImagePlus, Languages, Layers, LibraryBig, Maximize2, MessageCircle, Minus, Moon, MoveRight, Palette, PanelsTopLeft, Pencil, Plus, RotateCcw, Rows3, Scale, Search, Smartphone, Sparkles, Split, Trash2, Upload, UserRound, Wand2, X } from "lucide-react";
+import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BarChart3, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, Circle, CircleDot, Cog, Coins, Command, Copy, Database, Dice5, Download, Ellipsis, FileInput, Gamepad2, GripVertical, Hammer, Heart, ImagePlus, Languages, Layers, LibraryBig, Maximize2, MessageCircle, Minus, Moon, MoveRight, Palette, PanelsTopLeft, Pencil, Plus, RotateCcw, Rows3, Scale, Search, Smartphone, Sparkles, Split, Trash2, Upload, UserRound, Wand2, X, SquareCheck } from "lucide-react";
 import { createContext, useContext, useState } from "react";
 import { PhoneStatusBar } from "../components/DeviceFrame";
 import { mockRosterReferences, referenceById } from "../data/mockRosterReferences";
@@ -9,7 +9,7 @@ import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, T
 import { BudgetMeter, Chip, ExpandableBudget, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
 import { ComingSoonCard, DeveloperOptionsPreview } from "../concepts/ux/AppExtras";
-import { AddCollectionSheet, AdvancedInstallSetting, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RememberSectionsSetting, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceUpdateCard, SourceVersions, TaggedRosterRows, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
+import { ActionMenuDialog, AddCollectionSheet, LOCAL_ERRORS, LOCAL_FILE, LOCAL_SOURCE, LocalImportChoiceDialog, LocalImportError, LocalImportRow, LocalInterruptedNotice, LocalRefusedNotice, LocalSourceNote, LocalSourceRows, localSteps, AdvancedInstallSetting, AppDialog, AutoUpdateChecksSetting, ImportReportGroups, CollectionMenuDialog, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RememberSectionsSetting, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceUpdateCard, SourceVersions, SourcesNavRow, TaggedRosterRows, UpdateAvatarButton, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
 
 type Props = {
   concept: GalleryConcept;
@@ -190,37 +190,55 @@ function WorkbenchElements({
       <ElementSection title="Roster Creation">
         <button type="button" className="ux-start-row on">
           <span>
-            <strong>Warhammer 40,000</strong>
-            <small>Matched play · Incursion to Onslaught</small>
+            <strong>Example System</strong>
+            <small>Modes with guided configuration</small>
           </span>
           <Check size={18} />
         </button>
-        <div className="ux-filter-row">
-          {["1000 pts", "2000 pts", "Custom"].map((label) => (
-            <button key={label} type="button" className={`ux-filter-pill ${label === "Custom" ? "on" : ""}`}>
-              {label}
+        <button type="button" className="ux-select-field">
+          <span><strong>Faction A</strong><small>Example System</small></span><ChevronDown size={16} />
+        </button>
+        <button type="button" className="ux-select-field">
+          <span><strong>Mode A</strong><small>Faction A</small></span><ChevronDown size={16} />
+        </button>
+        <div className="ux-start-group ux-guided-step" role="radiogroup" aria-label="Size">
+          <h4>Size</h4>
+          <small className="ux-guided-note">Sets the Credits limit</small>
+          {[["Option A", "Limit 1000 Credits", false], ["Option B", "Limit 2000 Credits", true]].map(([name, limit, on]) => (
+            <button key={String(name)} type="button" role="radio" aria-checked={Boolean(on)} className={`ux-guided-option ${on ? "on" : ""}`}>
+              {on ? <CircleDot size={20} /> : <Circle size={20} />}<span><strong>{String(name)}</strong><em className="ux-guided-cost">{String(limit)}</em></span>
             </button>
           ))}
         </div>
-        <label className="ux-custom-points">
-          <input value="1500" aria-label="Custom points limit" readOnly />
-          <span>pts</span>
-        </label>
-        <button type="button" className="ux-select-field">
-          <span><strong>Adeptus Astartes</strong><small>Warhammer 40,000</small></span><ChevronDown size={16} />
-        </button>
-        <button type="button" className="ux-select-field">
-          <span><strong>Strike Force</strong><small>Adeptus Astartes · 1500 pts</small></span><ChevronDown size={16} />
-        </button>
+        <div className="ux-start-group ux-guided-step" role="group" aria-label="Extras">
+          <h4>Extras · optional</h4>
+          <small className="ux-guided-budget">1 / 2 selections</small>
+          <button type="button" role="checkbox" aria-checked className="ux-guided-option on"><SquareCheck size={20} /><span><strong>Option A</strong><em className="ux-guided-cost">+1 Resource A</em></span></button>
+          <div className="ux-guided-option"><span><strong>Option B</strong><em className="ux-guided-cost">+2 Resource B</em><small>Up to 2</small></span><span className="ux-stepper"><button type="button" aria-label="Fewer Option B"><Minus size={14} /></button><b>0</b><button type="button" aria-label="More Option B"><Plus size={14} /></button></span></div>
+        </div>
+        <div className="ux-start-group">
+          <h4>Credits limit</h4>
+          <div className="ux-filter-row">
+            {["1000 Credits", "2000 Credits", "Custom", "Unlimited"].map((label) => (
+              <button key={label} type="button" className={`ux-filter-pill ${label === "Custom" ? "on" : ""}`}>{label}</button>
+            ))}
+          </div>
+          <label className="ux-custom-points">
+            <input value="999" aria-label="Custom Credits limit" readOnly />
+            <span>Credits</span>
+          </label>
+          <small className="ux-guided-note">At most 999 Credits · shown only when no choice sets the limit</small>
+        </div>
         <label className="ux-start-group ux-roster-name">
           <h4>Roster name</h4><input value="New roster" aria-label="Roster name" readOnly />
         </label>
+        <button type="button" className="ux-ghost-btn ux-guided-skip">Skip guided setup</button>
         <div className="ux-loadout-selector-layer ux-elements-static">
           <section className="ux-loadout-selector" role="dialog" aria-label="Choose faction">
-            <header><span><strong>Choose faction</strong><small>Warhammer 40,000 · 1500 pts</small></span><button type="button" aria-label="Close picker"><X size={18} /></button></header>
+            <header><span><strong>Choose faction</strong><small>Example System</small></span><button type="button" aria-label="Close picker"><X size={18} /></button></header>
             <label className="ux-loadout-selector-search"><Search size={15} /><input placeholder="Search factions" readOnly /></label>
             <div className="ux-loadout-choice-list">
-              {[['Adeptus Astartes', 'Imperium'], ['Astra Militarum', 'Imperium'], ['Aeldari', 'Xenos']].map(([name, group], index) => (
+              {[['Faction A', 'Group A'], ['Faction B', 'Group B'], ['Faction C', 'Group C']].map(([name, group], index) => (
                 <button type="button" className={`ux-loadout-choice ${index === 0 ? "selected" : ""}`} key={name}><span><strong>{name}</strong><small>{group}</small></span><span className="ux-loadout-choice-check" aria-hidden>{index === 0 ? <Check size={15} /> : null}</span></button>
               ))}
             </div>
@@ -590,6 +608,20 @@ function WorkbenchElements({
         <RemoveSourceAlert inline />
       </ElementSection>
 
+      <ElementSection title="App Dialog · Menu">
+        <RemoveSourceAlert inline />
+        <DeleteVersionAlert inline />
+        <AppDialog inline title="Remove Example System One?" message="3 rosters will open read-only until this data is added again. Frees 41 MB. A long message wraps and the dialog scrolls instead of growing past the screen when the text size is large." actions={[{ label: "Cancel" }, { label: "Remove", tone: "destructive" }]} />
+        <ActionMenuDialog inline />
+        <small className="ux-elements-note">Built from UX-013 (DEC-027): replaces every system alert and action sheet. Centred on a dimmed backdrop in the theme (light, dark, imported schemes); Cancel (secondary) is first, the destructive action is filled in the error colour, other actions are primary or secondary. Menus stack the actions with Cancel last. Backdrop tap and Android back cancel, except a dialog that must be answered.</small>
+      </ElementSection>
+
+      <ElementSection title="Import Report Groups">
+        <ImportReportGroups />
+        <ImportReportGroups expanded />
+        <small className="ux-elements-note">UX-014 (DEC-027): on the source detail the severity counts stay visible and the groups of messages start folded behind Show; Hide folds them again.</small>
+      </ElementSection>
+
       <ElementSection title="Migration Report">
         <MigrationReportBody checked={false} />
         <MigrationReportBody />
@@ -600,6 +632,8 @@ function WorkbenchElements({
         <DefaultCollectionCard />
         <DefaultListingRows />
         <UserCollectionRows />
+        <small className="ux-elements-note">Default collection hidden (DEC-028): no card or default listings; this row in the user's group shows it again.</small>
+        <UserCollectionRows defaultHidden />
         <section className="ux-source-method">
           <div className="ux-source-method-heading"><span className="ux-setting-icon"><FileInput size={18} /></span><span><strong>Have a link?</strong><small>Any GitHub repository with roster data files.</small></span></div>
           <div className="ux-source-url"><input aria-label="Repository example" placeholder="owner/name or a GitHub link" /><button type="button">Continue</button></div>
@@ -611,11 +645,37 @@ function WorkbenchElements({
           {DEFAULT_COLLECTION.map((entry) => <CollectionSourceRow key={entry.repo} entry={entry} />)}
           <CollectionSourceRow entry={{ name: "example-system-seven", description: "Older edition, no longer maintained", repo: "community-data/example-system-seven", archived: true, action: "install" }} />
         </div>
+        <CollectionMenuDialog inline kind="default" />
+        <CollectionMenuDialog inline kind="user" />
+        <small className="ux-elements-note">The ⋯ menu: Hide collection only on the default collection (DEC-028, undone from Add game data); Remove collection only on the user's own entries, confirmed ("Installed game data stays"). Listings of the default collection and entries opened from another collection offer neither.</small>
+      </ElementSection>
+
+      <ElementSection title="Search GitHub">
+        <div className="ux-search-field ux-col-search"><Search size={15} /><input aria-label="Repository name or topic" placeholder="Repository name or topic" defaultValue="example system" /></div>
+        <div className="ux-source-list ux-managed-source-list ux-src-list">
+          <CollectionSourceRow entry={{ name: "example-system-eight", description: "Fan-made data for a skirmish game", repo: "someone/example-system-eight", action: "install" }} />
+        </div>
+        <small className="ux-elements-note">Plan 2C: GitHub-wide search on its own screen, run on submit; the same rows and actions as a collection page.</small>
       </ElementSection>
 
       <ElementSection title="Add Collection Sheet">
         <AddCollectionSheet inline state="found" />
+        <AddCollectionSheet inline state="library" />
+        <AddCollectionSheet inline state="duplicate" />
         <AddCollectionSheet inline state="repository" />
+      </ElementSection>
+
+      <ElementSection title="Install From A File">
+        <LocalImportRow />
+        <LocalImportChoiceDialog inline />
+        <JobModal inline title={`Installing ${LOCAL_FILE.label}`} subtitle={`From a file · ${LOCAL_FILE.files} files · ${LOCAL_FILE.size}`} percent={8} stepLabel="Step 1 of 4" steps={localSteps("files")} />
+        <LocalRefusedNotice />
+        {LOCAL_ERRORS.map(([id]) => <LocalImportError key={id} kind={id} />)}
+        <div className="ux-source-list ux-managed-source-list ux-src-list"><SourceRow source={LOCAL_SOURCE} /></div>
+        <LocalInterruptedNotice />
+        <LocalSourceNote />
+        <LocalSourceRows />
+        <small className="ux-elements-note">DS-3 (DEC-035): archives (.zip, .bsr), .gst/.cat (also .gstz/.catz), data .json or a folder. Files and folder are two actions of the app's own menu dialog. The job has Copying files in place of Download and no Try again; after a restart the interrupted notice offers Dismiss only. A local source shows "From a file · " and the picked name, and its import date, and has no update check, GitHub link or Install more factions.</small>
       </ElementSection>
 
       <ElementSection title="Advanced Installation Setting">
@@ -630,6 +690,13 @@ function WorkbenchElements({
         <WifiOnlySetting on />
         <NotificationsSetting />
         <NotificationsSetting on />
+      </ElementSection>
+
+      <ElementSection title="Automatic Update Checks Setting">
+        <div className="ux-result-label">Game data</div>
+        <AutoUpdateChecksSetting on />
+        <AutoUpdateChecksSetting on={false} />
+        <small className="ux-elements-note">UX-008 (DEC-027): on by default, shown while the update flag is on. Off stops the checks at start, on return to the app and hourly, and the check on opening Sources; pull to refresh and Check now still work.</small>
       </ElementSection>
 
       <ElementSection title="Remember Option Sections Setting">
@@ -650,14 +717,17 @@ function WorkbenchElements({
 
       <ElementSection title="Background Job Modal">
         <JobModal inline title={`Installing ${EXAMPLE_SYSTEM.name}`} subtitle={`${EXAMPLE_SYSTEM.repo} · ${EXAMPLE_SYSTEM.version}`} percent={46} stepLabel="Step 3 of 4" steps={installSteps("import")} notify />
-        <JobModal inline title={`Installing ${EXAMPLE_SYSTEM.name}`} subtitle={`${EXAMPLE_SYSTEM.repo} · ${EXAMPLE_SYSTEM.version}`} percent={46} stepLabel="Step 3 of 4" steps={installSteps("import")} overall={38} others={[{ title: "Updating Example System Two", detail: "Download · 4.1 MB of 29 MB", percent: 14 }, { title: "Installing Example System Three", detail: "Waiting for another install", waiting: true }]} />
+        <JobModal inline title={`Installing ${EXAMPLE_SYSTEM.name}`} subtitle={`${EXAMPLE_SYSTEM.repo} · ${EXAMPLE_SYSTEM.version}`} percent={46} stepLabel="Step 3 of 4" steps={installSteps("import")} overall={38} others={[{ title: "Updating Example System Two", detail: "Download · 4.1 MB of 29 MB", percent: 14 }, { title: "Installing Example System Three", detail: "Waiting for another install", waiting: true }, { title: "Installed Example System Four", detail: "12 factions. Ready to use.", ended: "done" }]} />
         <MobileDataNotice />
         <WifiWaitNotice />
         <JobOutcomeNotice outcome="updated" title="Updated Example System Two" body="3 rosters use this data. Check them to see which changed." />
         <JobOutcomeNotice outcome="done" title={`Installed ${EXAMPLE_SYSTEM.name}`} body="23 factions · 41 MB. Ready to use." />
         <JobOutcomeNotice outcome="failed" title={`Could not install ${EXAMPLE_SYSTEM.name}`} body="GitHub could not be reached. Check the connection and try again." />
-        <JobOutcomeNotice outcome="cancelled" title="Install stopped" body="7 of 23 factions were installed." />
+        {/* A cancelled install keeps nothing (DEC-027): one cancelled notice, no "Install stopped · N of M" variant. */}
         <JobOutcomeNotice outcome="cancelled" title="Install cancelled" body="Nothing was installed." />
+        {/* Cancel tapped: "Cancelling…" replaces the action (disabled, with a spinner) until the worker has stopped and discarded what it wrote. */}
+        <JobModal inline title={`Installing ${EXAMPLE_SYSTEM.name}`} subtitle={`${EXAMPLE_SYSTEM.repo} · ${EXAMPLE_SYSTEM.version}`} percent={52} stepLabel="Step 4 of 4" steps={installSteps("import")}
+          footer={<><button type="button" className="ux-job-btn destructive" disabled aria-disabled><RotateCcw size={15} className="ux-spin" aria-hidden />Cancelling…</button><button type="button" className="ux-job-btn secondary"><ChevronDown size={15} />Hide</button></>} />
       </ElementSection>
 
       <ElementSection title="Global Job Indicator">
@@ -821,6 +891,22 @@ function WorkbenchElements({
           <strong>Roster Builder</strong>
           <small>Version 1.0.0</small>
         </div>
+      </ElementSection>
+
+      <ElementSection title="Avatar Update Badge">
+        <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
+          <UpdateAvatarButton />
+          <UpdateAvatarButton updates={1} />
+          <UpdateAvatarButton updates={3} />
+        </div>
+        <small className="ux-elements-note">Tab header avatar: no dot without updates; with updates a dot in the info colour ringed in the header colour. The dot is a hint only: the button's label says the count ("App, settings and sources, 3 updates available").</small>
+      </ElementSection>
+
+      <ElementSection title="App Sources Row Count">
+        <SourcesNavRow />
+        <SourcesNavRow updates={1} />
+        <SourcesNavRow updates={3} />
+        <small className="ux-elements-note">App → Sources: with updates, a chip with the update icon and the words "1 update" / "3 updates" before the chevron. Shown whichever check found the updates.</small>
       </ElementSection>
 
       <ElementSection title="Coming Soon Placeholder">

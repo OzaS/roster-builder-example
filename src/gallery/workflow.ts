@@ -12,6 +12,7 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "migration-report", label: "Update report" },
   { id: "roster-read-only", label: "Read-only roster" },
   { id: "collection", label: "Collection" },
+  { id: "search-github", label: "Search GitHub" },
   { id: "subscription-main", label: "Subscription · Main" },
   { id: "create-roster", label: "Create Roster" },
   { id: "drafts", label: "Drafts" },
