@@ -3,11 +3,16 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 import { DesktopWorkbench } from "./concepts/desktop/DesktopWorkbench";
 import type { ColorScheme, WorkflowScreen } from "./types";
+import { applyStoredAmbient } from "./concepts/desktop/desktopAmbient";
+
 import "./styles/base.css";
 import "./styles/tokens.css";
 import "./styles/concepts.css";
 import "./styles/ux.css";
 import "./styles/sources.css";
+
+const ambientParam = new URLSearchParams(location.search).get("ambient");
+applyStoredAmbient(ambientParam === null ? undefined : ambientParam !== "0");
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

@@ -5,6 +5,7 @@ import { ScreenshotButton } from "../components/v2/ScreenshotButton";
 import { WorkflowScreenPicker, type WorkflowPickerSelection } from "../components/v2/WorkflowScreenPicker";
 import type { ColorScheme, ConceptId, DetachmentFavorite, ForceCreationMode, GalleryRelease, NavigatorView, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, UnitDetailView, UnitFavorite, WorkflowScreen } from "../types";
 import { colorSchemes } from "../types";
+import { DesktopAmbientSwitch } from "../concepts/desktop/desktopAmbient";
 import type { GalleryConcept } from "./galleryTypes";
 import { WorkflowBoard } from "./WorkflowBoard";
 import { workflowToPrototypeScreen } from "./workflow";
@@ -330,6 +331,7 @@ export function GalleryShell({
             <button className={forceCreationMode === "selector" ? "active" : ""} type="button" onClick={() => onForceCreationModeChange("selector")}><PanelBottom size={16} />Selector</button>
             <button className={forceCreationMode === "inline" ? "active" : ""} type="button" onClick={() => onForceCreationModeChange("inline")}><Rows3 size={16} />Inline</button>
           </ControlGroup>
+          {concept.id === "desktop-workbench" && <ControlGroup title="Desktop"><DesktopAmbientSwitch /></ControlGroup>}
           <ControlGroup title="Theme">
             <button className={themeMode === "dark" ? "active" : ""} type="button" onClick={() => onThemeModeChange("dark")}>
               <Moon size={16} />

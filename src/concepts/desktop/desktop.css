@@ -99,3 +99,45 @@
 .dt-toast.notification{bottom:14px;padding:12px 10px 12px 14px;box-shadow:0 14px 40px #0005}
 .dt-toast.notification>svg{color:var(--dt-accent)}
 .dt-app .dt-toast-action{font-weight:600;color:var(--dt-accent);padding:3px 8px;border-radius:7px}
+
+/* Desktop 04 — panels reach the window edges. Side panels sit on the window canvas; the centre (and hub pages) is
+   one sheet. Corners are rounded only where a panel does not touch the window border. */
+.dt-panels{gap:0;padding:0;position:relative}
+.dt-catalogue,.dt-inspector{background:transparent;border:0;border-radius:0}
+.dt-roster{border:1px solid var(--dt-border);border-bottom:0;border-radius:14px 14px 0 0}
+.dt-panels.no-left .dt-roster{border-left:0;border-top-left-radius:0}
+.dt-panels.no-right .dt-roster{border-right:0;border-top-right-radius:0}
+.dt-view-editor .dt-editor{padding-top:58px}
+.dt-panels{padding-top:8px}
+.dt-catalogue .dt-panel-foot,.dt-inspector-foot{border-top-color:var(--dt-border)}
+.dt-inspector-tabs{border-bottom:0}
+.dt-resizer{position:absolute;z-index:2;top:8px;bottom:0;width:8px;cursor:col-resize;touch-action:none}
+.dt-resizer::after{content:'';position:absolute;top:0;bottom:0;left:3px;width:2px;border-radius:2px;background:transparent;transition:background .15s}
+.dt-resizer:hover::after,.dt-resizer.dragging::after,.dt-resizer:focus-visible::after{background:var(--dt-fill)}
+.dt-resizer:focus-visible{outline:none}
+/* Hub pages and Welcome: the main area is the sheet next to the activity rail. */
+.dt-hub .dt-body{padding-top:58px}
+.dt-hub .dt-activity{padding-top:17px}
+.dt-hub .dt-body>main{background:var(--dt-pane);border:1px solid var(--dt-border);border-right:0;border-bottom:0;border-top-left-radius:14px;margin-top:8px}
+.dt-hub .dtp-page{padding:16px 20px 18px}
+.dt-hub .dt-welcome-top{padding-top:22px}
+.dt-hub .dtp-card{background:var(--dt-bg)}
+.dt-app.light .dt-hub .dtp-card,.dt-hub.light .dtp-card{background:var(--dt-pane)}
+.dt-tab-progress{top:57px}
+/* Width-aware content: panels adapt as they are resized. */
+.dt-catalogue,.dt-inspector,.dt-roster{container-type:inline-size}
+.dt-wide-only{display:none}
+@container (min-width: 320px){.dt-catalogue-unit .dt-wide-only{display:inline}}
+@container (max-width: 230px){.dt-filter>span,.dt-catalogue-unit small{display:none}.dt-catalogue-price{gap:6px}}
+@container (max-width: 300px){.dt-inspector-title>div:first-of-type{flex-wrap:wrap}.dt-inspector-tabs{padding:0 10px 10px}.dt-unit-actions{flex-wrap:wrap}}
+@container (min-width: 440px){.dt-inspector-content{padding:0 26px 24px}.dt-inspector-title{padding:22px 26px 16px}.dt-checkbox-row{padding:14px 16px}}
+@container (max-width: 470px){.dt-roster .dt-unit-icon,.dt-roster .dt-force-icon{display:none}.dt-unit-info small{display:none}.dt-unit-info strong{margin-bottom:0}}
+/* Ambient gradient (gallery switch): theme colours blurred into the top-left of the window canvas. */
+.dt-app>*{position:relative;z-index:1}
+.dt-app>.dt-floating-chrome{position:absolute;z-index:3}
+.dt-app>.dt-modal-scrim,.dt-app>.dt-toast,.dt-app>.dt-summary{position:absolute}
+.dt-app>.dt-tab-progress{position:absolute;z-index:2}
+.dt-ambient-on .dt-app::before{content:'';position:absolute;z-index:0;left:-140px;top:-160px;width:720px;height:560px;pointer-events:none;
+  background:radial-gradient(closest-side at 32% 40%,color-mix(in srgb,var(--ux-accent) 70%,transparent),transparent),radial-gradient(closest-side at 70% 30%,color-mix(in srgb,var(--ux-cool) 45%,transparent),transparent),radial-gradient(closest-side at 45% 75%,color-mix(in srgb,var(--ux-accent-2) 40%,transparent),transparent);
+  filter:blur(70px) saturate(1.2);opacity:.5}
+.dt-ambient-on .dt-app.light::before{opacity:.3}
