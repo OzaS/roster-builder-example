@@ -517,7 +517,7 @@ export function UpdatesNotice({ count = 2 }: { count?: number }) {
   );
 }
 
-type SourcesPreview = "installed" | "updates" | "selecting" | "updating" | "failed" | "interrupted" | "update-interrupted" | "local-choice" | "local" | "local-interrupted" | "empty";
+type SourcesPreview = "installed" | "updates" | "selecting" | "updating" | "failed" | "interrupted" | "update-interrupted" | "local-choice" | "local-refused" | "local" | "local-interrupted" | "empty";
 
 export function SourcesManageScreen({ props }: { props: ConceptProps }) {
   const [preview, setPreview] = useState<SourcesPreview>("updates");
@@ -535,13 +535,14 @@ export function SourcesManageScreen({ props }: { props: ConceptProps }) {
     <>
       <SourceScreenHeader props={props} title={selecting ? `${selected.length} selected` : "Sources"} subtitle={selecting ? "Choose sources to update" : "Installed game data"} right={selecting ? <button type="button" className="ux-job-hide" onClick={() => setPreview("updates")}>Cancel</button> : undefined} />
       <div className="ux-wb-home-body ux-sources-body ux-src-body">
-        <PreviewState value={preview} options={[["installed", "Installed"], ["updates", "Updates"], ["selecting", "Selecting"], ["updating", "Updating"], ["failed", "Install failed"], ["interrupted", "Install interrupted"], ["update-interrupted", "Update interrupted"], ["local-choice", "From a file · choose"], ["local", "From a file · installed"], ["local-interrupted", "From a file · interrupted"], ["empty", "Empty"]]} onChange={setPreview} />
+        <PreviewState value={preview} options={[["installed", "Installed"], ["updates", "Updates"], ["selecting", "Selecting"], ["updating", "Updating"], ["failed", "Install failed"], ["interrupted", "Install interrupted"], ["update-interrupted", "Update interrupted"], ["local-choice", "From a file · choose"], ["local-refused", "From a file · refused"], ["local", "From a file · installed"], ["local-interrupted", "From a file · interrupted"], ["empty", "Empty"]]} onChange={setPreview} />
         {!selecting ? (
           <button type="button" className="ux-add-source-primary" onClick={() => props.onNavigate("add-source")}>
             <Plus size={18} /><span><strong>Add game data</strong><small>Collections, a repository link, or GitHub search</small></span><ChevronRight size={17} />
           </button>
         ) : null}
         {!selecting ? <LocalImportRow onClick={() => setPreview("local-choice")} /> : null}
+        {preview === "local-refused" ? <LocalRefusedNotice /> : null}
         {preview === "updates" ? <UpdatesNotice /> : null}
         {preview === "empty" ? (
           <section className="ux-sources-empty">
@@ -661,6 +662,17 @@ export function LocalImportError({ kind }: { kind: LocalError }) {
 
 /** A local source in the Sources list: where it came from instead of a version, and when it was imported. */
 export const LOCAL_SOURCE: ExampleSource = { name: "Example System Three", factions: 9, names: "Iron Choir, Salt Kings, Lantern Guild…", meta: `From a file · ${LOCAL_FILE.label} · imported today · ${LOCAL_FILE.size}`, status: "ready" };
+
+/** A pick refused before its job starts (too large, no data files, a folder the phone will not list): a notice under the row. */
+export function LocalRefusedNotice() {
+  return (
+    <div className="ux-job-notice error ux-src-failed">
+      <OctagonAlert size={18} />
+      <span><strong>Could not install these files</strong><small>These files are too large: at most 2,000 files, 50 MB each and 200 MB together. Nothing was installed.</small></span>
+      <div className="ux-src-inline-actions"><button type="button" className="ux-job-btn">Dismiss</button></div>
+    </div>
+  );
+}
 
 /** After a restart: the picked files are gone, so the only action is Dismiss. */
 export function LocalInterruptedNotice() {
