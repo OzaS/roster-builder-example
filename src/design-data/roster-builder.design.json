@@ -291,6 +291,7 @@
             "label": "Design Gallery UI",
             "description": "Web-only review and gallery tooling; excluded from the React Native product implementation.",
             "sections": [
+              {"id": "gallery.library-navigation", "title": "Design Library Navigation", "level": "gallery-tooling", "status": "specified", "platforms": ["gallery"], "states": ["mobile library", "desktop library", "independent preferences"], "screens": []},
               { "id": "gallery.designer-rail", "title": "Designer Rail Controls", "level": "gallery-tooling", "status": "implemented", "platforms": ["gallery"], "states": ["default", "expanded", "editing"], "screens": [] },
               { "id": "gallery.workflow-board", "title": "Workflow Board Group", "level": "gallery-tooling", "status": "implemented", "platforms": ["gallery"], "states": ["default", "selected"], "screens": [] },
               { "id": "gallery.glance-comments", "title": "Glance Comments", "level": "gallery-tooling", "status": "implemented", "platforms": ["gallery"], "states": ["point", "element", "done"], "screens": [] },
@@ -332,8 +333,8 @@
       "icon": "PanelsTopLeft",
       "component": "DesktopWorkbench",
       "bestFor": "Focused desktop roster building with a searchable catalogue, persistent force outline and live unit inspector.",
-      "direction": "T3-inspired window chrome; VS Code-inspired welcome with recent rosters; an original flat, compact three-panel editing layout.",
-      "interaction": "Open a recent roster or create one. Add from the catalogue, select in the force, edit in the inspector. Toggle panels, inspect validation and use Command K.",
+      "direction": "Borderless workspace with floating panel controls, curved tabs at the top, and a three-panel editor without an activity rail.",
+      "interaction": "Browse Welcome and Editor in the design gallery. Open a recent roster or create one; edit with the catalogue, force tree and inspector. Floating controls toggle panels; Command K opens actions.",
       "tradeoff": "Desktop-first exploration. Sample data and prototype-session edits; not connected to the Battle Augur engine or persistence.",
       "screens": [
         {
@@ -365,13 +366,14 @@
         "screens": []
       },
       "elements": {
-        "release": "Desktop 01",
+        "release": "Desktop 02",
         "groups": [
           {
             "id": "product-ui",
             "label": "Desktop UI",
             "description": "Desktop workspace components. Representative interactive compositions in the Elements view.",
             "sections": [
+              {"id": "gallery.library-navigation", "title": "Design Library Navigation", "level": "gallery-tooling", "status": "specified", "platforms": ["gallery"], "states": ["mobile library", "desktop library", "independent preferences"], "screens": []},
               {
                 "id": "desktop.tokens",
                 "title": "Desktop Tokens",
@@ -396,7 +398,10 @@
                 ],
                 "states": [
                   "welcome",
-                  "editor",
+                  "editor without activity rail",
+                  "floating panel controls",
+                  "curved workspace tabs",
+                  "curved inspector tabs",
                   "command palette",
                   "panels hidden"
                 ],

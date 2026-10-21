@@ -259,7 +259,7 @@ export function GalleryShell({
   }
 
   return (
-    <div className="app" style={{ "--rail-width": `${railWidth}px` } as CSSProperties}>
+    <div className={`app ${concept.id === "desktop-workbench" ? "desktop-design-library" : "mobile-design-library"}`} style={{ "--rail-width": `${railWidth}px` } as CSSProperties}>
       <aside className="gallery-rail v2-gallery-rail">
         <div className="rail-resizer" role="separator" aria-orientation="vertical" aria-label="Resize designer panel" onPointerDown={startRailResize} />
         <div className="rail-topline">
@@ -267,7 +267,7 @@ export function GalleryShell({
             <span className="brand-mark">RB</span>
             <span>
               <strong>Roster Builder</strong>
-              <small>Concept gallery</small>
+              <small>{concept.id === "desktop-workbench" ? "Desktop design library" : "Mobile design library"}</small>
             </span>
           </div>
           <div className="rail-actions">
@@ -282,6 +282,7 @@ export function GalleryShell({
             ) : null}
           </div>
         </div>
+        <nav className="design-library-switch" aria-label="Design libraries"><a href="./" aria-current={concept.id !== "desktop-workbench" ? "page" : undefined}>Mobile</a><a href="?gallery=desktop" aria-current={concept.id === "desktop-workbench" ? "page" : undefined}>Desktop</a></nav>
         <ConceptGroup title="Designs" concepts={activeConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
         <div className="gallery-release-switch" role="group" aria-label="Design version">
           <button className={galleryRelease === "V1" ? "active" : ""} type="button" onClick={() => onGalleryReleaseChange("V1")}><span>V1</span><small>Current</small></button>

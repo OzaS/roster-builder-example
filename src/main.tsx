@@ -10,6 +10,6 @@ import "./styles/sources.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    {new URLSearchParams(location.search).has("desktop") ? <div className="dt-standalone"><DesktopWorkbench workflowScreen={new URLSearchParams(location.search).get("desktop") === "editor" ? "desktop-editor" : "desktop-welcome"} /><a className="dt-standalone-link" href="./">← Design gallery</a></div> : <App />}
+    {new URLSearchParams(location.search).has("desktop") ? <div className="dt-standalone"><DesktopWorkbench workflowScreen={new URLSearchParams(location.search).get("desktop") === "editor" ? "desktop-editor" : "desktop-welcome"} /><a className="dt-standalone-link" href="?gallery=desktop">← Desktop design library</a></div> : <App />}
   </StrictMode>,
 );

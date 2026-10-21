@@ -972,6 +972,7 @@ function WorkbenchElements({
       </CatalogGroup>
 
       <CatalogGroup groupId="gallery-ui">
+      <ElementSection title="Design Library Navigation"><nav className="design-library-switch" aria-label="Design library examples"><a href="./">Mobile</a><a href="?gallery=desktop">Desktop</a></nav></ElementSection>
       <ElementSection title="Designer Rail Controls">
         <div className="rail-actions">
           <button className="rail-icon-button" type="button" aria-label="Screenshot">

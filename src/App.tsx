@@ -6,7 +6,8 @@ import { prototypeToWorkflowScreen, workflowToPrototypeScreen } from "./gallery/
 import { captureElementAsPng } from "./utils/captureStage";
 import type { AppLanguage, ColorScheme, ConceptId, DetachmentFavorite, FavoriteLibrary, ForceCreationMode, GalleryRelease, NavigatorView, NavStyle, PlatformPreview, PrototypeScreen, Roster, RosterForce, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, ThemePreference, UnitDetailView, UnitFavorite, WorkflowScreen } from "./types";
 
-const GALLERY_STATE_KEY = "roster-builder.gallery-state.v1";
+const desktopLibrary = [new URLSearchParams(location.search).get("gallery"), new URLSearchParams(location.search).get("design")].includes("desktop");
+const GALLERY_STATE_KEY = desktopLibrary ? "roster-builder.desktop-gallery-state.v1" : "roster-builder.gallery-state.v1";
 const FAVORITES_KEY = "roster-builder.favorites.v1";
 const conceptIds = ["ux-workbench", "desktop-workbench"] satisfies ConceptId[];
 const platformIds = ["phone", "tablet"] satisfies PlatformPreview[];
@@ -105,7 +106,12 @@ type PersistedGalleryState = {
 };
 
 function App() {
-  const initialState = useMemo(readPersistedGalleryState, []);
+  const initialState = useMemo((): PersistedGalleryState => {
+    const saved = readPersistedGalleryState();
+    if (desktopLibrary) return { ...saved, selectedConcept: "desktop-workbench", workflowScreen: saved.workflowScreen?.startsWith("desktop-") ? saved.workflowScreen : "desktop-welcome", navigatorView: saved.navigatorView ?? "all-screens" };
+    if (saved.selectedConcept === "desktop-workbench") return { ...saved, selectedConcept: "ux-workbench", workflowScreen: "library", screen: "library" };
+    return saved;
+  }, []);
   const [designData, setDesignData] = useState<DesignData>(bundledDesignData);
   const [designDataWritable, setDesignDataWritable] = useState(false);
   const [selectedConcept, setSelectedConcept] = useState<ConceptId>(initialState.selectedConcept ?? "ux-workbench");
@@ -210,7 +216,7 @@ function App() {
     }
   }, [favorites]);
 
-  const conceptGroups = useMemo(() => buildConceptGroups(designData), [designData]);
+  const conceptGroups = useMemo(() => buildConceptGroups({ ...designData, designs: designData.designs.filter(design => desktopLibrary ? design.id === "desktop-workbench" : design.id !== "desktop-workbench") }), [designData]);
   const concept = findConceptInData(designData, selectedConcept);
   const Concept = concept.component;
   const captureRef = useRef<HTMLElement>(null);
