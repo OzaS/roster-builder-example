@@ -3,6 +3,10 @@ import type { PrototypeScreen, WorkflowScreen } from "../types";
 export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "desktop-welcome", label: "Desktop · Welcome" },
   { id: "desktop-editor", label: "Desktop · Roster editor" },
+  { id: "desktop-rosters", label: "Desktop · Rosters" },
+  { id: "desktop-lookup", label: "Desktop · Lookup" },
+  { id: "desktop-sources", label: "Desktop · Sources" },
+  { id: "desktop-settings", label: "Desktop · Settings" },
   { id: "library", label: "Lists" },
   { id: "library-v2", label: "Lists · V2" },
   { id: "collections", label: "Library" },
@@ -57,6 +61,10 @@ export function resolveWorkflow(workflow?: WorkflowScreen[]): Array<{ id: Workfl
 export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScreen {
   if (screen === "desktop-welcome") return "library";
   if (screen === "desktop-editor") return "overview";
+  if (screen === "desktop-rosters") return "library";
+  if (screen === "desktop-lookup") return "catalogue";
+  if (screen === "desktop-sources") return "sources";
+  if (screen === "desktop-settings") return "settings";
   if (screen === "library-v2") return "library";
   if (screen === "subscription-main") return "library";
   if (screen === "subscription-edition") return "overview";

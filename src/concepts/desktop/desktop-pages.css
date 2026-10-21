@@ -1,0 +1,198 @@
+/* Desktop hub pages: Rosters, Lookup, Sources, Settings. Shared --dt-* / --ux-* tokens, card structure from the mobile design. */
+.dtp-page { flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 76px 26px 18px 10px; gap: 14px; min-height: 0 }
+.dtp-header { display: flex; align-items: flex-end; gap: 16px }
+.dtp-header h1 { font-size: 24px; font-weight: 600; letter-spacing: -.6px }
+.dt-app .dtp-header p { color: var(--dt-muted); font-size: 12px; margin-top: 2px }
+.dtp-header-actions { margin-left: auto; display: flex; gap: 8px }
+.dt-app .dtp-btn { height: 34px; padding: 0 13px; border-radius: 10px; border: 1px solid var(--dt-border); font-size: 12px; font-weight: 500; gap: 7px; white-space: nowrap; background: var(--dt-pane) }
+.dt-app .dtp-btn:hover { background: var(--dt-hover) }
+.dt-app .dtp-btn.primary { background: var(--dt-fill); color: var(--ux-accent-ink); border-color: transparent }
+.dt-app .dtp-btn.primary:hover { filter: brightness(1.08) }
+.dt-app .dtp-btn.primary kbd { color: inherit; border-color: currentColor; opacity: .7 }
+.dt-app .dtp-btn.small { height: 28px; padding: 0 10px; font-size: 11px }
+.dt-app .dtp-btn.wide { flex: 1 1 100%; justify-content: space-between }
+.dt-app .dtp-btn.danger { color: var(--ux-err) }
+.dt-app .dtp-btn.danger.confirm { background: var(--ux-err); color: var(--ux-err-ink); border-color: transparent }
+.dt-app .dtp-icon { width: 30px; height: 30px; border-radius: 9px; color: var(--dt-muted); padding: 0 }
+
+.dtp-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap }
+.dtp-toolbar.tight { margin-top: -4px }
+.dtp-push { margin-left: auto }
+.dtp-search { display: flex; align-items: center; gap: 8px; flex: 1 1 260px; max-width: 420px; height: 36px; padding: 0 10px; border-radius: 12px; background: var(--dt-pane); border: 1px solid var(--dt-border); color: var(--dt-muted) }
+.dtp-search:focus-within { border-color: color-mix(in srgb, var(--dt-fill) 55%, transparent) }
+.dtp-search input { flex: 1; min-width: 0; border: 0; outline: none; background: none; font-size: 12px; color: var(--dt-text) }
+.dtp-search input::placeholder { color: var(--dt-faint) }
+.dtp-search button { width: 22px; height: 22px; border-radius: 6px; padding: 0 }
+.dtp-search.large { max-width: none; height: 46px; border-radius: 14px; padding: 0 14px; border-color: color-mix(in srgb, var(--dt-fill) 40%, transparent) }
+.dtp-search.large input { font-size: 15px }
+.dtp-chips { display: flex; gap: 6px; flex-wrap: wrap }
+.dt-app .dtp-chips button { height: 30px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--dt-border); font-size: 12px; color: var(--dt-muted); gap: 6px; background: var(--dt-pane) }
+.dt-app .dtp-chips button.active { background: var(--dt-selected); color: var(--dt-accent); border-color: color-mix(in srgb, var(--dt-fill) 45%, transparent) }
+.dtp-chips b { font-weight: 600 }
+.dtp-select { display: flex; align-items: center; gap: 6px; height: 34px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--dt-border); background: var(--dt-pane); color: var(--dt-muted) }
+.dtp-select select { border: 0; background: none; font-size: 12px; outline: none }
+
+.dtp-split { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 12px }
+.dtp-split.lookup { grid-template-columns: minmax(300px, 420px) minmax(0, 1fr) }
+.dtp-split.sources { grid-template-columns: minmax(320px, 400px) minmax(0, 1fr) }
+.dtp-card { background: var(--dt-pane); border: 1px solid var(--dt-border); border-radius: 16px; min-height: 0; min-width: 0 }
+.dtp-list { display: flex; flex-direction: column; overflow: hidden }
+.dtp-scroll { flex: 1; overflow: auto; padding: 6px }
+.dtp-list-foot { display: flex; align-items: center; gap: 7px; padding: 10px 16px; border-top: 1px solid var(--dt-border); font-size: 11px; color: var(--dt-faint) }
+.dtp-list-foot button { margin-left: auto; font-size: 11px; color: var(--dt-accent); padding: 2px 6px; border-radius: 6px }
+.dtp-table-head { padding: 12px 18px 8px; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--dt-faint); border-bottom: 1px solid var(--dt-border) }
+.dtp-roster-grid { display: grid !important; grid-template-columns: minmax(0, 1fr) 150px 130px 110px; align-items: center; gap: 14px }
+.dt-app .dtp-row { width: 100%; text-align: left; justify-content: flex-start; padding: 10px 12px; border-radius: 12px; gap: 12px }
+.dt-app .dtp-row.selected { background: var(--dt-selected); box-shadow: inset 3px 0 0 var(--dt-accent) }
+.dtp-row strong { display: block; font-size: 13px; font-weight: 500 }
+.dtp-row small { display: block; font-size: 11px; color: var(--dt-muted); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.dtp-name { display: flex; align-items: center; gap: 12px; min-width: 0 }
+.dtp-name>span:last-child { min-width: 0 }
+.dtp-points { font-size: 12px; color: var(--dt-muted); font-variant-numeric: tabular-nums }
+.dtp-points b { color: var(--dt-text); font-weight: 600 }
+.dtp-points i, .dtp-budget i, .dtp-progress { display: block; height: 3px; margin-top: 6px; border-radius: 3px; background: var(--dt-border); overflow: hidden }
+.dtp-points em, .dtp-budget em, .dtp-progress em { display: block; height: 100%; background: var(--dt-fill); border-radius: 3px; transition: width .3s }
+.dtp-points.over b, .dtp-budget .over { color: var(--dt-warn) }
+.dtp-points.over em { background: var(--dt-warn) }
+.dtp-muted { color: var(--dt-muted); font-size: 12px }
+.dtp-faint { color: var(--dt-faint) !important }
+.dtp-chip { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 9px; border-radius: 999px; font-size: 11px; font-weight: 500; white-space: nowrap; background: var(--dt-hover); color: var(--dt-muted); border: 1px solid transparent }
+.dtp-chip.ok { color: var(--ux-ok); background: color-mix(in srgb, var(--ux-ok) 12%, transparent) }
+.dtp-chip.warn { color: var(--dt-warn); background: color-mix(in srgb, var(--dt-warn) 13%, transparent) }
+.dtp-chip.err { color: var(--ux-err); background: color-mix(in srgb, var(--ux-err) 12%, transparent) }
+.dtp-chip.accent { color: var(--dt-accent); background: var(--dt-selected) }
+.dt-app .dtp-chip.add { border: 1px dashed var(--ux-line-2); background: none; cursor: pointer; gap: 4px }
+
+.dtp-detail { overflow: auto; padding: 20px }
+.dtp-detail h2 { font-size: 20px; font-weight: 600; letter-spacing: -.4px }
+.dt-app .dtp-detail h3 { font-size: 12px; font-weight: 600; margin: 20px 0 9px }
+.dtp-detail-title { display: flex; align-items: center; gap: 12px }
+.dtp-detail-title>div { flex: 1; min-width: 0 }
+.dt-app .dtp-detail-title p { font-size: 12px; color: var(--dt-muted); margin-top: 2px }
+.dtp-detail-title form { flex: 1; display: flex; gap: 6px }
+.dtp-detail-title input { flex: 1; min-width: 0; height: 32px; border-radius: 9px; border: 1px solid color-mix(in srgb, var(--dt-fill) 55%, transparent); background: var(--dt-hover); padding: 0 10px; font-size: 14px }
+.dtp-budget { margin: 18px 0 14px; padding: 14px; border-radius: 14px; background: var(--dt-hover) }
+.dtp-budget strong { font-size: 24px; font-weight: 600; letter-spacing: -.6px; display: block; font-variant-numeric: tabular-nums }
+.dtp-budget strong small { font-size: 12px; font-weight: 400; color: var(--dt-muted); letter-spacing: 0 }
+.dtp-budget i { height: 4px; margin: 9px 0 7px }
+.dtp-budget>span { font-size: 11px; color: var(--dt-muted) }
+.dtp-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; margin: 14px 0 }
+.dtp-facts.four { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) }
+.dtp-facts dt { font-size: 10px; letter-spacing: .8px; text-transform: uppercase; color: var(--dt-faint) }
+.dtp-facts dd { margin: 2px 0 0; font-size: 13px }
+.dtp-notice { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--dt-border); margin: 12px 0 }
+.dtp-notice strong { display: block; font-size: 13px; font-weight: 600 }
+.dtp-notice small { display: block; font-size: 12px; color: var(--dt-muted); margin-top: 2px; line-height: 1.45 }
+.dtp-notice.ok { color: var(--ux-ok); border-color: color-mix(in srgb, var(--ux-ok) 30%, transparent); background: color-mix(in srgb, var(--ux-ok) 7%, transparent) }
+.dtp-notice.warn { color: var(--dt-warn); border-color: color-mix(in srgb, var(--dt-warn) 35%, transparent); background: color-mix(in srgb, var(--dt-warn) 8%, transparent) }
+.dtp-notice.err { color: var(--ux-err); border-color: color-mix(in srgb, var(--ux-err) 32%, transparent); background: color-mix(in srgb, var(--ux-err) 7%, transparent) }
+.dtp-notice.accent { color: var(--dt-accent); border-color: color-mix(in srgb, var(--dt-fill) 30%, transparent); background: var(--dt-selected) }
+.dtp-notice>svg { margin-top: 1px }
+.dtp-detail-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px }
+.dtp-empty { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 48px 20px; color: var(--dt-muted); text-align: center; font-size: 12px }
+.dtp-empty strong { color: var(--dt-text); font-size: 14px; font-weight: 600; margin-top: 6px }
+.dtp-empty .dtp-btn { margin-top: 8px }
+
+.dtp-group h3 { display: flex; align-items: center; gap: 7px; padding: 12px 12px 6px; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--dt-faint); font-weight: 600 }
+.dtp-group h3 span { margin-left: auto; letter-spacing: 0 }
+.dtp-result>span:first-child { flex: 1; min-width: 0 }
+.dtp-cost { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap }
+.dtp-cost small { font-weight: 400; color: var(--dt-faint); font-size: 11px }
+.lookup-detail { padding: 24px 26px }
+.dtp-eyebrow { font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; font-weight: 600; color: var(--dt-muted) }
+.dtp-eyebrow span { padding: 0 4px; color: var(--dt-faint) }
+.dtp-entry-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 6px 0 2px }
+.dtp-entry-title h2 { font-size: 24px }
+.dtp-entry-title>strong { font-size: 22px; font-weight: 600; color: var(--dt-accent) }
+.dtp-entry-title>strong small { font-size: 12px; font-weight: 400; color: var(--dt-muted) }
+.dtp-profile { border-radius: 12px; overflow: hidden; font-size: 13px }
+.dtp-profile th { font-size: 10px; background: var(--dt-hover) }
+.dtp-body-text { font-size: 13px; line-height: 1.7; color: var(--dt-muted); max-width: 640px }
+.dtp-tags { display: flex; flex-wrap: wrap; gap: 6px }
+.dtp-links { display: flex; flex-direction: column; gap: 4px }
+.dt-app .dtp-links button { justify-content: flex-start; padding: 9px 10px; border-radius: 10px; border: 1px solid var(--dt-border); font-size: 12px }
+.dtp-links button svg:last-child { margin-left: auto; color: var(--dt-faint) }
+
+.dtp-banner { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; border: 1px solid color-mix(in srgb, var(--dt-fill) 35%, transparent); background: var(--dt-selected); color: var(--dt-accent) }
+.dtp-banner>span { flex: 1 }
+.dtp-banner strong { display: block; font-size: 13px; font-weight: 600 }
+.dtp-banner small { display: block; font-size: 12px; color: var(--dt-muted) }
+.dtp-source { align-items: flex-start !important }
+.dtp-source>span:first-child { flex: 1; min-width: 0 }
+.dtp-source .dtp-progress { margin-top: 8px }
+.dt-app .dtp-add-row { margin-top: 6px; border: 1px dashed var(--ux-line-2) }
+.dtp-add-row>span:nth-child(2) { flex: 1; min-width: 0 }
+.dtp-add-icon { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 10px; background: var(--dt-fill); color: var(--ux-accent-ink) }
+.dtp-update-card { margin: 14px 0; padding: 14px; border-radius: 14px; border: 1px solid color-mix(in srgb, var(--dt-fill) 40%, transparent); background: var(--dt-selected) }
+.dtp-update-card>div:first-child { display: flex; gap: 10px; color: var(--dt-accent) }
+.dtp-update-card strong { display: block; font-size: 13px; font-weight: 600 }
+.dtp-update-card small { display: block; font-size: 12px; color: var(--dt-muted) }
+.dtp-update-card ul { display: flex; gap: 18px; list-style: none; margin: 12px 0; padding: 0 0 0 28px; font-size: 12px; color: var(--dt-muted) }
+.dtp-update-card ul b { color: var(--dt-text); font-weight: 600 }
+.dtp-update-card .dtp-progress { margin: 12px 0 2px 28px }
+.dtp-update-actions { display: flex; gap: 8px; padding-left: 28px }
+.dtp-rows { display: flex; flex-direction: column; border: 1px solid var(--dt-border); border-radius: 14px; overflow: hidden }
+.dtp-collection-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; border-top: 1px solid var(--dt-border) }
+.dtp-collection-row:first-child { border-top: 0 }
+.dtp-collection-row strong { display: block; font-size: 13px; font-weight: 500 }
+.dtp-collection-row small { display: block; font-size: 11px; color: var(--dt-muted) }
+.dtp-row-actions { display: flex; align-items: center; gap: 4px }
+.dtp-inline-form { display: flex; gap: 8px }
+.dtp-inline-form .dtp-search { max-width: none }
+.dt-app .dtp-link-row { width: 100%; justify-content: flex-start; text-align: left; gap: 12px; padding: 12px 14px; margin-top: 8px; border-radius: 14px; border: 1px solid var(--dt-border) }
+.dtp-link-row>span { flex: 1 }
+.dtp-link-row strong { display: block; font-size: 13px; font-weight: 500 }
+.dtp-link-row small { display: block; font-size: 11px; color: var(--dt-muted) }
+.dtp-link-row>svg:first-child { color: var(--dt-accent) }
+.dtp-danger-zone { display: flex; align-items: center; gap: 12px; margin-top: 24px; padding: 14px; border-radius: 14px; border: 1px solid color-mix(in srgb, var(--ux-err) 28%, transparent) }
+.dtp-danger-zone>span { flex: 1 }
+.dtp-danger-zone strong { display: block; font-size: 13px; font-weight: 600 }
+.dtp-danger-zone small { display: block; font-size: 12px; color: var(--dt-muted) }
+
+.dtp-settings { flex: 1; min-height: 0; display: grid; grid-template-columns: 210px minmax(0, 760px); gap: 18px }
+.dtp-settings-nav { display: flex; flex-direction: column; gap: 2px }
+.dt-app .dtp-settings-nav button { justify-content: flex-start; gap: 10px; padding: 9px 12px; border-radius: 10px; font-size: 13px; color: var(--dt-muted) }
+.dt-app .dtp-settings-nav button.active { background: var(--dt-selected); color: var(--dt-accent) }
+.dtp-settings-body { overflow: auto; display: flex; flex-direction: column; gap: 12px; padding-bottom: 40vh; scroll-padding-top: 4px }
+.dtp-settings-card { flex-shrink: 0; padding: 18px 20px; display: flex; flex-direction: column; gap: 4px }
+.dt-app .dtp-settings-card>h2 { font-size: 15px; font-weight: 600; margin-bottom: 8px }
+.dtp-setting-line, .dt-app .dtp-setting-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 0; width: 100%; text-align: left; border-radius: 0 }
+.dt-app .dtp-setting-row:hover { background: none }
+.dtp-rows .dtp-setting-row { padding: 11px 14px; border-top: 1px solid var(--dt-border) }
+.dtp-rows .dtp-setting-row:first-child { border-top: 0 }
+.dt-app .dtp-rows .dtp-setting-row:hover { background: var(--dt-hover) }
+.dtp-setting-line strong, .dtp-setting-row strong, .dtp-setting-block>strong { display: block; font-size: 13px; font-weight: 500 }
+.dtp-setting-line small, .dtp-setting-row small { display: block; font-size: 12px; color: var(--dt-muted); margin-top: 2px }
+.dtp-setting-row>svg { color: var(--dt-accent) }
+.dtp-setting-block { padding: 10px 0 }
+.dtp-setting-foot { display: flex; align-items: center; gap: 12px; margin-top: 12px }
+.dtp-setting-foot small { color: var(--dt-muted); font-size: 12px }
+.dtp-mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px !important }
+.dtp-switch { flex-shrink: 0; width: 36px; height: 21px; border-radius: 999px; background: var(--ux-line-2); position: relative; transition: background .15s }
+.dtp-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 15px; height: 15px; border-radius: 50%; background: var(--dt-pane); box-shadow: 0 1px 3px #0003; transition: transform .15s }
+[aria-checked=true]>.dtp-switch { background: var(--dt-fill) }
+[aria-checked=true]>.dtp-switch::after { transform: translateX(15px) }
+.dtp-segmented { display: inline-flex; padding: 3px; border-radius: 11px; background: var(--dt-hover); gap: 2px }
+.dt-app .dtp-segmented button { height: 28px; min-width: 52px; padding: 0 12px; border-radius: 8px; font-size: 12px; color: var(--dt-muted) }
+.dt-app .dtp-segmented button.active { background: var(--dt-pane); color: var(--dt-text); box-shadow: 0 1px 3px #0002, inset 0 0 0 1px var(--dt-border) }
+.dtp-scheme-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 10px }
+.dt-app .dtp-scheme-grid button { justify-content: flex-start; gap: 10px; padding: 10px; border-radius: 12px; border: 1px solid var(--dt-border); font-size: 13px }
+.dt-app .dtp-scheme-grid button.active { border-color: color-mix(in srgb, var(--dt-fill) 55%, transparent); background: var(--dt-selected) }
+.dtp-scheme-grid button>svg:last-child:not(:first-child) { margin-left: auto; color: var(--dt-accent) }
+.dt-app .dtp-scheme-grid button:last-child { border-style: dashed; color: var(--dt-muted) }
+.dtp-swatch { display: flex; width: 40px; height: 24px; border-radius: 7px; overflow: hidden; border: 1px solid var(--ux-line-2) }
+.dtp-swatch i { flex: 1 }
+.dtp-storage-bar { display: flex; height: 8px; border-radius: 6px; overflow: hidden; background: var(--dt-hover); margin-top: 8px }
+.dtp-storage-bar i:nth-child(1) { background: var(--dt-fill) }
+.dtp-storage-bar i:nth-child(2) { background: var(--ux-cool) }
+.dtp-storage-bar i:nth-child(3) { background: var(--ux-ok) }
+.dtp-legend { display: flex; gap: 18px; font-size: 12px; color: var(--dt-muted); margin-top: 8px }
+.dtp-legend span { display: flex; align-items: center; gap: 6px }
+.dtp-legend i { width: 8px; height: 8px; border-radius: 3px; background: var(--dt-fill) }
+.dtp-legend span:nth-child(2) i { background: var(--ux-cool) }
+.dtp-legend span:nth-child(3) i { background: var(--ux-ok) }
+.dtp-shortcuts { margin: 0 }
+.dtp-shortcuts div { display: flex; justify-content: space-between; padding: 8px 0; border-top: 1px solid var(--dt-border); font-size: 13px }
+.dtp-shortcuts div:first-child { border-top: 0 }
+.dtp-shortcuts dd { margin: 0 }
+.dt-app .dtp-cost small { display: inline }

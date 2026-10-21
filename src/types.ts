@@ -31,6 +31,10 @@ export const colorSchemes: Array<{ id: ColorScheme; label: string; short: string
 export type WorkflowScreen =
   | "desktop-welcome"
   | "desktop-editor"
+  | "desktop-rosters"
+  | "desktop-lookup"
+  | "desktop-sources"
+  | "desktop-settings"
   | "library"
   | "library-v2"
   | "collections"

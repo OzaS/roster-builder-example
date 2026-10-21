@@ -1,0 +1,263 @@
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { AlertTriangle, ArrowDownToLine, ArrowRight, ArrowUpCircle, BookOpen, Check, ChevronRight, CircleAlert, Copy, Database, ExternalLink, FileUp, FolderOpen, Github, HardDrive, Info, Keyboard, Languages, Layers3, Link2, ListFilter, Palette, Pencil, Plus, RefreshCcw, Search, Shield, SlidersHorizontal, Trash2, Upload, Users, X } from 'lucide-react';
+import type { ColorScheme } from '../../types';
+import { collectionSources, colourSchemes, installedSources, lookupEntries, rosterLibrary, type LookupKind, type RosterSummary, type SourceInfo } from './desktopData';
+import './desktop-pages.css';
+
+type Notify = (message: string) => void;
+
+function PageHeader({ title, subtitle, children }: { title: string; subtitle: string; children?: ReactNode }) {
+  return <header className="dtp-header"><div><h1>{title}</h1><p>{subtitle}</p></div>{children && <div className="dtp-header-actions">{children}</div>}</header>;
+}
+
+function Chip({ tone = 'neutral', children }: { tone?: 'neutral' | 'ok' | 'warn' | 'err' | 'accent'; children: ReactNode }) {
+  return <span className={`dtp-chip ${tone}`}>{children}</span>;
+}
+
+function Switch({ label, detail, checked, onChange }: { label: string; detail?: string; checked: boolean; onChange: (v: boolean) => void }) {
+  return <button type="button" role="switch" aria-checked={checked} className="dtp-setting-row" onClick={() => onChange(!checked)}>
+    <span><strong>{label}</strong>{detail && <small>{detail}</small>}</span><i className="dtp-switch" aria-hidden="true" />
+  </button>;
+}
+
+function Segmented<T extends string | number>({ label, value, options, onChange }: { label: string; value: T; options: Array<{ value: T; label: string }>; onChange: (v: T) => void }) {
+  return <div className="dtp-segmented" role="radiogroup" aria-label={label}>{options.map(o => <button type="button" key={String(o.value)} role="radio" aria-checked={value === o.value} className={value === o.value ? 'active' : ''} onClick={() => onChange(o.value)}>{o.label}</button>)}</div>;
+}
+
+const statusChip = (r: RosterSummary) => r.status === 'issues' ? <Chip tone="warn"><AlertTriangle size={11} />{r.issues} {r.issues === 1 ? 'issue' : 'issues'}</Chip>
+  : r.status === 'data-changed' ? <Chip tone="accent">Data changed</Chip>
+    : r.status === 'faction-removed' ? <Chip tone="err">Faction removed</Chip>
+      : <Chip tone="ok"><Check size={11} />Ready</Chip>;
+
+/* ------------------------------ Rosters ------------------------------ */
+
+export function DesktopRosters({ onOpen, onCreate, onImport, notify }: { onOpen: (name: string) => void; onCreate: () => void; onImport: () => void; notify: Notify }) {
+  const [rosters, setRosters] = useState(rosterLibrary);
+  const [query, setQuery] = useState('');
+  const [attention, setAttention] = useState(false);
+  const [system, setSystem] = useState('All game systems');
+  const [sort, setSort] = useState('Recently opened');
+  const [selected, setSelected] = useState(rosterLibrary[0].name);
+  const [renaming, setRenaming] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const needsAttention = (r: RosterSummary) => r.status === 'data-changed' || r.status === 'faction-removed';
+  const visible = useMemo(() => {
+    const list = rosters.filter(r => (r.name + r.faction).toLowerCase().includes(query.toLowerCase()) && (!attention || needsAttention(r)) && (system === 'All game systems' || r.system === system));
+    if (sort === 'Name') return [...list].sort((a, b) => a.name.localeCompare(b.name));
+    if (sort === 'Points') return [...list].sort((a, b) => b.used - a.used);
+    return list;
+  }, [rosters, query, attention, system, sort]);
+  const current = rosters.find(r => r.name === selected);
+  useEffect(() => { setRenaming(false); setConfirmDelete(false); }, [selected]);
+  const attentionCount = rosters.filter(needsAttention).length;
+  const duplicate = (r: RosterSummary) => { const copy = { ...r, name: `Copy of ${r.name}`, opened: 'Just now', mark: r.mark }; setRosters(list => [copy, ...list]); setSelected(copy.name); notify(`Duplicated as “${copy.name}”`); };
+  const remove = (r: RosterSummary) => { setRosters(list => list.filter(x => x.name !== r.name)); setSelected(rosters.find(x => x.name !== r.name)?.name ?? ''); notify(`Deleted “${r.name}”`); };
+  return <main className="dtp-page">
+    <PageHeader title="Rosters" subtitle={`${rosters.length} rosters · stored on this device`}>
+      <button className="dtp-btn" onClick={onImport}><FileUp size={15} />Import</button>
+      <button className="dtp-btn primary" onClick={onCreate}><Plus size={15} />New roster<kbd>⌘ N</kbd></button>
+    </PageHeader>
+    <div className="dtp-toolbar">
+      <label className="dtp-search"><Search size={15} /><input placeholder="Find a roster or faction…" aria-label="Find a roster" value={query} onChange={e => setQuery(e.target.value)} />{query && <button aria-label="Clear search" onClick={() => setQuery('')}><X size={13} /></button>}</label>
+      <div className="dtp-chips"><button className={!attention ? 'active' : ''} onClick={() => setAttention(false)}>All <b>{rosters.length}</b></button>{attentionCount > 0 && <button className={attention ? 'active' : ''} onClick={() => setAttention(true)}><CircleAlert size={13} />Needs attention <b>{attentionCount}</b></button>}</div>
+      <label className="dtp-select"><ListFilter size={14} /><select aria-label="Game system" value={system} onChange={e => setSystem(e.target.value)}>{['All game systems', 'Open Field', 'Example System Two'].map(s => <option key={s}>{s}</option>)}</select></label>
+      <label className="dtp-select"><SlidersHorizontal size={14} /><select aria-label="Sort rosters" value={sort} onChange={e => setSort(e.target.value)}>{['Recently opened', 'Name', 'Points'].map(s => <option key={s}>{s}</option>)}</select></label>
+    </div>
+    <div className="dtp-split">
+      <section className="dtp-card dtp-list" aria-label="Rosters">
+        <div className="dtp-table-head dtp-roster-grid"><span>Roster</span><span>Points</span><span>Status</span><span>Opened</span></div>
+        <div className="dtp-scroll">
+          {visible.map((r, i) => <button key={r.name} className={`dtp-row dtp-roster-grid ${r.name === selected ? 'selected' : ''}`} onClick={() => setSelected(r.name)} onDoubleClick={() => onOpen(r.name)}>
+            <span className="dtp-name"><span className={`dt-monogram tone-${i % 4}`}>{r.mark}</span><span><strong>{r.name}</strong><small>{r.faction} · {r.system}</small></span></span>
+            <span className={`dtp-points ${r.used > r.limit ? 'over' : ''}`}><b>{r.used.toLocaleString()}</b> / {r.limit.toLocaleString()}<i><em style={{ width: `${Math.min(r.used / r.limit * 100, 100)}%` }} /></i></span>
+            <span>{statusChip(r)}</span>
+            <span className="dtp-muted">{r.opened}</span>
+          </button>)}
+          {!visible.length && <div className="dtp-empty"><Search size={22} /><strong>No rosters match</strong><p>Try another name, or clear the filters.</p><button className="dtp-btn" onClick={() => { setQuery(''); setAttention(false); setSystem('All game systems'); }}>Clear filters</button></div>}
+        </div>
+        <footer className="dtp-list-foot">Double-click a roster to open it in a tab.</footer>
+      </section>
+      <aside className="dtp-card dtp-detail" aria-label="Roster details">{current ? <>
+        <div className="dtp-detail-title">
+          <span className="dt-monogram tone-0">{current.mark}</span>
+          {renaming ? <form onSubmit={e => { e.preventDefault(); const v = (new FormData(e.currentTarget).get('name') as string).trim(); if (v) { setRosters(list => list.map(r => r.name === current.name ? { ...r, name: v } : r)); setSelected(v); } setRenaming(false); }}><input name="name" autoFocus maxLength={60} defaultValue={current.name} aria-label="Roster name" /><button className="dtp-btn small" type="submit">Save</button></form>
+            : <div><h2>{current.name}</h2><p>{current.faction} · {current.system}</p></div>}
+          {!renaming && <button className="dtp-icon" aria-label="Rename roster" title="Rename" onClick={() => setRenaming(true)}><Pencil size={14} /></button>}
+        </div>
+        <div className="dtp-budget"><strong className={current.used > current.limit ? 'over' : ''}>{current.used.toLocaleString()} <small>/ {current.limit.toLocaleString()} pts</small></strong><i><em style={{ width: `${Math.min(current.used / current.limit * 100, 100)}%` }} /></i><span>{current.used > current.limit ? `${current.used - current.limit} points over limit` : `${current.limit - current.used} points available`}</span></div>
+        <dl className="dtp-facts"><div><dt>Forces</dt><dd>{current.forces}</dd></div><div><dt>Units</dt><dd>{current.units}</dd></div><div><dt>Game data</dt><dd>{current.system} {current.system === 'Open Field' ? 'v1.4' : 'v3.0.2'}</dd></div><div><dt>Last opened</dt><dd>{current.opened}</dd></div></dl>
+        {current.status === 'ready' ? <div className="dtp-notice ok"><Shield size={16} /><span><strong>Ready</strong><small>All roster requirements met.</small></span></div>
+          : current.status === 'issues' ? <div className="dtp-notice warn"><AlertTriangle size={16} /><span><strong>{current.issues} {current.issues === 1 ? 'item needs' : 'items need'} attention</strong><small>{current.used > current.limit ? 'Over the points limit.' : 'Roster requirements not met.'}</small></span></div>
+            : <div className="dtp-notice err"><CircleAlert size={16} /><span><strong>{current.status === 'data-changed' ? 'Game data changed' : 'Faction removed'}</strong><small>{current.status === 'data-changed' ? 'Some entries changed in the last update. Open to review them.' : 'The faction is no longer in the installed data. The roster opens read-only.'}</small></span></div>}
+        <div className="dtp-detail-actions">
+          <button className="dtp-btn primary wide" onClick={() => onOpen(current.name)}>Open roster<ArrowRight size={15} /></button>
+          <button className="dtp-btn" onClick={() => duplicate(current)}><Copy size={14} />Duplicate</button>
+          <button className="dtp-btn" onClick={() => notify(`“${current.name}” exported`)}><ArrowDownToLine size={14} />Export</button>
+          <button className={`dtp-btn danger ${confirmDelete ? 'confirm' : ''}`} onClick={() => confirmDelete ? remove(current) : setConfirmDelete(true)}><Trash2 size={14} />{confirmDelete ? 'Delete for good?' : 'Delete'}</button>
+        </div>
+      </> : <div className="dtp-empty"><Layers3 size={22} /><strong>No roster selected</strong><p>Choose a roster to see its details.</p></div>}</aside>
+    </div>
+  </main>;
+}
+
+/* ------------------------------ Lookup ------------------------------ */
+
+export function DesktopLookup({ onOpenRoster }: { onOpenRoster: (name: string) => void }) {
+  const [query, setQuery] = useState('');
+  const [scope, setScope] = useState('All sources');
+  const [selectedId, setSelectedId] = useState(lookupEntries[0].id);
+  const searchRef = useRef<HTMLInputElement>(null);
+  useEffect(() => { searchRef.current?.focus({ preventScroll: true }); }, []);
+  const scopes = ['All sources', 'Frontier Coalition', 'Free Cities', 'Core rules'];
+  const results = lookupEntries.filter(e => (e.name + ' ' + e.text + ' ' + e.meta).toLowerCase().includes(query.toLowerCase()) && (scope === 'All sources' || e.owner.includes(scope) || (scope === 'Frontier Coalition' && e.kind === 'Equipment')));
+  const selected = results.find(e => e.id === selectedId) ?? results[0];
+  const groups: Array<{ kind: LookupKind; label: string; icon: ReactNode }> = [{ kind: 'Unit', label: 'Units', icon: <Users size={14} /> }, { kind: 'Rule', label: 'Rules', icon: <BookOpen size={14} /> }, { kind: 'Equipment', label: 'Equipment', icon: <Shield size={14} /> }];
+  return <main className="dtp-page">
+    <PageHeader title="Lookup" subtitle="Search the installed game data without opening a roster" />
+    <div className="dtp-toolbar">
+      <label className="dtp-search large"><Search size={17} /><input ref={searchRef} placeholder="Search units, rules and equipment…" aria-label="Search game data" value={query} onChange={e => setQuery(e.target.value)} />{query ? <button aria-label="Clear search" onClick={() => setQuery('')}><X size={14} /></button> : <kbd>⌘ F</kbd>}</label>
+    </div>
+    <div className="dtp-toolbar tight"><span className="dtp-muted">Open Field v1.4</span><div className="dtp-chips">{scopes.map(s => <button key={s} className={scope === s ? 'active' : ''} onClick={() => setScope(s)}>{s}</button>)}</div><span className="dtp-muted dtp-push">{results.length} results</span></div>
+    <div className="dtp-split lookup">
+      <section className="dtp-card dtp-list" aria-label="Results"><div className="dtp-scroll">
+        {groups.map(g => { const items = results.filter(e => e.kind === g.kind); return items.length ? <div className="dtp-group" key={g.kind}><h3>{g.icon}{g.label}<span>{items.length}</span></h3>{items.map(e => <button key={e.id} className={`dtp-row dtp-result ${selected?.id === e.id ? 'selected' : ''}`} onClick={() => setSelectedId(e.id)}><span><strong>{e.name}</strong><small>{e.owner} · {e.meta}</small></span>{e.badge ? <Chip>{e.badge}</Chip> : <b className="dtp-cost">{e.cost}{e.cost && /^\d/.test(e.cost) && <small> pts</small>}</b>}</button>)}</div> : null; })}
+        {!results.length && <div className="dtp-empty"><Search size={22} /><strong>Nothing found for “{query}”</strong><p>Check the spelling or search all sources.</p>{scope !== 'All sources' && <button className="dtp-btn" onClick={() => setScope('All sources')}>Search all sources</button>}</div>}
+      </div></section>
+      <article className="dtp-card dtp-detail lookup-detail" aria-label="Entry details">{selected ? <>
+        <span className="dtp-eyebrow">{selected.kind} <span>/</span> {selected.meta}</span>
+        <div className="dtp-entry-title"><h2>{selected.name}</h2>{selected.cost && <strong>{selected.cost}{/^\d/.test(selected.cost) && <small> pts</small>}</strong>}</div>
+        <p className="dtp-muted">{selected.owner} · {selected.source} v1.4</p>
+        {selected.conditional && <div className="dtp-notice accent"><Info size={15} /><span><small>{selected.conditional}</small></span></div>}
+        {selected.profile && <><h3>Profile</h3><table className="dt-profile dtp-profile"><thead><tr>{['Move', 'Defence', 'Resolve', 'Health'].map(v => <th key={v}>{v}</th>)}</tr></thead><tbody><tr>{selected.profile.map((v, i) => <td key={i}>{v}</td>)}</tr></tbody></table></>}
+        <h3>{selected.kind === 'Unit' ? 'Description' : selected.kind === 'Rule' ? 'Rule text' : 'Characteristics'}</h3>
+        <p className="dtp-body-text">{selected.text}</p>
+        {selected.kind === 'Unit' && <><h3>Rules</h3><div className="dtp-tags"><Chip>Steady advance</Chip><Chip>Forward deployment</Chip></div></>}
+        {selected.usedIn?.length ? <><h3>In your rosters</h3><div className="dtp-links">{selected.usedIn.map(r => <button key={r} onClick={() => onOpenRoster(r)}><Layers3 size={14} />{r}<ChevronRight size={14} /></button>)}</div></> : null}
+      </> : <div className="dtp-empty"><BookOpen size={22} /><strong>Select a result</strong></div>}</article>
+    </div>
+  </main>;
+}
+
+/* ------------------------------ Sources ------------------------------ */
+
+export function DesktopSources({ notify }: { notify: Notify }) {
+  const [sources, setSources] = useState(installedSources);
+  const [selectedId, setSelectedId] = useState<string>('open-field');
+  const [progress, setProgress] = useState<Record<string, number>>({});
+  const [link, setLink] = useState('');
+  const [confirmRemove, setConfirmRemove] = useState(false);
+  useEffect(() => { setConfirmRemove(false); }, [selectedId]);
+  useEffect(() => {
+    const running = Object.keys(progress);
+    if (!running.length) return;
+    const timer = setTimeout(() => {
+      const next: Record<string, number> = {};
+      running.forEach(id => { const p = progress[id] + 20; if (p < 100) next[id] = p; else { setSources(list => list.map(s => s.id === id ? { ...s, version: s.next ?? s.version, next: undefined, status: 'ready', kept: [s.version, ...(s.kept ?? [])].slice(0, 2), installed: 'Just now' } : s)); notify(`${sources.find(s => s.id === id)?.name} updated. 5 rosters checked, 1 changed.`); } });
+      setProgress(next);
+    }, 450);
+    return () => clearTimeout(timer);
+  }, [progress, sources, notify]);
+  const update = (ids: string[]) => setProgress(p => ({ ...p, ...Object.fromEntries(ids.map(id => [id, 0])) }));
+  const updates = sources.filter(s => s.next && progress[s.id] === undefined);
+  const selected = sources.find(s => s.id === selectedId);
+  const chip = (s: SourceInfo) => progress[s.id] !== undefined ? <Chip tone="accent">Updating {progress[s.id]}%</Chip> : s.status === 'update' ? <Chip tone="accent"><ArrowUpCircle size={11} />Update</Chip> : s.status === 'review' ? <Chip tone="warn"><AlertTriangle size={11} />Review</Chip> : <Chip tone="ok"><Check size={11} />Ready</Chip>;
+  return <main className="dtp-page">
+    <PageHeader title="Sources" subtitle={`Installed game data · ${sources.length} sources · ${(53.9).toFixed(1)} MB`}>
+      <button className="dtp-btn" onClick={() => notify('Choose an archive, data files or a folder')}><FolderOpen size={15} />Install from a file</button>
+      <button className="dtp-btn primary" onClick={() => setSelectedId('add')}><Plus size={15} />Add game data</button>
+    </PageHeader>
+    {updates.length > 0 && <div className="dtp-banner"><ArrowUpCircle size={17} /><span><strong>{updates.length} {updates.length === 1 ? 'update' : 'updates'} available</strong><small>New data for {updates.map(s => s.name).join(', ')}. Last checked 8 minutes ago.</small></span><button className="dtp-btn primary small" onClick={() => update(updates.map(s => s.id))}>Update all</button></div>}
+    <div className="dtp-split sources">
+      <section className="dtp-card dtp-list" aria-label="Installed sources"><div className="dtp-scroll">
+        <div className="dtp-group"><h3><Database size={14} />Installed<span>{sources.length}</span></h3>
+          {sources.map(s => <button key={s.id} className={`dtp-row dtp-source ${selectedId === s.id ? 'selected' : ''}`} onClick={() => setSelectedId(s.id)}>
+            <span><strong>{s.name}</strong><small>{s.factions.length} factions · {s.factions.slice(0, 2).join(', ')}{s.factions.length > 2 ? '…' : ''}</small><small className="dtp-faint">{s.fromFile ? `From a file · imported ${s.installed}` : `${s.repo}@${s.version} · ${s.installed} · ${s.size}`}</small>{progress[s.id] !== undefined && <i className="dtp-progress"><em style={{ width: `${progress[s.id]}%` }} /></i>}</span>
+            {chip(s)}
+          </button>)}
+        </div>
+        <button className={`dtp-row dtp-add-row ${selectedId === 'add' ? 'selected' : ''}`} onClick={() => setSelectedId('add')}><span className="dtp-add-icon"><Plus size={16} /></span><span><strong>Add game data</strong><small>Collections, a repository link, or GitHub search</small></span><ChevronRight size={15} /></button>
+      </div><footer className="dtp-list-foot"><RefreshCcw size={12} />Checked for updates 8 minutes ago<button onClick={() => notify('Checked for updates. Nothing new.')}>Check now</button></footer></section>
+      {selectedId === 'add' ? <section className="dtp-card dtp-detail" aria-label="Add game data">
+        <span className="dtp-eyebrow">Add game data</span><h2>Choose a game system</h2><p className="dtp-muted">Install from a collection, paste a repository link, or search GitHub.</p>
+        <h3>Default collection</h3>
+        <div className="dtp-rows">{collectionSources.map(c => <div className="dtp-collection-row" key={c.name}><span><strong>{c.name}</strong><small>{c.detail}</small></span>{c.state === 'Installed' ? <Chip tone="ok"><Check size={11} />Installed</Chip> : <button className="dtp-btn small" onClick={() => notify(`Installing ${c.name}…`)}>Install</button>}</div>)}</div>
+        <h3>Repository link</h3>
+        <form className="dtp-inline-form" onSubmit={e => { e.preventDefault(); notify(link ? 'Looking up the repository…' : 'Paste a repository link first'); }}><label className="dtp-search"><Link2 size={15} /><input placeholder="https://github.com/owner/repository" aria-label="Repository link" value={link} onChange={e => setLink(e.target.value)} /></label><button className="dtp-btn" type="submit">Continue</button></form>
+        <button className="dtp-link-row" onClick={() => notify('Search GitHub opens here')}><Github size={16} /><span><strong>Search GitHub</strong><small>Find data repositories by name</small></span><ChevronRight size={15} /></button>
+        <button className="dtp-link-row" onClick={() => notify('Add a collection or library by link')}><Plus size={16} /><span><strong>Add a collection or library</strong><small>Lists of sources kept by the community</small></span><ChevronRight size={15} /></button>
+      </section> : selected ? <section className="dtp-card dtp-detail" aria-label={`${selected.name} details`}>
+        <span className="dtp-eyebrow">{selected.fromFile ? 'Installed from a file' : selected.repo}</span>
+        <div className="dtp-entry-title"><h2>{selected.name}</h2>{chip(selected)}</div>
+        <p className="dtp-muted">{selected.factions.length} factions · {selected.documents} documents · {selected.size}</p>
+        {selected.next && progress[selected.id] === undefined && <div className="dtp-update-card"><div><ArrowUpCircle size={18} /><span><strong>Update available · {selected.version} → {selected.next}</strong><small>Changed upstream {selected.upstream}</small></span></div><ul><li><b>+2</b> units added</li><li><b>~5</b> costs changed</li><li><b>−1</b> rule removed</li></ul><div className="dtp-update-actions"><button className="dtp-btn primary" onClick={() => update([selected.id])}>Update</button><button className="dtp-btn" onClick={() => notify('Opens the repository in your browser')}><ExternalLink size={14} />View on GitHub</button></div></div>}
+        {progress[selected.id] !== undefined && <div className="dtp-update-card"><div><RefreshCcw size={18} /><span><strong>Updating to {selected.next}</strong><small>Downloading and checking data · {progress[selected.id]}%</small></span></div><i className="dtp-progress"><em style={{ width: `${progress[selected.id]}%` }} /></i></div>}
+        {selected.status === 'review' && <div className="dtp-notice warn"><AlertTriangle size={16} /><span><strong>3 import warnings</strong><small>Some entries reference missing data. Rosters still open; affected entries are marked.</small></span></div>}
+        {!selected.next && selected.status === 'ready' && progress[selected.id] === undefined && <div className="dtp-notice ok"><Check size={16} /><span><strong>{selected.fromFile ? 'Installed from a file' : 'Up to date'}</strong><small>{selected.fromFile ? 'Files are not checked for updates. Import a newer file to replace it.' : `Last checked ${selected.checked}.`}</small></span></div>}
+        <dl className="dtp-facts four"><div><dt>Version</dt><dd>{selected.version}</dd></div><div><dt>Installed</dt><dd>{selected.installed}</dd></div><div><dt>Changed upstream</dt><dd>{selected.upstream}</dd></div><div><dt>Last checked</dt><dd>{selected.checked}</dd></div></dl>
+        {selected.kept?.length ? <><h3>Versions</h3><div className="dtp-rows"><div className="dtp-collection-row"><span><strong>{selected.version}</strong><small>Current</small></span><Chip tone="ok">In use</Chip></div>{selected.kept.map(v => <div className="dtp-collection-row" key={v}><span><strong>{v}</strong><small>Kept · 12.8 MB</small></span><span className="dtp-row-actions"><button className="dtp-btn small" onClick={() => notify(`Switched to ${v}`)}>Switch</button><button className="dtp-icon" aria-label={`Delete ${v}`} onClick={() => notify(`${v} deleted`)}><Trash2 size={13} /></button></span></div>)}</div></> : null}
+        <h3>Factions</h3><div className="dtp-tags">{selected.factions.map(f => <Chip key={f}>{f}</Chip>)}<button className="dtp-chip add" onClick={() => notify('Choose more factions to install')}><Plus size={11} />Install more</button></div>
+        <h3>Rosters using it</h3>{selected.rosters.length ? <div className="dtp-links">{selected.rosters.map(r => <button key={r}><Layers3 size={14} />{r}<ChevronRight size={14} /></button>)}</div> : <p className="dtp-muted">No rosters use this source yet.</p>}
+        <div className="dtp-danger-zone"><span><strong>Remove {selected.name}</strong><small>{selected.rosters.length ? `${selected.rosters.length} rosters will open read-only.` : 'No rosters are affected.'} Frees {selected.size}.</small></span><button className={`dtp-btn danger ${confirmRemove ? 'confirm' : ''}`} onClick={() => { if (!confirmRemove) return setConfirmRemove(true); setSources(list => list.filter(s => s.id !== selected.id)); setSelectedId(sources.find(s => s.id !== selected.id)?.id ?? 'add'); notify(`${selected.name} removed`); }}><Trash2 size={14} />{confirmRemove ? 'Remove for good?' : 'Remove'}</button></div>
+      </section> : null}
+    </div>
+  </main>;
+}
+
+/* ------------------------------ Settings ------------------------------ */
+
+const settingsSections = [
+  { id: 'appearance', label: 'Appearance', icon: Palette },
+  { id: 'language', label: 'Language', icon: Languages },
+  { id: 'rosters', label: 'Rosters', icon: Layers3 },
+  { id: 'data', label: 'Game data', icon: Database },
+  { id: 'storage', label: 'Storage', icon: HardDrive },
+  { id: 'shortcuts', label: 'Keyboard shortcuts', icon: Keyboard },
+  { id: 'about', label: 'About', icon: Info },
+] as const;
+
+export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, notify }: { themePref: 'system' | 'light' | 'dark'; onThemePref: (v: 'system' | 'light' | 'dark') => void; scheme: ColorScheme; onScheme: (v: ColorScheme) => void; notify: Notify }) {
+  const [active, setActive] = useState<string>('appearance');
+  const [language, setLanguage] = useState('en');
+  const [toggles, setToggles] = useState({ rememberSections: true, restoreTabs: true, chooseFactions: false, autoChecks: true });
+  const [keep, setKeep] = useState(1);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const flip = (key: keyof typeof toggles) => (v: boolean) => setToggles(t => ({ ...t, [key]: v }));
+  const go = (id: string) => { setActive(id); scrollRef.current?.querySelector(`#dtp-set-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+  return <main className="dtp-page">
+    <PageHeader title="Settings" subtitle="Saved on this device" />
+    <div className="dtp-settings">
+      <nav className="dtp-settings-nav" aria-label="Settings sections">{settingsSections.map(s => <button key={s.id} className={active === s.id ? 'active' : ''} aria-current={active === s.id ? 'true' : undefined} onClick={() => go(s.id)}><s.icon size={15} />{s.label}</button>)}</nav>
+      <div className="dtp-settings-body" ref={scrollRef}>
+        <section id="dtp-set-appearance" className="dtp-card dtp-settings-card"><h2>Appearance</h2>
+          <div className="dtp-setting-line"><span><strong>Theme</strong><small>System follows your desktop setting.</small></span><Segmented label="Theme" value={themePref} onChange={onThemePref} options={[{ value: 'system', label: 'System' }, { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }]} /></div>
+          <div className="dtp-setting-block"><strong>Colour scheme</strong><div className="dtp-scheme-grid" role="radiogroup" aria-label="Colour scheme">{colourSchemes.map(c => <button key={c.id} role="radio" aria-checked={scheme === c.id} className={scheme === c.id ? 'active' : ''} onClick={() => onScheme(c.id)}><span className="dtp-swatch"><i style={{ background: 'var(--ux-bg)' }} /><i style={{ background: c.accent }} /><i style={{ background: 'var(--ux-surface-2)' }} /></span>{c.name}{scheme === c.id && <Check size={14} />}</button>)}<button onClick={() => notify('Choose a colour scheme file (JSON)')}><Upload size={15} />Import scheme</button></div></div>
+        </section>
+        <section id="dtp-set-language" className="dtp-card dtp-settings-card"><h2>Language</h2>
+          <div className="dtp-rows" role="radiogroup" aria-label="Language">{[['en', 'English'], ['fr', 'Français · imported']].map(([id, name]) => <button key={id} role="radio" aria-checked={language === id} className="dtp-setting-row" onClick={() => setLanguage(id)}><span><strong>{name}</strong></span>{language === id && <Check size={16} />}</button>)}</div>
+          <div className="dtp-setting-foot"><button className="dtp-btn" onClick={() => notify('Choose a language pack (JSON)')}><Upload size={14} />Import language pack</button><small>Only the app is translated. Game data is shown as written.</small></div>
+        </section>
+        <section id="dtp-set-rosters" className="dtp-card dtp-settings-card"><h2>Rosters</h2>
+          <Switch label="Remember option sections" detail="Folded option sections stay folded the next time you open a unit." checked={toggles.rememberSections} onChange={flip('rememberSections')} />
+          <Switch label="Reopen tabs on launch" detail="Rosters open when you quit come back as tabs." checked={toggles.restoreTabs} onChange={flip('restoreTabs')} />
+        </section>
+        <section id="dtp-set-data" className="dtp-card dtp-settings-card"><h2>Game data</h2>
+          <Switch label="Check for updates automatically" detail="When the app starts and every few hours while it is open." checked={toggles.autoChecks} onChange={flip('autoChecks')} />
+          <Switch label="Choose factions when installing" detail="Install only the factions you play." checked={toggles.chooseFactions} onChange={flip('chooseFactions')} />
+          <div className="dtp-setting-line"><span><strong>Keep previous versions</strong><small>{keep === 0 ? 'Older versions are deleted after an update.' : `Uses about ${keep * 13} MB per source.`}</small></span><Segmented label="Keep previous versions" value={keep} onChange={setKeep} options={[0, 1, 2, 3].map(v => ({ value: v, label: v === 0 ? 'Off' : String(v) }))} /></div>
+        </section>
+        <section id="dtp-set-storage" className="dtp-card dtp-settings-card"><h2>Storage</h2>
+          <div className="dtp-setting-line"><span><strong>Data folder</strong><small className="dtp-mono">~/Library/Application Support/Battle Augur</small></span><button className="dtp-btn" onClick={() => notify('Opens the folder in Finder')}><FolderOpen size={14} />Show in Finder</button></div>
+          <div className="dtp-storage-bar" aria-label="Storage used"><i style={{ width: '62%' }} /><i style={{ width: '8%' }} /><i style={{ width: '4%' }} /></div>
+          <div className="dtp-legend"><span><i />Game data 53.9 MB</span><span><i />Kept versions 12.8 MB</span><span><i />Rosters 0.4 MB</span></div>
+        </section>
+        <section id="dtp-set-shortcuts" className="dtp-card dtp-settings-card"><h2>Keyboard shortcuts</h2>
+          <dl className="dtp-shortcuts">{[['Command palette', '⌘ K'], ['New roster', '⌘ N'], ['Settings', '⌘ ,'], ['Lookup', '⌘ F'], ['Close summary or dialog', 'Esc']].map(([a, k]) => <div key={a}><dt>{a}</dt><dd><kbd>{k}</kbd></dd></div>)}</dl>
+        </section>
+        <section id="dtp-set-about" className="dtp-card dtp-settings-card"><h2>About</h2>
+          <dl className="dtp-facts four"><div><dt>Version</dt><dd>1.0.0 · desktop preview</dd></div><div><dt>Engine</dt><dd>0.9.4</dd></div><div><dt>Protocol</dt><dd>12</dd></div><div><dt>SQLite</dt><dd>3.46</dd></div></dl>
+          <p className="dtp-muted">Game data and rosters stay on this device.</p>
+        </section>
+      </div>
+    </div>
+  </main>;
+}

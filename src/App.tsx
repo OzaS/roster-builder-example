@@ -23,6 +23,10 @@ const defaultTabletPanelLayout: TabletPanelLayout = { treeRatio: 0.3, railRatio:
 const workflowScreenIds = [
   "desktop-welcome",
   "desktop-editor",
+  "desktop-rosters",
+  "desktop-lookup",
+  "desktop-sources",
+  "desktop-settings",
   "library",
   "library-v2",
   "collections",

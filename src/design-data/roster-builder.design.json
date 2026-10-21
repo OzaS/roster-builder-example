@@ -333,7 +333,7 @@
       "icon": "PanelsTopLeft",
       "component": "DesktopWorkbench",
       "bestFor": "Focused desktop roster building with a searchable catalogue, persistent force outline and live unit inspector.",
-      "direction": "Borderless workspace with floating panel controls, curved tabs at the top, and a three-panel editor without an activity rail.",
+      "direction": "Borderless workspace on the shared themes and colour schemes, floating panel controls, curved tabs at the top, rounded card panels, and a roster summary popover with a points line under the tabs. Hub pages (Rosters, Lookup, Sources, Settings) use an activity rail; the editor does not.",
       "interaction": "Browse Welcome and Editor in the design gallery. Open a recent roster or create one; edit with the catalogue, force tree and inspector. Floating controls toggle panels; Command K opens actions.",
       "tradeoff": "Desktop-first exploration. Sample data and prototype-session edits; not connected to the Battle Augur engine or persistence.",
       "screens": [
@@ -344,6 +344,22 @@
         {
           "id": "desktop-editor",
           "label": "Roster editor · Three panels"
+        },
+        {
+          "id": "desktop-rosters",
+          "label": "Rosters · List and details"
+        },
+        {
+          "id": "desktop-lookup",
+          "label": "Lookup · Search and entry"
+        },
+        {
+          "id": "desktop-sources",
+          "label": "Sources · Installed data"
+        },
+        {
+          "id": "desktop-settings",
+          "label": "Settings · Sections"
         }
       ],
       "workflows": [
@@ -352,7 +368,11 @@
           "label": "Desktop workspace",
           "screens": [
             "desktop-welcome",
-            "desktop-editor"
+            "desktop-editor",
+            "desktop-rosters",
+            "desktop-lookup",
+            "desktop-sources",
+            "desktop-settings"
           ]
         },
         {
@@ -366,7 +386,7 @@
         "screens": []
       },
       "elements": {
-        "release": "Desktop 02",
+        "release": "Desktop 03",
         "groups": [
           {
             "id": "product-ui",
@@ -384,7 +404,9 @@
                 ],
                 "states": [
                   "dark",
-                  "light"
+                  "light",
+                  "system",
+                  "shared colour schemes"
                 ],
                 "screens": []
               },
@@ -403,11 +425,20 @@
                   "curved workspace tabs",
                   "curved inspector tabs",
                   "command palette",
-                  "panels hidden"
+                  "panels hidden",
+                  "hub tab",
+                  "activity rail on hub pages",
+                  "roster summary popover",
+                  "points line under tabs",
+                  "over limit"
                 ],
                 "screens": [
                   "desktop-welcome",
-                  "desktop-editor"
+                  "desktop-editor",
+                  "desktop-rosters",
+                  "desktop-lookup",
+                  "desktop-sources",
+                  "desktop-settings"
                 ]
               },
               {
@@ -503,6 +534,42 @@
                 "screens": [
                   "desktop-editor"
                 ]
+              },
+              {
+                "id": "desktop.rosters",
+                "title": "Roster List & Details",
+                "level": "screen-composition",
+                "status": "needs-review",
+                "platforms": ["desktop"],
+                "states": ["selected", "search", "needs attention", "system filter", "sort", "no matches", "rename", "duplicate", "delete confirm", "issues", "data changed", "faction removed", "over limit"],
+                "screens": ["desktop-rosters"]
+              },
+              {
+                "id": "desktop.lookup",
+                "title": "Lookup Results & Entry",
+                "level": "screen-composition",
+                "status": "needs-review",
+                "platforms": ["desktop"],
+                "states": ["grouped results", "scope chips", "no results", "unit", "rule", "equipment", "conditional cost", "in your rosters"],
+                "screens": ["desktop-lookup"]
+              },
+              {
+                "id": "desktop.sources",
+                "title": "Sources & Source Detail",
+                "level": "screen-composition",
+                "status": "needs-review",
+                "platforms": ["desktop"],
+                "states": ["update available", "update all", "updating", "up to date", "review", "from a file", "kept versions", "add game data", "remove confirm"],
+                "screens": ["desktop-sources"]
+              },
+              {
+                "id": "desktop.settings",
+                "title": "Settings Sections",
+                "level": "screen-composition",
+                "status": "needs-review",
+                "platforms": ["desktop"],
+                "states": ["theme", "colour scheme", "import scheme", "language", "switches", "keep versions", "storage", "shortcuts", "about"],
+                "screens": ["desktop-settings"]
               }
             ]
           }
