@@ -441,7 +441,9 @@
                   "centre sheet with rounded inner corners",
                   "resizable side panels",
                   "width-aware panel content",
-                  "ambient gradient (gallery switch)"
+                  "ambient gradient (gallery switch)",
+                  "read-only roster tab",
+                  "command palette prototype states"
                 ],
                 "screens": [
                   "desktop-welcome",
@@ -482,7 +484,9 @@
                   "search",
                   "role filter",
                   "no results",
-                  "add"
+                  "add",
+                  "add to force picker",
+                  "nothing to add (read-only)"
                 ],
                 "screens": [
                   "desktop-editor"
@@ -502,11 +506,58 @@
                   "empty",
                   "over budget",
                   "duplicate",
-                  "remove"
+                  "remove",
+                  "several forces",
+                  "read-only"
                 ],
                 "screens": [
                   "desktop-editor"
                 ]
+              },
+              {
+                "id": "desktop.forces",
+                "title": "Several Forces & Add Force",
+                "level": "composite",
+                "status": "needs-review",
+                "platforms": ["desktop"],
+                "states": ["force section with its own groups and points", "force selected for adding (Adding here)", "catalogue Add to picker", "add force dialog", "force type with description", "disabled force type with reason", "faction and name", "rename inline", "remove with Undo", "last force cannot be removed"],
+                "screens": ["desktop-editor"]
+              },
+              {
+                "id": "desktop.undo",
+                "title": "Undo & Redo",
+                "level": "control",
+                "status": "needs-review",
+                "platforms": ["desktop"],
+                "states": ["undo / redo buttons in the force heading", "titles name the step", "⌘Z / ⇧⌘Z (editable bindings)", "text fields keep their own undo", "nothing to undo (disabled)", "toast with Redo after Undo", "toast Undo after add, duplicate, remove"],
+                "screens": ["desktop-editor"]
+              },
+              {
+                "id": "desktop.export",
+                "title": "Export Dialog",
+                "level": "overlay",
+                "status": "needs-review",
+                "platforms": ["desktop"],
+                "states": ["roster file (.json)", "text for sharing with preview", "print view (.html) preview", "include rules", "include profiles", "options disabled for the roster file", "Save file…", "Copy text", "result toast", "read-only export as it was"],
+                "screens": ["desktop-editor"]
+              },
+              {
+                "id": "desktop.import-result",
+                "title": "Import Result",
+                "level": "overlay",
+                "status": "needs-review",
+                "platforms": ["desktop"],
+                "states": ["everything matched", "parts did not match", "not-found entries with where they were", "matched / not found / points", "Open roster", "Open without them", "Cancel"],
+                "screens": ["desktop-editor"]
+              },
+              {
+                "id": "desktop.read-only",
+                "title": "Read-only Roster",
+                "level": "composite",
+                "status": "needs-review",
+                "platforms": ["desktop"],
+                "states": ["banner with reason", "Duplicate to edit", "Find game data (Sources)", "Export as it was", "catalogue: nothing to add", "editing disabled with reason on hover", "lock in the tab", "validation not checked"],
+                "screens": ["desktop-editor"]
               },
               {
                 "id": "desktop.inspector",
@@ -522,7 +573,8 @@
                   "rules",
                   "count limit",
                   "upgrade selected",
-                  "notes"
+                  "notes",
+                  "read-only (disabled with reason)"
                 ],
                 "screens": [
                   "desktop-editor"
@@ -540,7 +592,11 @@
                   "valid",
                   "missing required units",
                   "over budget",
-                  "expanded"
+                  "expanded",
+                  "issue list with where",
+                  "Show selects and scrolls to the unit or group",
+                  "per-force requirements",
+                  "not checked while read-only"
                 ],
                 "screens": [
                   "desktop-editor"
@@ -552,7 +608,7 @@
                 "level": "overlay",
                 "status": "needs-review",
                 "platforms": ["desktop"],
-                "states": ["functional toast top right", "undo action", "notification bottom right", "dismiss"],
+                "states": ["functional toast top right", "undo action", "notification bottom right", "dismiss", "undo / redo result"],
                 "screens": ["desktop-editor", "desktop-rosters", "desktop-sources"]
               },
               {
