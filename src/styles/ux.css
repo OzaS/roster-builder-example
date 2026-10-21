@@ -6009,12 +6009,14 @@ button.ux-reference-tag:focus-visible {
 .ux-mobile-unit-options button { color: inherit; background: none; border: none; cursor: pointer; }
 .ux-mobile-unit-options button:disabled { opacity: .45; cursor: default; }
 .ux-5a-header, .ux-5a-context, .ux-5a-section-title { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.ux-5a-header { justify-content: flex-start; font-size: 18px; }
+.ux-mobile-unit-options > .ux-5a-header { position: sticky; top: -16px; z-index: 1; background: var(--ux-bg); margin: -16px -16px 0; padding: 8px 16px; font-size: 18px; justify-content: flex-start; }
 .ux-5a-header button, .ux-mobile-unit-options nav button { min-height: 44px; }
 .ux-mobile-unit-options nav { display: flex; align-items: center; gap: 8px; font-size: 12px; }
 .ux-mobile-unit-options nav button, .ux-mobile-unit-options .ux-5a-link { color: var(--ux-accent); }
 .ux-5a-context { color: var(--ux-ink-secondary); font-size: 13px; }
-.ux-5a-context > span:first-child { flex: 1; }
+.ux-5a-context { flex-wrap: wrap; }
+.ux-5a-context > span:first-child { flex: 1 1 120px; min-width: 0; overflow-wrap: anywhere; }
+.ux-5a-options:not([hidden]) { display: flex; flex-direction: column; gap: 12px; }
 .ux-5a-progress { display: inline-flex; width: 16px; height: 16px; color: var(--ux-ink-secondary); }
 .ux-5a-progress svg { animation: ux-5a-spin 0.9s linear infinite; }
 @keyframes ux-5a-spin { to { transform: rotate(360deg); } }
@@ -6022,6 +6024,7 @@ button.ux-reference-tag:focus-visible {
 .ux-5a-budget { height: 5px; border-radius: 99px; background: var(--ux-surface-3); overflow: hidden; }
 .ux-5a-budget > div { height: 100%; background: var(--ux-accent); }
 .ux-5a-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.ux-5a-chips > span { border-radius: 12px; max-width: 100%; box-sizing: border-box; white-space: normal; overflow-wrap: anywhere; }
 .ux-5a-card { display: flex; flex-direction: column; gap: 10px; padding: 16px; background: var(--ux-surface); border: 1px solid var(--ux-line); border-radius: 18px; }
 .ux-mobile-unit-options .ux-5a-model-title { display: flex; justify-content: space-between; gap: 12px; text-align: left; min-height: 44px; }
 .ux-mobile-unit-options .ux-5a-model-title strong { font-size: 16px; }

@@ -273,6 +273,7 @@ function WorkbenchElements({
       </ElementSection>
 
       <ElementSection title="Unit Options · Mobile 5A">
+        <small className="ux-elements-note">UX-015/017/019/021: categories follow the content; Profile needs profiles or rules. Open Other options → Configure Drills: Back returns to Lancers. Training shares one radio choice across its folded child groups with a single outer None; quantities and independent checkboxes remain.</small>
         <div className="ux-elements-stack"><MobileUnitOptions compact /><MobileUnitOptions state="loading" compact /><MobileUnitOptions state="error" compact /><MobileUnitOptions state="gone" compact /></div>
       </ElementSection>
 
@@ -285,14 +286,14 @@ function WorkbenchElements({
       </ElementSection>
 
       <ElementSection title="Model Stack Split and Selection Controls">
-        <small>Radio: one of several, optional None. Checkbox: independent optional picks, including a single option or nothing. Switch: immediate Settings only. Stepper: counts. Visible glyphs 21–22 px; target 48 px (≥44 pt / 48 dp). Restart restores selection, tab, category, hidden entries and folds; pending edits and split drafts reset. Controls reload from the worker.</small>
+        <small>Radio: one of several; max-one ancestors share that choice across nested alternatives, with None only on the outer group. Checkbox: independent optional picks, including a single option or nothing. Switch: immediate Settings only. Stepper: counts. Visible glyphs 21–22 px; target 48 px (≥44 pt / 48 dp). Restart restores selection, tab, hidden entries and folds; pending edits and split drafts reset. Controls reload from the worker.</small>
         <div className="ux-mobile-unit-options"><ModelStackSamples /></div>
       </ElementSection>
 
       <ElementSection title="Unit Profile Tab · Mobile 5B">
         <div style={{ display: "grid", gap: 10 }}>
-          <small className="ux-elements-note">Built (plan 5B): Options | Profile tabs under the header chips. Profile: one card per profile type, horizontal scroll when wide, columns sized to their text; text columns (descriptions) are left-aligned and take the room left. Rules open on tap when they have a description. Categories close the tab. On Options a category chip opens Profile with that category marked.</small>
-          <div className="ux-elements-stack"><MobileUnitOptions compact initialTab="profile" /></div>
+          <small className="ux-elements-note">Built (UX-015/017): Options | Profile tabs below type/cost and budget, only when displayable profiles or rules exist. Profiles-only and rules-only both retain Profile; Drills has neither and omits it. Profile: one card per profile type, horizontal scroll when wide, columns sized to their text; text columns (descriptions) are left-aligned and take the room left. Rules open on tap when they have a description. Plain category labels close either tab and wrap across lines. A nested header Back returns to the mounted parent, keeping its scroll and edits (UX-019).</small>
+          <div className="ux-elements-stack"><MobileUnitOptions compact initialTab="profile" /><MobileUnitOptions compact initialTab="profile" profileContent="profiles" /><MobileUnitOptions compact initialTab="profile" profileContent="rules" /><MobileUnitOptions compact initialDrilled initialTab="profile" /></div>
         </div>
       </ElementSection>
 
