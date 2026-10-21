@@ -1395,23 +1395,21 @@ function ElementSection({ title, children }: { title: string; children: React.Re
   );
 }
 
-/** Plan 3D: synthetic 58-slot force. Unavailable empty slots never become rows. */
+/** UX-002 (2026-10-21): synthetic 58-slot force. Every section the force can take is listed; unavailable ones never become rows. */
 function ManySlotsElement() {
-  const [expanded, setExpanded] = useState(false);
   const slots = [
-    { name: "Configuration", usage: "1/1", note: "Option A", shown: true },
-    { name: "Required slot", usage: "0/1", note: "Below minimum", shown: true },
-    { name: "Occupied slot", usage: "1/0", note: "Above maximum · Unit A", shown: true },
-    { name: "Cost-limited slot", usage: "0/0", note: "Cost limit exceeded", shown: true },
-    ...Array.from({ length: 11 }, (_, i) => ({ name: `Optional slot ${i + 1}`, usage: "0/4", note: "", shown: false })),
+    { name: "Configuration", usage: "1/1", note: "Option A" },
+    { name: "Required slot", usage: "0/1", note: "Below minimum" },
+    { name: "Occupied slot", usage: "1/0", note: "Above maximum · Unit A" },
+    { name: "Cost-limited slot", usage: "0/0", note: "Cost limit exceeded" },
+    ...Array.from({ length: 11 }, (_, i) => ({ name: `Optional slot ${i + 1}`, usage: "0/4", note: "+ Add unit" })),
   ];
   return <div className="ux-force-sections" aria-label="Many-slot force">
-    <p>58 slots: occupied, required and broken slots stay visible. The 43 empty unavailable slots stay hidden, including with Show all.</p>
-    {slots.filter(slot => slot.shown || expanded).map(slot => <div className="ux-tree-branch" key={slot.name}>
-      <div className="ux-tree-section"><ChevronRight size={14} /><strong>{slot.name}</strong><small>{slot.usage}</small></div>
+    <p>58 slots: the 15 sections this force can take are listed, empty or not (occupied, required, broken, and 11 empty sections with entries to add). The 43 sections it cannot take (maximum 0 or nothing to add) are never shown. No Show all slots control.</p>
+    {slots.map(slot => <div className="ux-tree-branch" key={slot.name}>
+      <div className="ux-tree-section"><ChevronDown size={14} /><strong>{slot.name}</strong><small>{slot.usage}</small></div>
       {slot.note ? <small>{slot.note}</small> : null}
     </div>)}
-    <button type="button" className="ux-pool-hidden" aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>{expanded ? "Show fewer slots" : "Show all slots (11)"}</button>
-    <p>Each force has its own toggle; configuration and nested forces retain their order. Expansion survives model updates while the roster is open.</p>
+    <p>Configuration and nested forces retain their order; collapse choices survive model updates while the roster is open.</p>
   </div>;
 }
