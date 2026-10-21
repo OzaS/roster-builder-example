@@ -46,7 +46,7 @@ export function useDesktopJobs(initial: SourceInfo[], notify: Notify, onViewSour
       after.forEach(job => {
         if (job.status !== 'done' || before.find(b => b.id === job.id)?.status === 'done') return;
         if (job.kind === 'update') {
-          setSources(list => list.map(s => s.id === job.sourceId ? { ...s, version: s.next ?? s.version, next: undefined, status: 'ready', kept: [s.version, ...(s.kept ?? [])].slice(0, 2), installed: 'Just now' } : s));
+          setSources(list => list.map(s => s.id === job.sourceId ? { ...s, version: s.next ?? s.version, next: undefined, status: 'ready', kept: [s.version, ...(s.kept ?? [])].slice(0, 2), installed: 'Just now', lastUpdate: { from: s.version, to: s.next ?? s.version, when: 'just now', check: 'done', done: s.rosters.length } } : s));
           notify(`${job.name} updated. 5 rosters checked, 1 changed.`, { kind: 'notification', action: { label: 'View', run: () => onViewSource(job.sourceId) } });
         } else {
           setSources(list => [...list.filter(s => s.id !== job.sourceId), { id: job.sourceId, name: job.name, factions: job.chosen, repo: `example/${job.sourceId}`, version: 'v1.0', installed: 'Just now', upstream: 'Oct 18', checked: 'Just now', size: job.size, documents: job.chosen.length + 1, status: 'ready', rosters: [] }]);
