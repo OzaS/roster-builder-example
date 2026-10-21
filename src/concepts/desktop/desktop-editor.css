@@ -1,0 +1,133 @@
+/* Roster editor flows (revision 05): export, import result, several forces, read-only, undo/redo, validation details.
+   Colours come only from theme tokens (--dt-* → --ux-*). */
+
+/* Panel heading actions: undo / redo / validation */
+.dte-heading-actions, .dte-history { display: inline-flex; align-items: center; gap: 2px }
+.dte-history { padding-right: 4px; margin-right: 2px; border-right: 1px solid var(--dt-border) }
+.dt-app .dte-history .dt-icon:disabled { opacity: .35 }
+
+/* Several forces */
+.dte-force + .dte-force { margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--ux-line-2) }
+.dt-app .dte-force-heading { margin: 0 0 10px; padding: 8px 10px 8px 12px; gap: 8px; border: 1px solid transparent }
+.dt-app .dte-force-heading.active { border-color: color-mix(in srgb, var(--dt-fill) 45%, transparent); background: var(--dt-selected) }
+.dt-app .dte-force-name { flex: 1; min-width: 0; flex-direction: column; align-items: flex-start; gap: 3px; padding: 4px 6px; border-radius: 8px; text-align: left }
+.dt-app .dte-force-name:hover { background: color-mix(in srgb, var(--dt-text) 5%, transparent) }
+.dte-force-name strong { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500 }
+.dte-force-name small { font-size: 9px; color: var(--dt-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100% }
+.dte-force-name .dtp-chip { height: 18px; font-size: 10px; padding: 0 7px }
+.dte-force-tools { display: inline-flex; gap: 0; opacity: 0; transition: opacity .12s }
+.dte-force-heading:hover .dte-force-tools, .dte-force-heading:focus-within .dte-force-tools, .dte-force-heading.active .dte-force-tools { opacity: 1 }
+.dte-force-points { font-size: 11px; white-space: nowrap; font-variant-numeric: tabular-nums }
+.dte-force-points small { color: var(--dt-muted) }
+.dt-app .dte-rename { flex: 1; min-width: 0; font-size: 12px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--dt-accent); background: var(--dt-bg); color: var(--dt-text); outline: none }
+.dt-app .dt-add-force:disabled { opacity: .45 }
+
+/* Catalogue target force */
+.dte-target { display: flex; align-items: center; gap: 8px; margin: -2px 0 8px; padding: 6px 8px; border-radius: 10px; background: var(--dt-selected); font-size: 10px; color: var(--dt-muted) }
+.dte-target select { flex: 1; min-width: 0; border: 0; background: none; color: var(--dt-accent); font-size: 11px; font-weight: 500 }
+
+/* Flash on reveal */
+@keyframes dte-flash { 0% { box-shadow: 0 0 0 2px var(--dt-accent) } 100% { box-shadow: 0 0 0 2px transparent } }
+.dte-flash { animation: dte-flash 1.2s ease-out }
+@media (prefers-reduced-motion: reduce) { .dte-flash { animation: none } }
+
+/* Validation details */
+.dte-checks { list-style: none; max-height: 220px; overflow: auto }
+ul.dte-checks { padding: 6px 8px 6px 14px }
+.dte-checks li { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-top: 1px solid var(--dt-border) }
+.dte-checks li:first-child { border-top: 0 }
+.dte-checks li > svg { color: var(--dt-warn) }
+.dte-checks li > span { flex: 1; min-width: 0 }
+.dte-checks strong { display: block; font-size: 11px; font-weight: 500; color: var(--dt-text) }
+.dte-checks small { display: block; font-size: 10px; color: var(--dt-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+
+/* Read-only */
+.dte-readonly { display: flex; gap: 12px; margin: 0 12px 12px; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--ux-line-2); background: var(--dt-hover); outline: none }
+.dte-readonly:focus-visible { box-shadow: 0 0 0 2px var(--dt-accent) }
+.dte-readonly > svg { color: var(--dt-muted); margin-top: 1px }
+.dte-readonly strong { font-size: 13px; font-weight: 600 }
+.dt-app .dte-readonly p { font-size: 11px; color: var(--dt-muted); margin-top: 2px; line-height: 1.5 }
+.dte-readonly-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px }
+.dte-fieldset { border: 0; margin: 0; min-width: 0; min-inline-size: 0 }
+.dte-fieldset:disabled { opacity: .62 }
+.dte-catalogue-empty { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; padding: 40px 22px; color: var(--dt-muted) }
+.dt-app .dte-catalogue-empty h3 { font-size: 13px; font-weight: 600; color: var(--dt-text); margin-top: 4px }
+.dt-app .dte-catalogue-empty p { font-size: 11px; line-height: 1.5; margin-bottom: 6px }
+.dt-app .dt-unit-actions button:disabled, .dt-app .dt-add-empty:disabled { opacity: .4 }
+
+/* Command palette with prototype states scrolls */
+.dt-modal[aria-label="Command palette"] { max-height: calc(100% - 160px); overflow: auto }
+
+/* Dialogs */
+.dt-app .dte-scrim { padding-top: 70px }
+.dt-app .dte-dialog { width: min(520px, calc(100% - 60px)); padding: 0; display: flex; flex-direction: column; max-height: calc(100% - 84px); overflow: hidden }
+.dt-app .dte-dialog.wide { width: min(900px, calc(100% - 60px)) }
+.dt-app .dte-dialog > .dte-head { margin-bottom: 0 }
+.dte-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 18px 20px 12px; border-bottom: 1px solid var(--dt-border) }
+.dt-app .dte-head h2 { font-size: 17px; font-weight: 600 }
+.dt-app .dte-head p { font-size: 12px; color: var(--dt-muted); margin-top: 2px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap }
+.dte-foot { display: flex; align-items: center; gap: 8px; padding: 12px 18px; border-top: 1px solid var(--dt-border); flex-shrink: 0 }
+.dte-foot > :first-child { margin-right: auto }
+.dte-form { display: flex; flex-direction: column; min-height: 0; flex: 1 }
+.dt-app .dte-hint { font-size: 11px; color: var(--dt-faint); line-height: 1.45 }
+.dte-label { margin: 0 0 8px; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--dt-faint); font-weight: 600 }
+
+/* Export */
+.dte-export { display: grid; grid-template-columns: 300px minmax(0, 1fr); min-height: 0; flex: 1 }
+.dte-export-side { padding: 16px 18px; border-right: 1px solid var(--dt-border); overflow: auto }
+.dte-export-side .dte-label + .dt-choice-list { margin-bottom: 18px }
+.dt-app .dte-export .dt-choice-list > button { justify-content: flex-start; gap: 10px; align-items: flex-start }
+.dte-export .dt-choice-list > button > span:nth-child(2) { flex: 1 }
+.dte-choice-icon { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; background: var(--dt-hover); color: var(--dt-muted); flex-shrink: 0 }
+.dt-choice-list > button.active .dte-choice-icon { color: var(--dt-accent); background: var(--dt-pane) }
+.dte-options { display: flex; flex-direction: column; gap: 4px }
+.dte-options label { display: flex; align-items: flex-start; gap: 10px; padding: 8px 10px; border-radius: 10px; cursor: pointer }
+.dte-options label:hover { background: var(--dt-hover) }
+.dte-options label.disabled { cursor: default; opacity: .5 }
+.dte-options label.disabled:hover { background: none }
+.dte-options input { margin-top: 3px; accent-color: var(--dt-fill) }
+.dte-options strong { display: block; font-size: 12px; font-weight: 500 }
+.dte-options small { display: block; font-size: 11px; color: var(--dt-muted) }
+.dte-options .dte-hint { padding: 2px 10px 0 }
+.dte-export-preview { display: flex; flex-direction: column; min-width: 0; min-height: 0; padding: 16px 18px; background: var(--dt-bg) }
+.dte-preview-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 11px; color: var(--dt-muted) }
+.dte-preview-head .dte-label { margin: 0 }
+.dte-pre, .dte-paper { flex: 1; min-height: 0; height: 420px; overflow: auto; margin: 8px 0 0; border: 1px solid var(--dt-border); border-radius: 12px; outline: none }
+.dte-pre:focus-visible, .dte-paper:focus-visible { box-shadow: 0 0 0 2px var(--dt-accent) }
+.dte-pre { padding: 12px 14px; font: 11px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--dt-text); background: var(--dt-pane); white-space: pre-wrap; user-select: text }
+.dte-paper { padding: 22px 26px; background: var(--ux-surface-2); color: var(--dt-text); font-family: Georgia, "Times New Roman", serif }
+.dt-app .dte-paper h4 { margin: 0; font-size: 20px; font-weight: 600 }
+.dte-paper-meta { font-size: 11px; color: var(--dt-muted); margin: 2px 0 14px !important }
+.dt-app .dte-paper h5 { margin: 14px 0 6px; padding-bottom: 4px; border-bottom: 1px solid var(--ux-line-2); font-size: 13px; display: flex; justify-content: space-between; gap: 10px }
+.dte-paper h5 span { font-weight: 400; color: var(--dt-muted); font-size: 11px }
+.dte-paper-unit { display: grid; grid-template-columns: 1fr auto; gap: 0 10px; padding: 5px 0; font-size: 12px }
+.dte-paper-unit small, .dte-paper-unit em { grid-column: 1 / -1; font-size: 11px; color: var(--dt-muted) }
+.dte-paper-unit em { font-style: normal; font-family: ui-monospace, Menlo, monospace; font-size: 10px }
+.dt-app .dte-paper p { font-size: 11px; margin: 4px 0 }
+
+/* Import result */
+.dte-import { padding: 16px 20px 18px; overflow: auto; min-height: 0; flex: 1 }
+.dte-import-roster { display: flex; align-items: center; gap: 12px }
+.dte-import-roster strong { display: block; font-size: 14px; font-weight: 600 }
+.dte-import-roster small { display: block; font-size: 11px; color: var(--dt-muted) }
+.dte-import .dtp-notice { margin: 14px 0 }
+.dte-import-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0 0 16px }
+.dte-import-stats div { padding: 10px 12px; border-radius: 12px; background: var(--dt-hover) }
+.dte-import-stats dt { font-size: 10px; letter-spacing: .8px; text-transform: uppercase; color: var(--dt-faint) }
+.dte-import-stats dd { margin: 2px 0 0; font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums }
+.dte-import-stats dd.warn { color: var(--dt-warn) }
+.dte-import-stats dd small { font-size: 11px; font-weight: 400; color: var(--dt-muted) }
+.dte-import .dtp-rows + .dte-hint { margin-top: 10px }
+
+/* Add force */
+.dte-addforce { padding: 16px 20px 6px; overflow: auto; min-height: 0; flex: 1; display: flex; flex-direction: column; gap: 4px }
+.dte-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px }
+.dt-app .dte-field { font-size: 11px; margin-bottom: 14px }
+.dt-app .dte-field select, .dt-app .dte-field input { font-size: 13px; padding: 9px 10px; border-radius: 9px }
+.dte-type-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px }
+.dte-type-head .dte-label { margin: 0 }
+.dt-app .dte-search { height: 28px; max-width: 180px; border-radius: 8px }
+.dte-addforce .dt-choice-list { margin-bottom: 14px }
+.dt-app .dt-choice-list > button.blocked { cursor: not-allowed; opacity: .55; border-style: dashed }
+.dt-app .dt-choice-list > button.blocked:hover { background: none }
+.dt-choice-list small.dte-reason { display: flex; align-items: center; gap: 5px; color: var(--dt-warn); margin-top: 3px }
