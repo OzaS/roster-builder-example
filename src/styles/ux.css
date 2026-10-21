@@ -6136,6 +6136,7 @@ button.ux-reference-tag:focus-visible {
 .ux-fold-head > span { flex: 1; display: flex; flex-direction: column; gap: 2px; }
 .ux-fold-head strong { color: var(--ux-ink-secondary); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
 .ux-fold-head svg { flex-shrink: 0; color: var(--ux-ink-secondary); }
+.ux-mobile-unit-options .ux-fold-head .ux-fold-summary { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; color: var(--ux-ink-secondary); font-size: 13px; line-height: 1.3; }
 .ux-fold-nested { border-left: 2px solid var(--ux-line); padding-left: 12px; }
 .ux-tree-link-caption { display: block; color: var(--ux-ink-secondary); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
