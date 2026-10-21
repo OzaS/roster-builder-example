@@ -6225,3 +6225,10 @@ button.ux-guided-option { justify-content: flex-start; }
 /* UX-006: roster checks are checkboxes; all selection/count targets meet phone minima. */
 .ux-mobile-unit-options button, .ux-5a-count button { min-width: 48px; min-height: 48px; }
 .ux-5a-choice[role="checkbox"] { width: 100%; text-align: left; background: transparent; color: inherit; }
+
+/* Explicit Back on nested unit details (2026-10-21). */
+.ux-nested-back.ios button { display: inline-flex; align-items: center; gap: 0; max-width: 45%; color: var(--ux-accent); font-size: 17px; margin-left: -8px; }
+.ux-nested-back.ios button span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ux-nested-title { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
+.ux-nested-title strong { font-size: 20px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ux-nested-title small { font-size: 14px; color: var(--ux-ink-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

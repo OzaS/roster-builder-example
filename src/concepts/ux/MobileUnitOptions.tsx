@@ -1,9 +1,9 @@
-import { AlertTriangle, ArrowLeft, CheckCircle2, ChevronDown, ChevronRight, Circle, CircleDot, Square, SquareCheck, LoaderCircle, Minus, Plus } from "lucide-react";
+import { AlertTriangle, ArrowLeft, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Circle, CircleDot, Square, SquareCheck, LoaderCircle, Minus, Plus } from "lucide-react";
 import { type ReactNode, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 /** Implemented mobile unit detail: 5A options, 5B Profile tab, bottom categories, and links (associations). Synthetic names and costs; later detail features stay in the original design.
  * UX-004: a command in flight shows only a spinner in room kept next to the cost and never dims or inserts rows; optional one-of groups always list None first. UX-003: a count pinned at min = max has no stepper. */
-export function MobileUnitOptions({ onBack, state = "ready", compact = false, initialTab = "options", initialDrilled = false, profileContent = "both" }: { onBack?: () => void; state?: "ready" | "loading" | "error" | "gone"; compact?: boolean; initialTab?: "options" | "profile"; initialDrilled?: boolean; profileContent?: "both" | "profiles" | "rules" | "none" }) {
+export function MobileUnitOptions({ onBack, state = "ready", compact = false, initialTab = "options", initialDrilled = false, profileContent = "both", backStyle = "ios" }: { onBack?: () => void; state?: "ready" | "loading" | "error" | "gone"; compact?: boolean; initialTab?: "options" | "profile"; initialDrilled?: boolean; profileContent?: "both" | "profiles" | "rules" | "none"; backStyle?: "ios" | "android" }) {
   const [modelCost, setModelCost] = useState(70);
   const [guns, setGuns] = useState(2);
   const [banner, setBanner] = useState(true);
@@ -38,7 +38,8 @@ export function MobileUnitOptions({ onBack, state = "ready", compact = false, in
   if (state === "loading") return <section className="ux-mobile-unit-options"><p role="status">Loading options…</p><div className="ux-5a-skeleton" /><div className="ux-5a-skeleton" /><div className="ux-5a-skeleton" /></section>;
   if (state === "gone") return <section className="ux-mobile-unit-options"><div className="ux-5a-notice" role="alert"><AlertTriangle size={18} /><strong>This selection is no longer in the roster</strong></div><button type="button" onClick={onBack}>Back to roster</button></section>;
   return <section ref={frame} className={`ux-mobile-unit-options ${compact ? "compact" : ""}`}>
-    {!compact || drilled ? <header className="ux-5a-header"><button type="button" onClick={drilled ? () => setDrilled(false) : onBack} aria-label={drilled ? "Back to Lancers" : "Back to roster"}><ArrowLeft size={20} /></button><strong>{drilled ? "Drills" : "Lancers"}</strong></header> : null}
+    {/* Explicit Back on nested details (2026-10-21): iOS names the parent on the Back button ("‹ Lancers", the system shortens it when tight); Android adds "in Lancers" under the title, next to the Up arrow. Top level keeps the arrow only. */}
+    {!compact || drilled ? <header className={`ux-5a-header${drilled ? ` ux-nested-back ${backStyle}` : ""}`}><button type="button" onClick={drilled ? () => setDrilled(false) : onBack} aria-label={drilled ? "Back to Lancers" : "Back to roster"}>{drilled && backStyle === "ios" ? <><ChevronLeft size={24} /><span>Lancers</span></> : <ArrowLeft size={20} />}</button>{drilled && backStyle === "android" ? <span className="ux-nested-title"><strong>Drills</strong><small>in Lancers</small></span> : <strong>{drilled ? "Drills" : "Lancers"}</strong>}</header> : null}
     {drilled ? <nav aria-label="Selection path"><button type="button" onClick={() => setDrilled(false)}>Lancers</button><ChevronRight size={13} /><span>Drills</span></nav> : null}
     <div className="ux-5a-context"><span>{drilled ? "Upgrade" : "Line"}</span><span className="ux-5a-progress" role="status" aria-label={busy ? "Updating options" : undefined}>{busy ? <LoaderCircle size={16} /> : null}</span><strong>{drilled ? (drills && drill !== undefined ? 5 : 0) : total} Credits</strong></div>
     <div className="ux-5a-budget"><div style={{ width: `${Math.min(100, total / 2)}%` }} /></div>
