@@ -59,8 +59,8 @@ ul.dte-checks { padding: 6px 8px 6px 14px }
 .dt-modal[aria-label="Command palette"] { max-height: calc(100% - 160px); overflow: auto }
 
 /* Dialogs */
-.dte-scrim { padding-top: 70px }
-.dt-app .dte-dialog { width: min(520px, calc(100% - 60px)); padding: 0; display: flex; flex-direction: column; max-height: calc(100% - 100px); overflow: hidden }
+.dt-app .dte-scrim { padding-top: 70px }
+.dt-app .dte-dialog { width: min(520px, calc(100% - 60px)); padding: 0; display: flex; flex-direction: column; max-height: calc(100% - 84px); overflow: hidden }
 .dt-app .dte-dialog.wide { width: min(900px, calc(100% - 60px)) }
 .dt-app .dte-dialog > .dte-head { margin-bottom: 0 }
 .dte-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 18px 20px 12px; border-bottom: 1px solid var(--dt-border) }
