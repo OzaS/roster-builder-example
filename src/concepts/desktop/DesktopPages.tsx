@@ -4,6 +4,8 @@ import { AlertTriangle, ArrowDownToLine, ArrowRight, ArrowUpCircle, BookOpen, Ch
 import type { ColorScheme } from '../../types';
 import { collectionSources, colourSchemes, installedSources, lookupEntries, rosterLibrary, type LookupKind, type RosterSummary, type SourceInfo } from './desktopData';
 import { comboFromEvent, defaultBindings, formatCombo, hasCommandModifier, keyActions, type KeyAction, type KeyBindings } from './desktopKeys';
+import type { DesktopJobs, InstallEntry } from './DesktopJobs';
+import { jobPercent } from './DesktopJobs';
 import './desktop-pages.css';
 
 export type ToastOptions = { kind?: 'action' | 'notification'; action?: { label: string; run: () => void } };
@@ -35,13 +37,13 @@ const statusChip = (r: RosterSummary) => r.status === 'issues' ? <Chip tone="war
 
 /* ------------------------------ Rosters ------------------------------ */
 
-export function DesktopRosters({ onOpen, onCreate, onImport, notify, actionSlot }: { onOpen: (name: string) => void; onCreate: () => void; onImport: () => void; notify: Notify; actionSlot: HTMLElement | null }) {
-  const [rosters, setRosters] = useState(rosterLibrary);
+export function DesktopRosters({ initialRosters, onOpen, onCreate, onImport, notify, actionSlot }: { initialRosters: RosterSummary[]; onOpen: (name: string) => void; onCreate: () => void; onImport: () => void; notify: Notify; actionSlot: HTMLElement | null }) {
+  const [rosters, setRosters] = useState(initialRosters);
   const [query, setQuery] = useState('');
   const [attention, setAttention] = useState(false);
   const [system, setSystem] = useState('All game systems');
   const [sort, setSort] = useState('Recently opened');
-  const [selected, setSelected] = useState(rosterLibrary[0].name);
+  const [selected, setSelected] = useState(initialRosters[0]?.name ?? '');
   const [renaming, setRenaming] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const needsAttention = (r: RosterSummary) => r.status === 'data-changed' || r.status === 'faction-removed';
@@ -77,7 +79,8 @@ export function DesktopRosters({ onOpen, onCreate, onImport, notify, actionSlot 
             <span>{statusChip(r)}</span>
             <span className="dtp-muted">{r.opened}</span>
           </button>)}
-          {!visible.length && <div className="dtp-empty"><Search size={22} /><strong>No rosters match</strong><p>Try another name, or clear the filters.</p><button className="dtp-btn" onClick={() => { setQuery(''); setAttention(false); setSystem('All game systems'); }}>Clear filters</button></div>}
+          {!rosters.length && <div className="dtp-empty"><Layers3 size={22} /><strong>No rosters yet</strong><p>Create a roster, or import one from a file.</p><span className="dtp-row-actions"><button className="dtp-btn primary" onClick={onCreate}><Plus size={15} />New roster</button><button className="dtp-btn" onClick={onImport}><FileUp size={15} />Import</button></span></div>}
+          {rosters.length > 0 && !visible.length && <div className="dtp-empty"><Search size={22} /><strong>No rosters match</strong><p>Try another name, or clear the filters.</p><button className="dtp-btn" onClick={() => { setQuery(''); setAttention(false); setSystem('All game systems'); }}>Clear filters</button></div>}
         </div>
         <footer className="dtp-list-foot">{rosters.length} rosters stored on this device · double-click a roster to open it in a tab</footer>
       </section>
@@ -143,24 +146,16 @@ export function DesktopLookup({ onOpenRoster }: { onOpenRoster: (name: string) =
 
 /* ------------------------------ Sources ------------------------------ */
 
-export function DesktopSources({ notify, actionSlot }: { notify: Notify; actionSlot: HTMLElement | null }) {
-  const [sources, setSources] = useState(installedSources);
-  const [selectedId, setSelectedId] = useState<string>('open-field');
-  const [progress, setProgress] = useState<Record<string, number>>({});
+export function DesktopSources({ notify, actionSlot, jobs, selectedId, onSelect, onOpenJobs }: { notify: Notify; actionSlot: HTMLElement | null; jobs: DesktopJobs; selectedId: string; onSelect: (id: string) => void; onOpenJobs: () => void }) {
+  const { sources, setSources } = jobs;
+  const setSelectedId = onSelect;
+  const progress: Record<string, number> = Object.fromEntries(sources.flatMap(s => { const p = jobs.progressOf(s.id); return p ? [[s.id, p.percent]] : []; }));
   const [link, setLink] = useState('');
   const [confirmRemove, setConfirmRemove] = useState(false);
   useEffect(() => { setConfirmRemove(false); }, [selectedId]);
-  useEffect(() => {
-    const running = Object.keys(progress);
-    if (!running.length) return;
-    const timer = setTimeout(() => {
-      const next: Record<string, number> = {};
-      running.forEach(id => { const p = progress[id] + 20; if (p < 100) next[id] = p; else { setSources(list => list.map(s => s.id === id ? { ...s, version: s.next ?? s.version, next: undefined, status: 'ready', kept: [s.version, ...(s.kept ?? [])].slice(0, 2), installed: 'Just now' } : s)); notify(`${sources.find(s => s.id === id)?.name} updated. 5 rosters checked, 1 changed.`, { kind: 'notification' }); } });
-      setProgress(next);
-    }, 450);
-    return () => clearTimeout(timer);
-  }, [progress, sources, notify]);
-  const update = (ids: string[]) => setProgress(p => ({ ...p, ...Object.fromEntries(ids.map(id => [id, 0])) }));
+  const update = (ids: string[]) => { jobs.startUpdate(ids); onOpenJobs(); };
+  const install = (entry: InstallEntry) => { jobs.startInstall(entry); onOpenJobs(); };
+  const installing = jobs.jobs.filter(j => j.kind === 'install' && (j.status === 'running' || j.status === 'needs-you') && !sources.some(s => s.id === j.sourceId));
   const updates = sources.filter(s => s.next && progress[s.id] === undefined);
   const selected = sources.find(s => s.id === selectedId);
   const chip = (s: SourceInfo) => progress[s.id] !== undefined ? <Chip tone="accent">Updating {progress[s.id]}%</Chip> : s.status === 'update' ? <Chip tone="accent"><ArrowUpCircle size={11} />Update</Chip> : s.status === 'review' ? <Chip tone="warn"><AlertTriangle size={11} />Review</Chip> : <Chip tone="ok"><Check size={11} />Ready</Chip>;
@@ -177,13 +172,14 @@ export function DesktopSources({ notify, actionSlot }: { notify: Notify; actionS
             <span><strong>{s.name}</strong><small>{s.factions.length} factions · {s.factions.slice(0, 2).join(', ')}{s.factions.length > 2 ? '…' : ''}</small><small className="dtp-faint">{s.fromFile ? `From a file · imported ${s.installed}` : `${s.repo}@${s.version} · ${s.installed} · ${s.size}`}</small>{progress[s.id] !== undefined && <i className="dtp-progress"><em style={{ width: `${progress[s.id]}%` }} /></i>}</span>
             {chip(s)}
           </button>)}
+          {installing.map(j => <button key={j.id} className="dtp-row dtp-source" onClick={onOpenJobs}><span><strong>{j.name}</strong><small>{j.status === 'needs-you' ? 'Waiting for you to choose factions' : `${j.factions.length} factions available`}</small><i className="dtp-progress"><em style={{ width: `${jobPercent(j)}%` }} /></i></span>{j.status === 'needs-you' ? <Chip tone="warn"><AlertTriangle size={11} />Needs you</Chip> : <Chip tone="accent">Installing {jobPercent(j)}%</Chip>}</button>)}
         </div>
         <button className={`dtp-row dtp-add-row ${selectedId === 'add' ? 'selected' : ''}`} onClick={() => setSelectedId('add')}><span className="dtp-add-icon"><Plus size={16} /></span><span><strong>Add game data</strong><small>Collections, a repository link, or GitHub search</small></span><ChevronRight size={15} /></button>
       </div><footer className="dtp-list-foot"><RefreshCcw size={12} />Checked for updates 8 minutes ago<button onClick={() => notify('Checked for updates. Nothing new.')}>Check now</button></footer></section>
       {selectedId === 'add' ? <section className="dtp-card dtp-detail" aria-label="Add game data">
         <span className="dtp-eyebrow">Add game data</span><h2>Choose a game system</h2><p className="dtp-muted">Install from a collection, paste a repository link, or search GitHub.</p>
         <h3>Default collection</h3>
-        <div className="dtp-rows">{collectionSources.map(c => <div className="dtp-collection-row" key={c.name}><span><strong>{c.name}</strong><small>{c.detail}</small></span>{c.state === 'Installed' ? <Chip tone="ok"><Check size={11} />Installed</Chip> : <button className="dtp-btn small" onClick={() => notify(`Installing ${c.name}…`)}>Install</button>}</div>)}</div>
+        <div className="dtp-rows">{collectionSources.map(c => { const live = jobs.jobs.find(j => j.sourceId === c.id && (j.status === 'running' || j.status === 'needs-you')); return <div className="dtp-collection-row" key={c.id}><span><strong>{c.name}</strong><small>{c.detail}</small></span>{sources.some(s => s.id === c.id) ? <Chip tone="ok"><Check size={11} />Installed</Chip> : live ? <button className="dtp-btn small" onClick={onOpenJobs}>{live.status === 'needs-you' ? 'Choose factions' : `Installing ${jobPercent(live)}%`}</button> : <button className="dtp-btn small" onClick={() => install(c)}>Install</button>}</div>; })}</div>
         <h3>Repository link</h3>
         <form className="dtp-inline-form" onSubmit={e => { e.preventDefault(); notify(link ? 'Looking up the repository…' : 'Paste a repository link first'); }}><label className="dtp-search"><Link2 size={15} /><input placeholder="https://github.com/owner/repository" aria-label="Repository link" value={link} onChange={e => setLink(e.target.value)} /></label><button className="dtp-btn" type="submit">Continue</button></form>
         <button className="dtp-link-row" onClick={() => notify('Search GitHub opens here')}><Github size={16} /><span><strong>Search GitHub</strong><small>Find data repositories by name</small></span><ChevronRight size={15} /></button>
@@ -299,4 +295,23 @@ function KeyBindingsEditor({ bindings, onBindings }: { bindings: KeyBindings; on
       </span>
     </div>)}</div></div>)}
   </>;
+}
+
+/* ------------------------- Welcome: first run ------------------------- */
+
+/** Right side of Welcome while there is no game data, or data but no rosters yet. */
+export function WelcomeStart({ jobs, onCreate, onImport, onAddData, onOpenJobs }: { jobs: DesktopJobs; onCreate: () => void; onImport: () => void; onAddData: () => void; onOpenJobs: () => void }) {
+  if (jobs.sources.length) return <section className="dt-recents dt-start">
+    <header><h2>Ready when you are</h2><span>{jobs.sources.map(s => s.name).join(' · ')} installed</span></header>
+    <div className="dtp-empty left"><Layers3 size={22} /><strong>No rosters yet</strong><p>Your first roster takes a minute: choose a faction, a force and a points limit.</p><span className="dtp-row-actions"><button className="dtp-btn primary" onClick={onCreate}><Plus size={15} />Create your first roster</button><button className="dtp-btn" onClick={onImport}><FileUp size={15} />Import a roster</button></span></div>
+  </section>;
+  return <section className="dt-recents dt-start">
+    <header><h2>Start with game data</h2><span>Rosters are built from a game system's data. Install one; it stays available offline.</span></header>
+    <div className="dtp-rows">{collectionSources.map(c => { const live = jobs.jobs.find(j => j.sourceId === c.id && (j.status === 'running' || j.status === 'needs-you')); return <div className="dtp-collection-row" key={c.id}>
+      <span><strong>{c.name}</strong><small>{c.detail} · {c.size}</small>{live && <i className="dtp-progress"><em style={{ width: `${jobPercent(live)}%` }} /></i>}</span>
+      {live ? <button className={`dtp-btn small ${live.status === 'needs-you' ? 'primary' : ''}`} onClick={onOpenJobs}>{live.status === 'needs-you' ? 'Choose factions' : `Installing ${jobPercent(live)}%`}</button> : <button className="dtp-btn small" onClick={() => { jobs.startInstall(c); onOpenJobs(); }}>Install</button>}
+    </div>; })}</div>
+    <button className="dtp-link-row" onClick={onAddData}><FolderOpen size={16} /><span><strong>Install from a file or a link</strong><small>An archive, data files, a repository link or GitHub search</small></span><ChevronRight size={15} /></button>
+    <p className="dt-start-note">Battle Augur includes no game data. Sources come from community repositories you choose.</p>
+  </section>;
 }

@@ -39,10 +39,10 @@ export const installedSources: SourceInfo[] = [
 ];
 
 export const collectionSources = [
-  { name: 'Open Field', detail: 'Example game system · 3 factions', state: 'Installed' },
-  { name: 'Example System Two', detail: 'Example game system · 4 factions', state: 'Installed' },
-  { name: 'Example System Three', detail: 'Example game system · 6 factions', state: 'Install' },
-  { name: 'Example Skirmish', detail: 'Example skirmish system · 2 factions', state: 'Install' },
+  { id: 'open-field', name: 'Open Field', detail: 'Example game system · 3 factions', factions: ['Frontier Coalition', 'Free Cities', 'Northern Realms'], size: '14.2 MB' },
+  { id: 'system-two', name: 'Example System Two', detail: 'Example game system · 4 factions', factions: ['Glass Legion', 'Ember Covenant', 'Tide Wardens', 'Ash Pilgrims'], size: '38.6 MB' },
+  { id: 'system-three', name: 'Example System Three', detail: 'Example game system · 6 factions', factions: ['Iron Choir', 'Salt Kingdoms', 'Hollow Court', 'Lantern Guild', 'Stone Wardens', 'Drift Clans'], size: '22.4 MB' },
+  { id: 'example-skirmish', name: 'Example Skirmish', detail: 'Example skirmish system · 2 factions', factions: ['Watch', 'Wayfarers'], size: '2.3 MB' },
 ];
 
 export const colourSchemes = [

@@ -360,6 +360,10 @@
         {
           "id": "desktop-settings",
           "label": "Settings · Sections"
+        },
+        {
+          "id": "desktop-first-run",
+          "label": "First run · No game data"
         }
       ],
       "workflows": [
@@ -372,7 +376,8 @@
             "desktop-rosters",
             "desktop-lookup",
             "desktop-sources",
-            "desktop-settings"
+            "desktop-settings",
+            "desktop-first-run"
           ]
         },
         {
@@ -431,7 +436,12 @@
                   "roster summary popover",
                   "points line under tabs",
                   "over limit",
-                  "page actions in the tab row (no page titles)"
+                  "page actions in the tab row (no page titles)",
+                  "panels flush to the window edges",
+                  "centre sheet with rounded inner corners",
+                  "resizable side panels",
+                  "width-aware panel content",
+                  "ambient gradient (gallery switch)"
                 ],
                 "screens": [
                   "desktop-welcome",
@@ -544,6 +554,33 @@
                 "platforms": ["desktop"],
                 "states": ["functional toast top right", "undo action", "notification bottom right", "dismiss"],
                 "screens": ["desktop-editor", "desktop-rosters", "desktop-sources"]
+              },
+              {
+                "id": "desktop.jobs",
+                "title": "Installs & Updates (Jobs)",
+                "level": "overlay",
+                "status": "needs-review",
+                "platforms": ["desktop"],
+                "states": ["chrome progress button", "panel", "steps", "choose factions", "several jobs", "cancel", "hide", "finished", "clear finished", "source row progress"],
+                "screens": ["desktop-sources", "desktop-first-run"]
+              },
+              {
+                "id": "desktop.create",
+                "title": "Guided Roster Creation",
+                "level": "overlay",
+                "status": "needs-review",
+                "platforms": ["desktop"],
+                "states": ["game system", "points presets", "custom limit error", "unlimited", "faction search", "force", "configuration", "name suggestion", "summary", "back", "skip guided setup", "no game data"],
+                "screens": ["desktop-welcome", "desktop-rosters", "desktop-first-run"]
+              },
+              {
+                "id": "desktop.first-run",
+                "title": "First Run",
+                "level": "screen-composition",
+                "status": "needs-review",
+                "platforms": ["desktop"],
+                "states": ["no game data", "installing", "data but no rosters", "rosters empty"],
+                "screens": ["desktop-first-run"]
               },
               {
                 "id": "desktop.rosters",

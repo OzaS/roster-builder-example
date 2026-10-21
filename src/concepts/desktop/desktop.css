@@ -133,11 +133,9 @@
 @container (min-width: 440px){.dt-inspector-content{padding:0 26px 24px}.dt-inspector-title{padding:22px 26px 16px}.dt-checkbox-row{padding:14px 16px}}
 @container (max-width: 470px){.dt-roster .dt-unit-icon,.dt-roster .dt-force-icon{display:none}.dt-unit-info small{display:none}.dt-unit-info strong{margin-bottom:0}}
 /* Ambient gradient (gallery switch): theme colours blurred into the top-left of the window canvas. */
-.dt-app>*{position:relative;z-index:1}
-.dt-app>.dt-floating-chrome{position:absolute;z-index:3}
-.dt-app>.dt-modal-scrim,.dt-app>.dt-toast,.dt-app>.dt-summary{position:absolute}
-.dt-app>.dt-tab-progress{position:absolute;z-index:2}
+.dt-body{position:relative}
 .dt-ambient-on .dt-app::before{content:'';position:absolute;z-index:0;left:-140px;top:-160px;width:720px;height:560px;pointer-events:none;
   background:radial-gradient(closest-side at 32% 40%,color-mix(in srgb,var(--ux-accent) 70%,transparent),transparent),radial-gradient(closest-side at 70% 30%,color-mix(in srgb,var(--ux-cool) 45%,transparent),transparent),radial-gradient(closest-side at 45% 75%,color-mix(in srgb,var(--ux-accent-2) 40%,transparent),transparent);
   filter:blur(70px) saturate(1.2);opacity:.5}
 .dt-ambient-on .dt-app.light::before{opacity:.3}
+.dt-dot.idle{background:var(--dt-faint)}

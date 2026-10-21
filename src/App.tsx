@@ -27,6 +27,7 @@ const workflowScreenIds = [
   "desktop-lookup",
   "desktop-sources",
   "desktop-settings",
+  "desktop-first-run",
   "library",
   "library-v2",
   "collections",
