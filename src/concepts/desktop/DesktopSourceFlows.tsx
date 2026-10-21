@@ -435,7 +435,7 @@ function useDialogFocus(ref: RefObject<HTMLElement | null>, onClose: () => void)
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') { e.preventDefault(); close.current(); return; }
       if (e.key !== 'Tab' || !ref.current) return;
-      const nodes = Array.from(ref.current.querySelectorAll<HTMLElement>('button, input, summary')).filter(el => !el.hasAttribute('disabled') && el.offsetParent !== null);
+      const nodes = Array.from(ref.current.querySelectorAll<HTMLElement>('button, input, summary')).filter(el => !el.hasAttribute('disabled') && el.getClientRects().length > 0 && !el.closest('details:not([open]) > :not(summary)'));
       const first = nodes[0]; const last = nodes[nodes.length - 1];
       if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
       else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
