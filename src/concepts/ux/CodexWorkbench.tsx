@@ -7,7 +7,7 @@ import type { RosterReferenceDefinition, RosterUnit } from "../../types";
 import type { ConceptProps } from "../shared";
 import { AddGameDataScreen, AdvancedInstallSetting, AutoUpdateChecksSetting, CollectionScreen, InstallJobScreen, KeepVersionsSetting, MigrationReportScreen, NotificationsSetting, ReadOnlyRosterScreen, RememberSectionsSetting, SearchGitHubScreen, SourceDetailScreen, SourcesManageScreen, SourcesNavRow, UpdateAvatarButton, WifiOnlySetting } from "./SourceJobs";
 import { MobileUnitOptions } from "./MobileUnitOptions";
-import { BackOrTitle, BudgetMeter, Chip, ExpandableBudget, RosterMoreMenu, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "./uxShared";
+import { BackOrTitle, BudgetMeter, Chip, ExpandableBudget, RosterMoreMenu, RosterShareButton, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "./uxShared";
 
 /** Screens of the source-data flow designed in Battle Augur plan 2D (SourceJobs.tsx). */
 const SOURCE_FLOW_SCREENS: readonly string[] = ["install-job", "source-detail", "migration-report", "collection", "search-github", "roster-read-only"];
@@ -394,7 +394,8 @@ function WorkbenchHeader({
           <Download size={18} />
         </button>
       ) : null}
-      {isOverview ? <RosterMoreMenu open={moreOpen} onOpenChange={setMoreOpen} canUndo onExport={() => props.onNavigate("export")} /> : null}
+      {isOverview ? <RosterShareButton onExport={() => props.onNavigate("export")} /> : null}
+      {isOverview ? <RosterMoreMenu open={moreOpen} onOpenChange={setMoreOpen} canUndo /> : null}
       {isUnitDetail || isOverview ? (
         <span className={`ux-detail-progress ${isOverview ? "ux-overview-progress" : ""}`} role="progressbar" aria-label="Roster points used" aria-valuemin={0} aria-valuemax={props.roster.pointsLimit} aria-valuenow={props.roster.pointsUsed}>
           <i style={{ width: `${progress}%` }} />

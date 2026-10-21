@@ -1734,9 +1734,13 @@
   background: color-mix(in srgb, var(--ux-accent) 24%, transparent);
   border-color: var(--ux-accent);
 }
-/* UX-020: the phone roster bar keeps Back, a one-line name and More; search and export leave it (tablet keeps them). */
-.ux-wb-top.roster-overview {
-  grid-template-columns: 40px minmax(0, 1fr) 40px;
+/* UX-020: the phone roster bar keeps Back, a one-line name, Share and More; search leaves it (tablet keeps search and Export). */
+.ux-wb-top.roster-overview,
+.ux-wb-top.roster-overview.search-open,
+.ux-wb-top.ux-elements-roster-bar {
+  grid-template-columns: 40px minmax(0, 1fr);
+  grid-auto-flow: column;
+  grid-auto-columns: 40px;
 }
 .ux-wb-top.roster-overview .ux-roster-export {
   display: none;
@@ -1800,9 +1804,6 @@
 .ux-roster-more-menu button:disabled {
   opacity: 0.38;
   cursor: default;
-}
-.ux-wb-top.roster-overview.search-open {
-  grid-template-columns: 40px minmax(0, 1fr) 40px;
 }
 .ux-wb-top.roster-overview.search-open .ux-roster-navbar-search {
   grid-column: 2 / 3;
@@ -4923,6 +4924,7 @@ button.ux-reference-tag:focus-visible {
   display: flex;
 }
 .device-frame.tablet .ux-phone-overview-subtitle,
+.device-frame.tablet .ux-wb-top.roster-overview .ux-roster-share,
 .device-frame.tablet .ux-wb-top.roster-overview .ux-roster-more {
   display: none;
 }
