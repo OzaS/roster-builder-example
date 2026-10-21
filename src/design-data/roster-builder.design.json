@@ -610,6 +610,51 @@
                 "screens": ["desktop-sources"]
               },
               {
+                "id": "desktop.sources.last-update",
+                "title": "Last Update Card & Roster Check",
+                "level": "composite",
+                "status": "needs-review",
+                "platforms": ["desktop"],
+                "states": ["updated from/to", "not checked", "check rosters", "checking progress", "cancel", "cancelled part-way", "check failed", "checked with changes", "nothing changed", "no rosters", "view report", "finished-check notification", "preview states"],
+                "screens": ["desktop-sources"]
+              },
+              {
+                "id": "desktop.sources.report",
+                "title": "Update Report",
+                "level": "screen-composition",
+                "status": "needs-review",
+                "platforms": ["desktop"],
+                "states": ["back to source", "roster chips", "changed roster cards", "faction removed", "open roster", "unchanged rosters", "data change counts", "show all changes", "nothing changed", "not checked", "checking", "check failed", "report missing"],
+                "screens": ["desktop-sources"]
+              },
+              {
+                "id": "desktop.sources.collection",
+                "title": "Collection Page",
+                "level": "screen-composition",
+                "status": "needs-review",
+                "platforms": ["desktop"],
+                "states": ["default collection rows", "show all", "search", "no matches", "supported", "installed", "update", "installing percent", "choose factions", "archived toggle", "nested collections and libraries", "more menu", "refresh", "copy link", "hide default", "remove saved", "offline kept copy", "refresh failed retry", "loading", "empty", "preview states"],
+                "screens": ["desktop-sources"]
+              },
+              {
+                "id": "desktop.sources.github-search",
+                "title": "GitHub Search",
+                "level": "screen-composition",
+                "status": "needs-review",
+                "platforms": ["desktop"],
+                "states": ["prompt", "search on Enter", "searching", "results", "archived toggle", "install", "no results", "error retry", "preview states"],
+                "screens": ["desktop-sources"]
+              },
+              {
+                "id": "desktop.sources.add-collection",
+                "title": "Add Collection Dialog",
+                "level": "overlay",
+                "status": "needs-review",
+                "platforms": ["desktop"],
+                "states": ["link field", "find", "finding", "collection preview", "library preview", "add collection", "repository: install it", "already added", "not a collection", "no connection", "escape closes", "focus trap", "preview states"],
+                "screens": ["desktop-sources"]
+              },
+              {
                 "id": "desktop.settings",
                 "title": "Settings Sections",
                 "level": "screen-composition",
