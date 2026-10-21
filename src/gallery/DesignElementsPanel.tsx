@@ -313,6 +313,11 @@ function WorkbenchElements({
         <div className="ux-elements-stack"><MobileUnitOptions compact /><MobileUnitOptions state="loading" compact /><MobileUnitOptions state="error" compact /><MobileUnitOptions state="gone" compact /></div>
       </ElementSection>
 
+      <ElementSection title="Nested Detail Back">
+        <small className="ux-elements-note">Built (2026-10-21, user feedback): a nested detail names the parent Back returns to. iOS: the native Back button reads "‹ Parent" (UIKit shortens it to "Back", then the arrow, when tight). Android (no back titles): "in Parent" under the title, next to the Up arrow; title 20 bold, both lines one line each. Top-level details keep the arrow only. Breadcrumbs unchanged. Names come from worker breadcrumbs.</small>
+        <div className="ux-elements-stack"><MobileUnitOptions compact initialDrilled backStyle="ios" /><MobileUnitOptions compact initialDrilled backStyle="android" /></div>
+      </ElementSection>
+
       <ElementSection title="Foldable Option Sections">
         <div style={{ display: "grid", gap: 10, maxWidth: 360 }}>
           <small className="ux-elements-note">Built (UX-005): every option section is a header button (44 pt, expanded state) that folds its own body, at every nesting level and in model loadouts. Sections start folded at every level; opening a parent leaves its nested sections folded and never closes another section. The header keeps the name, "x/y selections", limits and errors; a folded header with an error beneath it adds "Issues inside". Open sections are kept per roster (Profile tab, collapsed model card, refreshes, drill-down, later visits, restart) and are never shared between selections; Settings → Rosters → Remember option sections turns that off (new visits then start folded). Model cards are separate and start expanded. A folded header shows a muted summary of what is selected inside (nested sections included, "2× Name" when more than one, two lines at most with an ellipsis, full list in the spoken label); nothing selected shows no summary line. Samples below: folded with a summary, folded with nothing selected, a long summary cut at two lines, and open.</small>
