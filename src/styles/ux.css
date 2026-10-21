@@ -1734,9 +1734,13 @@
   background: color-mix(in srgb, var(--ux-accent) 24%, transparent);
   border-color: var(--ux-accent);
 }
-/* UX-020: the phone roster bar keeps Back, a one-line name and More; search and export leave it (tablet keeps them). */
-.ux-wb-top.roster-overview {
-  grid-template-columns: 40px minmax(0, 1fr) 40px;
+/* UX-020: the phone roster bar keeps Back, a one-line name, Share and More; search leaves it (tablet keeps search and Export). */
+.ux-wb-top.roster-overview,
+.ux-wb-top.roster-overview.search-open,
+.ux-wb-top.ux-elements-roster-bar {
+  grid-template-columns: 40px minmax(0, 1fr);
+  grid-auto-flow: column;
+  grid-auto-columns: 40px;
 }
 .ux-wb-top.roster-overview .ux-roster-export {
   display: none;
@@ -1800,9 +1804,6 @@
 .ux-roster-more-menu button:disabled {
   opacity: 0.38;
   cursor: default;
-}
-.ux-wb-top.roster-overview.search-open {
-  grid-template-columns: 40px minmax(0, 1fr) 40px;
 }
 .ux-wb-top.roster-overview.search-open .ux-roster-navbar-search {
   grid-column: 2 / 3;
@@ -4923,6 +4924,7 @@ button.ux-reference-tag:focus-visible {
   display: flex;
 }
 .device-frame.tablet .ux-phone-overview-subtitle,
+.device-frame.tablet .ux-wb-top.roster-overview .ux-roster-share,
 .device-frame.tablet .ux-wb-top.roster-overview .ux-roster-more {
   display: none;
 }
@@ -6134,6 +6136,7 @@ button.ux-reference-tag:focus-visible {
 .ux-fold-head > span { flex: 1; display: flex; flex-direction: column; gap: 2px; }
 .ux-fold-head strong { color: var(--ux-ink-secondary); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
 .ux-fold-head svg { flex-shrink: 0; color: var(--ux-ink-secondary); }
+.ux-mobile-unit-options .ux-fold-head .ux-fold-summary { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; color: var(--ux-ink-secondary); font-size: 13px; line-height: 1.3; }
 .ux-fold-nested { border-left: 2px solid var(--ux-line); padding-left: 12px; }
 .ux-tree-link-caption { display: block; color: var(--ux-ink-secondary); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
@@ -6223,3 +6226,10 @@ button.ux-guided-option { justify-content: flex-start; }
 /* UX-006: roster checks are checkboxes; all selection/count targets meet phone minima. */
 .ux-mobile-unit-options button, .ux-5a-count button { min-width: 48px; min-height: 48px; }
 .ux-5a-choice[role="checkbox"] { width: 100%; text-align: left; background: transparent; color: inherit; }
+
+/* Explicit Back on nested unit details (2026-10-21). */
+.ux-nested-back.ios button { display: inline-flex; align-items: center; gap: 0; max-width: 45%; color: var(--ux-accent); font-size: 17px; margin-left: -8px; }
+.ux-nested-back.ios button span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ux-nested-title { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
+.ux-nested-title strong { font-size: 20px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ux-nested-title small { font-size: 14px; color: var(--ux-ink-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

@@ -6,7 +6,7 @@ import { PhoneStatusBar } from "../components/DeviceFrame";
 import { mockRosterReferences, referenceById } from "../data/mockRosterReferences";
 import type { DesignElementGroup, DesignElements } from "../design-data/designData";
 import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, ThemeMode } from "../types";
-import { BudgetMeter, Chip, ExpandableBudget, RosterMoreMenu, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "../concepts/ux/uxShared";
+import { BudgetMeter, Chip, ExpandableBudget, RosterMoreMenu, RosterShareButton, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
 import { ComingSoonCard, DeveloperOptionsPreview } from "../concepts/ux/AppExtras";
 import { ActionMenuDialog, AddCollectionSheet, LOCAL_ERRORS, LOCAL_FILE, LOCAL_SOURCE, LocalImportChoiceDialog, LocalImportError, LocalImportRow, LocalInterruptedNotice, LocalRefusedNotice, LocalSourceNote, LocalSourceRows, localSteps, AdvancedInstallSetting, AppDialog, AutoUpdateChecksSetting, ImportReportGroups, CollectionMenuDialog, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RememberSectionsSetting, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceUpdateCard, SourceVersions, SourcesNavRow, TaggedRosterRows, UpdateAvatarButton, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
@@ -147,16 +147,27 @@ function WorkbenchElements({
     <>
       <CatalogGroup groupId="product-ui" continuation>
       <ElementSection title="Workbench Chrome">
-        <header className="ux-wb-top ux-elements-static">
+        <header className="ux-wb-top ux-elements-static ux-elements-roster-bar">
           <button type="button" className="ux-icon-btn" aria-label="Back">
             <ArrowLeft size={18} />
           </button>
           <div className="ux-wb-title">
             <strong>{roster.name}</strong>
           </div>
+          <RosterShareButton />
           <RosterMoreMenu open={false} onOpenChange={() => undefined} />
         </header>
         <small className="ux-phone-overview-identity">{roster.faction} · {roster.system}</small>
+        <header className="ux-wb-top ux-elements-static ux-elements-roster-bar">
+          <button type="button" className="ux-icon-btn" aria-label="Back">
+            <ArrowLeft size={18} />
+          </button>
+          <div className="ux-wb-title">
+            <strong>{roster.name}</strong>
+          </div>
+          <RosterShareButton />
+        </header>
+        <small className="ux-hint">Read-only roster: Share only, no More button.</small>
         <header className="ux-wb-top unit-detail ux-elements-static">
           <button type="button" className="ux-icon-btn" aria-label="Back">
             <ArrowLeft size={18} />
@@ -178,11 +189,11 @@ function WorkbenchElements({
       </ElementSection>
 
       <ElementSection title="Roster More Menu">
-        <small className="ux-hint">UX-020: the menu of the roster bar's More button, anchored to it. Before an edit, after an edit, and on a read-only roster.</small>
+        <small className="ux-hint">UX-020: the roster bar has a visible Share button (Export or share) next to More. The More menu, anchored to its button, holds Undo and Redo only: before an edit (both disabled), after an edit (Undo enabled) and after an Undo (Redo enabled). A read-only roster has Share only and no More button.</small>
         <div className="ux-elements-more-menus">
           <RosterMoreMenu open inline onOpenChange={() => undefined} />
           <RosterMoreMenu open inline canUndo onOpenChange={() => undefined} />
-          <RosterMoreMenu open inline readOnly onOpenChange={() => undefined} />
+          <RosterMoreMenu open inline canUndo canRedo onOpenChange={() => undefined} />
         </div>
       </ElementSection>
 
@@ -302,9 +313,14 @@ function WorkbenchElements({
         <div className="ux-elements-stack"><MobileUnitOptions compact /><MobileUnitOptions state="loading" compact /><MobileUnitOptions state="error" compact /><MobileUnitOptions state="gone" compact /></div>
       </ElementSection>
 
+      <ElementSection title="Nested Detail Back">
+        <small className="ux-elements-note">Built (2026-10-21, user feedback): a nested detail names the parent Back returns to. iOS: the native Back button reads "‹ Parent" (UIKit shortens it to "Back", then the arrow, when tight). Android (no back titles): "in Parent" under the title, next to the Up arrow; title 20 bold, both lines one line each. Top-level details keep the arrow only. Breadcrumbs unchanged. Names come from worker breadcrumbs.</small>
+        <div className="ux-elements-stack"><MobileUnitOptions compact initialDrilled backStyle="ios" /><MobileUnitOptions compact initialDrilled backStyle="android" /></div>
+      </ElementSection>
+
       <ElementSection title="Foldable Option Sections">
         <div style={{ display: "grid", gap: 10, maxWidth: 360 }}>
-          <small className="ux-elements-note">Built (UX-005): every option section is a header button (44 pt, expanded state) that folds its own body, at every nesting level and in model loadouts. Sections start folded at every level; opening a parent leaves its nested sections folded and never closes another section. The header keeps the name, "x/y selections", limits and errors; a folded header with an error beneath it adds "Issues inside". Open sections are kept per roster (Profile tab, collapsed model card, refreshes, drill-down, later visits, restart) and are never shared between selections; Settings → Rosters → Remember option sections turns that off (new visits then start folded). Model cards are separate and start expanded.</small>
+          <small className="ux-elements-note">Built (UX-005): every option section is a header button (44 pt, expanded state) that folds its own body, at every nesting level and in model loadouts. Sections start folded at every level; opening a parent leaves its nested sections folded and never closes another section. The header keeps the name, "x/y selections", limits and errors; a folded header with an error beneath it adds "Issues inside". Open sections are kept per roster (Profile tab, collapsed model card, refreshes, drill-down, later visits, restart) and are never shared between selections; Settings → Rosters → Remember option sections turns that off (new visits then start folded). Model cards are separate and start expanded. A folded header shows a muted summary of what is selected inside (nested sections included, "2× Name" when more than one, two lines at most with an ellipsis, full list in the spoken label); nothing selected shows no summary line. Samples below: folded with a summary, folded with nothing selected, a long summary cut at two lines, and open.</small>
           <OptionFoldSamples />
           <div className="ux-elements-stack"><MobileUnitOptions compact /></div>
         </div>
