@@ -36,6 +36,7 @@ export type WorkflowScreen =
   | "desktop-sources"
   | "desktop-settings"
   | "desktop-first-run"
+  | "desktop-menus"
   | "library"
   | "library-v2"
   | "collections"

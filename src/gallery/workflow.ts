@@ -8,6 +8,7 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "desktop-sources", label: "Desktop · Sources" },
   { id: "desktop-settings", label: "Desktop · Settings" },
   { id: "desktop-first-run", label: "Desktop · First run" },
+  { id: "desktop-menus", label: "Desktop · Menu bar" },
   { id: "library", label: "Lists" },
   { id: "library-v2", label: "Lists · V2" },
   { id: "collections", label: "Library" },
@@ -67,6 +68,7 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen === "desktop-sources") return "sources";
   if (screen === "desktop-settings") return "settings";
   if (screen === "desktop-first-run") return "library";
+  if (screen === "desktop-menus") return "overview";
   if (screen === "library-v2") return "library";
   if (screen === "subscription-main") return "library";
   if (screen === "subscription-edition") return "overview";

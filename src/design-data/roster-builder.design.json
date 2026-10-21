@@ -364,6 +364,10 @@
         {
           "id": "desktop-first-run",
           "label": "First run · No game data"
+        },
+        {
+          "id": "desktop-menus",
+          "label": "Menu bar · Application menus"
         }
       ],
       "workflows": [
@@ -377,7 +381,8 @@
             "desktop-lookup",
             "desktop-sources",
             "desktop-settings",
-            "desktop-first-run"
+            "desktop-first-run",
+            "desktop-menus"
           ]
         },
         {
@@ -610,6 +615,15 @@
                 "platforms": ["desktop"],
                 "states": ["functional toast top right", "undo action", "notification bottom right", "dismiss", "undo / redo result"],
                 "screens": ["desktop-editor", "desktop-rosters", "desktop-sources"]
+              },
+              {
+                "id": "desktop.menus",
+                "title": "Application Menu Bar",
+                "level": "navigation",
+                "status": "needs-review",
+                "platforms": ["desktop"],
+                "states": ["menus", "shortcuts from key bindings", "submenu", "disabled with reason", "Escape closes"],
+                "screens": ["desktop-menus"]
               },
               {
                 "id": "desktop.jobs",
