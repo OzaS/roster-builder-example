@@ -1,6 +1,6 @@
 // Editable key bindings for the desktop prototype. "Mod" is Command on macOS and Ctrl elsewhere.
 
-export type KeyAction = 'palette' | 'newRoster' | 'rosters' | 'lookup' | 'settings' | 'summary' | 'toggleCatalogue' | 'toggleInspector';
+export type KeyAction = 'palette' | 'newRoster' | 'rosters' | 'lookup' | 'settings' | 'summary' | 'toggleCatalogue' | 'toggleInspector' | 'undo' | 'redo' | 'exportRoster';
 export type KeyBindings = Record<KeyAction, string>;
 
 export const keyActions: Array<{ id: KeyAction; label: string; group: 'General' | 'Roster editor' }> = [
@@ -12,11 +12,15 @@ export const keyActions: Array<{ id: KeyAction; label: string; group: 'General' 
   { id: 'summary', label: 'Roster summary', group: 'Roster editor' },
   { id: 'toggleCatalogue', label: 'Show or hide the catalogue', group: 'Roster editor' },
   { id: 'toggleInspector', label: 'Show or hide the inspector', group: 'Roster editor' },
+  { id: 'undo', label: 'Undo', group: 'Roster editor' },
+  { id: 'redo', label: 'Redo', group: 'Roster editor' },
+  { id: 'exportRoster', label: 'Export roster', group: 'Roster editor' },
 ];
 
 export const defaultBindings: KeyBindings = {
   palette: 'Mod+K', newRoster: 'Mod+N', rosters: 'Mod+Shift+R', lookup: 'Mod+F', settings: 'Mod+,',
   summary: 'Mod+I', toggleCatalogue: 'Mod+B', toggleInspector: 'Mod+Alt+B',
+  undo: 'Mod+Z', redo: 'Mod+Shift+Z', exportRoster: 'Mod+E',
 };
 
 const codeKey = (code: string, key: string) => code.startsWith('Key') ? code.slice(3) : code.startsWith('Digit') ? code.slice(5)
