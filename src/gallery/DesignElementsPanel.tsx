@@ -1,3 +1,4 @@
+import { DesktopElements } from "../concepts/desktop/DesktopWorkbench";
 import { AppearancePreferences } from "../concepts/ux/AppearanceSettings";
 import { MobileUnitOptions, ModelStackSamples, OptionFoldSamples } from "../concepts/ux/MobileUnitOptions";
 import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BarChart3, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, Circle, CircleDot, Cog, Coins, Command, Copy, Database, Dice5, Download, Ellipsis, FileInput, Gamepad2, GripVertical, Hammer, Heart, ImagePlus, Languages, Layers, LibraryBig, Maximize2, MessageCircle, Minus, Moon, MoveRight, Palette, PanelsTopLeft, Pencil, Plus, RotateCcw, Rows3, Scale, Search, Smartphone, Sparkles, Split, Trash2, Upload, UserRound, Wand2, X, SquareCheck } from "lucide-react";
@@ -41,6 +42,7 @@ export function DesignElementsPanel({
   onToggleOption,
   elements,
 }: Props) {
+  if (concept.id === "desktop-workbench") return <DesktopElements />;
   const rootClass = `design-elements-panel ux-screen ux-workbench ${shellClass(themeMode, colorScheme)} ${platform}`;
 
   return (

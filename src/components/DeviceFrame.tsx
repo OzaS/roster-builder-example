@@ -3,18 +3,19 @@ import type { ColorScheme, PlatformPreview, ThemeMode } from "../types";
 
 type Props = {
   platform: PlatformPreview;
+  desktop?: boolean;
   themeMode?: ThemeMode;
   colorScheme?: ColorScheme;
   statusBarUsesDesignBackground?: boolean;
   children: React.ReactNode;
 };
 
-export function DeviceFrame({ platform, themeMode = "dark", colorScheme = "generic", statusBarUsesDesignBackground = false, children }: Props) {
+export function DeviceFrame({ desktop = false, platform, themeMode = "dark", colorScheme = "generic", statusBarUsesDesignBackground = false, children }: Props) {
   const statusBarClass = statusBarUsesDesignBackground ? "status-bar-design" : "status-bar-device";
 
   return (
-    <div className={`device-frame ${platform} theme-${themeMode} ux-scheme-${colorScheme} ${statusBarClass}`}>
-      {platform === "phone" ? <PhoneStatusBar /> : null}
+    <div className={`device-frame ${desktop ? "dt-gallery-frame" : platform} theme-${themeMode} ux-scheme-${colorScheme} ${statusBarClass}`}>
+      {!desktop && platform === "phone" ? <PhoneStatusBar /> : null}
       <div className="device-frame-content">{children}</div>
     </div>
   );

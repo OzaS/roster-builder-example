@@ -1,3 +1,4 @@
+import { DesktopWorkbench } from "../concepts/desktop/DesktopWorkbench";
 import { PanelsTopLeft } from "lucide-react";
 import { CodexWorkbench } from "../concepts/ux/CodexWorkbench";
 import type { ConceptId, WorkflowScreen } from "../types";
@@ -32,7 +33,7 @@ export type DesignComment = {
 
 export type DesignElementStatus = "specified" | "ready-for-rn" | "implemented" | "needs-review";
 export type DesignElementLevel = "foundation" | "primitive" | "composite" | "navigation" | "overlay" | "screen-composition" | "gallery-tooling";
-export type DesignElementPlatform = "phone" | "tablet" | "gallery";
+export type DesignElementPlatform = "phone" | "tablet" | "desktop" | "gallery";
 
 export type DesignElementSection = {
   id: string;
@@ -67,7 +68,7 @@ export type EditableDesign = {
   name: string;
   eyebrow: string;
   icon: "PanelsTopLeft";
-  component: "CodexWorkbench";
+  component: "CodexWorkbench" | "DesktopWorkbench";
   bestFor: string;
   direction: string;
   interaction: string;
@@ -89,6 +90,7 @@ const iconMap = {
 };
 
 const componentMap = {
+  DesktopWorkbench,
   CodexWorkbench,
 };
 

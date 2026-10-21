@@ -323,6 +323,186 @@
           "createdAt": "2026-06-19T21:43:11.380Z"
         }
       ]
+    },
+    {
+      "id": "desktop-workbench",
+      "status": "active",
+      "name": "Battle Augur · Desktop",
+      "eyebrow": "Desktop · Three-panel workspace",
+      "icon": "PanelsTopLeft",
+      "component": "DesktopWorkbench",
+      "bestFor": "Focused desktop roster building with a searchable catalogue, persistent force outline and live unit inspector.",
+      "direction": "T3-inspired window chrome; VS Code-inspired welcome with recent rosters; an original flat, compact three-panel editing layout.",
+      "interaction": "Open a recent roster or create one. Add from the catalogue, select in the force, edit in the inspector. Toggle panels, inspect validation and use Command K.",
+      "tradeoff": "Desktop-first exploration. Sample data and prototype-session edits; not connected to the Battle Augur engine or persistence.",
+      "screens": [
+        {
+          "id": "desktop-welcome",
+          "label": "Welcome · Recent rosters"
+        },
+        {
+          "id": "desktop-editor",
+          "label": "Roster editor · Three panels"
+        }
+      ],
+      "workflows": [
+        {
+          "id": "desktop",
+          "label": "Desktop workspace",
+          "screens": [
+            "desktop-welcome",
+            "desktop-editor"
+          ]
+        },
+        {
+          "id": "unsorted",
+          "label": "Unsorted",
+          "screens": []
+        }
+      ],
+      "comments": [],
+      "trash": {
+        "screens": []
+      },
+      "elements": {
+        "release": "Desktop 01",
+        "groups": [
+          {
+            "id": "product-ui",
+            "label": "Desktop UI",
+            "description": "Desktop workspace components. Representative interactive compositions in the Elements view.",
+            "sections": [
+              {
+                "id": "desktop.tokens",
+                "title": "Desktop Tokens",
+                "level": "foundation",
+                "status": "specified",
+                "platforms": [
+                  "desktop"
+                ],
+                "states": [
+                  "dark",
+                  "light"
+                ],
+                "screens": []
+              },
+              {
+                "id": "desktop.chrome",
+                "title": "Workspace Chrome",
+                "level": "navigation",
+                "status": "specified",
+                "platforms": [
+                  "desktop"
+                ],
+                "states": [
+                  "welcome",
+                  "editor",
+                  "command palette",
+                  "panels hidden"
+                ],
+                "screens": [
+                  "desktop-welcome",
+                  "desktop-editor"
+                ]
+              },
+              {
+                "id": "desktop.welcome",
+                "title": "Welcome & Recent Rows",
+                "level": "screen-composition",
+                "status": "specified",
+                "platforms": [
+                  "desktop"
+                ],
+                "states": [
+                  "recent",
+                  "create",
+                  "import"
+                ],
+                "screens": [
+                  "desktop-welcome"
+                ]
+              },
+              {
+                "id": "desktop.catalogue",
+                "title": "Catalogue Rows",
+                "level": "composite",
+                "status": "specified",
+                "platforms": [
+                  "desktop"
+                ],
+                "states": [
+                  "default",
+                  "search",
+                  "role filter",
+                  "no results",
+                  "add"
+                ],
+                "screens": [
+                  "desktop-editor"
+                ]
+              },
+              {
+                "id": "desktop.roster",
+                "title": "Roster Tree & Budget",
+                "level": "composite",
+                "status": "specified",
+                "platforms": [
+                  "desktop"
+                ],
+                "states": [
+                  "selected",
+                  "collapsed",
+                  "empty",
+                  "over budget",
+                  "duplicate",
+                  "remove"
+                ],
+                "screens": [
+                  "desktop-editor"
+                ]
+              },
+              {
+                "id": "desktop.inspector",
+                "title": "Unit Inspector",
+                "level": "composite",
+                "status": "specified",
+                "platforms": [
+                  "desktop"
+                ],
+                "states": [
+                  "options",
+                  "profile",
+                  "rules",
+                  "count limit",
+                  "upgrade selected",
+                  "notes"
+                ],
+                "screens": [
+                  "desktop-editor"
+                ]
+              },
+              {
+                "id": "desktop.validation",
+                "title": "Validation Strip",
+                "level": "composite",
+                "status": "specified",
+                "platforms": [
+                  "desktop"
+                ],
+                "states": [
+                  "valid",
+                  "missing required units",
+                  "over budget",
+                  "expanded"
+                ],
+                "screens": [
+                  "desktop-editor"
+                ]
+              }
+            ]
+          }
+        ]
+      }
     }
   ]
 }

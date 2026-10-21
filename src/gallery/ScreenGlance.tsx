@@ -252,7 +252,7 @@ export function ScreenGlance({
           <div className="glance-device-shell">
             <div className="glance-device-export" ref={deviceCaptureRef}>
               <div className="glance-device-capture">
-                <DeviceFrame platform={platform} themeMode={themeMode} colorScheme={colorScheme} statusBarUsesDesignBackground={statusBarUsesDesignBackground}>
+                <DeviceFrame desktop={concept.id === "desktop-workbench"} platform={platform} themeMode={themeMode} colorScheme={colorScheme} statusBarUsesDesignBackground={statusBarUsesDesignBackground}>
                   <div className={`glance-device-target ${armed ? "placing" : ""}`} onClick={placeComment}>
                     <Component
                       roster={roster}

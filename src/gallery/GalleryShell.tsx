@@ -404,7 +404,7 @@ export function GalleryShell({
             />
           ) : (
             <div className="single-preview-shell" onClickCapture={handleSinglePreviewClick}>
-              <DeviceFrame platform={platform} themeMode={themeMode} colorScheme={colorScheme} statusBarUsesDesignBackground={statusBarUsesDesignBackground}>{children}</DeviceFrame>
+              <DeviceFrame desktop={concept.id === "desktop-workbench"} platform={platform} themeMode={themeMode} colorScheme={colorScheme} statusBarUsesDesignBackground={statusBarUsesDesignBackground}>{children}</DeviceFrame>
             </div>
           )}
         </section>

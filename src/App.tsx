@@ -8,7 +8,7 @@ import type { AppLanguage, ColorScheme, ConceptId, DetachmentFavorite, FavoriteL
 
 const GALLERY_STATE_KEY = "roster-builder.gallery-state.v1";
 const FAVORITES_KEY = "roster-builder.favorites.v1";
-const conceptIds = ["ux-workbench"] satisfies ConceptId[];
+const conceptIds = ["ux-workbench", "desktop-workbench"] satisfies ConceptId[];
 const platformIds = ["phone", "tablet"] satisfies PlatformPreview[];
 const themeModes = ["dark", "light"] satisfies ThemeMode[];
 const themePreferences = ["system", "dark", "light"] satisfies ThemePreference[];
@@ -20,6 +20,8 @@ const unitDetailViews = ["options", "profile"] satisfies UnitDetailView[];
 const forceCreationModes = ["selector", "inline"] satisfies ForceCreationMode[];
 const defaultTabletPanelLayout: TabletPanelLayout = { treeRatio: 0.3, railRatio: 0.26, treeVisible: true, railVisible: true };
 const workflowScreenIds = [
+  "desktop-welcome",
+  "desktop-editor",
   "library",
   "library-v2",
   "collections",

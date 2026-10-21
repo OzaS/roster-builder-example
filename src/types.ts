@@ -29,6 +29,8 @@ export const colorSchemes: Array<{ id: ColorScheme; label: string; short: string
 ];
 
 export type WorkflowScreen =
+  | "desktop-welcome"
+  | "desktop-editor"
   | "library"
   | "library-v2"
   | "collections"
@@ -209,7 +211,7 @@ export type FavoriteLibrary = {
   detachments: DetachmentFavorite[];
 };
 
-export type ConceptId = "ux-workbench";
+export type ConceptId = "ux-workbench" | "desktop-workbench";
 
 export type PrototypeScreen =
   | "library"
