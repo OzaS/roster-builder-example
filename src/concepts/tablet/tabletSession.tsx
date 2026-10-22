@@ -26,6 +26,8 @@ const stateRoutes: Record<string, TabletRoute> = {
   'tablet-sources-add-collection': { page: 'sources', state: 'add-collection' },
   'tablet-settings-game-data': { page: 'settings', state: 'game-data' },
   'tablet-settings-shortcuts': { page: 'settings', state: 'keys' },
+  'tablet-create': { page: 'home', state: 'create' },
+  'tablet-create-review': { page: 'home', state: 'create-review' },
 };
 
 /** Which page (and state) a gallery screen shows; undefined for screens that are not tablet pages. */

@@ -366,6 +366,8 @@
         { "id": "tablet-settings", "label": "Settings · Sections" },
         { "id": "tablet-settings-game-data", "label": "Settings · Game data" },
         { "id": "tablet-settings-shortcuts", "label": "Settings · Keyboard shortcuts" },
+        { "id": "tablet-create", "label": "New roster · Guided creation" },
+        { "id": "tablet-create-review", "label": "New roster · Review" },
         { "id": "tablet-archive-sketch", "label": "Archive · Earlier tablet sketch" }
       ],
       "workflows": [
@@ -400,6 +402,11 @@
           "id": "editor",
           "label": "Roster editor",
           "screens": ["tablet-editor", "tablet-editor-issues", "tablet-editor-add", "tablet-editor-forces", "tablet-editor-add-force", "tablet-editor-readonly", "tablet-editor-export", "tablet-editor-import-result"]
+        },
+        {
+          "id": "dialogs",
+          "label": "Dialogs and sheets",
+          "screens": ["tablet-create", "tablet-create-review"]
         },
         {
           "id": "archive",
@@ -449,6 +456,7 @@
               {"id": "tablet.read-only-roster", "title": "Read-only Roster", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["lock beside the roster name in the header", "banner says the faction was removed from the installed data and the roster is kept as saved", "actions: Make an editable copy, Find game data, Export as it was", "undo, redo, rename, add unit and add force are off; unit options show but cannot change", "Expanded: the catalogue pane says Nothing to add, with Find game data", "summary says Not checked while read-only", "Make an editable copy opens a copy; the original stays read-only"], "screens": ["tablet-editor-readonly"]},
               {"id": "tablet.export-sheet", "title": "Export Sheet", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["wide form sheet: format and options beside the preview (stacked in split view)", "format choice rows: Text for sharing, Roster file", "Include switches for Rules and Profiles (off and fixed for the roster file, with the reason)", "monospace preview, selectable, with file name and size", "Share in the header (the system share sheet), Copy text or Copy JSON, Save file…", "read-only roster: note that it is exported as it was saved", "opened from More, the summary popover or the read-only banner"], "screens": ["tablet-editor-export"]},
               {"id": "tablet.import-result-sheet", "title": "Import Result Sheet", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["file name under the title, roster mark, name, system, faction and forces", "everything matched: ok note", "parts did not match: warning note, counts for matched, not found and points of the file, list of entries not found with where they were", "Open roster, or Open without it / them", "Cancel leaves nothing opened", "Open starts the editor on what matched; reached from the recent-rosters switcher (Import roster…) or after choosing a file on Rosters"], "screens": ["tablet-editor-import-result"]},
+              {"id": "tablet.create-sheet", "title": "Guided Creation Sheet", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["wide form sheet opened by every New roster entry (rail button, Home, Rosters, recent-rosters switcher, editor menu)", "step list on the left: Game system, Faction, Force, Points and name, Review; finished steps show their choice and stay editable", "in a narrower window the list becomes a row of step marks above the content", "choice rows for system, faction (search when there are more than four) and force; points limit chips (presets, Custom with a whole-number field, Unlimited); name field with the suggested name as placeholder", "force that needs a higher limit says so and holds Continue", "Review lists every choice with Change; Create roster opens the empty roster in the editor", "Back and Skip guided setup under the content, Continue or Create roster in the header", "no game data: Install game data first, with Add game data", "split view: fills the window"], "screens": ["tablet-create", "tablet-create-review"]},
               {"id": "tablet.rename-sheet", "title": "Rename Sheet (one field)", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["roster name or force name", "field selected on open, character count", "Save stays off while the name is empty or unchanged", "Enter saves", "More menu: Rename roster; force menu: Rename force"], "screens": []}
             ]
           },

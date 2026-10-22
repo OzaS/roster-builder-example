@@ -58,6 +58,8 @@ export type WorkflowScreen =
   | "tablet-sources-add-collection"
   | "tablet-settings-game-data"
   | "tablet-settings-shortcuts"
+  | "tablet-create"
+  | "tablet-create-review"
   | "tablet-archive-sketch"
   | "desktop-welcome"
   | "desktop-editor"

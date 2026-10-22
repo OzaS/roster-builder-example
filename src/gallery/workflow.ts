@@ -30,6 +30,8 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "tablet-sources-add-collection", label: "Tablet · Sources · Add a collection" },
   { id: "tablet-settings-game-data", label: "Tablet · Settings · Game data" },
   { id: "tablet-settings-shortcuts", label: "Tablet · Settings · Keyboard shortcuts" },
+  { id: "tablet-create", label: "Tablet · New roster (guided creation)" },
+  { id: "tablet-create-review", label: "Tablet · New roster · Review" },
   { id: "tablet-archive-sketch", label: "Archive · Earlier tablet sketch" },
   { id: "desktop-welcome", label: "Desktop · Welcome" },
   { id: "desktop-editor", label: "Desktop · Roster editor" },

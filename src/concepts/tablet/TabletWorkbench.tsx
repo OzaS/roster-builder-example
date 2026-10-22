@@ -9,6 +9,7 @@ import { TabletSources } from './TabletSources';
 import { TabletSettings } from './TabletSettings';
 import { TabletEditor, type EditorStart } from './TabletEditor';
 import { ImportResultSheet } from './TabletEditorSheets';
+import { CreateRosterSheet, newRosterDocument, type NewRoster } from './TabletCreateSheet';
 import { sampleImport, type ImportResult } from '../desktop/DesktopEditorFlows';
 import { rosterLibrary } from '../desktop/desktopData';
 import { tabletRoute, useTabletSession, TabletJobsPanel, type TabletRoute } from './tabletSession';
@@ -60,11 +61,20 @@ function TabletShell({ route, initialEditor, initialImport = false, ...props }: 
   useEffect(() => { setScheme(props.colorScheme ?? 'default'); }, [props.colorScheme]);
   const chooseTheme = (pref: ThemePref) => { setThemePref(pref); setLight(pref === 'light' || (pref === 'system' && window.matchMedia('(prefers-color-scheme: light)').matches)); props.onThemePreferenceChange?.(pref); };
   const chooseScheme = (next: ColorScheme) => { setScheme(next); props.onColorSchemeChange?.(next); };
-  const newRoster = () => notify('New roster: guided creation opens here (designed in T3)');
+  // Guided creation (T3): every New roster entry opens the sheet over whatever is open; Create roster opens the editor on the new roster.
+  const [creating, setCreating] = useState<'start' | 'review' | null>(route.state === 'create' ? 'start' : route.state === 'create-review' ? 'review' : null);
+  const newRoster = () => setCreating('start');
   const goSources = useCallback(() => setPage('sources'), []);
   const session = useTabletSession({ route, notify, light, onViewSource: goSources });
   const shared = { env, notify, session };
+  const { jobs } = session;
   const addData = () => { session.setSourceDetail('add'); setPage('sources'); };
+  const createRoster = (draft: NewRoster) => {
+    const { summary, result } = newRosterDocument(draft); setCreating(null);
+    session.setRosters(list => [summary, ...list]);
+    setEditor(current => ({ name: draft.name, from: current?.from ?? page, start: 'editor', key: (current?.key ?? 0) + 1, imported: result }));
+    notify(`Created “${draft.name}”`);
+  };
   const openRoster = (name: string) => setEditor(current => ({ name, from: page, start: 'editor', key: (current?.key ?? 0) + 1 }));
   return <div className={`tb-app ux-screen ux-size-regular ${light ? 'light' : 'dark'} ux-scheme-${scheme} tb-${env.widthClass} tb-${env.input} ${editor ? 'tb-editing' : ''}`} data-device={env.device.id}>
     {editor ? <TabletEditor key={editor.key} env={env} notify={notify} light={light} rosterName={editor.name} from={editor.from} start={editor.start}
@@ -85,6 +95,7 @@ function TabletShell({ route, initialEditor, initialImport = false, ...props }: 
       setEditor(current => ({ name: result.name, from: current?.from ?? page, start: 'editor', key: (current?.key ?? 0) + 1, imported: result }));
       const left = result.unmatched.length; notify(left ? `Opened “${result.name}” without ${left === 1 ? '1 entry' : `${left} entries`}` : `Opened “${result.name}”`);
     }} />}
+    {creating && <CreateRosterSheet sources={jobs.sources} review={creating === 'review'} onClose={() => setCreating(null)} onCreate={createRoster} onAddData={() => { setCreating(null); setEditor(null); addData(); }} />}
     <div className={`dt-app tb-shim ${light ? 'light' : ''}`}><ToastRegion toasts={toasts} /></div>
   </div>;
 }
