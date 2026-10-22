@@ -1,0 +1,21 @@
+/* Tablet device frame (gallery chrome). The window keeps its real size; the transform only scales the picture. */
+.tb-fit { width: 100%; display: flex; justify-content: center; min-width: 0 }
+.tb-fit.fit-both { height: 100% }
+.tb-figure { margin: 0; display: grid; justify-items: center; gap: 10px; align-content: center }
+.tb-fit.fit-both .tb-figure { height: 100% }
+.tb-fit-box { position: relative; flex-shrink: 0 }
+.tb-device { position: absolute; display: flex; flex-direction: column; overflow: hidden; transform-origin: 0 0; border-radius: 26px; background: #101416; box-shadow: 0 0 0 10px #14191b, 0 28px 70px rgba(20, 29, 32, .32) }
+.tb-device.android { border-radius: 20px }
+.tb-device.theme-light { background: #f7f8fa }
+.tb-statusbar { flex: 0 0 24px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; color: #f4f7f8; background: #101416; font: 750 11px/1 Inter, ui-sans-serif, system-ui, sans-serif }
+.tb-device.theme-light .tb-statusbar { color: #141a26; background: #f7f8fa }
+.tb-statusbar > span { display: flex; align-items: center; gap: 5px }
+.tb-viewport { position: relative; flex: 1 1 auto; min-height: 0; overflow: hidden }
+.tb-viewport > * { height: 100% }
+.tb-home-indicator { position: absolute; z-index: 40; left: 50%; bottom: 8px; width: 140px; height: 5px; margin-left: -70px; border-radius: 3px; background: color-mix(in srgb, #8d95a6 80%, transparent); pointer-events: none }
+.tb-device.theme-light .tb-home-indicator { background: color-mix(in srgb, #3a4152 70%, transparent) }
+.tb-caption { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 12px; color: var(--muted); font-size: 12px }
+.tb-caption strong { color: var(--ink); font-weight: 750 }
+.tb-caption span + span::before { content: '·'; margin-right: 12px; color: var(--muted) }
+.tb-standalone .tb-caption { color: #98a1b3 }
+.tb-standalone .tb-caption strong { color: #f0f2f7 }
