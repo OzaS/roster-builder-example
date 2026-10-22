@@ -166,3 +166,15 @@
 .tb-el-card { height: auto !important; width: 420px; padding: 16px; border-radius: 18px }
 .tb-el-frames { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 28px; align-items: start }
 .tb-card { align-content: start }
+
+/* ------------------------------ T4: targets and hints ------------------------------ */
+/* Delegated hint (IconHints) for icon-only buttons from shared pieces: placed at the button, above it or below near the top. */
+.tb-hint-bubble.tb-hint-float { transform: translate(-50%, calc(-100% - 8px)) }
+.tb-hint-bubble.tb-hint-float.below { transform: translate(-50%, 8px) }
+/* Touch: every target at least 44 px (pointer mode keeps the denser desktop sizes where they are 32 px or more). */
+.tb-touch .tb-flow .dts-preview-row button, .tb-touch .tb-sheet .dts-preview-row button { height: 44px }
+/* Pointer hover where the mobile pieces have none. */
+.tb-pointer :is(.ux-tree-section, .ux-force-summary-main, .ux-tree-add, .tb-scheme, .tb-chip-add, .tb-text-link):not(:disabled):hover { background: var(--ux-surface-2) }
+.tb-pointer :is(.ux-job-btn, .tbs-action, .tbs-choice, .tbs-switch):not(:disabled):not(.primary):not(.active):hover { border-color: var(--ux-line-2); background: var(--ux-surface-2) }
+.tb-pointer :is(.ux-job-btn.primary, .ux-primary, .tbs-primary):not(:disabled):hover { filter: brightness(1.08) }
+.tb-pointer :is(.ux-5a-choice, .ux-5a-count button, .tbe-clear):not(:disabled):hover { background: var(--ux-surface-2) }

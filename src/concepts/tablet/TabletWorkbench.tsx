@@ -13,6 +13,7 @@ import { sampleImport, type ImportResult } from '../desktop/DesktopEditorFlows';
 import { rosterLibrary } from '../desktop/desktopData';
 import { tabletRoute, useTabletSession, TabletJobsPanel, type TabletRoute } from './tabletSession';
 import { useTabletEnv } from './tabletEnv';
+import { IconHints } from './TabletHint';
 import './tablet.css';
 
 type ThemePref = 'system' | 'light' | 'dark';
@@ -49,6 +50,7 @@ function TabletShell({ route, initialEditor, initialImport = false, ...props }: 
   const [light, setLight] = useState(props.themeMode === 'light');
   const [scheme, setScheme] = useState<ColorScheme>(props.colorScheme ?? 'default');
   const toasts = useToasts();
+  const appRef = useRef<HTMLDivElement>(null);
   const { notify } = toasts;
   const shownScreen = useRef(`${initialPage}/${initialEditor}/${initialImport}`);
   useEffect(() => {
@@ -66,7 +68,7 @@ function TabletShell({ route, initialEditor, initialImport = false, ...props }: 
   const shared = { env, notify, session };
   const addData = () => { session.setSourceDetail('add'); setPage('sources'); };
   const openRoster = (name: string) => setEditor(current => ({ name, from: page, start: 'editor', key: (current?.key ?? 0) + 1 }));
-  return <div className={`tb-app ux-screen ux-size-regular ${light ? 'light' : 'dark'} ux-scheme-${scheme} tb-${env.widthClass} tb-${env.input} ${editor ? 'tb-editing' : ''}`} data-device={env.device.id}>
+  return <div ref={appRef} className={`tb-app ux-screen ux-size-regular ${light ? 'light' : 'dark'} ux-scheme-${scheme} tb-${env.widthClass} tb-${env.input} ${editor ? 'tb-editing' : ''}`} data-device={env.device.id}>
     {editor ? <TabletEditor key={editor.key} env={env} notify={notify} light={light} rosterName={editor.name} from={editor.from} start={editor.start}
       onBack={() => setEditor(null)} onAllRosters={() => { setEditor(null); setPage('rosters'); }} onNewRoster={newRoster} onFindData={() => { setEditor(null); setPage('sources'); }} onImport={() => setImporting(sampleImport(true))} imported={editor.imported} /> : <>
     <TabletRail page={page} input={env.input} onPage={setPage} onNewRoster={newRoster} />
@@ -86,5 +88,6 @@ function TabletShell({ route, initialEditor, initialImport = false, ...props }: 
       const left = result.unmatched.length; notify(left ? `Opened “${result.name}” without ${left === 1 ? '1 entry' : `${left} entries`}` : `Opened “${result.name}”`);
     }} />}
     <div className={`dt-app tb-shim ${light ? 'light' : ''}`}><ToastRegion toasts={toasts} /></div>
+    <IconHints root={appRef} input={env.input} />
   </div>;
 }
