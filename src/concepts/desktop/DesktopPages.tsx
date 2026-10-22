@@ -1,35 +1,16 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { createPortal } from 'react-dom';
 import { AlertTriangle, ArrowDownToLine, ArrowRight, ArrowUpCircle, BookOpen, Check, ChevronRight, CircleAlert, Copy, Database, ExternalLink, FileUp, FolderOpen, Github, HardDrive, Info, Keyboard, Languages, Layers3, Link2, ListFilter, Palette, Pencil, Plus, RefreshCcw, Search, Shield, SlidersHorizontal, Trash2, Upload, Users, X } from 'lucide-react';
 import type { ColorScheme } from '../../types';
 import { collectionSources, colourSchemes, installedSources, lookupEntries, rosterLibrary, type LookupKind, type RosterSummary, type SourceInfo } from './desktopData';
 import { comboFromEvent, defaultBindings, formatCombo, hasCommandModifier, keyActions, type KeyAction, type KeyBindings } from './desktopKeys';
 import type { DesktopJobs } from './DesktopJobs';
 import { jobPercent } from './DesktopJobs';
+import { Chip, PageActions, Segmented, Switch } from '../workspace/Primitives';
 import './desktop-pages.css';
 import { AddCollectionDialog, AddDataCollections, CollectionView, GitHubSearchView, LastUpdateCard, LastUpdateStates, UpdateReportView, flowSourceId, isAddFlow, useRosterChecks } from './DesktopSourceFlows';
 
 export type ToastOptions = { kind?: 'action' | 'notification'; action?: { label: string; run: () => void } };
 type Notify = (message: string, options?: ToastOptions) => void;
-
-/** Page actions render into the window chrome next to the tabs; desktop pages have no title header. */
-function PageActions({ slot, children }: { slot: HTMLElement | null; children: ReactNode }) {
-  return slot ? createPortal(children, slot) : null;
-}
-
-function Chip({ tone = 'neutral', children }: { tone?: 'neutral' | 'ok' | 'warn' | 'err' | 'accent'; children: ReactNode }) {
-  return <span className={`dtp-chip ${tone}`}>{children}</span>;
-}
-
-function Switch({ label, detail, checked, onChange }: { label: string; detail?: string; checked: boolean; onChange: (v: boolean) => void }) {
-  return <button type="button" role="switch" aria-checked={checked} className="dtp-setting-row" onClick={() => onChange(!checked)}>
-    <span><strong>{label}</strong>{detail && <small>{detail}</small>}</span><i className="dtp-switch" aria-hidden="true" />
-  </button>;
-}
-
-function Segmented<T extends string | number>({ label, value, options, onChange }: { label: string; value: T; options: Array<{ value: T; label: string }>; onChange: (v: T) => void }) {
-  return <div className="dtp-segmented" role="radiogroup" aria-label={label}>{options.map(o => <button type="button" key={String(o.value)} role="radio" aria-checked={value === o.value} className={value === o.value ? 'active' : ''} onClick={() => onChange(o.value)}>{o.label}</button>)}</div>;
-}
 
 const statusChip = (r: RosterSummary) => r.status === 'issues' ? <Chip tone="warn"><AlertTriangle size={11} />{r.issues} {r.issues === 1 ? 'issue' : 'issues'}</Chip>
   : r.status === 'data-changed' ? <Chip tone="accent">Data changed</Chip>

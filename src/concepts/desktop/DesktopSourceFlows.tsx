@@ -3,6 +3,7 @@ import { AlertTriangle, Archive, ArrowDownToLine, ArrowLeft, ArrowUpCircle, Chec
 import { dataChanges, githubRepositories, rosterChecks, sourceCollections, type CheckState, type CollectionPage, type DataChanges, type LastUpdate, type Listing, type RosterCheck, type SourceInfo } from './desktopData';
 import { jobPercent, type DesktopJobs } from './DesktopJobs';
 import type { ToastOptions } from './DesktopPages';
+import { Chip, type ChipTone } from '../workspace/Primitives';
 import './desktop-sources.css';
 
 // Sources sub-flows for the desktop prototype (revision 05), all inside the Sources page's detail pane:
@@ -12,17 +13,12 @@ import './desktop-sources.css';
 
 type Notify = (message: string, options?: ToastOptions) => void;
 type Go = (detail: string) => void;
-type Tone = 'neutral' | 'ok' | 'warn' | 'err' | 'accent';
 
 export const flowSourceId = (detail: string) => detail.startsWith('report:') ? detail.slice(7) : detail;
 export const isAddFlow = (detail: string) => detail === 'add' || detail === 'github' || detail.startsWith('collection:');
 
 const plural = (n: number, one: string, other = `${one}s`) => `${n} ${n === 1 ? one : other}`;
 const titleCase = (slug: string) => slug.split(/[-_.]+/).filter(Boolean).map(w => w[0].toUpperCase() + w.slice(1)).join(' ');
-
-function Chip({ tone = 'neutral', children }: { tone?: Tone; children: ReactNode }) {
-  return <span className={`dtp-chip ${tone}`}>{children}</span>;
-}
 
 function BackButton({ label, onClick }: { label: string; onClick: () => void }) {
   return <button className="dts-back" aria-label={`Back to ${label}`} onClick={onClick}><ArrowLeft size={14} />{label}</button>;
@@ -222,7 +218,7 @@ export function LastUpdateStates({ source, jobs }: { source: SourceInfo; jobs: D
 
 function DataChangesView({ changes }: { changes: DataChanges }) {
   const [all, setAll] = useState(false);
-  const groups: Array<{ label: string; sign: string; tone: Tone; items: string[] }> = [
+  const groups: Array<{ label: string; sign: string; tone: ChipTone; items: string[] }> = [
     { label: 'Added', sign: '+', tone: 'ok', items: changes.added },
     { label: 'Changed', sign: '~', tone: 'accent', items: changes.changed },
     { label: 'Removed', sign: '−', tone: 'err', items: changes.removed },

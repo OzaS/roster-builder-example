@@ -56,12 +56,6 @@
 .dtp-points.over em { background: var(--dt-warn) }
 .dtp-muted { color: var(--dt-muted); font-size: 12px }
 .dtp-faint { color: var(--dt-faint) !important }
-.dtp-chip { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 9px; border-radius: 999px; font-size: 11px; font-weight: 500; white-space: nowrap; background: var(--dt-hover); color: var(--dt-muted); border: 1px solid transparent }
-.dtp-chip.ok { color: var(--ux-ok); background: color-mix(in srgb, var(--ux-ok) 12%, transparent) }
-.dtp-chip.warn { color: var(--dt-warn); background: color-mix(in srgb, var(--dt-warn) 13%, transparent) }
-.dtp-chip.err { color: var(--ux-err); background: color-mix(in srgb, var(--ux-err) 12%, transparent) }
-.dtp-chip.accent { color: var(--dt-accent); background: var(--dt-selected) }
-.dt-app .dtp-chip.add { border: 1px dashed var(--ux-line-2); background: none; cursor: pointer; gap: 4px }
 
 .dtp-detail { overflow: auto; padding: 20px }
 .dtp-detail h2 { font-size: 20px; font-weight: 600; letter-spacing: -.4px }
@@ -156,25 +150,13 @@
 .dtp-settings-body { overflow: auto; display: flex; flex-direction: column; gap: 12px; padding-bottom: 40vh; scroll-padding-top: 4px }
 .dtp-settings-card { flex-shrink: 0; padding: 18px 20px; display: flex; flex-direction: column; gap: 4px }
 .dt-app .dtp-settings-card>h2 { font-size: 15px; font-weight: 600; margin-bottom: 8px }
-.dtp-setting-line, .dt-app .dtp-setting-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 0; width: 100%; text-align: left; border-radius: 0 }
-.dt-app .dtp-setting-row:hover { background: none }
-.dtp-rows .dtp-setting-row { padding: 11px 14px; border-top: 1px solid var(--dt-border) }
-.dtp-rows .dtp-setting-row:first-child { border-top: 0 }
-.dt-app .dtp-rows .dtp-setting-row:hover { background: var(--dt-hover) }
-.dtp-setting-line strong, .dtp-setting-row strong, .dtp-setting-block>strong { display: block; font-size: 13px; font-weight: 500 }
-.dtp-setting-line small, .dtp-setting-row small { display: block; font-size: 12px; color: var(--dt-muted); margin-top: 2px }
-.dtp-setting-row>svg { color: var(--dt-accent) }
+.dtp-setting-line{ display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 0; width: 100%; text-align: left; border-radius: 0 }
+.dtp-setting-line strong,.dtp-setting-block>strong{ display: block; font-size: 13px; font-weight: 500 }
+.dtp-setting-line small{ display: block; font-size: 12px; color: var(--dt-muted); margin-top: 2px }
 .dtp-setting-block { padding: 10px 0 }
 .dtp-setting-foot { display: flex; align-items: center; gap: 12px; margin-top: 12px }
 .dtp-setting-foot small { color: var(--dt-muted); font-size: 12px }
 .dtp-mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px !important }
-.dtp-switch { flex-shrink: 0; width: 36px; height: 21px; border-radius: 999px; background: var(--ux-line-2); position: relative; transition: background .15s }
-.dtp-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 15px; height: 15px; border-radius: 50%; background: var(--dt-pane); box-shadow: 0 1px 3px #0003; transition: transform .15s }
-[aria-checked=true]>.dtp-switch { background: var(--dt-fill) }
-[aria-checked=true]>.dtp-switch::after { transform: translateX(15px) }
-.dtp-segmented { display: inline-flex; padding: 3px; border-radius: 11px; background: var(--dt-hover); gap: 2px }
-.dt-app .dtp-segmented button { height: 28px; min-width: 52px; padding: 0 12px; border-radius: 8px; font-size: 12px; color: var(--dt-muted) }
-.dt-app .dtp-segmented button.active { background: var(--dt-pane); color: var(--dt-text); box-shadow: 0 1px 3px #0002, inset 0 0 0 1px var(--dt-border) }
 .dtp-scheme-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 10px }
 .dt-app .dtp-scheme-grid button { justify-content: flex-start; gap: 10px; padding: 10px; border-radius: 12px; border: 1px solid var(--dt-border); font-size: 13px }
 .dt-app .dtp-scheme-grid button.active { border-color: color-mix(in srgb, var(--dt-fill) 55%, transparent); background: var(--dt-selected) }
