@@ -1,0 +1,80 @@
+/* Tablet dialogs (T3): guided creation, faction picker, add collection, appearance import, move unit, confirm.
+   Built on the form sheet (tablet-sheet.css); its scrim is the size container `tbs`, so the step list sits beside the content
+   once the sheet is wide (>= 760 px) and above it, as a row of marks, in a narrower window. */
+
+/* Guided creation: step list + content. */
+.tbc { display: grid; gap: 18px; align-content: start }
+.tbc-steps ol { display: flex; gap: 6px; margin: 0; padding: 0; list-style: none }
+.tbc-steps li { flex: 1; min-width: 0 }
+.tb-app button.tbc-step { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 6px 8px; border: 0; border-radius: 12px; background: transparent; color: var(--ux-muted); font: inherit; text-align: left; cursor: pointer; touch-action: manipulation }
+.tbc-step > span:last-child { display: grid; min-width: 0 }
+.tbc-step b { overflow: hidden; font-size: 14.5px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap }
+.tbc-step small { overflow: hidden; color: var(--ux-ink-tertiary); font-size: 12.5px; text-overflow: ellipsis; white-space: nowrap }
+.tbc-mark { flex: 0 0 auto; display: grid; place-items: center; width: 28px; height: 28px; border: 1.5px solid var(--ux-line-2); border-radius: 50%; font-size: 13px; font-weight: 750; font-variant-numeric: tabular-nums }
+.tb-app button.tbc-step.done { color: var(--ux-ink) }
+.tbc-step.done .tbc-mark { border-color: var(--ux-ok); background: color-mix(in srgb, var(--ux-ok) 16%, transparent); color: var(--ux-ok) }
+.tb-app button.tbc-step.current { background: color-mix(in srgb, var(--ux-accent) 12%, var(--ux-surface)); color: var(--ux-ink) }
+.tbc-step.current .tbc-mark { border-color: var(--ux-accent); background: var(--ux-accent); color: var(--ux-accent-ink) }
+.tb-app button.tbc-step:disabled { opacity: .5; cursor: default }
+.tb-app.tb-pointer button.tbc-step:not(:disabled):not(.current):hover { background: var(--ux-surface-2) }
+.tb-app button.tbc-step:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px }
+/* Narrow: marks in a row, the label of the current step only. */
+.tbc-step > span:last-child { display: none }
+.tbc-step.current > span:last-child { display: grid }
+.tbc-step.current > span:last-child small { display: none }
+.tb-app button.tbc-step { justify-content: center }
+.tb-app button.tbc-step.current { justify-content: flex-start }
+.tbc-steps li:has(.current) { flex: 3 }
+.tbc-main { display: flex; flex-direction: column; gap: 14px; min-width: 0 }
+.tbc-main .tbs-label { margin-bottom: 0 }
+.tbc-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px }
+.tb-app button.tbc-skip { min-height: 44px; padding: 0 8px; border: 0; background: transparent; color: var(--ux-muted); font: inherit; font-size: 14px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; touch-action: manipulation }
+.tb-app button.tbc-skip:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px }
+.tb-app button.tbc-add { border-style: dashed; color: var(--ux-ink) }
+.tbc-chips { display: flex; flex-wrap: wrap; gap: 8px }
+.tb-app button.tbc-chip { min-width: 84px; min-height: 48px; padding: 0 16px; border: 1px solid var(--ux-line-2); border-radius: 12px; background: var(--ux-surface); color: var(--ux-ink); font: inherit; font-size: 15.5px; font-weight: 650; font-variant-numeric: tabular-nums; cursor: pointer; touch-action: manipulation }
+.tb-app button.tbc-chip.active { border-color: var(--ux-accent); background: color-mix(in srgb, var(--ux-accent) 14%, var(--ux-surface)) }
+.tb-app.tb-pointer button.tbc-chip:not(.active):hover { background: var(--ux-surface-2) }
+.tb-app button.tbc-chip:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px }
+.tbc-error { color: var(--ux-err) }
+.tbc-review li { min-height: 64px }
+.tbc-review li > span small { order: -1 }
+.tbc-review .tbs-action { min-height: 44px; padding: 0 14px }
+.tbc-empty { display: grid; justify-items: center; gap: 8px; padding: 36px 16px; text-align: center; color: var(--ux-muted) }
+.tbc-empty strong { color: var(--ux-ink); font-size: 18px }
+.tbc-empty small { max-width: 360px; font-size: 14px; line-height: 1.45 }
+@container tbs (min-width: 760px) {
+  .tbc { grid-template-columns: 230px minmax(0, 1fr); gap: 24px }
+  .tbc-steps ol { flex-direction: column; gap: 4px }
+  .tbc-steps li, .tbc-steps li:has(.current) { flex: none }
+  .tbc-step > span:last-child, .tbc-step.current > span:last-child { display: grid }
+  .tbc-step.current > span:last-child small { display: block }
+  .tb-app button.tbc-step, .tb-app button.tbc-step.current { justify-content: flex-start; min-height: 56px; padding: 6px 10px }
+  .tbc-steps { padding-right: 20px; border-right: 1px solid var(--ux-line) }
+}
+
+/* Faction picker: a checkbox row with the count and Select all above. */
+.tbd-tools { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--ux-muted); font-size: 13.5px; font-weight: 650 }
+.tb-app button.tbs-choice > .tbd-box { flex: 0 0 auto; display: grid; place-items: center; width: 24px; height: 24px; border: 1.5px solid var(--ux-line-2); border-radius: 7px; color: var(--ux-accent-ink) }
+.tb-app button.tbs-choice.active > .tbd-box { border-color: var(--ux-accent); background: var(--ux-accent) }
+.tb-app button.tbs-choice[role=checkbox] { min-height: 56px }
+.tb-app .tbs-action.tbd-danger { margin-right: auto; border-color: color-mix(in srgb, var(--ux-err) 45%, var(--ux-line-2)); color: var(--ux-err) }
+.tb-app .tbs-action.tbd-inline { margin-top: 10px; min-height: 44px }
+
+/* Add a collection: the link field with its Find button, and the gallery-only state buttons. */
+.tbd-find { display: flex; gap: 10px }
+.tbd-find input { flex: 1; min-width: 0 }
+.tbd-find .tbs-action { flex: 0 0 auto; min-height: 48px }
+.tbs-field > small { font-size: 13px; font-weight: 500; line-height: 1.4 }
+.tbd-preview { border-top: 1px solid var(--ux-line); padding-top: 10px; color: var(--ux-muted); font-size: 13px }
+.tbd-preview summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-weight: 650 }
+.tbd-preview-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 10px }
+.tb-app .tbd-preview-row .tbs-action { min-height: 44px; padding: 0 14px; font-size: 13.5px }
+.tb-app .tbd-preview-row .tbs-action[aria-pressed=true] { border-color: var(--ux-accent); background: color-mix(in srgb, var(--ux-accent) 14%, var(--ux-surface)) }
+
+/* Appearance import: the swatch of the imported scheme. */
+.tbd-swatch { display: flex !important; align-items: center; gap: 0; margin-top: 10px }
+.tbd-swatch i { display: block; width: 24px; height: 28px; border: 1px solid var(--ux-line); border-left-width: 0 }
+.tbd-swatch i:first-child { border-left-width: 1px; border-radius: 8px 0 0 8px }
+.tbd-swatch i:nth-child(3) { border-radius: 0 8px 8px 0 }
+.tbd-swatch b { margin-left: 12px; color: var(--ux-ink); font-size: 14px }

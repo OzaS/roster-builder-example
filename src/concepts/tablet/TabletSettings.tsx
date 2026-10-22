@@ -23,9 +23,8 @@ const sections = [
 const Group = ({ title, children }: { title?: string; children: ReactNode }) => <section className="tb-section">{title && <span className="ux-result-label">{title}</span>}{children}</section>;
 
 export function TabletSettings({ env, notify, session, themePref, scheme, onTheme, onScheme }: SessionProps & { themePref: ThemePref; scheme: ColorScheme; onTheme: (t: ThemePref) => void; onScheme: (s: ColorScheme) => void }) {
-  const { light, advancedInstall, setAdvancedInstall, settingsSection, setSettingsSection } = session;
+  const { light, advancedInstall, setAdvancedInstall, settingsSection, setSettingsSection, language, setLanguage, setAppearanceImport } = session;
   const [open, setOpen] = useState(settingsSection !== undefined);
-  const [language, setLanguage] = useState('en');
   const [limit, setLimit] = useState(1000);
   const [toggles, setToggles] = useState({ rememberSections: true, reopenLast: true, autoChecks: true });
   const [keep, setKeep] = useState(1);
@@ -36,11 +35,11 @@ export function TabletSettings({ env, notify, session, themePref, scheme, onThem
       case 'appearance': return <>
         <WorkspaceScope light={light}><div className="tb-setting"><span><strong>Theme</strong><small>System follows the device setting.</small></span><Segmented<ThemePref> label="Theme" value={themePref} onChange={onTheme} options={[{ value: 'system', label: 'System' }, { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }]} /></div></WorkspaceScope>
         <Group title="Colour scheme"><div className="tb-schemes" role="radiogroup" aria-label="Colour scheme">{colourSchemes.map(c => <button type="button" key={c.id} role="radio" aria-checked={scheme === c.id} className={`ux-start-row tb-scheme ${scheme === c.id ? 'on' : ''}`} onClick={() => onScheme(c.id)}><i style={{ background: c.accent }} /><span><strong>{c.name}</strong></span>{scheme === c.id && <Check size={18} />}</button>)}</div>
-          <button type="button" className="ux-job-btn tb-wide" onClick={() => notify('Choose a colour scheme file (JSON)')}><Upload size={16} />Import colour scheme</button></Group>
+          <button type="button" className="ux-job-btn tb-wide" onClick={() => setAppearanceImport({ kind: 'scheme', outcome: 'idle' })}><Upload size={16} />Import colour scheme</button></Group>
       </>;
       case 'language': return <>
         <Group><div className="tb-schemes" role="radiogroup" aria-label="Language">{[['en', 'English'], ['fr', 'Français · imported']].map(([id, name]) => <button type="button" key={id} role="radio" aria-checked={language === id} className={`ux-start-row tb-scheme ${language === id ? 'on' : ''}`} onClick={() => setLanguage(id)}><Languages size={20} /><span><strong>{name}</strong></span>{language === id && <Check size={18} />}</button>)}</div>
-          <button type="button" className="ux-job-btn tb-wide" onClick={() => notify('Choose a language pack (JSON)')}><Upload size={16} />Import language pack</button></Group>
+          <button type="button" className="ux-job-btn tb-wide" onClick={() => setAppearanceImport({ kind: 'language', outcome: 'idle' })}><Upload size={16} />Import language pack</button></Group>
         <p className="tb-note"><Info size={15} />Only the app is translated. Game data is shown as written.</p>
       </>;
       case 'rosters': return <WorkspaceScope light={light}>

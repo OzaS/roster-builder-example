@@ -15,11 +15,11 @@
 @media (prefers-reduced-motion: reduce) { .tbs-scrim, .tbs-sheet { animation: none } }
 
 /* Header: Cancel · title · primary action (44 px targets). */
-.tbs-head { flex: 0 0 auto; display: grid; grid-template-columns: minmax(80px, 1fr) minmax(0, 2fr) minmax(80px, 1fr); align-items: center; gap: 8px; min-height: 64px; padding: 10px 14px; border-bottom: 1px solid var(--ux-line) }
+.tbs-head { flex: 0 0 auto; display: grid; grid-template-columns: minmax(max-content, 1fr) minmax(0, 2fr) minmax(max-content, 1fr); align-items: center; gap: 8px; min-height: 64px; padding: 10px 14px; border-bottom: 1px solid var(--ux-line) }
 .tbs-title { display: grid; min-width: 0; text-align: center }
 .tbs-title strong { overflow: hidden; font-size: 17px; font-weight: 800; text-overflow: ellipsis; white-space: nowrap }
 .tbs-title small { overflow: hidden; color: var(--ux-muted); font-size: 12.5px; text-overflow: ellipsis; white-space: nowrap }
-.tb-app .tbs-head button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 16px; border: 0; border-radius: 12px; font: inherit; font-size: 16px; cursor: pointer; touch-action: manipulation }
+.tb-app .tbs-head button { white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 16px; border: 0; border-radius: 12px; font: inherit; font-size: 16px; cursor: pointer; touch-action: manipulation }
 .tb-app .tbs-head button.tbs-cancel { justify-self: start; margin-left: -6px; background: transparent; color: var(--ux-accent-2); font-weight: 600 }
 .tb-app.light .tbs-head button.tbs-cancel { color: var(--ux-accent) }
 .tb-app .tbs-head button.tbs-primary { justify-self: end; background: var(--ux-accent); color: var(--ux-accent-ink); font-weight: 750 }

@@ -23,13 +23,18 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "tablet-rosters-empty", label: "Tablet · Rosters · Empty" },
   { id: "tablet-sources-add", label: "Tablet · Sources · Add game data" },
   { id: "tablet-sources-installing", label: "Tablet · Sources · Installing, every faction" },
-  { id: "tablet-sources-choose-factions", label: "Tablet · Sources · Installing, Advanced installation" },
+  { id: "tablet-sources-choose-factions", label: "Tablet · Sources · Faction picker (Advanced installation)" },
   { id: "tablet-sources-update-report", label: "Tablet · Sources · Update report" },
   { id: "tablet-sources-collection", label: "Tablet · Sources · Collection" },
   { id: "tablet-sources-github", label: "Tablet · Sources · Search GitHub" },
   { id: "tablet-sources-add-collection", label: "Tablet · Sources · Add a collection" },
   { id: "tablet-settings-game-data", label: "Tablet · Settings · Game data" },
   { id: "tablet-settings-shortcuts", label: "Tablet · Settings · Keyboard shortcuts" },
+  { id: "tablet-create", label: "Tablet · New roster (guided creation)" },
+  { id: "tablet-create-review", label: "Tablet · New roster · Review" },
+  { id: "tablet-settings-appearance-import", label: "Tablet · Settings · Appearance import" },
+  { id: "tablet-editor-move-unit", label: "Tablet · Roster editor · Move unit" },
+  { id: "tablet-confirm-delete", label: "Tablet · Confirm · Delete roster" },
   { id: "tablet-archive-sketch", label: "Archive · Earlier tablet sketch" },
   { id: "desktop-welcome", label: "Desktop · Welcome" },
   { id: "desktop-editor", label: "Desktop · Roster editor" },
@@ -94,7 +99,7 @@ export function resolveWorkflow(workflow?: WorkflowScreen[]): Array<{ id: Workfl
 
 export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScreen {
   if (screen === "tablet-archive-sketch") return "overview";
-  if (screen === "tablet-editor" || screen === "tablet-editor-issues" || screen === "tablet-editor-add" || screen === "tablet-editor-forces" || screen === "tablet-editor-add-force" || screen === "tablet-editor-readonly" || screen === "tablet-editor-export" || screen === "tablet-editor-import-result") return "overview";
+  if (screen === "tablet-editor" || screen === "tablet-editor-issues" || screen === "tablet-editor-add" || screen === "tablet-editor-forces" || screen === "tablet-editor-add-force" || screen === "tablet-editor-readonly" || screen === "tablet-editor-export" || screen === "tablet-editor-import-result" || screen === "tablet-editor-move-unit") return "overview";
   if (screen.startsWith("tablet-")) return "library"; // every other tablet screen is a page or a state of one
   if (screen === "tablet-home" || screen === "tablet-rosters" || screen === "tablet-lookup" || screen === "tablet-tools" || screen === "tablet-library" || screen === "tablet-sources" || screen === "tablet-settings") return "library";
   if (screen === "desktop-tools" || screen === "desktop-library") return "library";

@@ -104,7 +104,7 @@ export function FactionPicker({ job, onChoose, onCancel }: { job: Job; onChoose:
 }
 
 /** Popover under the chrome, like the roster summary: every job with its steps. */
-export function JobsPanel({ jobs, onChoose, onCancel, onHide, onClear, onViewSource }: { jobs: Job[]; onChoose: (id: string, chosen: string[]) => void; onCancel: (id: string) => void; onHide: () => void; onClear: () => void; onViewSource: (id: string) => void }) {
+export function JobsPanel({ jobs, onChoose, onPick, onCancel, onHide, onClear, onViewSource }: { jobs: Job[]; onChoose: (id: string, chosen: string[]) => void; /** When set, a waiting install offers a button that opens the picker elsewhere (the tablet's sheet) instead of the inline picker. */ onPick?: (id: string) => void; onCancel: (id: string) => void; onHide: () => void; onClear: () => void; onViewSource: (id: string) => void }) {
   const ended = jobs.filter(j => !isLive(j));
   return <section id="dt-jobs" className="dt-jobs" aria-label="Installs and updates">
     <header><h2>Installs and updates</h2><button className="dtp-btn small" onClick={onHide} title="Jobs keep running">Hide</button></header>
@@ -115,7 +115,7 @@ export function JobsPanel({ jobs, onChoose, onCancel, onHide, onClear, onViewSou
         {step.state === 'done' ? <Check size={13} /> : step.state === 'active' ? <LoaderCircle size={13} className="dt-spin" /> : step.state === 'needs-you' ? <AlertTriangle size={13} /> : <Circle size={11} />}
         <span>{step.label}</span><small>{step.state === 'active' ? `${step.progress}%` : step.state === 'needs-you' ? 'Needs you' : step.state === 'done' ? 'Done' : 'Waiting'}</small>
       </li>)}</ol>}
-      {job.status === 'needs-you' && <FactionPicker job={job} onChoose={chosen => onChoose(job.id, chosen)} onCancel={() => onCancel(job.id)} />}
+      {job.status === 'needs-you' && (onPick ? <div className="dt-job-actions"><button className="dtp-btn primary small" onClick={() => onPick(job.id)}>Choose factions</button><button className="dtp-btn small" onClick={() => onCancel(job.id)}>Cancel install</button></div> : <FactionPicker job={job} onChoose={chosen => onChoose(job.id, chosen)} onCancel={() => onCancel(job.id)} />)}
       {job.status === 'running' && <div className="dt-job-actions"><button className="dtp-btn small" onClick={() => onCancel(job.id)} title="Factions already imported stay installed">Cancel</button></div>}
       {job.status === 'done' && <div className="dt-job-actions"><small>{job.kind === 'install' ? `${job.chosen.length} ${job.chosen.length === 1 ? 'faction' : 'factions'} · ${job.size}` : '5 rosters checked · 1 changed'}</small><button className="dtp-btn small" onClick={() => onViewSource(job.sourceId)}>View source</button></div>}
     </article>)}

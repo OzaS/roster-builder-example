@@ -358,7 +358,7 @@
         { "id": "tablet-sources", "label": "Sources · Installed data" },
         { "id": "tablet-sources-add", "label": "Sources · Add game data" },
         { "id": "tablet-sources-installing", "label": "Sources · Installing, every faction" },
-        { "id": "tablet-sources-choose-factions", "label": "Sources · Installing, Advanced installation on" },
+        { "id": "tablet-sources-choose-factions", "label": "Sources · Faction picker (Advanced installation)" },
         { "id": "tablet-sources-update-report", "label": "Sources · Update report" },
         { "id": "tablet-sources-collection", "label": "Sources · Collection" },
         { "id": "tablet-sources-github", "label": "Sources · Search GitHub" },
@@ -366,6 +366,11 @@
         { "id": "tablet-settings", "label": "Settings · Sections" },
         { "id": "tablet-settings-game-data", "label": "Settings · Game data" },
         { "id": "tablet-settings-shortcuts", "label": "Settings · Keyboard shortcuts" },
+        { "id": "tablet-create", "label": "New roster · Guided creation" },
+        { "id": "tablet-create-review", "label": "New roster · Review" },
+        { "id": "tablet-settings-appearance-import", "label": "Settings · Appearance import" },
+        { "id": "tablet-editor-move-unit", "label": "Roster editor · Move unit" },
+        { "id": "tablet-confirm-delete", "label": "Confirm · Delete roster" },
         { "id": "tablet-archive-sketch", "label": "Archive · Earlier tablet sketch" }
       ],
       "workflows": [
@@ -400,6 +405,11 @@
           "id": "editor",
           "label": "Roster editor",
           "screens": ["tablet-editor", "tablet-editor-issues", "tablet-editor-add", "tablet-editor-forces", "tablet-editor-add-force", "tablet-editor-readonly", "tablet-editor-export", "tablet-editor-import-result"]
+        },
+        {
+          "id": "dialogs",
+          "label": "Dialogs and sheets",
+          "screens": ["tablet-create", "tablet-create-review", "tablet-settings-appearance-import", "tablet-confirm-delete", "tablet-editor-move-unit"]
         },
         {
           "id": "archive",
@@ -449,6 +459,12 @@
               {"id": "tablet.read-only-roster", "title": "Read-only Roster", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["lock beside the roster name in the header", "banner says the faction was removed from the installed data and the roster is kept as saved", "actions: Make an editable copy, Find game data, Export as it was", "undo, redo, rename, add unit and add force are off; unit options show but cannot change", "Expanded: the catalogue pane says Nothing to add, with Find game data", "summary says Not checked while read-only", "Make an editable copy opens a copy; the original stays read-only"], "screens": ["tablet-editor-readonly"]},
               {"id": "tablet.export-sheet", "title": "Export Sheet", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["wide form sheet: format and options beside the preview (stacked in split view)", "format choice rows: Text for sharing, Roster file", "Include switches for Rules and Profiles (off and fixed for the roster file, with the reason)", "monospace preview, selectable, with file name and size", "Share in the header (the system share sheet), Copy text or Copy JSON, Save file…", "read-only roster: note that it is exported as it was saved", "opened from More, the summary popover or the read-only banner"], "screens": ["tablet-editor-export"]},
               {"id": "tablet.import-result-sheet", "title": "Import Result Sheet", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["file name under the title, roster mark, name, system, faction and forces", "everything matched: ok note", "parts did not match: warning note, counts for matched, not found and points of the file, list of entries not found with where they were", "Open roster, or Open without it / them", "Cancel leaves nothing opened", "Open starts the editor on what matched; reached from the recent-rosters switcher (Import roster…) or after choosing a file on Rosters"], "screens": ["tablet-editor-import-result"]},
+              {"id": "tablet.create-sheet", "title": "Guided Creation Sheet", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["wide form sheet opened by every New roster entry (rail button, Home, Rosters, recent-rosters switcher, editor menu)", "step list on the left: Game system, Faction, Force, Points and name, Review; finished steps show their choice and stay editable", "in a narrower window the list becomes a row of step marks above the content", "choice rows for system, faction (search when there are more than four) and force; points limit chips (presets, Custom with a whole-number field, Unlimited); name field with the suggested name as placeholder", "force that needs a higher limit says so and holds Continue", "Review lists every choice with Change; Create roster opens the empty roster in the editor", "Back and Skip guided setup under the content, Continue or Create roster in the header", "no game data: Install game data first, with Add game data", "split view: fills the window"], "screens": ["tablet-create", "tablet-create-review"]},
+              {"id": "tablet.faction-picker-sheet", "title": "Faction Picker Sheet", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["only with Advanced installation on (DEC-022); every other install imports all factions and never asks", "opens by itself when an install reaches Choose factions; covers the whole window, rail included", "paused-install hint, search when there are more than four factions, N of M selected with Select all or none", "checkbox rows of 56 px, the first faction chosen", "Install N factions in the header; Choose later leaves the install waiting (the jobs popover offers Choose factions again); Cancel install", "split view: fills the window"], "screens": ["tablet-sources-choose-factions"]},
+              {"id": "tablet.add-collection-sheet", "title": "Add Collection Sheet", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["covers the whole window instead of the main area", "link field with Find; Enter finds", "found: collection or organisation card with its description; Add collection enables", "a repository link offers Install it", "errors: already added, not a collection, no connection", "keyboard: the field scrolls into view; Preview states are gallery controls"], "screens": ["tablet-sources-add-collection"]},
+              {"id": "tablet.appearance-import-sheet", "title": "Appearance Import Sheet", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["opened from Settings, Appearance: Import colour scheme and Import language pack", "explains the limits, Choose a file… opens the system picker in the app", "importing, saved scheme with swatch, language with warnings, contrast error or invalid file (the current choice stays)", "Done and Close in the header; import states are gallery controls"], "screens": ["tablet-settings-appearance-import"]},
+              {"id": "tablet.confirm-sheet", "title": "Confirm Sheet (destructive)", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["generic: title with the subject, what is affected, what it costs, a named action (Delete roster, not OK)", "destructive primary action in the error colour; Cancel is focused first", "Delete roster: the roster row, then an Undo toast for a few seconds", "split view: fills the window"], "screens": ["tablet-confirm-delete"]},
+              {"id": "tablet.move-unit-sheet", "title": "Move Unit Sheet", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["opened from the unit row menu (press and hold or right-click): Move to another force…", "choice rows of the roster's other forces with type, faction and unit count; the first that can take the unit is chosen", "a force that cannot take the unit says why (a Patrol takes no Support units) and stays off", "one force only: No other force, with Add force…", "one undo step; the unit stays selected and is revealed in its new force", "split view: fills the window"], "screens": ["tablet-editor-move-unit"]},
               {"id": "tablet.rename-sheet", "title": "Rename Sheet (one field)", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["roster name or force name", "field selected on open, character count", "Save stays off while the name is empty or unchanged", "Enter saves", "More menu: Rename roster; force menu: Rename force"], "screens": []}
             ]
           },
