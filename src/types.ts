@@ -39,6 +39,8 @@ export type WorkflowScreen =
   | "tablet-editor-readonly"
   | "tablet-editor-export"
   | "tablet-editor-shortcuts"
+  | "tablet-editor-text-200"
+  | "tablet-rosters-text-200"
   | "tablet-editor-import-result"
   | "tablet-lookup"
   | "tablet-tools"

@@ -11,7 +11,7 @@ import type { Job } from '../workspace/Jobs';
 import { editorShortcuts, keyLabel } from './tabletKeys';
 import { TabletWorkbench } from './TabletWorkbench';
 import { TabletPrefsContext, makeTabletEnv, TabletEnvContext } from './tabletEnv';
-import { defaultDeviceId, defaultInput, tabletDevices, widthClassLabel, widthClassOf, type TabletDeviceId, type TabletInput } from './tabletDevices';
+import { defaultDeviceId, defaultInput, defaultTextScale, tabletDevices, widthClassLabel, widthClassOf, type TabletDeviceId, type TabletInput, type TextScale } from './tabletDevices';
 import './tablet.css';
 
 const demoJob = (status: Job['status'], progress: number): Job => ({ id: 'demo', kind: 'install', sourceId: 'demo', name: 'Example System Three', size: '22.4 MB', factions: [], chosen: [], status, steps: [{ label: 'Download', state: status === 'needs-you' ? 'needs-you' : 'active', progress }] });
@@ -32,7 +32,8 @@ function ResizerDemo({ input, menu }: { input: TabletInput; menu?: boolean }) {
 export function TabletElements() {
   const [deviceId, setDeviceId] = useState<TabletDeviceId>(defaultDeviceId);
   const [input, setInput] = useState<TabletInput>(defaultInput);
-  const prefs = useMemo(() => ({ deviceId, input, setDeviceId, setInput }), [deviceId, input]);
+  const [textScale, setTextScale] = useState<TextScale>(defaultTextScale);
+  const prefs = useMemo(() => ({ deviceId, input, textScale, setDeviceId, setInput, setTextScale }), [deviceId, input, textScale]);
   const [page, setPage] = useState<'home' | 'rosters' | 'tools'>('rosters');
   const railIn = (mode: TabletInput) => <div className="tb-app ux-screen ux-size-regular dark tb-medium" style={{ height: 'auto', flex: 'none', background: 'var(--ux-bg)', borderRadius: 18, overflow: 'visible', width: 'max-content' }}>
     <TabletEnvContext.Provider value={makeTabletEnv('ipad-portrait', mode)}><div style={{ height: 620, display: 'flex' }}><TabletRail page={page} input={mode} onPage={p => setPage(p as typeof page)} onNewRoster={() => {}} /></div></TabletEnvContext.Provider>
@@ -49,7 +50,7 @@ export function TabletElements() {
       </div>
       <h2>Device frames · same scale</h2>
       <div className="tb-el-devices">{tabletDevices.map(d => <figure key={d.id}><i style={{ width: d.width / 8, height: d.height / 8 }} className={d.system} /><figcaption><strong>{d.label}</strong>{d.width} × {d.height} · {widthClassLabel[widthClassOf(d.width)]}</figcaption></figure>)}</div>
-      <h2>Device and input mode switches</h2>
+      <h2>Device, input mode and text size switches</h2>
       <div className="tb-el-controls"><TabletControls /></div>
       <h2>Coming soon placeholders · Tools and Library</h2>
       <div className="tb-el-row"><div className="tb-app ux-screen dark tb-el-card"><ComingSoonCard icon={Hammer} title="Tools" description="Roster analytics, comparison, a game tracker and a dice simulator." planned="Planned for 1.2+" covers="" /></div><div className="tb-app ux-screen dark tb-el-card"><ComingSoonCard icon={BookMarked} title="Library" description="Units and detachments you saved, ready to reuse." planned="Planned for 1.2+" covers="" /></div></div>
@@ -60,6 +61,9 @@ export function TabletElements() {
       <h2>Pane resizer · grab handle with preset widths (Narrow, Default, Wide)</h2>
       <p>Touch: tap the handle to cycle the presets, drag and it snaps to the nearest one, press and hold for the menu (presets and Hide). Pointer: free drag with the presets pulling within 12 px, double-click resets, hover shows the grip and a title. Keyboard: arrows (Shift for 48 px), Home and End, Enter cycles. The width and preset show while it moves.</p>
       <div className="tb-el-row"><ResizerDemo input="touch" menu /><ResizerDemo input="pointer" /></div>
+      <h2>Larger text and display zoom (UX-025) · Text size 100%, 150%, 200%</h2>
+      <p>The Text size switch (gallery, and <code>text=</code> on a standalone link) scales the tablet type and controls. The layout gets the smaller logical width (device width ÷ scale) and collapses by width class instead of clipping: Expanded → Medium (two panes) → single pane; under 600 the rail drops its labels (they stay the accessible names and hints) and scrolls when taller than the window; under 440 the editor header keeps Back, the roster mark, the points and More (undo and redo move into More). Screens: Roster editor · Text 200%, Rosters · Text 200%.</p>
+      <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-editor-text-200" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="split"><TabletWorkbench workflowScreen="tablet-rosters-text-200" /></TabletDeviceFrame></div>
       <h2>Empty state card · first run, no rosters, no match</h2>
       <div className="tb-el-row"><div className="tb-app ux-screen dark tb-el-card"><EmptyState icon={Layers3} title="No rosters yet" text="Create a roster, or import one from a file."><button type="button" className="ux-primary tb-primary"><Plus size={17} />New roster</button><button type="button" className="ux-job-btn">Import a roster</button></EmptyState></div></div>
       <h2>Install row · Install, installing, choose factions, update, installed (44 px actions; progress under the text)</h2>

@@ -209,3 +209,25 @@
 .tbk-caps { display: flex; gap: 6px; flex-shrink: 0 }
 .tbk-caps kbd { min-width: 28px; padding: 3px 8px; border: 1px solid var(--ux-line-2); border-radius: 8px; background: var(--ux-surface-2); font: 650 13px var(--font); text-align: center }
 @media (prefers-reduced-motion: reduce) { .tbk-overlay { animation: none } }
+
+/* ------------------------------ T4: larger text and display zoom (UX-025) ------------------------------ */
+/* The text size zooms the app root, so the layout gets a smaller logical window and collapses by width class: Expanded →
+   Medium → single pane. The rail scrolls when it is taller than the window; at Compact logical width it drops its labels
+   (they stay the accessible names and the hints) so the content keeps its room. */
+.tb-rail { overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none }
+.tb-rail::-webkit-scrollbar { display: none }
+.tb-rail > * { flex-shrink: 0 }
+.tb-compact .tb-rail { flex-basis: 68px; padding: 10px 6px 16px }
+.tb-compact .tb-app .tb-rail button.tb-rail-fab, .tb-compact.tb-app .tb-rail button.tb-rail-fab { width: 52px; height: 52px; margin-bottom: 10px }
+.tb-compact.tb-app button.tb-rail-item { min-height: 52px }
+.tb-compact .tb-rail-ind { width: 52px }
+.tb-compact button.tb-rail-item > span:last-child { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap }
+.tb-compact .tb-main { padding: 12px 12px 20px }
+@container (max-width: 300px) { .tb-row-end { display: none } }
+.tb-toolbar { flex-wrap: wrap }
+.tb-toolbar .tb-search { flex: 1 1 260px }
+.tb-compact .tb-home, .tb-compact.tb-app .tb-home-side { grid-template-columns: minmax(0, 1fr) }
+/* Compact logical width: the page scrolls as a whole (toolbars and filters wrap above the list) instead of squeezing the list. */
+.tb-compact .tb-main > .tb-page { overflow-y: auto; overscroll-behavior: contain }
+.tb-compact .tb-page > .tb-panes { flex: none; min-height: min(100%, 420px) }
+.tb-compact .tb-page .tb-list.scroll { flex: none; overflow: visible }

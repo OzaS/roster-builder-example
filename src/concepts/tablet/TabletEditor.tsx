@@ -20,7 +20,7 @@ import './tablet-editor.css';
 // shared summary popover (validation lives there, with Show) and a More menu. Panes by width:
 //   Expanded (>= 840): catalogue · force tree · unit details, side panes resizable with a touch grab handle and hideable.
 //   Medium (600-839): force tree · unit details; the catalogue is a slide-over from Add unit.
-//   Split view (< 700 wide): the tree alone; a unit's details open over it (like ListDetail on the pages).
+//   Split view (< 700 wide, also any window whose logical width drops under 700 at a larger text size): the tree alone; a unit's details open over it (like ListDetail on the pages).
 
 export type EditorStart = 'editor' | 'issues' | 'add' | 'forces' | 'add-force' | 'readonly' | 'export';
 type Pop = 'switcher' | 'more' | 'summary' | `unit-${number}` | `force-${string}` | null;
@@ -52,7 +52,10 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
   env: TabletEnv; notify: Notify; light: boolean; rosterName: string; from: string; start?: EditorStart; imported?: ImportResult;
   onBack: () => void; onAllRosters: () => void; onNewRoster: () => void; onImport: () => void; onFindData: () => void;
 }) {
-  const mode: Mode = env.widthClass === 'expanded' ? 'three' : env.device.width < 700 ? 'single' : 'two';
+  const mode: Mode = env.widthClass === 'expanded' ? 'three' : env.width < 700 ? 'single' : 'two';
+  // Under 440 logical px (split view at a larger text size) the header keeps Back, the roster mark, the points and More;
+  // undo and redo move into More (UX-025: collapse rather than clip).
+  const narrowHead = env.width < 440;
   const first = useRef(imported ? rosterFromImport(imported) : loadRoster(startRoster(start, rosterName))).current;
   const [roster, setRoster] = useState(first);
   const history = useRosterHistory<EditorUnit>({ units: first.units, forces: first.forces });
@@ -217,7 +220,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
   const inspectorLimits = mode === 'three' ? PANES.inspector : PANES.inspectorMedium;
   const fromLabel = from === 'rosters' ? 'Rosters' : 'Home';
 
-  return <div ref={rootRef} className={`tbe tbe-${mode}`} aria-label={`Roster editor: ${roster.name}`}>
+  return <div ref={rootRef} className={`tbe tbe-${mode} ${narrowHead ? 'tbe-narrow-head' : ''}`} aria-label={`Roster editor: ${roster.name}`}>
     <header className="tbe-header">
       <HintButton hint={`Back to ${fromLabel}`} input={env.input} side="bottom" wrapClassName="start" aria-label={`Back to ${fromLabel}`} className="tbe-back" onClick={onBack}><ChevronLeft size={24} /><span>{fromLabel}</span></HintButton>
       <div className="tbe-title-wrap" data-pop="switcher">
@@ -229,12 +232,14 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
         {pop === 'switcher' && <RosterSwitcher current={roster.name} onPick={switchRoster} onClose={() => setPop(null)} onAll={onAllRosters} onNew={onNewRoster} onImport={() => { setPop(null); onImport(); }} />}
       </div>
       <span className="tbe-header-spacer" />
-      <HintButton hint={readOnly ? 'Read-only roster: nothing to undo' : history.undoLabel ? `Undo “${history.undoLabel}”${keys('Mod+Z')}` : 'Nothing to undo'} input={env.input} side="bottom" aria-label={history.undoLabel ? `Undo ${history.undoLabel}` : 'Undo'} className="tbe-icon" disabled={!history.undoLabel || !!readOnly} onClick={undo}><Undo2 size={20} /></HintButton>
-      <HintButton hint={readOnly ? 'Read-only roster: nothing to redo' : history.redoLabel ? `Redo “${history.redoLabel}”${keys('Mod+Shift+Z')}` : 'Nothing to redo'} input={env.input} side="bottom" aria-label={history.redoLabel ? `Redo ${history.redoLabel}` : 'Redo'} className="tbe-icon" disabled={!history.redoLabel || !!readOnly} onClick={redo}><Redo2 size={20} /></HintButton>
+      {!narrowHead && <><HintButton hint={readOnly ? 'Read-only roster: nothing to undo' : history.undoLabel ? `Undo “${history.undoLabel}”${keys('Mod+Z')}` : 'Nothing to undo'} input={env.input} side="bottom" aria-label={history.undoLabel ? `Undo ${history.undoLabel}` : 'Undo'} className="tbe-icon" disabled={!history.undoLabel || !!readOnly} onClick={undo}><Undo2 size={20} /></HintButton>
+      <HintButton hint={readOnly ? 'Read-only roster: nothing to redo' : history.redoLabel ? `Redo “${history.redoLabel}”${keys('Mod+Shift+Z')}` : 'Nothing to redo'} input={env.input} side="bottom" aria-label={history.redoLabel ? `Redo ${history.redoLabel}` : 'Redo'} className="tbe-icon" disabled={!history.redoLabel || !!readOnly} onClick={redo}><Redo2 size={20} /></HintButton></>}
       <span className={`dt-app tb-shim ${light ? 'light' : ''}`} data-pop="summary"><SummaryToggle total={total} limit={limit} open={pop === 'summary'} onToggle={() => setPop(pop === 'summary' ? null : 'summary')} /></span>
       <div className="tbe-more-wrap" data-pop="more">
         <HintButton hint="More: export, panes and roster actions" input={env.input} side="bottom" wrapClassName="end" aria-label="More actions" aria-haspopup="menu" aria-expanded={pop === 'more'} className="tbe-icon" onClick={() => setPop(pop === 'more' ? null : 'more')}><Ellipsis size={20} /></HintButton>
         {pop === 'more' && <div className="tbe-menu end" role="menu" aria-label="More actions">
+          {narrowHead && <><button type="button" role="menuitem" disabled={!history.undoLabel || !!readOnly} onClick={() => { setPop(null); undo(); }}><Undo2 size={18} />{history.undoLabel ? `Undo “${history.undoLabel}”` : 'Undo'}</button>
+            <button type="button" role="menuitem" disabled={!history.redoLabel || !!readOnly} onClick={() => { setPop(null); redo(); }}><Redo2 size={18} />{history.redoLabel ? `Redo “${history.redoLabel}”` : 'Redo'}</button><hr /></>}
           <button type="button" role="menuitem" onClick={() => { setPop(null); setSheet({ kind: 'export' }); }}><ArrowDownToLine size={18} />Export roster…</button>
           <button type="button" role="menuitem" disabled={!!readOnly} onClick={() => { setPop(null); setSheet({ kind: 'rename' }); }}><Pencil size={18} />Rename roster</button>
           <button type="button" role="menuitem" onClick={duplicateRoster}><Copy size={18} />{readOnly ? 'Make an editable copy' : 'Duplicate roster'}</button>

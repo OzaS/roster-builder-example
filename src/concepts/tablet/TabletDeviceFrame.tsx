@@ -17,7 +17,7 @@ export function TabletDeviceFrame({ device, input, themeMode = 'dark', colorSche
 }) {
   const prefs = useTabletPrefs();
   const spec = deviceById(device ?? prefs.deviceId);
-  const env = makeTabletEnv(spec.id, input ?? prefs.input);
+  const env = makeTabletEnv(spec.id, input ?? prefs.input, prefs.textScale);
   const hostRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
   const outerW = spec.width + 2 * BEZEL;
@@ -45,7 +45,7 @@ export function TabletDeviceFrame({ device, input, themeMode = 'dark', colorSche
           <i className="tb-home-indicator" aria-hidden="true" />
         </div>
       </div>
-      {caption && <figcaption className="tb-caption"><strong>{spec.label}</strong><span>{spec.width} × {spec.height}</span><span>{widthClassLabel[env.widthClass]}</span><span>{env.input === 'touch' ? 'Touch' : 'Pointer'}</span></figcaption>}
+      {caption && <figcaption className="tb-caption"><strong>{spec.label}</strong><span>{spec.width} × {spec.height}</span><span>{widthClassLabel[env.widthClass]}</span><span>{env.input === 'touch' ? 'Touch' : 'Pointer'}</span>{env.textScale !== 100 && <span>Text {env.textScale}%</span>}</figcaption>}
     </figure>
   </div>;
 }

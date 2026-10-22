@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import type { ConceptProps } from '../shared';
 import type { ColorScheme } from '../../types';
 import { CodexWorkbench } from '../ux/CodexWorkbench';
@@ -12,7 +12,8 @@ import { ImportResultSheet } from './TabletEditorSheets';
 import { sampleImport, type ImportResult } from '../desktop/DesktopEditorFlows';
 import { rosterLibrary } from '../desktop/desktopData';
 import { tabletRoute, useTabletSession, TabletJobsPanel, type TabletRoute } from './tabletSession';
-import { useTabletEnv } from './tabletEnv';
+import { TabletEnvContext, makeTabletEnv, useTabletEnv } from './tabletEnv';
+import type { TextScale } from './tabletDevices';
 import { IconHints } from './TabletHint';
 import { ShortcutOverlay, shortcutGroups, useShortcutOverlay, useShortcuts } from './tabletKeys';
 import './tablet.css';
@@ -27,7 +28,11 @@ type ThemePref = 'system' | 'light' | 'dark';
 const editorScreens: Record<string, EditorStart> = { 'tablet-editor': 'editor', 'tablet-editor-issues': 'issues', 'tablet-editor-add': 'add', 'tablet-editor-forces': 'forces', 'tablet-editor-add-force': 'add-force', 'tablet-editor-readonly': 'readonly', 'tablet-editor-export': 'export' };
 
 export function TabletWorkbench(props: Partial<ConceptProps>) {
-  const screen: string | undefined = props.workflowScreen;
+  const shown: string | undefined = props.workflowScreen;
+  // `<screen>-text-200`: that screen at 200% text whatever the gallery's Text size switch says (UX-025).
+  const textScale: TextScale | undefined = shown?.endsWith('-text-200') ? 200 : undefined;
+  const screen = textScale ? shown?.slice(0, -'-text-200'.length) : shown;
+  if (textScale) return <TextScaled scale={textScale}><TabletWorkbench key={shown} {...props} workflowScreen={screen as ConceptProps['workflowScreen']} /></TextScaled>;
   if (screen === 'tablet-editor-shortcuts') return <TabletShell key={screen} {...props} route={tabletRoute('tablet-home')!} initialEditor="editor" initialShortcuts />;
   if (screen === 'tablet-editor-import-result') return <TabletShell key={screen} {...props} route={{ page: 'rosters', state: '' }} initialImport />;
   const editorStart = screen ? editorScreens[screen] : undefined;
@@ -35,6 +40,12 @@ export function TabletWorkbench(props: Partial<ConceptProps>) {
   if (route) return <TabletShell key={screen} {...props} route={route} initialEditor={editorStart} />;
   const sketch = props as ConceptProps;
   return <CodexWorkbench {...sketch} screen={screen === 'tablet-archive-sketch' ? 'overview' : sketch.screen} workflowScreen={screen === 'tablet-archive-sketch' ? 'overview' : sketch.workflowScreen} />;
+}
+
+/** Overrides the text size of the gallery switch for the screens that show a fixed size. */
+function TextScaled({ scale, children }: { scale: TextScale; children: ReactNode }) {
+  const env = useTabletEnv();
+  return <TabletEnvContext.Provider value={makeTabletEnv(env.device.id, env.input, scale)}>{children}</TabletEnvContext.Provider>;
 }
 
 type OpenEditor = { name: string; from: TabletPage; start: EditorStart; key: number; imported?: ImportResult };
@@ -83,7 +94,8 @@ function TabletShell({ route, initialEditor, initialImport = false, initialShort
   }, ['Mod+N', 'Mod+,', 'Mod+1', 'Mod+2', 'Mod+3', 'Mod+4', 'Mod+5']);
   const [shortcuts, setShortcuts] = useShortcutOverlay(appRef, env.device.system, initialShortcuts);
   const openRoster = (name: string) => setEditor(current => ({ name, from: page, start: 'editor', key: (current?.key ?? 0) + 1 }));
-  return <div ref={appRef} className={`tb-app ux-screen ux-size-regular ${light ? 'light' : 'dark'} ux-scheme-${scheme} tb-${env.widthClass} tb-${env.input} ${editor ? 'tb-editing' : ''}`} data-device={env.device.id}>
+  return <div ref={appRef} className={`tb-app ux-screen ux-size-regular ${light ? 'light' : 'dark'} ux-scheme-${scheme} tb-${env.widthClass} tb-${env.input} ${editor ? 'tb-editing' : ''}`} data-device={env.device.id} data-text={env.textScale}
+    style={env.textScale !== 100 ? { zoom: env.textScale / 100 } : undefined}>
     {editor ? <TabletEditor key={editor.key} env={env} notify={notify} light={light} rosterName={editor.name} from={editor.from} start={editor.start}
       onBack={() => setEditor(null)} onAllRosters={() => { setEditor(null); setPage('rosters'); }} onNewRoster={newRoster} onFindData={() => { setEditor(null); setPage('sources'); }} onImport={() => setImporting(sampleImport(true))} imported={editor.imported} /> : <>
     <TabletRail page={page} input={env.input} system={env.device.system} onPage={setPage} onNewRoster={newRoster} />

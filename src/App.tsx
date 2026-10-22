@@ -5,7 +5,7 @@ import { buildConceptGroups, bundledDesignData, designById, findConceptInData, f
 import { prototypeToWorkflowScreen, workflowToPrototypeScreen } from "./gallery/workflow";
 import { captureElementAsPng } from "./utils/captureStage";
 import { TabletPrefsContext } from "./concepts/tablet/tabletEnv";
-import { defaultDeviceId, defaultInput, isDeviceId, isTabletInput, type TabletDeviceId, type TabletInput } from "./concepts/tablet/tabletDevices";
+import { defaultDeviceId, defaultInput, defaultTextScale, isDeviceId, isTabletInput, isTextScale, type TabletDeviceId, type TabletInput, type TextScale } from "./concepts/tablet/tabletDevices";
 import type { AppLanguage, ColorScheme, ConceptId, DetachmentFavorite, FavoriteLibrary, ForceCreationMode, GalleryRelease, NavigatorView, NavStyle, PlatformPreview, PrototypeScreen, Roster, RosterForce, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, ThemePreference, UnitDetailView, UnitFavorite, WorkflowScreen } from "./types";
 
 // Three separate design libraries (DEC-039): ?gallery=tablet and ?gallery=desktop select theirs, the phone library is the default.
@@ -36,6 +36,8 @@ const workflowScreenIds = [
   "tablet-editor-readonly",
   "tablet-editor-export",
   "tablet-editor-shortcuts",
+  "tablet-editor-text-200",
+  "tablet-rosters-text-200",
   "tablet-editor-import-result",
   "tablet-lookup",
   "tablet-tools",
@@ -134,6 +136,7 @@ type PersistedGalleryState = {
   selectedConcept?: ConceptId;
   tabletDevice?: TabletDeviceId;
   tabletInput?: TabletInput;
+  tabletTextScale?: TextScale;
   themeMode?: ThemeMode;
   themePreference?: ThemePreference;
   language?: AppLanguage;
@@ -169,7 +172,8 @@ function App() {
   const platform: PlatformPreview = tabletLibrary ? "tablet" : "phone";
   const [tabletDeviceId, setTabletDeviceId] = useState<TabletDeviceId>(initialState.tabletDevice ?? defaultDeviceId);
   const [tabletInputMode, setTabletInputMode] = useState<TabletInput>(initialState.tabletInput ?? defaultInput);
-  const tabletPrefs = useMemo(() => ({ deviceId: tabletDeviceId, input: tabletInputMode, setDeviceId: setTabletDeviceId, setInput: setTabletInputMode }), [tabletDeviceId, tabletInputMode]);
+  const [tabletTextScale, setTabletTextScale] = useState<TextScale>(initialState.tabletTextScale ?? defaultTextScale);
+  const tabletPrefs = useMemo(() => ({ deviceId: tabletDeviceId, input: tabletInputMode, textScale: tabletTextScale, setDeviceId: setTabletDeviceId, setInput: setTabletInputMode, setTextScale: setTabletTextScale }), [tabletDeviceId, tabletInputMode, tabletTextScale]);
   const [themePreference, setThemePreference] = useState<ThemePreference>(initialState.themePreference ?? initialState.themeMode ?? "dark");
   const [systemTheme, setSystemTheme] = useState<ThemeMode>(() => preferredSystemTheme());
   const [language, setLanguage] = useState<AppLanguage>(initialState.language ?? "en");
@@ -246,6 +250,7 @@ function App() {
       selectedConcept,
       tabletDevice: tabletDeviceId,
       tabletInput: tabletInputMode,
+      tabletTextScale,
       themeMode,
       themePreference,
       language,
@@ -261,7 +266,7 @@ function App() {
       tabletPanelLayout,
       screen,
     });
-  }, [selectedConcept, tabletDeviceId, tabletInputMode, themeMode, themePreference, language, colorScheme, navigatorView, galleryRelease, workflowScreen, smartSearch, navStyle, statusBarUsesDesignBackground, unitDetailView, forceCreationMode, tabletPanelLayout, screen]);
+  }, [selectedConcept, tabletDeviceId, tabletInputMode, tabletTextScale, themeMode, themePreference, language, colorScheme, navigatorView, galleryRelease, workflowScreen, smartSearch, navStyle, statusBarUsesDesignBackground, unitDetailView, forceCreationMode, tabletPanelLayout, screen]);
 
   useEffect(() => {
     try {
@@ -888,6 +893,7 @@ function readPersistedGalleryState(): PersistedGalleryState {
       selectedConcept: isOneOf(parsed.selectedConcept, conceptIds) ? parsed.selectedConcept : undefined,
       tabletDevice: isDeviceId(parsed.tabletDevice) ? parsed.tabletDevice : undefined,
       tabletInput: isTabletInput(parsed.tabletInput) ? parsed.tabletInput : undefined,
+      tabletTextScale: isTextScale(parsed.tabletTextScale) ? parsed.tabletTextScale : undefined,
       themeMode: isOneOf(parsed.themeMode, themeModes) ? parsed.themeMode : undefined,
       themePreference: isOneOf(parsed.themePreference, themePreferences) ? parsed.themePreference : undefined,
       language: isOneOf(parsed.language, appLanguages) ? parsed.language : undefined,

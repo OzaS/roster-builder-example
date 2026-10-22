@@ -31,7 +31,7 @@ export const rosterStatus = (r: RosterSummary) => r.status === 'issues' ? <Mobil
       : <MobileChip tone="valid"><Check size={11} />Ready</MobileChip>;
 export const sourceStatus = (s: SourceInfo) => s.status === 'update' ? <MobileChip tone="cool">Update {s.next}</MobileChip> : s.status === 'review' ? <MobileChip tone="warning">Review</MobileChip> : <MobileChip tone="valid"><Check size={11} />Up to date</MobileChip>;
 
-export const narrow = (env: TabletEnv) => env.device.width < 700;
+export const narrow = (env: TabletEnv) => env.width < 700;
 
 /** List and detail panes. Where the width is too small for both (split view), the list stays and the detail opens over it. */
 export function ListDetail({ env, label, list, detail, open, onClose }: { env: TabletEnv; label: string; list: ReactNode; detail: ReactNode; open: boolean; onClose: () => void }) {
