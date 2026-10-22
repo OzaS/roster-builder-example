@@ -1,5 +1,6 @@
 import { DesktopWorkbench } from "../concepts/desktop/DesktopWorkbench";
-import { PanelsTopLeft } from "lucide-react";
+import { PanelsTopLeft, TabletSmartphone } from "lucide-react";
+import { TabletWorkbench } from "../concepts/tablet/TabletWorkbench";
 import { CodexWorkbench } from "../concepts/ux/CodexWorkbench";
 import type { ConceptId, WorkflowScreen } from "../types";
 import type { GalleryConcept } from "../gallery/galleryTypes";
@@ -67,8 +68,8 @@ export type EditableDesign = {
   status: DesignStatus;
   name: string;
   eyebrow: string;
-  icon: "PanelsTopLeft";
-  component: "CodexWorkbench" | "DesktopWorkbench";
+  icon: "PanelsTopLeft" | "TabletSmartphone";
+  component: "CodexWorkbench" | "DesktopWorkbench" | "TabletWorkbench";
   bestFor: string;
   direction: string;
   interaction: string;
@@ -87,10 +88,12 @@ export type DesignData = {
 
 const iconMap = {
   PanelsTopLeft,
+  TabletSmartphone,
 };
 
 const componentMap = {
   DesktopWorkbench,
+  TabletWorkbench,
   CodexWorkbench,
 };
 

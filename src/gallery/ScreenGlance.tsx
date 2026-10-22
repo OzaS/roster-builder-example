@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type MouseEvent as ReactMouseEvent } from "react";
 import { Camera, Check, Eye, EyeOff, ListChecks, MessageCircle, MousePointer2, Trash2, X } from "lucide-react";
-import { DeviceFrame } from "../components/DeviceFrame";
+import { PreviewFrame } from "../components/PreviewFrame";
 import type { ConceptProps } from "../concepts/shared";
 import type { DesignComment, EditableDesign } from "../design-data/designData";
 import { screenLabel } from "../design-data/designData";
@@ -252,7 +252,7 @@ export function ScreenGlance({
           <div className="glance-device-shell">
             <div className="glance-device-export" ref={deviceCaptureRef}>
               <div className="glance-device-capture">
-                <DeviceFrame desktop={concept.id === "desktop-workbench"} platform={platform} themeMode={themeMode} colorScheme={colorScheme} statusBarUsesDesignBackground={statusBarUsesDesignBackground}>
+                <PreviewFrame concept={concept} screen={screen} platform={platform} themeMode={themeMode} colorScheme={colorScheme} statusBarUsesDesignBackground={statusBarUsesDesignBackground} fit="width">
                   <div className={`glance-device-target ${armed ? "placing" : ""}`} onClick={placeComment}>
                     <Component
                       roster={roster}
@@ -301,7 +301,7 @@ export function ScreenGlance({
                       onBack={onBack}
                     />
                   </div>
-                </DeviceFrame>
+                </PreviewFrame>
                 <div className="comment-overlay" aria-hidden={visibleScreenComments.length === 0 && !activeCommentVisible}>
                   {visibleScreenComments.map((comment) => (
                     <button

@@ -19,3 +19,12 @@
 .tb-caption span + span::before { content: '·'; margin-right: 12px; color: var(--muted) }
 .tb-standalone .tb-caption { color: #98a1b3 }
 .tb-standalone .tb-caption strong { color: #f0f2f7 }
+
+/* Tablet library: the single preview fills the stage so the frame can scale to it. */
+.tablet-design-library .single-preview-shell { width: 100%; height: 100%; display: grid; place-items: center; min-width: 0; min-height: 0 }
+.tablet-design-library .preview-column { min-height: 0 }
+.tablet-design-library .gallery-stage { grid-template-columns: minmax(420px, 1fr) 260px }
+.tablet-device-buttons { grid-template-columns: 1fr !important }
+.tablet-device-buttons button span { display: grid; text-align: left }
+.tablet-device-buttons button small { color: var(--muted); font-size: 11px }
+.tablet-device-buttons button { justify-content: flex-start !important }

@@ -101,3 +101,5 @@
 .dt-ambient-on .dt-app.light::before{opacity:.3}
 .dt-dot.idle{background:var(--dt-faint)}
 .dt-app .dt-validation.paused{color:var(--dt-muted)!important;border-color:var(--dt-border)!important;background:var(--dt-hover)!important}
+/* Tablet library (gallery): like the desktop library it has no V1/V2 switch. */
+.tablet-design-library .gallery-release-switch{display:none}

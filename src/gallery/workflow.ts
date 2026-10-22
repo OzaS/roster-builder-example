@@ -1,10 +1,20 @@
 import type { PrototypeScreen, WorkflowScreen } from "../types";
 
 export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
+  { id: "tablet-home", label: "Tablet · Home" },
+  { id: "tablet-rosters", label: "Tablet · Rosters" },
+  { id: "tablet-lookup", label: "Tablet · Lookup" },
+  { id: "tablet-tools", label: "Tablet · Tools" },
+  { id: "tablet-library", label: "Tablet · Library" },
+  { id: "tablet-sources", label: "Tablet · Sources" },
+  { id: "tablet-settings", label: "Tablet · Settings" },
+  { id: "tablet-archive-sketch", label: "Archive · Earlier tablet sketch" },
   { id: "desktop-welcome", label: "Desktop · Welcome" },
   { id: "desktop-editor", label: "Desktop · Roster editor" },
   { id: "desktop-rosters", label: "Desktop · Rosters" },
   { id: "desktop-lookup", label: "Desktop · Lookup" },
+  { id: "desktop-tools", label: "Desktop · Tools" },
+  { id: "desktop-library", label: "Desktop · Library" },
   { id: "desktop-sources", label: "Desktop · Sources" },
   { id: "desktop-settings", label: "Desktop · Settings" },
   { id: "desktop-first-run", label: "Desktop · First run" },
@@ -61,6 +71,9 @@ export function resolveWorkflow(workflow?: WorkflowScreen[]): Array<{ id: Workfl
 }
 
 export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScreen {
+  if (screen === "tablet-archive-sketch") return "overview";
+  if (screen === "tablet-home" || screen === "tablet-rosters" || screen === "tablet-lookup" || screen === "tablet-tools" || screen === "tablet-library" || screen === "tablet-sources" || screen === "tablet-settings") return "library";
+  if (screen === "desktop-tools" || screen === "desktop-library") return "library";
   if (screen === "desktop-welcome") return "library";
   if (screen === "desktop-editor") return "overview";
   if (screen === "desktop-rosters") return "library";

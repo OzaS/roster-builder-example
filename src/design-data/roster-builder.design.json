@@ -326,6 +326,76 @@
       ]
     },
     {
+      "id": "tablet-workbench",
+      "status": "active",
+      "name": "Battle Augur · Tablet",
+      "eyebrow": "Tablet · Rail and panes",
+      "icon": "TabletSmartphone",
+      "component": "TabletWorkbench",
+      "bestFor": "Tablet roster building and lookup on the desktop structure (a side rail with pages and panes) with the mobile look: mobile type sizes, 44 px touch targets, mobile tokens and colour schemes.",
+      "direction": "A narrow rail with labelled icons (New roster on top; Home, Rosters, Lookup, Tools, Library; Sources and Settings pinned to the bottom) next to a content area of mobile cards and rows. Rosters, Lookup, Sources and Settings are list and detail panes; in split view the detail opens over the list. Tools and Library are placeholders. Device frames from iPad landscape to split view, touch and pointer input.",
+      "interaction": "Pick a device frame and an input mode in the designer rail. Switch pages with the rail; in Touch mode press and hold an item for about half a second to see its hint, in Pointer mode hover it. Standalone: ?tablet=rosters&device=ipad-portrait&input=pointer.",
+      "tradeoff": "Tablet 00 is the shell only: the roster editor (T1), real pages (T2), dialogs (T3) and the interaction pass (T4) are still to design. Sample data and prototype-session state; not connected to the Battle Augur engine.",
+      "screens": [
+        { "id": "tablet-home", "label": "Home · Quick start" },
+        { "id": "tablet-rosters", "label": "Rosters · List and details" },
+        { "id": "tablet-lookup", "label": "Lookup · Search and entry" },
+        { "id": "tablet-tools", "label": "Tools · Coming soon" },
+        { "id": "tablet-library", "label": "Library · Coming soon" },
+        { "id": "tablet-sources", "label": "Sources · Installed data" },
+        { "id": "tablet-settings", "label": "Settings · Sections" },
+        { "id": "tablet-archive-sketch", "label": "Archive · Earlier tablet sketch" }
+      ],
+      "workflows": [
+        {
+          "id": "tablet",
+          "label": "Tablet workspace",
+          "screens": ["tablet-home", "tablet-rosters", "tablet-lookup", "tablet-tools", "tablet-library", "tablet-sources", "tablet-settings"]
+        },
+        {
+          "id": "archive",
+          "label": "Archive",
+          "screens": ["tablet-archive-sketch"]
+        },
+        {
+          "id": "unsorted",
+          "label": "Unsorted",
+          "screens": []
+        }
+      ],
+      "comments": [],
+      "trash": {
+        "screens": []
+      },
+      "elements": {
+        "release": "Tablet 00",
+        "groups": [
+          {
+            "id": "product-ui",
+            "label": "Tablet UI",
+            "description": "Tablet shell components: the rail, the list and detail panes and the placeholders. Built from the workspace layer and the mobile content pieces.",
+            "sections": [
+              {"id": "tablet.rail", "title": "Tablet Rail", "level": "navigation", "status": "needs-review", "platforms": ["tablet"], "states": ["New roster action on top", "Home, Rosters, Lookup, Tools, Library", "Sources and Settings pinned to the bottom", "labels under icons", "active indicator and aria-current", "keyboard focus ring", "hint on every item: title in Pointer mode, press and hold in Touch mode", "targets of 48 px and more", "Rosters and Library use different icons"], "screens": ["tablet-home", "tablet-rosters", "tablet-lookup", "tablet-tools", "tablet-library", "tablet-sources", "tablet-settings"]},
+              {"id": "tablet.panes", "title": "List and Detail Panes", "level": "screen-composition", "status": "needs-review", "platforms": ["tablet"], "states": ["list and detail (Expanded and Medium)", "list only with a note, detail opens over the list (split view)", "selected row", "touch rows (72 px) and pointer rows (64 px)", "pointer hover state"], "screens": ["tablet-rosters", "tablet-lookup", "tablet-sources", "tablet-settings"]},
+              {"id": "tablet.home", "title": "Home Quick Start", "level": "screen-composition", "status": "needs-review", "platforms": ["tablet"], "states": ["continue roster", "new roster", "recent rosters", "data status with update", "one column at Medium width"], "screens": ["tablet-home"]},
+              {"id": "tablet.placeholder", "title": "Coming Soon Placeholder", "level": "composite", "status": "specified", "platforms": ["tablet", "desktop"], "states": ["Tools", "Library"], "screens": ["tablet-tools", "tablet-library", "desktop-tools", "desktop-library"]},
+              {"id": "tablet.toasts", "title": "Toasts (mobile feel)", "level": "overlay", "status": "needs-review", "platforms": ["tablet"], "states": ["functional toast top right", "notification bottom right above the home indicator", "44 px Dismiss and action targets"], "screens": ["tablet-home"]}
+            ]
+          },
+          {
+            "id": "gallery-ui",
+            "label": "Gallery UI",
+            "description": "Gallery-only tooling of the Tablet library. Not part of the product.",
+            "sections": [
+              {"id": "gallery.library-navigation", "title": "Design Library Navigation", "level": "gallery-tooling", "status": "specified", "platforms": ["gallery"], "states": ["phone library", "tablet library", "desktop library", "independent preferences"], "screens": []},
+              {"id": "gallery.tablet-frames", "title": "Tablet Device Frames", "level": "gallery-tooling", "status": "specified", "platforms": ["gallery"], "states": ["iPad 11\" landscape 1194 x 834", "iPad 11\" portrait 834 x 1194", "Android tablet 1280 x 800", "Foldable unfolded 884 x 1104", "split view 600 x 834", "scaled to fit, aspect ratio kept", "caption with name, size and width class", "standalone link at real size"], "screens": []},
+              {"id": "gallery.tablet-input", "title": "Input Mode Switch", "level": "gallery-tooling", "status": "specified", "platforms": ["gallery"], "states": ["Touch", "Pointer", "independent of theme and colour scheme"], "screens": []}
+            ]
+          }
+        ]
+      }
+    },
+    {
       "id": "desktop-workbench",
       "status": "active",
       "name": "Battle Augur · Desktop",
