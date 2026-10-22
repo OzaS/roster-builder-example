@@ -206,3 +206,4 @@
 /* A scrolling detail pane sizes its rows by content: with `auto` rows an overflowing pane squeezes some blocks (the facts group) to their borders. */
 .tb-detail { grid-auto-rows: max-content }
 .tb-app .tb-flow .dts-section-head { display: flex; align-items: center; justify-content: space-between }
+.tb-app .tb-sheet input:focus-visible { outline: none }
