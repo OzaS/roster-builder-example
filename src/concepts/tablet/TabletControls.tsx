@@ -1,10 +1,13 @@
 import { Hand, MousePointer2 } from 'lucide-react';
-import { tabletDevices, tabletInputs, widthClassLabel, widthClassOf } from './tabletDevices';
+import { defaultTextScale, tabletDevices, tabletInputs, textScales, widthClassLabel, widthClassOf } from './tabletDevices';
 import { useTabletPrefs } from './tabletEnv';
 
-/** Gallery chrome of the Tablet library: the device frame and the input mode (Touch | Pointer). Theme, colour scheme and Ambient sit in Display. */
+/** Gallery chrome of the Tablet library: the device frame, the input mode (Touch | Pointer) and the text size (UX-025).
+ *  Theme, colour scheme and Ambient sit in Display. */
 export function TabletControls() {
-  const { deviceId, input, setDeviceId, setInput } = useTabletPrefs();
+  const { deviceId, input, textScale = defaultTextScale, setDeviceId, setInput, setTextScale } = useTabletPrefs();
+  const device = tabletDevices.find(d => d.id === deviceId) ?? tabletDevices[0];
+  const logical = Math.round(device.width * 100 / textScale);
   return <section className="navigator-control-group tablet-controls" aria-label="Tablet preview">
     <h3>Device</h3>
     <div className="navigator-control-buttons tablet-device-buttons" role="group" aria-label="Device frame">
@@ -15,5 +18,12 @@ export function TabletControls() {
     <div className="navigator-control-buttons" role="group" aria-label="Input mode">
       {tabletInputs.map(i => <button key={i.id} type="button" className={input === i.id ? 'active' : ''} aria-pressed={input === i.id} onClick={() => setInput(i.id)}>{i.id === 'touch' ? <Hand size={16} /> : <MousePointer2 size={16} />}{i.label}</button>)}
     </div>
+    {setTextScale && <>
+      <h3>Text size</h3>
+      <div className="navigator-control-buttons" role="group" aria-label="Text size" title="Larger text and display zoom: iOS accessibility sizes, Android font scale up to 2.0. Panes collapse to the next width class instead of clipping.">
+        {textScales.map(s => <button key={s} type="button" className={textScale === s ? 'active' : ''} aria-pressed={textScale === s} onClick={() => setTextScale(s)}>{s}%</button>)}
+      </div>
+      {textScale !== 100 && <small className="tablet-text-note">Layout width {logical} pt · {widthClassLabel[widthClassOf(logical)]}</small>}
+    </>}
   </section>;
 }

@@ -5,22 +5,35 @@ import { ComingSoonCard } from '../ux/AppExtras';
 import { TabletControls } from './TabletControls';
 import { TabletDeviceFrame } from './TabletDeviceFrame';
 import { TabletRail } from './TabletRail';
+import { TabletResizer, type PanePresets } from './TabletResizer';
 import { EmptyState, InstallRow } from './TabletPieces';
 import type { Job } from '../workspace/Jobs';
-import { defaultBindings, formatCombo } from '../desktop/desktopKeys';
+import { editorShortcuts, keyLabel } from './tabletKeys';
 import { TabletWorkbench } from './TabletWorkbench';
 import { TabletPrefsContext, makeTabletEnv, TabletEnvContext } from './tabletEnv';
-import { defaultDeviceId, defaultInput, tabletDevices, widthClassLabel, widthClassOf, type TabletDeviceId, type TabletInput } from './tabletDevices';
+import { defaultDeviceId, defaultInput, defaultTextScale, tabletDevices, widthClassLabel, widthClassOf, type TabletDeviceId, type TabletInput, type TextScale } from './tabletDevices';
 import './tablet.css';
 
 const demoJob = (status: Job['status'], progress: number): Job => ({ id: 'demo', kind: 'install', sourceId: 'demo', name: 'Example System Three', size: '22.4 MB', factions: [], chosen: [], status, steps: [{ label: 'Download', state: status === 'needs-you' ? 'needs-you' : 'active', progress }] });
 const noop = () => {};
+const demoPane: PanePresets = { min: 240, max: 420, narrow: 248, initial: 300, wide: 400 };
+
+/** The pane resizer between two sample panes; the touch one shows its press-and-hold menu. */
+function ResizerDemo({ input, menu }: { input: TabletInput; menu?: boolean }) {
+  const [width, setWidth] = useState(demoPane.initial);
+  return <div className={`tb-app ux-screen dark tb-${input} tb-el-resizer`}><div className="tbe"><div className="tbe-panes" style={{ gridTemplateColumns: `${width}px minmax(0, 1fr)` }}>
+    <TabletResizer side="left" width={width} presets={demoPane} label="Resize catalogue" pane="catalogue" input={input} onWidth={setWidth} onHide={noop} defaultMenu={menu} />
+    <section className="tbe-pane tbe-catalogue pane"><header className="tbe-pane-head"><span><strong>Add units</strong><small>{width} px</small></span></header></section>
+    <section className="tbe-pane"><header className="tbe-pane-head"><span><strong>Your force</strong><small>{input === 'touch' ? 'Tap the handle, drag it, or press and hold' : 'Drag, double-click, or focus it and use the arrows'}</small></span></header></section>
+  </div></div></div>;
+}
 
 /** The Elements view of the Tablet library: the rail, the device frames, the input switch and two framed compositions. */
 export function TabletElements() {
   const [deviceId, setDeviceId] = useState<TabletDeviceId>(defaultDeviceId);
   const [input, setInput] = useState<TabletInput>(defaultInput);
-  const prefs = useMemo(() => ({ deviceId, input, setDeviceId, setInput }), [deviceId, input]);
+  const [textScale, setTextScale] = useState<TextScale>(defaultTextScale);
+  const prefs = useMemo(() => ({ deviceId, input, textScale, setDeviceId, setInput, setTextScale }), [deviceId, input, textScale]);
   const [page, setPage] = useState<'home' | 'rosters' | 'tools'>('rosters');
   const railIn = (mode: TabletInput) => <div className="tb-app ux-screen ux-size-regular dark tb-medium" style={{ height: 'auto', flex: 'none', background: 'var(--ux-bg)', borderRadius: 18, overflow: 'visible', width: 'max-content' }}>
     <TabletEnvContext.Provider value={makeTabletEnv('ipad-portrait', mode)}><div style={{ height: 620, display: 'flex' }}><TabletRail page={page} input={mode} onPage={p => setPage(p as typeof page)} onNewRoster={() => {}} /></div></TabletEnvContext.Provider>
@@ -37,7 +50,7 @@ export function TabletElements() {
       </div>
       <h2>Device frames · same scale</h2>
       <div className="tb-el-devices">{tabletDevices.map(d => <figure key={d.id}><i style={{ width: d.width / 8, height: d.height / 8 }} className={d.system} /><figcaption><strong>{d.label}</strong>{d.width} × {d.height} · {widthClassLabel[widthClassOf(d.width)]}</figcaption></figure>)}</div>
-      <h2>Device and input mode switches</h2>
+      <h2>Device, input mode and text size switches</h2>
       <div className="tb-el-controls"><TabletControls /></div>
       <h2>Coming soon placeholders · Tools and Library</h2>
       <div className="tb-el-row"><div className="tb-app ux-screen dark tb-el-card"><ComingSoonCard icon={Hammer} title="Tools" description="Roster analytics, comparison, a game tracker and a dice simulator." planned="Planned for 1.2+" covers="" /></div><div className="tb-app ux-screen dark tb-el-card"><ComingSoonCard icon={BookMarked} title="Library" description="Units and detachments you saved, ready to reuse." planned="Planned for 1.2+" covers="" /></div></div>
@@ -45,6 +58,12 @@ export function TabletElements() {
       <p>Editor header (Back, roster switcher, undo and redo, points button, More), the points line, resizable panes with a touch grab handle, mobile tree cards and unit rows (press and hold or right-click for the row menu), the mobile unit detail as a pane, the summary popover with issues and Show. Screens: Roster editor, Summary with issues, Add unit.</p>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-editor" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-editor-issues" /></TabletDeviceFrame></div>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-portrait"><TabletWorkbench workflowScreen="tablet-editor-add" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="split"><TabletWorkbench workflowScreen="tablet-editor" /></TabletDeviceFrame></div>
+      <h2>Pane resizer · grab handle with preset widths (Narrow, Default, Wide)</h2>
+      <p>Touch: tap the handle to cycle the presets, drag and it snaps to the nearest one, press and hold for the menu (presets and Hide). Pointer: free drag with the presets pulling within 12 px, double-click resets, hover shows the grip and a title. Keyboard: arrows (Shift for 48 px), Home and End, Enter cycles. The width and preset show while it moves.</p>
+      <div className="tb-el-row"><ResizerDemo input="touch" menu /><ResizerDemo input="pointer" /></div>
+      <h2>Larger text and display zoom (UX-025) · Text size 100%, 150%, 200%</h2>
+      <p>The Text size switch (gallery, and <code>text=</code> on a standalone link) scales the tablet type and controls. The layout gets the smaller logical width (device width ÷ scale) and collapses by width class instead of clipping: Expanded → Medium (two panes) → single pane; under 600 the rail drops its labels (they stay the accessible names and hints) and scrolls when taller than the window; under 440 the editor header keeps Back, the roster mark, the points and More (undo and redo move into More). Screens: Roster editor · Text 200%, Rosters · Text 200%.</p>
+      <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-editor-text-200" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="split"><TabletWorkbench workflowScreen="tablet-rosters-text-200" /></TabletDeviceFrame></div>
       <h2>Empty state card · first run, no rosters, no match</h2>
       <div className="tb-el-row"><div className="tb-app ux-screen dark tb-el-card"><EmptyState icon={Layers3} title="No rosters yet" text="Create a roster, or import one from a file."><button type="button" className="ux-primary tb-primary"><Plus size={17} />New roster</button><button type="button" className="ux-job-btn">Import a roster</button></EmptyState></div></div>
       <h2>Install row · Install, installing, choose factions, update, installed (44 px actions; progress under the text)</h2>
@@ -55,8 +74,11 @@ export function TabletElements() {
         <InstallRow title="Open Field" sub="Example game system · 3 factions · 14.2 MB" update onInstall={noop} onUpdate={noop} onJobs={noop} />
         <InstallRow title="Example Skirmish" sub="Example skirmish system · 2 factions · 2.3 MB" installed onInstall={noop} onShow={noop} onJobs={noop} />
       </div></div>
-      <h2>Keyboard shortcut rows · read-only (hardware keyboard)</h2>
-      <div className="tb-el-row"><div className="tb-app ux-screen dark tb-el-card"><div className="ux-src-group">{(['palette', 'undo', 'exportRoster'] as const).map(id => <div className="ux-src-kv tb-key-row" key={id}><span>{id === 'palette' ? 'Command palette' : id === 'undo' ? 'Undo' : 'Export roster'}</span><kbd className="tb-kbd">{formatCombo(defaultBindings[id])}</kbd></div>)}</div></div></div>
+      <h2>Keyboard shortcut rows · read-only (hardware keyboard), iPad and Android notation</h2>
+      <div className="tb-el-row">{(['ios', 'android'] as const).map(system => <div key={system} className="tb-app ux-screen dark tb-el-card"><div className="ux-src-group">{editorShortcuts.items.slice(0, 4).map(a => <div className="ux-src-kv tb-key-row" key={a.combo}><span>{a.label}</span><kbd className="tb-kbd">{keyLabel(a.combo, system)}</kbd></div>)}</div></div>)}</div>
+      <h2>Shortcut overlay · iPad (hold ⌘) and Android (Ctrl + /)</h2>
+      <p>Fixed shortcuts: ⌘N new roster, ⌘F find, ⌘1–5 the rail pages, ⌘, Settings, Esc closes a sheet, menu or popover; in the roster editor ⌘Z and ⇧⌘Z undo and redo, ⌘F finds a unit to add, ⌘E exports. On iPad the system overlay lists them while ⌘ is held; on Android Ctrl + / opens the same list. With a pointer, the hints of the rail, New roster, Undo and Redo name their shortcut. Screen: Roster editor · Keyboard shortcuts.</p>
+      <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-editor-shortcuts" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="android"><TabletWorkbench workflowScreen="tablet-editor-shortcuts" /></TabletDeviceFrame></div>
       <h2>Roster editor flows · several forces, read-only roster, export and import result (form sheets), add force at two widths</h2>
       <p>The form sheet is the tablet dialog: a centred sheet with Cancel, title and the primary action in its header and the mobile controls inside; in split view it fills the window. Several forces add a menu to each force card (add unit here, rename, remove), the Adding here chip and an Add force row. A read-only roster explains why, offers an editable copy and keeps edits off.</p>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-editor-forces" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-editor-readonly" /></TabletDeviceFrame></div>

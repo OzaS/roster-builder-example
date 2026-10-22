@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import { AlertTriangle, ArrowDownToLine, BookOpen, Check, ChevronDown, ChevronLeft, Copy, Database, Ellipsis, FilePlus2, Flag, LibraryBig, Lock, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, Pencil, Plus, Redo2, Search, Trash2, Undo2, Upload, Users, X } from 'lucide-react';
-import { PanelResizer, type PanelLimits } from '../workspace/PanelResizer';
 import { PointsLine, RosterSummary, SummaryToggle } from '../workspace/RosterSummary';
 import type { Notify } from '../workspace/Toasts';
 import { StatusGlyph, TreeUnitMain } from '../ux/uxShared';
@@ -10,6 +9,8 @@ import { rosterLibrary } from '../desktop/desktopData';
 import type { RosterUnit } from '../../types';
 import type { TabletEnv } from './tabletEnv';
 import { HintButton } from './TabletHint';
+import { TabletResizer, type PanePresets } from './TabletResizer';
+import { keyLabel, useShortcuts } from './tabletKeys';
 import { AddForceSheet, ExportSheet, RenameSheet } from './TabletEditorSheets';
 import { MoveRight } from 'lucide-react';
 import { MoveUnitSheet } from './TabletSheets';
@@ -21,7 +22,7 @@ import './tablet-editor.css';
 // shared summary popover (validation lives there, with Show) and a More menu. Panes by width:
 //   Expanded (>= 840): catalogue · force tree · unit details, side panes resizable with a touch grab handle and hideable.
 //   Medium (600-839): force tree · unit details; the catalogue is a slide-over from Add unit.
-//   Split view (< 700 wide): the tree alone; a unit's details open over it (like ListDetail on the pages).
+//   Split view (< 700 wide, also any window whose logical width drops under 700 at a larger text size): the tree alone; a unit's details open over it (like ListDetail on the pages).
 
 export type EditorStart = 'editor' | 'issues' | 'add' | 'forces' | 'add-force' | 'readonly' | 'export' | 'move-unit';
 type Pop = 'switcher' | 'more' | 'summary' | `unit-${number}` | `force-${string}` | null;
@@ -30,10 +31,11 @@ type Sheet = { kind: 'add-force' } | { kind: 'rename' } | { kind: 'rename-force'
 const startRoster = (start: EditorStart, name: string) => start === 'issues' ? 'Operation First Light' : start === 'forces' || start === 'add-force' || start === 'export' || start === 'move-unit' ? 'Harbour defence' : start === 'readonly' ? 'Ember patrol' : name;
 type Mode = 'three' | 'two' | 'single';
 
-const PANES: { catalogue: PanelLimits; inspector: PanelLimits; inspectorMedium: PanelLimits } = {
-  catalogue: { initial: 300, min: 240, max: 420 },
-  inspector: { initial: 400, min: 320, max: 520 },
-  inspectorMedium: { initial: 420, min: 340, max: 500 },
+// Side panes: limits and the three preset widths the touch grab handle cycles through and snaps to (T4).
+const PANES: { catalogue: PanePresets; inspector: PanePresets; inspectorMedium: PanePresets } = {
+  catalogue: { min: 240, max: 420, narrow: 248, initial: 300, wide: 400 },
+  inspector: { min: 320, max: 520, narrow: 340, initial: 400, wide: 500 },
+  inspectorMedium: { min: 320, max: 500, narrow: 340, initial: 420, wide: 480 },
 };
 const pts = (n: number) => n.toLocaleString('en-US');
 const memberLabel = (u: EditorUnit) => u.role === 'Command' ? 'Commander' : u.models === 1 ? 'Crew' : 'Unit members';
@@ -52,7 +54,10 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
   env: TabletEnv; notify: Notify; light: boolean; rosterName: string; from: string; start?: EditorStart; imported?: ImportResult;
   onBack: () => void; onAllRosters: () => void; onNewRoster: () => void; onImport: () => void; onFindData: () => void;
 }) {
-  const mode: Mode = env.widthClass === 'expanded' ? 'three' : env.device.width < 700 ? 'single' : 'two';
+  const mode: Mode = env.widthClass === 'expanded' ? 'three' : env.width < 700 ? 'single' : 'two';
+  // Under 440 logical px (split view at a larger text size) the header keeps Back, the roster mark, the points and More;
+  // undo and redo move into More (UX-025: collapse rather than clip).
+  const narrowHead = env.width < 440;
   const first = useRef(imported ? rosterFromImport(imported) : loadRoster(startRoster(start, rosterName))).current;
   const [roster, setRoster] = useState(first);
   const history = useRosterHistory<EditorUnit>({ units: first.units, forces: first.forces });
@@ -188,6 +193,14 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
     if (mode === 'three') { setShowCatalogue(true); requestAnimationFrame(() => searchRef.current?.focus({ preventScroll: true })); }
     else { setDetailOpen(false); setSlideOver(true); }
   };
+  // Hardware keyboard (T4): fixed shortcuts; the shell adds ⌘N, ⌘1–5 and the overlay. Undo and redo leave text fields alone.
+  useShortcuts(rootRef, {
+    'Mod+Z': undo, 'Mod+Shift+Z': redo,
+    'Mod+E': () => { setPop(null); setSheet({ kind: 'export' }); },
+    'Mod+F': () => { if (readOnly) return; setPop(null); openCatalogue(); requestAnimationFrame(() => requestAnimationFrame(() => searchRef.current?.focus({ preventScroll: true }))); },
+    Escape: () => { if (!pop && !slideOver && detailOpen) setDetailOpen(false); },
+  }, ['Mod+E', 'Mod+F']);
+  const keys = (combo: string) => env.input === 'pointer' ? ` (${keyLabel(combo, env.device.system)})` : '';
   const selectUnit = (unit: EditorUnit) => {
     setSelectedId(unit.id); setActiveForce(forceOf(unit)); setShowInspector(true);
     if (mode === 'single') setDetailOpen(true);
@@ -216,7 +229,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
   const inspectorLimits = mode === 'three' ? PANES.inspector : PANES.inspectorMedium;
   const fromLabel = from === 'rosters' ? 'Rosters' : 'Home';
 
-  return <div ref={rootRef} className={`tbe tbe-${mode}`} aria-label={`Roster editor: ${roster.name}`}>
+  return <div ref={rootRef} className={`tbe tbe-${mode} ${narrowHead ? 'tbe-narrow-head' : ''}`} aria-label={`Roster editor: ${roster.name}`}>
     <header className="tbe-header">
       <HintButton hint={`Back to ${fromLabel}`} input={env.input} side="bottom" wrapClassName="start" aria-label={`Back to ${fromLabel}`} className="tbe-back" onClick={onBack}><ChevronLeft size={24} /><span>{fromLabel}</span></HintButton>
       <div className="tbe-title-wrap" data-pop="switcher">
@@ -228,12 +241,14 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
         {pop === 'switcher' && <RosterSwitcher current={roster.name} onPick={switchRoster} onClose={() => setPop(null)} onAll={onAllRosters} onNew={onNewRoster} onImport={() => { setPop(null); onImport(); }} />}
       </div>
       <span className="tbe-header-spacer" />
-      <HintButton hint={readOnly ? 'Read-only roster: nothing to undo' : history.undoLabel ? `Undo “${history.undoLabel}”` : 'Nothing to undo'} input={env.input} side="bottom" aria-label={history.undoLabel ? `Undo ${history.undoLabel}` : 'Undo'} className="tbe-icon" disabled={!history.undoLabel || !!readOnly} onClick={undo}><Undo2 size={20} /></HintButton>
-      <HintButton hint={readOnly ? 'Read-only roster: nothing to redo' : history.redoLabel ? `Redo “${history.redoLabel}”` : 'Nothing to redo'} input={env.input} side="bottom" aria-label={history.redoLabel ? `Redo ${history.redoLabel}` : 'Redo'} className="tbe-icon" disabled={!history.redoLabel || !!readOnly} onClick={redo}><Redo2 size={20} /></HintButton>
+      {!narrowHead && <><HintButton hint={readOnly ? 'Read-only roster: nothing to undo' : history.undoLabel ? `Undo “${history.undoLabel}”${keys('Mod+Z')}` : 'Nothing to undo'} input={env.input} side="bottom" aria-label={history.undoLabel ? `Undo ${history.undoLabel}` : 'Undo'} className="tbe-icon" disabled={!history.undoLabel || !!readOnly} onClick={undo}><Undo2 size={20} /></HintButton>
+      <HintButton hint={readOnly ? 'Read-only roster: nothing to redo' : history.redoLabel ? `Redo “${history.redoLabel}”${keys('Mod+Shift+Z')}` : 'Nothing to redo'} input={env.input} side="bottom" aria-label={history.redoLabel ? `Redo ${history.redoLabel}` : 'Redo'} className="tbe-icon" disabled={!history.redoLabel || !!readOnly} onClick={redo}><Redo2 size={20} /></HintButton></>}
       <span className={`dt-app tb-shim ${light ? 'light' : ''}`} data-pop="summary"><SummaryToggle total={total} limit={limit} open={pop === 'summary'} onToggle={() => setPop(pop === 'summary' ? null : 'summary')} /></span>
       <div className="tbe-more-wrap" data-pop="more">
         <HintButton hint="More: export, panes and roster actions" input={env.input} side="bottom" wrapClassName="end" aria-label="More actions" aria-haspopup="menu" aria-expanded={pop === 'more'} className="tbe-icon" onClick={() => setPop(pop === 'more' ? null : 'more')}><Ellipsis size={20} /></HintButton>
         {pop === 'more' && <div className="tbe-menu end" role="menu" aria-label="More actions">
+          {narrowHead && <><button type="button" role="menuitem" disabled={!history.undoLabel || !!readOnly} onClick={() => { setPop(null); undo(); }}><Undo2 size={18} />{history.undoLabel ? `Undo “${history.undoLabel}”` : 'Undo'}</button>
+            <button type="button" role="menuitem" disabled={!history.redoLabel || !!readOnly} onClick={() => { setPop(null); redo(); }}><Redo2 size={18} />{history.redoLabel ? `Redo “${history.redoLabel}”` : 'Redo'}</button><hr /></>}
           <button type="button" role="menuitem" onClick={() => { setPop(null); setSheet({ kind: 'export' }); }}><ArrowDownToLine size={18} />Export roster…</button>
           <button type="button" role="menuitem" disabled={!!readOnly} onClick={() => { setPop(null); setSheet({ kind: 'rename' }); }}><Pencil size={18} />Rename roster</button>
           <button type="button" role="menuitem" onClick={duplicateRoster}><Copy size={18} />{readOnly ? 'Make an editable copy' : 'Duplicate roster'}</button>
@@ -255,8 +270,8 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
 
     <div className="tbe-body">
       <div className="tbe-panes" style={{ gridTemplateColumns: cols }}>
-        {mode === 'three' && showCatalogue && <PanelResizer side="left" width={catWidth} limits={PANES.catalogue} label="Resize catalogue" onWidth={setCatWidth} />}
-        {mode !== 'single' && showInspector && <PanelResizer side="right" width={inspWidth} limits={inspectorLimits} label="Resize unit details" onWidth={setInspWidth} />}
+        {mode === 'three' && showCatalogue && <TabletResizer side="left" width={catWidth} presets={PANES.catalogue} label="Resize catalogue" pane="catalogue" input={env.input} onWidth={setCatWidth} onHide={() => setShowCatalogue(false)} />}
+        {mode !== 'single' && showInspector && <TabletResizer side="right" width={inspWidth} presets={inspectorLimits} label="Resize unit details" pane="unit details" input={env.input} onWidth={setInspWidth} onHide={() => setShowInspector(false)} />}
         {mode === 'three' && showCatalogue && (readOnly ? <ReadOnlyCataloguePane env={env} info={readOnly} onFindData={onFindData} onClose={() => setShowCatalogue(false)} /> : catalogue('pane'))}
 
         <section className="tbe-pane tbe-tree" aria-label="Roster">
