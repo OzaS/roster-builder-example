@@ -3,8 +3,7 @@ import { AlertTriangle, ArrowDownToLine, ArrowRight, ArrowUpCircle, BookOpen, Ch
 import type { ColorScheme } from '../../types';
 import { collectionSources, colourSchemes, installedSources, lookupEntries, rosterLibrary, type LookupKind, type RosterSummary, type SourceInfo } from './desktopData';
 import { comboFromEvent, defaultBindings, formatCombo, hasCommandModifier, keyActions, type KeyAction, type KeyBindings } from './desktopKeys';
-import type { DesktopJobs } from './DesktopJobs';
-import { jobPercent } from './DesktopJobs';
+import { jobPercent, type WorkspaceJobs } from '../workspace/Jobs';
 import { Chip, PageActions, Segmented, Switch } from '../workspace/Primitives';
 import type { Notify } from '../workspace/Toasts';
 import './desktop-pages.css';
@@ -127,7 +126,7 @@ export function DesktopLookup({ onOpenRoster }: { onOpenRoster: (name: string) =
 
 /* ------------------------------ Sources ------------------------------ */
 
-export function DesktopSources({ notify, actionSlot, jobs, selectedId, onSelect, onOpenJobs, onOpenRoster }: { notify: Notify; actionSlot: HTMLElement | null; jobs: DesktopJobs; selectedId: string; onSelect: (id: string) => void; onOpenJobs: () => void; onOpenRoster?: (name: string) => void }) {
+export function DesktopSources({ notify, actionSlot, jobs, selectedId, onSelect, onOpenJobs, onOpenRoster }: { notify: Notify; actionSlot: HTMLElement | null; jobs: WorkspaceJobs; selectedId: string; onSelect: (id: string) => void; onOpenJobs: () => void; onOpenRoster?: (name: string) => void }) {
   const { sources, setSources } = jobs;
   const setSelectedId = onSelect;
   const progress: Record<string, number> = Object.fromEntries(sources.flatMap(s => { const p = jobs.progressOf(s.id); return p ? [[s.id, p.percent]] : []; }));
@@ -288,7 +287,7 @@ function KeyBindingsEditor({ bindings, onBindings }: { bindings: KeyBindings; on
 /* ------------------------- Welcome: first run ------------------------- */
 
 /** Right side of Welcome while there is no game data, or data but no rosters yet. */
-export function WelcomeStart({ jobs, onCreate, onImport, onAddData, onOpenJobs }: { jobs: DesktopJobs; onCreate: () => void; onImport: () => void; onAddData: () => void; onOpenJobs: () => void }) {
+export function WelcomeStart({ jobs, onCreate, onImport, onAddData, onOpenJobs }: { jobs: WorkspaceJobs; onCreate: () => void; onImport: () => void; onAddData: () => void; onOpenJobs: () => void }) {
   if (jobs.sources.length) return <section className="dt-recents dt-start">
     <header><h2>Ready when you are</h2><span>{jobs.sources.map(s => s.name).join(' · ')} installed</span></header>
     <div className="dtp-empty left"><Layers3 size={22} /><strong>No rosters yet</strong><p>Your first roster takes a minute: choose a faction, a force and a points limit.</p><span className="dtp-row-actions"><button className="dtp-btn primary" onClick={onCreate}><Plus size={15} />Create your first roster</button><button className="dtp-btn" onClick={onImport}><FileUp size={15} />Import a roster</button></span></div>

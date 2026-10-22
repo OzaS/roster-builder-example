@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { AlertTriangle, Check, ChevronDown, ChevronUp, Circle, LoaderCircle, Search, X } from 'lucide-react';
-import type { SourceInfo } from './desktopData';
-import type { Notify } from '../workspace/Toasts';
+import type { SourceInfo } from './sourceTypes';
+import type { Notify } from './Toasts';
+import './workspace.css';
 
-// Install / update jobs for the desktop prototype: one simulated queue shared by Welcome, Sources and the
+// Install / update jobs, shared by the desktop and tablet prototypes: one simulated queue shared by Welcome, Sources and the
 // window chrome. Installs pause on "Choose factions" until the user picks; Cancel needs no confirmation.
 
 export type StepState = 'waiting' | 'active' | 'done' | 'needs-you';
@@ -30,7 +31,7 @@ function advance(job: Job): Job {
   return { ...job, steps: list };
 }
 
-export function useDesktopJobs(initial: SourceInfo[], notify: Notify, onViewSource: (id: string) => void) {
+export function useWorkspaceJobs(initial: SourceInfo[], notify: Notify, onViewSource: (id: string) => void) {
   const [sources, setSources] = useState(initial);
   const [jobs, setJobs] = useState<Job[]>([]);
   const jobsRef = useRef(jobs);
@@ -69,7 +70,7 @@ export function useDesktopJobs(initial: SourceInfo[], notify: Notify, onViewSour
   const progressOf = (sourceId: string) => { const job = jobs.find(j => j.sourceId === sourceId && isLive(j)); return job ? { job, percent: jobPercent(job) } : undefined; };
   return { sources, setSources, jobs, startInstall, startUpdate, chooseFactions, cancel, clearEnded, progressOf };
 }
-export type DesktopJobs = ReturnType<typeof useDesktopJobs>;
+export type WorkspaceJobs = ReturnType<typeof useWorkspaceJobs>;
 
 /** Window-chrome button: live progress of the jobs; opens the jobs panel. */
 export function JobsToggle({ jobs, open, onToggle }: { jobs: Job[]; open: boolean; onToggle: () => void }) {
@@ -84,7 +85,7 @@ export function JobsToggle({ jobs, open, onToggle }: { jobs: Job[]; open: boolea
   </button>;
 }
 
-function FactionPicker({ job, onChoose, onCancel }: { job: Job; onChoose: (chosen: string[]) => void; onCancel: () => void }) {
+export function FactionPicker({ job, onChoose, onCancel }: { job: Job; onChoose: (chosen: string[]) => void; onCancel: () => void }) {
   const [query, setQuery] = useState('');
   const [chosen, setChosen] = useState<string[]>(job.factions.slice(0, 1));
   const shown = job.factions.filter(f => f.toLowerCase().includes(query.toLowerCase()));

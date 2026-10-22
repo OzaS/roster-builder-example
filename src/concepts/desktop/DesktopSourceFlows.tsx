@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent as ReactKeyboardEvent, type ReactNode, type RefObject } from 'react';
 import { AlertTriangle, Archive, ArrowDownToLine, ArrowLeft, ArrowUpCircle, Check, ChevronRight, CloudOff, Copy, Ellipsis, EyeOff, FileText, Github, History, Inbox, Layers3, LibraryBig, Link2, ListChecks, LoaderCircle, OctagonAlert, RefreshCcw, Search, Trash2, X } from 'lucide-react';
 import { dataChanges, githubRepositories, rosterChecks, sourceCollections, type CheckState, type CollectionPage, type DataChanges, type LastUpdate, type Listing, type RosterCheck, type SourceInfo } from './desktopData';
-import { jobPercent, type DesktopJobs } from './DesktopJobs';
+import { jobPercent, type WorkspaceJobs } from '../workspace/Jobs';
 import type { Notify } from '../workspace/Toasts';
 import { Chip, type ChipTone } from '../workspace/Primitives';
 import './desktop-sources.css';
@@ -53,9 +53,9 @@ const pageKind = (page: CollectionPage) => page.kind === 'library' ? `${plural(p
 
 /* ----------------------------- Listing rows ----------------------------- */
 
-const liveJob = (jobs: DesktopJobs, id: string) => jobs.jobs.find(j => j.sourceId === id && (j.status === 'running' || j.status === 'needs-you'));
+const liveJob = (jobs: WorkspaceJobs, id: string) => jobs.jobs.find(j => j.sourceId === id && (j.status === 'running' || j.status === 'needs-you'));
 
-function ListingAction({ listing, jobs, go, onOpenJobs }: { listing: Listing; jobs: DesktopJobs; go: Go; onOpenJobs: () => void }) {
+function ListingAction({ listing, jobs, go, onOpenJobs }: { listing: Listing; jobs: WorkspaceJobs; go: Go; onOpenJobs: () => void }) {
   const installed = jobs.sources.find(s => s.id === listing.id);
   const live = liveJob(jobs, listing.id);
   if (live) return <button className={`dtp-btn small ${live.status === 'needs-you' ? 'primary' : ''}`} title="Show installs and updates" onClick={onOpenJobs}>{live.status === 'needs-you' ? 'Choose factions' : `${live.kind === 'update' ? 'Updating' : 'Installing'} ${jobPercent(live)}%`}</button>;
@@ -64,7 +64,7 @@ function ListingAction({ listing, jobs, go, onOpenJobs }: { listing: Listing; jo
   return <button className="dtp-btn small" aria-label={`Install ${listing.name}`} onClick={() => { jobs.startInstall({ id: listing.id, name: listing.name, factions: listing.factions, size: listing.size }); onOpenJobs(); }}><ArrowDownToLine size={13} />Install</button>;
 }
 
-function ListingRow({ listing, jobs, go, onOpenJobs, compact = false }: { listing: Listing; jobs: DesktopJobs; go: Go; onOpenJobs: () => void; compact?: boolean }) {
+function ListingRow({ listing, jobs, go, onOpenJobs, compact = false }: { listing: Listing; jobs: WorkspaceJobs; go: Go; onOpenJobs: () => void; compact?: boolean }) {
   const installed = jobs.sources.find(s => s.id === listing.id);
   const live = liveJob(jobs, listing.id);
   const chips = !compact && (listing.supported || installed || listing.archived);
@@ -139,12 +139,12 @@ const checkResults = (s: SourceInfo) => {
   const count = u.check === 'done' ? s.rosters.length : u.done;
   return s.rosters.slice(0, count).map(name => ({ name, ...(u.nothingChanged ? unchangedCheck : rosterChecks[name] ?? unchangedCheck) }));
 };
-const patchUpdate = (jobs: DesktopJobs, id: string, patch: Partial<LastUpdate>) => jobs.setSources(list => list.map(s => s.id === id && s.lastUpdate ? { ...s, lastUpdate: { ...s.lastUpdate, ...patch } } : s));
-const startCheck = (jobs: DesktopJobs, id: string) => patchUpdate(jobs, id, { check: 'checking', done: 0 });
-const cancelCheck = (jobs: DesktopJobs, s: SourceInfo, notify: Notify) => { patchUpdate(jobs, s.id, { check: 'cancelled' }); notify(`Roster check of ${s.name} cancelled`); };
+const patchUpdate = (jobs: WorkspaceJobs, id: string, patch: Partial<LastUpdate>) => jobs.setSources(list => list.map(s => s.id === id && s.lastUpdate ? { ...s, lastUpdate: { ...s.lastUpdate, ...patch } } : s));
+const startCheck = (jobs: WorkspaceJobs, id: string) => patchUpdate(jobs, id, { check: 'checking', done: 0 });
+const cancelCheck = (jobs: WorkspaceJobs, s: SourceInfo, notify: Notify) => { patchUpdate(jobs, s.id, { check: 'cancelled' }); notify(`Roster check of ${s.name} cancelled`); };
 
 /** Runs the simulated roster checks while the Sources page is open; a finished check raises a notification. */
-export function useRosterChecks(jobs: DesktopJobs, notify: Notify, go: Go) {
+export function useRosterChecks(jobs: WorkspaceJobs, notify: Notify, go: Go) {
   const { sources, setSources } = jobs;
   const checking = sources.some(s => s.lastUpdate?.check === 'checking');
   useEffect(() => {
@@ -169,7 +169,7 @@ export function useRosterChecks(jobs: DesktopJobs, notify: Notify, go: Go) {
 }
 
 /** Source detail: when the last update finished and where its roster check stands. */
-export function LastUpdateCard({ source, jobs, notify, go }: { source: SourceInfo; jobs: DesktopJobs; notify: Notify; go: Go }) {
+export function LastUpdateCard({ source, jobs, notify, go }: { source: SourceInfo; jobs: WorkspaceJobs; notify: Notify; go: Go }) {
   const u = source.lastUpdate;
   if (!u) return null;
   const total = source.rosters.length;
@@ -196,7 +196,7 @@ export function LastUpdateCard({ source, jobs, notify, go }: { source: SourceInf
 }
 
 /** Preview control for the last update states of a source (source detail and report). */
-export function LastUpdateStates({ source, jobs }: { source: SourceInfo; jobs: DesktopJobs }) {
+export function LastUpdateStates({ source, jobs }: { source: SourceInfo; jobs: WorkspaceJobs }) {
   if (source.fromFile) return null;
   const u = source.lastUpdate;
   const total = source.rosters.length;
@@ -233,7 +233,7 @@ function DataChangesView({ changes }: { changes: DataChanges }) {
 }
 
 /** Update report in the detail pane: roster check results and the data changes of the last update. */
-export function UpdateReportView({ sourceId, jobs, notify, go, onOpenRoster }: { sourceId: string; jobs: DesktopJobs; notify: Notify; go: Go; onOpenRoster?: (name: string) => void }) {
+export function UpdateReportView({ sourceId, jobs, notify, go, onOpenRoster }: { sourceId: string; jobs: WorkspaceJobs; notify: Notify; go: Go; onOpenRoster?: (name: string) => void }) {
   const source = jobs.sources.find(s => s.id === sourceId);
   if (!source?.lastUpdate) return <section className="dtp-card dtp-detail dts-flow" aria-label="Update report">
     <BackButton label={source?.name ?? 'Add game data'} onClick={() => go(source?.id ?? 'add')} />
@@ -281,7 +281,7 @@ export function UpdateReportView({ sourceId, jobs, notify, go, onOpenRoster }: {
 /* ---------------------- Add game data: collections ---------------------- */
 
 /** The collections part of Add game data: the default collection's supported sources and saved collections. */
-export function AddDataCollections({ jobs, go, onOpenJobs }: { jobs: DesktopJobs; go: Go; onOpenJobs: () => void }) {
+export function AddDataCollections({ jobs, go, onOpenJobs }: { jobs: WorkspaceJobs; go: Go; onOpenJobs: () => void }) {
   const store = useFlowStore();
   const def = sourceCollections.default;
   const saved = store.saved.map(s => pageOf(s.id, store)).filter((p): p is CollectionPage => !!p);
@@ -298,7 +298,7 @@ export function AddDataCollections({ jobs, go, onOpenJobs }: { jobs: DesktopJobs
 type PageState = 'live' | 'loading' | 'cached' | 'failed' | 'empty';
 
 /** A collection or library page: search, source rows with their actions, archived toggle, nested entries and the ⋯ menu. */
-export function CollectionView({ pageId, jobs, notify, go, onOpenJobs }: { pageId: string; jobs: DesktopJobs; notify: Notify; go: Go; onOpenJobs: () => void }) {
+export function CollectionView({ pageId, jobs, notify, go, onOpenJobs }: { pageId: string; jobs: WorkspaceJobs; notify: Notify; go: Go; onOpenJobs: () => void }) {
   const store = useFlowStore();
   const [query, setQuery] = useState('');
   const [state, setState] = useState<PageState>('live');
@@ -351,7 +351,7 @@ export function CollectionView({ pageId, jobs, notify, go, onOpenJobs }: { pageI
 type SearchResult = { query: string; listings: Listing[]; error?: boolean };
 
 /** GitHub-wide repository search: runs on submit; archived results sit behind a toggle. */
-export function GitHubSearchView({ jobs, go, onOpenJobs }: { jobs: DesktopJobs; go: Go; onOpenJobs: () => void }) {
+export function GitHubSearchView({ jobs, go, onOpenJobs }: { jobs: WorkspaceJobs; go: Go; onOpenJobs: () => void }) {
   const store = useFlowStore();
   const [query, setQuery] = useState('');
   const [result, setResult] = useState<SearchResult | undefined>();
@@ -440,7 +440,7 @@ function useDialogFocus(ref: RefObject<HTMLElement | null>, onClose: () => void)
   }, [ref]);
 }
 
-export function AddCollectionDialog({ jobs, notify, go, onOpenJobs, onClose }: { jobs: DesktopJobs; notify: Notify; go: Go; onOpenJobs: () => void; onClose: () => void }) {
+export function AddCollectionDialog({ jobs, notify, go, onOpenJobs, onClose }: { jobs: WorkspaceJobs; notify: Notify; go: Go; onOpenJobs: () => void; onClose: () => void }) {
   const [value, setValue] = useState('');
   const [phase, setPhase] = useState<AddPhase>({ kind: 'idle' });
   const dialog = useRef<HTMLElement>(null);
