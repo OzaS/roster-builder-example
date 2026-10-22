@@ -27,7 +27,7 @@ export function TabletElements() {
       <LibrarySwitch current="tablet" label="Design library examples" />
       <h2>Tablet rail · Touch (press and hold shows the hint) and Pointer (hover shows the title)</h2>
       <div className="tb-el-row">{railIn('touch')}{railIn('pointer')}
-        <div className="tb-el-note"><strong>Hint bubble</strong><span className="tb-hint-bubble static">Rosters: find, open and manage your rosters</span><small>New roster on top; Home, Rosters, Lookup, Tools, Library; Sources and Settings pinned to the bottom. Active indicator, aria-current, focus ring, 48 px and larger targets.</small></div>
+        <div className="tb-el-note"><strong>Hint bubble</strong><span className="tb-hint-bubble static">Rosters: find, open and manage your rosters</span><small>Material 3 rail: New roster is an icon-only FAB on top (56 px, tonal, no shadow, aligned with the page content); Home, Rosters, Lookup, Tools, Library; Sources and Settings pinned to the bottom. Pill indicator behind the active icon, aria-current, focus ring, 56 px and larger targets.</small></div>
       </div>
       <h2>Device frames · same scale</h2>
       <div className="tb-el-devices">{tabletDevices.map(d => <figure key={d.id}><i style={{ width: d.width / 8, height: d.height / 8 }} className={d.system} /><figcaption><strong>{d.label}</strong>{d.width} × {d.height} · {widthClassLabel[widthClassOf(d.width)]}</figcaption></figure>)}</div>

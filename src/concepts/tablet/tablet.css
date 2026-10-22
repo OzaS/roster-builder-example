@@ -17,21 +17,26 @@
 .dt-ambient-on .tb-app.light::before { opacity: .3 }
 
 /* ------------------------------ rail ------------------------------ */
-.tb-rail { position: relative; z-index: 2; flex: 0 0 84px; display: flex; flex-direction: column; gap: 6px; padding: 14px 8px 30px; border-right: 1px solid var(--ux-line) }
+.tb-rail { position: relative; z-index: 2; flex: 0 0 88px; display: flex; flex-direction: column; gap: 4px; padding: 16px 8px 30px; border-right: 1px solid var(--ux-line) }
 .tb-hint-wrap { position: relative; display: block }
 .tb-app .tb-rail button { width: 100%; margin: 0; font: inherit }
-.tb-app button.tb-rail-item, .tb-app button.tb-rail-new { position: relative; display: grid; justify-items: center; align-content: center; gap: 4px; min-height: 56px; padding: 6px 2px; border: 0; border-radius: 16px; background: transparent; color: var(--ux-muted); font-size: 11px; font-weight: 750; letter-spacing: .2px; line-height: 1.15; text-align: center; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent }
-.tb-pointer button.tb-rail-item, .tb-pointer button.tb-rail-new { min-height: 48px }
+/* Material 3 rail: icon-only FAB on top (56 px, 16 px corners, tonal container, no shadow), 20 px above the destinations. */
+.tb-app .tb-rail button.tb-rail-fab { display: grid; place-items: center; width: 56px; height: 56px; margin: 0 auto 20px; padding: 0; border: 0; border-radius: 16px; background: color-mix(in srgb, var(--ux-accent) 28%, var(--ux-surface)); color: var(--ux-accent-2); cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; transition: background .15s }
+.tb-app.light .tb-rail button.tb-rail-fab { background: color-mix(in srgb, var(--ux-accent) 18%, var(--ux-surface)); color: var(--ux-accent) }
+.tb-pointer .tb-rail button.tb-rail-fab:hover { background: color-mix(in srgb, var(--ux-accent) 36%, var(--ux-surface)) }
+.tb-app .tb-rail button.tb-rail-fab:active { background: color-mix(in srgb, var(--ux-accent) 44%, var(--ux-surface)) }
+/* Destinations: the pill indicator (56 × 32) sits behind the icon only; the label stays under it. */
+.tb-app button.tb-rail-item { position: relative; display: grid; justify-items: center; align-content: center; gap: 4px; min-height: 64px; padding: 4px 0; border: 0; background: transparent; color: var(--ux-muted); font-size: 12px; font-weight: 650; letter-spacing: .1px; line-height: 1.15; text-align: center; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent }
+.tb-pointer button.tb-rail-item { min-height: 56px }
 .tb-touch .tb-rail button { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none }
-.tb-app button.tb-rail-item.active { color: var(--ux-accent-2); background: color-mix(in srgb, var(--ux-accent) 16%, transparent) }
-.tb-app button.tb-rail-item.active::before { content: ''; position: absolute; left: -8px; top: 14px; bottom: 14px; width: 4px; border-radius: 0 4px 4px 0; background: var(--ux-accent) }
-.tb-app.light button.tb-rail-item.active { color: var(--ux-accent) }
-.tb-app button.tb-rail-new { margin-bottom: 2px; background: linear-gradient(180deg, var(--ux-accent-2), var(--ux-accent)); color: var(--ux-accent-ink); font-weight: 800; box-shadow: 0 8px 20px color-mix(in srgb, var(--ux-accent) 32%, transparent) }
-.tb-app button.tb-rail-item:active, .tb-touch button.tb-rail-item:active { background: var(--ux-surface-3) }
-.tb-pointer button.tb-rail-item:not(.active):hover { color: var(--ux-ink); background: var(--ux-surface-2) }
-.tb-pointer button.tb-rail-new:hover { filter: brightness(1.06) }
-.tb-app .tb-rail button:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px }
-.tb-rail-rule { height: 1px; margin: 4px 10px 6px; background: var(--ux-line) }
+.tb-rail-ind { display: grid; place-items: center; width: 56px; height: 32px; border-radius: 16px; transition: background .15s }
+.tb-app button.tb-rail-item.active { color: var(--ux-ink); font-weight: 800 }
+.tb-app button.tb-rail-item.active .tb-rail-ind { background: color-mix(in srgb, var(--ux-accent) 26%, transparent); color: var(--ux-accent-2) }
+.tb-app.light button.tb-rail-item.active .tb-rail-ind { background: color-mix(in srgb, var(--ux-accent) 18%, transparent); color: var(--ux-accent) }
+.tb-pointer button.tb-rail-item:not(.active):hover { color: var(--ux-ink) }
+.tb-pointer button.tb-rail-item:not(.active):hover .tb-rail-ind { background: var(--ux-surface-2) }
+.tb-app button.tb-rail-item:active .tb-rail-ind { background: var(--ux-surface-3) }
+.tb-app .tb-rail button:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px; border-radius: 16px }
 .tb-rail-spacer { flex: 1 }
 .tb-hint-bubble { position: absolute; z-index: 30; max-width: 240px; padding: 10px 13px; border-radius: 12px; background: var(--ux-ink); color: var(--ux-bg); font-size: 13px; font-weight: 650; line-height: 1.3; text-align: left; white-space: normal; width: max-content; box-shadow: 0 10px 28px #0006; pointer-events: none }
 .tb-hint-bubble.right { left: calc(100% + 10px); top: 50%; transform: translateY(-50%) }

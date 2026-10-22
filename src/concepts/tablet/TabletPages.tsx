@@ -94,7 +94,7 @@ export function TabletHome({ env, notify, onPage, onNewRoster }: PageProps & { o
 
 /* -------------------------------- Rosters -------------------------------- */
 
-export function TabletRosters({ env, notify }: PageProps) {
+export function TabletRosters({ env, notify, onNewRoster }: PageProps & { onNewRoster: () => void }) {
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState(rosterLibrary[0].name);
   const [open, setOpen] = useState(false);
@@ -102,7 +102,8 @@ export function TabletRosters({ env, notify }: PageProps) {
   const current = rosterLibrary.find(r => r.name === selected) ?? rosterLibrary[0];
   return <div className="tb-page">
     <div className="tb-toolbar"><SearchField value={query} onChange={setQuery} label="Find a roster" placeholder="Find a roster or faction…" />
-      <HintButton hint="Import a roster from a file" input={env.input} side="bottom" className="ux-job-btn" onClick={() => notify('Import a roster file (prototype)')}><FileUp size={16} />Import</HintButton></div>
+      <HintButton hint="Import a roster from a file" input={env.input} side="bottom" className="ux-job-btn" onClick={() => notify('Import a roster file (prototype)')}><FileUp size={16} />Import</HintButton>
+      <HintButton hint="Create a roster" input={env.input} side="bottom" className="ux-job-btn primary" onClick={onNewRoster}><Plus size={16} />New roster</HintButton></div>
     <ListDetail env={env} label="Rosters" open={open} onClose={() => setOpen(false)}
       list={<div className="tb-list scroll">{visible.map(r => <Row key={r.name} selected={r.name === selected} mark={r.mark} title={r.name} sub={`${r.faction} · ${r.system}`} end={<><b>{pts(r.used)} / {pts(r.limit)}</b>{rosterStatus(r)}</>} onClick={() => { setSelected(r.name); setOpen(true); }} />)}{!visible.length && <p className="tb-empty">No rosters match “{query}”.</p>}</div>}
       detail={<>

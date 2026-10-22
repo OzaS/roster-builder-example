@@ -42,7 +42,7 @@ function TabletShell({ initialPage, ...props }: Partial<ConceptProps> & { initia
     <TabletRail page={page} input={env.input} onPage={setPage} onNewRoster={newRoster} />
     <main className="tb-main" aria-label={page}>
       {page === 'home' ? <TabletHome {...shared} onPage={setPage} onNewRoster={newRoster} />
-        : page === 'rosters' ? <TabletRosters {...shared} />
+        : page === 'rosters' ? <TabletRosters {...shared} onNewRoster={newRoster} />
           : page === 'lookup' ? <TabletLookup {...shared} />
             : page === 'tools' ? <TabletTools />
               : page === 'library' ? <TabletLibrary />
