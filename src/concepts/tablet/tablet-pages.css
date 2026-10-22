@@ -1,0 +1,209 @@
+/* Tablet pages (T2a Home/Rosters/Lookup, T2b Sources/Settings). Root = .tb-app.ux-screen (see tablet.css); mobile tokens only.
+   Targets are 44 px and larger. The workspace flows reused in the Sources pane (jobs popover, update report, collections,
+   GitHub search, add-collection sheet) keep their desktop classes (dtp-*, dts-*, dt-*) and are scaled to touch size under
+   `.tb-flow` / `.tb-jobs`; the `.tb-app` prefix makes these rules win over the desktop rules of the same specificity. */
+
+/* ------------------------------ shared ------------------------------ */
+.tb-toolbar-end { justify-content: flex-end }
+.tb-toolbar.wrap { flex-wrap: wrap }
+.tb-page > .tb-home { flex: 1; min-height: 0 }
+.tb-muted { color: var(--ux-muted) }
+.tb-card-head { display: grid; gap: 6px }
+.tb-card-title { font-size: 22px; font-weight: 800; line-height: 1.2 }
+.tb-list-label { padding: 4px 2px 0 }
+.tb-list-foot { display: flex; align-items: center; gap: 8px; margin: 0; padding: 0 4px; color: var(--ux-muted); font-size: 12.5px }
+.tb-list-foot .ux-job-btn { margin-left: auto }
+.tb-wide { width: 100% }
+.tb-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 6px }
+.tb-section > .tb-chips { margin-top: 0 }
+.tb-row-main .ux-job-bar, .tb-install-row .ux-job-bar { margin-top: 8px }
+
+.tb-note strong { display: block; color: var(--ux-ink); font-size: 14px }
+.tb-note.ok { border: 1px solid color-mix(in srgb, var(--ux-ok) 30%, transparent); background: color-mix(in srgb, var(--ux-ok) 8%, transparent); color: var(--ux-ok) }
+.tb-note.warn { border: 1px solid color-mix(in srgb, var(--ux-warn) 35%, transparent); background: color-mix(in srgb, var(--ux-warn) 9%, transparent); color: var(--ux-warn) }
+.tb-note.err { border: 1px solid color-mix(in srgb, var(--ux-err) 32%, transparent); background: color-mix(in srgb, var(--ux-err) 8%, transparent); color: var(--ux-err) }
+.tb-note.ok > span, .tb-note.warn > span, .tb-note.err > span { color: var(--ux-muted) }
+.tb-note .tb-text-link { color: var(--ux-accent-2) }
+
+.tb-app button.ux-job-btn.tb-confirm { border-color: transparent; background: var(--ux-err); color: var(--ux-err-ink) }
+.tb-app button.tb-icon-btn { display: grid; place-items: center; width: 44px; height: 44px; flex-shrink: 0; padding: 0; border: 1px solid var(--ux-line-2); border-radius: 12px; background: var(--ux-surface-2); color: var(--ux-muted); cursor: pointer }
+.tb-pointer button.tb-icon-btn:hover { color: var(--ux-ink) }
+.tb-app button.tb-chip-add { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px; border: 1px dashed var(--ux-line-2); border-radius: 999px; background: none; color: var(--ux-muted); font-size: 13.5px; font-weight: 700; cursor: pointer }
+.tb-app button.tb-text-link { display: block; min-height: 44px; padding: 0; border: 0; background: none; font-size: 14px; font-weight: 750; text-align: left; cursor: pointer }
+.tb-app .tb-text-link:focus-visible, .tb-app .tb-chip-add:focus-visible, .tb-app .tb-icon-btn:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px }
+
+/* empty states */
+.tb-empty-card { display: grid; justify-items: center; align-content: center; gap: 8px; padding: 36px 24px; border: 1px dashed var(--ux-line-2); border-radius: var(--ux-r-lg); color: var(--ux-muted); text-align: center }
+.tb-page > .tb-empty-card { flex: 1; min-height: 0 }
+.tb-empty-icon { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 16px; background: color-mix(in srgb, var(--ux-accent) 16%, var(--ux-surface-2)); color: var(--ux-accent-2) }
+.tb-empty-card strong { color: var(--ux-ink); font-size: 18px; font-weight: 800 }
+.tb-empty-card p { max-width: 420px; margin: 0; font-size: 14.5px; line-height: 1.45 }
+.tb-empty-card .tb-actions { justify-content: center; margin-top: 10px }
+.tb-card .tb-empty-card { border: 0; padding: 20px 8px }
+
+/* Home */
+.tb-steps { display: grid; gap: 16px; margin: 0; padding: 0; list-style: none }
+.tb-steps li { display: flex; align-items: flex-start; gap: 12px }
+.tb-steps strong { display: block; font-size: 15px }
+.tb-steps small { display: block; margin-top: 2px; color: var(--ux-muted); font-size: 13px; line-height: 1.4 }
+.tb-step-n { flex-shrink: 0; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: color-mix(in srgb, var(--ux-accent) 18%, var(--ux-surface-2)); color: var(--ux-accent-2); font-size: 14px; font-weight: 850 }
+.tb-install-row { display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 12px 14px; border: 1px solid var(--ux-line); border-radius: var(--ux-r-md); background: var(--ux-surface) }
+.tb-install-row .tb-row-main strong { display: block; font-size: 15px }
+.tb-install-row .tb-row-main small { display: block; margin-top: 1px; color: var(--ux-muted); font-size: 12.5px; white-space: normal }
+.tb-install-row.archived .tb-row-main { opacity: .72 }
+.tb-install-row .ux-job-btn { flex-shrink: 0 }
+.tb-install-row .tb-chips { margin-top: 6px }
+.tb-install-row .tb-row-main .ux-job-bar { max-width: 240px }
+
+/* Rosters */
+.tb-rename { flex: 1; display: flex; gap: 8px }
+.tb-rename input { flex: 1; min-width: 0; min-height: 48px; padding: 0 12px; border: 1px solid var(--ux-accent); border-radius: var(--ux-r-md); background: var(--ux-surface-2); color: var(--ux-ink); font-size: 16px; outline: none }
+.tb-detail .tb-actions .ux-job-btn.destructive { border-color: var(--ux-line-2) }
+
+/* Sources */
+.tb-banner { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--ux-accent) 40%, transparent); border-radius: var(--ux-r-md); background: color-mix(in srgb, var(--ux-accent) 12%, transparent); color: var(--ux-accent-2) }
+.tb-banner > span { flex: 1; min-width: 0 }
+.tb-banner strong { display: block; color: var(--ux-ink); font-size: 14.5px }
+.tb-banner small { display: block; color: var(--ux-muted); font-size: 12.5px }
+.tb-update { border-color: color-mix(in srgb, var(--ux-accent) 40%, transparent); background: color-mix(in srgb, var(--ux-accent) 9%, var(--ux-surface)) }
+.tb-update-head { display: flex; align-items: flex-start; gap: 12px; color: var(--ux-accent-2) }
+.tb-update-head strong { display: block; color: var(--ux-ink); font-size: 15px }
+.tb-update-head small { display: block; color: var(--ux-muted); font-size: 12.5px }
+.tb-counts { display: flex; flex-wrap: wrap; gap: 6px 20px; margin: 0; padding: 0 0 0 34px; list-style: none; color: var(--ux-muted); font-size: 13px }
+.tb-counts b { margin-right: 5px; color: var(--ux-ink) }
+.tb-danger { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px; border: 1px solid color-mix(in srgb, var(--ux-err) 30%, transparent); border-radius: var(--ux-r-md) }
+.tb-danger strong { display: block; font-size: 14.5px }
+.tb-danger small { display: block; margin-top: 2px; color: var(--ux-muted); font-size: 12.5px }
+.tb-link-form { display: flex; align-items: center; gap: 10px }
+.tb-link-form .tb-search { flex: 1 }
+.tb-link-form .ux-job-btn { flex-shrink: 0 }
+.tb-flow { display: grid; gap: 12px; align-content: start }
+.tb-flow:empty { display: none }
+.tb-sheet { display: contents }
+
+/* Jobs button (toolbar) and popover (workspace Jobs, scaled to touch size). The popover hangs under the toolbar row. */
+.tb-jobs-btn { display: contents }
+.tb-app .tb-jobs-btn .dt-jobs-toggle { height: 48px; padding: 0 14px; border-radius: 14px; font-size: 14px; font-weight: 700; gap: 9px; max-width: 360px }
+.tb-app .tb-jobs-btn .dt-ring { width: 18px; height: 18px; -webkit-mask: radial-gradient(circle, transparent 5.5px, #000 6px); mask: radial-gradient(circle, transparent 5.5px, #000 6px) }
+.tb-app .dt-jobs { z-index: 8; top: 84px; right: 20px; width: min(440px, calc(100% - 40px)); max-height: calc(100% - 110px); padding: 8px; border-radius: 22px; font-size: 14px }
+.tb-app .dt-jobs > header { padding: 8px 8px 8px 12px }
+.tb-app .dt-jobs h2 { font-size: 18px; font-weight: 800 }
+.tb-app .dt-job { margin: 6px 4px; padding: 14px; border-radius: 16px; background: var(--ux-surface-2) }
+.tb-app .dt-job-title { font-size: 15px }
+.tb-app .dt-job-title strong { font-weight: 750 }
+.tb-app .dt-job .dtp-progress { height: 6px; margin: 10px 0 12px }
+.tb-app .dt-job-steps { gap: 10px; font-size: 14px }
+.tb-app .dt-job-steps li small { font-size: 12.5px }
+.tb-app .dt-job-actions { margin-top: 12px; flex-wrap: wrap }
+.tb-app .dt-job-actions small { font-size: 13px }
+.tb-app .dt-jobs .dtp-btn, .tb-app .dt-jobs .dtp-btn.small { height: 44px; padding: 0 16px; border-radius: 12px; font-size: 14px; font-weight: 700 }
+.tb-app .dt-jobs .dt-job-clear { min-height: 44px; padding: 0 12px; font-size: 14px }
+.tb-app .dt-faction-picker p { font-size: 13.5px }
+.tb-app .dt-faction-picker .dtp-search { height: 48px; border-radius: 14px }
+.tb-app .dt-faction-picker .dtp-search input { font-size: 15px }
+.tb-app .dt-faction-tools { font-size: 13px }
+.tb-app .dt-faction-tools button { min-height: 44px; padding: 0 10px; font-size: 14px }
+.tb-app .dt-faction-list { max-height: 240px }
+.tb-app .dt-faction-list label { min-height: 48px; padding: 0 12px; font-size: 15px; gap: 12px }
+.tb-app .dt-faction-list input { width: 22px; height: 22px }
+
+/* Workspace flows in the detail pane, scaled to touch size */
+.tb-app .tb-flow { font-size: 14px }
+.tb-app .tb-flow .dtp-card.dtp-detail { padding: 0; border: 0; border-radius: 0; background: none; overflow: visible }
+.tb-app .tb-flow .dtp-detail h2 { font-size: 21px; font-weight: 800; letter-spacing: 0 }
+.tb-app .tb-flow .dtp-detail h3 { margin: 22px 0 10px; color: var(--ux-muted); font-size: 11px; font-weight: 850; letter-spacing: .7px; text-transform: uppercase }
+.tb-app .tb-flow .dts-section-head { margin: 22px 0 10px }
+.tb-app .tb-flow .dts-section-head h3 { margin: 0 }
+.tb-app .tb-flow .dtp-eyebrow { font-size: 11px }
+.tb-app .tb-flow .dtp-muted, .tb-app .tb-flow .dts-help, .tb-app .tb-flow .dts-error { font-size: 13.5px }
+.tb-app .tb-flow .dtp-body-text { font-size: 15px; line-height: 1.5; color: var(--ux-ink) }
+.tb-app .tb-flow .dts-meta { font-size: 12.5px }
+.tb-app .tb-flow .dts-note { font-size: 12.5px }
+.tb-app .tb-flow .dts-back { height: 44px; margin: 0 0 6px -8px; padding: 0 14px 0 8px; font-size: 14px; font-weight: 700 }
+.tb-app .tb-flow .dts-tile { width: 44px; height: 44px; border-radius: 12px }
+.tb-app .tb-flow .dts-title h2 { font-size: 21px }
+.tb-app .tb-flow .dtp-btn, .tb-app .tb-flow .dtp-btn.small { height: 44px; padding: 0 16px; border-radius: 12px; font-size: 14px; font-weight: 700; gap: 8px }
+.tb-app .tb-flow .dtp-btn.primary { border-radius: 12px }
+.tb-app .tb-flow .dtp-search, .tb-app .tb-flow .dts-search-form .dtp-search, .tb-app .tb-flow .dts-dialog .dtp-search { height: 48px; max-width: none; padding: 0 14px; border-radius: 14px }
+.tb-app .tb-flow .dtp-search input { font-size: 15px }
+.tb-app .tb-flow .dtp-search button { width: 44px; height: 44px; margin-right: -10px }
+.tb-app .tb-flow .dts-search-form .dtp-btn, .tb-app .tb-flow .dts-dialog .dtp-inline-form .dtp-btn { height: 48px }
+.tb-app .tb-flow .dtp-notice { gap: 12px; padding: 14px; border-radius: var(--ux-r-md) }
+.tb-app .tb-flow .dtp-notice strong { font-size: 14.5px }
+.tb-app .tb-flow .dtp-notice small { font-size: 13.5px }
+.tb-app .tb-flow .dtp-empty { padding: 28px 16px; font-size: 14px }
+.tb-app .tb-flow .dtp-empty strong { font-size: 16px }
+.tb-app .tb-flow .dtp-rows { border-color: var(--ux-line); border-radius: var(--ux-r-md); background: var(--ux-surface) }
+.tb-app .tb-flow .dtp-collection-row { min-height: 64px; padding: 10px 14px; border-color: var(--ux-line) }
+.tb-app .tb-flow .dtp-collection-row strong { font-size: 15px; font-weight: 700 }
+.tb-app .tb-flow .dtp-collection-row small { font-size: 12.5px }
+.tb-app .tb-flow .dtp-link-row { min-height: 64px; margin-top: 8px; padding: 12px 14px; border-color: var(--ux-line); border-radius: var(--ux-r-md); background: var(--ux-surface) }
+.tb-app .tb-flow .dtp-link-row strong { font-size: 15px; font-weight: 700 }
+.tb-app .tb-flow .dtp-link-row small { font-size: 12.5px }
+.tb-app .tb-flow .dtp-chip { height: 26px; padding: 0 10px; font-size: 12px; font-weight: 700 }
+.tb-app .tb-flow .dts-text-btn { height: 44px; padding: 0 12px; font-size: 14px; font-weight: 700 }
+.tb-app .tb-flow .dtp-links button { min-height: 52px; padding: 0 14px; border-color: var(--ux-line); border-radius: var(--ux-r-md); font-size: 14.5px }
+.tb-app .tb-flow .dtp-progress { height: 6px }
+.tb-app .tb-flow .dts-last-update { padding: 16px; border-radius: var(--ux-r-md); background: var(--ux-surface-2); border-color: var(--ux-line) }
+.tb-app .tb-flow .dts-last-head strong { font-size: 15px; font-weight: 750 }
+.tb-app .tb-flow .dts-last-head small { font-size: 13px }
+.tb-app .tb-flow .dts-last-head .dts-tile { width: 40px; height: 40px }
+.tb-app .tb-flow .dts-last-update > .dtp-progress, .tb-app .tb-flow .dts-last-actions { margin-left: 52px }
+.tb-app .tb-flow .dts-check-progress { font-size: 14px }
+.tb-app .tb-flow .dts-changed-card { padding: 14px; border-radius: var(--ux-r-md) }
+.tb-app .tb-flow .dts-changed-card strong { font-size: 14.5px }
+.tb-app .tb-flow .dts-changed-card ul { font-size: 13px; gap: 5px }
+.tb-app .tb-flow .dts-count { padding: 12px; border-radius: var(--ux-r-md) }
+.tb-app .tb-flow .dts-count b { font-size: 20px }
+.tb-app .tb-flow .dts-count span { font-size: 12.5px }
+.tb-app .tb-flow .dts-change-group h4 { font-size: 11px }
+.tb-app .tb-flow .dts-change-group ul { border-radius: var(--ux-r-md); border-color: var(--ux-line) }
+.tb-app .tb-flow .dts-change-group li { padding: 11px 14px; font-size: 13.5px; border-color: var(--ux-line) }
+.tb-app .tb-flow .dts-versions { font-size: 17px }
+.tb-app .tb-flow .dtp-icon, .tb-app .tb-flow .dts-more { width: 44px; height: 44px; border-radius: 12px }
+.tb-app .tb-flow .dts-menu { top: 48px; min-width: 240px; padding: 6px; border-radius: 16px }
+.tb-app .tb-flow .dts-menu button { height: 48px; padding: 0 12px; border-radius: 10px; font-size: 14.5px }
+.tb-app .tb-flow .dts-skeleton i { height: 64px; border-radius: var(--ux-r-md) }
+.tb-app .tb-flow .dts-preview { font-size: 12px }
+.tb-app .tb-flow .dts-preview summary { padding: 10px 6px }
+.tb-app .tb-flow .dts-preview-row button { height: 36px; padding: 0 14px; font-size: 12.5px }
+
+/* Add-collection sheet: centred form sheet over the pane (T3 designs the generic sheets). */
+.tb-app .tb-sheet .dt-modal-scrim { z-index: 9; align-items: center; padding: 24px }
+.tb-app .tb-sheet .dt-modal.dts-dialog { width: min(560px, 100%); max-height: 100%; overflow: auto; padding: 22px; border-radius: 24px; font-size: 14px }
+.tb-app .tb-sheet .dt-modal h2 { font-size: 20px; font-weight: 800; letter-spacing: 0 }
+.tb-app .tb-sheet .dts-dialog > header p { font-size: 13.5px }
+.tb-app .tb-sheet .dts-field-label { font-size: 13.5px; font-weight: 700 }
+.tb-app .tb-sheet .dts-found { padding: 14px; border-radius: var(--ux-r-md) }
+.tb-app .tb-sheet .dts-found strong { font-size: 15px }
+.tb-app .tb-sheet .dts-found small, .tb-app .tb-sheet .dts-found p { font-size: 13px }
+.tb-app .tb-sheet .dts-dialog > footer { gap: 10px; margin-top: 18px }
+.tb-app .tb-sheet .dtp-icon { width: 44px; height: 44px }
+.tb-app .tb-sheet .dtp-btn, .tb-app .tb-sheet .dtp-btn.small { height: 44px; padding: 0 16px; border-radius: 12px; font-size: 14px; font-weight: 700 }
+.tb-app .tb-sheet .dtp-notice { padding: 14px; border-radius: var(--ux-r-md) }
+.tb-app .tb-sheet .dtp-notice strong { font-size: 14.5px }
+.tb-app .tb-sheet .dtp-notice small { font-size: 13.5px }
+.tb-app .tb-sheet .dts-preview-row button { height: 36px; padding: 0 14px; font-size: 12.5px }
+.tb-app .tb-sheet .dts-preview summary { padding: 10px 6px; font-size: 12px }
+
+/* Settings */
+.tb-setting small { display: block; margin-top: 2px; color: var(--ux-muted); font-size: 12.5px }
+.tb-setting > span { min-width: 0 }
+.tb-setting.stacked { flex-direction: column; align-items: stretch; gap: 10px }
+.tb-setting.stacked .dtp-segmented { width: 100% }
+.tb-setting.stacked .dtp-segmented button { flex: 1; min-width: 0; padding: 0 8px }
+.tb-app .tb-schemes .tb-scheme i { width: 28px; height: 28px }
+.tb-storage-bar { display: flex; height: 10px; margin-bottom: 14px; overflow: hidden; border-radius: 6px; background: var(--ux-surface-3) }
+.tb-storage-bar i:nth-child(1) { background: var(--ux-accent) }
+.tb-storage-bar i:nth-child(2) { background: var(--ux-cool) }
+.tb-storage-bar i:nth-child(3) { background: var(--ux-ok) }
+.tb-key-row { min-height: 52px }
+.tb-kbd { padding: 4px 10px; border: 1px solid var(--ux-line-2); border-radius: 8px; background: var(--ux-surface-2); color: var(--ux-ink); font: 650 14px var(--font); letter-spacing: 2px }
+
+/* Elements view */
+.tb-el-stack { display: grid; gap: 10px; align-content: start }
+
+/* A scrolling detail pane sizes its rows by content: with `auto` rows an overflowing pane squeezes some blocks (the facts group) to their borders. */
+.tb-detail { grid-auto-rows: max-content }
+.tb-app .tb-flow .dts-section-head { display: flex; align-items: center; justify-content: space-between }
+.tb-app .tb-sheet input:focus-visible { outline: none }

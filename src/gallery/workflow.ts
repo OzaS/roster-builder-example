@@ -11,6 +11,20 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "tablet-library", label: "Tablet · Library" },
   { id: "tablet-sources", label: "Tablet · Sources" },
   { id: "tablet-settings", label: "Tablet · Settings" },
+  { id: "tablet-home-first-run", label: "Tablet · Home · First run" },
+  { id: "tablet-home-no-rosters", label: "Tablet · Home · No rosters" },
+  { id: "tablet-rosters-many", label: "Tablet · Rosters · Many rosters" },
+  { id: "tablet-rosters-search", label: "Tablet · Rosters · Search" },
+  { id: "tablet-rosters-empty", label: "Tablet · Rosters · Empty" },
+  { id: "tablet-sources-add", label: "Tablet · Sources · Add game data" },
+  { id: "tablet-sources-installing", label: "Tablet · Sources · Installing, every faction" },
+  { id: "tablet-sources-choose-factions", label: "Tablet · Sources · Installing, Advanced installation" },
+  { id: "tablet-sources-update-report", label: "Tablet · Sources · Update report" },
+  { id: "tablet-sources-collection", label: "Tablet · Sources · Collection" },
+  { id: "tablet-sources-github", label: "Tablet · Sources · Search GitHub" },
+  { id: "tablet-sources-add-collection", label: "Tablet · Sources · Add a collection" },
+  { id: "tablet-settings-game-data", label: "Tablet · Settings · Game data" },
+  { id: "tablet-settings-shortcuts", label: "Tablet · Settings · Keyboard shortcuts" },
   { id: "tablet-archive-sketch", label: "Archive · Earlier tablet sketch" },
   { id: "desktop-welcome", label: "Desktop · Welcome" },
   { id: "desktop-editor", label: "Desktop · Roster editor" },
@@ -76,6 +90,7 @@ export function resolveWorkflow(workflow?: WorkflowScreen[]): Array<{ id: Workfl
 export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScreen {
   if (screen === "tablet-archive-sketch") return "overview";
   if (screen === "tablet-editor" || screen === "tablet-editor-issues" || screen === "tablet-editor-add") return "overview";
+  if (screen.startsWith("tablet-")) return "library"; // every other tablet screen is a page or a state of one
   if (screen === "tablet-home" || screen === "tablet-rosters" || screen === "tablet-lookup" || screen === "tablet-tools" || screen === "tablet-library" || screen === "tablet-sources" || screen === "tablet-settings") return "library";
   if (screen === "desktop-tools" || screen === "desktop-library") return "library";
   if (screen === "desktop-welcome") return "library";
@@ -95,7 +110,7 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen === "add-detachment") return "detachment";
   if (screen === "option-drilldown") return "unit-detail";
   if (screen === "diagnostics") return "validation";
-  return screen;
+  return screen as PrototypeScreen; // the tablet screens returned above are not narrowed away by startsWith
 }
 
 export function prototypeToWorkflowScreen(screen: PrototypeScreen): WorkflowScreen {

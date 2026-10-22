@@ -1,130 +1,189 @@
-import { useMemo, useState, type CSSProperties, type ReactNode } from 'react';
-import { ArrowLeft, ArrowRight, Check, ChevronRight, Copy, FileUp, Hammer, Info, Pencil, Plus, RefreshCcw, Search, BookMarked } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { ArrowRight, BookOpen, ChevronRight, Copy, Database, FileUp, FolderOpen, Hammer, Info, Layers3, Pencil, Plus, RefreshCcw, Search, Trash2, ArrowDownToLine, BookMarked, Check } from 'lucide-react';
 import { Chip as MobileChip } from '../ux/uxShared'; // the mobile chip; the workspace Chip (dtp-chip) is not used here, see MOBILE-PIECES.md
 import { ComingSoonCard } from '../ux/AppExtras';
-import { Segmented, Switch } from '../workspace/Primitives';
-import type { Notify } from '../workspace/Toasts';
-import { colourSchemes, installedSources, lookupEntries, rosterLibrary, type LookupEntry, type RosterSummary, type SourceInfo } from '../desktop/desktopData';
-import type { ColorScheme } from '../../types';
-import type { TabletEnv } from './tabletEnv';
+import { collectionSources, lookupEntries, type LookupEntry, type RosterSummary } from '../desktop/desktopData';
 import { HintButton } from './TabletHint';
+import { EmptyState, Facts, InstallRow, ListDetail, Meter, Progress, Row, SearchField, pts, rosterStatus, sourceStatus, plural, type PageProps, type SessionProps } from './TabletPieces';
+import { TabletJobsButton } from './tabletSession';
 
-// Minimal pages of the tablet (T0b): the layout skeleton per width class with synthetic rows. T1/T2 design the real pages.
+// Pages of the tablet: Home, Rosters and Lookup (T2a). Sources and Settings have their own files. Synthetic rows only.
 
-export type PageProps = { env: TabletEnv; notify: Notify };
-type ThemePref = 'system' | 'light' | 'dark';
-
-/** Workspace controls (Segmented, Switch) style their buttons under a `.dt-app` ancestor; this wrapper adds it without a box. */
-const WorkspaceScope = ({ light, children }: { light: boolean; children: ReactNode }) => <div className={`dt-app tb-shim ${light ? 'light' : ''}`}>{children}</div>;
-
-const pts = (n: number) => n.toLocaleString('en-US');
-const meter = (used: number, limit: number) => ({ '--fill': `${Math.min(100, used / limit * 100)}%` }) as CSSProperties;
-const Meter = ({ used, limit }: { used: number; limit: number }) => <div className={`ux-meter ${used > limit ? 'over' : ''}`}>
-  <div className="ux-meter-readout"><strong>{pts(used)}</strong><span>/ {pts(limit)} pts</span></div>
-  <div className="ux-meter-track"><span style={meter(used, limit)} /></div>
-</div>;
-
-const rosterStatus = (r: RosterSummary) => r.status === 'issues' ? <MobileChip tone="warning">{r.issues} {r.issues === 1 ? 'issue' : 'issues'}</MobileChip>
-  : r.status === 'data-changed' ? <MobileChip tone="cool">Data changed</MobileChip>
-    : r.status === 'faction-removed' ? <MobileChip tone="error">Faction removed</MobileChip>
-      : <MobileChip tone="valid"><Check size={11} />Ready</MobileChip>;
-const sourceStatus = (s: SourceInfo) => s.status === 'update' ? <MobileChip tone="cool">Update {s.next}</MobileChip> : s.status === 'review' ? <MobileChip tone="warning">Review</MobileChip> : <MobileChip tone="valid"><Check size={11} />Up to date</MobileChip>;
-
-/* ------------------------- shared skeleton pieces ------------------------- */
-
-const narrow = (env: TabletEnv) => env.device.width < 700;
-
-/** List and detail panes. Where the width is too small for both (split view), the list stays and the detail opens over it. */
-function ListDetail({ env, label, list, detail, open, onClose }: { env: TabletEnv; label: string; list: ReactNode; detail: ReactNode; open: boolean; onClose: () => void }) {
-  if (!narrow(env)) return <div className="tb-panes"><section className="tb-pane" aria-label={label}>{list}</section><section className="tb-pane tb-detail" aria-label={`${label} details`}>{detail}</section></div>;
-  return <div className="tb-panes single">
-    <section className="tb-pane" aria-label={label}>{list}<p className="tb-split-note"><Info size={15} />At this width the detail opens over the list.</p></section>
-    {open && <section className="tb-pane tb-detail over" aria-label={`${label} details`}><button type="button" className="ux-job-btn tb-back" onClick={onClose}><ArrowLeft size={16} />Back to the list</button>{detail}</section>}
-  </div>;
-}
-
-const SearchField = ({ value, onChange, label, placeholder }: { value: string; onChange: (v: string) => void; label: string; placeholder: string }) =>
-  <label className="ux-search tb-search"><Search size={16} /><input value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} aria-label={label} /></label>;
-
-const Row = ({ selected, onClick, mark, title, sub, end }: { selected: boolean; onClick: () => void; mark?: string; title: string; sub: string; end?: ReactNode }) =>
-  <button type="button" className={`ux-list-card tb-row ${selected ? 'selected' : ''}`} aria-current={selected ? 'true' : undefined} onClick={onClick}>
-    {mark && <span className="tb-mark" aria-hidden="true">{mark}</span>}
-    <span className="tb-row-main"><strong>{title}</strong><small>{sub}</small></span>
-    {end && <span className="tb-row-end">{end}</span>}
-  </button>;
-
-const Facts = ({ rows }: { rows: Array<[string, ReactNode]> }) => <div className="ux-src-group">{rows.map(([k, v]) => <div className="ux-src-kv" key={k}><span>{k}</span><b>{v}</b></div>)}</div>;
+export type { PageProps };
 
 /* --------------------------------- Home --------------------------------- */
 
-export function TabletHome({ env, notify, onPage, onNewRoster, onOpenRoster }: PageProps & { onPage: (page: 'rosters' | 'sources') => void; onNewRoster: () => void; onOpenRoster: (name: string) => void }) {
-  const recent = rosterLibrary.slice(0, 4);
-  const current = rosterLibrary[0];
-  const update = installedSources[0];
-  return <div className="tb-page tb-home">
-    <div className="tb-home-main">
-      <section className="tb-card tb-continue" aria-label="Continue roster">
-        <span className="ux-result-label">Continue</span>
-        <div className="tb-continue-head"><span className="tb-mark large" aria-hidden="true">{current.mark}</span><span><strong>{current.name}</strong><small>{current.faction} · {current.system} · opened {current.opened}</small></span></div>
-        <Meter used={current.used} limit={current.limit} />
-        <div className="tb-actions">
-          <HintButton hint="Open the roster you were editing" input={env.input} side="top" className="ux-primary tb-primary" onClick={() => onOpenRoster(current.name)}>Continue roster<ArrowRight size={17} /></HintButton>
-          <HintButton hint="Create a roster" input={env.input} side="top" className="ux-job-btn" onClick={onNewRoster}><Plus size={17} />New roster</HintButton>
-        </div>
-      </section>
-      <section className="tb-section" aria-label="Recent rosters">
-        <div className="tb-section-head"><span className="ux-result-label">Recent rosters</span><button type="button" className="ux-job-btn ux-src-ghost" onClick={() => onPage('rosters')}>All rosters<ChevronRight size={15} /></button></div>
-        <div className="tb-list">{recent.map((r, i) => <Row key={r.name} selected={false} mark={r.mark} title={r.name} sub={`${r.faction} · ${r.opened}`} end={<><b>{pts(r.used)} / {pts(r.limit)}</b>{i === 2 ? rosterStatus(r) : null}</>} onClick={() => onOpenRoster(r.name)} />)}</div>
-      </section>
+const steps = [['Add game data', 'Install a game system from a collection or a file.'], ['Create a roster', 'Choose a faction, a force and a points limit.'], ['Build and check', 'Add units, see the points and the checks as you go.']];
+
+export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRoster }: SessionProps & { onPage: (page: 'rosters' | 'sources') => void; onNewRoster: () => void; onOpenRoster: (name: string) => void }) {
+  const { rosters, jobs, hasData, setJobsOpen, setSourceDetail } = session;
+  const recent = rosters.slice(0, 4);
+  const current = rosters[0];
+  const update = jobs.sources.find(s => s.next) ?? jobs.sources[0];
+  const updating = update && jobs.progressOf(update.id);
+  const addData = () => { setSourceDetail('add'); onPage('sources'); };
+  const startInstall = (c: typeof collectionSources[number]) => { jobs.startInstall(c); setJobsOpen(true); };
+  const attention = rosters.filter(r => r.status !== 'ready').length;
+
+  const dataCard = update && <section className="tb-card" aria-label="Game data status">
+    <span className="ux-result-label">Game data</span>
+    <div className="tb-data-row"><span><strong>{update.name}</strong><small>{update.version} · checked {update.checked}</small></span>{sourceStatus(update)}</div>
+    {updating ? <>
+      <p className="tb-note"><RefreshCcw size={15} />Updating to {update.next} · {updating.percent}%. You can keep working.</p>
+      <Progress percent={updating.percent} />
+      <div className="tb-actions"><button type="button" className="ux-job-btn" onClick={() => setJobsOpen(true)}>Show progress</button></div>
+    </> : update.next ? <>
+      <p className="tb-note"><Info size={15} />Version {update.next} is available. Your rosters stay on {update.version} until you update.</p>
+      <div className="tb-actions"><HintButton hint="Download the new version and check your rosters" input={env.input} side="top" className="ux-job-btn primary" onClick={() => { jobs.startUpdate([update.id]); setJobsOpen(true); }}><RefreshCcw size={16} />Update</HintButton><button type="button" className="ux-job-btn" onClick={() => onPage('sources')}>Sources</button></div>
+    </> : <>
+      <p className="tb-note ok"><Check size={15} />Everything is up to date.</p>
+      <div className="tb-actions"><button type="button" className="ux-job-btn" onClick={() => onPage('sources')}>Sources</button></div>
+    </>}
+  </section>;
+  const deviceCard = <section className="tb-card">
+    <span className="ux-result-label">On this device</span>
+    <Facts rows={[['Rosters', rosters.length], ['Game systems', jobs.sources.length], ['Needs attention', attention]]} />
+  </section>;
+
+  const toolbar = jobs.jobs.length > 0 && <div className="tb-toolbar tb-toolbar-end"><TabletJobsButton session={session} /></div>;
+
+  /* First run: no game data on the device. */
+  if (!hasData) return <div className="tb-page">
+    {toolbar}
+    <div className="tb-home">
+      <div className="tb-home-main">
+        <section className="tb-card" aria-label="Start with game data">
+          <span className="ux-result-label">Get started</span>
+          <div className="tb-card-head"><h2 className="tb-card-title">Start with game data</h2><p className="tb-body tb-muted">Rosters are built from a game system's data. Install one; it stays available offline.</p></div>
+          <div className="tb-list">{collectionSources.map(c => <InstallRow key={c.id} title={c.name} sub={`${c.detail} · ${c.size}`} live={jobs.jobs.find(j => j.sourceId === c.id && (j.status === 'running' || j.status === 'needs-you'))} installed={jobs.sources.some(s => s.id === c.id)} onInstall={() => startInstall(c)} onJobs={() => setJobsOpen(true)} />)}</div>
+          <Row selected={false} mark={<FolderOpen size={20} />} title="Install from a file or a link" sub="An archive, data files, a repository link or GitHub search" end={<ChevronRight size={17} />} onClick={addData} />
+          <p className="tb-note"><Info size={15} />Battle Augur includes no game data. Sources come from community repositories you choose.</p>
+        </section>
+      </div>
+      <aside className="tb-home-side" aria-label="How it works">
+        <section className="tb-card"><span className="ux-result-label">How it works</span>
+          <ol className="tb-steps">{steps.map(([title, text], i) => <li key={title}><span className="tb-step-n" aria-hidden="true">{i + 1}</span><span><strong>{title}</strong><small>{text}</small></span></li>)}</ol>
+        </section>
+      </aside>
     </div>
-    <aside className="tb-home-side" aria-label="Data status">
-      <section className="tb-card">
-        <span className="ux-result-label">Game data</span>
-        <div className="tb-data-row"><span><strong>{update.name}</strong><small>{update.version} · checked {update.checked}</small></span>{sourceStatus(update)}</div>
-        <p className="tb-note">Version {update.next} is available. Your rosters stay on {update.version} until you update.</p>
-        <div className="tb-actions"><HintButton hint="Download the new version and check your rosters" input={env.input} side="top" className="ux-job-btn primary" onClick={() => notify(`Updating ${update.name} to ${update.next} (prototype)`)}><RefreshCcw size={16} />Update</HintButton><button type="button" className="ux-job-btn" onClick={() => onPage('sources')}>Sources</button></div>
-      </section>
-      <section className="tb-card">
-        <span className="ux-result-label">On this device</span>
-        <Facts rows={[['Rosters', rosterLibrary.length], ['Game systems', installedSources.length], ['Needs attention', rosterLibrary.filter(r => r.status !== 'ready').length]]} />
-      </section>
-    </aside>
+  </div>;
+
+  /* Game data, no rosters yet. */
+  if (!current) return <div className="tb-page">
+    {toolbar}
+    <div className="tb-home">
+      <div className="tb-home-main">
+        <section className="tb-card" aria-label="Ready when you are">
+          <span className="ux-result-label">Ready when you are</span>
+          <EmptyState icon={Layers3} title="No rosters yet" text="Your first roster takes a minute: choose a faction, a force and a points limit.">
+            <HintButton hint="Create a roster" input={env.input} side="top" className="ux-primary tb-primary" onClick={onNewRoster}><Plus size={17} />Create your first roster</HintButton>
+            <HintButton hint="Import a roster from a file" input={env.input} side="top" className="ux-job-btn" onClick={() => notify('Import a roster file (prototype)')}><FileUp size={16} />Import a roster</HintButton>
+          </EmptyState>
+        </section>
+      </div>
+      <aside className="tb-home-side" aria-label="Data status">{dataCard}{deviceCard}</aside>
+    </div>
+  </div>;
+
+  /* The usual state. */
+  return <div className="tb-page">
+    {toolbar}
+    <div className="tb-home">
+      <div className="tb-home-main">
+        <section className="tb-card tb-continue" aria-label="Continue roster">
+          <span className="ux-result-label">Continue</span>
+          <div className="tb-continue-head"><span className="tb-mark large" aria-hidden="true">{current.mark}</span><span><strong>{current.name}</strong><small>{current.faction} · {current.system} · opened {current.opened}</small></span></div>
+          <Meter used={current.used} limit={current.limit} />
+          <div className="tb-actions">
+            <HintButton hint="Open the roster you were editing" input={env.input} side="top" className="ux-primary tb-primary" onClick={() => onOpenRoster(current.name)}>Continue roster<ArrowRight size={17} /></HintButton>
+            <HintButton hint="Create a roster" input={env.input} side="top" className="ux-job-btn" onClick={onNewRoster}><Plus size={17} />New roster</HintButton>
+          </div>
+        </section>
+        <section className="tb-section" aria-label="Recent rosters">
+          <div className="tb-section-head"><span className="ux-result-label">Recent rosters</span><button type="button" className="ux-job-btn ux-src-ghost" onClick={() => onPage('rosters')}>All rosters<ChevronRight size={15} /></button></div>
+          <div className="tb-list">{recent.map((r, i) => <Row key={r.name} selected={false} mark={r.mark} title={r.name} sub={`${r.faction} · ${r.opened}`} end={<><b>{pts(r.used)} / {pts(r.limit)}</b>{i === 2 ? rosterStatus(r) : null}</>} onClick={() => onOpenRoster(r.name)} />)}</div>
+        </section>
+      </div>
+      <aside className="tb-home-side" aria-label="Data status">{dataCard}{deviceCard}</aside>
+    </div>
   </div>;
 }
 
 /* -------------------------------- Rosters -------------------------------- */
 
-export function TabletRosters({ env, notify, onNewRoster, onOpenRoster }: PageProps & { onNewRoster: () => void; onOpenRoster: (name: string) => void }) {
-  const [query, setQuery] = useState('');
-  const [selected, setSelected] = useState(rosterLibrary[0].name);
+const needsAttention = (r: RosterSummary) => r.status === 'data-changed' || r.status === 'faction-removed';
+const rosterNote = (r: RosterSummary) => r.status === 'ready' ? ['ok', 'Ready', 'All roster requirements met.']
+  : r.status === 'issues' ? ['warn', `${r.issues} ${r.issues === 1 ? 'item needs' : 'items need'} attention`, r.used > r.limit ? 'Over the points limit.' : 'Roster requirements not met.']
+    : r.status === 'data-changed' ? ['warn', 'Game data changed', 'Some entries changed in the last update. Open to review them.']
+      : ['err', 'Faction removed', 'The faction is no longer in the installed data. The roster opens read-only.'];
+
+export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster }: SessionProps & { onNewRoster: () => void; onOpenRoster: (name: string) => void }) {
+  const { rosters, setRosters, hasData } = session;
+  const [query, setQuery] = useState(session.state === 'search' ? 'patrol' : '');
+  const [attention, setAttention] = useState(false);
+  const [selected, setSelected] = useState(rosters[0]?.name ?? '');
   const [open, setOpen] = useState(false);
-  const visible = useMemo(() => rosterLibrary.filter(r => (r.name + r.faction).toLowerCase().includes(query.toLowerCase())), [query]);
-  const current = rosterLibrary.find(r => r.name === selected) ?? rosterLibrary[0];
+  const [renaming, setRenaming] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const q = query.trim().toLowerCase();
+  const visible = useMemo(() => rosters.filter(r => (r.name + r.faction).toLowerCase().includes(q) && (!attention || needsAttention(r))), [rosters, q, attention]);
+  const attentionCount = rosters.filter(needsAttention).length;
+  const current = rosters.find(r => r.name === selected) ?? visible[0] ?? rosters[0];
+  const choose = (name: string) => { setSelected(name); setOpen(true); setRenaming(false); setConfirmDelete(false); };
+  const actions = <>
+    <HintButton hint="Import a roster from a file" input={env.input} side="bottom" className="ux-job-btn" onClick={() => notify('Import a roster file (prototype)')}><FileUp size={16} />Import</HintButton>
+    <HintButton hint="Create a roster" input={env.input} side="bottom" className="ux-job-btn primary" onClick={onNewRoster}><Plus size={16} />New roster</HintButton>
+  </>;
+  if (!rosters.length) return <div className="tb-page">
+    <div className="tb-toolbar tb-toolbar-end">{actions}</div>
+    <EmptyState icon={Layers3} title="No rosters yet" text={hasData ? 'Create a roster, or import one from a file.' : 'Rosters are built from game data. Add a game system first, then create a roster.'}>
+      <HintButton hint="Create a roster" input={env.input} side="top" className="ux-primary tb-primary" onClick={onNewRoster}><Plus size={17} />New roster</HintButton>
+      <HintButton hint="Import a roster from a file" input={env.input} side="top" className="ux-job-btn" onClick={() => notify('Import a roster file (prototype)')}><FileUp size={16} />Import a roster</HintButton>
+    </EmptyState>
+  </div>;
+  const duplicate = (r: RosterSummary) => { const copy = { ...r, name: `Copy of ${r.name}`, opened: 'Just now' }; setRosters(list => [copy, ...list]); choose(copy.name); notify(`Duplicated as “${copy.name}”`); };
+  const remove = (r: RosterSummary) => { const before = rosters; setRosters(list => list.filter(x => x.name !== r.name)); setSelected(rosters.find(x => x.name !== r.name)?.name ?? ''); setConfirmDelete(false); notify(`Deleted “${r.name}”`, { action: { label: 'Undo', run: () => { setRosters(before); setSelected(r.name); } } }); };
+  const rename = (r: RosterSummary, name: string) => { if (name && name !== r.name) { setRosters(list => list.map(x => x.name === r.name ? { ...x, name } : x)); setSelected(name); } setRenaming(false); };
+  const [noteTone, noteTitle, noteText] = current ? rosterNote(current) : ['', '', ''];
   return <div className="tb-page">
-    <div className="tb-toolbar"><SearchField value={query} onChange={setQuery} label="Find a roster" placeholder="Find a roster or faction…" />
-      <HintButton hint="Import a roster from a file" input={env.input} side="bottom" className="ux-job-btn" onClick={() => notify('Import a roster file (prototype)')}><FileUp size={16} />Import</HintButton>
-      <HintButton hint="Create a roster" input={env.input} side="bottom" className="ux-job-btn primary" onClick={onNewRoster}><Plus size={16} />New roster</HintButton></div>
+    <div className="tb-toolbar"><SearchField value={query} onChange={setQuery} label="Find a roster" placeholder="Find a roster or faction…" />{actions}</div>
+    <div className="tb-filters" role="group" aria-label="Filter rosters"><button type="button" className={`tb-filter ${!attention ? 'active' : ''}`} aria-pressed={!attention} onClick={() => setAttention(false)}>All {rosters.length}</button>{attentionCount > 0 && <button type="button" className={`tb-filter ${attention ? 'active' : ''}`} aria-pressed={attention} onClick={() => setAttention(true)}>Needs attention {attentionCount}</button>}</div>
     <ListDetail env={env} label="Rosters" open={open} onClose={() => setOpen(false)}
-      list={<div className="tb-list scroll">{visible.map(r => <Row key={r.name} selected={r.name === selected} mark={r.mark} title={r.name} sub={`${r.faction} · ${r.system}`} end={<><b>{pts(r.used)} / {pts(r.limit)}</b>{rosterStatus(r)}</>} onClick={() => { setSelected(r.name); setOpen(true); }} />)}{!visible.length && <p className="tb-empty">No rosters match “{query}”.</p>}</div>}
-      detail={<>
-        <div className="tb-detail-title"><span className="tb-mark large" aria-hidden="true">{current.mark}</span><span><h2>{current.name}</h2><small>{current.faction} · {current.system}</small></span></div>
+      list={<>
+        <div className="tb-list scroll">
+          {visible.map(r => <Row key={r.name} selected={r.name === current?.name} mark={r.mark} title={r.name} sub={`${r.faction} · ${r.system}`} end={<><b>{pts(r.used)} / {pts(r.limit)}</b>{rosterStatus(r)}</>} onClick={() => choose(r.name)} />)}
+          {!visible.length && <EmptyState icon={Search} title={q ? `No rosters match “${query.trim()}”` : 'No rosters need attention'} text="Try another name, or clear the filters."><button type="button" className="ux-job-btn" onClick={() => { setQuery(''); setAttention(false); }}>Clear filters</button></EmptyState>}
+        </div>
+        <p className="tb-list-foot" aria-live="polite">{visible.length === rosters.length ? `${plural(rosters.length, 'roster')} stored on this device` : `${visible.length} of ${rosters.length} rosters`}</p>
+      </>}
+      detail={current ? <>
+        <div className="tb-detail-title"><span className="tb-mark large" aria-hidden="true">{current.mark}</span>
+          {renaming ? <form className="tb-rename" onSubmit={e => { e.preventDefault(); rename(current, (new FormData(e.currentTarget).get('name') as string).trim()); }}><input name="name" autoFocus maxLength={60} defaultValue={current.name} aria-label="Roster name" /><button type="submit" className="ux-job-btn primary">Save</button></form>
+            : <span><h2>{current.name}</h2><small>{current.faction} · {current.system}</small></span>}
+        </div>
         <Meter used={current.used} limit={current.limit} />
+        <p className={`tb-note ${noteTone}`}><Info size={15} /><span><strong>{noteTitle}</strong>{noteText}</span></p>
         <Facts rows={[['Status', rosterStatus(current)], ['Forces', current.forces], ['Units', current.units], ['Last opened', current.opened]]} />
-        <div className="tb-actions"><button type="button" className="ux-primary tb-primary" onClick={() => onOpenRoster(current.name)}>Open roster<ArrowRight size={17} /></button><HintButton hint="Rename this roster" input={env.input} side="top" className="ux-job-btn" onClick={() => notify('Rename (prototype)')}><Pencil size={16} />Rename</HintButton><HintButton hint="Make an editable copy" input={env.input} side="top" className="ux-job-btn" onClick={() => notify(`Duplicated “${current.name}” (prototype)`)}><Copy size={16} />Duplicate</HintButton></div>
-      </>} />
+        <div className="tb-actions"><button type="button" className="ux-primary tb-primary" onClick={() => onOpenRoster(current.name)}>Open roster<ArrowRight size={17} /></button>
+          <HintButton hint="Rename this roster" input={env.input} side="top" className="ux-job-btn" onClick={() => setRenaming(true)}><Pencil size={16} />Rename</HintButton>
+          <HintButton hint="Make an editable copy" input={env.input} side="top" className="ux-job-btn" onClick={() => duplicate(current)}><Copy size={16} />Duplicate</HintButton>
+          <HintButton hint="Export this roster as a file" input={env.input} side="top" className="ux-job-btn" onClick={() => notify(`“${current.name}” exported`)}><ArrowDownToLine size={16} />Export</HintButton>
+          <HintButton hint={confirmDelete ? 'Tap again to delete this roster for good' : 'Delete this roster'} input={env.input} side="top" className={`ux-job-btn ${confirmDelete ? 'tb-confirm' : 'destructive'}`} onClick={() => confirmDelete ? remove(current) : setConfirmDelete(true)}><Trash2 size={16} />{confirmDelete ? 'Delete for good?' : 'Delete'}</HintButton></div>
+      </> : null} />
   </div>;
 }
 
 /* --------------------------------- Lookup --------------------------------- */
 
 const scopes = ['All', 'Unit', 'Rule', 'Equipment'] as const;
-export function TabletLookup({ env }: PageProps) {
+export function TabletLookup({ env, session, onAddData }: SessionProps & { onAddData: () => void }) {
   const [query, setQuery] = useState('');
   const [scope, setScope] = useState<typeof scopes[number]>('All');
   const [selected, setSelected] = useState(lookupEntries[0].id);
   const [open, setOpen] = useState(false);
   const visible = useMemo(() => lookupEntries.filter(e => (scope === 'All' || e.kind === scope) && (e.name + e.owner).toLowerCase().includes(query.toLowerCase())), [query, scope]);
   const current: LookupEntry = lookupEntries.find(e => e.id === selected) ?? lookupEntries[0];
+  if (!session.hasData) return <div className="tb-page"><EmptyState icon={BookOpen} title="Nothing to look up yet" text="Lookup searches the units, rules and equipment of your installed game data."><button type="button" className="ux-primary tb-primary" onClick={onAddData}><Database size={17} />Add game data</button></EmptyState></div>;
   return <div className="tb-page">
     <div className="tb-toolbar"><SearchField value={query} onChange={setQuery} label="Search the game data" placeholder="Search units, rules and equipment…" /></div>
     <div className="tb-filters" role="group" aria-label="Scope">{scopes.map(s => <button type="button" key={s} className={`tb-filter ${scope === s ? 'active' : ''}`} aria-pressed={scope === s} onClick={() => setScope(s)}>{s === 'All' ? 'All' : s === 'Equipment' ? 'Equipment' : `${s}s`}</button>)}</div>
@@ -136,55 +195,6 @@ export function TabletLookup({ env }: PageProps) {
         {current.profile && <div className="tb-profile" role="table" aria-label="Profile">{['Move', 'Save', 'Resolve', 'Attacks'].map((h, i) => <span key={h} role="cell"><small>{h}</small><b>{current.profile?.[i]}</b></span>)}</div>}
         {current.conditional && <p className="tb-note"><Info size={15} />{current.conditional}</p>}
         {current.usedIn && <Facts rows={[['Used in', current.usedIn.join(', ')]]} />}
-      </>} />
-  </div>;
-}
-
-/* --------------------------------- Sources --------------------------------- */
-
-export function TabletSources({ env, notify }: PageProps) {
-  const [selected, setSelected] = useState(installedSources[0].id);
-  const [open, setOpen] = useState(false);
-  const current = installedSources.find(s => s.id === selected) ?? installedSources[0];
-  return <div className="tb-page">
-    <div className="tb-toolbar"><span className="tb-toolbar-note">{installedSources.length} game systems installed. Everything works offline.</span>
-      <HintButton hint="Add game data from a collection, a link or a file" input={env.input} side="bottom" className="ux-job-btn" onClick={() => notify('Add game data (prototype)')}><Plus size={16} />Add game data</HintButton></div>
-    <ListDetail env={env} label="Installed sources" open={open} onClose={() => setOpen(false)}
-      list={<div className="tb-list scroll">{installedSources.map(s => <Row key={s.id} selected={s.id === selected} title={s.name} sub={`${s.version} · ${s.factions.length} factions · ${s.size}`} end={sourceStatus(s)} onClick={() => { setSelected(s.id); setOpen(true); }} />)}</div>}
-      detail={<>
-        <div className="tb-detail-title"><span><h2>{current.name}</h2><small>{current.repo}</small></span>{sourceStatus(current)}</div>
-        <Facts rows={[['Version', current.version], ['Installed', current.installed], ['Checked', current.checked], ['Size', current.size], ['Data files', current.documents], ['Rosters using it', current.rosters.length]]} />
-        <div className="tb-actions">{current.status === 'update' && <button type="button" className="ux-job-btn primary" onClick={() => notify(`Updating ${current.name} to ${current.next} (prototype)`)}><RefreshCcw size={16} />Update to {current.next}</button>}<button type="button" className="ux-job-btn" onClick={() => notify('Checked for updates (prototype)')}>Check for updates</button></div>
-      </>} />
-  </div>;
-}
-
-/* --------------------------------- Settings --------------------------------- */
-
-const settingSections = [
-  { id: 'appearance', label: 'Appearance', sub: 'Theme and colour scheme' },
-  { id: 'language', label: 'Language', sub: 'English' },
-  { id: 'rosters', label: 'Rosters', sub: 'Defaults for new rosters' },
-  { id: 'data', label: 'Game data', sub: 'Updates and installation' },
-  { id: 'storage', label: 'Storage', sub: '53.2 MB used' },
-  { id: 'about', label: 'About', sub: 'Version and licences' },
-];
-export function TabletSettings({ env, themePref, light, scheme, onTheme, onScheme }: PageProps & { themePref: ThemePref; light: boolean; scheme: ColorScheme; onTheme: (t: ThemePref) => void; onScheme: (s: ColorScheme) => void }) {
-  const [section, setSection] = useState('appearance');
-  const [open, setOpen] = useState(false);
-  const [checks, setChecks] = useState(true);
-  const [advanced, setAdvanced] = useState(false);
-  const current = settingSections.find(s => s.id === section) ?? settingSections[0];
-  return <div className="tb-page">
-    <ListDetail env={env} label="Settings" open={open} onClose={() => setOpen(false)}
-      list={<div className="tb-list scroll">{settingSections.map(s => <Row key={s.id} selected={s.id === section} title={s.label} sub={s.sub} end={<ChevronRight size={17} />} onClick={() => { setSection(s.id); setOpen(true); }} />)}</div>}
-      detail={<>
-        <div className="tb-detail-title"><span><h2>{current.label}</h2><small>{current.sub}</small></span></div>
-        {section === 'appearance' ? <>
-          <WorkspaceScope light={light}><div className="tb-setting"><strong>Theme</strong><Segmented<ThemePref> label="Theme" value={themePref} onChange={onTheme} options={[{ value: 'system', label: 'System' }, { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }]} /></div></WorkspaceScope>
-          <div className="tb-schemes" role="radiogroup" aria-label="Colour scheme">{colourSchemes.map(c => <button type="button" key={c.id} role="radio" aria-checked={scheme === c.id} className={`ux-start-row tb-scheme ${scheme === c.id ? 'on' : ''}`} onClick={() => onScheme(c.id)}><i style={{ background: c.accent }} /><span><strong>{c.name}</strong></span>{scheme === c.id && <Check size={18} />}</button>)}</div>
-        </> : section === 'data' ? <WorkspaceScope light={light}><div className="ux-src-group tb-switches"><Switch label="Check for updates automatically" detail="When the app is open and online." checked={checks} onChange={setChecks} /><Switch label="Advanced installation" detail="Choose which factions to install. Off: everything is installed." checked={advanced} onChange={setAdvanced} /></div></WorkspaceScope>
-          : <Facts rows={[['Setting', 'Placeholder'], ['Designed in', 'T2 · Pages']]} />}
       </>} />
   </div>;
 }
