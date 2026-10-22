@@ -29,10 +29,20 @@ export const colorSchemes: Array<{ id: ColorScheme; label: string; short: string
 ];
 
 export type WorkflowScreen =
+  | "tablet-home"
+  | "tablet-rosters"
+  | "tablet-lookup"
+  | "tablet-tools"
+  | "tablet-library"
+  | "tablet-sources"
+  | "tablet-settings"
+  | "tablet-archive-sketch"
   | "desktop-welcome"
   | "desktop-editor"
   | "desktop-rosters"
   | "desktop-lookup"
+  | "desktop-tools"
+  | "desktop-library"
   | "desktop-sources"
   | "desktop-settings"
   | "desktop-first-run"
@@ -217,7 +227,7 @@ export type FavoriteLibrary = {
   detachments: DetachmentFavorite[];
 };
 
-export type ConceptId = "ux-workbench" | "desktop-workbench";
+export type ConceptId = "ux-workbench" | "tablet-workbench" | "desktop-workbench";
 
 export type PrototypeScreen =
   | "library"

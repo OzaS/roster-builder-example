@@ -1,4 +1,4 @@
-import { DeviceFrame } from "../components/DeviceFrame";
+import { PreviewFrame } from "../components/PreviewFrame";
 import type { MouseEvent as ReactMouseEvent } from "react";
 import { resolveWorkflow, workflowToPrototypeScreen } from "./workflow";
 import type { GalleryConcept, WorkflowFlow } from "./galleryTypes";
@@ -125,7 +125,7 @@ export function WorkflowBoard({
                     {item.label}
                   </button>
                   <div className="workflow-screen-hitarea" onClick={(event) => handleScreenClick(event, item.screen, onOpenGlance)}>
-                    <DeviceFrame desktop={concept.id === "desktop-workbench"} platform={platform} themeMode={themeMode} colorScheme={colorScheme} statusBarUsesDesignBackground={statusBarUsesDesignBackground}>
+                    <PreviewFrame concept={concept} screen={item.screen} platform={platform} themeMode={themeMode} colorScheme={colorScheme} statusBarUsesDesignBackground={statusBarUsesDesignBackground} fit="width">
                       <Concept
                         roster={roster}
                         unitFavorites={unitFavorites}
@@ -172,7 +172,7 @@ export function WorkflowBoard({
                         onNavigate={onNavigate}
                         onBack={onBack}
                       />
-                    </DeviceFrame>
+                    </PreviewFrame>
                   </div>
                 </article>
               );

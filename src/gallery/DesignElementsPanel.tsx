@@ -1,4 +1,6 @@
 import { DesktopElements } from "../concepts/desktop/DesktopWorkbench";
+import { TabletElements } from "../concepts/tablet/TabletElements";
+import { LibrarySwitch } from "./LibrarySwitch";
 import { AppearancePreferences } from "../concepts/ux/AppearanceSettings";
 import { MobileUnitOptions, ModelStackSamples, OptionFoldSamples } from "../concepts/ux/MobileUnitOptions";
 import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BarChart3, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, Circle, CircleDot, Cog, Coins, Command, Copy, Database, Dice5, Download, Ellipsis, FileInput, Gamepad2, GripVertical, Hammer, Heart, ImagePlus, Languages, Layers, LibraryBig, Maximize2, MessageCircle, Minus, Moon, MoveRight, Palette, PanelsTopLeft, Pencil, Plus, RotateCcw, Rows3, Scale, Search, Smartphone, Sparkles, Split, Trash2, Upload, UserRound, Wand2, X, SquareCheck } from "lucide-react";
@@ -43,6 +45,7 @@ export function DesignElementsPanel({
   elements,
 }: Props) {
   if (concept.id === "desktop-workbench") return <DesktopElements />;
+  if (concept.id === "tablet-workbench") return <TabletElements />;
   const rootClass = `design-elements-panel ux-screen ux-workbench ${shellClass(themeMode, colorScheme)} ${platform}`;
 
   return (
@@ -972,7 +975,7 @@ function WorkbenchElements({
       </CatalogGroup>
 
       <CatalogGroup groupId="gallery-ui">
-      <ElementSection title="Design Library Navigation"><nav className="design-library-switch" aria-label="Design library examples"><a href="./">Mobile</a><a href="?gallery=desktop">Desktop</a></nav></ElementSection>
+      <ElementSection title="Design Library Navigation"><LibrarySwitch current="phone" label="Design library examples" /></ElementSection>
       <ElementSection title="Designer Rail Controls">
         <div className="rail-actions">
           <button className="rail-icon-button" type="button" aria-label="Screenshot">

@@ -1,11 +1,13 @@
 import { useMemo, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent, type RefObject } from "react";
-import { Archive, Component, MonitorSmartphone, Moon, Navigation, Palette, PanelBottom, Pencil, Plus, Rows3, Smartphone, Sun, TabletSmartphone, Trash2 } from "lucide-react";
-import { DeviceFrame } from "../components/DeviceFrame";
+import { Archive, Component, Moon, Navigation, Palette, PanelBottom, Pencil, Plus, Rows3, Smartphone, Sun, Trash2 } from "lucide-react";
+import { PreviewFrame } from "../components/PreviewFrame";
 import { ScreenshotButton } from "../components/v2/ScreenshotButton";
 import { WorkflowScreenPicker, type WorkflowPickerSelection } from "../components/v2/WorkflowScreenPicker";
 import type { ColorScheme, ConceptId, DetachmentFavorite, ForceCreationMode, GalleryRelease, NavigatorView, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, UnitDetailView, UnitFavorite, WorkflowScreen } from "../types";
 import { colorSchemes } from "../types";
 import { DesktopAmbientSwitch } from "../concepts/desktop/desktopAmbient";
+import { TabletControls } from "../concepts/tablet/TabletControls";
+import { LibrarySwitch, type LibraryId } from "./LibrarySwitch";
 import type { GalleryConcept } from "./galleryTypes";
 import { WorkflowBoard } from "./WorkflowBoard";
 import { workflowToPrototypeScreen } from "./workflow";
@@ -74,7 +76,6 @@ type Props = {
     onBack: () => void;
   };
   onConceptChange: (id: ConceptId) => void;
-  onPlatformChange: (platform: PlatformPreview) => void;
   onThemeModeChange: (mode: ThemeMode) => void;
   onColorSchemeChange: (scheme: ColorScheme) => void;
   onNavigatorViewChange: (view: NavigatorView) => void;
@@ -86,6 +87,8 @@ type Props = {
   onCapture: () => void;
   onDesignDataChange: (data: DesignData) => void;
 };
+
+const libraryName: Record<LibraryId, string> = { phone: "Phone", tablet: "Tablet", desktop: "Desktop" };
 
 const navStyleOptions: Array<{ id: Exclude<NavStyle, "top">; label: string; icon: typeof PanelBottom }> = [
   { id: "tabs", label: "Bottom tabs", icon: PanelBottom },
@@ -112,7 +115,6 @@ export function GalleryShell({
   children,
   boardProps,
   onConceptChange,
-  onPlatformChange,
   onThemeModeChange,
   onColorSchemeChange,
   onNavigatorViewChange,
@@ -124,6 +126,7 @@ export function GalleryShell({
   onCapture,
   onDesignDataChange,
 }: Props) {
+  const library: LibraryId = concept.id === "desktop-workbench" ? "desktop" : concept.id === "tablet-workbench" ? "tablet" : "phone";
   const [railWidth, setRailWidth] = useState(280);
   const [workflowSelection, setWorkflowSelection] = useState<WorkflowPickerSelection>("all");
   const [glance, setGlance] = useState<null | { screen: WorkflowScreen; placement?: GlancePlacement }>(null);
@@ -260,7 +263,7 @@ export function GalleryShell({
   }
 
   return (
-    <div className={`app ${concept.id === "desktop-workbench" ? "desktop-design-library" : "mobile-design-library"}`} style={{ "--rail-width": `${railWidth}px` } as CSSProperties}>
+    <div className={`app ${library}-design-library`} style={{ "--rail-width": `${railWidth}px` } as CSSProperties}>
       <aside className="gallery-rail v2-gallery-rail">
         <div className="rail-resizer" role="separator" aria-orientation="vertical" aria-label="Resize designer panel" onPointerDown={startRailResize} />
         <div className="rail-topline">
@@ -268,7 +271,7 @@ export function GalleryShell({
             <span className="brand-mark">RB</span>
             <span>
               <strong>Roster Builder</strong>
-              <small>{concept.id === "desktop-workbench" ? "Desktop design library" : "Mobile design library"}</small>
+              <small>{libraryName[library]} design library</small>
             </span>
           </div>
           <div className="rail-actions">
@@ -283,7 +286,7 @@ export function GalleryShell({
             ) : null}
           </div>
         </div>
-        <nav className="design-library-switch" aria-label="Design libraries"><a href="./" aria-current={concept.id !== "desktop-workbench" ? "page" : undefined}>Mobile</a><a href="?gallery=desktop" aria-current={concept.id === "desktop-workbench" ? "page" : undefined}>Desktop</a></nav>
+        <LibrarySwitch current={library} />
         <ConceptGroup title="Designs" concepts={activeConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
         <div className="gallery-release-switch" role="group" aria-label="Design version">
           <button className={galleryRelease === "V1" ? "active" : ""} type="button" onClick={() => onGalleryReleaseChange("V1")}><span>V1</span><small>Current</small></button>
@@ -312,6 +315,7 @@ export function GalleryShell({
           onRemoveScreen={removeScreen}
           onRestoreScreen={restoreScreen}
         />
+        {library === "tablet" && <TabletControls />}
         <details className="rail-disclosure">
           <summary>
             <h3>Display</h3>
@@ -331,7 +335,8 @@ export function GalleryShell({
             <button className={forceCreationMode === "selector" ? "active" : ""} type="button" onClick={() => onForceCreationModeChange("selector")}><PanelBottom size={16} />Selector</button>
             <button className={forceCreationMode === "inline" ? "active" : ""} type="button" onClick={() => onForceCreationModeChange("inline")}><Rows3 size={16} />Inline</button>
           </ControlGroup>
-          {concept.id === "desktop-workbench" && <ControlGroup title="Desktop"><DesktopAmbientSwitch /></ControlGroup>}
+          {library === "desktop" && <ControlGroup title="Desktop"><DesktopAmbientSwitch /></ControlGroup>}
+          {library === "tablet" && <ControlGroup title="Tablet"><DesktopAmbientSwitch /></ControlGroup>}
           <ControlGroup title="Theme">
             <button className={themeMode === "dark" ? "active" : ""} type="button" onClick={() => onThemeModeChange("dark")}>
               <Moon size={16} />
@@ -363,16 +368,6 @@ export function GalleryShell({
             ))}
           </ControlGroup>
         </details>
-        <div className="platform-toggle" role="group" aria-label="Preview device">
-          <button className={platform === "phone" ? "active" : ""} onClick={() => onPlatformChange("phone")} type="button">
-            <MonitorSmartphone size={17} />
-            Phone
-          </button>
-          <button className={platform === "tablet" ? "active" : ""} onClick={() => onPlatformChange("tablet")} type="button">
-            <TabletSmartphone size={17} />
-            Tablet
-          </button>
-        </div>
       </aside>
       <main className={`gallery-stage ${navigatorView !== "single" ? "board-mode" : ""}`}>
         <section className="preview-column" ref={captureRef}>
@@ -407,7 +402,7 @@ export function GalleryShell({
             />
           ) : (
             <div className="single-preview-shell" onClickCapture={handleSinglePreviewClick}>
-              <DeviceFrame desktop={concept.id === "desktop-workbench"} platform={platform} themeMode={themeMode} colorScheme={colorScheme} statusBarUsesDesignBackground={statusBarUsesDesignBackground}>{children}</DeviceFrame>
+              <PreviewFrame concept={concept} screen={workflowScreen} platform={platform} themeMode={themeMode} colorScheme={colorScheme} statusBarUsesDesignBackground={statusBarUsesDesignBackground}>{children}</PreviewFrame>
             </div>
           )}
         </section>

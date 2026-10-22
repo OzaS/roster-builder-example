@@ -4,13 +4,18 @@ import { GalleryShell } from "./gallery/GalleryShell";
 import { buildConceptGroups, bundledDesignData, designById, findConceptInData, firstScreenInDesign, normalizeDesignData, type DesignData } from "./design-data/designData";
 import { prototypeToWorkflowScreen, workflowToPrototypeScreen } from "./gallery/workflow";
 import { captureElementAsPng } from "./utils/captureStage";
+import { TabletPrefsContext } from "./concepts/tablet/tabletEnv";
+import { defaultDeviceId, defaultInput, isDeviceId, isTabletInput, type TabletDeviceId, type TabletInput } from "./concepts/tablet/tabletDevices";
 import type { AppLanguage, ColorScheme, ConceptId, DetachmentFavorite, FavoriteLibrary, ForceCreationMode, GalleryRelease, NavigatorView, NavStyle, PlatformPreview, PrototypeScreen, Roster, RosterForce, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, ThemePreference, UnitDetailView, UnitFavorite, WorkflowScreen } from "./types";
 
-const desktopLibrary = [new URLSearchParams(location.search).get("gallery"), new URLSearchParams(location.search).get("design")].includes("desktop");
-const GALLERY_STATE_KEY = desktopLibrary ? "roster-builder.desktop-gallery-state.v1" : "roster-builder.gallery-state.v1";
+// Three separate design libraries (DEC-039): ?gallery=tablet and ?gallery=desktop select theirs, the phone library is the default.
+const libraryParams = [new URLSearchParams(location.search).get("gallery"), new URLSearchParams(location.search).get("design")];
+const libraryKind: "phone" | "tablet" | "desktop" = libraryParams.includes("desktop") ? "desktop" : libraryParams.includes("tablet") ? "tablet" : "phone";
+const desktopLibrary = libraryKind === "desktop";
+const tabletLibrary = libraryKind === "tablet";
+const GALLERY_STATE_KEY = desktopLibrary ? "roster-builder.desktop-gallery-state.v1" : tabletLibrary ? "roster-builder.tablet-gallery-state.v1" : "roster-builder.gallery-state.v1";
 const FAVORITES_KEY = "roster-builder.favorites.v1";
-const conceptIds = ["ux-workbench", "desktop-workbench"] satisfies ConceptId[];
-const platformIds = ["phone", "tablet"] satisfies PlatformPreview[];
+const conceptIds = ["ux-workbench", "tablet-workbench", "desktop-workbench"] satisfies ConceptId[];
 const themeModes = ["dark", "light"] satisfies ThemeMode[];
 const themePreferences = ["system", "dark", "light"] satisfies ThemePreference[];
 const appLanguages = ["en", "fr"] satisfies AppLanguage[];
@@ -21,10 +26,20 @@ const unitDetailViews = ["options", "profile"] satisfies UnitDetailView[];
 const forceCreationModes = ["selector", "inline"] satisfies ForceCreationMode[];
 const defaultTabletPanelLayout: TabletPanelLayout = { treeRatio: 0.3, railRatio: 0.26, treeVisible: true, railVisible: true };
 const workflowScreenIds = [
+  "tablet-home",
+  "tablet-rosters",
+  "tablet-lookup",
+  "tablet-tools",
+  "tablet-library",
+  "tablet-sources",
+  "tablet-settings",
+  "tablet-archive-sketch",
   "desktop-welcome",
   "desktop-editor",
   "desktop-rosters",
   "desktop-lookup",
+  "desktop-tools",
+  "desktop-library",
   "desktop-sources",
   "desktop-settings",
   "desktop-first-run",
@@ -94,7 +109,8 @@ const prototypeScreenIds = [
 
 type PersistedGalleryState = {
   selectedConcept?: ConceptId;
-  platform?: PlatformPreview;
+  tabletDevice?: TabletDeviceId;
+  tabletInput?: TabletInput;
   themeMode?: ThemeMode;
   themePreference?: ThemePreference;
   language?: AppLanguage;
@@ -115,13 +131,22 @@ function App() {
   const initialState = useMemo((): PersistedGalleryState => {
     const saved = readPersistedGalleryState();
     if (desktopLibrary) return { ...saved, selectedConcept: "desktop-workbench", workflowScreen: saved.workflowScreen?.startsWith("desktop-") ? saved.workflowScreen : "desktop-welcome", navigatorView: saved.navigatorView ?? "all-screens" };
-    if (saved.selectedConcept === "desktop-workbench") return { ...saved, selectedConcept: "ux-workbench", workflowScreen: "library", screen: "library" };
+    if (tabletLibrary) {
+      // After using the archived sketch the workflow screen can be a phone screen; fall back to Home then.
+      const keep = saved.workflowScreen?.startsWith("tablet-");
+      return { ...saved, selectedConcept: "tablet-workbench", workflowScreen: keep ? saved.workflowScreen : "tablet-home", screen: keep ? workflowToPrototypeScreen(saved.workflowScreen!) : workflowToPrototypeScreen("tablet-home"), navigatorView: saved.navigatorView ?? "single" };
+    }
+    if (saved.selectedConcept === "desktop-workbench" || saved.selectedConcept === "tablet-workbench" || saved.workflowScreen?.startsWith("tablet-") || saved.workflowScreen?.startsWith("desktop-")) return { ...saved, selectedConcept: "ux-workbench", workflowScreen: "library", screen: "library" };
     return saved;
   }, []);
   const [designData, setDesignData] = useState<DesignData>(bundledDesignData);
   const [designDataWritable, setDesignDataWritable] = useState(false);
   const [selectedConcept, setSelectedConcept] = useState<ConceptId>(initialState.selectedConcept ?? "ux-workbench");
-  const [platform, setPlatform] = useState<PlatformPreview>(initialState.platform ?? "phone");
+  // The phone library always shows phone (old saved `platform` values are ignored); the tablet library shows tablet frames.
+  const platform: PlatformPreview = tabletLibrary ? "tablet" : "phone";
+  const [tabletDeviceId, setTabletDeviceId] = useState<TabletDeviceId>(initialState.tabletDevice ?? defaultDeviceId);
+  const [tabletInputMode, setTabletInputMode] = useState<TabletInput>(initialState.tabletInput ?? defaultInput);
+  const tabletPrefs = useMemo(() => ({ deviceId: tabletDeviceId, input: tabletInputMode, setDeviceId: setTabletDeviceId, setInput: setTabletInputMode }), [tabletDeviceId, tabletInputMode]);
   const [themePreference, setThemePreference] = useState<ThemePreference>(initialState.themePreference ?? initialState.themeMode ?? "dark");
   const [systemTheme, setSystemTheme] = useState<ThemeMode>(() => preferredSystemTheme());
   const [language, setLanguage] = useState<AppLanguage>(initialState.language ?? "en");
@@ -196,7 +221,8 @@ function App() {
   useEffect(() => {
     persistGalleryState({
       selectedConcept,
-      platform,
+      tabletDevice: tabletDeviceId,
+      tabletInput: tabletInputMode,
       themeMode,
       themePreference,
       language,
@@ -212,7 +238,7 @@ function App() {
       tabletPanelLayout,
       screen,
     });
-  }, [selectedConcept, platform, themeMode, themePreference, language, colorScheme, navigatorView, galleryRelease, workflowScreen, smartSearch, navStyle, statusBarUsesDesignBackground, unitDetailView, forceCreationMode, tabletPanelLayout, screen]);
+  }, [selectedConcept, tabletDeviceId, tabletInputMode, themeMode, themePreference, language, colorScheme, navigatorView, galleryRelease, workflowScreen, smartSearch, navStyle, statusBarUsesDesignBackground, unitDetailView, forceCreationMode, tabletPanelLayout, screen]);
 
   useEffect(() => {
     try {
@@ -222,7 +248,7 @@ function App() {
     }
   }, [favorites]);
 
-  const conceptGroups = useMemo(() => buildConceptGroups({ ...designData, designs: designData.designs.filter(design => desktopLibrary ? design.id === "desktop-workbench" : design.id !== "desktop-workbench") }), [designData]);
+  const conceptGroups = useMemo(() => buildConceptGroups({ ...designData, designs: designData.designs.filter(design => design.id === (desktopLibrary ? "desktop-workbench" : tabletLibrary ? "tablet-workbench" : "ux-workbench")) }), [designData]);
   const concept = findConceptInData(designData, selectedConcept);
   const Concept = concept.component;
   const captureRef = useRef<HTMLElement>(null);
@@ -566,6 +592,7 @@ function App() {
   }
 
   return (
+    <TabletPrefsContext.Provider value={tabletPrefs}>
     <GalleryShell
       selectedConcept={concept.id}
       platform={platform}
@@ -581,7 +608,6 @@ function App() {
       archivedConcepts={conceptGroups.archivedConcepts}
       captureRef={captureRef}
       onConceptChange={changeConcept}
-      onPlatformChange={setPlatform}
       onThemeModeChange={(mode) => setThemePreference(mode)}
       onColorSchemeChange={setColorScheme}
       onNavigatorViewChange={setNavigatorView}
@@ -693,6 +719,7 @@ function App() {
         onBack={goBack}
       />
     </GalleryShell>
+    </TabletPrefsContext.Provider>
   );
 }
 
@@ -836,7 +863,8 @@ function readPersistedGalleryState(): PersistedGalleryState {
     const parsed = JSON.parse(stored) as Partial<PersistedGalleryState>;
     return {
       selectedConcept: isOneOf(parsed.selectedConcept, conceptIds) ? parsed.selectedConcept : undefined,
-      platform: isOneOf(parsed.platform, platformIds) ? parsed.platform : undefined,
+      tabletDevice: isDeviceId(parsed.tabletDevice) ? parsed.tabletDevice : undefined,
+      tabletInput: isTabletInput(parsed.tabletInput) ? parsed.tabletInput : undefined,
       themeMode: isOneOf(parsed.themeMode, themeModes) ? parsed.themeMode : undefined,
       themePreference: isOneOf(parsed.themePreference, themePreferences) ? parsed.themePreference : undefined,
       language: isOneOf(parsed.language, appLanguages) ? parsed.language : undefined,
