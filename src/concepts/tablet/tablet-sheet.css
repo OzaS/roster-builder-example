@@ -1,13 +1,13 @@
 /* Tablet form sheet (TabletSheet) and the form pieces used inside it. Lives inside .tb-app.ux-screen (mobile tokens).
    The scrim fills the nearest positioned ancestor and is a size container: under 700 px wide (split view) the sheet fills the height.
    Stacking: the scrim sits above the editor header and popovers (inside .tbe: 20; at the app root: 5, below the toasts at 6). */
-.tbs-scrim { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; padding: 32px 24px; container: tbs / inline-size; background: rgb(0 0 0 / .46); animation: tbs-fade .18s ease-out }
+.tbs-scrim { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; container: tbs / inline-size; background: rgb(0 0 0 / .46); animation: tbs-fade .18s ease-out }
 .tbe > .tbs-scrim { z-index: 20 }
-.tbs-sheet { display: flex; flex-direction: column; width: min(600px, 100%); max-height: 100%; overflow: hidden; border: 1px solid var(--ux-line-2); border-radius: 24px; background: var(--ux-bg); box-shadow: 0 28px 80px #0008; animation: tbs-rise .22s ease-out }
-.tbs-sheet.wide { width: min(920px, 100%) }
+.tbs-sheet { display: flex; flex-direction: column; width: min(600px, calc(100% - 48px)); max-height: calc(100% - 64px); overflow: hidden; border: 1px solid var(--ux-line-2); border-radius: 24px; background: var(--ux-bg); box-shadow: 0 28px 80px #0008; animation: tbs-rise .22s ease-out }
+.tbs-sheet.wide { width: min(920px, calc(100% - 48px)) }
 @container tbs (max-width: 700px) {
-  .tbs-scrim { padding: 0; place-items: stretch }
-  .tbs-sheet, .tbs-sheet.wide { width: 100%; max-height: none; border: 0; border-radius: 0; box-shadow: none; animation-name: tbs-push }
+  .tbs-scrim { place-items: stretch }
+  .tbs-sheet, .tbs-sheet.wide { width: 100%; height: 100%; max-height: none; border: 0; border-radius: 0; box-shadow: none; animation-name: tbs-push }
 }
 @keyframes tbs-fade { from { opacity: 0 } to { opacity: 1 } }
 @keyframes tbs-rise { from { transform: translateY(16px); opacity: 0 } to { transform: none; opacity: 1 } }
