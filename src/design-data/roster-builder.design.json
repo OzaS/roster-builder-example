@@ -369,6 +369,7 @@
         { "id": "tablet-create", "label": "New roster · Guided creation" },
         { "id": "tablet-create-review", "label": "New roster · Review" },
         { "id": "tablet-settings-appearance-import", "label": "Settings · Appearance import" },
+        { "id": "tablet-editor-move-unit", "label": "Roster editor · Move unit" },
         { "id": "tablet-confirm-delete", "label": "Confirm · Delete roster" },
         { "id": "tablet-archive-sketch", "label": "Archive · Earlier tablet sketch" }
       ],
@@ -408,7 +409,7 @@
         {
           "id": "dialogs",
           "label": "Dialogs and sheets",
-          "screens": ["tablet-create", "tablet-create-review", "tablet-settings-appearance-import", "tablet-confirm-delete"]
+          "screens": ["tablet-create", "tablet-create-review", "tablet-settings-appearance-import", "tablet-confirm-delete", "tablet-editor-move-unit"]
         },
         {
           "id": "archive",
@@ -463,6 +464,7 @@
               {"id": "tablet.add-collection-sheet", "title": "Add Collection Sheet", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["covers the whole window instead of the main area", "link field with Find; Enter finds", "found: collection or organisation card with its description; Add collection enables", "a repository link offers Install it", "errors: already added, not a collection, no connection", "keyboard: the field scrolls into view; Preview states are gallery controls"], "screens": ["tablet-sources-add-collection"]},
               {"id": "tablet.appearance-import-sheet", "title": "Appearance Import Sheet", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["opened from Settings, Appearance: Import colour scheme and Import language pack", "explains the limits, Choose a file… opens the system picker in the app", "importing, saved scheme with swatch, language with warnings, contrast error or invalid file (the current choice stays)", "Done and Close in the header; import states are gallery controls"], "screens": ["tablet-settings-appearance-import"]},
               {"id": "tablet.confirm-sheet", "title": "Confirm Sheet (destructive)", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["generic: title with the subject, what is affected, what it costs, a named action (Delete roster, not OK)", "destructive primary action in the error colour; Cancel is focused first", "Delete roster: the roster row, then an Undo toast for a few seconds", "split view: fills the window"], "screens": ["tablet-confirm-delete"]},
+              {"id": "tablet.move-unit-sheet", "title": "Move Unit Sheet", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["opened from the unit row menu (press and hold or right-click): Move to another force…", "choice rows of the roster's other forces with type, faction and unit count; the first that can take the unit is chosen", "a force that cannot take the unit says why (a Patrol takes no Support units) and stays off", "one force only: No other force, with Add force…", "one undo step; the unit stays selected and is revealed in its new force", "split view: fills the window"], "screens": ["tablet-editor-move-unit"]},
               {"id": "tablet.rename-sheet", "title": "Rename Sheet (one field)", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["roster name or force name", "field selected on open, character count", "Save stays off while the name is empty or unchanged", "Enter saves", "More menu: Rename roster; force menu: Rename force"], "screens": []}
             ]
           },

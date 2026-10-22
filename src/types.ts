@@ -61,6 +61,7 @@ export type WorkflowScreen =
   | "tablet-create"
   | "tablet-create-review"
   | "tablet-settings-appearance-import"
+  | "tablet-editor-move-unit"
   | "tablet-confirm-delete"
   | "tablet-archive-sketch"
   | "desktop-welcome"

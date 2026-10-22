@@ -11,6 +11,8 @@ import type { RosterUnit } from '../../types';
 import type { TabletEnv } from './tabletEnv';
 import { HintButton } from './TabletHint';
 import { AddForceSheet, ExportSheet, RenameSheet } from './TabletEditorSheets';
+import { MoveRight } from 'lucide-react';
+import { MoveUnitSheet } from './TabletSheets';
 import { editorCatalogue, loadRoster, rosterFromImport, unitCategories, unitProfile, unitRules, weaponChoices, weaponProfile, type CatalogueEntry } from './tabletEditorData';
 import './tablet-editor.css';
 
@@ -21,11 +23,11 @@ import './tablet-editor.css';
 //   Medium (600-839): force tree · unit details; the catalogue is a slide-over from Add unit.
 //   Split view (< 700 wide): the tree alone; a unit's details open over it (like ListDetail on the pages).
 
-export type EditorStart = 'editor' | 'issues' | 'add' | 'forces' | 'add-force' | 'readonly' | 'export';
+export type EditorStart = 'editor' | 'issues' | 'add' | 'forces' | 'add-force' | 'readonly' | 'export' | 'move-unit';
 type Pop = 'switcher' | 'more' | 'summary' | `unit-${number}` | `force-${string}` | null;
-type Sheet = { kind: 'add-force' } | { kind: 'rename' } | { kind: 'rename-force'; id: string } | { kind: 'export' } | null;
+type Sheet = { kind: 'add-force' } | { kind: 'rename' } | { kind: 'rename-force'; id: string } | { kind: 'export' } | { kind: 'move'; id: number } | null;
 /** The sample roster each gallery start opens: two forces, a roster whose faction was removed, or the default. */
-const startRoster = (start: EditorStart, name: string) => start === 'issues' ? 'Operation First Light' : start === 'forces' || start === 'add-force' || start === 'export' ? 'Harbour defence' : start === 'readonly' ? 'Ember patrol' : name;
+const startRoster = (start: EditorStart, name: string) => start === 'issues' ? 'Operation First Light' : start === 'forces' || start === 'add-force' || start === 'export' || start === 'move-unit' ? 'Harbour defence' : start === 'readonly' ? 'Ember patrol' : name;
 type Mode = 'three' | 'two' | 'single';
 
 const PANES: { catalogue: PanelLimits; inspector: PanelLimits; inspectorMedium: PanelLimits } = {
@@ -67,7 +69,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
   const [inspWidth, setInspWidth] = useState(mode === 'three' ? PANES.inspector.initial : PANES.inspectorMedium.initial);
   const [slideOver, setSlideOver] = useState(start === 'add' && mode !== 'three');
   const [detailOpen, setDetailOpen] = useState(false);
-  const [sheet, setSheet] = useState<Sheet>(start === 'add-force' ? { kind: 'add-force' } : start === 'export' ? { kind: 'export' } : null);
+  const [sheet, setSheet] = useState<Sheet>(start === 'add-force' ? { kind: 'add-force' } : start === 'export' ? { kind: 'export' } : start === 'move-unit' ? { kind: 'move', id: 1 } : null);
   const [query, setQuery] = useState('');
   const [role, setRole] = useState(start === 'add' ? 'Core' : 'All');
   const rootRef = useRef<HTMLDivElement>(null);
@@ -139,6 +141,13 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
     const step = history.edit(`Remove ${unit.name}`, d => ({ ...d, units: d.units.filter(u => u.id !== unit.id) }), { focus: unit.id });
     if (unit.id === selectedId) { setSelectedId(units.find(u => u.id !== unit.id)?.id ?? 0); setDetailOpen(false); }
     notify(`${unit.name} removed`, withUndo(step));
+  };
+  /** Move a unit to another force of the roster (one undo step); the unit stays selected and is revealed in its new force. */
+  const moveUnit = (unit: EditorUnit, forceId: string) => {
+    if (readOnly || forceOf(unit) === forceId) return;
+    const step = history.edit(`Move ${unit.name}`, d => ({ ...d, units: d.units.map(u => u.id === unit.id ? { ...u, forceId } : u) }), { focus: unit.id });
+    setSheet(null); setActiveForce(forceId); setSelectedId(unit.id); expand(forceId, `${forceId}/${unit.role}`); reveal(rootRef, `[data-tb-unit="${unit.id}"]`);
+    notify(`${unit.name} moved to ${forceById(forceId).name}`, withUndo(step));
   };
 
   /* ---------------------------------------------------------------- forces and the roster itself */
@@ -292,7 +301,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
                       </button>
                       {branchOpen && <div className="ux-tree-units">
                         {entries.map(u => <UnitRow key={u.id} unit={u} env={env} active={u.id === selectedId} issue={unitIssue(u.id)} menuOpen={pop === `unit-${u.id}`} readOnly={!!readOnly}
-                          onSelect={() => selectUnit(u)} onMenu={() => setPop(pop === `unit-${u.id}` ? null : `unit-${u.id}`)} onDuplicate={() => duplicateUnit(u)} onRemove={() => removeUnit(u)} />)}
+                          onSelect={() => selectUnit(u)} onMenu={() => setPop(pop === `unit-${u.id}` ? null : `unit-${u.id}`)} onDuplicate={() => duplicateUnit(u)} onRemove={() => removeUnit(u)} onMove={() => { setPop(null); setSheet({ kind: 'move', id: u.id }); }} />)}
                         {!readOnly && <button type="button" className="ux-tree-add" onClick={() => openCatalogue(group, force.id)}><Plus size={16} />Add {group.toLowerCase()} unit</button>}
                       </div>}
                     </div>;
@@ -323,6 +332,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
 
     {sheet?.kind === 'export' && <ExportSheet roster={exportable} readOnly={!!readOnly} notify={notify} onClose={() => setSheet(null)} />}
     {sheet?.kind === 'add-force' && <AddForceSheet forces={forces} limit={limit} faction={roster.faction} onAdd={addForce} onClose={() => setSheet(null)} />}
+    {sheet?.kind === 'move' && units.some(u => u.id === sheet.id) && <MoveUnitSheet unit={units.find(u => u.id === sheet.id)!} forces={forces} units={units} from={forceOf(units.find(u => u.id === sheet.id)!)} onMove={id => moveUnit(units.find(u => u.id === sheet.id)!, id)} onAddForce={() => setSheet({ kind: 'add-force' })} onClose={() => setSheet(null)} />}
     {sheet?.kind === 'rename' && <RenameSheet title="Rename roster" label="Roster name" value={roster.name} onSave={renameRoster} onClose={() => setSheet(null)} />}
     {sheet?.kind === 'rename-force' && <RenameSheet title="Rename force" label="Force name" value={forceById(sheet.id).name} maxLength={40} onSave={name => renameForce(sheet.id, name)} onClose={() => setSheet(null)} />}
   </div>;
@@ -396,9 +406,9 @@ function ReadOnlyCataloguePane({ env, info, onFindData, onClose }: { env: Tablet
 
 /* ---------------------------------------------------------------- force tree row */
 
-function UnitRow({ unit, env, active, issue, menuOpen, readOnly, onSelect, onMenu, onDuplicate, onRemove }: {
+function UnitRow({ unit, env, active, issue, menuOpen, readOnly, onSelect, onMenu, onDuplicate, onRemove, onMove }: {
   unit: EditorUnit; env: TabletEnv; active: boolean; issue?: RosterIssue; menuOpen: boolean; readOnly: boolean;
-  onSelect: () => void; onMenu: () => void; onDuplicate: () => void; onRemove: () => void;
+  onSelect: () => void; onMenu: () => void; onDuplicate: () => void; onRemove: () => void; onMove: () => void;
 }) {
   // Touch: press and hold opens the row menu (the phone's swipe actions are off at this size). Pointer: right-click does.
   const hold = useRef<number>(undefined);
@@ -423,6 +433,7 @@ function UnitRow({ unit, env, active, issue, menuOpen, readOnly, onSelect, onMen
     {menuOpen && <div className="tbe-menu tbe-unit-menu" role="menu" aria-label={`Actions for ${unit.name}`}>
       <button type="button" role="menuitem" onClick={() => { onMenu(); onSelect(); }}><Users size={18} />Show details</button>
       <button type="button" role="menuitem" onClick={onDuplicate}><Copy size={18} />Duplicate</button>
+      <button type="button" role="menuitem" onClick={onMove}><MoveRight size={18} />Move to another force…</button>
       <button type="button" role="menuitem" className="danger" onClick={onRemove}><Trash2 size={18} />Remove</button>
     </div>}
   </div>;
