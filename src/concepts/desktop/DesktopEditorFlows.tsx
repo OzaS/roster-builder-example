@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from 'react';
+import { useMemo, useReducer, useRef, useState, type ReactNode } from 'react';
 import { AlertTriangle, ArrowDownToLine, Check, CheckCircle2, ClipboardCopy, Copy, Database, FileJson, FileText, Flag, Lock, Pencil, Printer, Redo2, Search, Trash2, Undo2, X } from 'lucide-react';
 import { formatCombo } from './desktopKeys';
+import { Dialog, DialogHeader } from '../workspace/Dialog';
 import './desktop-editor.css';
 
 // Roster editor flows for the desktop prototype (revision 05): undo/redo history, several forces, export,
@@ -158,33 +159,6 @@ export function CatalogueTarget({ forces, active, onChange }: { forces: Force[];
   return <label className="dte-target"><span>Add to</span><select aria-label="Add catalogue units to force" value={active} onChange={e => onChange(e.target.value)}>{forces.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}</select></label>;
 }
 
-/* ---------------------------------------------------------------- Dialog shell */
-
-/** A centred dialog that takes focus, keeps Tab inside and closes on Escape; focus returns to where it was. */
-function EditorDialog({ label, wide = false, onClose, children }: { label: string; wide?: boolean; onClose: () => void; children: ReactNode }) {
-  const ref = useRef<HTMLElement>(null);
-  const close = useRef(onClose); close.current = onClose;
-  useEffect(() => {
-    const previous = document.activeElement as HTMLElement | null;
-    const nodes = () => Array.from(ref.current?.querySelectorAll<HTMLElement>('button, input, select, textarea, [tabindex]:not([tabindex="-1"])') ?? []).filter(el => !el.hasAttribute('disabled'));
-    (ref.current?.querySelector<HTMLElement>('[data-autofocus]') ?? nodes()[0])?.focus();
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') { e.preventDefault(); close.current(); return; }
-      if (e.key !== 'Tab') return;
-      const list = nodes(); const first = list[0]; const last = list[list.length - 1];
-      if (!ref.current?.contains(document.activeElement)) { e.preventDefault(); first?.focus(); }
-      else if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
-      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => { window.removeEventListener('keydown', onKey); previous?.focus?.(); };
-  }, []);
-  return <div className="dt-modal-scrim dte-scrim" onClick={onClose}><section ref={ref} className={`dt-modal dte-dialog ${wide ? 'wide' : ''}`} role="dialog" aria-modal="true" aria-label={label} onClick={e => e.stopPropagation()}>{children}</section></div>;
-}
-function DialogHeader({ title, sub, onClose }: { title: string; sub?: ReactNode; onClose: () => void }) {
-  return <header className="dte-head"><div><h2>{title}</h2>{sub && <p>{sub}</p>}</div><button type="button" className="dt-icon" aria-label="Close" title="Close (Esc)" onClick={onClose}><X size={16} /></button></header>;
-}
-
 /* ---------------------------------------------------------------- Export */
 
 export type ExportRoster = { name: string; limit: number; total: number; system: string; faction: string; forces: Array<Force & { points: number; units: EditorUnit[] }>; file: unknown };
@@ -238,7 +212,7 @@ export function ExportDialog({ roster, readOnly, onClose, notify }: { roster: Ex
   const save = () => { downloadFile(fileName, output, format === 'json' ? 'application/json' : format === 'html' ? 'text/html' : 'text/plain'); notify(`Saved “${fileName}”`); onClose(); };
   const copy = async () => { try { await navigator.clipboard.writeText(output); notify(format === 'json' ? 'Roster file copied as text' : 'Roster text copied'); onClose(); } catch { notify('Could not copy. Select the preview and copy it instead.'); } };
   const optionsReason = format === 'json' ? 'The roster file always contains everything.' : undefined;
-  return <EditorDialog label="Export roster" wide onClose={onClose}>
+  return <Dialog label="Export roster" wide onClose={onClose}>
     <DialogHeader title="Export roster" sub={<>{roster.name} · {roster.forces.length} {roster.forces.length === 1 ? 'force' : 'forces'} · {roster.total.toLocaleString()} pts{readOnly && <> · <Lock size={11} /> read-only, exported as it was saved</>}</>} onClose={onClose} />
     <div className="dte-export">
       <div className="dte-export-side">
@@ -262,7 +236,7 @@ export function ExportDialog({ roster, readOnly, onClose, notify }: { roster: Ex
       <button type="button" className="dtp-btn" disabled={format === 'html'} title={format === 'html' ? 'A print view is saved as a file' : undefined} onClick={copy}><ClipboardCopy size={14} />{format === 'json' ? 'Copy JSON' : 'Copy text'}</button>
       <button type="button" className="dtp-btn primary" onClick={save}><ArrowDownToLine size={14} />Save file…</button>
     </footer>
-  </EditorDialog>;
+  </Dialog>;
 }
 
 /* ---------------------------------------------------------------- Import result */
@@ -297,7 +271,7 @@ export function ImportDialog({ result, version, onOpen, onClose }: { result: Imp
   const matched = result.units.length; const missing = result.unmatched.length;
   const points = result.units.reduce((n, u) => n + unitCost(u), 0);
   const filePoints = points + result.unmatched.reduce((n, u) => n + u.points, 0);
-  return <EditorDialog label="Import roster" onClose={onClose}>
+  return <Dialog label="Import roster" onClose={onClose}>
     <DialogHeader title="Import roster" sub={result.fileName} onClose={onClose} />
     <div className="dte-import">
       <div className="dte-import-roster"><span className="dt-monogram">{result.name.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase()}</span><span><strong>{result.name}</strong><small>{result.system} · {result.faction} · {result.forces.length} {result.forces.length === 1 ? 'force' : 'forces'}</small></span></div>
@@ -310,7 +284,7 @@ export function ImportDialog({ result, version, onOpen, onClose }: { result: Imp
       <button type="button" className="dtp-btn" onClick={onClose}>Cancel</button>
       <button type="button" className="dtp-btn primary" data-autofocus onClick={onOpen}>{missing ? `Open without ${missing === 1 ? 'it' : 'them'}` : 'Open roster'}</button>
     </footer>
-  </EditorDialog>;
+  </Dialog>;
 }
 
 /* ---------------------------------------------------------------- Add force */
@@ -325,7 +299,7 @@ export function AddForceDialog({ forces, limit, faction, onAdd, onClose }: { for
   const suggested = `${type || 'New'} ${forces.filter(f => f.type === type).length + 1}`;
   const shown = FORCE_TYPES.filter(t => `${t.name} ${t.detail}`.toLowerCase().includes(query.toLowerCase()));
   const add = () => { if (type) onAdd({ name: name.trim() || suggested, type, faction: chosenFaction }); };
-  return <EditorDialog label="Add force" onClose={onClose}>
+  return <Dialog label="Add force" onClose={onClose}>
     <DialogHeader title="Add force" sub={`Forces in this roster: ${forces.length}. Each has its own units and points.`} onClose={onClose} />
     <form className="dte-form" onSubmit={e => { e.preventDefault(); add(); }}>
       <div className="dte-addforce">
@@ -343,7 +317,7 @@ export function AddForceDialog({ forces, limit, faction, onAdd, onClose }: { for
       </div>
       <footer className="dte-foot"><span className="dte-hint">Leave the name empty to use “{suggested}”.</span><button type="button" className="dtp-btn" onClick={onClose}>Cancel</button><button type="submit" className="dtp-btn primary" disabled={!type}>Add force</button></footer>
     </form>
-  </EditorDialog>;
+  </Dialog>;
 }
 
 /* ---------------------------------------------------------------- Read-only */

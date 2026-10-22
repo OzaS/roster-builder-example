@@ -631,7 +631,7 @@
                 "level": "overlay",
                 "status": "needs-review",
                 "platforms": ["desktop"],
-                "states": ["chrome progress button", "panel", "steps", "choose factions", "several jobs", "cancel", "hide", "finished", "clear finished", "source row progress"],
+                "states": ["chrome progress button", "panel", "steps (install everything, no pause)", "choose factions (Advanced installation on)", "several jobs", "cancel", "hide", "finished", "clear finished", "source row progress"],
                 "screens": ["desktop-sources", "desktop-first-run"]
               },
               {
@@ -649,7 +649,7 @@
                 "level": "screen-composition",
                 "status": "needs-review",
                 "platforms": ["desktop"],
-                "states": ["no game data", "installing", "data but no rosters", "rosters empty"],
+                "states": ["no game data", "installing (every faction, no pause)", "installing with Choose factions (Advanced installation on)", "data but no rosters", "rosters empty"],
                 "screens": ["desktop-first-run"]
               },
               {
@@ -703,7 +703,7 @@
                 "level": "screen-composition",
                 "status": "needs-review",
                 "platforms": ["desktop"],
-                "states": ["default collection rows", "show all", "search", "no matches", "supported", "installed", "update", "installing percent", "choose factions", "archived toggle", "nested collections and libraries", "more menu", "refresh", "copy link", "hide default", "remove saved", "offline kept copy", "refresh failed retry", "loading", "empty", "preview states"],
+                "states": ["default collection rows", "show all", "search", "no matches", "supported", "installed", "update", "installing percent", "choose factions (Advanced installation on)", "archived toggle", "nested collections and libraries", "more menu", "refresh", "copy link", "hide default", "remove saved", "offline kept copy", "refresh failed retry", "loading", "empty", "preview states"],
                 "screens": ["desktop-sources"]
               },
               {
@@ -730,7 +730,7 @@
                 "level": "screen-composition",
                 "status": "needs-review",
                 "platforms": ["desktop"],
-                "states": ["theme", "colour scheme", "import scheme", "language", "switches", "keep versions", "storage", "key bindings", "recording", "needs a modifier", "conflict replace", "reset", "about", "scroll-tracked section list"],
+                "states": ["theme", "colour scheme", "import scheme", "language", "switches", "Advanced installation switch (off by default)", "keep versions", "storage", "key bindings", "recording", "needs a modifier", "conflict replace", "reset", "about", "scroll-tracked section list"],
                 "screens": ["desktop-settings"]
               }
             ]

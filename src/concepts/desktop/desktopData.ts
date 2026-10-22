@@ -1,5 +1,8 @@
 // Synthetic, game-neutral sample data for the desktop hub screens (DEC-001).
 
+import type { CheckState, LastUpdate, SourceInfo, SourceStatus } from '../workspace/sourceTypes';
+export type { CheckState, LastUpdate, SourceInfo, SourceStatus };
+
 export type RosterStatus = 'ready' | 'issues' | 'data-changed' | 'faction-removed';
 export type RosterSummary = { name: string; faction: string; system: string; used: number; limit: number; opened: string; forces: number; units: number; status: RosterStatus; issues?: number; mark: string };
 
@@ -29,8 +32,6 @@ export const lookupEntries: LookupEntry[] = [
   { id: 'e2', kind: 'Equipment', name: 'Heavy carbine', owner: 'Veteran Guard', source: 'Open Field', meta: 'Ranged weapon', cost: '+5', text: 'Range 18" · Attacks 2 · Strength 4.', conditional: 'Replaces Service rifle. Cost is per model.' },
 ];
 
-export type SourceStatus = 'ready' | 'update' | 'review';
-export type SourceInfo = { id: string; name: string; factions: string[]; repo: string; version: string; next?: string; installed: string; upstream: string; checked: string; size: string; documents: number; status: SourceStatus; fromFile?: boolean; kept?: string[]; rosters: string[]; lastUpdate?: LastUpdate };
 
 export const installedSources: SourceInfo[] = [
   { id: 'open-field', name: 'Open Field', factions: ['Frontier Coalition', 'Free Cities', 'Northern Realms'], repo: 'example/open-field', version: 'v1.4', next: 'v1.5', installed: 'Oct 2', upstream: 'Oct 19', checked: '8 minutes ago', size: '14.2 MB', documents: 6, status: 'update', kept: ['v1.3'], rosters: ['The Ashen Expedition', 'Northern Watch', 'Operation First Light', 'Weekend skirmish', 'Harbour defence'] },
@@ -55,9 +56,6 @@ export const colourSchemes = [
 
 /* --------------------------- Sources flows (revision 05) --------------------------- */
 
-/** Where the roster check of a source's last update stands. */
-export type CheckState = 'not-checked' | 'checking' | 'done' | 'cancelled' | 'failed';
-export type LastUpdate = { from: string; to: string; when: string; check: CheckState; done: number; nothingChanged?: boolean };
 export type RosterCheck = { status: 'unchanged' | 'changed' | 'faction-removed'; lines: string[] };
 
 /** What the roster check finds per roster; rosters not listed are unchanged. */

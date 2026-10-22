@@ -4,27 +4,11 @@
 .dtp-header h1 { font-size: 24px; font-weight: 600; letter-spacing: -.6px }
 .dt-app .dtp-header p { color: var(--dt-muted); font-size: 12px; margin-top: 2px }
 .dtp-header-actions { margin-left: auto; display: flex; gap: 8px }
-.dt-app .dtp-btn { height: 34px; padding: 0 13px; border-radius: 10px; border: 1px solid var(--dt-border); font-size: 12px; font-weight: 500; gap: 7px; white-space: nowrap; background: var(--dt-pane) }
-.dt-app .dtp-btn:hover { background: var(--dt-hover) }
-.dt-app .dtp-btn.primary { background: var(--dt-fill); color: var(--ux-accent-ink); border-color: transparent }
-.dt-app .dtp-btn.primary:hover { filter: brightness(1.08) }
-.dt-app .dtp-btn.primary kbd { color: inherit; border-color: currentColor; opacity: .7 }
-.dt-app .dtp-btn.small { height: 28px; padding: 0 10px; font-size: 11px }
-.dt-app .dtp-btn.wide { flex: 1 1 100%; justify-content: space-between }
-.dt-app .dtp-btn.danger { color: var(--ux-err) }
-.dt-app .dtp-btn.danger.confirm { background: var(--ux-err); color: var(--ux-err-ink); border-color: transparent }
 .dt-app .dtp-icon { width: 30px; height: 30px; border-radius: 9px; color: var(--dt-muted); padding: 0 }
 
 .dtp-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap }
 .dtp-toolbar.tight { margin-top: -4px }
 .dtp-push { margin-left: auto }
-.dtp-search { display: flex; align-items: center; gap: 8px; flex: 1 1 260px; max-width: 420px; height: 36px; padding: 0 10px; border-radius: 12px; background: var(--dt-pane); border: 1px solid var(--dt-border); color: var(--dt-muted) }
-.dtp-search:focus-within { border-color: color-mix(in srgb, var(--dt-fill) 55%, transparent) }
-.dtp-search input { flex: 1; min-width: 0; border: 0; outline: none; background: none; font-size: 12px; color: var(--dt-text) }
-.dtp-search input::placeholder { color: var(--dt-faint) }
-.dtp-search button { width: 22px; height: 22px; border-radius: 6px; padding: 0 }
-.dtp-search.large { max-width: none; height: 46px; border-radius: 14px; padding: 0 14px; border-color: color-mix(in srgb, var(--dt-fill) 40%, transparent) }
-.dtp-search.large input { font-size: 15px }
 .dtp-chips { display: flex; gap: 6px; flex-wrap: wrap }
 .dt-app .dtp-chips button { height: 30px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--dt-border); font-size: 12px; color: var(--dt-muted); gap: 6px; background: var(--dt-pane) }
 .dt-app .dtp-chips button.active { background: var(--dt-selected); color: var(--dt-accent); border-color: color-mix(in srgb, var(--dt-fill) 45%, transparent) }
@@ -50,18 +34,12 @@
 .dtp-name>span:last-child { min-width: 0 }
 .dtp-points { font-size: 12px; color: var(--dt-muted); font-variant-numeric: tabular-nums }
 .dtp-points b { color: var(--dt-text); font-weight: 600 }
-.dtp-points i, .dtp-budget i, .dtp-progress { display: block; height: 3px; margin-top: 6px; border-radius: 3px; background: var(--dt-border); overflow: hidden }
-.dtp-points em, .dtp-budget em, .dtp-progress em { display: block; height: 100%; background: var(--dt-fill); border-radius: 3px; transition: width .3s }
+.dtp-points i,.dtp-budget i{ display: block; height: 3px; margin-top: 6px; border-radius: 3px; background: var(--dt-border); overflow: hidden }
+.dtp-points em,.dtp-budget em{ display: block; height: 100%; background: var(--dt-fill); border-radius: 3px; transition: width .3s }
 .dtp-points.over b, .dtp-budget .over { color: var(--dt-warn) }
 .dtp-points.over em { background: var(--dt-warn) }
 .dtp-muted { color: var(--dt-muted); font-size: 12px }
 .dtp-faint { color: var(--dt-faint) !important }
-.dtp-chip { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 9px; border-radius: 999px; font-size: 11px; font-weight: 500; white-space: nowrap; background: var(--dt-hover); color: var(--dt-muted); border: 1px solid transparent }
-.dtp-chip.ok { color: var(--ux-ok); background: color-mix(in srgb, var(--ux-ok) 12%, transparent) }
-.dtp-chip.warn { color: var(--dt-warn); background: color-mix(in srgb, var(--dt-warn) 13%, transparent) }
-.dtp-chip.err { color: var(--ux-err); background: color-mix(in srgb, var(--ux-err) 12%, transparent) }
-.dtp-chip.accent { color: var(--dt-accent); background: var(--dt-selected) }
-.dt-app .dtp-chip.add { border: 1px dashed var(--ux-line-2); background: none; cursor: pointer; gap: 4px }
 
 .dtp-detail { overflow: auto; padding: 20px }
 .dtp-detail h2 { font-size: 20px; font-weight: 600; letter-spacing: -.4px }
@@ -156,25 +134,13 @@
 .dtp-settings-body { overflow: auto; display: flex; flex-direction: column; gap: 12px; padding-bottom: 40vh; scroll-padding-top: 4px }
 .dtp-settings-card { flex-shrink: 0; padding: 18px 20px; display: flex; flex-direction: column; gap: 4px }
 .dt-app .dtp-settings-card>h2 { font-size: 15px; font-weight: 600; margin-bottom: 8px }
-.dtp-setting-line, .dt-app .dtp-setting-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 0; width: 100%; text-align: left; border-radius: 0 }
-.dt-app .dtp-setting-row:hover { background: none }
-.dtp-rows .dtp-setting-row { padding: 11px 14px; border-top: 1px solid var(--dt-border) }
-.dtp-rows .dtp-setting-row:first-child { border-top: 0 }
-.dt-app .dtp-rows .dtp-setting-row:hover { background: var(--dt-hover) }
-.dtp-setting-line strong, .dtp-setting-row strong, .dtp-setting-block>strong { display: block; font-size: 13px; font-weight: 500 }
-.dtp-setting-line small, .dtp-setting-row small { display: block; font-size: 12px; color: var(--dt-muted); margin-top: 2px }
-.dtp-setting-row>svg { color: var(--dt-accent) }
+.dtp-setting-line{ display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 0; width: 100%; text-align: left; border-radius: 0 }
+.dtp-setting-line strong,.dtp-setting-block>strong{ display: block; font-size: 13px; font-weight: 500 }
+.dtp-setting-line small{ display: block; font-size: 12px; color: var(--dt-muted); margin-top: 2px }
 .dtp-setting-block { padding: 10px 0 }
 .dtp-setting-foot { display: flex; align-items: center; gap: 12px; margin-top: 12px }
 .dtp-setting-foot small { color: var(--dt-muted); font-size: 12px }
 .dtp-mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px !important }
-.dtp-switch { flex-shrink: 0; width: 36px; height: 21px; border-radius: 999px; background: var(--ux-line-2); position: relative; transition: background .15s }
-.dtp-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 15px; height: 15px; border-radius: 50%; background: var(--dt-pane); box-shadow: 0 1px 3px #0003; transition: transform .15s }
-[aria-checked=true]>.dtp-switch { background: var(--dt-fill) }
-[aria-checked=true]>.dtp-switch::after { transform: translateX(15px) }
-.dtp-segmented { display: inline-flex; padding: 3px; border-radius: 11px; background: var(--dt-hover); gap: 2px }
-.dt-app .dtp-segmented button { height: 28px; min-width: 52px; padding: 0 12px; border-radius: 8px; font-size: 12px; color: var(--dt-muted) }
-.dt-app .dtp-segmented button.active { background: var(--dt-pane); color: var(--dt-text); box-shadow: 0 1px 3px #0002, inset 0 0 0 1px var(--dt-border) }
 .dtp-scheme-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 10px }
 .dt-app .dtp-scheme-grid button { justify-content: flex-start; gap: 10px; padding: 10px; border-radius: 12px; border: 1px solid var(--dt-border); font-size: 13px }
 .dt-app .dtp-scheme-grid button.active { border-color: color-mix(in srgb, var(--dt-fill) 55%, transparent); background: var(--dt-selected) }
@@ -203,50 +169,6 @@
 .dt-app .dtp-key.recording { border-color: var(--dt-fill); background: var(--dt-selected); color: var(--dt-accent) }
 .dtp-key-error { color: var(--dt-warn) !important }
 .dtp-page { padding-top: 66px }
-
-/* Jobs: chrome toggle + popover */
-.dt-app .dt-jobs-toggle { height: 32px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--dt-border); font-size: 11px; color: var(--dt-muted); gap: 7px; max-width: 320px; font-variant-numeric: tabular-nums }
-.dt-jobs-toggle>span:not(.dt-ring) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
-.dt-app .dt-jobs-toggle.active { background: var(--dt-selected); color: var(--dt-accent); border-color: color-mix(in srgb, var(--dt-fill) 40%, transparent) }
-.dt-app .dt-jobs-toggle.needs { color: var(--dt-warn); border-color: color-mix(in srgb, var(--dt-warn) 45%, transparent); background: color-mix(in srgb, var(--dt-warn) 10%, transparent) }
-.dt-ring { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; background: conic-gradient(var(--dt-fill) var(--p), var(--ux-line-2) 0); -webkit-mask: radial-gradient(circle, transparent 4px, #000 4.5px); mask: radial-gradient(circle, transparent 4px, #000 4.5px) }
-.dt-jobs { position: absolute; z-index: 4; top: 54px; right: 14px; width: 360px; max-height: calc(100% - 80px); overflow: auto; background: var(--dt-pane); border: 1px solid var(--ux-line-2); border-radius: 18px; box-shadow: 0 18px 50px #0004; padding: 6px }
-.dt-jobs>header { display: flex; align-items: center; justify-content: space-between; padding: 10px 10px 8px }
-.dt-app .dt-jobs h2 { font-size: 14px; font-weight: 600 }
-.dt-job { margin: 4px; padding: 12px; border-radius: 14px; background: var(--dt-hover) }
-.dt-job-title { display: flex; justify-content: space-between; gap: 10px; font-size: 13px }
-.dt-job-title strong { font-weight: 600 }
-.dt-job-title span { color: var(--dt-muted); font-variant-numeric: tabular-nums }
-.dt-job .dtp-progress { margin: 8px 0 10px }
-.dt-job-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px }
-.dt-job-steps li { display: flex; align-items: center; gap: 8px; color: var(--dt-faint) }
-.dt-job-steps li span { flex: 1 }
-.dt-job-steps li small { font-size: 11px; font-variant-numeric: tabular-nums }
-.dt-job-steps li.done { color: var(--dt-muted) }
-.dt-job-steps li.done svg { color: var(--ux-ok) }
-.dt-job-steps li.active { color: var(--dt-text) }
-.dt-job-steps li.active svg { color: var(--dt-accent) }
-.dt-job-steps li.needs-you { color: var(--dt-warn) }
-.dt-spin { animation: dt-spin 1s linear infinite }
-@keyframes dt-spin { to { transform: rotate(360deg) } }
-@media (prefers-reduced-motion: reduce) { .dt-spin { animation: none } }
-.dt-job-actions { display: flex; align-items: center; gap: 8px; margin-top: 10px }
-.dt-job-actions small { flex: 1; color: var(--dt-muted); font-size: 12px }
-.dt-job.done .dt-job-title strong::before { content: '✓ '; color: var(--ux-ok) }
-.dt-job.cancelled { opacity: .7 }
-.dt-jobs footer { padding: 4px 8px 6px }
-.dt-app .dt-job-clear { font-size: 12px; color: var(--dt-muted); gap: 6px; padding: 6px 8px; border-radius: 8px }
-.dt-faction-picker { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--dt-border) }
-.dt-app .dt-faction-picker p { font-size: 12px; color: var(--dt-muted); margin-bottom: 8px }
-.dt-faction-picker .dtp-search { max-width: none; height: 32px; background: var(--dt-pane) }
-.dt-faction-tools { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--dt-muted); margin: 8px 2px 4px }
-.dt-app .dt-faction-tools button { font-size: 11px; color: var(--dt-accent); padding: 2px 4px; border-radius: 6px }
-.dt-faction-list { display: flex; flex-direction: column; max-height: 168px; overflow: auto; border-radius: 10px; background: var(--dt-pane); padding: 4px }
-.dt-faction-list label { display: flex; align-items: center; gap: 9px; padding: 7px 8px; border-radius: 8px; font-size: 12px; cursor: pointer }
-.dt-faction-list label:hover { background: var(--dt-hover) }
-.dt-faction-list input { accent-color: var(--dt-fill) }
-.dt-faction-list small { padding: 8px; color: var(--dt-muted) }
-.dt-app .dtp-btn:disabled { opacity: .45; cursor: default }
 
 /* Guided creation */
 .dt-app .dt-wizard-modal { width: min(820px, calc(100% - 60px)); padding: 0; overflow: hidden }

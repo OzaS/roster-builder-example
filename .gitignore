@@ -1,3 +1,5 @@
 dist
 archived-designs.zip
 node_modules
+.vite
+.DS_Store

@@ -1,35 +1,14 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { createPortal } from 'react-dom';
 import { AlertTriangle, ArrowDownToLine, ArrowRight, ArrowUpCircle, BookOpen, Check, ChevronRight, CircleAlert, Copy, Database, ExternalLink, FileUp, FolderOpen, Github, HardDrive, Info, Keyboard, Languages, Layers3, Link2, ListFilter, Palette, Pencil, Plus, RefreshCcw, Search, Shield, SlidersHorizontal, Trash2, Upload, Users, X } from 'lucide-react';
 import type { ColorScheme } from '../../types';
 import { collectionSources, colourSchemes, installedSources, lookupEntries, rosterLibrary, type LookupKind, type RosterSummary, type SourceInfo } from './desktopData';
 import { comboFromEvent, defaultBindings, formatCombo, hasCommandModifier, keyActions, type KeyAction, type KeyBindings } from './desktopKeys';
-import type { DesktopJobs } from './DesktopJobs';
-import { jobPercent } from './DesktopJobs';
+import { jobPercent, type WorkspaceJobs } from '../workspace/Jobs';
+import { Chip, PageActions, Segmented, Switch } from '../workspace/Primitives';
+import type { Notify } from '../workspace/Toasts';
 import './desktop-pages.css';
 import { AddCollectionDialog, AddDataCollections, CollectionView, GitHubSearchView, LastUpdateCard, LastUpdateStates, UpdateReportView, flowSourceId, isAddFlow, useRosterChecks } from './DesktopSourceFlows';
 
-export type ToastOptions = { kind?: 'action' | 'notification'; action?: { label: string; run: () => void } };
-type Notify = (message: string, options?: ToastOptions) => void;
-
-/** Page actions render into the window chrome next to the tabs; desktop pages have no title header. */
-function PageActions({ slot, children }: { slot: HTMLElement | null; children: ReactNode }) {
-  return slot ? createPortal(children, slot) : null;
-}
-
-function Chip({ tone = 'neutral', children }: { tone?: 'neutral' | 'ok' | 'warn' | 'err' | 'accent'; children: ReactNode }) {
-  return <span className={`dtp-chip ${tone}`}>{children}</span>;
-}
-
-function Switch({ label, detail, checked, onChange }: { label: string; detail?: string; checked: boolean; onChange: (v: boolean) => void }) {
-  return <button type="button" role="switch" aria-checked={checked} className="dtp-setting-row" onClick={() => onChange(!checked)}>
-    <span><strong>{label}</strong>{detail && <small>{detail}</small>}</span><i className="dtp-switch" aria-hidden="true" />
-  </button>;
-}
-
-function Segmented<T extends string | number>({ label, value, options, onChange }: { label: string; value: T; options: Array<{ value: T; label: string }>; onChange: (v: T) => void }) {
-  return <div className="dtp-segmented" role="radiogroup" aria-label={label}>{options.map(o => <button type="button" key={String(o.value)} role="radio" aria-checked={value === o.value} className={value === o.value ? 'active' : ''} onClick={() => onChange(o.value)}>{o.label}</button>)}</div>;
-}
 
 const statusChip = (r: RosterSummary) => r.status === 'issues' ? <Chip tone="warn"><AlertTriangle size={11} />{r.issues} {r.issues === 1 ? 'issue' : 'issues'}</Chip>
   : r.status === 'data-changed' ? <Chip tone="accent">Data changed</Chip>
@@ -147,7 +126,7 @@ export function DesktopLookup({ onOpenRoster }: { onOpenRoster: (name: string) =
 
 /* ------------------------------ Sources ------------------------------ */
 
-export function DesktopSources({ notify, actionSlot, jobs, selectedId, onSelect, onOpenJobs, onOpenRoster }: { notify: Notify; actionSlot: HTMLElement | null; jobs: DesktopJobs; selectedId: string; onSelect: (id: string) => void; onOpenJobs: () => void; onOpenRoster?: (name: string) => void }) {
+export function DesktopSources({ notify, actionSlot, jobs, selectedId, onSelect, onOpenJobs, onOpenRoster }: { notify: Notify; actionSlot: HTMLElement | null; jobs: WorkspaceJobs; selectedId: string; onSelect: (id: string) => void; onOpenJobs: () => void; onOpenRoster?: (name: string) => void }) {
   const { sources, setSources } = jobs;
   const setSelectedId = onSelect;
   const progress: Record<string, number> = Object.fromEntries(sources.flatMap(s => { const p = jobs.progressOf(s.id); return p ? [[s.id, p.percent]] : []; }));
@@ -222,10 +201,10 @@ const settingsSections = [
   { id: 'about', label: 'About', icon: Info },
 ] as const;
 
-export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, bindings, onBindings, notify }: { themePref: 'system' | 'light' | 'dark'; onThemePref: (v: 'system' | 'light' | 'dark') => void; scheme: ColorScheme; onScheme: (v: ColorScheme) => void; bindings: KeyBindings; onBindings: (next: KeyBindings) => void; notify: Notify }) {
+export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, bindings, onBindings, advancedInstall, onAdvancedInstall, notify }: { themePref: 'system' | 'light' | 'dark'; onThemePref: (v: 'system' | 'light' | 'dark') => void; scheme: ColorScheme; onScheme: (v: ColorScheme) => void; bindings: KeyBindings; onBindings: (next: KeyBindings) => void; advancedInstall: boolean; onAdvancedInstall: (v: boolean) => void; notify: Notify }) {
   const [active, setActive] = useState<string>('appearance');
   const [language, setLanguage] = useState('en');
-  const [toggles, setToggles] = useState({ rememberSections: true, restoreTabs: true, chooseFactions: false, autoChecks: true });
+  const [toggles, setToggles] = useState({ rememberSections: true, restoreTabs: true, autoChecks: true });
   const [keep, setKeep] = useState(1);
   const scrollRef = useRef<HTMLDivElement>(null);
   const flip = (key: keyof typeof toggles) => (v: boolean) => setToggles(t => ({ ...t, [key]: v }));
@@ -248,7 +227,7 @@ export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, bind
         </section>
         <section id="dtp-set-data" className="dtp-card dtp-settings-card"><h2>Game data</h2>
           <Switch label="Check for updates automatically" detail="When the app starts and every few hours while it is open." checked={toggles.autoChecks} onChange={flip('autoChecks')} />
-          <Switch label="Choose factions when installing" detail="Install only the factions you play." checked={toggles.chooseFactions} onChange={flip('chooseFactions')} />
+          <Switch label="Advanced installation" detail="Choose which factions to install when you add game data. Off: everything is installed." checked={advancedInstall} onChange={onAdvancedInstall} />
           <div className="dtp-setting-line"><span><strong>Keep previous versions</strong><small>{keep === 0 ? 'Older versions are deleted after an update.' : `Uses about ${keep * 13} MB per source.`}</small></span><Segmented label="Keep previous versions" value={keep} onChange={setKeep} options={[0, 1, 2, 3].map(v => ({ value: v, label: v === 0 ? 'Off' : String(v) }))} /></div>
         </section>
         <section id="dtp-set-storage" className="dtp-card dtp-settings-card"><h2>Storage</h2>
@@ -308,7 +287,7 @@ function KeyBindingsEditor({ bindings, onBindings }: { bindings: KeyBindings; on
 /* ------------------------- Welcome: first run ------------------------- */
 
 /** Right side of Welcome while there is no game data, or data but no rosters yet. */
-export function WelcomeStart({ jobs, onCreate, onImport, onAddData, onOpenJobs }: { jobs: DesktopJobs; onCreate: () => void; onImport: () => void; onAddData: () => void; onOpenJobs: () => void }) {
+export function WelcomeStart({ jobs, onCreate, onImport, onAddData, onOpenJobs }: { jobs: WorkspaceJobs; onCreate: () => void; onImport: () => void; onAddData: () => void; onOpenJobs: () => void }) {
   if (jobs.sources.length) return <section className="dt-recents dt-start">
     <header><h2>Ready when you are</h2><span>{jobs.sources.map(s => s.name).join(' · ')} installed</span></header>
     <div className="dtp-empty left"><Layers3 size={22} /><strong>No rosters yet</strong><p>Your first roster takes a minute: choose a faction, a force and a points limit.</p><span className="dtp-row-actions"><button className="dtp-btn primary" onClick={onCreate}><Plus size={15} />Create your first roster</button><button className="dtp-btn" onClick={onImport}><FileUp size={15} />Import a roster</button></span></div>
