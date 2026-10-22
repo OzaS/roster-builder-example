@@ -1,0 +1,145 @@
+/* Tablet prototype: the desktop structure (rail, pages, panes) in the mobile design language.
+   Root = .tb-app.ux-screen: the shared --ux-* theme tokens and the mobile content pieces (.ux-*) work as on the phone.
+   The workspace layer expects a .dt-app root for its --dt-* tokens, so .tb-app maps the same tokens itself. It does not carry
+   .dt-app: `.dt-app button { border: 0; background: none }` would strip the mobile buttons (.ux-list-card, .ux-job-btn, ...).
+   The few workspace controls that style their buttons under .dt-app (Segmented, Switch, toasts) sit inside .tb-shim, a
+   .dt-app wrapper without a box (display: contents). */
+.tb-app, .tb-shim { --dt-bg: var(--ux-bg); --dt-side: var(--ux-bg); --dt-pane: var(--ux-surface); --dt-hover: var(--ux-surface-2); --dt-border: var(--ux-line); --dt-text: var(--ux-ink); --dt-muted: var(--ux-muted); --dt-faint: var(--ux-ink-tertiary); --dt-accent: var(--ux-accent-2); --dt-fill: var(--ux-accent); --dt-selected: color-mix(in srgb, var(--ux-accent) 15%, transparent); --dt-ok: var(--ux-ok); --dt-warn: var(--ux-warn) }
+.tb-app.light, .tb-shim.light { --dt-accent: var(--ux-accent) }
+.tb-shim.dt-app { display: contents; font: inherit; color: inherit }
+.dt-ambient-on .tb-shim.dt-app::before { display: none }
+.tb-app.ux-screen { flex-direction: row; font: 15px/1.4 var(--font); text-align: left }
+
+/* Ambient gradient (gallery switch), same recipe as the desktop. */
+.dt-ambient-on .tb-app::before { content: ''; position: absolute; z-index: 0; left: -140px; top: -160px; width: 720px; height: 560px; pointer-events: none;
+  background: radial-gradient(closest-side at 32% 40%, color-mix(in srgb, var(--ux-accent) 70%, transparent), transparent), radial-gradient(closest-side at 70% 30%, color-mix(in srgb, var(--ux-cool) 45%, transparent), transparent), radial-gradient(closest-side at 45% 75%, color-mix(in srgb, var(--ux-accent-2) 40%, transparent), transparent);
+  filter: blur(70px) saturate(1.2); opacity: .5 }
+.dt-ambient-on .tb-app.light::before { opacity: .3 }
+
+/* ------------------------------ rail ------------------------------ */
+.tb-rail { position: relative; z-index: 2; flex: 0 0 84px; display: flex; flex-direction: column; gap: 6px; padding: 14px 8px 30px; border-right: 1px solid var(--ux-line) }
+.tb-hint-wrap { position: relative; display: block }
+.tb-app .tb-rail button { width: 100%; margin: 0; font: inherit }
+.tb-app button.tb-rail-item, .tb-app button.tb-rail-new { position: relative; display: grid; justify-items: center; align-content: center; gap: 4px; min-height: 56px; padding: 6px 2px; border: 0; border-radius: 16px; background: transparent; color: var(--ux-muted); font-size: 11px; font-weight: 750; letter-spacing: .2px; line-height: 1.15; text-align: center; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent }
+.tb-pointer button.tb-rail-item, .tb-pointer button.tb-rail-new { min-height: 48px }
+.tb-touch .tb-rail button { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none }
+.tb-app button.tb-rail-item.active { color: var(--ux-accent-2); background: color-mix(in srgb, var(--ux-accent) 16%, transparent) }
+.tb-app button.tb-rail-item.active::before { content: ''; position: absolute; left: -8px; top: 14px; bottom: 14px; width: 4px; border-radius: 0 4px 4px 0; background: var(--ux-accent) }
+.tb-app.light button.tb-rail-item.active { color: var(--ux-accent) }
+.tb-app button.tb-rail-new { margin-bottom: 2px; background: linear-gradient(180deg, var(--ux-accent-2), var(--ux-accent)); color: var(--ux-accent-ink); font-weight: 800; box-shadow: 0 8px 20px color-mix(in srgb, var(--ux-accent) 32%, transparent) }
+.tb-app button.tb-rail-item:active, .tb-touch button.tb-rail-item:active { background: var(--ux-surface-3) }
+.tb-pointer button.tb-rail-item:not(.active):hover { color: var(--ux-ink); background: var(--ux-surface-2) }
+.tb-pointer button.tb-rail-new:hover { filter: brightness(1.06) }
+.tb-app .tb-rail button:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px }
+.tb-rail-rule { height: 1px; margin: 4px 10px 6px; background: var(--ux-line) }
+.tb-rail-spacer { flex: 1 }
+.tb-hint-bubble { position: absolute; z-index: 30; max-width: 240px; padding: 10px 13px; border-radius: 12px; background: var(--ux-ink); color: var(--ux-bg); font-size: 13px; font-weight: 650; line-height: 1.3; text-align: left; white-space: normal; width: max-content; box-shadow: 0 10px 28px #0006; pointer-events: none }
+.tb-hint-bubble.right { left: calc(100% + 10px); top: 50%; transform: translateY(-50%) }
+.tb-hint-bubble.top { left: 50%; bottom: calc(100% + 8px); transform: translateX(-50%) }
+.tb-hint-bubble.bottom { left: 50%; top: calc(100% + 8px); transform: translateX(-50%) }
+
+/* ------------------------------ pages ------------------------------ */
+.tb-main { position: relative; z-index: 1; flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 16px 20px 30px 18px }
+.tb-page { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 14px }
+.tb-toolbar { display: flex; align-items: center; gap: 10px }
+.tb-toolbar .tb-search { flex: 1 }
+.tb-toolbar-note { flex: 1; color: var(--ux-muted); font-size: 13.5px }
+.tb-search { min-height: 48px; background: var(--ux-surface); font-size: 15px }
+.tb-search input { font-size: 15px }
+.tb-search input:focus-visible { outline: none }
+.tb-search:focus-within { border-color: var(--ux-accent) }
+.tb-filters { display: flex; flex-wrap: wrap; gap: 8px }
+.tb-app button.tb-filter { min-height: 44px; padding: 0 18px; border: 1px solid var(--ux-line); border-radius: 999px; background: var(--ux-surface); color: var(--ux-muted); font-size: 14px; font-weight: 750; cursor: pointer }
+.tb-app button.tb-filter.active { border-color: var(--ux-accent); background: color-mix(in srgb, var(--ux-accent) 16%, transparent); color: var(--ux-accent-2) }
+.tb-pointer button.tb-filter:not(.active):hover { color: var(--ux-ink); border-color: var(--ux-line-2) }
+.tb-app :is(button.tb-filter, button.tb-row, .ux-job-btn, .ux-primary, .tb-scheme):focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px }
+
+.tb-panes { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(290px, 2fr) minmax(0, 3fr); gap: 14px }
+.tb-panes.single { grid-template-columns: minmax(0, 1fr); position: relative }
+.tb-pane { min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: 10px; container-type: inline-size }
+@container (max-width: 400px) { .tb-row-end b { display: none } }
+.tb-medium .tb-panes:not(.single) { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) }
+.tb-split-note { display: flex; align-items: center; gap: 8px; margin: 0; padding: 10px 12px; border-radius: var(--ux-r-md); background: var(--ux-surface-2); color: var(--ux-muted); font-size: 12.5px }
+.tb-list { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: 8px; min-width: 0 }
+.tb-list.scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 2px 3px 2px 0 }
+.tb-detail { overflow-y: auto; align-content: start; gap: 16px; padding: 20px; border: 1px solid var(--ux-line); border-radius: var(--ux-r-lg); background: var(--ux-surface); display: grid }
+.tb-detail.over { position: absolute; inset: 0; z-index: 5; box-shadow: 0 18px 48px #0006 }
+.tb-detail-title { display: flex; align-items: center; gap: 12px }
+.tb-detail-title > span:not(.tb-mark):not(.ux-chip) { flex: 1; min-width: 0 }
+.tb-detail-title h2 { font-size: 21px; font-weight: 800; line-height: 1.2 }
+.tb-detail-title small, .tb-continue-head small, .tb-data-row small { display: block; margin-top: 2px; color: var(--ux-muted); font-size: 12.5px }
+.tb-body { margin: 0; font-size: 15px; line-height: 1.5 }
+.tb-note { display: flex; gap: 8px; align-items: flex-start; margin: 0; padding: 12px; border-radius: var(--ux-r-md); background: var(--ux-surface-2); color: var(--ux-muted); font-size: 13px; line-height: 1.4 }
+.tb-note svg { flex-shrink: 0; margin-top: 1px }
+.tb-empty { margin: 14px 0; color: var(--ux-muted); text-align: center }
+.tb-profile { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--ux-line); border-radius: var(--ux-r-md); overflow: hidden }
+.tb-profile span { display: grid; gap: 4px; padding: 10px; text-align: center }
+.tb-profile span + span { border-left: 1px solid var(--ux-line) }
+.tb-profile small { color: var(--ux-muted); font-size: 11px; font-weight: 750; text-transform: uppercase; letter-spacing: .5px }
+.tb-profile b { font-size: 18px }
+
+.tb-app button.tb-row { min-height: 64px; gap: 12px; padding: 12px 14px; justify-content: flex-start; color: var(--ux-ink) }
+.tb-touch button.tb-row { min-height: 72px }
+.tb-row-main { flex: 1; min-width: 0 }
+.tb-row-main strong, .tb-row-main small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.tb-row-end { display: grid; justify-items: end; gap: 5px; flex-shrink: 0 }
+.tb-row-end svg { color: var(--ux-muted) }
+.tb-app button.tb-row.selected { border-color: var(--ux-accent); background: color-mix(in srgb, var(--ux-accent) 12%, var(--ux-surface)) }
+.tb-touch .ux-list-card:hover { transform: none; border-color: var(--ux-line) }
+.tb-touch button.tb-row.selected:hover { border-color: var(--ux-accent) }
+.tb-touch button.tb-row:active { background: var(--ux-surface-2) }
+.tb-pointer button.tb-row:hover { transform: none; border-color: var(--ux-line-2) }
+.tb-pointer button.tb-row.selected:hover { border-color: var(--ux-accent) }
+.tb-mark { flex-shrink: 0; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: color-mix(in srgb, var(--ux-accent) 18%, var(--ux-surface-2)); color: var(--ux-accent-2); font-size: 13px; font-weight: 850; letter-spacing: .4px }
+.tb-mark.large { width: 48px; height: 48px; border-radius: 14px; font-size: 15px }
+.tb-card { display: grid; gap: 14px; padding: 18px; border: 1px solid var(--ux-line); border-radius: var(--ux-r-lg); background: var(--ux-surface) }
+.tb-continue-head { display: flex; align-items: center; gap: 12px }
+.tb-continue-head strong { display: block; font-size: 19px; font-weight: 800 }
+.tb-data-row { display: flex; align-items: center; justify-content: space-between; gap: 10px }
+.tb-data-row strong { font-size: 16px }
+.tb-actions { display: flex; flex-wrap: wrap; gap: 10px }
+.tb-actions .ux-job-btn { min-height: 48px; padding: 0 16px }
+.tb-pointer .tb-actions .ux-job-btn { min-height: 44px }
+.tb-actions .tb-primary { min-height: 48px; flex: 0 1 auto }
+.tb-back { align-self: flex-start; min-height: 44px }
+.tb-section { display: grid; gap: 10px }
+.tb-section-head { display: flex; align-items: center; justify-content: space-between }
+.tb-section-head .ux-job-btn { min-height: 44px }
+.tb-home { display: grid; grid-template-columns: minmax(0, 3fr) minmax(250px, 2fr); gap: 16px; align-content: start; overflow-y: auto }
+.tb-home-main, .tb-home-side { display: grid; gap: 16px; align-content: start; min-width: 0 }
+.tb-medium .tb-home { grid-template-columns: minmax(0, 1fr) }
+.tb-medium.tb-app .tb-home-side { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+.tb-soon { justify-content: center; align-items: center }
+.tb-soon .ux-cs-card { width: min(520px, 100%) }
+.tb-soon .ux-cs-card > p { max-width: 420px }
+
+.tb-setting { display: flex; align-items: center; justify-content: space-between; gap: 16px }
+.tb-setting strong { font-size: 15px }
+.tb-app .dtp-segmented { padding: 4px; border-radius: 14px }
+.tb-app .dtp-segmented button { height: 44px; min-width: 80px; padding: 0 16px; border-radius: 10px; font-size: 14px; font-weight: 700 }
+.tb-schemes { display: grid; gap: 8px }
+.tb-scheme { min-height: 56px; cursor: pointer }
+.tb-scheme i { width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0 }
+.tb-switches { padding: 4px 14px }
+.tb-app .dtp-setting-row { min-height: 60px; padding: 8px 0 }
+.tb-app .dtp-setting-row + .dtp-setting-row { border-top: 1px solid var(--ux-line) }
+.tb-app .dtp-setting-row strong { font-size: 15px; font-weight: 700 }
+.tb-app .dtp-setting-row small { font-size: 12.5px }
+.tb-app .dtp-switch { width: 52px; height: 32px }
+.tb-app .dtp-switch::after { top: 4px; left: 4px; width: 24px; height: 24px }
+.tb-app [aria-checked=true] > .dtp-switch::after { transform: translateX(20px) }
+
+/* ------------------------------ toasts (mobile feel) ------------------------------ */
+.tb-app .dt-toast { padding: 12px 8px 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.35; gap: 10px }
+.tb-app .dt-toast.functional { top: 16px; right: 16px; max-width: min(420px, calc(100% - 32px)) }
+.tb-app .dt-toast.notification { bottom: 34px; right: 16px; max-width: min(420px, calc(100% - 32px)) }
+.tb-app .dt-toast .dt-icon { width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0 }
+.tb-app .dt-toast .dt-toast-action { min-height: 44px; padding: 0 12px; font-size: 14px; font-weight: 750 }
+
+/* Standalone link (?tablet=...) */
+.tb-standalone { min-height: 100vh; width: max-content; min-width: 100%; display: grid; place-items: center; padding: 24px; background: #0b0c10 }
+.tb-standalone-link { position: fixed; left: 14px; top: 10px; color: #98a1b3; font: 12px var(--font); text-decoration: none }
+.tb-standalone-link:hover { color: #f0f2f7 }
+.tb-app .ux-chip { text-transform: none }
+.tb-app button.tb-scheme { justify-content: flex-start; gap: 14px; text-align: left }
+.tb-scheme > span { flex: 1 }
