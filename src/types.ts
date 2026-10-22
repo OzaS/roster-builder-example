@@ -150,7 +150,7 @@ export type RosterUnitDetail = {
   standaloneOptionIds: string[];
   profileTables: RosterProfileTable[];
   traits: string[];
-  wargear: Array<{ id: string; name: string; description: string }>;
+  equipment: Array<{ id: string; name: string; description: string }>;
   rules: string[];
   categories: string[];
 };
@@ -174,7 +174,7 @@ export type RosterUnit = {
   detail?: RosterUnitDetail;
   /** What was chosen inside it (configuration picks), shown under the name, New Recruit style. */
   summary?: string;
-  /** A non-zero cost other than points, shown in accent text beside the name (e.g. "1 Detachment Point"). */
+  /** A non-zero cost other than points, shown in accent text beside the name (e.g. "1 Formation Point"). */
   extraCost?: string;
 };
 

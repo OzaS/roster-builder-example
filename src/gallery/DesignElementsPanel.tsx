@@ -427,7 +427,7 @@ function WorkbenchElements({
       </ElementSection>
 
       <ElementSection title="Move Unit Dialog">
-        <section className="ux-entry-dialog" style={{ borderRadius: 12 }}><header><span><strong>Move unit</strong><small>Compatible Battleline sections</small></span></header><div className="ux-destination-list"><button type="button"><span><strong>Dark Angels Auxiliary</strong><small>Unrestricted Collection · Battleline</small></span><MoveRight size={16} /></button></div></section>
+        <section className="ux-entry-dialog" style={{ borderRadius: 12 }}><header><span><strong>Move unit</strong><small>Compatible Core sections</small></span></header><div className="ux-destination-list"><button type="button"><span><strong>Free Cities Auxiliary</strong><small>Unrestricted Collection · Core</small></span><MoveRight size={16} /></button></div></section>
       </ElementSection>
 
       <ElementSection title="Validation Rail">
@@ -551,7 +551,7 @@ function WorkbenchElements({
             <button type="button" className="ux-smart-add" aria-label="Add"><Plus size={16} /></button>
           </div>
           <button type="button" className="ux-pool-row ux-smart-fill-row">
-            <span><strong>Relic Shield</strong><small>{selectedUnit.name} · {selectedSection.name}</small></span>
+            <span><strong>Ward Shield</strong><small>{selectedUnit.name} · {selectedSection.name}</small></span>
             <span className="ux-pool-meta"><b>+15 pts</b></span>
             <ChevronRight size={16} />
           </button>
@@ -896,7 +896,7 @@ function WorkbenchElements({
       </ElementSection>
 
       <ElementSection title="Favorite Library Cards">
-        <section className="ux-favorite-library-section"><header><span className="ux-collection-icon"><Heart size={18} /></span><strong>Favorite units</strong></header><div className="ux-favorite-card-list"><article className="ux-favorite-card"><span><strong>Veteran Spearhead</strong><small>Battleline · {selectedUnit.points} pts</small></span><div><button type="button"><Plus size={14} />Add</button><button type="button"><Trash2 size={14} /></button></div></article></div></section>
+        <section className="ux-favorite-library-section"><header><span className="ux-collection-icon"><Heart size={18} /></span><strong>Favorite units</strong></header><div className="ux-favorite-card-list"><article className="ux-favorite-card"><span><strong>Veteran Spearhead</strong><small>Core · {selectedUnit.points} pts</small></span><div><button type="button"><Plus size={14} />Add</button><button type="button"><Trash2 size={14} /></button></div></article></div></section>
       </ElementSection>
 
       <ElementSection title="App & Account">
@@ -1116,7 +1116,7 @@ function TabletWorkspaceElement({ roster }: { roster: Roster }) {
           <button type="button" className="ux-icon-btn" aria-label="Lists"><Layers size={17} /></button>
           <label className="ux-navbar-search">
             <Search size={15} />
-            <input value="terminator" aria-label="Search roster" readOnly />
+            <input value="bastion" aria-label="Search roster" readOnly />
             <X size={15} />
           </label>
           <span className="ux-roster-header-points"><b>{roster.pointsUsed} / {roster.pointsLimit}</b><small>{pointsLeft} pts left</small></span>
@@ -1166,7 +1166,7 @@ function OptionsSection({ selectedUnit, onToggleOption }: { selectedUnit: Roster
           if (!options.length) return null;
           return (
             <section className="ux-opt-group" key={group}>
-              <h4>{group === "weapon" ? "Wargear" : group === "upgrade" ? "Upgrades" : "Special rules"}</h4>
+              <h4>{group === "weapon" ? "Equipment" : group === "upgrade" ? "Upgrades" : "Special rules"}</h4>
               {options.map((option) => (
                 <button key={option.id} type="button" className={`ux-opt-row ${option.selected ? "on" : ""}`} onClick={() => onToggleOption(option.id)}>
                   <span className="ux-opt-check" aria-hidden />
@@ -1241,7 +1241,7 @@ function LoadoutEditorElement({ unit }: { unit: RosterUnit }) {
       <article className="ux-loadout-group expanded">
         <header className="ux-loadout-group-head">
           <button type="button" className="ux-loadout-group-toggle" aria-expanded="true">
-            <span><strong>{group.name} ×{group.count}</strong><small>Bolt pistol · Chainsword</small></span>
+            <span><strong>{group.name} ×{group.count}</strong><small>Service pistol · Serrated sword</small></span>
             <span className="ux-loadout-group-meta"><small>{group.count * group.basePointsPerModel} pts</small><ChevronDown size={15} /></span>
           </button>
           <div className="ux-loadout-group-actions">
@@ -1302,8 +1302,8 @@ function ForceEntriesElement({ roster }: { roster: Roster }) {
       <button type="button" className="ux-force-add"><Plus size={14} />Add force</button>
       <section className="ux-force-draft" aria-label="New force">
         <header><strong>New force</strong><button type="button" aria-label="Cancel force creation"><X size={15} /></button></header>
-        <label><span>Force</span><select defaultValue="dark-angels"><option value="dark-angels">Dark Angels</option></select></label>
-        <label><span>Organization</span><select defaultValue="crusade"><option value="crusade">Crusade Force Organization Chart</option></select></label>
+        <label><span>Force</span><select defaultValue="free-cities"><option value="free-cities">Free Cities</option></select></label>
+        <label><span>Layout</span><select defaultValue="frontier"><option value="frontier">Frontier Force Layout Chart</option></select></label>
         <div className="ux-force-draft-actions"><button type="button">Cancel</button><button type="button" className="primary">Add force</button></div>
       </section>
       <div className="ux-force-selector-layer ux-elements-static">
@@ -1314,7 +1314,7 @@ function ForceEntriesElement({ roster }: { roster: Roster }) {
             {/* Plan 4C: one tap adds and closes. */}
             <div className="ux-force-detachments"><strong>Detachments in Primary Force</strong><button type="button"><span><b>Core Detachment<em className="ux-force-required" aria-label="Required"> !</em></b><small>Required · 0/1</small></span><Plus size={15} /></button><button type="button"><span><b>Support Detachment</b><small>At maximum · 1/1: adding breaks its limit</small></span><Plus size={15} /></button></div>
             <button type="button" className="ux-force-faction-select" aria-expanded={false}><span><strong>Faction</strong><small>Faction A</small></span><ChevronRight size={16} /></button>
-            <strong className="ux-force-section-title">Organization</strong>
+            <strong className="ux-force-section-title">Layout</strong>
             <div className="ux-force-choice-list"><button type="button"><span><strong>Standard Force (1)</strong><small>Recommended</small></span><Plus size={15} /></button><button type="button"><span><strong>Open Force (0)</strong><small>Sandbox</small></span><Plus size={15} /></button></div>
             <button type="button" className="ux-pool-hidden">Show hidden (3)</button>
           </div>

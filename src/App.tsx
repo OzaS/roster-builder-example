@@ -165,9 +165,9 @@ function App() {
   const [favorites, setFavorites] = useState<FavoriteLibrary>(() => readFavoriteLibrary());
   const [selectedForceId, setSelectedForceId] = useState("primary-force");
   const [expandedForceIds, setExpandedForceIds] = useState<string[]>(mockRoster.forces.map((force) => force.id));
-  const [selectedSectionId, setSelectedSectionId] = useState("battleline");
-  const [selectedUnitId, setSelectedUnitId] = useState("assault-squad");
-  const [expandedSectionIds, setExpandedSectionIds] = useState<string[]>(["hq", "battleline", "elites"]);
+  const [selectedSectionId, setSelectedSectionId] = useState("core");
+  const [selectedUnitId, setSelectedUnitId] = useState("forward-squad");
+  const [expandedSectionIds, setExpandedSectionIds] = useState<string[]>(["command", "core", "specialists"]);
   const [screen, setScreen] = useState<PrototypeScreen>(initialState.screen ?? workflowToPrototypeScreen(initialState.workflowScreen ?? "library"));
   const [screenHistory, setScreenHistory] = useState<PrototypeScreen[]>([]);
 
@@ -450,9 +450,9 @@ function App() {
     if (!catalogue || !detachment) return;
     const forceId = `force-${Date.now()}`;
     const sections = [
-      { id: `${forceId}-hq`, name: "HQ", required: "0/2", units: [] },
-      { id: `${forceId}-battleline`, name: "Battleline", required: "0/6", units: [] },
-      { id: `${forceId}-elites`, name: "Elites", required: "0/3", units: [] },
+      { id: `${forceId}-command`, name: "Command", required: "0/2", units: [] },
+      { id: `${forceId}-core`, name: "Core", required: "0/6", units: [] },
+      { id: `${forceId}-specialists`, name: "Specialists", required: "0/3", units: [] },
       { id: `${forceId}-transport`, name: "Transport", required: "0/2", units: [] },
     ];
     setRoster((current) => ({
