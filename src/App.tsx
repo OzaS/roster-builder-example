@@ -28,6 +28,9 @@ const defaultTabletPanelLayout: TabletPanelLayout = { treeRatio: 0.3, railRatio:
 const workflowScreenIds = [
   "tablet-home",
   "tablet-rosters",
+  "tablet-editor",
+  "tablet-editor-issues",
+  "tablet-editor-add",
   "tablet-lookup",
   "tablet-tools",
   "tablet-library",

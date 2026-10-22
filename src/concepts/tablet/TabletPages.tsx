@@ -57,7 +57,7 @@ const Facts = ({ rows }: { rows: Array<[string, ReactNode]> }) => <div className
 
 /* --------------------------------- Home --------------------------------- */
 
-export function TabletHome({ env, notify, onPage, onNewRoster }: PageProps & { onPage: (page: 'rosters' | 'sources') => void; onNewRoster: () => void }) {
+export function TabletHome({ env, notify, onPage, onNewRoster, onOpenRoster }: PageProps & { onPage: (page: 'rosters' | 'sources') => void; onNewRoster: () => void; onOpenRoster: (name: string) => void }) {
   const recent = rosterLibrary.slice(0, 4);
   const current = rosterLibrary[0];
   const update = installedSources[0];
@@ -68,13 +68,13 @@ export function TabletHome({ env, notify, onPage, onNewRoster }: PageProps & { o
         <div className="tb-continue-head"><span className="tb-mark large" aria-hidden="true">{current.mark}</span><span><strong>{current.name}</strong><small>{current.faction} · {current.system} · opened {current.opened}</small></span></div>
         <Meter used={current.used} limit={current.limit} />
         <div className="tb-actions">
-          <HintButton hint="Open the roster you were editing" input={env.input} side="top" className="ux-primary tb-primary" onClick={() => notify(`Opening “${current.name}” (prototype)`)}>Continue roster<ArrowRight size={17} /></HintButton>
+          <HintButton hint="Open the roster you were editing" input={env.input} side="top" className="ux-primary tb-primary" onClick={() => onOpenRoster(current.name)}>Continue roster<ArrowRight size={17} /></HintButton>
           <HintButton hint="Create a roster" input={env.input} side="top" className="ux-job-btn" onClick={onNewRoster}><Plus size={17} />New roster</HintButton>
         </div>
       </section>
       <section className="tb-section" aria-label="Recent rosters">
         <div className="tb-section-head"><span className="ux-result-label">Recent rosters</span><button type="button" className="ux-job-btn ux-src-ghost" onClick={() => onPage('rosters')}>All rosters<ChevronRight size={15} /></button></div>
-        <div className="tb-list">{recent.map((r, i) => <Row key={r.name} selected={false} mark={r.mark} title={r.name} sub={`${r.faction} · ${r.opened}`} end={<><b>{pts(r.used)} / {pts(r.limit)}</b>{i === 2 ? rosterStatus(r) : null}</>} onClick={() => notify(`Opening “${r.name}” (prototype)`)} />)}</div>
+        <div className="tb-list">{recent.map((r, i) => <Row key={r.name} selected={false} mark={r.mark} title={r.name} sub={`${r.faction} · ${r.opened}`} end={<><b>{pts(r.used)} / {pts(r.limit)}</b>{i === 2 ? rosterStatus(r) : null}</>} onClick={() => onOpenRoster(r.name)} />)}</div>
       </section>
     </div>
     <aside className="tb-home-side" aria-label="Data status">
@@ -94,7 +94,7 @@ export function TabletHome({ env, notify, onPage, onNewRoster }: PageProps & { o
 
 /* -------------------------------- Rosters -------------------------------- */
 
-export function TabletRosters({ env, notify, onNewRoster }: PageProps & { onNewRoster: () => void }) {
+export function TabletRosters({ env, notify, onNewRoster, onOpenRoster }: PageProps & { onNewRoster: () => void; onOpenRoster: (name: string) => void }) {
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState(rosterLibrary[0].name);
   const [open, setOpen] = useState(false);
@@ -110,7 +110,7 @@ export function TabletRosters({ env, notify, onNewRoster }: PageProps & { onNewR
         <div className="tb-detail-title"><span className="tb-mark large" aria-hidden="true">{current.mark}</span><span><h2>{current.name}</h2><small>{current.faction} · {current.system}</small></span></div>
         <Meter used={current.used} limit={current.limit} />
         <Facts rows={[['Status', rosterStatus(current)], ['Forces', current.forces], ['Units', current.units], ['Last opened', current.opened]]} />
-        <div className="tb-actions"><button type="button" className="ux-primary tb-primary" onClick={() => notify(`Opening “${current.name}” (prototype)`)}>Open roster<ArrowRight size={17} /></button><HintButton hint="Rename this roster" input={env.input} side="top" className="ux-job-btn" onClick={() => notify('Rename (prototype)')}><Pencil size={16} />Rename</HintButton><HintButton hint="Make an editable copy" input={env.input} side="top" className="ux-job-btn" onClick={() => notify(`Duplicated “${current.name}” (prototype)`)}><Copy size={16} />Duplicate</HintButton></div>
+        <div className="tb-actions"><button type="button" className="ux-primary tb-primary" onClick={() => onOpenRoster(current.name)}>Open roster<ArrowRight size={17} /></button><HintButton hint="Rename this roster" input={env.input} side="top" className="ux-job-btn" onClick={() => notify('Rename (prototype)')}><Pencil size={16} />Rename</HintButton><HintButton hint="Make an editable copy" input={env.input} side="top" className="ux-job-btn" onClick={() => notify(`Duplicated “${current.name}” (prototype)`)}><Copy size={16} />Duplicate</HintButton></div>
       </>} />
   </div>;
 }

@@ -339,6 +339,9 @@
       "screens": [
         { "id": "tablet-home", "label": "Home · Quick start" },
         { "id": "tablet-rosters", "label": "Rosters · List and details" },
+        { "id": "tablet-editor", "label": "Roster editor · Panes by width" },
+        { "id": "tablet-editor-issues", "label": "Roster editor · Summary with issues" },
+        { "id": "tablet-editor-add", "label": "Roster editor · Add unit" },
         { "id": "tablet-lookup", "label": "Lookup · Search and entry" },
         { "id": "tablet-tools", "label": "Tools · Coming soon" },
         { "id": "tablet-library", "label": "Library · Coming soon" },
@@ -351,6 +354,11 @@
           "id": "tablet",
           "label": "Tablet workspace",
           "screens": ["tablet-home", "tablet-rosters", "tablet-lookup", "tablet-tools", "tablet-library", "tablet-sources", "tablet-settings"]
+        },
+        {
+          "id": "editor",
+          "label": "Roster editor",
+          "screens": ["tablet-editor", "tablet-editor-issues", "tablet-editor-add"]
         },
         {
           "id": "archive",
@@ -379,7 +387,15 @@
               {"id": "tablet.panes", "title": "List and Detail Panes", "level": "screen-composition", "status": "needs-review", "platforms": ["tablet"], "states": ["list and detail (Expanded and Medium)", "list only with a note, detail opens over the list (split view)", "selected row", "touch rows (72 px) and pointer rows (64 px)", "pointer hover state"], "screens": ["tablet-rosters", "tablet-lookup", "tablet-sources", "tablet-settings"]},
               {"id": "tablet.home", "title": "Home Quick Start", "level": "screen-composition", "status": "needs-review", "platforms": ["tablet"], "states": ["continue roster", "new roster", "recent rosters", "data status with update", "one column at Medium width"], "screens": ["tablet-home"]},
               {"id": "tablet.placeholder", "title": "Coming Soon Placeholder", "level": "composite", "status": "specified", "platforms": ["tablet", "desktop"], "states": ["Tools", "Library"], "screens": ["tablet-tools", "tablet-library", "desktop-tools", "desktop-library"]},
-              {"id": "tablet.toasts", "title": "Toasts (mobile feel)", "level": "overlay", "status": "needs-review", "platforms": ["tablet"], "states": ["functional toast top right", "notification bottom right above the home indicator", "44 px Dismiss and action targets"], "screens": ["tablet-home"]}
+              {"id": "tablet.toasts", "title": "Toasts (mobile feel)", "level": "overlay", "status": "needs-review", "platforms": ["tablet"], "states": ["functional toast top right", "notification bottom right above the home indicator", "44 px Dismiss and action targets"], "screens": ["tablet-home"]},
+              {"id": "tablet.editor-header", "title": "Editor Header", "level": "navigation", "status": "needs-review", "platforms": ["tablet"], "states": ["covers the rail (one roster at a time)", "Back to the page it was opened from (chevron only in split view)", "roster mark, name and faction, opens the recent-rosters switcher", "undo and redo, hints name the step, disabled when there is nothing to undo or the roster is read-only", "points button (shared SummaryToggle at 44 px) opens the summary popover", "More menu: export, rename, duplicate, show or hide the catalogue and unit details", "points line under the header while the popover is closed", "every icon control has a hint (press and hold on touch, hover title with a pointer)"], "screens": ["tablet-editor", "tablet-editor-issues", "tablet-editor-add"]},
+              {"id": "tablet.editor-panes", "title": "Editor Panes by Width", "level": "screen-composition", "status": "needs-review", "platforms": ["tablet"], "states": ["Expanded: catalogue, force tree and unit details", "Medium: force tree and unit details, catalogue as a slide-over", "split view: the force tree alone, unit details open over it with Back to Roster", "side panes resizable", "catalogue and unit details hidden from their pane header or the More menu"], "screens": ["tablet-editor", "tablet-editor-add"]},
+              {"id": "tablet.pane-resizer", "title": "Pane Resizer Grab Handle", "level": "control", "status": "needs-review", "platforms": ["tablet"], "states": ["24 px hit area centred on the pane border", "visible grip (8 x 52 px)", "drag, arrow keys (Shift for bigger steps), double-tap or double-click resets", "accent while dragging, focused or hovered with a pointer", "width limits per pane"], "screens": ["tablet-editor"]},
+              {"id": "tablet.unit-catalogue", "title": "Unit Catalogue (pane and slide-over)", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["search with clear", "role filter pills (44 px)", "adds-to force picker when the roster has several forces", "60 px rows with points and an add button", "no match", "pane at Expanded width", "slide-over from Add unit at Medium width and in split view, scrim closes it", "opened on a role from a section's Add unit row or an issue's Show", "data source footer"], "screens": ["tablet-editor", "tablet-editor-add"]},
+              {"id": "tablet.force-tree", "title": "Force Tree (mobile cards)", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["force card with type, faction and points, folds", "section branches with count and requirement, fold", "unit rows at 52 px (56 px on touch) with count, configuration summary and points", "active row", "row needing attention (warning glyph)", "Add <role> unit row", "row menu by press and hold (touch) or right-click (pointer): Show details, Duplicate, Remove", "added or revealed row flashes", "several forces", "read-only banner"], "screens": ["tablet-editor", "tablet-editor-issues"]},
+              {"id": "tablet.unit-details", "title": "Unit Details Pane", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["the mobile unit detail in a pane: title, role and force, cost", "Duplicate and Remove (44 px) with Undo toasts", "share of the roster points", "issue notice", "Options and Profile tabs", "unit size stepper; pinned count without a stepper", "weapon choice section (radio rows)", "upgrades section (toggle row) with an invalid counter", "notes", "profile and weapon tables, rules that expand", "categories", "empty: Select a unit"], "screens": ["tablet-editor", "tablet-editor-issues"]},
+              {"id": "tablet.summary-popover", "title": "Roster Summary Popover", "level": "overlay", "status": "needs-review", "platforms": ["tablet"], "states": ["shared RosterSummary at mobile sizes (48 px rows)", "points and points left or over", "points limit", "issues row opens the issue list", "Show selects the unit and reveals it in the tree; a missing-unit issue opens the catalogue on that role; the points issue focuses the limit", "all requirements met", "not checked while read-only", "Export and New roster actions", "closes on a tap outside or Escape"], "screens": ["tablet-editor-issues", "tablet-editor"]},
+              {"id": "tablet.roster-switcher", "title": "Recent Rosters Switcher", "level": "overlay", "status": "needs-review", "platforms": ["tablet"], "states": ["five recent rosters with mark, faction, points and when opened", "current roster checked", "switching keeps the editor open and its Back target", "All rosters", "New roster"], "screens": ["tablet-editor"]}
             ]
           },
           {
