@@ -269,8 +269,8 @@ export function RoleIcon() {
 export function LibraryScreen({ roster, onNavigate }: { roster: Roster; onNavigate: (screen: PrototypeScreen) => void }) {
   const rosters = [
     { name: roster.name, faction: roster.faction, points: `${roster.pointsUsed}/${roster.pointsLimit}`, status: "2 checks" },
-    { name: "Incursion Test List", faction: "Space Wolves", points: "515/1000", status: "valid" },
-    { name: "Narrative Boarding Patrol", faction: "Aeldari", points: "490/500", status: "1 check" },
+    { name: "Skirmish Test List", faction: "Frontier Coalition", points: "515/1000", status: "valid" },
+    { name: "Night Harbour Patrol", faction: "Free Cities", points: "490/500", status: "1 check" },
   ];
 
   return (

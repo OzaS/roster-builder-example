@@ -672,7 +672,7 @@ function InlineForceDraft({ props, onClose }: { props: ConceptProps; onClose: ()
       <header><strong>New force</strong><button type="button" aria-label="Cancel force creation" onClick={onClose}><X size={15} /></button></header>
       {props.detachmentFavorites.length ? <FavoriteCreationSection title="Favorite detachments">{props.detachmentFavorites.map((favorite) => <button type="button" key={favorite.id} onClick={() => { props.onReuseDetachmentFavorite(favorite.id); onClose(); }}><Heart size={14} /><span><strong>{forceDisplayName(favorite.force)}</strong><small>{favorite.force.points} pts</small></span><Plus size={14} /></button>)}</FavoriteCreationSection> : null}
       <label><span>Force</span><select value={catalogueId} onChange={(event) => setCatalogueId(event.currentTarget.value)}><option value="">Choose force</option>{mockCatalogues.map((item) => <option value={item.id} key={item.id}>{item.name}</option>)}</select></label>
-      <label><span>Organization</span><select value={detachmentId} onChange={(event) => setDetachmentId(event.currentTarget.value)}><option value="">Choose detachment</option>{mockDetachments.map((item) => <option value={item.id} key={item.id}>{item.name}</option>)}</select></label>
+      <label><span>Layout</span><select value={detachmentId} onChange={(event) => setDetachmentId(event.currentTarget.value)}><option value="">Choose detachment</option>{mockDetachments.map((item) => <option value={item.id} key={item.id}>{item.name}</option>)}</select></label>
       <div className="ux-force-draft-actions"><button type="button" onClick={onClose}>Cancel</button><button type="button" className="primary" disabled={!catalogueId || !detachmentId} onClick={submit}>Add force</button></div>
     </section>
   );
@@ -716,7 +716,7 @@ function ForceSelector({ props, onClose }: { props: ConceptProps; onClose: () =>
           {/* Plan 4C: the faction list is long (dozens per game system): one selector row opens it in place. */}
           <button type="button" className="ux-force-faction-select" aria-expanded={choosingFaction} onClick={() => setChoosingFaction((value) => !value)}><span><strong>Faction</strong><small>{mockCatalogues.find((item) => item.id === catalogueId)?.name}</small></span>{choosingFaction ? <ChevronDown size={16} /> : <ChevronRight size={16} />}</button>
           {choosingFaction ? <div className="ux-force-choice-list" aria-label="Factions">{mockCatalogues.filter((item) => match(item.name)).map((item) => <button type="button" className={catalogueId === item.id ? "selected" : ""} key={item.id} onClick={() => { setCatalogueId(item.id); setChoosingFaction(false); }}><span><strong>{item.name}</strong></span>{catalogueId === item.id ? <Check size={15} /> : null}</button>)}</div> : null}
-          <strong className="ux-force-section-title">Organization</strong>
+          <strong className="ux-force-section-title">Layout</strong>
           <div className="ux-force-choice-list" aria-label="Top-level forces">
             {detachments.length ? detachments.map((item, index) => <button type="button" key={item.id} onClick={() => add(item.id)}><span><strong>{item.name} {index === 0 ? "(1)" : "(0)"}</strong>{index === 0 ? null : <small>{item.fit}</small>}</span><Plus size={15} /></button>) : <div className="ux-loadout-selector-empty"><strong>No matching forces</strong><small>Try another name.</small></div>}
           </div>
@@ -902,7 +902,7 @@ function FlatOptions({ props }: { props: ConceptProps }) {
         if (!options.length) return null;
         return (
           <section className="ux-opt-group" key={group}>
-            <h4>{group === "weapon" ? "Wargear" : group === "upgrade" ? "Upgrades" : "Special rules"}</h4>
+            <h4>{group === "weapon" ? "Equipment" : group === "upgrade" ? "Upgrades" : "Special rules"}</h4>
             {options.map((option) => <OptionButton key={option.id} option={option} onToggle={props.onToggleOption} />)}
           </section>
         );
@@ -985,9 +985,9 @@ function UnitProfile({ unit, onOpenReference, glance = false }: { unit: RosterUn
         </ProfileSection>
       ))}
 
-      <ProfileSection title="Wargear" open={glance}>
+      <ProfileSection title="Equipment" open={glance}>
         <div className="ux-profile-copy-list">
-          {detail.wargear.map((item) => (
+          {detail.equipment.map((item) => (
             <article key={item.id}>
               <strong>{item.name}</strong>
               <p>{item.description}</p>
@@ -1020,7 +1020,7 @@ function ProfileSection({ title, open = false, children }: { title: string; open
 }
 
 function ProfileTable({ table, unitCount, onOpenReference, fitToWidth = false }: { table: NonNullable<ConceptProps["selectedUnit"]["detail"]>["profileTables"][number]; unitCount: number; onOpenReference: (reference: RosterReferenceDefinition) => void; fitToWidth?: boolean }) {
-  const rowName = (row: typeof table.rows[number]) => row.id === "assault-legionary" ? `Assault Legionary (x${unitCount - 1})` : row.name.replace("(x10)", `(x${unitCount})`);
+  const rowName = (row: typeof table.rows[number]) => row.id === "forward-trooper" ? `Forward Trooper (x${unitCount - 1})` : row.name.replace("(x10)", `(x${unitCount})`);
   const tableElement = (
     <table className="ux-profile-table">
         <thead>
@@ -1245,8 +1245,8 @@ function Library({ props }: { props: ConceptProps }) {
   const [activeFilter, setActiveFilter] = useState("All rosters");
   const rosters = [
     { name: props.roster.name, sub: props.roster.faction, pts: `${props.roster.pointsUsed}/${props.roster.pointsLimit}` },
-    { name: "Incursion Test List", sub: "Saved roster", pts: "500/1000" },
-    { name: "Narrative Boarding Patrol", sub: "Saved roster", pts: "490/500" },
+    { name: "Skirmish Test List", sub: "Saved roster", pts: "500/1000" },
+    { name: "Night Harbour Patrol", sub: "Saved roster", pts: "490/500" },
   ];
   const filteredRosters = rosters.filter((roster) => `${roster.name} ${roster.sub}`.toLowerCase().includes(query.trim().toLowerCase()));
   return (
@@ -1263,8 +1263,8 @@ function Library({ props }: { props: ConceptProps }) {
           <aside className="ux-roster-organizer" aria-label="Organize rosters">
             <header><span><small>V2 workspace</small><strong>Organize</strong></span><button type="button" aria-label="Close organizer" onClick={() => setOrganizerOpen(false)}><X size={16} /></button></header>
             <label className="ux-lists-search"><Search size={15} /><input value={query} onChange={(event) => setQuery(event.currentTarget.value)} placeholder="Search rosters" /><kbd>⌘ K</kbd></label>
-            <div className="ux-organizer-group"><small>Folders</small>{["All rosters", "Tournament prep", "Narrative league"].map((label, index) => <button type="button" className={activeFilter === label ? "active" : ""} key={label} onClick={() => setActiveFilter(label)}>{index ? <Folder size={15} /> : <FolderOpen size={15} />}<span>{label}</span><b>{index ? index + 1 : rosters.length}</b></button>)}<button type="button" className="ux-organizer-add"><Plus size={14} />New folder</button></div>
-            <div className="ux-organizer-group"><small>Game systems</small>{["Warhammer 40,000", "Horus Heresy"].map((label) => <button type="button" key={label} onClick={() => setActiveFilter(label)} className={activeFilter === label ? "active" : ""}><Gamepad2 size={15} /><span>{label}</span></button>)}</div>
+            <div className="ux-organizer-group"><small>Folders</small>{["All rosters", "Tournament prep", "Story league"].map((label, index) => <button type="button" className={activeFilter === label ? "active" : ""} key={label} onClick={() => setActiveFilter(label)}>{index ? <Folder size={15} /> : <FolderOpen size={15} />}<span>{label}</span><b>{index ? index + 1 : rosters.length}</b></button>)}<button type="button" className="ux-organizer-add"><Plus size={14} />New folder</button></div>
+            <div className="ux-organizer-group"><small>Game systems</small>{["Open Field", "Example System Two"].map((label) => <button type="button" key={label} onClick={() => setActiveFilter(label)} className={activeFilter === label ? "active" : ""}><Gamepad2 size={15} /><span>{label}</span></button>)}</div>
             <div className="ux-organizer-tags"><small>Tags</small><div><button type="button"><Tag size={12} />Competitive</button><button type="button"><Tag size={12} />Draft</button><button type="button"><Tag size={12} />Favourite</button></div></div>
           </aside>
         ) : null}
@@ -1703,15 +1703,15 @@ function SmartSearchScreen({ props }: { props: ConceptProps }) {
   );
 }
 
-/** Quick source lookup for units, rules, wargear, and keywords. */
+/** Quick source lookup for units, rules, equipment, and keywords. */
 function LookupScreen({ props }: { props: ConceptProps }) {
   const units = flattenUnits(props.roster).slice(0, 4);
   const rules = [
-    { name: "Oath of Moment", sub: "Army rule", tag: "Core" },
-    { name: "Deep Strike", sub: "Deployment ability", tag: "Keyword" },
-    { name: "Invulnerable Save", sub: "Defensive rule", tag: "Rule" },
+    { name: "Rally Call", sub: "Faction rule", tag: "Core" },
+    { name: "Aerial Drop", sub: "Deployment ability", tag: "Keyword" },
+    { name: "Ward Save", sub: "Defensive rule", tag: "Rule" },
   ];
-  const wargear = flattenUnits(props.roster)
+  const equipment = flattenUnits(props.roster)
     .flatMap((unit) => unit.options.filter((option) => option.group !== "rule").map((option) => ({ ...option, unit: unit.name })))
     .slice(0, 3);
 
@@ -1727,7 +1727,7 @@ function LookupScreen({ props }: { props: ConceptProps }) {
       <div className="ux-wb-home-body">
         <div className={`ux-wb-search ${props.smartSearch ? "smart" : ""}`}>
           {props.smartSearch ? <Command size={15} /> : <Search size={15} />}
-          <input placeholder="Search Assault Squad, Deep Strike, plasma..." readOnly />
+          <input placeholder="Search Forward Squad, Aerial Drop, arc..." readOnly />
         </div>
         <div className="ux-source-filters">
           {["All sources", props.roster.system, props.roster.faction, "Core rules"].map((filter, index) => (
@@ -1758,8 +1758,8 @@ function LookupScreen({ props }: { props: ConceptProps }) {
             </button>
           ))}
         </LookupGroup>
-        <LookupGroup title="Wargear" icon={<Hammer size={15} />}>
-          {wargear.map((item) => (
+        <LookupGroup title="Equipment" icon={<Hammer size={15} />}>
+          {equipment.map((item) => (
             <button key={`${item.unit}-${item.id}`} type="button" className="ux-lookup-row">
               <span>
                 <strong>{item.name}</strong>
@@ -2020,7 +2020,7 @@ function GameTrackerScreen({ props }: { props: ConceptProps }) {
             <ClipboardList size={15} />
             <strong>Game plan</strong>
           </div>
-          {["Pre-game: confirm mission and terrain", "Round 1: command phase sequence", "Round 2: score primary and mark reserves"].map((item, index) => (
+          {["Pre-game: confirm mission and terrain", "Round 1: opening phase sequence", "Round 2: score objectives and mark reserves"].map((item, index) => (
             <button key={item} type="button" className={`ux-source-row ${index < 2 ? "on" : ""}`}>
               <span className="ux-opt-check" aria-hidden />
               <span>
