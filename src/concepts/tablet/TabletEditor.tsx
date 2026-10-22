@@ -1,17 +1,17 @@
 import { useEffect, useRef, useState, type RefObject } from 'react';
-import { AlertTriangle, ArrowDownToLine, BookOpen, Check, ChevronDown, ChevronLeft, Copy, Database, Ellipsis, FilePlus2, Flag, LibraryBig, Lock, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, Pencil, Plus, Redo2, Search, Trash2, Undo2, Users, X } from 'lucide-react';
+import { AlertTriangle, ArrowDownToLine, BookOpen, Check, ChevronDown, ChevronLeft, Copy, Database, Ellipsis, FilePlus2, Flag, LibraryBig, Lock, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, Pencil, Plus, Redo2, Search, Trash2, Undo2, Upload, Users, X } from 'lucide-react';
 import { PanelResizer, type PanelLimits } from '../workspace/PanelResizer';
 import { PointsLine, RosterSummary, SummaryToggle } from '../workspace/RosterSummary';
 import type { Notify } from '../workspace/Toasts';
 import { StatusGlyph, TreeUnitMain } from '../ux/uxShared';
 import { Count, FoldSection, RadioRow, ToggleRow } from '../ux/MobileUnitOptions';
-import { PRIMARY_FORCE_ID, ROLES, forceOf, groupLimit, rosterIssues, unitCost, useRosterHistory, type EditorUnit, type Force, type ReadOnlyInfo, type RosterIssue } from '../desktop/DesktopEditorFlows';
+import { PRIMARY_FORCE_ID, ROLES, forceOf, groupLimit, rosterIssues, unitCost, useRosterHistory, type EditorUnit, type Force, type ExportRoster, type ImportResult, type ReadOnlyInfo, type RosterIssue } from '../desktop/DesktopEditorFlows';
 import { rosterLibrary } from '../desktop/desktopData';
 import type { RosterUnit } from '../../types';
 import type { TabletEnv } from './tabletEnv';
 import { HintButton } from './TabletHint';
-import { AddForceSheet, RenameSheet } from './TabletEditorSheets';
-import { editorCatalogue, loadRoster, unitCategories, unitProfile, unitRules, weaponChoices, weaponProfile, type CatalogueEntry } from './tabletEditorData';
+import { AddForceSheet, ExportSheet, RenameSheet } from './TabletEditorSheets';
+import { editorCatalogue, loadRoster, rosterFromImport, unitCategories, unitProfile, unitRules, weaponChoices, weaponProfile, type CatalogueEntry } from './tabletEditorData';
 import './tablet-editor.css';
 
 // The tablet roster editor (T1a Expanded, T1b Medium; DEC-039: desktop structure, mobile feel, one roster at a time).
@@ -46,12 +46,12 @@ function reveal(root: RefObject<HTMLElement | null>, selector: string, focus = f
   }));
 }
 
-export function TabletEditor({ env, notify, light, rosterName, from, start = 'editor', onBack, onAllRosters, onNewRoster, onFindData }: {
-  env: TabletEnv; notify: Notify; light: boolean; rosterName: string; from: string; start?: EditorStart;
-  onBack: () => void; onAllRosters: () => void; onNewRoster: () => void; onFindData: () => void;
+export function TabletEditor({ env, notify, light, rosterName, from, start = 'editor', imported, onBack, onAllRosters, onNewRoster, onImport, onFindData }: {
+  env: TabletEnv; notify: Notify; light: boolean; rosterName: string; from: string; start?: EditorStart; imported?: ImportResult;
+  onBack: () => void; onAllRosters: () => void; onNewRoster: () => void; onImport: () => void; onFindData: () => void;
 }) {
   const mode: Mode = env.widthClass === 'expanded' ? 'three' : env.device.width < 700 ? 'single' : 'two';
-  const first = useRef(loadRoster(startRoster(start, rosterName))).current;
+  const first = useRef(imported ? rosterFromImport(imported) : loadRoster(startRoster(start, rosterName))).current;
   const [roster, setRoster] = useState(first);
   const history = useRosterHistory<EditorUnit>({ units: first.units, forces: first.forces });
   const { units, forces } = history.doc;
@@ -192,7 +192,12 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
     if (unit) { expand(forceOf(unit), `${forceOf(unit)}/${unit.role}`); selectUnit(unit); reveal(rootRef, `[data-tb-unit="${unit.id}"]`, mode !== 'single'); return; }
     if (t.forceId && t.group) { expand(t.forceId, `${t.forceId}/${t.group}`); setActiveForce(t.forceId); setDetailOpen(false); reveal(rootRef, `[data-tb-group="${t.forceId}/${t.group}"]`); openCatalogue(t.group, t.forceId); }
   };
-  const later = (what: string) => { setPop(null); notify(`${what}: designed in T1c (editor flows)`); };
+  /** The roster as the export sheet and its file see it (the units as they stand now, per force). */
+  const exportable: ExportRoster = {
+    name: roster.name, limit, total, system: roster.system, faction: roster.faction,
+    forces: forces.map(f => { const own = units.filter(u => forceOf(u) === f.id); return { ...f, units: own, points: own.reduce((n, u) => n + unitCost(u), 0) }; }),
+    file: { name: roster.name, system: roster.system, faction: roster.faction, limit, forces, units },
+  };
 
   const cols = mode === 'three'
     ? `${showCatalogue ? `${catWidth}px ` : ''}minmax(300px, 1fr)${showInspector ? ` ${inspWidth}px` : ''}`
@@ -211,7 +216,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
           <span className="tbe-title-text"><strong>{readOnly && <Lock size={14} />}{roster.name}</strong><small>{roster.faction} · {roster.force}</small></span>
           <ChevronDown size={18} className="tbe-title-caret" />
         </HintButton>
-        {pop === 'switcher' && <RosterSwitcher current={roster.name} onPick={switchRoster} onClose={() => setPop(null)} onAll={onAllRosters} onNew={onNewRoster} />}
+        {pop === 'switcher' && <RosterSwitcher current={roster.name} onPick={switchRoster} onClose={() => setPop(null)} onAll={onAllRosters} onNew={onNewRoster} onImport={() => { setPop(null); onImport(); }} />}
       </div>
       <span className="tbe-header-spacer" />
       <HintButton hint={readOnly ? 'Read-only roster: nothing to undo' : history.undoLabel ? `Undo “${history.undoLabel}”` : 'Nothing to undo'} input={env.input} side="bottom" aria-label={history.undoLabel ? `Undo ${history.undoLabel}` : 'Undo'} className="tbe-icon" disabled={!history.undoLabel || !!readOnly} onClick={undo}><Undo2 size={20} /></HintButton>
@@ -220,7 +225,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
       <div className="tbe-more-wrap" data-pop="more">
         <HintButton hint="More: export, panes and roster actions" input={env.input} side="bottom" wrapClassName="end" aria-label="More actions" aria-haspopup="menu" aria-expanded={pop === 'more'} className="tbe-icon" onClick={() => setPop(pop === 'more' ? null : 'more')}><Ellipsis size={20} /></HintButton>
         {pop === 'more' && <div className="tbe-menu end" role="menu" aria-label="More actions">
-          <button type="button" role="menuitem" onClick={() => later('Export roster')}><ArrowDownToLine size={18} />Export roster…</button>
+          <button type="button" role="menuitem" onClick={() => { setPop(null); setSheet({ kind: 'export' }); }}><ArrowDownToLine size={18} />Export roster…</button>
           <button type="button" role="menuitem" disabled={!!readOnly} onClick={() => { setPop(null); setSheet({ kind: 'rename' }); }}><Pencil size={18} />Rename roster</button>
           <button type="button" role="menuitem" onClick={duplicateRoster}><Copy size={18} />{readOnly ? 'Make an editable copy' : 'Duplicate roster'}</button>
           <button type="button" role="menuitem" disabled={!!readOnly} onClick={() => { setPop(null); setSheet({ kind: 'add-force' }); }}><Flag size={18} />Add force…</button>
@@ -236,7 +241,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
       <RosterSummary name={roster.name} faction={roster.faction} force={roster.force} total={total} limit={limit} issueCount={readOnly ? 0 : issues.length} onLimit={setLimit} onShowIssues={() => setIssuesOpen(v => !v)}
         data={{ name: roster.system, version: roster.system === 'Open Field' ? 'v1.4' : 'v3.0.2', onClick: () => notify(`${roster.system} · sample data is ready offline`) }}
         details={issuesOpen ? <IssueList issues={readOnly ? [] : issues} readOnly={!!readOnly} onShow={showIssue} /> : undefined}
-        actions={[{ label: 'Export roster…', icon: <ArrowDownToLine size={17} />, onClick: () => later('Export roster') }, { label: 'New roster', icon: <FilePlus2 size={17} />, onClick: () => { setPop(null); onNewRoster(); } }]} />
+        actions={[{ label: 'Export roster…', icon: <ArrowDownToLine size={17} />, onClick: () => { setPop(null); setSheet({ kind: 'export' }); } }, { label: 'New roster', icon: <FilePlus2 size={17} />, onClick: () => { setPop(null); onNewRoster(); } }]} />
     </div>}
 
     <div className="tbe-body">
@@ -255,7 +260,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
               <div className="tbe-readonly-actions">
                 <button type="button" className="ux-job-btn primary" onClick={duplicateRoster}><Copy size={17} />Make an editable copy</button>
                 <button type="button" className="ux-job-btn" onClick={onFindData}><Database size={17} />Find game data</button>
-                <button type="button" className="ux-job-btn" onClick={() => later('Export as it was')}><ArrowDownToLine size={17} />Export as it was</button>
+                <button type="button" className="ux-job-btn" onClick={() => setSheet({ kind: 'export' })}><ArrowDownToLine size={17} />Export as it was</button>
               </div></div></section>}
           <div className="ux-wb-tree tbe-tree-scroll">
             <div className="ux-force-list">
@@ -316,6 +321,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
       </div>}
     </div>
 
+    {sheet?.kind === 'export' && <ExportSheet roster={exportable} readOnly={!!readOnly} notify={notify} onClose={() => setSheet(null)} />}
     {sheet?.kind === 'add-force' && <AddForceSheet forces={forces} limit={limit} faction={roster.faction} onAdd={addForce} onClose={() => setSheet(null)} />}
     {sheet?.kind === 'rename' && <RenameSheet title="Rename roster" label="Roster name" value={roster.name} onSave={renameRoster} onClose={() => setSheet(null)} />}
     {sheet?.kind === 'rename-force' && <RenameSheet title="Rename force" label="Force name" value={forceById(sheet.id).name} maxLength={40} onSave={name => renameForce(sheet.id, name)} onClose={() => setSheet(null)} />}
@@ -324,7 +330,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
 
 /* ---------------------------------------------------------------- header pieces */
 
-function RosterSwitcher({ current, onPick, onClose, onAll, onNew }: { current: string; onPick: (name: string) => void; onClose: () => void; onAll: () => void; onNew: () => void }) {
+function RosterSwitcher({ current, onPick, onClose, onAll, onNew, onImport }: { current: string; onPick: (name: string) => void; onClose: () => void; onAll: () => void; onNew: () => void; onImport: () => void }) {
   return <div className="tbe-menu tbe-switcher" role="menu" aria-label="Recent rosters">
     <span className="tbe-menu-label">Recent rosters</span>
     {rosterLibrary.slice(0, 5).map(r => <button type="button" role="menuitemradio" aria-checked={r.name === current} key={r.name} onClick={() => r.name === current ? onClose() : onPick(r.name)}>
@@ -335,6 +341,7 @@ function RosterSwitcher({ current, onPick, onClose, onAll, onNew }: { current: s
     <hr />
     <button type="button" role="menuitem" onClick={onAll}><LibraryBig size={18} />All rosters</button>
     <button type="button" role="menuitem" onClick={onNew}><FilePlus2 size={18} />New roster</button>
+    <button type="button" role="menuitem" onClick={onImport}><Upload size={18} />Import roster…</button>
   </div>;
 }
 

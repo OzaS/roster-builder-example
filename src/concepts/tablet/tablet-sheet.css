@@ -54,3 +54,56 @@
 .tb-app .tbs-action { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 16px; border: 1px solid var(--ux-line-2); border-radius: 12px; background: var(--ux-surface-2); color: var(--ux-ink); font: inherit; font-size: 14.5px; font-weight: 650; cursor: pointer; touch-action: manipulation }
 .tb-app .tbs-action:disabled { opacity: .45; cursor: default }
 .tb-app.tb-pointer .tbs-action:not(:disabled):hover { background: var(--ux-surface-3) }
+
+/* Notes (warning, ok, info), stats and rows. */
+.tbs-note { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border: 1px solid var(--ux-line); border-radius: 14px; background: var(--ux-surface); color: var(--ux-muted); font-size: 13.5px }
+.tbs-note > svg { flex-shrink: 0; margin-top: 1px }
+.tbs-note strong { display: block; color: var(--ux-ink); font-size: 14.5px }
+.tbs-note small { display: block; margin-top: 2px; font-size: 13px; line-height: 1.4 }
+.tbs-note.warn { border-color: color-mix(in srgb, var(--ux-warn) 40%, var(--ux-line)); background: color-mix(in srgb, var(--ux-warn) 10%, var(--ux-surface)) }
+.tbs-note.warn > svg { color: var(--ux-warn) }
+.tbs-note.ok > svg { color: var(--ux-ok) }
+.tbs-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 0 }
+.tbs-stats > div { padding: 12px 14px; border: 1px solid var(--ux-line); border-radius: 14px; background: var(--ux-surface) }
+.tbs-stats dt { color: var(--ux-muted); font-size: 12.5px; font-weight: 650 }
+.tbs-stats dd { margin: 2px 0 0; font-size: 24px; font-weight: 800; font-variant-numeric: tabular-nums }
+.tbs-stats dd.warn { color: var(--ux-warn) }
+.tbs-stats dd small { color: var(--ux-muted); font-size: 13px; font-weight: 600 }
+.tbs-rows { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none }
+.tbs-rows li { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 60px; padding: 8px 14px; border: 1px solid var(--ux-line); border-radius: 14px; background: var(--ux-surface) }
+.tbs-rows li > span { display: grid; min-width: 0 }
+.tbs-rows strong { font-size: 15px }
+.tbs-rows small { color: var(--ux-muted); font-size: 13px }
+.tbs-rows em { flex-shrink: 0; padding: 3px 10px; border-radius: 999px; background: color-mix(in srgb, var(--ux-warn) 18%, transparent); color: var(--ux-warn); font-size: 12px; font-style: normal; font-weight: 750 }
+.tbs-import-roster { display: flex; align-items: center; gap: 12px }
+.tbs-import-roster > span:last-child { display: grid; min-width: 0 }
+.tbs-import-roster strong { font-size: 18px; font-weight: 800 }
+.tbs-import-roster small { color: var(--ux-muted); font-size: 13px }
+.tbs-import-roster .tb-mark { width: 44px; height: 44px; border-radius: 12px; font-size: 14px }
+
+/* Switch row (44 px+). */
+.tbs-options { display: grid; gap: 8px }
+.tb-app button.tbs-switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 60px; padding: 8px 14px; border: 1px solid var(--ux-line); border-radius: 14px; background: var(--ux-surface); color: var(--ux-ink); font: inherit; text-align: left; cursor: pointer; touch-action: manipulation }
+.tb-app button.tbs-switch:disabled { opacity: .55; cursor: default }
+.tbs-switch > span { display: grid; min-width: 0 }
+.tbs-switch strong { font-size: 15.5px; font-weight: 650 }
+.tbs-switch small { color: var(--ux-muted); font-size: 13px }
+.tbs-switch i { position: relative; flex-shrink: 0; width: 52px; height: 32px; border-radius: 16px; background: var(--ux-surface-3); transition: background .15s }
+.tbs-switch i::after { content: ''; position: absolute; top: 4px; left: 4px; width: 24px; height: 24px; border-radius: 50%; background: var(--ux-ink-tertiary); transition: transform .15s, background .15s }
+.tbs-switch[aria-checked=true] i { background: var(--ux-accent) }
+.tbs-switch[aria-checked=true] i::after { background: var(--ux-accent-ink); transform: translateX(20px) }
+.tb-app :is(.tbs-switch):focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px }
+
+/* Export: format and options beside the preview, stacked in a narrow sheet. */
+.tbs-export { display: grid; gap: 16px }
+.tbs-export-side, .tbs-export-preview { display: flex; flex-direction: column; gap: 14px; min-width: 0 }
+.tbs-preview-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; color: var(--ux-muted); font-size: 12.5px }
+.tbs-preview-head .tbs-label { margin: 0 }
+.tbs-pre { height: 260px; margin: 0; padding: 12px 14px; overflow: auto; border: 1px solid var(--ux-line-2); border-radius: 14px; background: var(--ux-surface); color: var(--ux-ink); font: 12.5px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; user-select: text }
+.tbs-pre:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 1px }
+.tbs-actions { display: flex; flex-wrap: wrap; gap: 10px }
+.tbs-actions .tbs-action { flex: 1 1 160px }
+@container tbs (min-width: 760px) {
+  .tbs-export { grid-template-columns: 330px minmax(0, 1fr); gap: 24px }
+  .tbs-pre { height: 340px }
+}
