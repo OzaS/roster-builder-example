@@ -231,3 +231,7 @@
 .dt-app .dt-start-note { font-size: 11px; color: var(--dt-faint); margin-top: 14px }
 .dtp-empty.left { align-items: flex-start; text-align: left; padding: 22px; border: 1px dashed var(--ux-line-2); border-radius: 14px }
 .dtp-empty .dtp-row-actions { gap: 8px; margin-top: 10px }
+.dt-soon{display:flex;align-items:center;justify-content:center}
+.dt-soon .ux-cs-card{width:min(520px,100%)}
+.dt-soon .ux-cs-card>p{max-width:420px}
+.dt-soon .ux-chip{text-transform:none}

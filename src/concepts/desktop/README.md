@@ -4,10 +4,10 @@ Lives in the existing design gallery as **Battle Augur · Desktop**. Select the 
 
 Run `npm run dev`. Direct prototype links:
 
-- `http://localhost:5173/?gallery=desktop` — separate desktop design library (Mobile/Desktop switch, independent view preferences)
+- `http://localhost:5173/?gallery=desktop` — separate desktop design library (Phone/Tablet/Desktop switch, independent view preferences)
 - `http://localhost:5173/?desktop` — welcome and recent rosters
 - `http://localhost:5173/?desktop=editor` — three-panel roster editor
-- `?desktop=rosters`, `?desktop=lookup`, `?desktop=sources`, `?desktop=settings` — hub pages (draft)
+- `?desktop=rosters`, `?desktop=lookup`, `?desktop=sources`, `?desktop=settings` — hub pages (draft); `?desktop=tools`, `?desktop=library` — placeholders (coming soon)
 - `?desktop=first-run` — no game data and no rosters yet
 - `?desktop=menus` — the macOS application menu bar above the editor
 - add `&ambient=1` or `&ambient=0` to force the ambient gradient
@@ -42,3 +42,5 @@ Revision 05 · Sources flows: the Sources page's detail pane gains sub-views, ke
 Revision 05 · Menu bar: the Electron application menu on macOS (Battle Augur, File, Edit, Roster, View, Go, Window, Help). Shortcuts follow the key bindings; disabled items say why. Windows and Linux show the same menus inside the window. Code: `DesktopMenuBar.tsx`, `desktop-menus.css`.
 
 Revision 05b · Shared workspace layer and Advanced installation (DEC-022). The panel resizer, toasts, dialog shell, jobs (queue, chrome button, panel, faction picker), roster summary popover and points line, and the small primitives (Chip, Switch, Segmented, IconButton, page-action slot) moved to `../workspace/` so the tablet can use them; see `../workspace/README.md`. Nothing changed visually. **Installs** now follow DEC-022: adding game data installs every faction by default, with the steps Download · Read data files · Import n factions · Save, and never pauses. Settings → Game data has the switch **Advanced installation** ("Choose which factions to install when you add game data. Off: everything is installed.", off by default, session state in the workbench, applies to the next install); with it on, an install pauses on **Choose factions** as before (Welcome row, Sources rows, collection page action, chrome button and jobs panel all show the pause). Standalone links: `&install=advanced` starts with the switch on.
+
+Revision 05c · Tools and Library placeholders (DEC-039). The activity rail gains **Tools** (Hammer) and **Library** (BookMarked) after Lookup, so Phone, Tablet and Desktop list the same features. Both open the "Coming soon" card of the phone (`ComingSoonCard`, `../ux/AppExtras.tsx`) in the page area; the features come in 1.2+. Standalone links: `?desktop=tools`, `?desktop=library`. The menu bar's Go menu and the command palette list both pages. The tablet prototype (`../tablet/`) uses the same two items and icons; Rosters keeps LibraryBig and Library takes BookMarked, so no two items share an icon. Gallery: the library switch is now **Phone · Tablet · Desktop** (`?gallery=tablet` is the tablet library).

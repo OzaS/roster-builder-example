@@ -291,7 +291,7 @@
             "label": "Design Gallery UI",
             "description": "Web-only review and gallery tooling; excluded from the React Native product implementation.",
             "sections": [
-              {"id": "gallery.library-navigation", "title": "Design Library Navigation", "level": "gallery-tooling", "status": "specified", "platforms": ["gallery"], "states": ["mobile library", "desktop library", "independent preferences"], "screens": []},
+              {"id": "gallery.library-navigation", "title": "Design Library Navigation", "level": "gallery-tooling", "status": "specified", "platforms": ["gallery"], "states": ["phone library", "tablet library", "desktop library", "independent preferences"], "screens": []},
               { "id": "gallery.designer-rail", "title": "Designer Rail Controls", "level": "gallery-tooling", "status": "implemented", "platforms": ["gallery"], "states": ["default", "expanded", "editing"], "screens": [] },
               { "id": "gallery.workflow-board", "title": "Workflow Board Group", "level": "gallery-tooling", "status": "implemented", "platforms": ["gallery"], "states": ["default", "selected"], "screens": [] },
               { "id": "gallery.glance-comments", "title": "Glance Comments", "level": "gallery-tooling", "status": "implemented", "platforms": ["gallery"], "states": ["point", "element", "done"], "screens": [] },
@@ -424,6 +424,14 @@
           "label": "Lookup · Search and entry"
         },
         {
+          "id": "desktop-tools",
+          "label": "Tools · Coming soon"
+        },
+        {
+          "id": "desktop-library",
+          "label": "Library · Coming soon"
+        },
+        {
           "id": "desktop-sources",
           "label": "Sources · Installed data"
         },
@@ -449,6 +457,8 @@
             "desktop-editor",
             "desktop-rosters",
             "desktop-lookup",
+            "desktop-tools",
+            "desktop-library",
             "desktop-sources",
             "desktop-settings",
             "desktop-first-run",
@@ -473,7 +483,7 @@
             "label": "Desktop UI",
             "description": "Desktop workspace components. Representative interactive compositions in the Elements view.",
             "sections": [
-              {"id": "gallery.library-navigation", "title": "Design Library Navigation", "level": "gallery-tooling", "status": "specified", "platforms": ["gallery"], "states": ["mobile library", "desktop library", "independent preferences"], "screens": []},
+              {"id": "gallery.library-navigation", "title": "Design Library Navigation", "level": "gallery-tooling", "status": "specified", "platforms": ["gallery"], "states": ["phone library", "tablet library", "desktop library", "independent preferences"], "screens": []},
               {
                 "id": "desktop.tokens",
                 "title": "Desktop Tokens",
@@ -508,6 +518,7 @@
                   "panels hidden",
                   "hub tab",
                   "activity rail on hub pages",
+                  "Tools and Library placeholders in the rail (coming soon)",
                   "roster summary popover",
                   "points line under tabs",
                   "over limit",
@@ -525,6 +536,8 @@
                   "desktop-editor",
                   "desktop-rosters",
                   "desktop-lookup",
+                  "desktop-tools",
+                  "desktop-library",
                   "desktop-sources",
                   "desktop-settings"
                 ]
