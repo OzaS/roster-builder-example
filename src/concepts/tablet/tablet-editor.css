@@ -1,0 +1,191 @@
+/* Tablet roster editor (T1a Expanded, T1b Medium). Lives inside the .tb-app.ux-screen root (see tablet.css): the mobile
+   content pieces (.ux-force-*, .ux-tree-*, .ux-mobile-unit-options, .ux-5a-*) get the mobile type scale and 44 px targets here;
+   the workspace pieces (points button, points line, summary popover, resizer) are restyled for touch.
+   Stacking inside .tbe: unit details over the tree 5 · slide-over scrim 7 · header and its menus 10 · summary popover 11. */
+.tbe { position: relative; z-index: 1; flex: 1; min-width: 0; display: flex; flex-direction: column; background: var(--ux-bg) }
+.tb-editing .dt-toast.functional { top: 76px }
+
+/* ------------------------------ header ------------------------------ */
+.tbe-header { position: relative; z-index: 10; flex: 0 0 auto; display: flex; align-items: center; gap: 4px; min-height: 64px; padding: 8px 12px 8px 6px; border-bottom: 1px solid var(--ux-line); background: var(--ux-bg) }
+.tbe-header .dt-tab-progress { top: auto; bottom: -1px; height: 3px }
+.tbe-header-spacer { flex: 1 }
+.tbe .tb-hint-wrap.start .tb-hint-bubble.bottom { left: 0; transform: none }
+.tbe .tb-hint-wrap.end .tb-hint-bubble.bottom { left: auto; right: 0; transform: none }
+.tbe button.tbe-back { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; padding: 0 10px 0 2px; border: 0; border-radius: 12px; background: transparent; color: var(--ux-accent-2); font: inherit; font-size: 16px; font-weight: 650; cursor: pointer }
+.tb-app.light .tbe button.tbe-back { color: var(--ux-accent) }
+.tbe-single .tbe-header button.tbe-back span { display: none }
+.tbe-single .tbe-header button.tbe-back { padding: 0; justify-content: center }
+.tbe-title-wrap { position: relative; min-width: 0; flex: 0 1 auto }
+.tbe-title-wrap > .tb-hint-wrap { min-width: 0 }
+.tbe button.tbe-title { display: flex; align-items: center; gap: 10px; min-height: 52px; max-width: 100%; padding: 4px 10px 4px 6px; border: 0; border-radius: 14px; background: transparent; color: var(--ux-ink); font: inherit; text-align: left; cursor: pointer }
+.tbe-title .tb-mark { width: 38px; height: 38px; border-radius: 11px; font-size: 12px }
+.tbe-title-text { display: grid; min-width: 0 }
+.tbe-title-text strong { display: flex; align-items: center; gap: 6px; overflow: hidden; font-size: 17px; font-weight: 800; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap }
+.tbe-title-text strong svg { flex-shrink: 0; color: var(--ux-warn) }
+.tbe-title-text small { overflow: hidden; color: var(--ux-muted); font-size: 12.5px; text-overflow: ellipsis; white-space: nowrap }
+.tbe-title-caret { flex-shrink: 0; color: var(--ux-muted) }
+.tb-pointer .tbe button.tbe-title:hover, .tbe button.tbe-title[aria-expanded=true] { background: var(--ux-surface-2) }
+.tbe button.tbe-icon { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 12px; background: transparent; color: var(--ux-ink); cursor: pointer; touch-action: manipulation }
+.tbe button.tbe-icon.small { color: var(--ux-muted) }
+.tbe button.tbe-icon:disabled { opacity: .38; cursor: default }
+.tb-pointer .tbe button.tbe-icon:not(:disabled):hover, .tbe button.tbe-icon[aria-expanded=true] { background: var(--ux-surface-2) }
+.tbe button.tbe-icon:not(:disabled):active { background: var(--ux-surface-3) }
+.tbe :is(button.tbe-back, button.tbe-title, button.tbe-icon, .tbe-menu button, button.tbe-cat-row, .ux-tree-unit, .ux-tree-section, .ux-force-summary-main, .ux-tree-add):focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 1px }
+.tbe-more-wrap { position: relative }
+
+/* Points button (shared SummaryToggle) at touch size. */
+.tbe-header .dt-summary-toggle { height: 44px; margin: 0 2px 0 6px; padding: 0 12px 0 14px !important; border-radius: 12px; background: var(--ux-surface); color: var(--ux-muted); font-size: 14px; white-space: nowrap }
+.tbe-header .dt-summary-toggle b { font-size: 16px; font-weight: 800 }
+
+/* ------------------------------ menus ------------------------------ */
+.tbe-menu { position: absolute; z-index: 9; top: calc(100% + 6px); left: 0; display: grid; min-width: 260px; padding: 6px; border: 1px solid var(--ux-line-2); border-radius: 16px; background: var(--ux-surface); box-shadow: 0 18px 48px #0006 }
+.tbe-menu.end { left: auto; right: 0 }
+.tbe .tbe-menu button { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent; color: var(--ux-ink); font: inherit; font-size: 15px; font-weight: 600; text-align: left; cursor: pointer }
+.tbe .tbe-menu button > svg { flex-shrink: 0; color: var(--ux-muted) }
+.tbe .tbe-menu button:disabled { opacity: .45; cursor: default }
+.tb-pointer .tbe .tbe-menu button:not(:disabled):hover, .tbe .tbe-menu button:not(:disabled):active { background: var(--ux-surface-2) }
+.tbe .tbe-menu button.danger, .tbe .tbe-menu button.danger > svg { color: var(--ux-err) }
+.tbe-menu hr { width: 100%; margin: 6px 0; border: 0; border-top: 1px solid var(--ux-line) }
+.tbe-menu-label { padding: 8px 12px 4px; color: var(--ux-muted); font-size: 12px; font-weight: 750; letter-spacing: .06em; text-transform: uppercase }
+.tbe-switcher { width: min(400px, calc(100vw - 32px)) }
+.tbe .tbe-switcher button[role=menuitemradio] { min-height: 62px }
+.tbe-switcher .tb-mark { width: 36px; height: 36px; border-radius: 10px; font-size: 12px }
+.tbe-switch-main { flex: 1; min-width: 0; display: grid }
+.tbe-switch-main strong, .tbe-switch-main small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.tbe-switch-main strong { font-size: 15px }
+.tbe-switch-main small { color: var(--ux-muted); font-size: 12.5px; font-weight: 500 }
+.tbe .tbe-menu button > svg.tbe-check { color: var(--ux-accent-2) }
+
+/* ------------------------------ summary popover (shared RosterSummary, mobile sizes) ------------------------------ */
+.tbe .dt-summary { z-index: 11; top: 68px; right: 60px; width: 400px; max-height: calc(100% - 84px); overflow-y: auto; padding: 8px; border-radius: 22px }
+.tbe-single .dt-summary { right: 10px; width: min(400px, calc(100% - 20px)) }
+.tbe .dt-summary > header { padding: 12px 12px 4px }
+.tbe .dt-summary h2 { font-size: 18px; font-weight: 800 }
+.tbe .dt-summary header p { margin-top: 3px; font-size: 13px }
+.tbe .dt-summary-budget { margin: 8px 4px; padding: 14px; border-radius: 16px }
+.tbe .dt-summary-budget strong { font-size: 28px; font-weight: 800 }
+.tbe .dt-summary-budget small { font-size: 14px }
+.tbe .dt-summary-budget > span { font-size: 13px }
+.tbe .dt-summary-budget .dt-progress { height: 6px; margin: 10px 0 8px; border-radius: 3px }
+.tbe.tbe .dt-summary-rows > button, .tbe.tbe .dt-summary-rows > label { min-height: 48px; gap: 12px !important; padding: 8px 12px; border-radius: 12px; font-size: 15px }
+.tbe.tbe .dt-summary-rows svg { width: 18px; height: 18px }
+.tbe.tbe .dt-summary-rows small { font-size: 13px }
+.tbe.tbe .dt-summary-rows select { min-height: 40px; padding: 0 10px; border-radius: 10px; font-size: 14px }
+.tbe-issues { display: grid; gap: 6px; margin: 0 4px 8px; padding: 6px; border-radius: 16px; background: var(--dt-hover); list-style: none }
+.tbe-issues li { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 8px 6px 8px 10px; border-radius: 12px; background: var(--ux-surface) }
+.tbe-issues li > svg { color: var(--ux-warn) }
+.tbe-issues strong { display: block; font-size: 14px; font-weight: 700; line-height: 1.3 }
+.tbe-issues small { display: block; margin-top: 2px; color: var(--ux-muted); font-size: 12.5px }
+.tbe.tbe .tbe-issues button.tbe-show { min-width: 64px; min-height: 44px; padding: 0 14px; border: 1px solid var(--ux-line-2); border-radius: 12px; background: var(--ux-surface-2); color: var(--ux-accent-2); font-size: 14px; font-weight: 750 }
+.tb-app.light .tbe.tbe .tbe-issues button.tbe-show { color: var(--ux-accent) }
+.tbe-issue-ok { display: flex; align-items: center; gap: 8px; margin: 0; padding: 10px 8px; color: var(--ux-muted); font-size: 14px }
+
+/* ------------------------------ panes ------------------------------ */
+.tbe-body { position: relative; flex: 1; min-height: 0; display: flex }
+.tbe-panes { position: relative; flex: 1; min-width: 0; min-height: 0; display: grid }
+.tbe-pane { position: relative; min-width: 0; min-height: 0; display: flex; flex-direction: column; container-type: inline-size }
+.tbe-catalogue.pane { border-right: 1px solid var(--ux-line); background: color-mix(in srgb, var(--ux-surface) 50%, var(--ux-bg)) }
+.tbe-inspector { border-left: 1px solid var(--ux-line); background: var(--ux-bg) }
+.tbe-pane-head { flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 60px; padding: 8px 8px 8px 18px; border-bottom: 1px solid var(--ux-line) }
+.tbe-pane-head > span { display: grid; min-width: 0 }
+.tbe-pane-head strong { font-size: 16px; font-weight: 800 }
+.tbe-pane-head small { overflow: hidden; color: var(--ux-muted); font-size: 12.5px; text-overflow: ellipsis; white-space: nowrap }
+.tbe-tree .tbe-pane-head { padding-right: 12px }
+.tbe .tbe-add { min-height: 44px; padding: 0 16px; font-size: 14.5px; white-space: nowrap }
+
+/* Resizer (shared PanelResizer) with a touch grab handle: a 24 px hit area centred on the pane border and a visible grip. */
+.tbe-panes > .dt-resizer { top: 0; z-index: 4; width: 24px }
+.tbe-panes > .dt-resizer.left { margin-left: -8px }
+.tbe-panes > .dt-resizer.right { margin-right: -8px }
+.tbe-panes > .dt-resizer::after { left: 11px }
+.tbe-panes > .dt-resizer::before { content: ''; position: absolute; top: 50%; left: 8px; width: 8px; height: 52px; margin-top: -26px; border: 2px solid var(--ux-bg); border-radius: 5px; background: var(--ux-line-2); transition: background .15s }
+.tbe-panes > .dt-resizer:is(.dragging, :focus-visible)::before { background: var(--ux-accent) }
+.tb-pointer .tbe-panes > .dt-resizer:hover::before { background: var(--ux-accent) }
+
+/* Force tree: the mobile tree cards and unit rows at tablet touch size. */
+.tbe-tree-scroll.ux-wb-tree { flex: 1; min-height: 0; gap: 10px; padding: 14px 16px 40px }
+.tbe .ux-force-summary { grid-template-columns: minmax(0, 1fr); min-height: 56px; padding: 0; border-radius: 12px }
+.tbe .ux-force-summary-main { grid-template-columns: 18px minmax(0, 1fr) auto; gap: 10px; min-height: 56px; padding: 8px 14px 8px 12px }
+.tbe .ux-force-summary strong { font-size: 16px }
+.tbe .ux-force-summary small { font-size: 12.5px }
+.tbe .ux-force-summary b { font-size: 14px }
+.tbe .ux-force-sections { gap: 10px; padding: 10px 0 0 }
+.tbe .ux-tree-branch { overflow: visible; border-radius: 16px }
+.tbe .ux-tree-section { grid-template-columns: 18px minmax(0, 1fr) auto; gap: 10px; min-height: 52px; padding: 8px 14px; color: var(--ux-ink) }
+.tbe .ux-tree-section strong { font-size: 15.5px }
+.tbe .ux-tree-section small { font-size: 13px }
+.tbe .ux-tree-units { gap: 4px; padding: 0 8px 8px }
+.tbe-unit { position: relative }
+.tbe .ux-tree-unit { width: 100%; grid-template-columns: 4px minmax(0, 1fr) auto auto; gap: 12px; min-height: 52px; padding: 8px 12px 8px 8px; border-radius: 12px; color: var(--ux-ink); font: inherit; touch-action: manipulation; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none }
+.tb-touch .tbe .ux-tree-unit { min-height: 56px }
+.tbe .ux-tree-unit-main span { font-size: 15.5px; font-weight: 650 }
+.tbe .ux-tree-unit-main small { font-size: 12.5px }
+.tbe .ux-tree-unit b { min-width: 34px; color: var(--ux-ink); font-size: 14.5px; font-variant-numeric: tabular-nums; text-align: right }
+.tb-pointer .tbe .ux-tree-unit:not(.active):hover { background: var(--ux-surface-2) }
+.tbe .ux-tree-add { width: 100%; min-height: 44px; gap: 8px; padding: 0 10px; font-size: 14px }
+.tbe-unit-menu.tbe-menu { top: calc(100% - 4px); left: auto; right: 8px; min-width: 220px }
+.tbe-readonly { display: flex; gap: 12px; margin: 12px 16px 0; padding: 14px; border: 1px solid color-mix(in srgb, var(--ux-warn) 40%, var(--ux-line)); border-radius: 16px; background: color-mix(in srgb, var(--ux-warn) 10%, var(--ux-surface)) }
+.tbe-readonly > svg { flex-shrink: 0; color: var(--ux-warn) }
+.tbe-readonly strong { display: block; font-size: 15px }
+.tbe-readonly small { display: block; margin-top: 2px; color: var(--ux-muted); font-size: 13px; line-height: 1.4 }
+@keyframes tbe-flash { 0% { box-shadow: 0 0 0 2px var(--ux-accent) } 100% { box-shadow: 0 0 0 2px transparent } }
+.tbe-flash { animation: tbe-flash 1.2s ease-out }
+
+/* Catalogue: pane (Expanded) or slide-over (Medium, split view). */
+.tbe-cat-tools { display: grid; gap: 10px; padding: 12px 14px 6px }
+.tbe-roles { gap: 6px }
+.tbe .tbe-roles .tb-filter { padding: 0 14px; font-size: 13.5px }
+.tbe .tbe-clear { display: grid; place-items: center; width: 36px; height: 36px; margin-right: -6px; border: 0; border-radius: 50%; background: transparent; color: var(--ux-muted); cursor: pointer }
+.tbe-target { display: flex; align-items: center; gap: 10px; color: var(--ux-muted); font-size: 13.5px }
+.tbe-target select { flex: 1; min-height: 44px; padding: 0 10px; border: 1px solid var(--ux-line-2); border-radius: 12px; background: var(--ux-surface); color: var(--ux-ink); font: inherit; font-size: 14.5px }
+.tbe-cat-list { flex: 1; min-height: 0; overflow-y: auto; padding: 0 10px 24px }
+.tbe-cat-list h4 { display: flex; justify-content: space-between; margin: 14px 8px 6px; color: var(--ux-muted); font-size: 12px; font-weight: 750; letter-spacing: .06em; text-transform: uppercase }
+.tbe button.tbe-cat-row { display: grid; grid-template-columns: minmax(0, 1fr) auto 36px; align-items: center; gap: 10px; width: 100%; min-height: 60px; padding: 8px 8px 8px 12px; border: 0; border-radius: 14px; background: transparent; color: var(--ux-ink); font: inherit; text-align: left; cursor: pointer; touch-action: manipulation }
+.tbe-cat-row > span:first-child { display: grid; min-width: 0 }
+.tbe-cat-row strong, .tbe-cat-row > span > small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.tbe-cat-row strong { font-size: 15.5px; font-weight: 650 }
+.tbe-cat-row > span > small { color: var(--ux-muted); font-size: 12.5px }
+.tbe-cat-row b { font-size: 14.5px; font-variant-numeric: tabular-nums }
+.tbe-cat-row b small { color: var(--ux-muted); font-size: 12px; font-weight: 600 }
+.tbe-cat-plus { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: color-mix(in srgb, var(--ux-accent) 18%, var(--ux-surface-2)); color: var(--ux-accent-2) }
+.tb-app.light .tbe-cat-plus { color: var(--ux-accent) }
+.tb-pointer .tbe button.tbe-cat-row:hover, .tbe button.tbe-cat-row:active { background: var(--ux-surface-2) }
+.tbe-pane-foot { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 0 16px 8px; border-top: 1px solid var(--ux-line); color: var(--ux-muted); font-size: 13px }
+.tbe-pane-foot span { margin-left: auto; color: var(--ux-ink-tertiary) }
+@container (max-width: 270px) { .tbe-cat-row > span > small { display: none } }
+
+.tbe-scrim { position: absolute; inset: 0; z-index: 7; background: rgb(0 0 0 / .38); animation: tbe-fade .18s ease-out }
+.tbe-slide { position: absolute; top: 0; bottom: 0; left: 0; display: flex; width: min(400px, calc(100% - 64px)); overflow: hidden; border-right: 1px solid var(--ux-line-2); border-radius: 0 22px 22px 0; background: var(--ux-bg); box-shadow: 18px 0 48px #0005; animation: tbe-slide .22s ease-out }
+.tbe-slide .tbe-catalogue { flex: 1 }
+@keyframes tbe-slide { from { transform: translateX(-100%) } to { transform: none } }
+@keyframes tbe-fade { from { opacity: 0 } to { opacity: 1 } }
+
+/* Split view: the unit details open over the tree. */
+.tbe-over { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; background: var(--ux-bg); animation: tbe-push .2s ease-out }
+.tbe-over .tbe-pane-head { padding-left: 6px; justify-content: flex-start }
+@keyframes tbe-push { from { transform: translateX(40px); opacity: 0 } to { transform: none; opacity: 1 } }
+@media (prefers-reduced-motion: reduce) { .tbe-scrim, .tbe-slide, .tbe-over, .tbe-flash { animation: none } }
+
+/* Unit details: the mobile unit detail (Options · Profile, sections, option rows) as a pane. */
+.tbe-detail.ux-mobile-unit-options { gap: 12px; padding: 16px 18px 40px; background: var(--ux-bg) }
+.tbe-unit-title { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px }
+.tbe-unit-title > span { min-width: 0 }
+.tbe-detail .tbe-unit-title small { color: var(--ux-muted); font-size: 12px; font-weight: 750; letter-spacing: .05em; text-transform: uppercase }
+.tbe-unit-title h2 { margin: 2px 0 0; font-size: 22px; font-weight: 800; line-height: 1.2 }
+.tbe-unit-title > strong { color: var(--ux-accent-2); font-size: 22px; font-weight: 800; white-space: nowrap }
+.tb-app.light .tbe-unit-title > strong { color: var(--ux-accent) }
+.tbe-detail .tbe-unit-title > strong small { display: inline; color: var(--ux-muted); font-size: 13px; letter-spacing: 0; text-transform: none }
+.tbe-unit-actions { display: flex; flex-wrap: wrap; gap: 8px }
+.tbe .tbe-unit-actions .ux-job-btn { min-height: 44px; padding: 0 14px; border: 1px solid var(--ux-line-2); border-radius: 12px; background: var(--ux-surface-2); font-size: 14px }
+.tbe .tbe-unit-actions .ux-job-btn.destructive { border-color: color-mix(in srgb, var(--ux-err) 40%, var(--ux-line)); background: transparent; color: var(--ux-err) }
+.tbe-unit-issue { align-items: center }
+.tbe-unit-issue strong { display: block; font-size: 14px }
+.tbe-options { display: flex; flex-direction: column; gap: 12px }
+.tbe-notes { width: 100%; min-height: 88px; padding: 12px; border: 1px solid var(--ux-line-2); border-radius: 12px; background: var(--ux-surface-2); color: var(--ux-ink); font: inherit; font-size: 15px; resize: vertical }
+.tbe-notes:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 1px }
+.tbe-rot { flex-shrink: 0; transition: transform .15s }
+.tbe-rot.closed { transform: rotate(-90deg) }
+.tbe-detail .tbe-rule-text { padding: 0 0 12px 30px; font-size: 13.5px }
+.tbe-empty { flex: 1; display: grid; place-content: center; justify-items: center; gap: 8px; padding: 30px; color: var(--ux-muted); text-align: center }
+.tbe-empty strong { color: var(--ux-ink); font-size: 17px }
+.tbe-empty .ux-job-btn { margin-top: 8px }

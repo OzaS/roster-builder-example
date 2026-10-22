@@ -31,6 +31,9 @@ export const colorSchemes: Array<{ id: ColorScheme; label: string; short: string
 export type WorkflowScreen =
   | "tablet-home"
   | "tablet-rosters"
+  | "tablet-editor"
+  | "tablet-editor-issues"
+  | "tablet-editor-add"
   | "tablet-lookup"
   | "tablet-tools"
   | "tablet-library"
