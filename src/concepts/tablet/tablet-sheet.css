@@ -1,0 +1,109 @@
+/* Tablet form sheet (TabletSheet) and the form pieces used inside it. Lives inside .tb-app.ux-screen (mobile tokens).
+   The scrim fills the nearest positioned ancestor and is a size container: under 700 px wide (split view) the sheet fills the height.
+   Stacking: the scrim sits above the editor header and popovers (inside .tbe: 20; at the app root: 5, below the toasts at 6). */
+.tbs-scrim { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; container: tbs / inline-size; background: rgb(0 0 0 / .46); animation: tbs-fade .18s ease-out }
+.tbe > .tbs-scrim { z-index: 20 }
+.tbs-sheet { display: flex; flex-direction: column; width: min(600px, calc(100% - 48px)); max-height: calc(100% - 64px); overflow: hidden; border: 1px solid var(--ux-line-2); border-radius: 24px; background: var(--ux-bg); box-shadow: 0 28px 80px #0008; animation: tbs-rise .22s ease-out }
+.tbs-sheet.wide { width: min(920px, calc(100% - 48px)) }
+@container tbs (max-width: 700px) {
+  .tbs-scrim { place-items: stretch }
+  .tbs-sheet, .tbs-sheet.wide { width: 100%; height: 100%; max-height: none; border: 0; border-radius: 0; box-shadow: none; animation-name: tbs-push }
+}
+@keyframes tbs-fade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes tbs-rise { from { transform: translateY(16px); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes tbs-push { from { transform: translateY(32px); opacity: 0 } to { transform: none; opacity: 1 } }
+@media (prefers-reduced-motion: reduce) { .tbs-scrim, .tbs-sheet { animation: none } }
+
+/* Header: Cancel · title · primary action (44 px targets). */
+.tbs-head { flex: 0 0 auto; display: grid; grid-template-columns: minmax(80px, 1fr) minmax(0, 2fr) minmax(80px, 1fr); align-items: center; gap: 8px; min-height: 64px; padding: 10px 14px; border-bottom: 1px solid var(--ux-line) }
+.tbs-title { display: grid; min-width: 0; text-align: center }
+.tbs-title strong { overflow: hidden; font-size: 17px; font-weight: 800; text-overflow: ellipsis; white-space: nowrap }
+.tbs-title small { overflow: hidden; color: var(--ux-muted); font-size: 12.5px; text-overflow: ellipsis; white-space: nowrap }
+.tb-app .tbs-head button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 16px; border: 0; border-radius: 12px; font: inherit; font-size: 16px; cursor: pointer; touch-action: manipulation }
+.tb-app .tbs-head button.tbs-cancel { justify-self: start; margin-left: -6px; background: transparent; color: var(--ux-accent-2); font-weight: 600 }
+.tb-app.light .tbs-head button.tbs-cancel { color: var(--ux-accent) }
+.tb-app .tbs-head button.tbs-primary { justify-self: end; background: var(--ux-accent); color: var(--ux-accent-ink); font-weight: 750 }
+.tb-app .tbs-head button.tbs-primary.destructive { background: var(--ux-err); color: var(--ux-err-ink) }
+.tb-app .tbs-head button.tbs-primary:disabled { background: var(--ux-surface-3); color: var(--ux-ink-tertiary); cursor: default }
+.tb-app.tb-pointer .tbs-head button.tbs-cancel:hover { background: var(--ux-surface-2) }
+.tb-app :is(.tbs-head button, .tbs-choice, .tbs-action):focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px }
+
+/* Body scrolls; the header stays. */
+.tbs-body { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 14px; padding: 18px 20px 24px; overflow-y: auto; overscroll-behavior: contain }
+
+/* Form pieces. */
+.tbs-label { margin: 0 0 -6px; color: var(--ux-muted); font-size: 12px; font-weight: 750; letter-spacing: .06em; text-transform: uppercase }
+.tbs-hint { margin: 0; color: var(--ux-muted); font-size: 13.5px; line-height: 1.4 }
+.tbs-field { display: grid; gap: 6px; color: var(--ux-muted); font-size: 13px; font-weight: 650 }
+.tbs-field :is(input, select) { min-height: 48px; padding: 0 14px; border: 1px solid var(--ux-line-2); border-radius: 12px; background: var(--ux-surface); color: var(--ux-ink); font: inherit; font-size: 16px; font-weight: 500 }
+.tbs-field :is(input, select):focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 1px }
+.tbs-field-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px }
+.tbs-count { justify-self: end; color: var(--ux-ink-tertiary); font-size: 12px; font-weight: 500 }
+.tbs-choices { display: grid; gap: 8px }
+.tb-app button.tbs-choice { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 60px; padding: 10px 14px; border: 1px solid var(--ux-line); border-radius: 14px; background: var(--ux-surface); color: var(--ux-ink); font: inherit; text-align: left; cursor: pointer; touch-action: manipulation }
+.tb-app button.tbs-choice > svg:first-child, .tb-app button.tbs-choice > .tbs-choice-icon { flex-shrink: 0; color: var(--ux-muted) }
+.tb-app button.tbs-choice.active { border-color: var(--ux-accent); background: color-mix(in srgb, var(--ux-accent) 12%, var(--ux-surface)) }
+.tb-app button.tbs-choice.active > svg:first-child { color: var(--ux-accent-2) }
+.tb-app button.tbs-choice[aria-disabled=true] { opacity: .55; cursor: default }
+.tb-app.tb-pointer button.tbs-choice:not(.active):not([aria-disabled=true]):hover { background: var(--ux-surface-2) }
+.tbs-choice > span:not(.tbs-choice-icon) { flex: 1; display: grid; min-width: 0 }
+.tbs-choice strong { font-size: 15.5px; font-weight: 650 }
+.tbs-choice small { color: var(--ux-muted); font-size: 13px; line-height: 1.35 }
+.tbs-choice small.reason { display: flex; align-items: center; gap: 5px; margin-top: 2px; color: var(--ux-warn) }
+.tbs-choice > svg:last-child:not(:first-child) { flex-shrink: 0; color: var(--ux-accent-2) }
+.tb-app .tbs-action { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 16px; border: 1px solid var(--ux-line-2); border-radius: 12px; background: var(--ux-surface-2); color: var(--ux-ink); font: inherit; font-size: 14.5px; font-weight: 650; cursor: pointer; touch-action: manipulation }
+.tb-app .tbs-action:disabled { opacity: .45; cursor: default }
+.tb-app.tb-pointer .tbs-action:not(:disabled):hover { background: var(--ux-surface-3) }
+
+/* Notes (warning, ok, info), stats and rows. */
+.tbs-note { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border: 1px solid var(--ux-line); border-radius: 14px; background: var(--ux-surface); color: var(--ux-muted); font-size: 13.5px }
+.tbs-note > svg { flex-shrink: 0; margin-top: 1px }
+.tbs-note strong { display: block; color: var(--ux-ink); font-size: 14.5px }
+.tbs-note small { display: block; margin-top: 2px; font-size: 13px; line-height: 1.4 }
+.tbs-note.warn { border-color: color-mix(in srgb, var(--ux-warn) 40%, var(--ux-line)); background: color-mix(in srgb, var(--ux-warn) 10%, var(--ux-surface)) }
+.tbs-note.warn > svg { color: var(--ux-warn) }
+.tbs-note.ok > svg { color: var(--ux-ok) }
+.tbs-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 0 }
+.tbs-stats > div { padding: 12px 14px; border: 1px solid var(--ux-line); border-radius: 14px; background: var(--ux-surface) }
+.tbs-stats dt { color: var(--ux-muted); font-size: 12.5px; font-weight: 650 }
+.tbs-stats dd { margin: 2px 0 0; font-size: 24px; font-weight: 800; font-variant-numeric: tabular-nums }
+.tbs-stats dd.warn { color: var(--ux-warn) }
+.tbs-stats dd small { color: var(--ux-muted); font-size: 13px; font-weight: 600 }
+.tbs-rows { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none }
+.tbs-rows li { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 60px; padding: 8px 14px; border: 1px solid var(--ux-line); border-radius: 14px; background: var(--ux-surface) }
+.tbs-rows li > span { display: grid; min-width: 0 }
+.tbs-rows strong { font-size: 15px }
+.tbs-rows small { color: var(--ux-muted); font-size: 13px }
+.tbs-rows em { flex-shrink: 0; padding: 3px 10px; border-radius: 999px; background: color-mix(in srgb, var(--ux-warn) 18%, transparent); color: var(--ux-warn); font-size: 12px; font-style: normal; font-weight: 750 }
+.tbs-import-roster { display: flex; align-items: center; gap: 12px }
+.tbs-import-roster > span:last-child { display: grid; min-width: 0 }
+.tbs-import-roster strong { font-size: 18px; font-weight: 800 }
+.tbs-import-roster small { color: var(--ux-muted); font-size: 13px }
+.tbs-import-roster .tb-mark { width: 44px; height: 44px; border-radius: 12px; font-size: 14px }
+
+/* Switch row (44 px+). */
+.tbs-options { display: grid; gap: 8px }
+.tb-app button.tbs-switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 60px; padding: 8px 14px; border: 1px solid var(--ux-line); border-radius: 14px; background: var(--ux-surface); color: var(--ux-ink); font: inherit; text-align: left; cursor: pointer; touch-action: manipulation }
+.tb-app button.tbs-switch:disabled { opacity: .55; cursor: default }
+.tbs-switch > span { display: grid; min-width: 0 }
+.tbs-switch strong { font-size: 15.5px; font-weight: 650 }
+.tbs-switch small { color: var(--ux-muted); font-size: 13px }
+.tbs-switch i { position: relative; flex-shrink: 0; width: 52px; height: 32px; border-radius: 16px; background: var(--ux-surface-3); transition: background .15s }
+.tbs-switch i::after { content: ''; position: absolute; top: 4px; left: 4px; width: 24px; height: 24px; border-radius: 50%; background: var(--ux-ink-tertiary); transition: transform .15s, background .15s }
+.tbs-switch[aria-checked=true] i { background: var(--ux-accent) }
+.tbs-switch[aria-checked=true] i::after { background: var(--ux-accent-ink); transform: translateX(20px) }
+.tb-app :is(.tbs-switch):focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px }
+
+/* Export: format and options beside the preview, stacked in a narrow sheet. */
+.tbs-export { display: grid; gap: 16px }
+.tbs-export-side, .tbs-export-preview { display: flex; flex-direction: column; gap: 14px; min-width: 0 }
+.tbs-preview-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; color: var(--ux-muted); font-size: 12.5px }
+.tbs-preview-head .tbs-label { margin: 0 }
+.tbs-pre { height: 260px; margin: 0; padding: 12px 14px; overflow: auto; border: 1px solid var(--ux-line-2); border-radius: 14px; background: var(--ux-surface); color: var(--ux-ink); font: 12.5px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; user-select: text }
+.tbs-pre:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 1px }
+.tbs-actions { display: flex; flex-wrap: wrap; gap: 10px }
+.tbs-actions .tbs-action { flex: 1 1 160px }
+@container tbs (min-width: 760px) {
+  .tbs-export { grid-template-columns: 330px minmax(0, 1fr); gap: 24px }
+  .tbs-pre { height: 340px }
+}

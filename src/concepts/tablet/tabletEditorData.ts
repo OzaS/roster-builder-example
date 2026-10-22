@@ -1,7 +1,7 @@
 // Synthetic, game-neutral sample data of the tablet roster editor (DEC-001). The roster document, its undo history and the
 // validation rules come from the desktop editor flows; this file adds the catalogue, the sample rosters and the unit detail.
 
-import { primaryForce, specialRoster, type EditorUnit, type Force, type ReadOnlyInfo } from '../desktop/DesktopEditorFlows';
+import { primaryForce, specialRoster, type EditorUnit, type Force, type ImportResult, type ReadOnlyInfo } from '../desktop/DesktopEditorFlows';
 import { lookupEntries, rosterLibrary } from '../desktop/desktopData';
 
 export type CatalogueEntry = { name: string; role: string; models: number; points: number; weapon: string };
@@ -39,6 +39,12 @@ export function loadRoster(name: string): LoadedRoster {
   if (name === 'Weekend skirmish') { const b = baseUnits(); units = [b[0], { ...b[1], upgrade: false }, b[2], b[4]]; limit = 500; }
   if (name === 'Glass Legion trial') { units = units.slice(0, 4); limit = 750; }
   return { name: entry.name, mark, units, forces: [primaryForce('Expedition force', entry.faction)], limit, faction: entry.faction, force: 'Expedition force', system: entry.system, readOnly: null, selected: units[1]?.id ?? units[0].id };
+}
+
+/** An imported file becomes an open roster: what matched the installed data, in the file's forces. */
+export function rosterFromImport(result: ImportResult): LoadedRoster {
+  const mark = result.name.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  return { name: result.name, mark, units: result.units, forces: result.forces, limit: result.limit, faction: result.faction, force: result.forces[0].type, system: result.system, readOnly: null, selected: result.units[0]?.id ?? 0 };
 }
 
 /** Primary weapon choices of a unit: its own weapon first, then the shared ones. All are included in the unit cost. */

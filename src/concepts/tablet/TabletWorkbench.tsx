@@ -8,6 +8,8 @@ import { TabletHome, TabletLibrary, TabletLookup, TabletRosters, TabletTools } f
 import { TabletSources } from './TabletSources';
 import { TabletSettings } from './TabletSettings';
 import { TabletEditor, type EditorStart } from './TabletEditor';
+import { ImportResultSheet } from './TabletEditorSheets';
+import { sampleImport, type ImportResult } from '../desktop/DesktopEditorFlows';
 import { rosterLibrary } from '../desktop/desktopData';
 import { tabletRoute, useTabletSession, TabletJobsPanel, type TabletRoute } from './tabletSession';
 import { useTabletEnv } from './tabletEnv';
@@ -20,10 +22,11 @@ type ThemePref = 'system' | 'light' | 'dark';
  * Screens `tablet-<page>` open that page (or a state of one, see `tabletRoute`); `tablet-editor*` open the roster editor
  * (from Home); `tablet-archive-sketch` (and any phone screen the sketch navigates to) shows the earlier three-pane sketch, unchanged.
  */
-const editorScreens: Record<string, EditorStart> = { 'tablet-editor': 'editor', 'tablet-editor-issues': 'issues', 'tablet-editor-add': 'add' };
+const editorScreens: Record<string, EditorStart> = { 'tablet-editor': 'editor', 'tablet-editor-issues': 'issues', 'tablet-editor-add': 'add', 'tablet-editor-forces': 'forces', 'tablet-editor-add-force': 'add-force', 'tablet-editor-readonly': 'readonly', 'tablet-editor-export': 'export' };
 
 export function TabletWorkbench(props: Partial<ConceptProps>) {
   const screen: string | undefined = props.workflowScreen;
+  if (screen === 'tablet-editor-import-result') return <TabletShell key={screen} {...props} route={{ page: 'rosters', state: '' }} initialImport />;
   const editorStart = screen ? editorScreens[screen] : undefined;
   const route = editorStart ? tabletRoute('tablet-home') : tabletRoute(screen); // a rail page, or a state of one (`tablet-home-first-run`, ...)
   if (route) return <TabletShell key={screen} {...props} route={route} initialEditor={editorStart} />;
@@ -31,26 +34,28 @@ export function TabletWorkbench(props: Partial<ConceptProps>) {
   return <CodexWorkbench {...sketch} screen={screen === 'tablet-archive-sketch' ? 'overview' : sketch.screen} workflowScreen={screen === 'tablet-archive-sketch' ? 'overview' : sketch.workflowScreen} />;
 }
 
-type OpenEditor = { name: string; from: TabletPage; start: EditorStart; key: number };
+type OpenEditor = { name: string; from: TabletPage; start: EditorStart; key: number; imported?: ImportResult };
 const editorAt = (start: EditorStart | undefined, key = 0): OpenEditor | null => start ? { name: rosterLibrary[0].name, from: 'home', start, key } : null;
 
-function TabletShell({ route, initialEditor, ...props }: Partial<ConceptProps> & { route: TabletRoute; initialEditor?: EditorStart }) {
+function TabletShell({ route, initialEditor, initialImport = false, ...props }: Partial<ConceptProps> & { route: TabletRoute; initialEditor?: EditorStart; initialImport?: boolean }) {
   const initialPage = route.page;
   const env = useTabletEnv();
   const [page, setPage] = useState<TabletPage>(initialPage);
   // One roster at a time (DEC-039): the editor covers the rail; Back returns to the page it was opened from.
   const [editor, setEditor] = useState<OpenEditor | null>(() => editorAt(initialEditor));
+  // The import result sheet (a file was chosen and matched against the installed data) sits over whatever is open.
+  const [importing, setImporting] = useState<ImportResult | null>(() => initialImport ? sampleImport(true) : null);
   const [themePref, setThemePref] = useState<ThemePref>(props.themePreference ?? props.themeMode ?? 'dark');
   const [light, setLight] = useState(props.themeMode === 'light');
   const [scheme, setScheme] = useState<ColorScheme>(props.colorScheme ?? 'default');
   const toasts = useToasts();
   const { notify } = toasts;
-  const shownScreen = useRef(`${initialPage}/${initialEditor}`);
+  const shownScreen = useRef(`${initialPage}/${initialEditor}/${initialImport}`);
   useEffect(() => {
-    if (shownScreen.current === `${initialPage}/${initialEditor}`) return;
-    shownScreen.current = `${initialPage}/${initialEditor}`;
-    setPage(initialPage); setEditor(current => editorAt(initialEditor, (current?.key ?? 0) + 1));
-  }, [initialPage, initialEditor]);
+    if (shownScreen.current === `${initialPage}/${initialEditor}/${initialImport}`) return;
+    shownScreen.current = `${initialPage}/${initialEditor}/${initialImport}`;
+    setPage(initialPage); setEditor(current => editorAt(initialEditor, (current?.key ?? 0) + 1)); setImporting(initialImport ? sampleImport(true) : null);
+  }, [initialPage, initialEditor, initialImport]);
   useEffect(() => { setLight(props.themeMode === 'light'); }, [props.themeMode]);
   useEffect(() => { setScheme(props.colorScheme ?? 'default'); }, [props.colorScheme]);
   const chooseTheme = (pref: ThemePref) => { setThemePref(pref); setLight(pref === 'light' || (pref === 'system' && window.matchMedia('(prefers-color-scheme: light)').matches)); props.onThemePreferenceChange?.(pref); };
@@ -63,7 +68,7 @@ function TabletShell({ route, initialEditor, ...props }: Partial<ConceptProps> &
   const openRoster = (name: string) => setEditor(current => ({ name, from: page, start: 'editor', key: (current?.key ?? 0) + 1 }));
   return <div className={`tb-app ux-screen ux-size-regular ${light ? 'light' : 'dark'} ux-scheme-${scheme} tb-${env.widthClass} tb-${env.input} ${editor ? 'tb-editing' : ''}`} data-device={env.device.id}>
     {editor ? <TabletEditor key={editor.key} env={env} notify={notify} light={light} rosterName={editor.name} from={editor.from} start={editor.start}
-      onBack={() => setEditor(null)} onAllRosters={() => { setEditor(null); setPage('rosters'); }} onNewRoster={newRoster} /> : <>
+      onBack={() => setEditor(null)} onAllRosters={() => { setEditor(null); setPage('rosters'); }} onNewRoster={newRoster} onFindData={() => { setEditor(null); setPage('sources'); }} onImport={() => setImporting(sampleImport(true))} imported={editor.imported} /> : <>
     <TabletRail page={page} input={env.input} onPage={setPage} onNewRoster={newRoster} />
     <main className="tb-main" aria-label={page}>
       {page === 'home' ? <TabletHome {...shared} onPage={setPage} onNewRoster={newRoster} onOpenRoster={openRoster} />
@@ -75,6 +80,11 @@ function TabletShell({ route, initialEditor, ...props }: Partial<ConceptProps> &
                   : <TabletSettings {...shared} themePref={themePref} scheme={scheme} onTheme={chooseTheme} onScheme={chooseScheme} />}
       <TabletJobsPanel session={session} />
     </main></>}
+    {importing && <ImportResultSheet result={importing} version="v1.4" onClose={() => setImporting(null)} onOpen={() => {
+      const result = importing; setImporting(null);
+      setEditor(current => ({ name: result.name, from: current?.from ?? page, start: 'editor', key: (current?.key ?? 0) + 1, imported: result }));
+      const left = result.unmatched.length; notify(left ? `Opened “${result.name}” without ${left === 1 ? '1 entry' : `${left} entries`}` : `Opened “${result.name}”`);
+    }} />}
     <div className={`dt-app tb-shim ${light ? 'light' : ''}`}><ToastRegion toasts={toasts} /></div>
   </div>;
 }

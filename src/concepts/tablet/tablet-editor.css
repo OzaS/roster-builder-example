@@ -124,10 +124,27 @@
 .tb-pointer .tbe .ux-tree-unit:not(.active):hover { background: var(--ux-surface-2) }
 .tbe .ux-tree-add { width: 100%; min-height: 44px; gap: 8px; padding: 0 10px; font-size: 14px }
 .tbe-unit-menu.tbe-menu { top: calc(100% - 4px); left: auto; right: 8px; min-width: 220px }
-.tbe-readonly { display: flex; gap: 12px; margin: 12px 16px 0; padding: 14px; border: 1px solid color-mix(in srgb, var(--ux-warn) 40%, var(--ux-line)); border-radius: 16px; background: color-mix(in srgb, var(--ux-warn) 10%, var(--ux-surface)) }
-.tbe-readonly > svg { flex-shrink: 0; color: var(--ux-warn) }
-.tbe-readonly strong { display: block; font-size: 15px }
-.tbe-readonly small { display: block; margin-top: 2px; color: var(--ux-muted); font-size: 13px; line-height: 1.4 }
+.tbe-readonly { display: flex; gap: 12px; margin: 12px 16px 0; padding: 14px 16px; border: 1px solid color-mix(in srgb, var(--ux-warn) 40%, var(--ux-line)); border-radius: 16px; background: color-mix(in srgb, var(--ux-warn) 10%, var(--ux-surface)); outline: none }
+.tbe-readonly > svg { flex-shrink: 0; margin-top: 1px; color: var(--ux-warn) }
+.tbe-readonly > div { min-width: 0 }
+.tbe-readonly strong { display: block; font-size: 15.5px }
+.tbe-readonly p { margin: 3px 0 0; color: var(--ux-muted); font-size: 13.5px; line-height: 1.45 }
+.tbe-readonly-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px }
+.tbe .tbe-readonly-actions .ux-job-btn { min-height: 44px; padding: 0 14px; border: 1px solid var(--ux-line-2); border-radius: 12px; background: var(--ux-surface-2); font-size: 14px }
+.tbe .tbe-readonly-actions .ux-job-btn.primary { border-color: transparent; background: var(--ux-accent); color: var(--ux-accent-ink) }
+.tbe-catalogue .tbe-empty { padding-top: 56px; justify-content: center }
+.tbe-catalogue .tbe-empty small { max-width: 26ch }
+
+/* Several forces: the force card gets its own menu button, the force that receives new units says so. */
+.tbe .ux-force-summary { grid-template-columns: minmax(0, 1fr) 52px }
+.tbe-force-tools { position: relative; display: grid; place-items: center }
+.tbe-force-tools .tb-hint-wrap { display: grid }
+.tbe .ux-force-summary strong { display: flex; align-items: center; gap: 8px; min-width: 0 }
+.tbe .ux-force-summary strong .tbe-chip { flex-shrink: 0; padding: 2px 9px; border-radius: 999px; background: color-mix(in srgb, var(--ux-accent) 22%, transparent); color: var(--ux-accent-2); font-size: 11.5px; font-weight: 750 }
+.tb-app.light .tbe .ux-force-summary strong .tbe-chip { color: var(--ux-accent) }
+.tbe .ux-force-entry.selected .ux-force-summary { border-left-width: 3px }
+.tbe button.tbe-add-force { border-style: dashed }
+.tbe button.tbe-add-force:disabled { opacity: .45; cursor: default }
 @keyframes tbe-flash { 0% { box-shadow: 0 0 0 2px var(--ux-accent) } 100% { box-shadow: 0 0 0 2px transparent } }
 .tbe-flash { animation: tbe-flash 1.2s ease-out }
 
