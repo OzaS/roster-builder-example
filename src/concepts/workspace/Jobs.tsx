@@ -5,7 +5,8 @@ import type { Notify } from './Toasts';
 import './workspace.css';
 
 // Install / update jobs, shared by the desktop and tablet prototypes: one simulated queue shared by Welcome, Sources and the
-// window chrome. Installs pause on "Choose factions" until the user picks; Cancel needs no confirmation.
+// window chrome. By default an install brings every faction and never pauses (DEC-022); with Advanced installation
+// on it pauses on "Choose factions" until the user picks. Cancel needs no confirmation.
 
 export type StepState = 'waiting' | 'active' | 'done' | 'needs-you';
 export type JobStep = { label: string; state: StepState; progress: number };
@@ -21,7 +22,7 @@ function advance(job: Job): Job {
   const i = job.steps.findIndex(s => s.state === 'active');
   if (i < 0) return job;
   const list = job.steps.map(s => ({ ...s }));
-  list[i].progress = Math.min(100, list[i].progress + (job.kind === 'install' && i === 3 ? 12 : 34));
+  list[i].progress = Math.min(100, list[i].progress + (job.kind === 'install' && list[i].label.startsWith('Import ') ? 12 : 34));
   if (list[i].progress < 100) return { ...job, steps: list };
   list[i].state = 'done';
   const next = list[i + 1];
@@ -31,11 +32,14 @@ function advance(job: Job): Job {
   return { ...job, steps: list };
 }
 
-export function useWorkspaceJobs(initial: SourceInfo[], notify: Notify, onViewSource: (id: string) => void) {
+/** `advancedInstall` is read when an install starts: off installs every faction without pausing, on adds the Choose factions step. */
+export function useWorkspaceJobs(initial: SourceInfo[], notify: Notify, onViewSource: (id: string) => void, advancedInstall = false) {
   const [sources, setSources] = useState(initial);
   const [jobs, setJobs] = useState<Job[]>([]);
   const jobsRef = useRef(jobs);
   jobsRef.current = jobs;
+  const advancedRef = useRef(advancedInstall);
+  advancedRef.current = advancedInstall;
   const running = jobs.some(j => j.status === 'running');
   useEffect(() => {
     if (!running) return;
@@ -58,7 +62,8 @@ export function useWorkspaceJobs(initial: SourceInfo[], notify: Notify, onViewSo
   }, [running, notify, onViewSource]);
   const startInstall = (entry: InstallEntry) => {
     if (jobsRef.current.some(j => j.sourceId === entry.id && isLive(j))) return;
-    setJobs(list => [...list.filter(j => j.sourceId !== entry.id), { id: `job-${entry.id}-${Date.now()}`, kind: 'install', sourceId: entry.id, name: entry.name, size: entry.size, factions: entry.factions, chosen: [], steps: steps([`Download · ${entry.size}`, 'Read data files', 'Choose factions', 'Import factions', 'Save']), status: 'running' }]);
+    const advanced = advancedRef.current;
+    setJobs(list => [...list.filter(j => j.sourceId !== entry.id), { id: `job-${entry.id}-${Date.now()}`, kind: 'install', sourceId: entry.id, name: entry.name, size: entry.size, factions: entry.factions, chosen: advanced ? [] : entry.factions, steps: steps(advanced ? [`Download · ${entry.size}`, 'Read data files', 'Choose factions', 'Import factions', 'Save'] : [`Download · ${entry.size}`, 'Read data files', `Import ${entry.factions.length} ${entry.factions.length === 1 ? 'faction' : 'factions'}`, 'Save']), status: 'running' }]);
   };
   const startUpdate = (ids: string[]) => setJobs(list => [...list.filter(j => !ids.includes(j.sourceId) || isLive(j)), ...ids.filter(id => !list.some(j => j.sourceId === id && isLive(j))).map(id => {
     const source = sources.find(s => s.id === id)!;

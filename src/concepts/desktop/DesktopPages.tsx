@@ -201,10 +201,10 @@ const settingsSections = [
   { id: 'about', label: 'About', icon: Info },
 ] as const;
 
-export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, bindings, onBindings, notify }: { themePref: 'system' | 'light' | 'dark'; onThemePref: (v: 'system' | 'light' | 'dark') => void; scheme: ColorScheme; onScheme: (v: ColorScheme) => void; bindings: KeyBindings; onBindings: (next: KeyBindings) => void; notify: Notify }) {
+export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, bindings, onBindings, advancedInstall, onAdvancedInstall, notify }: { themePref: 'system' | 'light' | 'dark'; onThemePref: (v: 'system' | 'light' | 'dark') => void; scheme: ColorScheme; onScheme: (v: ColorScheme) => void; bindings: KeyBindings; onBindings: (next: KeyBindings) => void; advancedInstall: boolean; onAdvancedInstall: (v: boolean) => void; notify: Notify }) {
   const [active, setActive] = useState<string>('appearance');
   const [language, setLanguage] = useState('en');
-  const [toggles, setToggles] = useState({ rememberSections: true, restoreTabs: true, chooseFactions: false, autoChecks: true });
+  const [toggles, setToggles] = useState({ rememberSections: true, restoreTabs: true, autoChecks: true });
   const [keep, setKeep] = useState(1);
   const scrollRef = useRef<HTMLDivElement>(null);
   const flip = (key: keyof typeof toggles) => (v: boolean) => setToggles(t => ({ ...t, [key]: v }));
@@ -227,7 +227,7 @@ export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, bind
         </section>
         <section id="dtp-set-data" className="dtp-card dtp-settings-card"><h2>Game data</h2>
           <Switch label="Check for updates automatically" detail="When the app starts and every few hours while it is open." checked={toggles.autoChecks} onChange={flip('autoChecks')} />
-          <Switch label="Choose factions when installing" detail="Install only the factions you play." checked={toggles.chooseFactions} onChange={flip('chooseFactions')} />
+          <Switch label="Advanced installation" detail="Choose which factions to install when you add game data. Off: everything is installed." checked={advancedInstall} onChange={onAdvancedInstall} />
           <div className="dtp-setting-line"><span><strong>Keep previous versions</strong><small>{keep === 0 ? 'Older versions are deleted after an update.' : `Uses about ${keep * 13} MB per source.`}</small></span><Segmented label="Keep previous versions" value={keep} onChange={setKeep} options={[0, 1, 2, 3].map(v => ({ value: v, label: v === 0 ? 'Off' : String(v) }))} /></div>
         </section>
         <section id="dtp-set-storage" className="dtp-card dtp-settings-card"><h2>Storage</h2>
