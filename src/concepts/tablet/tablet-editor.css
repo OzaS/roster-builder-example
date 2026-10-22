@@ -93,14 +93,29 @@
 .tbe-tree .tbe-pane-head { padding-right: 12px }
 .tbe .tbe-add { min-height: 44px; padding: 0 16px; font-size: 14.5px; white-space: nowrap }
 
-/* Resizer (shared PanelResizer) with a touch grab handle: a 24 px hit area centred on the pane border and a visible grip. */
-.tbe-panes > .dt-resizer { top: 0; z-index: 4; width: 24px }
-.tbe-panes > .dt-resizer.left { margin-left: -8px }
-.tbe-panes > .dt-resizer.right { margin-right: -8px }
-.tbe-panes > .dt-resizer::after { left: 11px }
-.tbe-panes > .dt-resizer::before { content: ''; position: absolute; top: 50%; left: 8px; width: 8px; height: 52px; margin-top: -26px; border: 2px solid var(--ux-bg); border-radius: 5px; background: var(--ux-line-2); transition: background .15s }
-.tbe-panes > .dt-resizer:is(.dragging, :focus-visible)::before { background: var(--ux-accent) }
-.tb-pointer .tbe-panes > .dt-resizer:hover::before { background: var(--ux-accent) }
+/* Pane resizer (TabletResizer, T4): a grab handle on the pane border with preset widths. The strip along the border is
+   20 px; the grip in the middle has a 44 x 96 hit area on touch (the visible grip is 8 x 52, 10 x 64 on touch). */
+.tbr { position: absolute; z-index: 6; top: 0; bottom: 0; width: 0 }
+.tbr-handle { position: absolute; top: 0; bottom: 0; left: -10px; width: 20px; cursor: col-resize; touch-action: none; outline: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none }
+.tbr-handle::after { content: ''; position: absolute; top: 0; bottom: 0; left: 9px; width: 2px; background: transparent; transition: background .15s }
+.tbr-grip { position: absolute; top: 50%; left: 50%; display: grid; place-items: center; width: 24px; height: 72px; transform: translate(-50%, -50%) }
+.tbr.touch .tbr-grip { width: 44px; height: 96px }
+.tbr-grip i { width: 8px; height: 52px; border: 2px solid var(--ux-bg); border-radius: 5px; background: var(--ux-line-2); transition: background .15s, transform .15s }
+.tbr.touch .tbr-grip i { width: 10px; height: 64px; border-radius: 6px }
+.tbr.dragging .tbr-grip i, .tbr-handle:focus-visible .tbr-grip i, .tb-pointer .tbr-handle:hover .tbr-grip i { background: var(--ux-accent) }
+.tbr.dragging .tbr-handle::after, .tbr-handle:focus-visible::after, .tb-pointer .tbr-handle:hover::after { background: color-mix(in srgb, var(--ux-accent) 60%, transparent) }
+.tbr.dragging .tbr-grip i { transform: scaleX(1.25) }
+.tbr-handle:focus-visible .tbr-grip i { outline: 2px solid var(--ux-accent-2); outline-offset: 2px }
+.tbr-label { position: absolute; top: calc(50% - 88px); left: 0; transform: translateX(-50%); padding: 6px 11px; border-radius: 999px; background: var(--ux-ink); color: var(--ux-bg); font-size: 12.5px; font-weight: 650; white-space: nowrap; pointer-events: none; box-shadow: 0 8px 22px #0005 }
+.tbr-label b { font-weight: 800 }
+.tbr-menu.tbe-menu { top: 50%; min-width: 236px; transform: translateY(-50%) }
+.tbr.left .tbr-menu { left: 28px }
+.tbr.right .tbr-menu { left: auto; right: 28px }
+.tbr-swatch { flex-shrink: 0; display: flex; width: 34px; height: 22px; padding: 3px; border: 1.5px solid var(--ux-line-2); border-radius: 6px }
+.tbr-swatch i { border-radius: 3px; background: color-mix(in srgb, var(--ux-accent) 55%, transparent) }
+.tbr.right .tbr-swatch { justify-content: flex-end }
+.tbr-menu-main { flex: 1; display: grid }
+.tbr-menu-main small { color: var(--ux-muted); font-size: 12.5px; font-weight: 500 }
 
 /* Force tree: the mobile tree cards and unit rows at tablet touch size. */
 .tbe-tree-scroll.ux-wb-tree { flex: 1; min-height: 0; gap: 10px; padding: 14px 16px 40px }

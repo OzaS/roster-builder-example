@@ -178,3 +178,4 @@
 .tb-pointer :is(.ux-job-btn, .tbs-action, .tbs-choice, .tbs-switch):not(:disabled):not(.primary):not(.active):hover { border-color: var(--ux-line-2); background: var(--ux-surface-2) }
 .tb-pointer :is(.ux-job-btn.primary, .ux-primary, .tbs-primary):not(:disabled):hover { filter: brightness(1.08) }
 .tb-pointer :is(.ux-5a-choice, .ux-5a-count button, .tbe-clear):not(:disabled):hover { background: var(--ux-surface-2) }
+.tb-el-resizer { width: 640px; height: 360px !important; flex: none; border-radius: 18px; overflow: hidden }

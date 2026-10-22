@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import { AlertTriangle, ArrowDownToLine, BookOpen, Check, ChevronDown, ChevronLeft, Copy, Database, Ellipsis, FilePlus2, Flag, LibraryBig, Lock, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, Pencil, Plus, Redo2, Search, Trash2, Undo2, Upload, Users, X } from 'lucide-react';
-import { PanelResizer, type PanelLimits } from '../workspace/PanelResizer';
 import { PointsLine, RosterSummary, SummaryToggle } from '../workspace/RosterSummary';
 import type { Notify } from '../workspace/Toasts';
 import { StatusGlyph, TreeUnitMain } from '../ux/uxShared';
@@ -10,6 +9,7 @@ import { rosterLibrary } from '../desktop/desktopData';
 import type { RosterUnit } from '../../types';
 import type { TabletEnv } from './tabletEnv';
 import { HintButton } from './TabletHint';
+import { TabletResizer, type PanePresets } from './TabletResizer';
 import { AddForceSheet, ExportSheet, RenameSheet } from './TabletEditorSheets';
 import { editorCatalogue, loadRoster, rosterFromImport, unitCategories, unitProfile, unitRules, weaponChoices, weaponProfile, type CatalogueEntry } from './tabletEditorData';
 import './tablet-editor.css';
@@ -28,10 +28,11 @@ type Sheet = { kind: 'add-force' } | { kind: 'rename' } | { kind: 'rename-force'
 const startRoster = (start: EditorStart, name: string) => start === 'issues' ? 'Operation First Light' : start === 'forces' || start === 'add-force' || start === 'export' ? 'Harbour defence' : start === 'readonly' ? 'Ember patrol' : name;
 type Mode = 'three' | 'two' | 'single';
 
-const PANES: { catalogue: PanelLimits; inspector: PanelLimits; inspectorMedium: PanelLimits } = {
-  catalogue: { initial: 300, min: 240, max: 420 },
-  inspector: { initial: 400, min: 320, max: 520 },
-  inspectorMedium: { initial: 420, min: 340, max: 500 },
+// Side panes: limits and the three preset widths the touch grab handle cycles through and snaps to (T4).
+const PANES: { catalogue: PanePresets; inspector: PanePresets; inspectorMedium: PanePresets } = {
+  catalogue: { min: 240, max: 420, narrow: 248, initial: 300, wide: 400 },
+  inspector: { min: 320, max: 520, narrow: 340, initial: 400, wide: 500 },
+  inspectorMedium: { min: 320, max: 500, narrow: 340, initial: 420, wide: 480 },
 };
 const pts = (n: number) => n.toLocaleString('en-US');
 const memberLabel = (u: EditorUnit) => u.role === 'Command' ? 'Commander' : u.models === 1 ? 'Crew' : 'Unit members';
@@ -246,8 +247,8 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
 
     <div className="tbe-body">
       <div className="tbe-panes" style={{ gridTemplateColumns: cols }}>
-        {mode === 'three' && showCatalogue && <PanelResizer side="left" width={catWidth} limits={PANES.catalogue} label="Resize catalogue" onWidth={setCatWidth} />}
-        {mode !== 'single' && showInspector && <PanelResizer side="right" width={inspWidth} limits={inspectorLimits} label="Resize unit details" onWidth={setInspWidth} />}
+        {mode === 'three' && showCatalogue && <TabletResizer side="left" width={catWidth} presets={PANES.catalogue} label="Resize catalogue" pane="catalogue" input={env.input} onWidth={setCatWidth} onHide={() => setShowCatalogue(false)} />}
+        {mode !== 'single' && showInspector && <TabletResizer side="right" width={inspWidth} presets={inspectorLimits} label="Resize unit details" pane="unit details" input={env.input} onWidth={setInspWidth} onHide={() => setShowInspector(false)} />}
         {mode === 'three' && showCatalogue && (readOnly ? <ReadOnlyCataloguePane env={env} info={readOnly} onFindData={onFindData} onClose={() => setShowCatalogue(false)} /> : catalogue('pane'))}
 
         <section className="tbe-pane tbe-tree" aria-label="Roster">
