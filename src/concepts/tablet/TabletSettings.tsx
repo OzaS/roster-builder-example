@@ -3,8 +3,8 @@ import { Check, ChevronRight, Database, FolderOpen, HardDrive, Info, Keyboard, L
 import type { ColorScheme } from '../../types';
 import { Segmented, Switch } from '../workspace/Primitives';
 import { colourSchemes } from '../desktop/desktopData';
-import { defaultBindings, formatCombo, keyActions } from '../desktop/desktopKeys';
 import { Facts, ListDetail, Row, WorkspaceScope, type SessionProps } from './TabletPieces';
+import { editorShortcuts, generalShortcuts, keyLabel } from './tabletKeys';
 
 // Settings (T2b): sections as a list, each one a real page in the detail pane. Key bindings are a read-only list here: the
 // shortcuts work with a hardware keyboard and appear in the system overlay; the editor stays on the desktop.
@@ -59,8 +59,8 @@ export function TabletSettings({ env, notify, session, themePref, scheme, onThem
         <div className="tb-actions"><button type="button" className="ux-job-btn" onClick={() => notify('Kept versions cleared. 12.8 MB freed.')}>Clear kept versions</button><button type="button" className="ux-job-btn" onClick={() => notify('Choose where to save the backup (prototype)')}><FolderOpen size={16} />Export all rosters</button></div>
       </>;
       case 'keys': return <>
-        <p className="tb-note"><Keyboard size={15} /><span>These shortcuts work with a hardware keyboard. On iPad hold ⌘ to see them anywhere; on Android press Ctrl + /. The key bindings editor is part of the desktop app.</span></p>
-        {(['General', 'Roster editor'] as const).map(group => <Group key={group} title={group}><div className="ux-src-group">{keyActions.filter(a => a.group === group).map(a => <div className="ux-src-kv tb-key-row" key={a.id}><span>{a.label}</span><kbd className="tb-kbd">{formatCombo(defaultBindings[a.id])}</kbd></div>)}</div></Group>)}
+        <p className="tb-note"><Keyboard size={15} /><span>These shortcuts work with a hardware keyboard. {env.device.system === 'ios' ? 'Hold ⌘ to see them anywhere.' : 'Press Ctrl + / to see them anywhere.'} They are fixed; the key bindings editor is part of the desktop app.</span></p>
+        {[generalShortcuts, editorShortcuts].map(group => <Group key={group.title} title={group.title}><div className="ux-src-group">{group.items.map(a => <div className="ux-src-kv tb-key-row" key={a.combo}><span>{a.label}</span><kbd className="tb-kbd">{keyLabel(a.combo, env.device.system)}</kbd></div>)}</div></Group>)}
       </>;
       default: return <>
         <Facts rows={[['Version', '1.0.0 · tablet preview'], ['Engine', '0.9.4'], ['Protocol', '12'], ['SQLite', '3.46']]} />

@@ -10,6 +10,7 @@ import type { RosterUnit } from '../../types';
 import type { TabletEnv } from './tabletEnv';
 import { HintButton } from './TabletHint';
 import { TabletResizer, type PanePresets } from './TabletResizer';
+import { keyLabel, useShortcuts } from './tabletKeys';
 import { AddForceSheet, ExportSheet, RenameSheet } from './TabletEditorSheets';
 import { editorCatalogue, loadRoster, rosterFromImport, unitCategories, unitProfile, unitRules, weaponChoices, weaponProfile, type CatalogueEntry } from './tabletEditorData';
 import './tablet-editor.css';
@@ -180,6 +181,14 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
     if (mode === 'three') { setShowCatalogue(true); requestAnimationFrame(() => searchRef.current?.focus({ preventScroll: true })); }
     else { setDetailOpen(false); setSlideOver(true); }
   };
+  // Hardware keyboard (T4): fixed shortcuts; the shell adds ⌘N, ⌘1–5 and the overlay. Undo and redo leave text fields alone.
+  useShortcuts(rootRef, {
+    'Mod+Z': undo, 'Mod+Shift+Z': redo,
+    'Mod+E': () => { setPop(null); setSheet({ kind: 'export' }); },
+    'Mod+F': () => { if (readOnly) return; setPop(null); openCatalogue(); requestAnimationFrame(() => requestAnimationFrame(() => searchRef.current?.focus({ preventScroll: true }))); },
+    Escape: () => { if (!pop && !slideOver && detailOpen) setDetailOpen(false); },
+  }, ['Mod+E', 'Mod+F']);
+  const keys = (combo: string) => env.input === 'pointer' ? ` (${keyLabel(combo, env.device.system)})` : '';
   const selectUnit = (unit: EditorUnit) => {
     setSelectedId(unit.id); setActiveForce(forceOf(unit)); setShowInspector(true);
     if (mode === 'single') setDetailOpen(true);
@@ -220,8 +229,8 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
         {pop === 'switcher' && <RosterSwitcher current={roster.name} onPick={switchRoster} onClose={() => setPop(null)} onAll={onAllRosters} onNew={onNewRoster} onImport={() => { setPop(null); onImport(); }} />}
       </div>
       <span className="tbe-header-spacer" />
-      <HintButton hint={readOnly ? 'Read-only roster: nothing to undo' : history.undoLabel ? `Undo “${history.undoLabel}”` : 'Nothing to undo'} input={env.input} side="bottom" aria-label={history.undoLabel ? `Undo ${history.undoLabel}` : 'Undo'} className="tbe-icon" disabled={!history.undoLabel || !!readOnly} onClick={undo}><Undo2 size={20} /></HintButton>
-      <HintButton hint={readOnly ? 'Read-only roster: nothing to redo' : history.redoLabel ? `Redo “${history.redoLabel}”` : 'Nothing to redo'} input={env.input} side="bottom" aria-label={history.redoLabel ? `Redo ${history.redoLabel}` : 'Redo'} className="tbe-icon" disabled={!history.redoLabel || !!readOnly} onClick={redo}><Redo2 size={20} /></HintButton>
+      <HintButton hint={readOnly ? 'Read-only roster: nothing to undo' : history.undoLabel ? `Undo “${history.undoLabel}”${keys('Mod+Z')}` : 'Nothing to undo'} input={env.input} side="bottom" aria-label={history.undoLabel ? `Undo ${history.undoLabel}` : 'Undo'} className="tbe-icon" disabled={!history.undoLabel || !!readOnly} onClick={undo}><Undo2 size={20} /></HintButton>
+      <HintButton hint={readOnly ? 'Read-only roster: nothing to redo' : history.redoLabel ? `Redo “${history.redoLabel}”${keys('Mod+Shift+Z')}` : 'Nothing to redo'} input={env.input} side="bottom" aria-label={history.redoLabel ? `Redo ${history.redoLabel}` : 'Redo'} className="tbe-icon" disabled={!history.redoLabel || !!readOnly} onClick={redo}><Redo2 size={20} /></HintButton>
       <span className={`dt-app tb-shim ${light ? 'light' : ''}`} data-pop="summary"><SummaryToggle total={total} limit={limit} open={pop === 'summary'} onToggle={() => setPop(pop === 'summary' ? null : 'summary')} /></span>
       <div className="tbe-more-wrap" data-pop="more">
         <HintButton hint="More: export, panes and roster actions" input={env.input} side="bottom" wrapClassName="end" aria-label="More actions" aria-haspopup="menu" aria-expanded={pop === 'more'} className="tbe-icon" onClick={() => setPop(pop === 'more' ? null : 'more')}><Ellipsis size={20} /></HintButton>

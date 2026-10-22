@@ -35,6 +35,7 @@ const workflowScreenIds = [
   "tablet-editor-add-force",
   "tablet-editor-readonly",
   "tablet-editor-export",
+  "tablet-editor-shortcuts",
   "tablet-editor-import-result",
   "tablet-lookup",
   "tablet-tools",

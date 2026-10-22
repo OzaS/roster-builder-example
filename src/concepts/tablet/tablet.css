@@ -179,3 +179,33 @@
 .tb-pointer :is(.ux-job-btn.primary, .ux-primary, .tbs-primary):not(:disabled):hover { filter: brightness(1.08) }
 .tb-pointer :is(.ux-5a-choice, .ux-5a-count button, .tbe-clear):not(:disabled):hover { background: var(--ux-surface-2) }
 .tb-el-resizer { width: 640px; height: 360px !important; flex: none; border-radius: 18px; overflow: hidden }
+
+/* ------------------------------ T4: shortcut overlay (hardware keyboard) ------------------------------ */
+/* iPad: the system overlay while ⌘ is held (translucent material, app name, columns of groups, glyph keys on the right).
+   Android: the keyboard shortcuts helper from Ctrl + / (a dialog with a close button, key caps as chips). */
+.tbk-overlay { position: absolute; inset: 0; z-index: 40; display: grid; place-items: center; padding: 24px; animation: tbe-fade .15s ease-out }
+.tbk-overlay.ios { background: rgb(0 0 0 / .18) }
+.tbk-overlay.android { background: rgb(0 0 0 / .42) }
+.tbk-panel { display: flex; flex-direction: column; max-height: 100%; overflow: hidden; color: var(--ux-ink) }
+.tbk-overlay.ios .tbk-panel { width: min(880px, 100%); padding: 20px 28px 24px; border: 1px solid var(--ux-line-2); border-radius: 26px; background: color-mix(in srgb, var(--ux-surface) 80%, transparent); -webkit-backdrop-filter: blur(30px) saturate(1.4); backdrop-filter: blur(30px) saturate(1.4); box-shadow: 0 30px 80px #0007 }
+.tbk-overlay.ios header { display: grid; justify-items: center; gap: 2px; margin-bottom: 16px }
+.tbk-overlay.ios header strong { font-size: 16px; font-weight: 800 }
+.tbk-overlay.ios header small { color: var(--ux-muted); font-size: 12.5px }
+.tbk-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 8px 36px; overflow-y: auto }
+.tbk-cols h3 { margin: 6px 0 4px; color: var(--ux-muted); font-size: 12.5px; font-weight: 750 }
+.tbk-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 34px; font-size: 14.5px }
+.tbk-overlay.ios .tbk-row + .tbk-row { border-top: 1px solid var(--ux-line) }
+.tbk-overlay.ios kbd { color: var(--ux-muted); font: 600 15px var(--font); letter-spacing: 1.5px; white-space: nowrap }
+.tbk-overlay.android .tbk-panel { width: min(560px, 100%); padding: 8px 8px 16px; border-radius: 28px; background: var(--ux-surface); box-shadow: 0 24px 64px #0008 }
+.tbk-overlay.android header { display: flex; align-items: center; gap: 12px; padding: 8px 8px 0 16px }
+.tbk-overlay.android header strong { flex: 1; font-size: 20px; font-weight: 750 }
+.tbk-overlay.android header button { display: grid; place-items: center; width: 48px; height: 48px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--ux-ink); cursor: pointer }
+.tb-pointer .tbk-overlay.android header button:hover { background: var(--ux-surface-2) }
+.tbk-overlay .tbk-app { margin: 2px 0 8px 50px; color: var(--ux-muted); font-size: 13px }
+.tbk-overlay.android .tbk-cols { grid-template-columns: minmax(0, 1fr); padding: 0 16px }
+.tbk-overlay.android .tbk-cols h3 { margin-top: 12px; color: var(--ux-accent-2); font-size: 14px }
+.tb-app.light .tbk-overlay.android .tbk-cols h3 { color: var(--ux-accent) }
+.tbk-overlay.android .tbk-row { min-height: 48px }
+.tbk-caps { display: flex; gap: 6px; flex-shrink: 0 }
+.tbk-caps kbd { min-width: 28px; padding: 3px 8px; border: 1px solid var(--ux-line-2); border-radius: 8px; background: var(--ux-surface-2); font: 650 13px var(--font); text-align: center }
+@media (prefers-reduced-motion: reduce) { .tbk-overlay { animation: none } }

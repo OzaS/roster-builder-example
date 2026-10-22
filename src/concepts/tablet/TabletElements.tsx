@@ -8,7 +8,7 @@ import { TabletRail } from './TabletRail';
 import { TabletResizer, type PanePresets } from './TabletResizer';
 import { EmptyState, InstallRow } from './TabletPieces';
 import type { Job } from '../workspace/Jobs';
-import { defaultBindings, formatCombo } from '../desktop/desktopKeys';
+import { editorShortcuts, keyLabel } from './tabletKeys';
 import { TabletWorkbench } from './TabletWorkbench';
 import { TabletPrefsContext, makeTabletEnv, TabletEnvContext } from './tabletEnv';
 import { defaultDeviceId, defaultInput, tabletDevices, widthClassLabel, widthClassOf, type TabletDeviceId, type TabletInput } from './tabletDevices';
@@ -70,8 +70,11 @@ export function TabletElements() {
         <InstallRow title="Open Field" sub="Example game system · 3 factions · 14.2 MB" update onInstall={noop} onUpdate={noop} onJobs={noop} />
         <InstallRow title="Example Skirmish" sub="Example skirmish system · 2 factions · 2.3 MB" installed onInstall={noop} onShow={noop} onJobs={noop} />
       </div></div>
-      <h2>Keyboard shortcut rows · read-only (hardware keyboard)</h2>
-      <div className="tb-el-row"><div className="tb-app ux-screen dark tb-el-card"><div className="ux-src-group">{(['palette', 'undo', 'exportRoster'] as const).map(id => <div className="ux-src-kv tb-key-row" key={id}><span>{id === 'palette' ? 'Command palette' : id === 'undo' ? 'Undo' : 'Export roster'}</span><kbd className="tb-kbd">{formatCombo(defaultBindings[id])}</kbd></div>)}</div></div></div>
+      <h2>Keyboard shortcut rows · read-only (hardware keyboard), iPad and Android notation</h2>
+      <div className="tb-el-row">{(['ios', 'android'] as const).map(system => <div key={system} className="tb-app ux-screen dark tb-el-card"><div className="ux-src-group">{editorShortcuts.items.slice(0, 4).map(a => <div className="ux-src-kv tb-key-row" key={a.combo}><span>{a.label}</span><kbd className="tb-kbd">{keyLabel(a.combo, system)}</kbd></div>)}</div></div>)}</div>
+      <h2>Shortcut overlay · iPad (hold ⌘) and Android (Ctrl + /)</h2>
+      <p>Fixed shortcuts: ⌘N new roster, ⌘F find, ⌘1–5 the rail pages, ⌘, Settings, Esc closes a sheet, menu or popover; in the roster editor ⌘Z and ⇧⌘Z undo and redo, ⌘F finds a unit to add, ⌘E exports. On iPad the system overlay lists them while ⌘ is held; on Android Ctrl + / opens the same list. With a pointer, the hints of the rail, New roster, Undo and Redo name their shortcut. Screen: Roster editor · Keyboard shortcuts.</p>
+      <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-editor-shortcuts" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="android"><TabletWorkbench workflowScreen="tablet-editor-shortcuts" /></TabletDeviceFrame></div>
       <h2>Roster editor flows · several forces, read-only roster, export and import result (form sheets), add force at two widths</h2>
       <p>The form sheet is the tablet dialog: a centred sheet with Cancel, title and the primary action in its header and the mobile controls inside; in split view it fills the window. Several forces add a menu to each force card (add unit here, rename, remove), the Adding here chip and an Add force row. A read-only roster explains why, offers an editable copy and keeps edits off.</p>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-editor-forces" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-editor-readonly" /></TabletDeviceFrame></div>
