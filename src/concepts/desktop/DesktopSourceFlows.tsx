@@ -17,7 +17,7 @@ export const flowSourceId = (detail: string) => detail.startsWith('report:') ? d
 export const isAddFlow = (detail: string) => detail === 'add' || detail === 'github' || detail.startsWith('collection:');
 
 const plural = (n: number, one: string, other = `${one}s`) => `${n} ${n === 1 ? one : other}`;
-const titleCase = (slug: string) => slug.split(/[-_.]+/).filter(Boolean).map(w => w[0].toUpperCase() + w.slice(1)).join(' ');
+export const titleCase = (slug: string) => slug.split(/[-_.]+/).filter(Boolean).map(w => w[0].toUpperCase() + w.slice(1)).join(' ');
 
 function BackButton({ label, onClick }: { label: string; onClick: () => void }) {
   return <button className="dts-back" aria-label={`Back to ${label}`} onClick={onClick}><ArrowLeft size={14} />{label}</button>;
@@ -36,9 +36,9 @@ function PreviewStates({ items, note }: { items: Array<{ label: string; active?:
 
 type Saved = { id: string; name: string; kind: 'collection' | 'library'; link: string };
 type FlowStore = { hidden: boolean; showArchived: boolean; saved: Saved[] };
-let flowStore: FlowStore = { hidden: false, showArchived: false, saved: [] };
+export let flowStore: FlowStore = { hidden: false, showArchived: false, saved: [] };
 const listeners = new Set<() => void>();
-const setFlowStore = (patch: Partial<FlowStore>) => { flowStore = { ...flowStore, ...patch }; listeners.forEach(l => l()); };
+export const setFlowStore = (patch: Partial<FlowStore>) => { flowStore = { ...flowStore, ...patch }; listeners.forEach(l => l()); };
 const subscribe = (listener: () => void) => { listeners.add(listener); return () => { listeners.delete(listener); }; };
 const useFlowStore = () => useSyncExternalStore(subscribe, () => flowStore);
 
@@ -397,10 +397,10 @@ export function GitHubSearchView({ jobs, go, onOpenJobs }: { jobs: WorkspaceJobs
 
 /* ------------------------- Add a collection dialog ------------------------- */
 
-type AddPhase = { kind: 'idle' } | { kind: 'finding' } | { kind: 'found'; saved: Saved; page: CollectionPage } | { kind: 'error'; text: string } | { kind: 'repository'; repo: string };
+export type AddPhase = { kind: 'idle' } | { kind: 'finding' } | { kind: 'found'; saved: Saved; page: CollectionPage } | { kind: 'error'; text: string } | { kind: 'repository'; repo: string };
 
 /** What a pasted link is: a collection file, a GitHub organisation or user, a repository, or nothing usable. */
-function readLink(raw: string): AddPhase {
+export function readLink(raw: string): AddPhase {
   const path = raw.trim().replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/\/+$/, '');
   const known = (link: string) => link === sourceCollections.default.link || flowStore.saved.some(s => s.link === link);
   if (/\.json$/i.test(path)) {

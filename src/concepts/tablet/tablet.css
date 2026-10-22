@@ -17,21 +17,26 @@
 .dt-ambient-on .tb-app.light::before { opacity: .3 }
 
 /* ------------------------------ rail ------------------------------ */
-.tb-rail { position: relative; z-index: 2; flex: 0 0 84px; display: flex; flex-direction: column; gap: 6px; padding: 14px 8px 30px; border-right: 1px solid var(--ux-line) }
+.tb-rail { position: relative; z-index: 2; flex: 0 0 88px; display: flex; flex-direction: column; gap: 4px; padding: 16px 8px 30px; border-right: 1px solid var(--ux-line) }
 .tb-hint-wrap { position: relative; display: block }
 .tb-app .tb-rail button { width: 100%; margin: 0; font: inherit }
-.tb-app button.tb-rail-item, .tb-app button.tb-rail-new { position: relative; display: grid; justify-items: center; align-content: center; gap: 4px; min-height: 56px; padding: 6px 2px; border: 0; border-radius: 16px; background: transparent; color: var(--ux-muted); font-size: 11px; font-weight: 750; letter-spacing: .2px; line-height: 1.15; text-align: center; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent }
-.tb-pointer button.tb-rail-item, .tb-pointer button.tb-rail-new { min-height: 48px }
+/* Material 3 rail: icon-only FAB on top (56 px, 16 px corners, tonal container, no shadow), 20 px above the destinations. */
+.tb-app .tb-rail button.tb-rail-fab { display: grid; place-items: center; width: 56px; height: 56px; margin: 0 auto 20px; padding: 0; border: 0; border-radius: 16px; background: color-mix(in srgb, var(--ux-accent) 28%, var(--ux-surface)); color: var(--ux-accent-2); cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; transition: background .15s }
+.tb-app.light .tb-rail button.tb-rail-fab { background: color-mix(in srgb, var(--ux-accent) 18%, var(--ux-surface)); color: var(--ux-accent) }
+.tb-pointer .tb-rail button.tb-rail-fab:hover { background: color-mix(in srgb, var(--ux-accent) 36%, var(--ux-surface)) }
+.tb-app .tb-rail button.tb-rail-fab:active { background: color-mix(in srgb, var(--ux-accent) 44%, var(--ux-surface)) }
+/* Destinations: the pill indicator (56 × 32) sits behind the icon only; the label stays under it. */
+.tb-app button.tb-rail-item { position: relative; display: grid; justify-items: center; align-content: center; gap: 4px; min-height: 64px; padding: 4px 0; border: 0; background: transparent; color: var(--ux-muted); font-size: 12px; font-weight: 650; letter-spacing: .1px; line-height: 1.15; text-align: center; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent }
+.tb-pointer button.tb-rail-item { min-height: 56px }
 .tb-touch .tb-rail button { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none }
-.tb-app button.tb-rail-item.active { color: var(--ux-accent-2); background: color-mix(in srgb, var(--ux-accent) 16%, transparent) }
-.tb-app button.tb-rail-item.active::before { content: ''; position: absolute; left: -8px; top: 14px; bottom: 14px; width: 4px; border-radius: 0 4px 4px 0; background: var(--ux-accent) }
-.tb-app.light button.tb-rail-item.active { color: var(--ux-accent) }
-.tb-app button.tb-rail-new { margin-bottom: 2px; background: linear-gradient(180deg, var(--ux-accent-2), var(--ux-accent)); color: var(--ux-accent-ink); font-weight: 800; box-shadow: 0 8px 20px color-mix(in srgb, var(--ux-accent) 32%, transparent) }
-.tb-app button.tb-rail-item:active, .tb-touch button.tb-rail-item:active { background: var(--ux-surface-3) }
-.tb-pointer button.tb-rail-item:not(.active):hover { color: var(--ux-ink); background: var(--ux-surface-2) }
-.tb-pointer button.tb-rail-new:hover { filter: brightness(1.06) }
-.tb-app .tb-rail button:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px }
-.tb-rail-rule { height: 1px; margin: 4px 10px 6px; background: var(--ux-line) }
+.tb-rail-ind { display: grid; place-items: center; width: 56px; height: 32px; border-radius: 16px; transition: background .15s }
+.tb-app button.tb-rail-item.active { color: var(--ux-ink); font-weight: 800 }
+.tb-app button.tb-rail-item.active .tb-rail-ind { background: color-mix(in srgb, var(--ux-accent) 26%, transparent); color: var(--ux-accent-2) }
+.tb-app.light button.tb-rail-item.active .tb-rail-ind { background: color-mix(in srgb, var(--ux-accent) 18%, transparent); color: var(--ux-accent) }
+.tb-pointer button.tb-rail-item:not(.active):hover { color: var(--ux-ink) }
+.tb-pointer button.tb-rail-item:not(.active):hover .tb-rail-ind { background: var(--ux-surface-2) }
+.tb-app button.tb-rail-item:active .tb-rail-ind { background: var(--ux-surface-3) }
+.tb-app .tb-rail button:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px; border-radius: 16px }
 .tb-rail-spacer { flex: 1 }
 .tb-hint-bubble { position: absolute; z-index: 30; max-width: 240px; padding: 10px 13px; border-radius: 12px; background: var(--ux-ink); color: var(--ux-bg); font-size: 13px; font-weight: 650; line-height: 1.3; text-align: left; white-space: normal; width: max-content; box-shadow: 0 10px 28px #0006; pointer-events: none }
 .tb-hint-bubble.right { left: calc(100% + 10px); top: 50%; transform: translateY(-50%) }
@@ -161,3 +166,68 @@
 .tb-el-card { height: auto !important; width: 420px; padding: 16px; border-radius: 18px }
 .tb-el-frames { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 28px; align-items: start }
 .tb-card { align-content: start }
+
+/* ------------------------------ T4: targets and hints ------------------------------ */
+/* Delegated hint (IconHints) for icon-only buttons from shared pieces: placed at the button, above it or below near the top. */
+.tb-hint-bubble.tb-hint-float { transform: translate(-50%, calc(-100% - 8px)) }
+.tb-hint-bubble.tb-hint-float.below { transform: translate(-50%, 8px) }
+/* Touch: every target at least 44 px (pointer mode keeps the denser desktop sizes where they are 32 px or more). */
+.tb-touch .tb-flow .dts-preview-row button, .tb-touch .tb-sheet .dts-preview-row button { height: 44px }
+/* Pointer hover where the mobile pieces have none. */
+.tb-pointer :is(.ux-tree-section, .ux-force-summary-main, .ux-tree-add, .tb-scheme, .tb-chip-add, .tb-text-link):not(:disabled):hover { background: var(--ux-surface-2) }
+.tb-pointer :is(.ux-job-btn, .tbs-action, .tbs-choice, .tbs-switch):not(:disabled):not(.primary):not(.active):hover { border-color: var(--ux-line-2); background: var(--ux-surface-2) }
+.tb-pointer :is(.ux-job-btn.primary, .ux-primary, .tbs-primary):not(:disabled):hover { filter: brightness(1.08) }
+.tb-pointer :is(.ux-5a-choice, .ux-5a-count button, .tbe-clear):not(:disabled):hover { background: var(--ux-surface-2) }
+.tb-el-resizer { width: 640px; height: 360px !important; flex: none; border-radius: 18px; overflow: hidden }
+
+/* ------------------------------ T4: shortcut overlay (hardware keyboard) ------------------------------ */
+/* iPad: the system overlay while ⌘ is held (translucent material, app name, columns of groups, glyph keys on the right).
+   Android: the keyboard shortcuts helper from Ctrl + / (a dialog with a close button, key caps as chips). */
+.tbk-overlay { position: absolute; inset: 0; z-index: 40; display: grid; place-items: center; padding: 24px; animation: tbe-fade .15s ease-out }
+.tbk-overlay.ios { background: rgb(0 0 0 / .18) }
+.tbk-overlay.android { background: rgb(0 0 0 / .42) }
+.tbk-panel { display: flex; flex-direction: column; max-height: 100%; overflow: hidden; color: var(--ux-ink) }
+.tbk-overlay.ios .tbk-panel { width: min(880px, 100%); padding: 20px 28px 24px; border: 1px solid var(--ux-line-2); border-radius: 26px; background: color-mix(in srgb, var(--ux-surface) 80%, transparent); -webkit-backdrop-filter: blur(30px) saturate(1.4); backdrop-filter: blur(30px) saturate(1.4); box-shadow: 0 30px 80px #0007 }
+.tbk-overlay.ios header { display: grid; justify-items: center; gap: 2px; margin-bottom: 16px }
+.tbk-overlay.ios header strong { font-size: 16px; font-weight: 800 }
+.tbk-overlay.ios header small { color: var(--ux-muted); font-size: 12.5px }
+.tbk-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 8px 36px; overflow-y: auto }
+.tbk-cols h3 { margin: 6px 0 4px; color: var(--ux-muted); font-size: 12.5px; font-weight: 750 }
+.tbk-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 34px; font-size: 14.5px }
+.tbk-overlay.ios .tbk-row + .tbk-row { border-top: 1px solid var(--ux-line) }
+.tbk-overlay.ios kbd { color: var(--ux-muted); font: 600 15px var(--font); letter-spacing: 1.5px; white-space: nowrap }
+.tbk-overlay.android .tbk-panel { width: min(560px, 100%); padding: 8px 8px 16px; border-radius: 28px; background: var(--ux-surface); box-shadow: 0 24px 64px #0008 }
+.tbk-overlay.android header { display: flex; align-items: center; gap: 12px; padding: 8px 8px 0 16px }
+.tbk-overlay.android header strong { flex: 1; font-size: 20px; font-weight: 750 }
+.tbk-overlay.android header button { display: grid; place-items: center; width: 48px; height: 48px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--ux-ink); cursor: pointer }
+.tb-pointer .tbk-overlay.android header button:hover { background: var(--ux-surface-2) }
+.tbk-overlay .tbk-app { margin: 2px 0 8px 50px; color: var(--ux-muted); font-size: 13px }
+.tbk-overlay.android .tbk-cols { grid-template-columns: minmax(0, 1fr); padding: 0 16px }
+.tbk-overlay.android .tbk-cols h3 { margin-top: 12px; color: var(--ux-accent-2); font-size: 14px }
+.tb-app.light .tbk-overlay.android .tbk-cols h3 { color: var(--ux-accent) }
+.tbk-overlay.android .tbk-row { min-height: 48px }
+.tbk-caps { display: flex; gap: 6px; flex-shrink: 0 }
+.tbk-caps kbd { min-width: 28px; padding: 3px 8px; border: 1px solid var(--ux-line-2); border-radius: 8px; background: var(--ux-surface-2); font: 650 13px var(--font); text-align: center }
+@media (prefers-reduced-motion: reduce) { .tbk-overlay { animation: none } }
+
+/* ------------------------------ T4: larger text and display zoom (UX-025) ------------------------------ */
+/* The text size zooms the app root, so the layout gets a smaller logical window and collapses by width class: Expanded →
+   Medium → single pane. The rail scrolls when it is taller than the window; at Compact logical width it drops its labels
+   (they stay the accessible names and the hints) so the content keeps its room. */
+.tb-rail { overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none }
+.tb-rail::-webkit-scrollbar { display: none }
+.tb-rail > * { flex-shrink: 0 }
+.tb-compact .tb-rail { flex-basis: 68px; padding: 10px 6px 16px }
+.tb-compact .tb-app .tb-rail button.tb-rail-fab, .tb-compact.tb-app .tb-rail button.tb-rail-fab { width: 52px; height: 52px; margin-bottom: 10px }
+.tb-compact.tb-app button.tb-rail-item { min-height: 52px }
+.tb-compact .tb-rail-ind { width: 52px }
+.tb-compact button.tb-rail-item > span:last-child { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap }
+.tb-compact .tb-main { padding: 12px 12px 20px }
+@container (max-width: 300px) { .tb-row-end { display: none } }
+.tb-toolbar { flex-wrap: wrap }
+.tb-toolbar .tb-search { flex: 1 1 260px }
+.tb-compact .tb-home, .tb-compact.tb-app .tb-home-side { grid-template-columns: minmax(0, 1fr) }
+/* Compact logical width: the page scrolls as a whole (toolbars and filters wrap above the list) instead of squeezing the list. */
+.tb-compact .tb-main > .tb-page { overflow-y: auto; overscroll-behavior: contain }
+.tb-compact .tb-page > .tb-panes { flex: none; min-height: min(100%, 420px) }
+.tb-compact .tb-page .tb-list.scroll { flex: none; overflow: visible }

@@ -28,3 +28,4 @@
 .tablet-device-buttons button span { display: grid; text-align: left }
 .tablet-device-buttons button small { color: var(--muted); font-size: 11px }
 .tablet-device-buttons button { justify-content: flex-start !important }
+.tablet-text-note { display: block; margin-top: 6px; color: var(--muted); font-size: 11.5px }

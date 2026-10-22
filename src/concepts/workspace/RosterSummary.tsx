@@ -21,8 +21,10 @@ export function PointsLine({ total, limit }: { total: number; limit: number }) {
 
 export type SummaryAction = { label: string; icon: ReactNode; kbd?: string; onClick: () => void };
 
-export function RosterSummary({ name, faction, force, total, limit, issueCount, data, actions, onLimit, onShowIssues }: {
+/** `details`: optional content under the status rows (the tablet lists the issues there with Show); the desktop passes none. */
+export function RosterSummary({ name, faction, force, total, limit, issueCount, data, actions, onLimit, onShowIssues, details }: {
   name: string; faction: string; force: string; total: number; limit: number; issueCount: number;
+  details?: ReactNode;
   data: { name: string; version: string; onClick: () => void };
   actions: SummaryAction[];
   onLimit: (limit: number) => void; onShowIssues: () => void;
@@ -36,6 +38,7 @@ export function RosterSummary({ name, faction, force, total, limit, issueCount, 
       <button onClick={onShowIssues}><Shield size={15} /><span>{issueCount ? `${issueCount} ${issueCount === 1 ? 'item needs' : 'items need'} attention` : 'Your force is ready'}</span><ChevronRight size={14} /></button>
       <button onClick={data.onClick}><Database size={15} /><span>{data.name}</span><small>{data.version}</small><ChevronRight size={14} /></button>
     </div>
+    {details}
     <div className="dt-summary-rows">{actions.map(a => <button key={a.label} onClick={a.onClick}>{a.icon}<span>{a.label}</span>{a.kbd && <kbd>{a.kbd}</kbd>}</button>)}</div>
   </section>;
 }

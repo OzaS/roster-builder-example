@@ -22,5 +22,12 @@ export const deviceById = (id: TabletDeviceId): TabletDevice => tabletDevices.fi
 export const isDeviceId = (value: unknown): value is TabletDeviceId => tabletDevices.some(d => d.id === value);
 export const isTabletInput = (value: unknown): value is TabletInput => value === 'touch' || value === 'pointer';
 
+/** Larger text and display zoom (UX-025): iOS accessibility text sizes and Display Zoom, Android font scale up to 2.0 and
+ *  display size. The prototype scales the whole tablet UI, so the layout sees a smaller logical window (width / scale). */
+export type TextScale = 100 | 150 | 200;
+export const textScales: TextScale[] = [100, 150, 200];
+export const defaultTextScale: TextScale = 100;
+export const isTextScale = (value: unknown): value is TextScale => textScales.includes(Number(value) as TextScale);
+
 export const widthClassOf = (width: number): WidthClass => width < 600 ? 'compact' : width < 840 ? 'medium' : 'expanded';
 export const widthClassLabel: Record<WidthClass, string> = { compact: 'Compact <600', medium: 'Medium 600–839', expanded: 'Expanded ≥840' };

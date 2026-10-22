@@ -79,17 +79,17 @@ export function MobileUnitOptions({ onBack, state = "ready", compact = false, in
   </section>;
 }
 
-function Count({ name, value, min, max, over, disabled, onChange }: { name: string; value: number; min: number; max?: number; over?: boolean; disabled: boolean; onChange: (value: number) => void }) {
+export function Count({ name, value, min, max, over, disabled, onChange }: { name: string; value: number; min: number; max?: number; over?: boolean; disabled: boolean; onChange: (value: number) => void }) {
   return <div className={`ux-5a-count ${over ? "ux-5a-invalid" : ""}`}>
     <button type="button" disabled={disabled || value <= min} aria-label={`Decrease ${name}`} onClick={() => onChange(value - 1)}><Minus size={18} /></button><strong>{over ? <AlertTriangle size={13} /> : null}{value}</strong><button type="button" disabled={disabled || (max !== undefined && value >= max)} aria-label={`Increase ${name}`} onClick={() => onChange(Math.max(min, value + 1))}><Plus size={18} /></button>
   </div>;
 }
-function ToggleRow({ name, cost, value, disabled, onChange }: { name: string; cost: string; value: boolean; disabled: boolean; onChange: () => void }) {
+export function ToggleRow({ name, cost, value, disabled, onChange }: { name: string; cost: string; value: boolean; disabled: boolean; onChange: () => void }) {
   return <button type="button" className="ux-5a-choice" role="checkbox" aria-label={name} aria-checked={value} disabled={disabled} onClick={onChange}>{value ? <SquareCheck size={22} /> : <Square size={22} />}<span><strong>{name}</strong><small>{cost}</small></span></button>;
 }
 
 /** UX-021: descendant alternatives share their outer max-one choice; only that outer group has None. */
-function RadioRow({ name, cost, selected, onChange }: { name: string; cost: string; selected: boolean; onChange: () => void }) {
+export function RadioRow({ name, cost, selected, onChange }: { name: string; cost: string; selected: boolean; onChange: () => void }) {
   return <button type="button" className="ux-5a-choice" role="radio" aria-label={name} aria-checked={selected} onClick={onChange}>{selected ? <CircleDot size={22} /> : <Circle size={22} />}<span><strong>{name}</strong><small>{cost}</small></span></button>;
 }
 
@@ -111,7 +111,7 @@ function MobileUnitProfile({ profiles, rules: showRules }: { profiles: boolean; 
 const summarise = (picked: readonly (readonly [string, number])[]) => picked.filter(([, count]) => count > 0).map(([name, count]) => count > 1 ? `${count}× ${name}` : name).join(", ");
 
 /** Option sections fold independently at every level: the header (name, counter, limits, errors) is a 44 px button and stays when the body folds; a folded header says when an error is inside. */
-function FoldSection({ title, counter, invalid, inner, summary, folded, onFold, children }: { title: string; counter?: string; invalid?: boolean; inner?: boolean; summary?: string; folded?: boolean; onFold?: () => void; children?: ReactNode }) {
+export function FoldSection({ title, counter, invalid, inner, summary, folded, onFold, children }: { title: string; counter?: string; invalid?: boolean; inner?: boolean; summary?: string; folded?: boolean; onFold?: () => void; children?: ReactNode }) {
   const buried = folded && inner;
   // A folded header names what is selected inside (nested sections included, display order, "2× Name" when more than one); nothing selected shows no line. Two lines at most, the rest is cut with an ellipsis; the spoken label has the whole list.
   const shownSummary = folded && summary ? summary : undefined;
