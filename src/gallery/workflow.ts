@@ -6,6 +6,9 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "tablet-editor", label: "Tablet · Roster editor" },
   { id: "tablet-editor-issues", label: "Tablet · Roster editor · Issues" },
   { id: "tablet-editor-add", label: "Tablet · Roster editor · Add unit" },
+  { id: "tablet-editor-forces", label: "Tablet · Roster editor · Several forces" },
+  { id: "tablet-editor-add-force", label: "Tablet · Roster editor · Add force" },
+  { id: "tablet-editor-readonly", label: "Tablet · Roster editor · Read-only roster" },
   { id: "tablet-lookup", label: "Tablet · Lookup" },
   { id: "tablet-tools", label: "Tablet · Tools" },
   { id: "tablet-library", label: "Tablet · Library" },
@@ -75,7 +78,7 @@ export function resolveWorkflow(workflow?: WorkflowScreen[]): Array<{ id: Workfl
 
 export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScreen {
   if (screen === "tablet-archive-sketch") return "overview";
-  if (screen === "tablet-editor" || screen === "tablet-editor-issues" || screen === "tablet-editor-add") return "overview";
+  if (screen === "tablet-editor" || screen === "tablet-editor-issues" || screen === "tablet-editor-add" || screen === "tablet-editor-forces" || screen === "tablet-editor-add-force" || screen === "tablet-editor-readonly") return "overview";
   if (screen === "tablet-home" || screen === "tablet-rosters" || screen === "tablet-lookup" || screen === "tablet-tools" || screen === "tablet-library" || screen === "tablet-sources" || screen === "tablet-settings") return "library";
   if (screen === "desktop-tools" || screen === "desktop-library") return "library";
   if (screen === "desktop-welcome") return "library";

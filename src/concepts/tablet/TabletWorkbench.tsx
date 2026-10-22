@@ -17,7 +17,7 @@ type ThemePref = 'system' | 'light' | 'dark';
  * Screens `tablet-<page>` open that page; `tablet-editor*` open the roster editor (from Home); `tablet-archive-sketch` (and any
  * phone screen the sketch navigates to) shows the earlier three-pane sketch, unchanged.
  */
-const editorScreens: Record<string, EditorStart> = { editor: 'editor', 'editor-issues': 'issues', 'editor-add': 'add' };
+const editorScreens: Record<string, EditorStart> = { editor: 'editor', 'editor-issues': 'issues', 'editor-add': 'add', 'editor-forces': 'forces', 'editor-add-force': 'add-force', 'editor-readonly': 'readonly', 'editor-export': 'export' };
 
 export function TabletWorkbench(props: Partial<ConceptProps>) {
   const screen: string | undefined = props.workflowScreen;
@@ -56,7 +56,7 @@ function TabletShell({ initialPage, initialEditor, ...props }: Partial<ConceptPr
   const openRoster = (name: string) => setEditor(current => ({ name, from: page, start: 'editor', key: (current?.key ?? 0) + 1 }));
   return <div className={`tb-app ux-screen ux-size-regular ${light ? 'light' : 'dark'} ux-scheme-${scheme} tb-${env.widthClass} tb-${env.input} ${editor ? 'tb-editing' : ''}`} data-device={env.device.id}>
     {editor ? <TabletEditor key={editor.key} env={env} notify={notify} light={light} rosterName={editor.name} from={editor.from} start={editor.start}
-      onBack={() => setEditor(null)} onAllRosters={() => { setEditor(null); setPage('rosters'); }} onNewRoster={newRoster} /> : <>
+      onBack={() => setEditor(null)} onAllRosters={() => { setEditor(null); setPage('rosters'); }} onNewRoster={newRoster} onFindData={() => { setEditor(null); setPage('sources'); }} /> : <>
     <TabletRail page={page} input={env.input} onPage={setPage} onNewRoster={newRoster} />
     <main className="tb-main" aria-label={page}>
       {page === 'home' ? <TabletHome {...shared} onPage={setPage} onNewRoster={newRoster} onOpenRoster={openRoster} />

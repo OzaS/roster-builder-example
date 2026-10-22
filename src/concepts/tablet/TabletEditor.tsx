@@ -1,15 +1,16 @@
 import { useEffect, useRef, useState, type RefObject } from 'react';
-import { AlertTriangle, ArrowDownToLine, BookOpen, Check, ChevronDown, ChevronLeft, Copy, Database, Ellipsis, FilePlus2, LibraryBig, Lock, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, Pencil, Plus, Redo2, Search, Trash2, Undo2, Users, X } from 'lucide-react';
+import { AlertTriangle, ArrowDownToLine, BookOpen, Check, ChevronDown, ChevronLeft, Copy, Database, Ellipsis, FilePlus2, Flag, LibraryBig, Lock, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, Pencil, Plus, Redo2, Search, Trash2, Undo2, Users, X } from 'lucide-react';
 import { PanelResizer, type PanelLimits } from '../workspace/PanelResizer';
 import { PointsLine, RosterSummary, SummaryToggle } from '../workspace/RosterSummary';
 import type { Notify } from '../workspace/Toasts';
 import { StatusGlyph, TreeUnitMain } from '../ux/uxShared';
 import { Count, FoldSection, RadioRow, ToggleRow } from '../ux/MobileUnitOptions';
-import { ROLES, forceOf, groupLimit, rosterIssues, unitCost, useRosterHistory, type EditorUnit, type Force, type RosterIssue } from '../desktop/DesktopEditorFlows';
+import { PRIMARY_FORCE_ID, ROLES, forceOf, groupLimit, rosterIssues, unitCost, useRosterHistory, type EditorUnit, type Force, type ReadOnlyInfo, type RosterIssue } from '../desktop/DesktopEditorFlows';
 import { rosterLibrary } from '../desktop/desktopData';
 import type { RosterUnit } from '../../types';
 import type { TabletEnv } from './tabletEnv';
 import { HintButton } from './TabletHint';
+import { AddForceSheet, RenameSheet } from './TabletEditorSheets';
 import { editorCatalogue, loadRoster, unitCategories, unitProfile, unitRules, weaponChoices, weaponProfile, type CatalogueEntry } from './tabletEditorData';
 import './tablet-editor.css';
 
@@ -20,8 +21,11 @@ import './tablet-editor.css';
 //   Medium (600-839): force tree · unit details; the catalogue is a slide-over from Add unit.
 //   Split view (< 700 wide): the tree alone; a unit's details open over it (like ListDetail on the pages).
 
-export type EditorStart = 'editor' | 'issues' | 'add';
-type Pop = 'switcher' | 'more' | 'summary' | `unit-${number}` | null;
+export type EditorStart = 'editor' | 'issues' | 'add' | 'forces' | 'add-force' | 'readonly' | 'export';
+type Pop = 'switcher' | 'more' | 'summary' | `unit-${number}` | `force-${string}` | null;
+type Sheet = { kind: 'add-force' } | { kind: 'rename' } | { kind: 'rename-force'; id: string } | { kind: 'export' } | null;
+/** The sample roster each gallery start opens: two forces, a roster whose faction was removed, or the default. */
+const startRoster = (start: EditorStart, name: string) => start === 'issues' ? 'Operation First Light' : start === 'forces' || start === 'add-force' || start === 'export' ? 'Harbour defence' : start === 'readonly' ? 'Ember patrol' : name;
 type Mode = 'three' | 'two' | 'single';
 
 const PANES: { catalogue: PanelLimits; inspector: PanelLimits; inspectorMedium: PanelLimits } = {
@@ -42,12 +46,12 @@ function reveal(root: RefObject<HTMLElement | null>, selector: string, focus = f
   }));
 }
 
-export function TabletEditor({ env, notify, light, rosterName, from, start = 'editor', onBack, onAllRosters, onNewRoster }: {
+export function TabletEditor({ env, notify, light, rosterName, from, start = 'editor', onBack, onAllRosters, onNewRoster, onFindData }: {
   env: TabletEnv; notify: Notify; light: boolean; rosterName: string; from: string; start?: EditorStart;
-  onBack: () => void; onAllRosters: () => void; onNewRoster: () => void;
+  onBack: () => void; onAllRosters: () => void; onNewRoster: () => void; onFindData: () => void;
 }) {
   const mode: Mode = env.widthClass === 'expanded' ? 'three' : env.device.width < 700 ? 'single' : 'two';
-  const first = useRef(loadRoster(start === 'issues' ? 'Operation First Light' : rosterName)).current;
+  const first = useRef(loadRoster(startRoster(start, rosterName))).current;
   const [roster, setRoster] = useState(first);
   const history = useRosterHistory<EditorUnit>({ units: first.units, forces: first.forces });
   const { units, forces } = history.doc;
@@ -63,6 +67,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
   const [inspWidth, setInspWidth] = useState(mode === 'three' ? PANES.inspector.initial : PANES.inspectorMedium.initial);
   const [slideOver, setSlideOver] = useState(start === 'add' && mode !== 'three');
   const [detailOpen, setDetailOpen] = useState(false);
+  const [sheet, setSheet] = useState<Sheet>(start === 'add-force' ? { kind: 'add-force' } : start === 'export' ? { kind: 'export' } : null);
   const [query, setQuery] = useState('');
   const [role, setRole] = useState(start === 'add' ? 'Core' : 'All');
   const rootRef = useRef<HTMLDivElement>(null);
@@ -80,9 +85,9 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
   }, [pop]);
   useEffect(() => {
     if (!slideOver) return;
-    const key = (e: KeyboardEvent) => { if (e.key === 'Escape' && !pop) setSlideOver(false); };
+    const key = (e: KeyboardEvent) => { if (e.key === 'Escape' && !pop && !sheet) setSlideOver(false); };
     window.addEventListener('keydown', key); return () => window.removeEventListener('keydown', key);
-  }, [slideOver, pop]);
+  }, [slideOver, pop, sheet]);
 
   const total = units.reduce((n, u) => n + unitCost(u), 0);
   const issues = rosterIssues(units, forces, limit, readOnly);
@@ -136,6 +141,36 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
     notify(`${unit.name} removed`, withUndo(step));
   };
 
+  /* ---------------------------------------------------------------- forces and the roster itself */
+  const addForce = (force: Omit<Force, 'id'>) => {
+    if (readOnly) return;
+    const id = `f${Math.max(0, ...history.peek().forces.map(f => Number(f.id.slice(1)) || 0)) + 1}`;
+    const step = history.edit(`Add ${force.name}`, d => ({ ...d, forces: [...d.forces, { ...force, id }] }));
+    setSheet(null); setActiveForce(id); expand(id);
+    reveal(rootRef, `[data-tb-force="${id}"]`);
+    notify(`${force.name} added`, withUndo(step));
+  };
+  const renameForce = (id: string, name: string) => {
+    const old = forceById(id).name; if (readOnly || name === old) return;
+    const step = history.edit(`Rename ${old}`, d => ({ ...d, forces: d.forces.map(f => f.id === id ? { ...f, name } : f) }));
+    setSheet(null); notify(`${old} renamed to ${name}`, withUndo(step));
+  };
+  const removeForce = (force: Force) => {
+    if (readOnly || forces.length < 2) return; setPop(null);
+    const count = units.filter(u => forceOf(u) === force.id).length;
+    const step = history.edit(`Remove ${force.name}`, d => ({ units: d.units.filter(u => forceOf(u) !== force.id), forces: d.forces.filter(f => f.id !== force.id) }));
+    setActiveForce(forces.find(f => f.id !== force.id)?.id ?? PRIMARY_FORCE_ID);
+    if (units.some(u => u.id === selectedId && forceOf(u) === force.id)) setDetailOpen(false);
+    settle(); notify(`${force.name} removed${count ? ` with its ${count} ${count === 1 ? 'unit' : 'units'}` : ''}`, withUndo(step));
+  };
+  const renameRoster = (name: string) => { setRoster(r => ({ ...r, name })); setSheet(null); notify(`Renamed to “${name}”`); };
+  /** Duplicate roster: an editable copy opens; for a read-only roster this is how it becomes editable (the original stays as it was). */
+  const duplicateRoster = () => {
+    setPop(null); const name = `${roster.name} (copy)`;
+    history.reset(history.peek()); setRoster(r => ({ ...r, name, readOnly: null }));
+    notify(readOnly ? `Opened “${name}”, an editable copy. The original stays read-only.` : `Duplicated as “${name}”. The original is unchanged.`);
+  };
+
   /* ---------------------------------------------------------------- panes */
   const openCatalogue = (group?: string, forceId?: string) => {
     if (readOnly) return;
@@ -160,7 +195,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
   const later = (what: string) => { setPop(null); notify(`${what}: designed in T1c (editor flows)`); };
 
   const cols = mode === 'three'
-    ? `${showCatalogue && !readOnly ? `${catWidth}px ` : ''}minmax(300px, 1fr)${showInspector ? ` ${inspWidth}px` : ''}`
+    ? `${showCatalogue ? `${catWidth}px ` : ''}minmax(300px, 1fr)${showInspector ? ` ${inspWidth}px` : ''}`
     : mode === 'two' ? `minmax(300px, 1fr)${showInspector ? ` ${inspWidth}px` : ''}` : 'minmax(0, 1fr)';
   const catalogue = (variant: 'pane' | 'slide') => <CataloguePanel env={env} variant={variant} query={query} onQuery={setQuery} role={role} onRole={setRole} forces={forces} target={target} onTarget={setActiveForce} searchRef={searchRef} onAdd={addUnit}
     onClose={() => variant === 'pane' ? setShowCatalogue(false) : setSlideOver(false)} faction={roster.faction} system={roster.system} />;
@@ -186,10 +221,11 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
         <HintButton hint="More: export, panes and roster actions" input={env.input} side="bottom" wrapClassName="end" aria-label="More actions" aria-haspopup="menu" aria-expanded={pop === 'more'} className="tbe-icon" onClick={() => setPop(pop === 'more' ? null : 'more')}><Ellipsis size={20} /></HintButton>
         {pop === 'more' && <div className="tbe-menu end" role="menu" aria-label="More actions">
           <button type="button" role="menuitem" onClick={() => later('Export roster')}><ArrowDownToLine size={18} />Export roster…</button>
-          <button type="button" role="menuitem" disabled={!!readOnly} onClick={() => later('Rename roster')}><Pencil size={18} />Rename roster</button>
-          <button type="button" role="menuitem" onClick={() => later('Duplicate roster')}><Copy size={18} />Duplicate roster</button>
+          <button type="button" role="menuitem" disabled={!!readOnly} onClick={() => { setPop(null); setSheet({ kind: 'rename' }); }}><Pencil size={18} />Rename roster</button>
+          <button type="button" role="menuitem" onClick={duplicateRoster}><Copy size={18} />{readOnly ? 'Make an editable copy' : 'Duplicate roster'}</button>
+          <button type="button" role="menuitem" disabled={!!readOnly} onClick={() => { setPop(null); setSheet({ kind: 'add-force' }); }}><Flag size={18} />Add force…</button>
           {mode !== 'single' && <hr />}
-          {mode === 'three' && !readOnly && <button type="button" role="menuitem" onClick={() => { setShowCatalogue(v => !v); setPop(null); }}>{showCatalogue ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}{showCatalogue ? 'Hide catalogue' : 'Show catalogue'}</button>}
+          {mode === 'three' && <button type="button" role="menuitem" onClick={() => { setShowCatalogue(v => !v); setPop(null); }}>{showCatalogue ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}{showCatalogue ? 'Hide catalogue' : 'Show catalogue'}</button>}
           {mode !== 'single' && <button type="button" role="menuitem" onClick={() => { setShowInspector(v => !v); setPop(null); }}>{showInspector ? <PanelRightClose size={18} /> : <PanelRightOpen size={18} />}{showInspector ? 'Hide unit details' : 'Show unit details'}</button>}
         </div>}
       </div>
@@ -205,26 +241,41 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
 
     <div className="tbe-body">
       <div className="tbe-panes" style={{ gridTemplateColumns: cols }}>
-        {mode === 'three' && showCatalogue && !readOnly && <PanelResizer side="left" width={catWidth} limits={PANES.catalogue} label="Resize catalogue" onWidth={setCatWidth} />}
+        {mode === 'three' && showCatalogue && <PanelResizer side="left" width={catWidth} limits={PANES.catalogue} label="Resize catalogue" onWidth={setCatWidth} />}
         {mode !== 'single' && showInspector && <PanelResizer side="right" width={inspWidth} limits={inspectorLimits} label="Resize unit details" onWidth={setInspWidth} />}
-        {mode === 'three' && showCatalogue && !readOnly && catalogue('pane')}
+        {mode === 'three' && showCatalogue && (readOnly ? <ReadOnlyCataloguePane env={env} info={readOnly} onFindData={onFindData} onClose={() => setShowCatalogue(false)} /> : catalogue('pane'))}
 
         <section className="tbe-pane tbe-tree" aria-label="Roster">
           <header className="tbe-pane-head">
             <span><strong>{forces.length > 1 ? 'Your forces' : 'Your force'}</strong><small>{units.length} units{forces.length > 1 ? ` · ${forces.length} forces` : ''} · {pts(total)} pts</small></span>
             {!readOnly && (mode !== 'three' || !showCatalogue) && <HintButton hint={`Add a unit to ${forces.length > 1 ? target.name : 'this roster'} from the catalogue`} input={env.input} side="bottom" className="ux-job-btn primary tbe-add" onClick={() => openCatalogue()}><Plus size={18} />Add unit</HintButton>}
           </header>
-          {readOnly && <div className="tbe-readonly" role="region" aria-label="Read-only roster"><Lock size={18} /><span><strong>This roster is read-only</strong><small>{readOnly.faction} was removed from the installed {readOnly.system} data. The full read-only flow is designed in T1c.</small></span></div>}
+          {readOnly && <section className="tbe-readonly" role="region" aria-label="Read-only roster" tabIndex={-1}><Lock size={20} />
+            <div><strong>This roster is read-only</strong><p>{readOnly.faction} was removed from the installed {readOnly.system} data, so its units can't be checked or changed. The roster is kept as it was saved.</p>
+              <div className="tbe-readonly-actions">
+                <button type="button" className="ux-job-btn primary" onClick={duplicateRoster}><Copy size={17} />Make an editable copy</button>
+                <button type="button" className="ux-job-btn" onClick={onFindData}><Database size={17} />Find game data</button>
+                <button type="button" className="ux-job-btn" onClick={() => later('Export as it was')}><ArrowDownToLine size={17} />Export as it was</button>
+              </div></div></section>}
           <div className="ux-wb-tree tbe-tree-scroll">
             <div className="ux-force-list">
               {forces.map(force => {
                 const own = units.filter(u => forceOf(u) === force.id);
                 const open = !collapsed.includes(force.id);
+                const multi = forces.length > 1;
                 return <section key={force.id} className={`ux-force-entry ${open ? 'open' : ''} ${forces.length > 1 && force.id === activeForce ? 'selected' : ''}`} data-tb-force={force.id}>
                   <div className="ux-force-summary">
                     <button type="button" className="ux-force-summary-main" aria-expanded={open} onClick={() => { toggle(force.id); setActiveForce(force.id); }}>
-                      <ChevronDown size={16} /><span><strong>{force.name}</strong><small>{force.type} · {force.faction}</small></span><b>{pts(own.reduce((n, u) => n + unitCost(u), 0))} pts</b>
+                      <ChevronDown size={16} /><span><strong>{force.name}{multi && force.id === activeForce && <span className="tbe-chip">Adding here</span>}</strong><small>{force.type} · {force.faction} · {own.length} {own.length === 1 ? 'unit' : 'units'}</small></span><b>{pts(own.reduce((n, u) => n + unitCost(u), 0))} pts</b>
                     </button>
+                    <div className="tbe-force-tools" data-pop={`force-${force.id}`}>
+                      <HintButton hint={readOnly ? 'Read-only roster' : `Rename or remove ${force.name}`} input={env.input} side="bottom" wrapClassName="end" aria-label={`Actions for ${force.name}`} aria-haspopup="menu" aria-expanded={pop === `force-${force.id}`} className="tbe-icon" disabled={!!readOnly} onClick={() => setPop(pop === `force-${force.id}` ? null : `force-${force.id}`)}><Ellipsis size={20} /></HintButton>
+                      {pop === `force-${force.id}` && <div className="tbe-menu end" role="menu" aria-label={`Actions for ${force.name}`}>
+                        <button type="button" role="menuitem" onClick={() => { setPop(null); openCatalogue(undefined, force.id); }}><Plus size={18} />Add unit here</button>
+                        <button type="button" role="menuitem" onClick={() => { setPop(null); setSheet({ kind: 'rename-force', id: force.id }); }}><Pencil size={18} />Rename force</button>
+                        <button type="button" role="menuitem" className="danger" disabled={!multi} onClick={() => removeForce(force)}><Trash2 size={18} />{multi ? 'Remove force' : 'Remove force (needs two)'}</button>
+                      </div>}
+                    </div>
                   </div>
                   {open && <div className="ux-force-sections">{ROLES.map(group => {
                     const key = `${force.id}/${group}`;
@@ -243,6 +294,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
                   })}</div>}
                 </section>;
               })}
+              <button type="button" className="ux-tree-add tbe-add-force" disabled={!!readOnly} onClick={() => setSheet({ kind: 'add-force' })}><Flag size={16} />Add force</button>
             </div>
           </div>
         </section>
@@ -263,6 +315,10 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
         <div className="tbe-slide" role="dialog" aria-modal="true" aria-label="Add units" onClick={e => e.stopPropagation()}>{catalogue('slide')}</div>
       </div>}
     </div>
+
+    {sheet?.kind === 'add-force' && <AddForceSheet forces={forces} limit={limit} faction={roster.faction} onAdd={addForce} onClose={() => setSheet(null)} />}
+    {sheet?.kind === 'rename' && <RenameSheet title="Rename roster" label="Roster name" value={roster.name} onSave={renameRoster} onClose={() => setSheet(null)} />}
+    {sheet?.kind === 'rename-force' && <RenameSheet title="Rename force" label="Force name" value={forceById(sheet.id).name} maxLength={40} onSave={name => renameForce(sheet.id, name)} onClose={() => setSheet(null)} />}
   </div>;
 }
 
@@ -319,6 +375,15 @@ function CataloguePanel({ env, variant, query, onQuery, role, onRole, forces, ta
       {!any && <p className="tb-empty">No units match. Try another word or role.</p>}
     </div>
     <footer className="tbe-pane-foot"><Database size={15} />{faction}<span>{system} · v1.4</span></footer>
+  </aside>;
+}
+
+function ReadOnlyCataloguePane({ env, info, onFindData, onClose }: { env: TabletEnv; info: ReadOnlyInfo; onFindData: () => void; onClose: () => void }) {
+  return <aside className="tbe-pane tbe-catalogue pane" aria-label="Unit catalogue">
+    <header className="tbe-pane-head"><span><strong>Unit catalogue</strong></span>
+      <HintButton hint="Hide the catalogue (More → Show catalogue brings it back)" input={env.input} side="bottom" wrapClassName="end" aria-label="Hide catalogue" className="tbe-icon small" onClick={onClose}><PanelLeftClose size={18} /></HintButton></header>
+    <div className="tbe-empty"><Lock size={30} /><strong>Nothing to add</strong><small>{info.faction} is not in the installed {info.system} data, so its units can't be added.</small><button type="button" className="ux-job-btn" onClick={onFindData}><Database size={17} />Find game data</button></div>
+    <footer className="tbe-pane-foot"><Database size={15} />{info.faction}<span>removed</span></footer>
   </aside>;
 }
 
