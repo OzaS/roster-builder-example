@@ -47,6 +47,9 @@
   -webkit-font-smoothing: antialiased;
 }
 
+/* Size class: `.ux-size-regular` on an ancestor (a tablet pane host or the window root) gives the pieces the same behaviour as
+   `.device-frame.tablet`: sheets become centred dialogs and swipe actions are hidden. Without it (phone, compact) nothing changes.
+   See ../concepts/workspace/MOBILE-PIECES.md. */
 .ux-screen.light {
   --ux-bg: #eef1f6;
   --ux-surface: #ffffff;
@@ -2177,11 +2180,13 @@
   border-top: 1px solid var(--ux-line);
   background: var(--ux-surface);
 }
-.device-frame.tablet .ux-force-selector-layer {
+.device-frame.tablet .ux-force-selector-layer,
+.ux-size-regular .ux-force-selector-layer {
   align-items: center;
   padding: 24px;
 }
-.device-frame.tablet .ux-force-selector {
+.device-frame.tablet .ux-force-selector,
+.ux-size-regular .ux-force-selector {
   width: min(520px, 100%);
   max-height: min(640px, calc(100% - 48px));
   border-bottom: 1px solid var(--ux-line-2);
@@ -2292,8 +2297,8 @@
   cursor: pointer;
 }
 .ux-swipe-actions button.delete { background: color-mix(in srgb, var(--ux-err) 82%, var(--ux-surface)); color: white; }
-.device-frame.tablet .ux-swipe-actions { display: none; }
-.device-frame.tablet .ux-swipe-unit-content { transform: none !important; }
+.device-frame.tablet .ux-swipe-actions, .ux-size-regular .ux-swipe-actions { display: none; }
+.device-frame.tablet .ux-swipe-unit-content, .ux-size-regular .ux-swipe-unit-content { transform: none !important; }
 .ux-tree-unit {
   display: grid;
   grid-template-columns: 14px minmax(0, 1fr) auto;
@@ -2829,11 +2834,13 @@
   font-size: 11px;
 }
 
-.device-frame.tablet .ux-loadout-selector-layer {
+.device-frame.tablet .ux-loadout-selector-layer,
+.ux-size-regular .ux-loadout-selector-layer {
   align-items: center;
   padding: 24px;
 }
-.device-frame.tablet .ux-loadout-selector {
+.device-frame.tablet .ux-loadout-selector,
+.ux-size-regular .ux-loadout-selector {
   width: min(520px, 100%);
   max-height: min(640px, calc(100% - 48px));
   border-bottom: 1px solid var(--ux-line-2);
@@ -5537,8 +5544,8 @@ button.ux-reference-tag:focus-visible {
 .ux-destination-list > button { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 10px; width: 100%; padding: 11px; border: 1px solid var(--ux-line); border-radius: 8px; background: var(--ux-surface-2); color: var(--ux-ink); text-align: left; cursor: pointer; }
 .ux-destination-list strong, .ux-destination-list small { display: block; }
 .ux-destination-list small { margin-top: 3px; color: var(--ux-muted); font-size: 10px; }
-.device-frame.tablet .ux-entry-dialog-layer { align-items: center; justify-content: center; padding: 24px; }
-.device-frame.tablet .ux-entry-dialog { max-width: 480px; border-radius: 12px; }
+.device-frame.tablet .ux-entry-dialog-layer, .ux-size-regular .ux-entry-dialog-layer { align-items: center; justify-content: center; padding: 24px; }
+.device-frame.tablet .ux-entry-dialog, .ux-size-regular .ux-entry-dialog { max-width: 480px; border-radius: 12px; }
 
 /* In-app unit and rules reference glances */
 .ux-reference-glance-layer {
@@ -5711,7 +5718,8 @@ button.ux-reference-tag:focus-visible {
 .device-frame.phone .ux-reference-glance-card {
   border-radius: 10px;
 }
-.device-frame.tablet .ux-reference-glance-layer {
+.device-frame.tablet .ux-reference-glance-layer,
+.ux-size-regular .ux-reference-glance-layer {
   padding: 24px;
 }
 
