@@ -7,7 +7,7 @@ the phone frame (`.device-frame.phone`, 390 px wide, 844 px high, one pane at a 
 ## Summary
 
 - **Content is mostly frame-neutral.** There are no `100vw` / `100vh` units and no fixed 390 px widths in `ux.css`
-  (390 px appears only in the tablet subscription card, `min(390px, 100%)`). Cards, rows, chips, option rows, profile tables
+  (390 px appears only in the tablet subscription card, `min(390px, 100%)`; the viewport units are `52vh` on the select popover, now a variable, and `6vw` in the subscription card title clamp). Cards, rows, chips, option rows, profile tables
   and the options surface are plain `.ux-*` rules that only need an ancestor `.ux-screen` for the `--ux-*` tokens. The
   desktop root already carries `ux-screen`, so they render inside a `.dt-app` pane.
 - **Overlays are the main assumption.** Every sheet, dialog and glance layer is `position: absolute; inset: 0` against the
@@ -16,7 +16,8 @@ the phone frame (`.device-frame.phone`, 390 px wide, 844 px high, one pane at a 
 - **The big components are not pane-ready by API.** The workbench pieces are private functions inside
   `CodexWorkbench.tsx` that take the whole `ConceptProps` (about 50 fields: roster, selection, every handler). Reusing them in
   a tablet pane means extracting them behind data props first; that is the larger change this file only lists.
-- **Fixed additively (this slice):** the opt-in size class `.ux-size-regular` (see below). Nothing else changed; the phone
+- **Fixed additively (this slice):** the opt-in size class `.ux-size-regular` (see below) and the `--ux-popover-max-height`
+  variable (default `52vh`). Nothing else changed; the phone
   library and phone/tablet workbench screens render byte-identically.
 
 ## Opt-in size class: `.ux-size-regular`
@@ -47,7 +48,8 @@ pane, give the pane host `position: relative` (and `overflow: hidden`), or rende
 | Options surface: `MobileUnitOptions`, `Count`, `ToggleRow`, `RadioRow`, `FoldSection`, `MobileUnitProfile` | `ux/MobileUnitOptions.tsx`, `ux.css` `.ux-mobile-unit-options`, `.ux-5a-*`, `.ux-5b-tabs` | Self-contained flex column with its own scroll and a sticky header; `onBack` draws a back header for the phone drill-down; `compact` sets `max-height: 640px`; 44 px minimum targets | Usable in a pane as is. Omit `onBack` (or hide the header) when the drill-down is a pane, not a screen; the 16 px padding and 44 px targets are touch-sized, so check density against the desktop inspector |
 | Option rows (`.ux-opt-row`, `.ux-opt-check`) | `ux.css` | Class-based, no frame. A `:hover` style exists next to the touch styles | None |
 | Chips: `Chip` (`valid` / `warning` / `error` / `cool` / `neutral`) | `ux/uxShared.tsx`, `ux.css` `.ux-chip` | None; needs `.ux-screen` tokens | Note the name clash with the workspace `Chip` (`dtp-chip`, tones `ok` / `warn` / `err` / `accent`); import one under an alias. Pick per context: workspace chips in chrome and lists, mobile chips inside mobile content |
-| Budget: `BudgetMeter`, `ExpandableBudget`, `budget()` | `ux/uxShared.tsx` | Presentational; `ExpandableBudget` opens an in-flow panel (`top: calc(100% + 8px)`, `max-height: min(330px, 52vh)`) | Tablet shows budget through `SummaryToggle` / `RosterSummary` / `PointsLine`; reuse `budget()` only. The `52vh` is the one viewport unit; replace it with a container height if `ExpandableBudget` is reused |
+| Budget: `BudgetMeter`, `ExpandableBudget`, `budget()` | `ux/uxShared.tsx` | Presentational; `ExpandableBudget` expands in the flow | Tablet shows budget through `SummaryToggle` / `RosterSummary` / `PointsLine`; reuse `budget()` only |
+| Select field and its popover (`.ux-select-field`, `.ux-select-popover`) | `ux.css` | Popover opens under the field (`top: calc(100% + 8px)`) with `max-height: min(330px, 52vh)`, one of two viewport units in the mobile styles (the other is `clamp(22px, 6vw, 28px)` on the subscription card title) | Fixed additively: the height reads `--ux-popover-max-height` and defaults to `52vh` (phone unchanged); set it on a pane host to bound popovers by the pane |
 | Bottom sheets: install job sheet, `.ux-sheet` | `ux/SourceJobs.tsx`, `ux.css` `.ux-sheet`, `sources.css` `.ux-job-backdrop` | Bottom-anchored (`margin-top: auto` inside an absolute backdrop, grip handle, top-rounded corners, 80 px bottom padding for the tab bar) | Not reused: the tablet uses the workspace `JobsPanel` / `JobsToggle` / `FactionPicker` |
 | Detail mode bar (`DetailModeBar`) | `ux/CodexWorkbench.tsx`, `ux.css` `.ux-detail-mode-layer` | Absolute `bottom: 14px; left: 50%` of the window root, `max-width: calc(100% - 24px)` | If kept, anchor to the detail pane (pane `position: relative`); otherwise drop for the desktop inspector tabs |
 | Tab bar (`TabBar`) | `ux/CodexWorkbench.tsx`, `ux.css` `.ux-tabbar` | Absolute bottom of the window root with `env(safe-area-inset-bottom)` padding; `has-tabs` shifts floating pieces up (`.ux-job-float { bottom: 96px }`) | Not reused: the tablet has the desktop activity rail and tabs |
@@ -62,6 +64,5 @@ pane, give the pane host `position: relative` (and `overflow: hidden`), or rende
 2. Replace the one-pane-at-a-time classes (`show-detail`, `show-checks`, `focus-*`, `tree-collapsed`) and the
    `.device-frame.tablet` three-pane rules with the workspace panes and `PanelResizer`.
 3. Decide per overlay whether it is confined to a pane (pane host `position: relative`) or the window (render at the root).
-4. Replace `ExpandableBudget`'s `52vh` with a container-relative height if it is reused.
-5. Both resets apply inside a `.dt-app` pane (`.ux-screen :where(button)` / `.ux-screen *` and `.dt-app button`); check the
+4. Both resets apply inside a `.dt-app` pane (`.ux-screen :where(button)` / `.ux-screen *` and `.dt-app button`); check the
    few places where they disagree (button display and font) when the first mobile piece lands in a tablet pane.

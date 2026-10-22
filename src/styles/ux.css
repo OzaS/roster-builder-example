@@ -980,7 +980,7 @@
   top: calc(100% + 8px);
   display: grid;
   gap: 8px;
-  max-height: min(330px, 52vh);
+  max-height: min(330px, var(--ux-popover-max-height, 52vh));
   padding: 10px;
   border: 1px solid var(--ux-line-2);
   border-radius: var(--ux-r-md);
