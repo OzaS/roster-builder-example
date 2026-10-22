@@ -17,7 +17,7 @@ export function TabletElements() {
   const prefs = useMemo(() => ({ deviceId, input, setDeviceId, setInput }), [deviceId, input]);
   const [page, setPage] = useState<'home' | 'rosters' | 'tools'>('rosters');
   const railIn = (mode: TabletInput) => <div className="tb-app ux-screen ux-size-regular dark tb-medium" style={{ height: 'auto', flex: 'none', background: 'var(--ux-bg)', borderRadius: 18, overflow: 'visible', width: 'max-content' }}>
-    <TabletEnvContext.Provider value={makeTabletEnv('ipad-portrait', mode)}><div style={{ height: 520, display: 'flex' }}><TabletRail page={page} input={mode} onPage={p => setPage(p as typeof page)} onNewRoster={() => {}} /></div></TabletEnvContext.Provider>
+    <TabletEnvContext.Provider value={makeTabletEnv('ipad-portrait', mode)}><div style={{ height: 620, display: 'flex' }}><TabletRail page={page} input={mode} onPage={p => setPage(p as typeof page)} onNewRoster={() => {}} /></div></TabletEnvContext.Provider>
   </div>;
   return <TabletPrefsContext.Provider value={prefs}>
     <div className="tb-elements">

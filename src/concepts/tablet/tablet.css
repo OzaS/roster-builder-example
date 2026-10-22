@@ -160,3 +160,4 @@
 .tb-el-controls { max-width: 320px }
 .tb-el-card { height: auto !important; width: 420px; padding: 16px; border-radius: 18px }
 .tb-el-frames { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 28px; align-items: start }
+.tb-card { align-content: start }
