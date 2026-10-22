@@ -53,3 +53,28 @@
   .tbc-steps { padding-right: 20px; border-right: 1px solid var(--ux-line) }
 }
 
+/* Faction picker: a checkbox row with the count and Select all above. */
+.tbd-tools { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--ux-muted); font-size: 13.5px; font-weight: 650 }
+.tb-app button.tbs-choice > .tbd-box { flex: 0 0 auto; display: grid; place-items: center; width: 24px; height: 24px; border: 1.5px solid var(--ux-line-2); border-radius: 7px; color: var(--ux-accent-ink) }
+.tb-app button.tbs-choice.active > .tbd-box { border-color: var(--ux-accent); background: var(--ux-accent) }
+.tb-app button.tbs-choice[role=checkbox] { min-height: 56px }
+.tb-app .tbs-action.tbd-danger { margin-right: auto; border-color: color-mix(in srgb, var(--ux-err) 45%, var(--ux-line-2)); color: var(--ux-err) }
+.tb-app .tbs-action.tbd-inline { margin-top: 10px; min-height: 44px }
+
+/* Add a collection: the link field with its Find button, and the gallery-only state buttons. */
+.tbd-find { display: flex; gap: 10px }
+.tbd-find input { flex: 1; min-width: 0 }
+.tbd-find .tbs-action { flex: 0 0 auto; min-height: 48px }
+.tbs-field > small { font-size: 13px; font-weight: 500; line-height: 1.4 }
+.tbd-preview { border-top: 1px solid var(--ux-line); padding-top: 10px; color: var(--ux-muted); font-size: 13px }
+.tbd-preview summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-weight: 650 }
+.tbd-preview-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 10px }
+.tb-app .tbd-preview-row .tbs-action { min-height: 44px; padding: 0 14px; font-size: 13.5px }
+.tb-app .tbd-preview-row .tbs-action[aria-pressed=true] { border-color: var(--ux-accent); background: color-mix(in srgb, var(--ux-accent) 14%, var(--ux-surface)) }
+
+/* Appearance import: the swatch of the imported scheme. */
+.tbd-swatch { display: flex !important; align-items: center; gap: 0; margin-top: 10px }
+.tbd-swatch i { display: block; width: 24px; height: 28px; border: 1px solid var(--ux-line); border-left-width: 0 }
+.tbd-swatch i:first-child { border-left-width: 1px; border-radius: 8px 0 0 8px }
+.tbd-swatch i:nth-child(3) { border-radius: 0 8px 8px 0 }
+.tbd-swatch b { margin-left: 12px; color: var(--ux-ink); font-size: 14px }

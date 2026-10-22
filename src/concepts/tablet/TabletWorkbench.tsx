@@ -10,6 +10,7 @@ import { TabletSettings } from './TabletSettings';
 import { TabletEditor, type EditorStart } from './TabletEditor';
 import { ImportResultSheet } from './TabletEditorSheets';
 import { CreateRosterSheet, newRosterDocument, type NewRoster } from './TabletCreateSheet';
+import { TabletSessionSheets } from './TabletSheets';
 import { sampleImport, type ImportResult } from '../desktop/DesktopEditorFlows';
 import { rosterLibrary } from '../desktop/desktopData';
 import { tabletRoute, useTabletSession, TabletJobsPanel, type TabletRoute } from './tabletSession';
@@ -95,6 +96,7 @@ function TabletShell({ route, initialEditor, initialImport = false, ...props }: 
       setEditor(current => ({ name: result.name, from: current?.from ?? page, start: 'editor', key: (current?.key ?? 0) + 1, imported: result }));
       const left = result.unmatched.length; notify(left ? `Opened “${result.name}” without ${left === 1 ? '1 entry' : `${left} entries`}` : `Opened “${result.name}”`);
     }} />}
+    <TabletSessionSheets session={session} notify={notify} />
     {creating && <CreateRosterSheet sources={jobs.sources} review={creating === 'review'} onClose={() => setCreating(null)} onCreate={createRoster} onAddData={() => { setCreating(null); setEditor(null); addData(); }} />}
     <div className={`dt-app tb-shim ${light ? 'light' : ''}`}><ToastRegion toasts={toasts} /></div>
   </div>;

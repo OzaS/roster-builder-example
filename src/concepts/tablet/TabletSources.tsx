@@ -3,7 +3,7 @@ import { AlertTriangle, ArrowUpCircle, Check, ChevronRight, ExternalLink, Folder
 import { Chip as MobileChip } from '../ux/uxShared'; // the mobile chip; the workspace Chip (dtp-chip) is not used here, see MOBILE-PIECES.md
 import { jobPercent } from '../workspace/Jobs';
 import type { SourceInfo } from '../desktop/desktopData';
-import { AddCollectionDialog, AddDataCollections, CollectionView, GitHubSearchView, LastUpdateCard, LastUpdateStates, UpdateReportView, flowSourceId, isAddFlow, useRosterChecks } from '../desktop/DesktopSourceFlows';
+import { AddDataCollections, CollectionView, GitHubSearchView, LastUpdateCard, LastUpdateStates, UpdateReportView, flowSourceId, isAddFlow, useRosterChecks } from '../desktop/DesktopSourceFlows';
 import '../desktop/desktop-pages.css';
 import { HintButton } from './TabletHint';
 import { Facts, ListDetail, Row, WorkspaceScope, plural, sourceStatus, Progress, type SessionProps } from './TabletPieces';
@@ -11,15 +11,14 @@ import { TabletJobsButton } from './tabletSession';
 import type { TabletPage } from './TabletRail';
 
 // Sources (T2b): installed game data as list + detail, the progress button and jobs popover in the toolbar, and the add flows.
-// The update report, collection pages, GitHub search and the add-collection sheet are the workspace flows of the desktop,
-// drawn with touch-size controls (tablet-pages.css); T3 designs the generic sheets. The detail's mode lives in the session
+// The update report, collection pages and GitHub search are the workspace flows of the desktop, drawn with touch-size
+// controls (tablet-pages.css). The add-collection and faction picker sheets (T3) cover the whole window: TabletSessionSheets. The detail's mode lives in the session
 // (`sourceDetail`): a source id, 'add', 'github', 'collection:<id>' or 'report:<id>', so it survives switching pages.
 
 export function TabletSources({ env, notify, session, onPage, onOpenRoster }: SessionProps & { onPage: (page: TabletPage) => void; onOpenRoster: (name: string) => void }) {
   const { jobs, sourceDetail, setSourceDetail, setJobsOpen, light, advancedInstall } = session;
   const { sources, setSources } = jobs;
   const [open, setOpen] = useState(sourceDetail !== undefined);
-  const [addingCollection, setAddingCollection] = useState(session.state === 'add-collection');
   const [confirmRemove, setConfirmRemove] = useState(false);
   const [link, setLink] = useState('');
   const detail = sourceDetail ?? sources[0]?.id ?? 'add';
@@ -60,7 +59,7 @@ export function TabletSources({ env, notify, session, onPage, onOpenRoster }: Se
     </form>
     <div className="tb-list">
       <Row selected={false} mark={<Github size={20} />} title="Search GitHub" sub="Find data repositories by name" end={<ChevronRight size={17} />} onClick={() => go('github')} />
-      <Row selected={false} mark={<Plus size={20} />} title="Add a collection or library" sub="Lists of sources kept by the community" end={<ChevronRight size={17} />} onClick={() => setAddingCollection(true)} />
+      <Row selected={false} mark={<Plus size={20} />} title="Add a collection or library" sub="Lists of sources kept by the community" end={<ChevronRight size={17} />} onClick={() => session.setAddCollectionOpen(true)} />
       <Row selected={false} mark={<FolderOpen size={20} />} title="Install from a file" sub="An archive, data files or a folder" end={<ChevronRight size={17} />} onClick={() => notify('Choose an archive, data files or a folder (prototype)')} />
     </div>
   </>;
@@ -107,6 +106,5 @@ export function TabletSources({ env, notify, session, onPage, onOpenRoster }: Se
       <HintButton hint="Install game data from an archive, data files or a folder" input={env.input} side="bottom" className="ux-job-btn" onClick={() => notify('Choose an archive, data files or a folder (prototype)')}><FolderOpen size={16} />Install from a file</HintButton>
       <HintButton hint="Install from a collection, a repository link or GitHub search" input={env.input} side="bottom" className="ux-job-btn primary" onClick={() => go('add')}><Plus size={16} />Add game data</HintButton></div>
     <ListDetail env={env} label="Installed sources" open={open} onClose={() => setOpen(false)} list={list} detail={pane} />
-    {addingCollection && <WorkspaceScope light={light}><div className="tb-flow tb-sheet"><AddCollectionDialog {...flow} onClose={() => setAddingCollection(false)} /></div></WorkspaceScope>}
   </div>;
 }

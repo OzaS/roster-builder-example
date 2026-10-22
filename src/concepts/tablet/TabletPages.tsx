@@ -124,12 +124,11 @@ export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster 
   const [selected, setSelected] = useState(rosters[0]?.name ?? '');
   const [open, setOpen] = useState(false);
   const [renaming, setRenaming] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
   const q = query.trim().toLowerCase();
   const visible = useMemo(() => rosters.filter(r => (r.name + r.faction).toLowerCase().includes(q) && (!attention || needsAttention(r))), [rosters, q, attention]);
   const attentionCount = rosters.filter(needsAttention).length;
   const current = rosters.find(r => r.name === selected) ?? visible[0] ?? rosters[0];
-  const choose = (name: string) => { setSelected(name); setOpen(true); setRenaming(false); setConfirmDelete(false); };
+  const choose = (name: string) => { setSelected(name); setOpen(true); setRenaming(false); };
   const actions = <>
     <HintButton hint="Import a roster from a file" input={env.input} side="bottom" className="ux-job-btn" onClick={() => notify('Import a roster file (prototype)')}><FileUp size={16} />Import</HintButton>
     <HintButton hint="Create a roster" input={env.input} side="bottom" className="ux-job-btn primary" onClick={onNewRoster}><Plus size={16} />New roster</HintButton>
@@ -142,7 +141,6 @@ export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster 
     </EmptyState>
   </div>;
   const duplicate = (r: RosterSummary) => { const copy = { ...r, name: `Copy of ${r.name}`, opened: 'Just now' }; setRosters(list => [copy, ...list]); choose(copy.name); notify(`Duplicated as “${copy.name}”`); };
-  const remove = (r: RosterSummary) => { const before = rosters; setRosters(list => list.filter(x => x.name !== r.name)); setSelected(rosters.find(x => x.name !== r.name)?.name ?? ''); setConfirmDelete(false); notify(`Deleted “${r.name}”`, { action: { label: 'Undo', run: () => { setRosters(before); setSelected(r.name); } } }); };
   const rename = (r: RosterSummary, name: string) => { if (name && name !== r.name) { setRosters(list => list.map(x => x.name === r.name ? { ...x, name } : x)); setSelected(name); } setRenaming(false); };
   const [noteTone, noteTitle, noteText] = current ? rosterNote(current) : ['', '', ''];
   return <div className="tb-page">
@@ -168,7 +166,7 @@ export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster 
           <HintButton hint="Rename this roster" input={env.input} side="top" className="ux-job-btn" onClick={() => setRenaming(true)}><Pencil size={16} />Rename</HintButton>
           <HintButton hint="Make an editable copy" input={env.input} side="top" className="ux-job-btn" onClick={() => duplicate(current)}><Copy size={16} />Duplicate</HintButton>
           <HintButton hint="Export this roster as a file" input={env.input} side="top" className="ux-job-btn" onClick={() => notify(`“${current.name}” exported`)}><ArrowDownToLine size={16} />Export</HintButton>
-          <HintButton hint={confirmDelete ? 'Tap again to delete this roster for good' : 'Delete this roster'} input={env.input} side="top" className={`ux-job-btn ${confirmDelete ? 'tb-confirm' : 'destructive'}`} onClick={() => confirmDelete ? remove(current) : setConfirmDelete(true)}><Trash2 size={16} />{confirmDelete ? 'Delete for good?' : 'Delete'}</HintButton></div>
+          <HintButton hint="Delete this roster (asks first)" input={env.input} side="top" className="ux-job-btn destructive" onClick={() => session.setDeleting(current.name)}><Trash2 size={16} />Delete</HintButton></div>
       </> : null} />
   </div>;
 }
