@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, Check, Database, Minus, Plus, Search, X } from 'lucide-react';
 import type { SourceInfo } from './desktopData';
+import { ModalShell } from '../workspace/Dialog';
 
 // Guided roster creation for desktop: the mobile steps (game system → points limit → faction and force →
 // configuration → name) as one dialog with a step list on the left. Earlier steps stay editable.
@@ -50,9 +51,9 @@ export function DesktopCreate({ sources, onCreate, onClose, onAddData }: { sourc
   const next = () => { if (!valid[step]) return; if (index === STEPS.length - 1) create(); else go(index + 1); };
   const skip = () => onCreate({ name: 'Untitled roster', limit: 1000, system: source?.name ?? '', faction: source?.factions[0] ?? '', force: FORCES[0].name });
 
-  if (!sources.length) return <Dialog onClose={onClose} label="Create roster"><div className="dt-wizard-empty"><Database size={26} /><h2>Install game data first</h2><p>Rosters are built from a game system's data. Install one, then create your roster.</p><button className="dtp-btn primary" onClick={onAddData}>Add game data<ArrowRight size={15} /></button></div></Dialog>;
+  if (!sources.length) return <ModalShell onClose={onClose} label="Create roster" className="dt-wizard-modal"><div className="dt-wizard-empty"><Database size={26} /><h2>Install game data first</h2><p>Rosters are built from a game system's data. Install one, then create your roster.</p><button className="dtp-btn primary" onClick={onAddData}>Add game data<ArrowRight size={15} /></button></div></ModalShell>;
 
-  return <Dialog onClose={onClose} label="Create roster">
+  return <ModalShell onClose={onClose} label="Create roster" className="dt-wizard-modal">
     <form className="dt-wizard" onSubmit={e => { e.preventDefault(); next(); }}>
       <nav className="dt-wizard-steps" aria-label="Steps">
         <h2>New roster</h2>
@@ -90,9 +91,5 @@ export function DesktopCreate({ sources, onCreate, onClose, onAddData }: { sourc
         <footer><button type="button" className="dtp-btn" disabled={index === 0} onClick={() => go(index - 1)}><ArrowLeft size={14} />Back</button><span className="dt-wizard-keys">Enter to continue</span><button type="submit" className="dtp-btn primary" disabled={!valid[step]}>{index === STEPS.length - 1 ? 'Create roster' : 'Continue'}<ArrowRight size={14} /></button></footer>
       </div>
     </form>
-  </Dialog>;
-}
-
-function Dialog({ label, onClose, children }: { label: string; onClose: () => void; children: React.ReactNode }) {
-  return <div className="dt-modal-scrim" onClick={onClose}><section className="dt-modal dt-wizard-modal" role="dialog" aria-modal="true" aria-label={label} onClick={e => e.stopPropagation()}>{children}</section></div>;
+  </ModalShell>;
 }

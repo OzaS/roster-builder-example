@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent a
 import { AlertTriangle, Archive, ArrowDownToLine, ArrowLeft, ArrowUpCircle, Check, ChevronRight, CloudOff, Copy, Ellipsis, EyeOff, FileText, Github, History, Inbox, Layers3, LibraryBig, Link2, ListChecks, LoaderCircle, OctagonAlert, RefreshCcw, Search, Trash2, X } from 'lucide-react';
 import { dataChanges, githubRepositories, rosterChecks, sourceCollections, type CheckState, type CollectionPage, type DataChanges, type LastUpdate, type Listing, type RosterCheck, type SourceInfo } from './desktopData';
 import { jobPercent, type DesktopJobs } from './DesktopJobs';
-import type { ToastOptions } from './DesktopPages';
+import type { Notify } from '../workspace/Toasts';
 import { Chip, type ChipTone } from '../workspace/Primitives';
 import './desktop-sources.css';
 
@@ -11,7 +11,6 @@ import './desktop-sources.css';
 // The detail pane's mode lives in the page's selected id: a source id, 'add', 'report:<id>',
 // 'collection:<id>' or 'github', so it survives switching pages like the selected source does.
 
-type Notify = (message: string, options?: ToastOptions) => void;
 type Go = (detail: string) => void;
 
 export const flowSourceId = (detail: string) => detail.startsWith('report:') ? detail.slice(7) : detail;

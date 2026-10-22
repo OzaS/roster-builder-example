@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AlertTriangle, Check, ChevronDown, ChevronUp, Circle, LoaderCircle, Search, X } from 'lucide-react';
 import type { SourceInfo } from './desktopData';
-import type { ToastOptions } from './DesktopPages';
+import type { Notify } from '../workspace/Toasts';
 
 // Install / update jobs for the desktop prototype: one simulated queue shared by Welcome, Sources and the
 // window chrome. Installs pause on "Choose factions" until the user picks; Cancel needs no confirmation.
@@ -29,8 +29,6 @@ function advance(job: Job): Job {
   next.state = 'active';
   return { ...job, steps: list };
 }
-
-type Notify = (text: string, options?: ToastOptions) => void;
 
 export function useDesktopJobs(initial: SourceInfo[], notify: Notify, onViewSource: (id: string) => void) {
   const [sources, setSources] = useState(initial);

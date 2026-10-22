@@ -6,11 +6,10 @@ import { comboFromEvent, defaultBindings, formatCombo, hasCommandModifier, keyAc
 import type { DesktopJobs } from './DesktopJobs';
 import { jobPercent } from './DesktopJobs';
 import { Chip, PageActions, Segmented, Switch } from '../workspace/Primitives';
+import type { Notify } from '../workspace/Toasts';
 import './desktop-pages.css';
 import { AddCollectionDialog, AddDataCollections, CollectionView, GitHubSearchView, LastUpdateCard, LastUpdateStates, UpdateReportView, flowSourceId, isAddFlow, useRosterChecks } from './DesktopSourceFlows';
 
-export type ToastOptions = { kind?: 'action' | 'notification'; action?: { label: string; run: () => void } };
-type Notify = (message: string, options?: ToastOptions) => void;
 
 const statusChip = (r: RosterSummary) => r.status === 'issues' ? <Chip tone="warn"><AlertTriangle size={11} />{r.issues} {r.issues === 1 ? 'issue' : 'issues'}</Chip>
   : r.status === 'data-changed' ? <Chip tone="accent">Data changed</Chip>

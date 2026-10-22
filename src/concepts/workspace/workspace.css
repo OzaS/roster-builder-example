@@ -32,3 +32,27 @@
 .dt-resizer::after {content:'';position:absolute;top:0;bottom:0;left:3px;width:2px;border-radius:2px;background:transparent;transition:background .15s}
 .dt-resizer:hover::after,.dt-resizer.dragging::after,.dt-resizer:focus-visible::after {background:var(--dt-fill)}
 .dt-resizer:focus-visible {outline:none}
+
+/* Dialog shell */
+.dt-app .dte-scrim { padding-top: 70px }
+.dt-app .dte-dialog { width: min(520px, calc(100% - 60px)); padding: 0; display: flex; flex-direction: column; max-height: calc(100% - 84px); overflow: hidden }
+.dt-app .dte-dialog.wide { width: min(900px, calc(100% - 60px)) }
+.dt-app .dte-dialog > .dte-head { margin-bottom: 0 }
+.dte-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 18px 20px 12px; border-bottom: 1px solid var(--dt-border) }
+.dt-app .dte-head h2 { font-size: 17px; font-weight: 600 }
+.dt-app .dte-head p { font-size: 12px; color: var(--dt-muted); margin-top: 2px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap }
+
+/* Modal scrim and dialog, toasts */
+.dt-modal-scrim {position:absolute;inset:0;z-index:5;background:color-mix(in srgb,var(--ux-bg) 60%,transparent);backdrop-filter:blur(5px);display:flex;justify-content:center;align-items:flex-start;padding-top:130px}
+.dt-modal {width:430px;background:var(--dt-pane);border:1px solid var(--dt-border);border-radius:12px;box-shadow:0 30px 90px #0007;padding:16px}
+.dt-modal>header {display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}
+.dt-modal h2 {font-size:16px;font-weight:500;letter-spacing:-.3px}
+.dt-toast {position:absolute;z-index:6;bottom:43px;left:50%;transform:translateX(-50%);background:var(--dt-hover);border:1px solid var(--dt-border);border-radius:7px;padding:8px 9px 8px 13px;box-shadow:0 7px 30px #0005;display:flex;align-items:center;gap:9px;font-size:11px;white-space:nowrap}
+.dt-toast>svg {color:var(--dt-ok)}
+.dt-modal {border-radius:18px;border-color:var(--ux-line-2)}
+.dt-toast {border-radius:12px;background:var(--dt-pane);border-color:var(--ux-line-2)}
+.dt-toast.functional,.dt-toast.notification {left:auto;right:14px;transform:none;max-width:420px;white-space:normal}
+.dt-toast.functional {top:66px;bottom:auto}
+.dt-toast.notification {bottom:14px;padding:12px 10px 12px 14px;box-shadow:0 14px 40px #0005}
+.dt-toast.notification>svg {color:var(--dt-accent)}
+.dt-app .dt-toast-action {font-weight:600;color:var(--dt-accent);padding:3px 8px;border-radius:7px}
