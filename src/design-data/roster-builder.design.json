@@ -498,7 +498,7 @@
       "bestFor": "Focused desktop roster building with a searchable catalogue, persistent force outline and live unit inspector.",
       "direction": "Borderless workspace on the shared themes and colour schemes, floating panel controls, curved tabs at the top, rounded card panels, and a roster summary popover with a points line under the tabs. Hub pages (Rosters, Lookup, Sources, Settings) use an activity rail; the editor does not.",
       "interaction": "Browse Welcome and Editor in the design gallery. Open a recent roster or create one; edit with the catalogue, force tree and inspector. Floating controls toggle panels; Command K opens actions.",
-      "tradeoff": "Desktop-first exploration. Sample data and prototype-session edits; not connected to the Battle Augur engine or persistence. App foundation (2026-10-22): Electron rail, live roster/source lists and persistent appearance settings are implemented. Desktop install slice (2026-10-22): runtime collection browsing and repository-link installs, shared job progress/cancel/retry/results and Advanced installation choice are implemented. Add game data uses the full page sheet; Jobs stays available when empty; View Sources returns to the installed list. Desktop discovery slice (2026-10-22): GitHub search, saved collections/libraries, default hide/show and refresh/copy/confirmed remove are implemented. Collection actions use visible grouped buttons instead of an ellipsis menu; Add collection uses a centred modal with focus containment and Escape restoration; copy feedback includes a selectable link on failure. Live GitHub/native clipboard acceptance remains open. Desktop lifecycle slice (2026-10-23): installed source list/detail, provenance/facts, faction tags, folded report/documents, pinned install-more and guarded removal are implemented; removal uses a danger-zone confirmation with live impact and busy/error feedback. Desktop local import slice (2026-10-23): Sources file/folder choice, native picker handoff, refusal/pending/interrupted notices and shared local job/replacement feedback are implemented using existing dialogs/notices. Desktop updates slice (2026-10-23): update checks (manual and automatic), Update one/all/selected, detail changes and removal warnings, update jobs with Check rosters / Later, the Last update card, a dedicated update report page and the update preferences are implemented; the compare link is selectable URL text. Desktop kept versions and recovery slice (2026-10-23): kept-version switch/delete and interrupted recovery are implemented. Desktop roster organizer and creation slice (2026-10-23): the Rosters list/detail organizer with rename/duplicate/delete and guided creation from Rosters and Welcome are implemented. Roster opening, editor panes and full Settings remain targets; unavailable actions are marked planned.",
+      "tradeoff": "Desktop-first exploration. Sample data and prototype-session edits; not connected to the Battle Augur engine or persistence. App foundation (2026-10-22): Electron rail, live roster/source lists and persistent appearance settings are implemented. Desktop install slice (2026-10-22): runtime collection browsing and repository-link installs, shared job progress/cancel/retry/results and Advanced installation choice are implemented. Add game data uses the full page sheet; Jobs stays available when empty; View Sources returns to the installed list. Desktop discovery slice (2026-10-22): GitHub search, saved collections/libraries, default hide/show and refresh/copy/confirmed remove are implemented. Collection actions use visible grouped buttons instead of an ellipsis menu; Add collection uses a centred modal with focus containment and Escape restoration; copy feedback includes a selectable link on failure. Live GitHub/native clipboard acceptance remains open. Desktop lifecycle slice (2026-10-23): installed source list/detail, provenance/facts, faction tags, folded report/documents, pinned install-more and guarded removal are implemented; removal uses a danger-zone confirmation with live impact and busy/error feedback. Desktop local import slice (2026-10-23): Sources file/folder choice, native picker handoff, refusal/pending/interrupted notices and shared local job/replacement feedback are implemented using existing dialogs/notices. Desktop updates slice (2026-10-23): update checks (manual and automatic), Update one/all/selected, detail changes and removal warnings, update jobs with Check rosters / Later, the Last update card, a dedicated update report page and the update preferences are implemented; the compare link is selectable URL text. Desktop kept versions and recovery slice (2026-10-23): kept-version switch/delete and interrupted recovery are implemented. Desktop roster organizer and creation slice (2026-10-23): the Rosters list/detail organizer with rename/duplicate/delete and guided creation from Rosters and Welcome are implemented. Roster opening, editor panes and full Settings remain targets; unavailable actions are marked planned. Desktop roster editor slice (2026-10-23): Open from Rosters or a source's detail starts the three-panel editor on the engine worker: catalogue pane (Add to force, role filter, search, show hidden, budget line), roster tree with header totals/limits and Saved status, Add force dialog, duplicate/delete with toast Undo, Undo/Redo buttons and ⌘Z / ⇧⌘Z, and the unit inspector (folded remembered option sections, nested drill chain with Back, model loadouts with split, Options/Profile tabs with rules, links). Command K, editable bindings, floating panel toggles, notes and the separate Rules tab are not built; diagnostics navigation and the read-only banner follow.",
       "screens": [
         {
           "id": "desktop-welcome",
@@ -668,7 +668,7 @@
                   "add",
                   "add to force picker",
                   "nothing to add (read-only)"
-                ],
+                , "App DP07: left pane over mobile's Add unit pool for the Add to force (picker when several forces); role filter from that force's slots; search; Show hidden; budget line under the title; Add selects and announces the new unit; read-only shows nothing to add"],
                 "screens": [
                   "desktop-editor"
                 ]
@@ -690,7 +690,7 @@
                   "remove",
                   "several forces",
                   "read-only"
-                ],
+                , "App DP07: header (name, faction · system, errors, budget with over-limit and other limits, Saved); force sections with slot chips/counts/points, unit rows (×models, cost, status edge), collapse, duplicate and delete per row; empty state with Add force"],
                 "screens": [
                   "desktop-editor"
                 ]
@@ -701,7 +701,7 @@
                 "level": "composite",
                 "status": "needs-review",
                 "platforms": ["desktop"],
-                "states": ["force section with its own groups and points", "force selected for adding (Adding here)", "catalogue Add to picker", "add force dialog", "force type with description", "disabled force type with reason", "faction and name", "rename inline", "remove with Undo", "last force cannot be removed"],
+                "states": ["force section with its own groups and points", "force selected for adding (Adding here)", "catalogue Add to picker", "add force dialog", "force type with description", "disabled force type with reason", "faction and name", "rename inline", "remove with Undo", "last force cannot be removed", "App DP07: several forces with their own sections and points; Add force as a modal (child/root forces, faction, hidden forces, limits and reasons); the added force becomes the catalogue's Add to target; delete with toast Undo; the first force cannot be deleted. Inline rename not built"],
                 "screens": ["desktop-editor"]
               },
               {
@@ -710,7 +710,7 @@
                 "level": "control",
                 "status": "needs-review",
                 "platforms": ["desktop"],
-                "states": ["undo / redo buttons in the force heading", "titles name the step", "⌘Z / ⇧⌘Z (editable bindings)", "text fields keep their own undo", "nothing to undo (disabled)", "toast with Redo after Undo", "toast Undo after add, duplicate, remove"],
+                "states": ["undo / redo buttons in the force heading", "titles name the step", "⌘Z / ⇧⌘Z (editable bindings)", "text fields keep their own undo", "nothing to undo (disabled)", "toast with Redo after Undo", "toast Undo after add, duplicate, remove", "App DP07: Undo/Redo buttons in the force heading (generic titles: the worker history does not name steps); ⌘Z / ⇧⌘Z outside text fields; toasts with Redo after Undo and Undo after delete/redo, guarded against later edits; editable bindings not built"],
                 "screens": ["desktop-editor"]
               },
               {
@@ -756,7 +756,7 @@
                   "upgrade selected",
                   "notes",
                   "read-only (disabled with reason)"
-                ],
+                , "App DP07: mobile's unit detail in the right pane: slot, name, cost, Duplicate/Delete; folded option sections remembered per roster; check/radio/None/quantity rows with limits and reasons; nested drill chain with Back and breadcrumbs; model loadouts with count and split; Options/Profile tabs (rules on Profile); links; inline issues; read-only disables controls with the reason. Notes not built"],
                 "screens": [
                   "desktop-editor"
                 ]
