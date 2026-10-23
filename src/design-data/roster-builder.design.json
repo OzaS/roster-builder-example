@@ -498,7 +498,7 @@
       "bestFor": "Focused desktop roster building with a searchable catalogue, persistent force outline and live unit inspector.",
       "direction": "Borderless workspace on the shared themes and colour schemes, floating panel controls, curved tabs at the top, rounded card panels, and a roster summary popover with a points line under the tabs. Hub pages (Rosters, Lookup, Sources, Settings) use an activity rail; the editor does not.",
       "interaction": "Browse Welcome and Editor in the design gallery. Open a recent roster or create one; edit with the catalogue, force tree and inspector. Floating controls toggle panels; Command K opens actions.",
-      "tradeoff": "Desktop-first exploration. Sample data and prototype-session edits; not connected to the Battle Augur engine or persistence. App foundation (2026-10-22): Electron rail, live roster/source lists and persistent appearance settings are implemented. Desktop install slice (2026-10-22): runtime collection browsing and repository-link installs, shared job progress/cancel/retry/results and Advanced installation choice are implemented. Add game data uses the full page sheet; Jobs stays available when empty; View Sources returns to the installed list. Custom collections, GitHub search, updates, creation, editor panes and full Settings remain targets; unavailable actions are marked planned.",
+      "tradeoff": "Desktop-first exploration. Sample data and prototype-session edits; not connected to the Battle Augur engine or persistence. App foundation (2026-10-22): Electron rail, live roster/source lists and persistent appearance settings are implemented. Desktop install slice (2026-10-22): runtime collection browsing and repository-link installs, shared job progress/cancel/retry/results and Advanced installation choice are implemented. Add game data uses the full page sheet; Jobs stays available when empty; View Sources returns to the installed list. Desktop discovery slice (2026-10-22): GitHub search, saved collections/libraries, default hide/show and refresh/copy/confirmed remove are implemented. Collection actions use visible grouped buttons instead of an ellipsis menu; Add collection uses a centred modal with focus containment and Escape restoration; copy feedback includes a selectable link on failure. Live GitHub/native clipboard acceptance remains open. Updates, creation, editor panes and full Settings remain targets; unavailable actions are marked planned.",
       "screens": [
         {
           "id": "desktop-welcome",
@@ -879,7 +879,7 @@
                 "level": "screen-composition",
                 "status": "needs-review",
                 "platforms": ["desktop"],
-                "states": ["default collection rows", "show all", "search", "no matches", "supported", "installed", "update", "installing percent", "choose factions (Advanced installation on)", "archived toggle", "nested collections and libraries", "more menu", "refresh", "copy link", "hide default", "remove saved", "offline kept copy", "refresh failed retry", "loading", "empty", "preview states", "App install slice: Add game data is a full page, default runtime collection and nested listings, repository link with validation; custom collection management and GitHub search remain planned"],
+                "states": ["default collection rows", "show all", "search", "no matches", "supported", "installed", "update", "installing percent", "choose factions (Advanced installation on)", "archived toggle", "nested collections and libraries", "more menu", "refresh", "copy link", "hide default", "remove saved", "offline kept copy", "refresh failed retry", "loading", "empty", "preview states", "App discovery slice: full-page hub with default preview and nested listings, saved collection/library rows, repository validation, GitHub search and add collection; grouped Refresh/Copy/Hide/Remove actions with clipboard feedback and confirmed removal of saved listings only"],
                 "screens": ["desktop-sources"]
               },
               {
@@ -888,7 +888,7 @@
                 "level": "screen-composition",
                 "status": "needs-review",
                 "platforms": ["desktop"],
-                "states": ["prompt", "search on Enter", "searching", "results", "archived toggle", "install", "no results", "error retry", "preview states"],
+                "states": ["prompt", "search on Enter", "App discovery slice: submit/retry, active and archived results, empty/error states and shared install/job actions", "searching", "results", "archived toggle", "install", "no results", "error retry", "preview states"],
                 "screens": ["desktop-sources"]
               },
               {
@@ -897,7 +897,7 @@
                 "level": "overlay",
                 "status": "needs-review",
                 "platforms": ["desktop"],
-                "states": ["link field", "find", "finding", "collection preview", "library preview", "add collection", "repository: install it", "already added", "not a collection", "no connection", "escape closes", "focus trap", "preview states"],
+                "states": ["link field", "find", "finding", "collection preview", "library preview", "add collection", "repository: install it", "already added", "not a collection", "no connection", "escape closes", "focus trap", "preview states", "App discovery slice: native modal initial focus, Escape/Cancel restores opener or navigation heading; duplicate preview/save safety; saved collection counts and library persistence"],
                 "screens": ["desktop-sources"]
               },
               {
