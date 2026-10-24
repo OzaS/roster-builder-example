@@ -648,7 +648,8 @@
                 "states": [
                   "recent",
                   "create",
-                  "import"
+                  "import",
+                  "App DD02: two columns (brand mark, eyebrow, display heading, tagline, start actions Create / Import / Manage game data, the offline line; Recent rosters from the shared home view with monogram, factions · system · points, data-tag and error chips, opened day, All rosters; data but no rosters: Ready when you are with the empty card); YOUR WORKSPACE top line and footer. Differences: no ⌘N label (DD-15) and no ⌘K tip (DD-17); the status line keeps the app's totals instead of All systems ready; opened times are day precision; the footer's right side says Battle Augur only; without data the start actions are Add game data and Game data; the cool monogram tone uses the info token; below 900 px the columns stack"
                 ],
                 "screens": [
                   "desktop-welcome"
@@ -828,7 +829,7 @@
                 "level": "screen-composition",
                 "status": "needs-review",
                 "platforms": ["desktop"],
-                "states": ["no game data", "installing (every faction, no pause)", "installing with Choose factions (Advanced installation on)", "data but no rosters", "rosters empty"],
+                "states": ["no game data", "installing (every faction, no pause)", "installing with Choose factions (Advanced installation on)", "data but no rosters", "rosters empty", "App DD02: Start with game data whenever no game data is installed (also with rosters left without data, which add a rosters-wait footer with All rosters); up to five default-collection rows plus Show all, the row action following the install job (Install, Installing n %, Choose factions, Waiting, View source); quiet loading / failed / offline / hidden lines with Retry and Add game data, and the kept-copy line offline; Install from a file (its flag) and Install from a link as two rows; the status line says No game data yet. Differences: rows show the description or the repository and date (listings have no faction count or size)"],
                 "screens": ["desktop-first-run"]
               },
               {
