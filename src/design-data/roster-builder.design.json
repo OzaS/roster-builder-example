@@ -589,7 +589,8 @@
                   "dark",
                   "light",
                   "system",
-                  "shared colour schemes"
+                  "shared colour schemes",
+                  "App DD01: type scale (13 px base, 9–11 px captions with tracking, weight 500 headings, 37 px display), spacing and radius scale; one set of primitives after workspace/ (Button kinds, IconButton, Chip tones, Switch, Segmented, fields, Card, dialog shell, toast positions) used on every screen"
                 ],
                 "screens": []
               },
@@ -622,7 +623,8 @@
                   "width-aware panel content",
                   "ambient gradient (gallery switch)",
                   "read-only roster tab",
-                  "command palette prototype states"
+                  "command palette prototype states",
+                  "App DD01: hub tab with icon and title (Add game data and the update report count as Sources sub-views), Jobs button and page actions top right (Rosters, Sources), rail spacing with the brand spark and active bar, centre sheet, ambient gradient always on (no setting). Differences: no account avatar until accounts exist; no roster tab, + tab or status dot yet (DD-08/DD-16); Jobs button shown with no jobs so the panel stays reachable; Refresh / Check now in the tab row until DD-05; below 960 px wide / 600 px tall the app tightens the tab row and rail (the gallery draws no narrower frame)"
                 ],
                 "screens": [
                   "desktop-welcome",
@@ -790,7 +792,7 @@
                 "level": "overlay",
                 "status": "needs-review",
                 "platforms": ["desktop"],
-                "states": ["functional toast top right", "undo action", "notification bottom right", "dismiss", "undo / redo result"],
+                "states": ["functional toast top right", "undo action", "notification bottom right", "dismiss", "undo / redo result", "App DD01: functional/notification position classes exist; the editor toast stays bottom centre until the editor toolbar goes (DD-08)"],
                 "screens": ["desktop-editor", "desktop-rosters", "desktop-sources"]
               },
               {
