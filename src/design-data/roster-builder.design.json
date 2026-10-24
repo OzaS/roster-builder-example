@@ -871,7 +871,7 @@
                 "level": "screen-composition",
                 "status": "needs-review",
                 "platforms": ["desktop"],
-                "states": ["back to source", "roster chips", "changed roster cards", "faction removed", "open roster", "unchanged rosters", "data change counts", "show all changes", "nothing changed", "not checked", "checking", "check failed", "report missing", "App DP05a: dedicated report page with Back to Sources, summary badges, changed/unchanged/removed-faction roster rows, data change counts, missing/error/partial states; Open roster is shown as planned"],
+                "states": ["back to source", "roster chips", "changed roster cards", "faction removed", "open roster", "unchanged rosters", "data change counts", "show all changes", "nothing changed", "not checked", "checking", "check failed", "report missing", "App DP05a: dedicated report page with Back to Sources, summary badges, changed/unchanged/removed-faction roster rows, data change counts, missing/error/partial states; Open roster is shown as planned", "App DP10: Open roster on changed roster cards and unchanged roster rows opens the editor (Back to Sources); the planned note is gone"],
                 "screens": ["desktop-sources"]
               },
               {
@@ -907,7 +907,7 @@
                 "level": "screen-composition",
                 "status": "needs-review",
                 "platforms": ["desktop"],
-                "states": ["theme", "colour scheme", "import scheme", "language", "switches", "Advanced installation switch (off by default)", "keep versions", "storage", "key bindings", "recording", "needs a modifier", "conflict replace", "reset", "about", "scroll-tracked section list", "App DP05a: Check for updates automatically switch and Keep previous versions (Off, 1–3) applying to the next update; DP05b: switching/deleting kept versions in source detail"],
+                "states": ["theme", "colour scheme", "import scheme", "language", "switches", "Advanced installation switch (off by default)", "keep versions", "storage", "key bindings", "recording", "needs a modifier", "conflict replace", "reset", "about", "scroll-tracked section list", "App DP05a: Check for updates automatically switch and Keep previous versions (Off, 1–3) applying to the next update; DP05b: switching/deleting kept versions in source detail", "App DP10: section list (scroll-tracked) and cards for Appearance (theme segmented; colour schemes with swatches, imported schemes and Import scheme behind the colour-scheme flag, as mobile), Language (English and imported packs, Import language pack behind its flag, applied at start), Rosters (Remember option sections), Game data (automatic checks behind the updates flag, Advanced installation, Keep previous versions with the size), About (version, build, engine, data note and folder; seven clicks on the version unlock Developer) and Developer (feature flags by area with reset, engine worker restart, imports at once, install measurements). Not built: storage breakdown, key bindings and reopen tabs (desktop-only, after parity); Wi-Fi only and notifications are phone-only"],
                 "screens": ["desktop-settings"]
               }
             ]
