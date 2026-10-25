@@ -693,7 +693,7 @@
                   "remove",
                   "several forces",
                   "read-only"
-                , "App DP07: header (name, faction · system, errors, budget with over-limit and other limits, Saved); force sections with slot chips/counts/points, unit rows (×models, cost, status edge), collapse, duplicate and delete per row; empty state with Add force"],
+                , "App DP07: header (name, faction · system, errors, budget with over-limit and other limits, Saved); force sections with slot chips/counts/points, unit rows (×models, cost, status edge), collapse, duplicate and delete per row; empty state with Add force", "App DD10: tree after dt-roster: heading Your force(s) with units · forces, Undo / Redo and the check icon toggling the issues; force cards (flag icon, the force's own name, Faction · N units, points; collapse chevron kept); a slot's rows share one group card (name in data case, used / max, state chip, points; Add {group} unit row in every addable group); unit rows (icon by kind, name with other costs as tag chips, N models · loadout for every unit, points over the cost name, chevron; markers replace the points, no status edges; Duplicate / Delete float in on hover or focus); dashed Add force (neutral word, not Add detachment); no ALPHA-style tag (not in the data); at 470 px and less icons and loadout step back"],
                 "screens": [
                   "desktop-editor"
                 ]
@@ -704,7 +704,7 @@
                 "level": "composite",
                 "status": "needs-review",
                 "platforms": ["desktop"],
-                "states": ["force section with its own groups and points", "force selected for adding (Adding here)", "catalogue Add to picker", "add force dialog", "force type with description", "disabled force type with reason", "faction and name", "rename inline", "remove with Undo", "last force cannot be removed", "App DP07: several forces with their own sections and points; Add force as a modal (child/root forces, faction, hidden forces, limits and reasons); the added force becomes the catalogue's Add to target; delete with toast Undo; the first force cannot be deleted. Inline rename not built"],
+                "states": ["force section with its own groups and points", "force selected for adding (Adding here)", "catalogue Add to picker", "add force dialog", "force type with description", "disabled force type with reason", "faction and name", "rename inline", "remove with Undo", "last force cannot be removed", "App DP07: several forces with their own sections and points; Add force as a modal (child/root forces, faction, hidden forces, limits and reasons); the added force becomes the catalogue's Add to target; delete with toast Undo; the first force cannot be deleted. Inline rename not built", "App DD10: the target force card tinted with an accent border and an Add here / Adding here pill beside the name (not a chip inside it, the name does not select); a dashed rule between forces; Delete in hover tools. Inline rename not built (DD-19)"],
                 "screens": ["desktop-editor"]
               },
               {
@@ -781,7 +781,7 @@
                   "Show selects and scrolls to the unit or group",
                   "per-force requirements",
                   "not checked while read-only",
-                  "App DP08: strip at the foot of the roster pane: Checking rules…, Roster is legal, or counts in words; expands into mobile's issue list (severity and roster/force groups, rules not evaluated yet, unit count, loading, failure with Try again); the header's status line opens it; each issue is one button with a Show label; Show opens collapsed rows, selects a unit (inspector at the unit), scrolls, focuses and highlights the row (header status for a roster issue), announces it, and toasts when the entry is gone; while read-only on new data it still lists and selects. The stored roster without data shows saved checks instead of the strip"
+                  "App DP08: strip at the foot of the roster pane: Checking rules…, Roster is legal, or counts in words; expands into mobile's issue list (severity and roster/force groups, rules not evaluated yet, unit count, loading, failure with Try again); the header's status line opens it; each issue is one button with a Show label; Show opens collapsed rows, selects a unit (inspector at the unit), scrolls, focuses and highlights the row (header status for a roster issue), announces it, and toasts when the entry is gone; while read-only on new data it still lists and selects. The stored roster without data shows saved checks instead of the strip", "App DD10: dt-validation card at the pane foot (Shield, title, subline, chevron that turns), tones ok / warn / err, muted while checking; the app's words kept (Roster is legal, counts in words); the details card scrolls on its own; rows with the severity icon and word, the entry, Show {issue}; grouping by severity and roster / force kept; the pane heading's check icon toggles it too. No Validation paused look: an open read-only roster is still checked and the stored roster has no strip (DD-12)"
                 ],
                 "screens": [
                   "desktop-editor"
