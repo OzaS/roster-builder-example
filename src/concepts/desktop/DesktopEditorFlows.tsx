@@ -216,7 +216,7 @@ export function downloadFile(name: string, text: string, type: string) {
   const url = URL.createObjectURL(new Blob([text], { type })); const a = document.createElement('a'); a.href = url; a.download = name; a.click(); URL.revokeObjectURL(url);
 }
 
-export function ExportDialog({ roster, readOnly, onClose, notify }: { roster: ExportRoster; readOnly: boolean; onClose: () => void; notify: (text: string) => void }) {
+export function ExportDialog({ roster, readOnly, storedMode = false, formats, onClose, notify }: { roster: ExportRoster; readOnly: boolean; storedMode?: boolean; formats?: readonly ExportFormat[]; onClose: () => void; notify: (text: string) => void }) {
   const [format, setFormat] = useState<ExportFormat>('text');
   const [rules, setRules] = useState(false);
   const [profiles, setProfiles] = useState(true);
@@ -228,11 +228,11 @@ export function ExportDialog({ roster, readOnly, onClose, notify }: { roster: Ex
   const copy = async () => { try { await navigator.clipboard.writeText(output); notify(format === 'json' ? 'Roster file copied as text' : 'Roster text copied'); onClose(); } catch { notify('Could not copy. Select the preview and copy it instead.'); } };
   const optionsReason = format === 'json' ? 'The roster file always contains everything.' : undefined;
   return <Dialog label="Export roster" wide onClose={onClose}>
-    <DialogHeader title="Export roster" sub={<>{roster.name} · {roster.forces.length} {roster.forces.length === 1 ? 'force' : 'forces'} · {roster.total.toLocaleString()} pts{readOnly && <> · <Lock size={11} /> read-only, exported as it was saved</>}</>} onClose={onClose} />
+    <DialogHeader title="Export roster" sub={<>{roster.name} · {roster.forces.length} {roster.forces.length === 1 ? 'force' : 'forces'} · {roster.total.toLocaleString()} pts{readOnly && <> · <Lock size={11} /> {storedMode ? 'as last saved' : 'read-only, exported as it was saved'}</>}</>} onClose={onClose} />
     <div className="dte-export">
       <div className="dte-export-side">
         <h3 className="dte-label" id="dte-format">Format</h3>
-        <div className="dt-choice-list compact" role="radiogroup" aria-labelledby="dte-format">{FORMATS.map(f => <button type="button" role="radio" aria-checked={format === f.id} key={f.id} className={format === f.id ? 'active' : ''} data-autofocus={format === f.id ? true : undefined} onClick={() => setFormat(f.id)}><span className="dte-choice-icon">{f.icon}</span><span><strong>{f.label}</strong><small>{f.detail}</small></span>{format === f.id && <Check size={15} />}</button>)}</div>
+        <div className="dt-choice-list compact" role="radiogroup" aria-labelledby="dte-format">{FORMATS.filter(f => formats === undefined || formats.includes(f.id)).map(f => <button type="button" role="radio" aria-checked={format === f.id} key={f.id} className={format === f.id ? 'active' : ''} data-autofocus={format === f.id ? true : undefined} onClick={() => setFormat(f.id)}><span className="dte-choice-icon">{f.icon}</span><span><strong>{formats ? f.id === 'json' ? 'New Recruit JSON' : 'Text' : f.label}{storedMode ? ' · as last saved' : ''}</strong><small>{storedMode ? 'Uses the stored roster without installed game data.' : f.detail}</small></span>{format === f.id && <Check size={15} />}</button>)}</div>
         <h3 className="dte-label">Include</h3>
         <div className="dte-options" title={optionsReason}>
           <label className={optionsReason ? 'disabled' : ''}><input type="checkbox" checked={format === 'json' || rules} disabled={!!optionsReason} onChange={e => setRules(e.target.checked)} /><span><strong>Rules</strong><small>Rule names on units and their text at the end</small></span></label>

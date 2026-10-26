@@ -7,6 +7,7 @@ import { jobPercent, type WorkspaceJobs } from '../workspace/Jobs';
 import { Chip, PageActions, Segmented, Switch } from '../workspace/Primitives';
 import type { Notify } from '../workspace/Toasts';
 import './desktop-pages.css';
+import { ExportDialog, primaryForce, specialRoster, type ExportRoster } from './DesktopEditorFlows';
 import { AddCollectionDialog, AddDataCollections, CollectionView, GitHubSearchView, LastUpdateCard, LastUpdateStates, UpdateReportView, flowSourceId, isAddFlow, useRosterChecks } from './DesktopSourceFlows';
 
 
@@ -19,6 +20,13 @@ const statusChip = (r: RosterSummary) => r.status === 'issues' ? <Chip tone="war
 
 export function DesktopRosters({ initialRosters, onOpen, onCreate, onImport, notify, actionSlot }: { initialRosters: RosterSummary[]; onOpen: (name: string) => void; onCreate: () => void; onImport: () => void; notify: Notify; actionSlot: HTMLElement | null }) {
   const [rosters, setRosters] = useState(initialRosters);
+  const [exporting, setExporting] = useState<RosterSummary | null>(null);
+  const exportSnapshot = (r: RosterSummary): ExportRoster => {
+    const snapshot = specialRoster(r.name);
+    const forces = snapshot?.forces ?? [{ ...primaryForce(), faction: r.faction }];
+    const units = snapshot?.units ?? [{ id: 1, name: 'Example unit', role: 'Core', models: r.units, points: r.used, weapon: 'Service equipment', upgrade: false, forceId: forces[0].id }];
+    return { name: r.name, limit: r.limit, total: r.used, system: r.system, faction: r.faction, forces: forces.map(f => ({ ...f, points: units.filter(u => (u.forceId ?? forces[0].id) === f.id).reduce((n, u) => n + u.points, 0), units: units.filter(u => (u.forceId ?? forces[0].id) === f.id) })), file: { name: r.name, forces, units } };
+  };
   const [query, setQuery] = useState('');
   const [attention, setAttention] = useState(false);
   const [system, setSystem] = useState('All game systems');
@@ -79,11 +87,12 @@ export function DesktopRosters({ initialRosters, onOpen, onCreate, onImport, not
         <div className="dtp-detail-actions">
           <button className="dtp-btn primary wide" onClick={() => onOpen(current.name)}>Open roster<ArrowRight size={15} /></button>
           <button className="dtp-btn" onClick={() => duplicate(current)}><Copy size={14} />Duplicate</button>
-          <button className="dtp-btn" onClick={() => notify(`“${current.name}” exported`)}><ArrowDownToLine size={14} />Export</button>
+          <button className="dtp-btn" onClick={() => setExporting(current)}><ArrowDownToLine size={14} />Export</button>
           <button className={`dtp-btn danger ${confirmDelete ? 'confirm' : ''}`} onClick={() => confirmDelete ? remove(current) : setConfirmDelete(true)}><Trash2 size={14} />{confirmDelete ? 'Delete for good?' : 'Delete'}</button>
         </div>
       </> : <div className="dtp-empty"><Layers3 size={22} /><strong>No roster selected</strong><p>Choose a roster to see its details.</p></div>}</aside>
     </div>
+    {exporting && <ExportDialog roster={exportSnapshot(exporting)} readOnly={exporting.status === 'faction-removed'} storedMode={exporting.status === 'faction-removed'} formats={['text', 'json']} onClose={() => setExporting(null)} notify={notify} />}
   </main>;
 }
 
