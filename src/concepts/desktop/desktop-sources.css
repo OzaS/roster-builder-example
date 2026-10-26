@@ -120,3 +120,6 @@
 .dt-app .dts-preview-row button { height: 26px; padding: 0 10px; border-radius: 999px; border: 1px dashed var(--ux-line-2); font-size: 11px; color: var(--dt-muted) }
 .dt-app .dts-preview-row button.active { border-style: solid; border-color: color-mix(in srgb, var(--dt-fill) 45%, transparent); background: var(--dt-selected); color: var(--dt-accent) }
 .dt-app .dts-preview p { margin-top: 6px }
+.dtp-source-links { display: flex; flex-wrap: wrap; gap: 4px; margin: -4px 0 0 -10px }
+.dt-app .dtp-btn.dts-link { background: none; border-color: transparent; color: var(--dt-accent) }
+.dt-app .dtp-btn.dts-link:hover { background: var(--dt-hover) }
