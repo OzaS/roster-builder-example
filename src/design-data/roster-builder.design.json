@@ -799,13 +799,14 @@
                 "states": ["functional toast top right", "undo action", "notification bottom right", "dismiss", "undo / redo result", "App DD01: functional/notification position classes exist; the editor toast stays bottom centre until the editor toolbar goes (DD-08)", "App DD07: toasts follow Toasts.tsx: notifications bottom right for a job that ends while the panel is closed (mobile's end-toast wording, View or Details; none for a cancel; red for a failure; no roster-check notification); functional toasts top right under the tab row for Rosters' rename / duplicate / delete (no Undo, DEC-024; they go when the page changes). The editor's toast stays bottom centre until DD-08 moves the editor toolbar's Export out of the top right.", "App DD08: the editor's toast moves to the functional region top right under the tab row, in the functional toasts' look; the summary popover lies above it while open"],
                 "screens": ["desktop-editor", "desktop-rosters", "desktop-sources"]
               },
+              {"id": "desktop.limit-controls", "title": "Custom Limit and Configuration Warning", "level": "overlay", "status": "specified", "platforms": ["desktop"], "states": ["preset limit", "current/custom value", "custom input focus", "data fallback", "above configuration allowance", "equal or below without configuration warning", "points button warning", "summary warning", "points line warning", "retained validation error"], "screens": ["desktop-editor", "desktop-menus"]},
               {
                 "id": "desktop.menus",
                 "title": "Application Menu Bar",
                 "level": "navigation",
                 "status": "needs-review",
                 "platforms": ["desktop"],
-                "states": ["menus", "shortcuts from key bindings", "submenu", "disabled with reason", "Escape closes"],
+                "states": ["menus", "shortcuts from key bindings", "submenu", "disabled with reason", "Escape closes", "App DD18 (PR #86): native application menus route existing commands with binding-aware shortcuts and disabled reasons; Open recent can be cleared without deleting rosters. Close tab keeps the window; Duplicate, Remove and Find are editable. Native text Edit roles remain. The primary cost limit submenu and summary support presets/current/custom and Unlimited or named data fallback, with autosave and undo. Limits remain freely editable; configuration constraints remain rule errors. Above the configuration allowance only, the points button, summary and points line warn and name that allowance. Custom focuses/selects the input. Read-only/busy states disable edits. Differences: native macOS menu; non-Command keys show in labels there; Undo/Redo have no step description; Help/Report lack destinations and Install from file stays in Sources; the summary retains autosave instead of the gallery data row. Windows/Linux styling and native verification await their platform passes."],
                 "screens": ["desktop-menus"]
               },
               {

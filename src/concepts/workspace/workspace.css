@@ -153,3 +153,15 @@
 .dt-summary-rows small {color:var(--dt-faint);font-size:11px}
 .dt-app .dt-summary-rows select {border:1px solid var(--dt-border);background:var(--dt-bg);border-radius:8px;padding:3px 6px;font-size:11px}
 .dt-tab-progress {top:57px}
+
+/* DD-18: separate configuration allowance and editable custom limit. */
+.dt-summary-toggle.configuration-warning {color:var(--dt-warn);border-color:var(--dt-warn)!important}
+.dt-configuration-warning {display:flex;align-items:center;gap:8px;margin:8px 12px;color:var(--dt-warn);font-size:11px}
+.dt-configuration-warning svg {flex-shrink:0}
+.dt-custom-limit {display:flex;gap:8px;padding:4px 10px}
+.dt-custom-limit input {min-width:0;flex:1;background:var(--dt-bg);color:var(--dt-text);border:1px solid var(--dt-border);border-radius:8px;padding:5px 8px}
+.dt-limit-elements {display:block!important;position:relative;height:auto!important;min-height:0!important;padding:18px!important;border-radius:18px}
+.dt-limit-example-chrome {position:relative;display:flex;justify-content:flex-end;padding-bottom:12px}
+.dt-limit-example-chrome .dt-tab-progress {top:auto;bottom:0}
+.dt-limit-elements .dt-summary {position:relative;top:auto;right:auto;margin:12px 0;width:min(100%,330px)}
+.dt-limit-example-hint {max-width:400px;color:var(--dt-muted);font-size:12px;margin-top:12px}

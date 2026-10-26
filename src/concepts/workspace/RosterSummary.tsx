@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
-import { ChevronDown, ChevronRight, ChevronUp, Database, Flag, Shield } from 'lucide-react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { AlertTriangle, ChevronDown, ChevronRight, ChevronUp, Database, Flag, Shield } from 'lucide-react';
 import './workspace.css';
 
 // The points button, the thin points line under the tabs and the roster summary popover. They know nothing about
@@ -8,33 +8,45 @@ import './workspace.css';
 const over = (total: number, limit: number) => limit !== 0 && total > limit;
 const percent = (total: number, limit: number) => limit === 0 ? 0 : Math.min(total / limit * 100, 100);
 const limitText = (limit: number) => limit === 0 ? '∞' : limit.toLocaleString();
+const configurationWarning = (limit: number, allowance?: number) => allowance !== undefined && limit > allowance ? `The configuration allows ${allowance.toLocaleString()} pts` : undefined;
 
 /** The "860 / 1,000 pts" button in the window chrome; it opens the summary popover. */
-export function SummaryToggle({ total, limit, open, onToggle }: { total: number; limit: number; open: boolean; onToggle: () => void }) {
-  return <button type="button" className={`dt-summary-toggle ${open ? 'active' : ''} ${over(total, limit) ? 'over' : ''}`} aria-expanded={open} aria-controls="dt-roster-summary" title="Roster summary" onClick={onToggle}><b>{total.toLocaleString()}</b> / {limitText(limit)} pts{open ? <ChevronUp size={14} /> : <ChevronDown size={14} />}</button>;
+export function SummaryToggle({ total, limit, open, onToggle, configurationLimit }: { total: number; limit: number; open: boolean; onToggle: () => void; configurationLimit?: number }) {
+  const warning = configurationWarning(limit, configurationLimit);
+  return <button type="button" className={`dt-summary-toggle ${open ? 'active' : ''} ${over(total, limit) ? 'over' : ''} ${warning ? 'configuration-warning' : ''}`} aria-expanded={open} aria-controls="dt-roster-summary" title={warning ? `Roster summary. ${warning}` : 'Roster summary'} onClick={onToggle}>{warning && <AlertTriangle size={14} />}<b>{total.toLocaleString()}</b> / {limitText(limit)} pts{open ? <ChevronUp size={14} /> : <ChevronDown size={14} />}</button>;
 }
 
 /** Thin progress line along the bottom edge of the tab row (shown while the popover is closed). */
-export function PointsLine({ total, limit }: { total: number; limit: number }) {
-  return <div className={`dt-tab-progress ${over(total, limit) ? 'over' : ''}`} role="progressbar" aria-label="Points used" aria-valuemin={0} aria-valuemax={limit} aria-valuenow={total}><i style={{ width: `${percent(total, limit)}%` }} /></div>;
+export function PointsLine({ total, limit, configurationLimit }: { total: number; limit: number; configurationLimit?: number }) {
+  const warning = configurationWarning(limit, configurationLimit);
+  return <div className={`dt-tab-progress ${over(total, limit) || warning ? 'over' : ''}`} role="progressbar" aria-label="Points used" aria-valuemin={0} aria-valuemax={limit} aria-valuenow={total} aria-valuetext={warning} title={warning}><i style={{ width: `${percent(total, limit)}%` }} /></div>;
 }
 
 export type SummaryAction = { label: string; icon: ReactNode; kbd?: string; onClick: () => void };
 
 /** `details`: optional content under the status rows (the tablet lists the issues there with Show); the desktop passes none. */
-export function RosterSummary({ name, faction, force, total, limit, issueCount, data, actions, onLimit, onShowIssues, details }: {
+export function RosterSummary({ name, faction, force, total, limit, issueCount, data, actions, onLimit, onShowIssues, details, configurationLimit, customLimit = false }: {
   name: string; faction: string; force: string; total: number; limit: number; issueCount: number;
   details?: ReactNode;
+  configurationLimit?: number; customLimit?: boolean;
   data: { name: string; version: string; onClick: () => void };
   actions: SummaryAction[];
   onLimit: (limit: number) => void; onShowIssues: () => void;
 }) {
   const isOver = over(total, limit);
+  const warning = configurationWarning(limit, configurationLimit);
+  const [custom, setCustom] = useState(false);
+  const [draft, setDraft] = useState(String(limit));
+  const field = useRef<HTMLInputElement>(null);
+  useEffect(() => { if (custom) { field.current?.focus(); field.current?.select(); } }, [custom]);
+  const choices = Array.from(new Set([0, ...(customLimit ? [1000, 2000, 3000] : [500, 1000, 1500, 2000]), limit, ...(configurationLimit === undefined ? [] : [configurationLimit])])).sort((a, b) => a - b);
   return <section id="dt-roster-summary" className="dt-summary" aria-label="Roster summary">
     <header><h2>{name}</h2><p>{faction} <span>·</span> {force}</p></header>
+    {warning && <p className="dt-configuration-warning"><AlertTriangle size={15} />{warning}</p>}
     <div className="dt-summary-budget"><strong className={isOver ? 'dt-warning' : ''}>{total.toLocaleString()} <small>/ {limitText(limit)} pts</small></strong><div className={`dt-progress ${isOver ? 'over' : ''}`}><i style={{ width: `${percent(total, limit)}%` }} /></div><span>{limit === 0 ? 'No points limit' : total <= limit ? `${limit - total} points available` : `${total - limit} points over limit`}</span></div>
     <div className="dt-summary-rows">
-      <label><Flag size={15} /><span>Points limit</span><select aria-label="Points limit" value={limit} onChange={e => onLimit(Number(e.target.value))}>{Array.from(new Set([500, 1000, 1500, 2000, limit])).sort((a, b) => a - b).map(v => <option key={v} value={v}>{v ? `${v.toLocaleString()} pts` : 'No limit'}</option>)}</select></label>
+      <label><Flag size={15} /><span>Points limit</span><select aria-label="Points limit" value={custom ? 'custom' : limit} onChange={e => { if (e.target.value === 'custom') { setDraft(String(limit)); setCustom(true); } else { setCustom(false); onLimit(Number(e.target.value)); } }}>{choices.map(v => <option key={v} value={v}>{v ? `${v.toLocaleString()} pts` : configurationLimit === undefined ? 'Unlimited' : `Use data limit (${configurationLimit.toLocaleString()} pts)`}</option>)}{customLimit && <option value="custom">Custom…</option>}</select></label>
+      {custom && <form className="dt-custom-limit" onSubmit={e => { e.preventDefault(); const value = Number(draft); if (Number.isFinite(value) && value > 0) { onLimit(value); setCustom(false); } }}><input ref={field} aria-label="Custom points limit" type="number" min="0" step="any" required value={draft} onChange={e => setDraft(e.target.value)} /><button type="submit" disabled={!Number.isFinite(Number(draft)) || Number(draft) <= 0}>Apply</button></form>}
       <button onClick={onShowIssues}><Shield size={15} /><span>{issueCount ? `${issueCount} ${issueCount === 1 ? 'item needs' : 'items need'} attention` : 'Your force is ready'}</span><ChevronRight size={14} /></button>
       <button onClick={data.onClick}><Database size={15} /><span>{data.name}</span><small>{data.version}</small><ChevronRight size={14} /></button>
     </div>
