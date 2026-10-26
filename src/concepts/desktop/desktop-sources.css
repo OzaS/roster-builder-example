@@ -1,19 +1,19 @@
 /* Sources flows (revision 05): last update, update report, collection pages, GitHub search, add-collection dialog.
    Theme tokens only (--dt-* / --ux-*). */
 .dts-flow { container-type: inline-size }
-.dt-app .dts-back { display: flex; width: max-content; gap: 6px; height: 28px; padding: 0 9px 0 6px; margin: -6px 0 12px -6px; border-radius: 8px; font-size: 12px; color: var(--dt-muted) }
+.dt-app .dts-back { display: flex; width: max-content; gap: 6px; height: 28px; padding: 0 9px 0 6px; margin: -6px 0 12px -6px; border-radius: 8px; font-size:12px; color: var(--dt-muted) }
 .dt-app .dts-back:hover { color: var(--dt-text) }
 .dts-title { display: flex; align-items: center; gap: 12px; margin-bottom: 8px }
 .dts-title>div:nth-child(2) { flex: 1; min-width: 0 }
-.dt-app .dts-title h2 { font-size: 22px; margin-top: 2px }
+.dt-app .dts-title h2 { font-size:22px; margin-top: 2px }
 .dts-tile { width: 38px; height: 38px; flex-shrink: 0; display: grid; place-items: center; border-radius: 11px; background: var(--dt-hover); color: var(--dt-accent); border: 1px solid var(--dt-border) }
-.dts-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px; font-size: 11px; color: var(--dt-faint) }
+.dts-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px; font-size:12px; color: var(--dt-faint) }
 .dts-meta>span { display: inline-flex; align-items: center; gap: 5px }
 .dts-meta .dtp-mono { color: var(--dt-muted); overflow-wrap: anywhere }
-.dt-app .dts-note { margin-top: 20px; font-size: 11px; color: var(--dt-faint) }
-.dt-app .dts-help { display: block; font-size: 11px; color: var(--dt-muted); margin-top: 6px }
-.dt-app .dts-error { display: block; font-size: 11px; color: var(--ux-err); margin-top: 6px }
-.dt-app .dts-text-btn { height: 26px; padding: 0 8px; border-radius: 8px; gap: 3px; font-size: 12px; font-weight: 500; color: var(--dt-accent) }
+.dt-app .dts-note { margin-top: 20px; font-size:12px; color: var(--dt-faint) }
+.dt-app .dts-help { display: block; font-size:12px; color: var(--dt-muted); margin-top: 6px }
+.dt-app .dts-error { display: block; font-size:12px; color: var(--ux-err); margin-top: 6px }
+.dt-app .dts-text-btn { height: 26px; padding: 0 8px; border-radius: 8px; gap: 3px; font-size:12px; font-weight: 500; color: var(--dt-accent) }
 .dt-app .dts-text-btn.center { display: flex; margin: 10px auto 0 }
 .dt-app .dtp-detail .dts-section-head { display: flex; align-items: center; justify-content: space-between; margin: 20px 0 9px }
 .dt-app .dtp-detail .dts-section-head h3 { margin: 0 }
@@ -41,7 +41,7 @@
 .dt-app .dts-more { border: 1px solid var(--dt-border) }
 .dt-app .dts-more[aria-expanded=true] { background: var(--dt-selected); color: var(--dt-accent) }
 .dts-menu { position: absolute; z-index: 3; top: 36px; right: 0; min-width: 200px; padding: 5px; border-radius: 12px; background: var(--dt-pane); border: 1px solid var(--ux-line-2); box-shadow: 0 14px 40px #0004; display: flex; flex-direction: column }
-.dt-app .dts-menu button { justify-content: flex-start; gap: 10px; height: 34px; padding: 0 10px; border-radius: 8px; font-size: 12px; text-align: left }
+.dt-app .dts-menu button { justify-content: flex-start; gap: 10px; height: 34px; padding: 0 10px; border-radius: 8px; font-size:12px; text-align: left }
 .dt-app .dts-menu button svg { color: var(--dt-muted) }
 .dt-app .dts-menu button.danger, .dt-app .dts-menu button.danger svg { color: var(--ux-err) }
 .dt-app .dts-menu button:focus-visible { outline-offset: -2px }
@@ -51,16 +51,16 @@
 .dts-last-update.failed { border-color: color-mix(in srgb, var(--ux-err) 30%, transparent) }
 .dts-last-head { display: flex; align-items: center; gap: 12px }
 .dts-last-head>span:nth-child(2) { flex: 1; min-width: 0 }
-.dts-last-head strong { display: block; font-size: 13px; font-weight: 600 }
-.dts-last-head small { display: block; font-size: 12px; color: var(--dt-muted); font-variant-numeric: tabular-nums }
+.dts-last-head strong { display: block; font-size:14px; font-weight: 600 }
+.dts-last-head small { display: block; font-size:12px; color: var(--dt-muted); font-variant-numeric: tabular-nums }
 .dts-last-head .dts-tile { width: 34px; height: 34px; border-radius: 10px; color: var(--dt-muted); background: var(--dt-pane) }
 .dts-last-update>.dtp-progress { margin: 12px 0 0 46px }
 .dts-last-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0 46px }
 
 /* Update report */
-.dt-app .dts-report h2 { font-size: 22px }
-.dts-versions { font-weight: 500; color: var(--dt-muted); margin-left: 6px; font-size: 17px; font-variant-numeric: tabular-nums }
-.dts-check-progress { display: flex; align-items: center; gap: 12px; margin: 14px 0; padding: 12px 14px; border-radius: 12px; background: var(--dt-selected); color: var(--dt-accent); font-size: 13px; font-variant-numeric: tabular-nums }
+.dt-app .dts-report h2 { font-size:22px }
+.dts-versions { font-weight: 500; color: var(--dt-muted); margin-left: 6px; font-size:17px; font-variant-numeric: tabular-nums }
+.dts-check-progress { display: flex; align-items: center; gap: 12px; margin: 14px 0; padding: 12px 14px; border-radius: 12px; background: var(--dt-selected); color: var(--dt-accent); font-size:14px; font-variant-numeric: tabular-nums }
 .dts-check-progress>span { display: flex; align-items: center; gap: 8px; white-space: nowrap }
 .dts-check-progress .dtp-progress { flex: 1; margin: 0 }
 :is(.dts-flow, .dts-dialog) .dtp-notice>.dtp-btn { margin-left: auto; align-self: center; flex-shrink: 0 }
@@ -73,51 +73,51 @@
 .dts-changed-card header { display: flex; align-items: center; gap: 8px }
 .dts-changed-card header>svg { color: var(--dt-warn) }
 .dts-changed-card.err header>svg { color: var(--ux-err) }
-.dts-changed-card strong { flex: 1; min-width: 0; font-size: 13px; font-weight: 600 }
-.dts-changed-card ul { margin: 8px 0 0 23px; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--dt-muted); font-variant-numeric: tabular-nums }
+.dts-changed-card strong { flex: 1; min-width: 0; font-size:14px; font-weight: 600 }
+.dts-changed-card ul { margin: 8px 0 0 23px; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 3px; font-size:12px; color: var(--dt-muted); font-variant-numeric: tabular-nums }
 .dts-data-changes { display: flex; flex-direction: column; gap: 12px }
 .dts-counts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px }
 .dts-count { padding: 10px 12px; border-radius: 12px; background: var(--dt-hover) }
-.dts-count b { display: block; font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums }
-.dts-count span { font-size: 11px; color: var(--dt-muted) }
+.dts-count b { display: block; font-size:18px; font-weight: 600; font-variant-numeric: tabular-nums }
+.dts-count span { font-size:12px; color: var(--dt-muted) }
 .dts-count.ok b { color: var(--ux-ok) }
 .dts-count.accent b { color: var(--dt-accent) }
 .dts-count.err b { color: var(--ux-err) }
-.dt-app .dts-change-group h4 { margin: 0 0 4px; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--dt-faint); font-weight: 600 }
+.dt-app .dts-change-group h4 { margin: 0 0 4px; font-size:12px; letter-spacing: 1px; text-transform: uppercase; color: var(--dt-faint); font-weight: 600 }
 .dts-change-group ul { margin: 0; padding: 0; list-style: none; border: 1px solid var(--dt-border); border-radius: 12px; overflow: hidden }
-.dts-change-group li { padding: 8px 12px; font-size: 12px; border-top: 1px solid var(--dt-border); font-variant-numeric: tabular-nums }
+.dts-change-group li { padding: 8px 12px; font-size:12px; border-top: 1px solid var(--dt-border); font-variant-numeric: tabular-nums }
 .dts-change-group li:first-child { border-top: 0 }
 .dts-data-changes>.dts-text-btn { align-self: flex-start }
 
 /* GitHub search */
 .dts-search-form { margin-top: 14px }
 .dts-search-form .dtp-search { height: 40px }
-.dts-search-form .dtp-search input { font-size: 13px }
+.dts-search-form .dtp-search input { font-size:14px }
 .dts-search-form .dtp-btn { height: 40px }
-.dt-app .dts-count-line { font-size: 11px; color: var(--dt-muted); margin: 18px 0 8px }
+.dt-app .dts-count-line { font-size:12px; color: var(--dt-muted); margin: 18px 0 8px }
 
 /* Add a collection dialog */
 .dt-app .dts-dialog { width: min(520px, calc(100% - 60px)); padding: 20px }
 .dts-dialog>header { align-items: flex-start !important }
-.dt-app .dts-dialog>header p { font-size: 12px; color: var(--dt-muted); margin-top: 2px }
-.dt-app .dts-field-label { display: block; font-size: 12px; font-weight: 500; margin-bottom: 6px }
+.dt-app .dts-dialog>header p { font-size:12px; color: var(--dt-muted); margin-top: 2px }
+.dt-app .dts-field-label { display: block; font-size:12px; font-weight: 500; margin-bottom: 6px }
 .dts-dialog .dtp-search { max-width: none; height: 38px }
 .dts-dialog .dtp-search.invalid { border-color: color-mix(in srgb, var(--ux-err) 60%, transparent) }
 .dts-dialog .dtp-inline-form .dtp-btn { height: 38px }
 .dts-found { display: flex; gap: 12px; margin-top: 14px; padding: 12px 14px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--dt-fill) 35%, transparent); background: var(--dt-selected) }
-.dts-found strong { display: block; font-size: 13px; font-weight: 600 }
-.dts-found small { display: block; font-size: 11px; color: var(--dt-muted) }
-.dt-app .dts-found p { font-size: 12px; color: var(--dt-muted); margin-top: 6px }
+.dts-found strong { display: block; font-size:14px; font-weight: 600 }
+.dts-found small { display: block; font-size:12px; color: var(--dt-muted) }
+.dt-app .dts-found p { font-size:12px; color: var(--dt-muted); margin-top: 6px }
 .dts-dialog>.dtp-notice { margin-bottom: 0 }
 .dt-app .dts-dialog>.dts-note { margin-top: 14px }
 .dts-dialog>footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px }
 
 /* Gallery preview states (not part of the app) */
-.dts-preview { margin-top: 22px; padding-top: 10px; border-top: 1px dashed var(--ux-line-2); font-size: 11px; color: var(--dt-faint) }
+.dts-preview { margin-top: 22px; padding-top: 10px; border-top: 1px dashed var(--ux-line-2); font-size:12px; color: var(--dt-faint) }
 .dts-preview summary { cursor: pointer; width: max-content; padding: 2px 4px; border-radius: 6px }
 .dts-preview summary:focus-visible { outline: 2px solid var(--dt-accent) }
 .dts-preview-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px }
-.dt-app .dts-preview-row button { height: 26px; padding: 0 10px; border-radius: 999px; border: 1px dashed var(--ux-line-2); font-size: 11px; color: var(--dt-muted) }
+.dt-app .dts-preview-row button { height: 26px; padding: 0 10px; border-radius: 999px; border: 1px dashed var(--ux-line-2); font-size:12px; color: var(--dt-muted) }
 .dt-app .dts-preview-row button.active { border-style: solid; border-color: color-mix(in srgb, var(--dt-fill) 45%, transparent); background: var(--dt-selected); color: var(--dt-accent) }
 .dt-app .dts-preview p { margin-top: 6px }
 .dtp-source-links { display: flex; flex-wrap: wrap; gap: 4px; margin: -4px 0 0 -10px }
