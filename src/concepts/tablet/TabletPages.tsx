@@ -199,5 +199,5 @@ export function TabletLookup({ env, session, onAddData }: SessionProps & { onAdd
 
 /* ------------------------------ Placeholders ------------------------------ */
 
-export const TabletTools = () => <div className="tb-page tb-soon"><ComingSoonCard icon={Hammer} title="Tools" description="Roster analytics, comparison, a game tracker and a dice simulator, for when the roster is done and the game starts." planned="Planned for 1.2+" covers="" /></div>;
-export const TabletLibrary = () => <div className="tb-page tb-soon"><ComingSoonCard icon={BookMarked} title="Library" description="Units and detachments you saved from your rosters, ready to reuse in the next one." planned="Planned for 1.2+" covers="" /></div>;
+export const TabletTools = () => <div className="tb-page tb-soon"><ComingSoonCard icon={Hammer} title="Tools" description="Roster analytics, comparison, a game tracker and a dice simulator, for when the roster is done and the game starts." planned="Planned for a later release" covers="" /></div>;
+export const TabletLibrary = () => <div className="tb-page tb-soon"><ComingSoonCard icon={BookMarked} title="Library" description="Units and detachments you saved from your rosters, ready to reuse in the next one." planned="Planned for an early update" covers="" /></div>;
