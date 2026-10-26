@@ -9,7 +9,7 @@ import { Chip } from "./uxShared";
  */
 
 /** The placeholder a tab root (Lookup, Tools, Library) or a pushed feature shows until it is built. Defaults to the Lookup text; the tablet passes its own. */
-export function ComingSoonCard({ icon: Icon = Search, title = "Lookup", description = "Search the game data you installed without opening a roster: check a rule mid-game, compare costs, read a profile.", planned = "Planned for V1.x", covers = "Covers LK-1" }: { icon?: LucideIcon; title?: string; description?: string; planned?: string; covers?: string } = {}) {
+export function ComingSoonCard({ icon: Icon = Search, title = "Lookup", description = "Search the game data you installed without opening a roster: check a rule mid-game, compare costs, read a profile.", planned = "Planned for an early update", covers = "Covers LK-1" }: { icon?: LucideIcon; title?: string; description?: string; planned?: string; covers?: string } = {}) {
   return (
     <section className="ux-cs-card">
       <span className="ux-cs-icon"><Icon size={26} /></span>
@@ -17,7 +17,7 @@ export function ComingSoonCard({ icon: Icon = Search, title = "Lookup", descript
       <strong>{title}</strong>
       <p>{description}</p>
       <div className="ux-src-chips ux-cs-chips"><Chip tone="cool"><Clock size={10} /> {planned}</Chip>{covers ? <Chip tone="neutral">{covers}</Chip> : null}</div>
-      <small className="ux-cs-note">This part of Battle Augur is planned. It is switched on for testing, so you can see where it will live.</small>
+      <small className="ux-cs-note">This part of Battle Augur is planned. It shows here so you can see where it will live.</small>
     </section>
   );
 }
