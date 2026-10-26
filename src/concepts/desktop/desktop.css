@@ -125,6 +125,6 @@
 
 /* Match the app's AA-safe light semantic fills; do not compound a translucent chip with the canvas. */
 .dt-app.light .dtp-chip.warn,.dt-app.light .dt-summary-check{background:color-mix(in srgb,var(--dt-warn) 12%,var(--dt-pane))}
-.dt-app.light .dtp-chip.err{background:color-mix(in srgb,var(--dt-err,var(--ux-err)) 12%,var(--dt-pane))}
+.dt-app .dtp-chip.err{background:color-mix(in srgb,var(--dt-err,var(--ux-err)) 12%,var(--dt-pane))}
 .dt-app.light .dt-summary{box-shadow:0 8px 24px #0001}
 .dt-app .dt-summary-toggle,.dt-app .dt-summary header p,.dt-app .dt-summary-budget>span,.dt-app .dt-summary-rows small,.dt-app .dt-summary-rows select{font-size:12px}
