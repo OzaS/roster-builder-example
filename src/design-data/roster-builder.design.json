@@ -591,6 +591,7 @@
                   "system",
                   "shared colour schemes",
                   "App DD01: type scale (13 px base, 9–11 px captions with tracking, weight 500 headings, 37 px display), spacing and radius scale; one set of primitives after workspace/ (Button kinds, IconButton, Chip tones, Switch, Segmented, fields, Card, dialog shell, toast positions) used on every screen"
+                , "App DD21 final pass: verified against the gallery at 1280–1920 px, dark and light, in Default, Crimson, Gilded, Azure and Verdant; no scheme or light-theme differences (every colour comes from the shared tokens). Larger text is the page zoom (View → Zoom In / Zoom Out / Actual Size); at 125% and 150% from 1280 × 800 panes and dialogs scroll their bodies and keep headers and footers; below 720 × 480 × zoom the layout goes under its minimum (UX-047). Keyboard: tab row → page actions → rail → page, each dialog top to bottom; modal dialogs keep focus until Escape and return it to their opener; nonmodal popovers (jobs, summary, ⋯ menus) let Tab move on. Settings' Theme, colour scheme and Keep versions groups take one Tab stop per option (no arrow keys; export formats, add force and inspector tabs use arrows). Confirmations (Delete, Remove) use the dialog header with an icon Close; the gallery's Rosters uses a two-click delete instead (DD-03). Sources' results (removed, updated) stay in-page notices, not toasts."
                 ],
                 "screens": []
               },
