@@ -124,3 +124,43 @@ ul.dte-checks { padding: 6px 8px 6px 14px }
 .dt-app .dt-choice-list > button.blocked { cursor: not-allowed; opacity: .55; border-style: dashed }
 .dt-app .dt-choice-list > button.blocked:hover { background: none }
 .dt-choice-list small.dte-reason { display: flex; align-items: center; gap: 5px; color: var(--dt-warn); margin-top: 3px }
+
+/* DX-01 editor layout: no validation strip under the tree (it takes the pane's full height). The check's state shows on
+   the points button (a toned count) and the summary popover's status row, which opens the issue list as its own section;
+   the tree heading's Shield has a count badge and opens the popover there. Unit rows keep room for Duplicate / Remove
+   before the issue icon and the points, and the issue icon opens that unit's issues. The catalogue and inspector lose
+   their headings: the search and the unit's overline and name move up beside the Hide buttons. */
+.dt-summary-check { display: inline-flex; align-items: center; gap: 3px; padding: 1px 6px 1px 4px; border-radius: 999px; color: var(--dt-warn); background: color-mix(in srgb, var(--dt-warn) 14%, transparent); font-weight: 600 }
+.dt-app .dt-summary-rows > .dt-summary-status.has-issues > svg:first-child { color: var(--dt-warn) }
+.dt-app .dt-summary-rows > .dt-summary-status.ready > svg:first-child { color: var(--dt-ok) }
+.dt-summary-rows > p.dt-summary-status { display: flex; align-items: center; gap: 10px; padding: 8px 10px; font-size: 12px; color: var(--dt-muted) }
+.dt-summary-rows > p.dt-summary-status small { display: block; margin-top: 1px }
+.dte-issue-section { margin: 0 4px 6px; max-height: min(260px, 40vh); overflow: auto; border: 1px solid var(--dt-border); border-radius: 12px; background: var(--dt-hover) }
+.dte-issue-section .dt-check-details { margin: 0; max-height: none; border: 0; background: none }
+.dte-issue-section .dte-checks small { font-size: 10px; color: var(--dt-muted) }
+.dte-issue-filter { display: flex; align-items: center; gap: 8px; padding: 8px 10px 2px 14px; font-size: 11px; color: var(--dt-muted) }
+.dte-issue-filter span { flex: 1; min-width: 0 }
+.dte-issue-filter strong { color: var(--dt-text); font-weight: 500 }
+.dte-shield { position: relative; display: inline-flex }
+.dte-badge { position: absolute; top: -7px; right: -9px; min-width: 15px; height: 15px; padding: 0 4px; border-radius: 999px; background: var(--dt-warn); color: var(--dt-bg); font-size: 9px; font-weight: 700; line-height: 15px; text-align: center }
+.dte-unit-row { display: flex; align-items: center; gap: 4px; margin: 0 6px; padding-right: 12px; border-radius: 10px }
+.dte-unit-row:hover { background: var(--dt-hover) }
+.dt-app .dte-unit-row.selected { background: var(--dt-selected); box-shadow: inset 3px 0 0 var(--dt-accent) }
+.dte-unit-row.selected .dt-unit-icon { color: var(--dt-accent); background: var(--dt-pane) }
+.dt-app .dte-unit-row .dt-roster-unit { flex: 1; min-width: 0; width: auto; margin: 0; padding: 10px 6px 10px 12px; background: none; box-shadow: none }
+.dte-row-actions { display: none; gap: 2px }
+.dte-unit-row:hover .dte-row-actions, .dte-unit-row:focus-within .dte-row-actions { display: inline-flex }
+.dt-app .dte-row-actions .dt-icon { width: 26px; height: 26px; color: var(--dt-muted) }
+.dt-app .dte-unit-issue { width: 26px; height: 26px; flex-shrink: 0; border-radius: 8px; color: var(--dt-warn) }
+.dt-app .dte-unit-issue:hover { background: var(--dt-hover) }
+.dte-unit-end { display: flex; align-items: center; gap: 11px; flex-shrink: 0; cursor: pointer; color: var(--dt-faint) }
+.dt-panel-heading.dte-pane-tools { gap: 6px; padding: 0 10px 0 13px }
+.dte-pane-tools .dt-search { flex: 1; min-width: 0 }
+.dte-pane-tools:not(:has(.dt-search)) { justify-content: flex-end }
+.dt-app .dt-inspector-title > .dte-inspector-head { display: flex; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start; gap: 8px; margin-top: 0 }
+.dte-inspector-head > div { flex: 1; min-width: 0 }
+.dte-inspector-name { display: flex; justify-content: space-between; align-items: center; gap: 9px; margin-top: 8px }
+.dte-inspector-head > .dt-icon { flex-shrink: 0; margin: -7px -8px 0 0 }
+.dt-inspector:has(> .dt-empty) { position: relative }
+.dte-empty-hide { position: absolute; top: 8px; right: 8px }
+@container (max-width: 300px) { .dte-inspector-name { flex-wrap: wrap } }

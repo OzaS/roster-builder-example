@@ -117,9 +117,24 @@ export function rosterIssues(units: EditorUnit[], forces: Force[], limit: number
   return issues;
 }
 
-export function IssueDetails({ issues, onShow }: { issues: RosterIssue[]; onShow: (issue: RosterIssue) => void }) {
-  if (!issues.length) return <div className="dt-check-details dte-checks" id="dte-check-details"><p><Check size={13} /> Command requirement met</p><p><Check size={13} /> Minimum Core units met</p><p><Check size={13} /> Unit sizes and upgrades are allowed</p><p><Check size={13} /> Within points limit</p></div>;
-  return <ul className="dt-check-details dte-checks" id="dte-check-details" aria-label="Roster issues">
+/** Issues about one unit (its row's issue icon narrows the popover's list to them). */
+export const unitIssues = (issues: RosterIssue[], unitId: number) => issues.filter(issue => issue.target.unitId === unitId);
+
+/**
+ * DX-01: the issue list is an expanded section of the summary popover's status row (no strip under the tree). `unit`: the
+ * list narrowed to one unit's issues (its row's issue icon), with All issues to widen it again.
+ */
+export function IssueDetails({ issues, onShow, unit, onAll }: { issues: RosterIssue[]; onShow: (issue: RosterIssue) => void; unit?: string; onAll?: () => void }) {
+  if (unit) return <div className="dte-issue-section" id="dte-check-details">
+    <p className="dte-issue-filter"><span>Issues of <strong>{unit}</strong></span><button type="button" className="dtp-btn small" title="Show every issue in the roster" onClick={onAll}>All issues</button></p>
+    <IssueList issues={issues} onShow={onShow} />
+  </div>;
+  return <div className="dte-issue-section" id="dte-check-details"><IssueList issues={issues} onShow={onShow} /></div>;
+}
+
+function IssueList({ issues, onShow }: { issues: RosterIssue[]; onShow: (issue: RosterIssue) => void }) {
+  if (!issues.length) return <div className="dt-check-details dte-checks"><p><Check size={13} /> Command requirement met</p><p><Check size={13} /> Minimum Core units met</p><p><Check size={13} /> Unit sizes and upgrades are allowed</p><p><Check size={13} /> Within points limit</p></div>;
+  return <ul className="dt-check-details dte-checks" aria-label="Roster issues">
     {issues.map(issue => <li key={issue.id}><AlertTriangle size={14} /><span><strong>{issue.text}</strong><small>{issue.where}</small></span><button type="button" className="dtp-btn small" onClick={() => onShow(issue)} aria-label={`Show: ${issue.where}`}>Show</button></li>)}
   </ul>;
 }
@@ -332,7 +347,7 @@ export function ReadOnlyBanner({ info, onDuplicate, onFindData, onExport }: { in
   </section>;
 }
 export function ReadOnlyCatalogue({ info, onFindData, onHide }: { info: ReadOnlyInfo; onFindData: () => void; onHide: () => void }) {
-  return <aside className="dt-catalogue"><header className="dt-panel-heading"><span>Unit catalogue</span><button type="button" className="dt-icon" aria-label="Hide catalogue" title="Hide catalogue" onClick={onHide}><X size={15} /></button></header>
+  return <aside className="dt-catalogue" aria-label="Unit catalogue"><header className="dt-panel-heading dte-pane-tools"><button type="button" className="dt-icon" aria-label="Hide catalogue" title="Hide catalogue" onClick={onHide}><X size={15} /></button></header>
     <div className="dte-catalogue-empty"><Lock size={22} /><h3>Nothing to add</h3><p>{info.faction} is not in the installed {info.system} data, so its units can't be added.</p><button type="button" className="dtp-btn small" onClick={onFindData}><Database size={13} />Find game data</button></div>
     <footer className="dt-panel-foot"><Database size={12} /> {info.faction} <span>removed</span></footer></aside>;
 }
@@ -377,5 +392,5 @@ export const GALLERY_STATES: Array<{ id: GalleryFlow; label: string }> = [
   { id: 'forces', label: 'Roster with two forces' },
   { id: 'add-force', label: 'Add force dialog' },
   { id: 'read-only', label: 'Read-only roster (faction removed)' },
-  { id: 'issues', label: 'Validation details with issues' },
+  { id: 'issues', label: 'Issue list in the roster summary' },
 ];
