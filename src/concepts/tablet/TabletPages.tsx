@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ArrowRight, BookOpen, ChevronRight, Copy, Database, FileUp, FolderOpen, Hammer, Info, Layers3, Pencil, Plus, RefreshCcw, Search, Trash2, ArrowDownToLine, BookMarked, Check } from 'lucide-react';
+import { ArrowRight, BookOpen, ChevronRight, Copy, Database, FileUp, FolderOpen, Hammer, Info, Layers3, ListTree, Pencil, Plus, RefreshCcw, Search, Trash2, ArrowDownToLine, BookMarked, Check } from 'lucide-react';
 import { Chip as MobileChip } from '../ux/uxShared'; // the mobile chip; the workspace Chip (dtp-chip) is not used here, see MOBILE-PIECES.md
 import { ComingSoonCard } from '../ux/AppExtras';
 import { collectionSources, lookupEntries, type LookupEntry, type RosterSummary } from '../desktop/desktopData';
@@ -124,18 +124,45 @@ const rosterNote = (r: RosterSummary) => r.status === 'ready' ? ['ok', 'Ready', 
     : r.status === 'data-changed' ? ['warn', 'Game data changed', 'Some entries changed in the last update. Open to review them.']
       : ['err', 'Faction removed', 'The faction is no longer in the installed data. The roster opens read-only.'];
 
+/** The game systems of the stored rosters with their counts, the system of the most recently opened roster first (DEC-040). */
+export function rosterSystems(rosters: RosterSummary[]): { name: string; count: number }[] {
+  const counts = new Map<string, number>();
+  for (const r of rosters) counts.set(r.system, (counts.get(r.system) ?? 0) + 1);
+  return [...counts].map(([name, count]) => ({ name, count }));
+}
+
+/** Toggle chip at the end of the filter row: groups the list by game system (TB-03, UX-055). */
+export const GroupToggle = ({ on, onChange }: { on: boolean; onChange: (on: boolean) => void }) =>
+  <button type="button" className={`tb-filter tb-filter-toggle ${on ? 'active' : ''}`} aria-pressed={on} onClick={() => onChange(!on)}>{on ? <Check size={16} aria-hidden="true" /> : <ListTree size={16} aria-hidden="true" />}Group by game system</button>;
+
+/** Section header of a grouped list: the game system and how many of the shown rosters it holds. */
+export const GroupHeader = ({ name, count }: { name: string; count: number }) =>
+  <h3 className="tb-group-head" aria-label={`${name}, ${plural(count, 'roster')}`}><span>{name}</span><span aria-hidden="true">·</span><span>{count}</span></h3>;
+
 export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster }: SessionProps & { onNewRoster: () => void; onOpenRoster: (name: string) => void }) {
   const { rosters, setRosters, hasData } = session;
   const [query, setQuery] = useState(session.state === 'search' ? 'patrol' : '');
   const [attention, setAttention] = useState(false);
+  // One game system chip at a time; a system with no rosters left drops back to All (and stays dropped).
+  const [chosenSystem, setSystem] = useState<string | null>(session.state === 'system' ? 'Example System Two' : null);
+  // Kept on the device across launches, like the system chip.
+  const [grouped, setGrouped] = useState(session.state === 'grouped');
   const [selected, setSelected] = useState(rosters[0]?.name ?? '');
   const [open, setOpen] = useState(false);
   const [renaming, setRenaming] = useState(false);
   const q = query.trim().toLowerCase();
-  const visible = useMemo(() => rosters.filter(r => (r.name + r.faction).toLowerCase().includes(q) && (!attention || needsAttention(r))), [rosters, q, attention]);
+  const systems = useMemo(() => rosterSystems(rosters), [rosters]);
+  // The chips (and grouping) show only when the rosters span two or more game systems.
+  const bySystem = systems.length >= 2;
+  const system = chosenSystem !== null && systems.some(s => s.name === chosenSystem) ? chosenSystem : null;
+  const visible = useMemo(() => rosters.filter(r => (r.name + r.faction + r.system).toLowerCase().includes(q) && (!attention || needsAttention(r)) && (system === null || r.system === system)), [rosters, q, attention, system]);
+  // Groups follow the chip order; inside a group the list order stays; groups with no shown roster are left out.
+  const groups = bySystem && grouped ? systems.map(s => ({ name: s.name, rows: visible.filter(r => r.system === s.name) })).filter(g => g.rows.length > 0) : null;
   const attentionCount = rosters.filter(needsAttention).length;
-  const current = rosters.find(r => r.name === selected) ?? visible[0] ?? rosters[0];
+  // The detail follows the list: a roster the filters hide gives way to the first one shown.
+  const current = visible.find(r => r.name === selected) ?? visible[0];
   const choose = (name: string) => { setSelected(name); setOpen(true); setRenaming(false); };
+  const clearFilters = () => { setQuery(''); setAttention(false); setSystem(null); };
   const actions = <>
     <HintButton hint="Import a roster from a file" input={env.input} side="bottom" className="ux-job-btn" onClick={() => notify('Import a roster file (prototype)')}><FileUp size={16} />Import</HintButton>
     <NewRosterButton env={env} onNewRoster={onNewRoster} />
@@ -150,16 +177,23 @@ export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster 
   const duplicate = (r: RosterSummary) => { const copy = { ...r, name: `Copy of ${r.name}`, opened: 'Just now' }; setRosters(list => [copy, ...list]); choose(copy.name); notify(`Duplicated as “${copy.name}”`); };
   const rename = (r: RosterSummary, name: string) => { if (name && name !== r.name) { setRosters(list => list.map(x => x.name === r.name ? { ...x, name } : x)); setSelected(name); } setRenaming(false); };
   const [noteTone, noteTitle, noteText] = current ? rosterNote(current) : ['', '', ''];
+  const row = (r: RosterSummary) => <Row key={r.name} selected={r.name === current?.name} mark={r.mark} title={r.name} sub={`${r.faction} · ${r.system}`} end={<><b>{pts(r.used)} / {pts(r.limit)}</b>{rosterStatus(r)}</>} onClick={() => choose(r.name)} />;
+  const filtered = q !== '' || attention || system !== null;
   return <div className="tb-page">
     <div className="tb-toolbar"><SearchField value={query} onChange={setQuery} label="Find a roster" placeholder="Find a roster or faction…" />{actions}</div>
-    <div className="tb-filters" role="group" aria-label="Filter rosters"><button type="button" className={`tb-filter ${!attention ? 'active' : ''}`} aria-pressed={!attention} onClick={() => setAttention(false)}>All {rosters.length}</button>{attentionCount > 0 && <button type="button" className={`tb-filter ${attention ? 'active' : ''}`} aria-pressed={attention} onClick={() => setAttention(true)}>Needs attention {attentionCount}</button>}</div>
+    <div className="tb-filters" role="group" aria-label="Filter rosters">
+      <button type="button" className={`tb-filter ${!attention && system === null ? 'active' : ''}`} aria-pressed={!attention && system === null} onClick={() => { setAttention(false); setSystem(null); }}>All {rosters.length}</button>
+      {bySystem && systems.map(s => <button type="button" key={s.name} className={`tb-filter tb-filter-system ${system === s.name ? 'active' : ''}`} aria-pressed={system === s.name} aria-label={`${s.name}, ${plural(s.count, 'roster')}`} title={s.name} onClick={() => setSystem(system === s.name ? null : s.name)}><span>{s.name}</span> {s.count}</button>)}
+      {attentionCount > 0 && <button type="button" className={`tb-filter ${attention ? 'active' : ''}`} aria-pressed={attention} onClick={() => setAttention(!attention)}>Needs attention {attentionCount}</button>}
+      {bySystem && <GroupToggle on={grouped} onChange={setGrouped} />}
+    </div>
     <ListDetail env={env} label="Rosters" open={open} onClose={() => setOpen(false)}
       list={<>
         <div className="tb-list scroll">
-          {visible.map(r => <Row key={r.name} selected={r.name === current?.name} mark={r.mark} title={r.name} sub={`${r.faction} · ${r.system}`} end={<><b>{pts(r.used)} / {pts(r.limit)}</b>{rosterStatus(r)}</>} onClick={() => choose(r.name)} />)}
-          {!visible.length && <EmptyState icon={Search} title={q ? `No rosters match “${query.trim()}”` : 'No rosters need attention'} text="Try another name, or clear the filters."><button type="button" className="ux-job-btn" onClick={() => { setQuery(''); setAttention(false); }}>Clear filters</button></EmptyState>}
+          {groups ? groups.map(g => <section key={g.name} className="tb-group" aria-label={g.name}><GroupHeader name={g.name} count={g.rows.length} />{g.rows.map(row)}</section>) : visible.map(row)}
+          {!visible.length && <EmptyState icon={Search} title={q ? `No rosters match “${query.trim()}”` : 'No rosters match the filters'} text="Try another name, or clear the filters."><button type="button" className="ux-job-btn" onClick={clearFilters}>Clear filters</button></EmptyState>}
         </div>
-        <p className="tb-list-foot" aria-live="polite">{visible.length === rosters.length ? `${plural(rosters.length, 'roster')} stored on this device` : `${visible.length} of ${rosters.length} rosters`}</p>
+        <p className="tb-list-foot" aria-live="polite">{!filtered ? `${plural(rosters.length, 'roster')} stored on this device` : `${visible.length} of ${rosters.length} rosters`}{groups ? ` · ${plural(groups.length, 'game system')}` : ''}</p>
       </>}
       detail={current ? <>
         <div className="tb-detail-title"><span className="tb-mark large" aria-hidden="true">{current.mark}</span>

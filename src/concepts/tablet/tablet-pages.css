@@ -14,6 +14,15 @@
 .tb-list-foot { display: flex; align-items: center; gap: 8px; margin: 0; padding: 0 4px; color: var(--ux-muted); font-size: 12.5px }
 .tb-list-foot .ux-job-btn { margin-left: auto }
 .tb-wide { width: 100% }
+/* Rosters (TB-03): game system chips (long names end with an ellipsis), the Group by game system toggle at the end of the
+   filter row, and the section headers of the grouped list (sticky at the top of the list pane while their rows scroll). */
+.tb-app button.tb-filter-system { display: inline-flex; align-items: center; gap: 6px; max-width: 280px }
+.tb-filter-system > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.tb-app button.tb-filter-toggle { display: inline-flex; align-items: center; gap: 8px; margin-left: auto }
+.tb-group { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px }
+.tb-group + .tb-group { margin-top: 10px }
+.tb-group-head { position: sticky; top: -2px; z-index: 1; display: flex; align-items: center; gap: 6px; min-height: 36px; margin: 0; padding: 6px 8px; border-radius: 10px; background: color-mix(in srgb, var(--ux-bg) 84%, transparent); backdrop-filter: blur(12px); color: var(--ux-muted); font-size: 13px; font-weight: 800; letter-spacing: .02em }
+.tb-group-head > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ux-ink) }
 .tb-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 6px }
 .tb-section > .tb-chips { margin-top: 0 }
 .tb-row-main .ux-job-bar, .tb-install-row .ux-job-bar { margin-top: 8px }
