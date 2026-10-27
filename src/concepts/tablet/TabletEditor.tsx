@@ -178,11 +178,12 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
     settle(); notify(`${force.name} removed${count ? ` with its ${count} ${count === 1 ? 'unit' : 'units'}` : ''}`, withUndo(step));
   };
   const renameRoster = (name: string) => { setRoster(r => ({ ...r, name })); setSheet(null); notify(`Renamed to “${name}”`); };
-  /** Duplicate roster: an editable copy opens; for a read-only roster this is how it becomes editable (the original stays as it was). */
-  const duplicateRoster = () => {
+  /** Duplicate roster (More): the copy opens; a read-only roster's copy is read-only too, as in the app (TB-06: it keeps the
+   *  original's check). The read-only banner's Make an editable copy opens an editable one (the original stays as it was). */
+  const duplicateRoster = (editable = !readOnly) => {
     setPop(null); const name = `${roster.name} (copy)`;
-    history.reset(history.peek()); setRoster(r => ({ ...r, name, readOnly: null }));
-    notify(readOnly ? `Opened “${name}”, an editable copy. The original stays read-only.` : `Duplicated as “${name}”. The original is unchanged.`);
+    history.reset(history.peek()); setRoster(r => ({ ...r, name, ...(editable ? { readOnly: null } : {}) }));
+    notify(!readOnly ? `Duplicated as “${name}”. The original is unchanged.` : editable ? `Opened “${name}”, an editable copy. The original stays read-only.` : `Duplicated as “${name}”. The copy is read-only too.`);
   };
 
   /* ---------------------------------------------------------------- panes */
@@ -251,7 +252,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
             <button type="button" role="menuitem" disabled={!history.redoLabel || !!readOnly} onClick={() => { setPop(null); redo(); }}><Redo2 size={18} />{history.redoLabel ? `Redo “${history.redoLabel}”` : 'Redo'}</button><hr /></>}
           <button type="button" role="menuitem" onClick={() => { setPop(null); setSheet({ kind: 'export' }); }}><ArrowDownToLine size={18} />Export roster…</button>
           <button type="button" role="menuitem" disabled={!!readOnly} onClick={() => { setPop(null); setSheet({ kind: 'rename' }); }}><Pencil size={18} />Rename roster</button>
-          <button type="button" role="menuitem" onClick={duplicateRoster}><Copy size={18} />{readOnly ? 'Make an editable copy' : 'Duplicate roster'}</button>
+          <button type="button" role="menuitem" onClick={() => duplicateRoster()}><Copy size={18} />Duplicate roster</button>
           <button type="button" role="menuitem" disabled={!!readOnly} onClick={() => { setPop(null); setSheet({ kind: 'add-force' }); }}><Flag size={18} />Add force…</button>
           {mode !== 'single' && <hr />}
           {mode === 'three' && <button type="button" role="menuitem" onClick={() => { setShowCatalogue(v => !v); setPop(null); }}>{showCatalogue ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}{showCatalogue ? 'Hide catalogue' : 'Show catalogue'}</button>}
@@ -263,7 +264,6 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
 
     {pop === 'summary' && <div className={`dt-app tb-shim ${light ? 'light' : ''}`} data-pop="summary">
       <RosterSummary name={roster.name} faction={roster.faction} force={roster.force} total={total} limit={limit} issueCount={readOnly ? 0 : issues.length} onLimit={setLimit} onShowIssues={() => setIssuesOpen(v => !v)}
-        data={{ name: roster.system, version: roster.system === 'Open Field' ? 'v1.4' : 'v3.0.2', onClick: () => notify(`${roster.system} · sample data is ready offline`) }}
         details={issuesOpen ? <IssueList issues={readOnly ? [] : issues} readOnly={!!readOnly} onShow={showIssue} /> : undefined}
         actions={[{ label: 'Export roster…', icon: <ArrowDownToLine size={17} />, onClick: () => { setPop(null); setSheet({ kind: 'export' }); } }, { label: 'New roster', icon: <FilePlus2 size={17} />, onClick: () => { setPop(null); onNewRoster(); } }]} />
     </div>}
@@ -282,7 +282,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
           {readOnly && <section className="tbe-readonly" role="region" aria-label="Read-only roster" tabIndex={-1}><Lock size={20} />
             <div><strong>This roster is read-only</strong><p>{readOnly.faction} was removed from the installed {readOnly.system} data, so its units can't be checked or changed. The roster is kept as it was saved.</p>
               <div className="tbe-readonly-actions">
-                <button type="button" className="ux-job-btn primary" onClick={duplicateRoster}><Copy size={17} />Make an editable copy</button>
+                <button type="button" className="ux-job-btn primary" onClick={() => duplicateRoster(true)}><Copy size={17} />Make an editable copy</button>
                 <button type="button" className="ux-job-btn" onClick={onFindData}><Database size={17} />Find game data</button>
                 <button type="button" className="ux-job-btn" onClick={() => setSheet({ kind: 'export' })}><ArrowDownToLine size={17} />Export as it was</button>
               </div></div></section>}
