@@ -8,7 +8,8 @@
 .tbc-steps li { flex: 1; min-width: 0 }
 .tb-app button.tbc-step { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 6px 8px; border: 0; border-radius: 12px; background: transparent; color: var(--ux-muted); font: inherit; text-align: left; cursor: pointer; touch-action: manipulation }
 .tbc-step > span:last-child { display: grid; min-width: 0 }
-.tbc-step b { overflow: hidden; font-size: 14.5px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap }
+/* Step titles wrap to two lines (the app's step list, TB-09); the summary line stays one line. */
+.tbc-step b { display: -webkit-box; overflow: hidden; font-size: 14.5px; font-weight: 650; -webkit-box-orient: vertical; -webkit-line-clamp: 2 }
 .tbc-step small { overflow: hidden; color: var(--ux-ink-tertiary); font-size: 12.5px; text-overflow: ellipsis; white-space: nowrap }
 .tbc-mark { flex: 0 0 auto; display: grid; place-items: center; width: 28px; height: 28px; border: 1.5px solid var(--ux-line-2); border-radius: 50%; font-size: 13px; font-weight: 750; font-variant-numeric: tabular-nums }
 .tb-app button.tbc-step.done { color: var(--ux-ink) }
@@ -30,7 +31,6 @@
 .tbc-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px }
 .tb-app button.tbc-skip { min-height: 44px; padding: 0 8px; border: 0; background: transparent; color: var(--ux-muted); font: inherit; font-size: 14px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; touch-action: manipulation }
 .tb-app button.tbc-skip:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px }
-.tb-app button.tbc-add { border-style: dashed; color: var(--ux-ink) }
 .tbc-chips { display: flex; flex-wrap: wrap; gap: 8px }
 .tb-app button.tbc-chip { min-width: 84px; min-height: 48px; padding: 0 16px; border: 1px solid var(--ux-line-2); border-radius: 12px; background: var(--ux-surface); color: var(--ux-ink); font: inherit; font-size: 15.5px; font-weight: 650; font-variant-numeric: tabular-nums; cursor: pointer; touch-action: manipulation }
 .tb-app button.tbc-chip.active { border-color: var(--ux-accent); background: color-mix(in srgb, var(--ux-accent) 14%, var(--ux-surface)) }
@@ -78,3 +78,5 @@
 .tbd-swatch i:first-child { border-left-width: 1px; border-radius: 8px 0 0 8px }
 .tbd-swatch i:nth-child(3) { border-radius: 0 8px 8px 0 }
 .tbd-swatch b { margin-left: 12px; color: var(--ux-ink); font-size: 14px }
+
+.tb-app button.tbc-add-system { align-self: flex-start; margin-top: 4px }

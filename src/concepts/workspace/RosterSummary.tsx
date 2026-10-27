@@ -39,7 +39,8 @@ export function RosterSummary({ name, faction, force, total, limit, issueCount, 
   name: string; faction: string; force: string; total: number; limit: number; issueCount: number;
   details?: ReactNode; issues?: ReactNode; issuesOpen?: boolean; paused?: boolean;
   configurationLimit?: number; customLimit?: boolean;
-  data: { name: string; version: string; onClick: () => void };
+  /** The game data row (system and version, opening Sources); the tablet's summary has none, as in the app (TB-06). */
+  data?: { name: string; version: string; onClick: () => void };
   actions: SummaryAction[];
   onLimit: (limit: number) => void; onShowIssues: () => void;
 }) {
@@ -61,7 +62,7 @@ export function RosterSummary({ name, faction, force, total, limit, issueCount, 
         : issues === undefined ? <button onClick={onShowIssues}><Shield size={15} /><span>{issueCount ? issueText(issueCount) : 'Your force is ready'}</span><ChevronRight size={14} /></button>
         : <button className={`dt-summary-status ${issueCount ? 'has-issues' : 'ready'}`} aria-expanded={issuesOpen} aria-controls="dte-check-details" title={issuesOpen ? 'Hide the issues' : 'Show the issues'} onClick={onShowIssues}>{issueCount ? <ShieldAlert size={15} /> : <Shield size={15} />}<span>{issueCount ? issueText(issueCount) : 'Your force is ready'}</span>{issuesOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}</button>}
       {issuesOpen && !paused && issues}
-      <button onClick={data.onClick}><Database size={15} /><span>{data.name}</span><small>{data.version}</small><ChevronRight size={14} /></button>
+      {data && <button onClick={data.onClick}><Database size={15} /><span>{data.name}</span><small>{data.version}</small><ChevronRight size={14} /></button>}
     </div>
     {details}
     <div className="dt-summary-rows">{actions.map(a => <button key={a.label} onClick={a.onClick}>{a.icon}<span>{a.label}</span>{a.kbd && <kbd>{a.kbd}</kbd>}</button>)}</div>

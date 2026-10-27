@@ -34,7 +34,7 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "tablet-settings-game-data", label: "Tablet · Settings · Game data" },
   { id: "tablet-settings-shortcuts", label: "Tablet · Settings · Keyboard shortcuts" },
   { id: "tablet-create", label: "Tablet · New roster (guided creation)" },
-  { id: "tablet-create-review", label: "Tablet · New roster · Review" },
+  { id: "tablet-create-review", label: "Tablet · New roster · Name and summary" },
   { id: "tablet-settings-appearance-import", label: "Tablet · Settings · Appearance import" },
   { id: "tablet-editor-move-unit", label: "Tablet · Roster editor · Move unit" },
   { id: "tablet-confirm-delete", label: "Tablet · Confirm · Delete roster" },
