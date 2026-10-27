@@ -35,8 +35,8 @@ export function TabletElements() {
   const [textScale, setTextScale] = useState<TextScale>(defaultTextScale);
   const prefs = useMemo(() => ({ deviceId, input, textScale, setDeviceId, setInput, setTextScale }), [deviceId, input, textScale]);
   const [page, setPage] = useState<'home' | 'rosters' | 'tools'>('rosters');
-  const railIn = (mode: TabletInput) => <div className="tb-app ux-screen ux-size-regular dark tb-medium" style={{ height: 'auto', flex: 'none', background: 'var(--ux-bg)', borderRadius: 18, overflow: 'visible', width: 'max-content' }}>
-    <TabletEnvContext.Provider value={makeTabletEnv('ipad-portrait', mode)}><div style={{ height: 620, display: 'flex' }}><TabletRail page={page} input={mode} onPage={p => setPage(p as typeof page)} onNewRoster={() => {}} /></div></TabletEnvContext.Provider>
+  const railIn = (mode: TabletInput, device: 'ipad-portrait' | 'android') => <div className="tb-app ux-screen ux-size-regular dark tb-medium" style={{ height: 'auto', flex: 'none', background: 'var(--ux-bg)', borderRadius: 18, overflow: 'visible', width: 'max-content' }}>
+    <TabletEnvContext.Provider value={makeTabletEnv(device, mode)}><div style={{ height: 620, display: 'flex' }}><TabletRail page={page} input={mode} system={device === 'android' ? 'android' : 'ios'} onPage={p => setPage(p as typeof page)} onNewRoster={() => {}} /></div></TabletEnvContext.Provider>
   </div>;
   return <TabletPrefsContext.Provider value={prefs}>
     <div className="tb-elements">
@@ -44,10 +44,12 @@ export function TabletElements() {
       <p>The tablet takes the desktop structure (a rail with pages and panes) and the mobile look (mobile type sizes, targets of 44 px and more, the shared --ux-* tokens and colour schemes). Device, input mode, theme, colour scheme and Ambient are gallery controls.</p>
       <h2>Design library navigation</h2>
       <LibrarySwitch current="tablet" label="Design library examples" />
-      <h2>Tablet rail · Touch (press and hold shows the hint) and Pointer (hover shows the title)</h2>
-      <div className="tb-el-row">{railIn('touch')}{railIn('pointer')}
-        <div className="tb-el-note"><strong>Hint bubble</strong><span className="tb-hint-bubble static">Rosters: find, open and manage your rosters</span><small>Material 3 rail: New roster is an icon-only FAB on top (56 px, tonal, no shadow, aligned with the page content); Home, Rosters, Lookup, Tools, Library; Sources and Settings pinned to the bottom. Pill indicator behind the active icon, aria-current, focus ring, 56 px and larger targets.</small></div>
+      <h2>Tablet rail · iPad Touch and Pointer, Android Touch (press and hold shows the hint; with a pointer, hover shows the title)</h2>
+      <div className="tb-el-row">{railIn('touch', 'ipad-portrait')}{railIn('pointer', 'ipad-portrait')}{railIn('touch', 'android')}
+        <div className="tb-el-note"><strong>Hint bubble</strong><span className="tb-hint-bubble static">Rosters: find, open and manage your rosters</span><small>Home, Rosters, Lookup, Tools, Library; Sources and Settings pinned to the bottom. Pill indicator behind the active icon, aria-current, focus ring, 56 px and larger targets. iPad (HIG): destinations only; New roster sits at the trailing edge of the Home and Rosters toolbars, ⌘N everywhere. Android (Material 3 rail): New roster is an icon-only FAB on top (56 px, tonal, no shadow, aligned with the page content). TB-00 review, 2026-10-26.</small></div>
       </div>
+      <h2>Home toolbar · iPad (New roster at the trailing edge) and Android (New roster on the rail)</h2>
+      <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-home" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="android"><TabletWorkbench workflowScreen="tablet-home" /></TabletDeviceFrame></div>
       <h2>Device frames · same scale</h2>
       <div className="tb-el-devices">{tabletDevices.map(d => <figure key={d.id}><i style={{ width: d.width / 8, height: d.height / 8 }} className={d.system} /><figcaption><strong>{d.label}</strong>{d.width} × {d.height} · {widthClassLabel[widthClassOf(d.width)]}</figcaption></figure>)}</div>
       <h2>Device, input mode and text size switches</h2>
