@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
-import { JobsPanel, JobsToggle, useWorkspaceJobs } from '../workspace/Jobs';
+import { JobsPanel, useWorkspaceJobs } from '../workspace/Jobs';
 import type { Notify } from '../workspace/Toasts';
 import { collectionSources, installedSources, rosterLibrary, type RosterSummary } from '../desktop/desktopData';
 import { isTabletPage, type TabletPage } from './TabletRail';
@@ -82,13 +82,7 @@ export function useTabletSession({ route, notify, light, onViewSource }: { route
 export type TabletSession = ReturnType<typeof useTabletSession>;
 export type SetState<T> = Dispatch<SetStateAction<T>>;
 
-/** Progress button for a toolbar row: live progress of the jobs, opens the jobs popover (workspace Jobs). */
-export function TabletJobsButton({ session }: { session: TabletSession }) {
-  const { jobs, jobsOpen, setJobsOpen, light } = session;
-  return <div className={`dt-app tb-shim tb-jobs-btn ${light ? 'light' : ''}`}><JobsToggle jobs={jobs.jobs} open={jobsOpen} onToggle={() => setJobsOpen(!jobsOpen)} /></div>;
-}
-
-/** The jobs popover under the toolbar row, over the page. Faction picking appears only with Advanced installation on. */
+/** Job details requested from Home or Sources in-page controls. Faction picking appears only with Advanced installation on. */
 export function TabletJobsPanel({ session }: { session: TabletSession }) {
   const { jobs, jobsOpen, setJobsOpen, viewSource, setPickerJob, light } = session;
   if (!jobsOpen || !jobs.jobs.length) return null;

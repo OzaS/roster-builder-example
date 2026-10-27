@@ -68,6 +68,8 @@ export function TabletElements() {
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-editor-text-200" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="split"><TabletWorkbench workflowScreen="tablet-rosters-text-200" /></TabletDeviceFrame></div>
       <h2>Empty state card · first run, no rosters, no match</h2>
       <div className="tb-el-row"><div className="tb-app ux-screen dark tb-el-card"><EmptyState icon={Layers3} title="No rosters yet" text="Create a roster, or import one from a file."><button type="button" className="ux-primary tb-primary"><Plus size={17} />New roster</button><button type="button" className="ux-job-btn">Import a roster</button></EmptyState></div></div>
+      <h2>Home and Sources progress · in-page controls, no global toolbar jobs button</h2>
+      <p>Each installed source has its version, Update and Show progress. All jobs stays reachable in the data card after the first install, including completed jobs, failures, cancel and retry. Installs and updates run inline; requested details and Advanced installation faction choice use the existing job details and picker.</p>
       <h2>Install row · Install, installing, choose factions, update, installed (44 px actions; progress under the text)</h2>
       <div className="tb-el-row"><div className="tb-app ux-screen dark tb-el-card tb-el-stack">
         <InstallRow title="Example System Three" sub="Example game system · 6 factions · 22.4 MB" onInstall={noop} onJobs={noop} />

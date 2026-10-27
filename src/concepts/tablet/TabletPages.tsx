@@ -5,7 +5,6 @@ import { ComingSoonCard } from '../ux/AppExtras';
 import { collectionSources, lookupEntries, type LookupEntry, type RosterSummary } from '../desktop/desktopData';
 import { HintButton } from './TabletHint';
 import { EmptyState, Facts, InstallRow, ListDetail, Meter, Progress, Row, SearchField, pts, rosterStatus, sourceStatus, plural, type PageProps, type SessionProps } from './TabletPieces';
-import { TabletJobsButton } from './tabletSession';
 import { keyLabel } from './tabletKeys';
 
 // Pages of the tablet: Home, Rosters and Lookup (T2a). Sources and Settings have their own files. Synthetic rows only.
@@ -24,26 +23,25 @@ export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRo
   const { rosters, jobs, hasData, setJobsOpen, setSourceDetail } = session;
   const recent = rosters.slice(0, 4);
   const current = rosters[0];
-  const update = jobs.sources.find(s => s.next) ?? jobs.sources[0];
-  const updating = update && jobs.progressOf(update.id);
   const addData = () => { setSourceDetail('add'); onPage('sources'); };
-  const startInstall = (c: typeof collectionSources[number]) => { jobs.startInstall(c); setJobsOpen(true); };
+  const startInstall = (c: typeof collectionSources[number]) => { jobs.startInstall(c); };
   const attention = rosters.filter(r => r.status !== 'ready').length;
 
-  const dataCard = update && <section className="tb-card" aria-label="Game data status">
+  // Every installed source keeps its own version, update and progress control.
+  const history = jobs.jobs.length > 0 && <button type="button" className="ux-job-btn" onClick={() => setJobsOpen(true)}>Show progress · All jobs</button>;
+  const dataCard = <section className="tb-card" aria-label="Game data status">
     <span className="ux-result-label">Game data</span>
-    <div className="tb-data-row"><span><strong>{update.name}</strong><small>{update.version} · checked {update.checked}</small></span>{sourceStatus(update)}</div>
-    {updating ? <>
-      <p className="tb-note"><RefreshCcw size={15} />Updating to {update.next} · {updating.percent}%. You can keep working.</p>
-      <Progress percent={updating.percent} />
-      <div className="tb-actions"><button type="button" className="ux-job-btn" onClick={() => setJobsOpen(true)}>Show progress</button></div>
-    </> : update.next ? <>
-      <p className="tb-note"><Info size={15} />Version {update.next} is available. Your rosters stay on {update.version} until you update.</p>
-      <div className="tb-actions"><HintButton hint="Download the new version and check your rosters" input={env.input} side="top" className="ux-job-btn primary" onClick={() => { jobs.startUpdate([update.id]); setJobsOpen(true); }}><RefreshCcw size={16} />Update</HintButton><button type="button" className="ux-job-btn" onClick={() => onPage('sources')}>Sources</button></div>
-    </> : <>
-      <p className="tb-note ok"><Check size={15} />Everything is up to date.</p>
-      <div className="tb-actions"><button type="button" className="ux-job-btn" onClick={() => onPage('sources')}>Sources</button></div>
-    </>}
+    {jobs.sources.map(source => {
+      const progress = jobs.progressOf(source.id);
+      return <div key={source.id} className="tb-section">
+        <div className="tb-data-row"><span><strong>{source.name}</strong><small>{source.version} · checked {source.checked}</small></span>{sourceStatus(source)}</div>
+        {progress ? <><p className="tb-note">Updating · {progress.percent}%. You can keep working.</p><Progress percent={progress.percent} /><button type="button" className="ux-job-btn" onClick={() => setJobsOpen(true)}>Show progress</button></>
+          : source.next ? <><p className="tb-note"><Info size={15} />Version {source.next} is available.</p><HintButton hint="Download the new version and check your rosters" input={env.input} side="top" className="ux-job-btn primary" onClick={() => jobs.startUpdate([source.id])}><RefreshCcw size={16} />Update {source.name}</HintButton></>
+          : <p className="tb-note ok"><Check size={15} />Up to date</p>}
+      </div>;
+    })}
+    {history}
+    <button type="button" className="ux-job-btn" onClick={() => onPage('sources')}>Sources</button>
   </section>;
   const deviceCard = <section className="tb-card">
     <span className="ux-result-label">On this device</span>
@@ -53,7 +51,7 @@ export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRo
   // iPad: New roster sits at the trailing edge of the toolbar once there is game data (Android has the rail FAB and keeps
   // New roster in the Continue card); the card then drops its own New roster.
   const create = env.device.system === 'ios' && hasData;
-  const toolbar = (jobs.jobs.length > 0 || create) && <div className="tb-toolbar tb-toolbar-end">{jobs.jobs.length > 0 && <TabletJobsButton session={session} />}{create && <NewRosterButton env={env} onNewRoster={onNewRoster} />}</div>;
+  const toolbar = create && <div className="tb-toolbar tb-toolbar-end"><NewRosterButton env={env} onNewRoster={onNewRoster} /></div>;
 
   /* First run: no game data on the device. */
   if (!hasData) return <div className="tb-page">
@@ -64,6 +62,7 @@ export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRo
           <span className="ux-result-label">Get started</span>
           <div className="tb-card-head"><h2 className="tb-card-title">Start with game data</h2><p className="tb-body tb-muted">Rosters are built from a game system's data. Install one; it stays available offline.</p></div>
           <div className="tb-list">{collectionSources.map(c => <InstallRow key={c.id} title={c.name} sub={`${c.detail} · ${c.size}`} live={jobs.jobs.find(j => j.sourceId === c.id && (j.status === 'running' || j.status === 'needs-you'))} installed={jobs.sources.some(s => s.id === c.id)} onInstall={() => startInstall(c)} onJobs={() => setJobsOpen(true)} />)}</div>
+          {history}
           <Row selected={false} mark={<FolderOpen size={20} />} title="Install from a file or a link" sub="An archive, data files, a repository link or GitHub search" end={<ChevronRight size={17} />} onClick={addData} />
           <p className="tb-note"><Info size={15} />Battle Augur includes no game data. Sources come from community repositories you choose.</p>
         </section>
