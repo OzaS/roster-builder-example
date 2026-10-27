@@ -143,6 +143,7 @@ export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster 
   const { rosters, setRosters, hasData } = session;
   const [query, setQuery] = useState(session.state === 'search' ? 'patrol' : '');
   const [attention, setAttention] = useState(false);
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
   // One game system chip at a time; a system with no rosters left drops back to All (and stays dropped).
   const [chosenSystem, setSystem] = useState<string | null>(session.state === 'system' ? 'Example System Two' : null);
   // Kept on the device across launches, like the system chip.
@@ -180,12 +181,15 @@ export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster 
   const row = (r: RosterSummary) => <Row key={r.name} selected={r.name === current?.name} mark={r.mark} title={r.name} sub={`${r.faction} · ${r.system}`} end={<><b>{pts(r.used)} / {pts(r.limit)}</b>{rosterStatus(r)}</>} onClick={() => choose(r.name)} />;
   const filtered = q !== '' || attention || system !== null;
   return <div className="tb-page">
-    <div className="tb-toolbar"><SearchField value={query} onChange={setQuery} label="Find a roster" placeholder="Find a roster or faction…" />{actions}</div>
-    <div className="tb-filters" role="group" aria-label="Filter rosters">
+    <div className="tb-toolbar tb-toolbar-end">{actions}</div>
+    <div className="tb-roster-search"><SearchField value={query} onChange={setQuery} label="Find a roster" placeholder="Find a roster or faction…" /></div>
+    <div className="tb-filters tb-roster-filters" role="group" aria-label="Filter rosters">
       <button type="button" className={`tb-filter ${!attention && system === null ? 'active' : ''}`} aria-pressed={!attention && system === null} onClick={() => { setAttention(false); setSystem(null); }}>All {rosters.length}</button>
-      {bySystem && systems.map(s => <button type="button" key={s.name} className={`tb-filter tb-filter-system ${system === s.name ? 'active' : ''}`} aria-pressed={system === s.name} aria-label={`${s.name}, ${plural(s.count, 'roster')}`} title={s.name} onClick={() => setSystem(system === s.name ? null : s.name)}><span>{s.name}</span> {s.count}</button>)}
-      {attentionCount > 0 && <button type="button" className={`tb-filter ${attention ? 'active' : ''}`} aria-pressed={attention} onClick={() => setAttention(!attention)}>Needs attention {attentionCount}</button>}
-      {bySystem && <GroupToggle on={grouped} onChange={setGrouped} />}
+      {!filtersExpanded && <button type="button" className={`tb-filter tb-filter-system ${system !== null || attention ? 'active' : ''}`} aria-expanded={false} title={[system, attention ? 'Needs attention' : null].filter(Boolean).join(', ')} onClick={() => setFiltersExpanded(true)}><span>{['More', system, attention ? 'Needs attention' : null].filter(Boolean).join(' · ')}</span></button>}
+      {filtersExpanded && bySystem && systems.map(s => <button type="button" key={s.name} className={`tb-filter tb-filter-system ${system === s.name ? 'active' : ''}`} aria-pressed={system === s.name} aria-label={`${s.name}, ${plural(s.count, 'roster')}`} title={s.name} onClick={() => setSystem(system === s.name ? null : s.name)}><span>{s.name}</span> {s.count}</button>)}
+      {filtersExpanded && attentionCount > 0 && <button type="button" className={`tb-filter ${attention ? 'active' : ''}`} aria-pressed={attention} onClick={() => setAttention(!attention)}>Needs attention {attentionCount}</button>}
+      {filtersExpanded && bySystem && <GroupToggle on={grouped} onChange={setGrouped} />}
+      {filtersExpanded && <button type="button" className="tb-filter" aria-expanded={true} onClick={() => setFiltersExpanded(false)}>Less</button>}
     </div>
     <ListDetail env={env} label="Rosters" open={open} onClose={() => setOpen(false)}
       list={<>
