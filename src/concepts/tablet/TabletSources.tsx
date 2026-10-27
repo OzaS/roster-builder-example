@@ -7,10 +7,9 @@ import { AddDataCollections, CollectionView, GitHubSearchView, LastUpdateCard, L
 import '../desktop/desktop-pages.css';
 import { HintButton } from './TabletHint';
 import { Facts, ListDetail, Row, WorkspaceScope, plural, sourceStatus, Progress, type SessionProps } from './TabletPieces';
-import { TabletJobsButton } from './tabletSession';
 import type { TabletPage } from './TabletRail';
 
-// Sources (T2b): installed game data as list + detail, the progress button and jobs popover in the toolbar, and the add flows.
+// Sources (T2b): installed game data as list + detail, in-page progress controls and requested jobs details, and the add flows.
 // The update report, collection pages and GitHub search are the workspace flows of the desktop, drawn with touch-size
 // controls (tablet-pages.css). The add-collection and faction picker sheets (T3) cover the whole window: TabletSessionSheets. The detail's mode lives in the session
 // (`sourceDetail`): a source id, 'add', 'github', 'collection:<id>' or 'report:<id>', so it survives switching pages.
@@ -28,7 +27,7 @@ export function TabletSources({ env, notify, session, onPage, onOpenRoster }: Se
   useEffect(() => { setConfirmRemove(false); }, [detail]);
   useRosterChecks(jobs, notify, go);
   const openJobs = () => setJobsOpen(true);
-  const update = (ids: string[]) => { jobs.startUpdate(ids); openJobs(); };
+  const update = (ids: string[]) => { jobs.startUpdate(ids); };
   const progress: Record<string, number> = Object.fromEntries(sources.flatMap(s => { const p = jobs.progressOf(s.id); return p ? [[s.id, p.percent]] : []; }));
   const installing = jobs.jobs.filter(j => j.kind === 'install' && (j.status === 'running' || j.status === 'needs-you') && !sources.some(s => s.id === j.sourceId));
   const updates = sources.filter(s => s.next && progress[s.id] === undefined);
@@ -102,9 +101,9 @@ export function TabletSources({ env, notify, session, onPage, onOpenRoster }: Se
 
   return <div className="tb-page">
     <div className="tb-toolbar wrap"><span className="tb-toolbar-note">{plural(sources.length, 'game system')} installed. Everything works offline.</span>
-      <TabletJobsButton session={session} />
       <HintButton hint="Install game data from an archive, data files or a folder" input={env.input} side="bottom" className="ux-job-btn" onClick={() => notify('Choose an archive, data files or a folder (prototype)')}><FolderOpen size={16} />Install from a file</HintButton>
       <HintButton hint="Install from a collection, a repository link or GitHub search" input={env.input} side="bottom" className="ux-job-btn primary" onClick={() => go('add')}><Plus size={16} />Add game data</HintButton></div>
+    {jobs.jobs.length > 0 && <div className="tb-actions"><button type="button" className="ux-job-btn" onClick={openJobs}>Show progress · All jobs</button></div>}
     <ListDetail env={env} label="Installed sources" open={open} onClose={() => setOpen(false)} list={list} detail={pane} />
   </div>;
 }
