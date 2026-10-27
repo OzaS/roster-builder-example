@@ -6,10 +6,15 @@ import { collectionSources, lookupEntries, type LookupEntry, type RosterSummary 
 import { HintButton } from './TabletHint';
 import { EmptyState, Facts, InstallRow, ListDetail, Meter, Progress, Row, SearchField, pts, rosterStatus, sourceStatus, plural, type PageProps, type SessionProps } from './TabletPieces';
 import { TabletJobsButton } from './tabletSession';
+import { keyLabel } from './tabletKeys';
 
 // Pages of the tablet: Home, Rosters and Lookup (T2a). Sources and Settings have their own files. Synthetic rows only.
 
 export type { PageProps };
+
+/** New roster at the trailing edge of a page toolbar (Rosters on every tablet; Home on iPad, where the rail has no FAB). */
+const NewRosterButton = ({ env, onNewRoster }: Pick<PageProps, 'env'> & { onNewRoster: () => void }) =>
+  <HintButton hint={`Create a roster${env.input === 'pointer' ? ` (${keyLabel('Mod+N', env.device.system)})` : ''}`} input={env.input} side="bottom" className="ux-job-btn primary" onClick={onNewRoster}><Plus size={16} />New roster</HintButton>;
 
 /* --------------------------------- Home --------------------------------- */
 
@@ -45,7 +50,10 @@ export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRo
     <Facts rows={[['Rosters', rosters.length], ['Game systems', jobs.sources.length], ['Needs attention', attention]]} />
   </section>;
 
-  const toolbar = jobs.jobs.length > 0 && <div className="tb-toolbar tb-toolbar-end"><TabletJobsButton session={session} /></div>;
+  // iPad: New roster sits at the trailing edge of the toolbar once there is game data (Android has the rail FAB and keeps
+  // New roster in the Continue card); the card then drops its own New roster.
+  const create = env.device.system === 'ios' && hasData;
+  const toolbar = (jobs.jobs.length > 0 || create) && <div className="tb-toolbar tb-toolbar-end">{jobs.jobs.length > 0 && <TabletJobsButton session={session} />}{create && <NewRosterButton env={env} onNewRoster={onNewRoster} />}</div>;
 
   /* First run: no game data on the device. */
   if (!hasData) return <div className="tb-page">
@@ -96,7 +104,7 @@ export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRo
           <Meter used={current.used} limit={current.limit} />
           <div className="tb-actions">
             <HintButton hint="Open the roster you were editing" input={env.input} side="top" className="ux-primary tb-primary" onClick={() => onOpenRoster(current.name)}>Continue roster<ArrowRight size={17} /></HintButton>
-            <HintButton hint="Create a roster" input={env.input} side="top" className="ux-job-btn" onClick={onNewRoster}><Plus size={17} />New roster</HintButton>
+            {!create && <HintButton hint="Create a roster" input={env.input} side="top" className="ux-job-btn" onClick={onNewRoster}><Plus size={17} />New roster</HintButton>}
           </div>
         </section>
         <section className="tb-section" aria-label="Recent rosters">
@@ -131,7 +139,7 @@ export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster 
   const choose = (name: string) => { setSelected(name); setOpen(true); setRenaming(false); };
   const actions = <>
     <HintButton hint="Import a roster from a file" input={env.input} side="bottom" className="ux-job-btn" onClick={() => notify('Import a roster file (prototype)')}><FileUp size={16} />Import</HintButton>
-    <HintButton hint="Create a roster" input={env.input} side="bottom" className="ux-job-btn primary" onClick={onNewRoster}><Plus size={16} />New roster</HintButton>
+    <NewRosterButton env={env} onNewRoster={onNewRoster} />
   </>;
   if (!rosters.length) return <div className="tb-page">
     <div className="tb-toolbar tb-toolbar-end">{actions}</div>
