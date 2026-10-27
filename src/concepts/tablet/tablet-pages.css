@@ -219,5 +219,5 @@
 
 /* TFB-003/004: search spans both panes; expanded filters stay on one scrollable row. */
 .tb-roster-search, .tb-roster-search .tb-search { width: 100%; min-width: 0; box-sizing: border-box }
-.tb-roster-filters { flex-wrap: nowrap; overflow-x: auto; flex-shrink: 0; padding-block: 2px }
+.tb-filters.tb-roster-filters { flex-wrap: nowrap; overflow-x: auto; flex-shrink: 0; padding-block: 2px }
 .tb-roster-filters > button { flex-shrink: 0; white-space: nowrap }
