@@ -7,6 +7,7 @@ import { TabletDeviceFrame } from './TabletDeviceFrame';
 import { TabletRail } from './TabletRail';
 import { TabletResizer, type PanePresets } from './TabletResizer';
 import { EmptyState, InstallRow } from './TabletPieces';
+import { GroupHeader, GroupToggle } from './TabletPages';
 import type { Job } from '../workspace/Jobs';
 import { editorShortcuts, keyLabel } from './tabletKeys';
 import { TabletWorkbench } from './TabletWorkbench';
@@ -66,6 +67,14 @@ export function TabletElements() {
       <h2>Larger text and display zoom (UX-025) · Text size 100%, 150%, 200%</h2>
       <p>The Text size switch (gallery, and <code>text=</code> on a standalone link) scales the tablet type and controls. The layout gets the smaller logical width (device width ÷ scale) and collapses by width class instead of clipping: Expanded → Medium (two panes) → single pane; under 600 the rail drops its labels (they stay the accessible names and hints) and scrolls when taller than the window; under 440 the editor header keeps Back, the roster mark, the points and More (undo and redo move into More). Screens: Roster editor · Text 200%, Rosters · Text 200%.</p>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-editor-text-200" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="split"><TabletWorkbench workflowScreen="tablet-rosters-text-200" /></TabletDeviceFrame></div>
+      <h2>Roster filters (TB-03) · game system chips, Group by game system toggle and the list section header</h2>
+      <p>The filter row: All, one chip per game system with its count (the system of the most recently opened roster first; shown only with two or more systems), Needs attention, and the Group by game system toggle at the trailing end. A system chip combines with the search and Needs attention; Clear filters resets them but not the grouping. Grouped, the list pane has a sticky header per system (System · n of the rosters shown); empty groups are left out. Both choices are kept on the device. Screens: Rosters · Game system filter, Rosters · Grouped by game system.</p>
+      <div className="tb-el-row"><div className="tb-app ux-screen dark tb-el-card tb-el-stack">
+        <div className="tb-filters" role="group" aria-label="Filter rosters (sample)"><button type="button" className="tb-filter">All 26</button><button type="button" className="tb-filter tb-filter-system active" aria-pressed="true"><span>Open Field</span> 17</button><button type="button" className="tb-filter tb-filter-system" aria-pressed="false"><span>Example System With A Long Name</span> 9</button><button type="button" className="tb-filter">Needs attention 4</button></div>
+        <div className="tb-filters"><GroupToggle on={false} onChange={noop} /><GroupToggle on onChange={noop} /></div>
+        <div className="tb-list"><GroupHeader name="Open Field" count={17} /><GroupHeader name="Example System With A Long Name That Runs On" count={9} /></div>
+      </div></div>
+      <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-rosters-system" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-portrait"><TabletWorkbench workflowScreen="tablet-rosters-grouped" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="split"><TabletWorkbench workflowScreen="tablet-rosters-grouped" /></TabletDeviceFrame></div>
       <h2>Empty state card · first run, no rosters, no match</h2>
       <div className="tb-el-row"><div className="tb-app ux-screen dark tb-el-card"><EmptyState icon={Layers3} title="No rosters yet" text="Create a roster, or import one from a file."><button type="button" className="ux-primary tb-primary"><Plus size={17} />New roster</button><button type="button" className="ux-job-btn">Import a roster</button></EmptyState></div></div>
       <h2>Home and Sources progress · in-page controls, no global toolbar jobs button</h2>

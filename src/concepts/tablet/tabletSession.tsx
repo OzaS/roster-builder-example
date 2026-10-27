@@ -20,6 +20,8 @@ const stateRoutes: Record<string, TabletRoute> = {
   'tablet-rosters-empty': { page: 'rosters', state: 'empty' },
   'tablet-rosters-many': { page: 'rosters', state: 'many' },
   'tablet-rosters-search': { page: 'rosters', state: 'search' },
+  'tablet-rosters-system': { page: 'rosters', state: 'system' },
+  'tablet-rosters-grouped': { page: 'rosters', state: 'grouped' },
   'tablet-sources-add': { page: 'sources', state: 'add' },
   'tablet-sources-installing': { page: 'sources', state: 'installing' },
   'tablet-sources-choose-factions': { page: 'sources', state: 'choose-factions' },
@@ -50,7 +52,7 @@ const demoInstall = collectionSources[2];
 
 export function useTabletSession({ route, notify, light, onViewSource }: { route: TabletRoute; notify: Notify; light: boolean; onViewSource: () => void }) {
   const { state } = route;
-  const [rosters, setRosters] = useState<RosterSummary[]>(() => ['first-run', 'no-rosters', 'empty'].includes(state) ? [] : state === 'many' || state === 'search' ? manyRosters : rosterLibrary);
+  const [rosters, setRosters] = useState<RosterSummary[]>(() => ['first-run', 'no-rosters', 'empty'].includes(state) ? [] : ['many', 'search', 'system', 'grouped'].includes(state) ? manyRosters : rosterLibrary);
   const [advancedInstall, setAdvancedInstall] = useState(state === 'choose-factions');
   const [jobsOpen, setJobsOpen] = useState(false);
   /** Sources page: a source id, 'add', 'github', 'collection:<id>' or 'report:<id>'; undefined = nothing opened yet. */
