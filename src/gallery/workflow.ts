@@ -21,6 +21,7 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "tablet-settings", label: "Tablet · Settings" },
   { id: "tablet-home-first-run", label: "Tablet · Home · First run" },
   { id: "tablet-home-no-rosters", label: "Tablet · Home · No rosters" },
+  { id: "tablet-home-many-systems", label: "Tablet · Home · Many game systems" },
   { id: "tablet-rosters-many", label: "Tablet · Rosters · Many rosters" },
   { id: "tablet-rosters-search", label: "Tablet · Rosters · Search" },
   { id: "tablet-rosters-empty", label: "Tablet · Rosters · Empty" },

@@ -110,10 +110,19 @@
 .tb-section { display: grid; gap: 10px }
 .tb-section-head { display: flex; align-items: center; justify-content: space-between }
 .tb-section-head .ux-job-btn { min-height: 44px }
-.tb-home { display: grid; grid-template-columns: minmax(0, 3fr) minmax(250px, 2fr); gap: 16px; align-content: start; overflow-y: auto }
-.tb-home-main, .tb-home-side { display: grid; gap: 16px; align-content: start; min-width: 0 }
-.tb-medium .tb-home { grid-template-columns: minmax(0, 1fr) }
-.tb-medium.tb-app .tb-home-side { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+/* TFB-002: Home's widgets keep their places in the page; each scrolls its own content. A summary card keeps its height,
+   a .tb-fill widget (Game data, Recent rosters, the first-run and no-rosters cards) takes the spare height. Below 520 px of
+   page (larger text, short windows) the page scrolls as a whole instead, so nothing is cut off. */
+.tb-home-page { overflow-y: auto; overscroll-behavior: contain }
+.tb-home { display: grid; grid-template-columns: minmax(0, 3fr) minmax(250px, 2fr); grid-template-rows: minmax(0, 1fr); gap: 16px; min-height: 520px }
+.tb-home-main, .tb-home-side { display: flex; flex-direction: column; gap: 16px; min-width: 0; min-height: 0 }
+.tb-home .tb-card { flex: 0 1 auto; min-height: 96px; overflow-y: auto; overscroll-behavior: contain }
+.tb-home .tb-fill { flex: 1 1 0; min-height: 160px }
+.tb-home .tb-recent { display: flex; flex-direction: column; gap: 10px }
+.tb-home .tb-recent > .tb-list { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding-right: 3px }
+.tb-home .tb-more { justify-self: start; align-self: flex-start }
+.tb-medium .tb-home { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 3fr) minmax(0, 2fr) }
+.tb-medium.tb-app .tb-home-side { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch }
 .tb-soon { justify-content: center; align-items: center }
 .tb-soon .ux-cs-card { width: min(520px, 100%) }
 .tb-soon .ux-cs-card > p { max-width: 420px }
@@ -227,6 +236,10 @@
 .tb-toolbar { flex-wrap: wrap }
 .tb-toolbar .tb-search { flex: 1 1 260px }
 .tb-compact .tb-home, .tb-compact.tb-app .tb-home-side { grid-template-columns: minmax(0, 1fr) }
+/* Compact (the phone design): one scrolling page, the widgets at their natural height. */
+.tb-compact .tb-home { grid-template-rows: none; min-height: 0 }
+.tb-compact .tb-home-main, .tb-compact .tb-home-side { display: grid; align-content: start }
+.tb-compact .tb-home .tb-card, .tb-compact .tb-home .tb-recent > .tb-list { overflow: visible; min-height: 0 }
 /* Compact logical width: the page scrolls as a whole (toolbars and filters wrap above the list) instead of squeezing the list. */
 .tb-compact .tb-main > .tb-page { overflow-y: auto; overscroll-behavior: contain }
 .tb-compact .tb-page > .tb-panes { flex: none; min-height: min(100%, 420px) }
