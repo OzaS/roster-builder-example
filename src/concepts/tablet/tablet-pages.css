@@ -239,8 +239,6 @@
 
 /* TFB-006: status tile beside the roster name, the avatar's size; the full note is a disclosure under the header. */
 .tb-app button.tb-status-tile { display: inline-grid; place-items: center; align-content: center; gap: 1px; flex: none; width: 48px; height: 48px; padding: 0; border: 1px solid var(--ux-line-2); border-radius: 14px; background: var(--ux-surface-2); color: var(--ux-muted); cursor: pointer }
-.tb-status-tile > span { display: inline-flex; align-items: center; gap: 1px; font-size: 11px; font-weight: 800; line-height: 1 }
-.tb-status-tile .flip { transform: rotate(180deg) }
 .tb-app button.tb-status-tile.ok { border-color: color-mix(in srgb, var(--ux-ok) 45%, transparent); background: color-mix(in srgb, var(--ux-ok) 12%, transparent); color: var(--ux-ok) }
 .tb-app button.tb-status-tile.warn { border-color: color-mix(in srgb, var(--ux-warn) 45%, transparent); background: color-mix(in srgb, var(--ux-warn) 12%, transparent); color: var(--ux-warn) }
 .tb-app button.tb-status-tile.err { border-color: color-mix(in srgb, var(--ux-err) 45%, transparent); background: color-mix(in srgb, var(--ux-err) 12%, transparent); color: var(--ux-err) }

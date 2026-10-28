@@ -30,12 +30,12 @@ function ResizerDemo({ input, menu }: { input: TabletInput; menu?: boolean }) {
 }
 
 /** The compact validation control replaces the existing full-width validation banner; inspect every tone. */
-function ValidationHeaderDemo({ tone, title, body, count = 1 }: { tone: string; title: string; body: string; count?: number }) {
+function ValidationHeaderDemo({ tone, title, body }: { tone: string; title: string; body: string }) {
   const [open, setOpen] = useState(false);
   return <div className="tb-app ux-screen dark tb-el-card tb-el-fill"><div className="tb-roster-detail-header">
     <div className="tb-roster-heading"><h2>The Ashen Expedition</h2><small>Frontier Coalition · Open Field</small></div>
     <strong className="tb-roster-total">770 <small>pts</small></strong>
-    <div className="tb-validation-anchor"><StatusTile tone={tone} label={`${title}. ${body}`} count={count} expanded={open} onToggle={() => setOpen(!open)} />
+    <div className="tb-validation-anchor"><StatusTile tone={tone} label={`${title}. ${body}`} expanded={open} onToggle={() => setOpen(!open)} />
       {open && <section className={`tb-validation-popover tb-note ${tone}`} aria-label="Roster validation details"><strong>{title}</strong><span>{body}</span></section>}
     </div>
   </div></div>;
@@ -98,10 +98,10 @@ export function TabletElements() {
       </div>)}</div>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-rosters-system" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-portrait"><TabletWorkbench workflowScreen="tablet-rosters-grouped" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="split"><TabletWorkbench workflowScreen="tablet-rosters-grouped" /></TabletDeviceFrame></div>
       <h2>Roster structure (TFB-010) · name, points and validation share the header</h2>
-      <p>The 48 px indicator replaces the existing large validation banner. It represents the same Ready, roster errors and data-warning information, with the appropriate icon, tone and problem count. It is not a separate success tick. Tap it to read the existing validation title and explanation in a compact popover; no full-width validation row is reserved. The name, points and indicator stay together above two-column metadata. Row selection previews the roster; its separate trailing chevron enters the roster. Rename, Duplicate, Export and Delete form one action strip below the metadata.</p>
+      <p>The 48 px indicator replaces the existing large validation banner. It represents the same Ready, roster errors and data-warning information, with only the appropriate status icon and tone. No count, text or chevron appears inside the control; issue counts and explanations remain in the accessible name and the popover. It is not a separate success tick. Tap it to read the existing validation title and explanation in a compact popover; no full-width validation row is reserved. The name, points and indicator stay together above two-column metadata. Row selection previews the roster; its separate trailing chevron enters the roster. Rename, Duplicate, Export and Delete form one action strip below the metadata.</p>
       <div className="tb-el-stack">
         <ValidationHeaderDemo tone="ok" title="Ready" body="All roster requirements met." />
-        <ValidationHeaderDemo tone="err" title="2 items need attention" body="Roster requirements not met." count={2} />
+        <ValidationHeaderDemo tone="err" title="2 items need attention" body="Roster requirements not met." />
         <ValidationHeaderDemo tone="warn" title="Game data changed" body="Some entries changed in the last update. Open to review them." />
       </div>
       <div className="tb-el-row" style={{ marginTop: 24 }}>{([420, 320] as const).map(width => <div key={width} className="tb-app ux-screen dark tb-el-card" style={{ width }}><div className="tb-el-stack tb-el-fill"><strong>{width === 420 ? 'Two columns' : 'Narrow card · one column'}</strong>

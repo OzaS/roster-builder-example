@@ -1,5 +1,5 @@
 import { type ReactNode, useId, useMemo, useState } from 'react';
-import { ArrowRight, BookOpen, ChevronDown, ChevronRight, Copy, Database, FileUp, FolderOpen, Hammer, Info, Layers3, Pencil, Plus, RefreshCcw, Search, ShieldCheck, Trash2, TriangleAlert, ArrowDownToLine, BookMarked, Check } from 'lucide-react';
+import { ArrowRight, BookOpen, ChevronRight, Copy, Database, FileUp, FolderOpen, Hammer, Info, Layers3, Pencil, Plus, RefreshCcw, Search, ShieldCheck, Trash2, TriangleAlert, ArrowDownToLine, BookMarked, Check } from 'lucide-react';
 import { Chip as MobileChip } from '../ux/uxShared'; // the mobile chip; the workspace Chip (dtp-chip) is not used here, see MOBILE-PIECES.md
 import { ComingSoonCard } from '../ux/AppExtras';
 import { collectionSources, lookupEntries, type LookupEntry, type RosterSummary } from '../desktop/desktopData';
@@ -164,11 +164,11 @@ export function RosterFilterBar({ platform, all, controls, disclosure, group }: 
 
 const NOTE_ICONS = { ok: ShieldCheck, warn: TriangleAlert, err: TriangleAlert } as const;
 
-/** Compact form of the existing validation banner (TFB-010): severity icon, error count and disclosure. */
-export const StatusTile = ({ tone, label, count = 1, expanded, controls, onToggle }: { tone: string; label: string; count?: number; expanded: boolean; controls?: string; onToggle: () => void }) => {
+/** Compact form of the existing validation banner (TFB-010): status icon only; validation counts and explanations stay in the accessible name and popover. */
+export const StatusTile = ({ tone, label, expanded, controls, onToggle }: { tone: string; label: string; expanded: boolean; controls?: string; onToggle: () => void }) => {
   const Icon = NOTE_ICONS[tone as keyof typeof NOTE_ICONS] ?? Info;
   return <button type="button" className={`tb-status-tile ${tone}`} aria-expanded={expanded} aria-controls={controls} aria-label={label} title="Shows or hides the status details" onClick={onToggle}>
-    <Icon size={20} aria-hidden="true" /><span aria-hidden="true">{count > 1 || tone === 'err' ? <b>{count}</b> : null}<ChevronDown size={12} className={expanded ? 'flip' : ''} /></span>
+    <Icon size={20} aria-hidden="true" />
   </button>;
 };
 
@@ -257,7 +257,7 @@ export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster 
             : <div className="tb-roster-heading"><h2>{current.name}</h2><small>{current.faction} · {current.system}</small></div>}
           <strong className="tb-roster-total">{pts(current.used)} <small>pts</small></strong>
           <div className="tb-validation-anchor">
-            <StatusTile tone={noteTone} label={`${noteTitle}. ${noteText}`} count={current.issues ?? 1} expanded={statusOpen} controls={validationId} onToggle={() => setStatusOpen(!statusOpen)} />
+            <StatusTile tone={noteTone} label={`${noteTitle}. ${noteText}`} expanded={statusOpen} controls={validationId} onToggle={() => setStatusOpen(!statusOpen)} />
             {statusOpen && <section id={validationId} className={`tb-validation-popover tb-note ${noteTone}`} aria-label="Roster validation details">
               <strong>{noteTitle}</strong><span>{noteText}</span>
             </section>}
