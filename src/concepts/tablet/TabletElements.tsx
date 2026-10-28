@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { BookMarked, Check, ChevronLeft, Hammer, Layers3, Plus } from 'lucide-react';
+import { BookMarked, Check, Hammer, Layers3, Plus } from 'lucide-react';
 import { LibrarySwitch } from '../../gallery/LibrarySwitch';
 import { ComingSoonCard } from '../ux/AppExtras';
 import { TabletControls } from './TabletControls';
@@ -68,12 +68,12 @@ export function TabletElements() {
       <p>The Text size switch (gallery, and <code>text=</code> on a standalone link) scales the tablet type and controls. The layout gets the smaller logical width (device width ÷ scale) and collapses by width class instead of clipping: Expanded → Medium (two panes) → single pane; under 600 the rail drops its labels (they stay the accessible names and hints) and scrolls when taller than the window; under 440 the editor header keeps Back, the roster mark, the points and More (undo and redo move into More). Screens: Roster editor · Text 200%, Rosters · Text 200%.</p>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-editor-text-200" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="split"><TabletWorkbench workflowScreen="tablet-rosters-text-200" /></TabletDeviceFrame></div>
       <h2>Roster filters (TB-03) · game system chips, Group by game system toggle and the list section header</h2>
-      <p>TFB-003/004: search spans both panes. All stays fixed at the left, More / Less stays fixed at the right, and only the middle system, attention and grouping choices scroll. Less preserves the query; collapsed More names active filters. Android uses connected shapes with rounded outer ends and pill-shaped checked selections, based on the user's references. iPad uses an inset capsule with selected segments. Counts, full accessible names and 44 px targets stay. Scroll the sample's middle section; All and Less do not move.</p>
+      <p>TFB-003/004: search spans both panes. All stays fixed at the left, More / Less stays fixed at the right, and only the middle system, attention and grouping choices scroll. Less preserves the query; collapsed More names active filters. Both platforms follow the user's opened/closed references: compact adjacent All / More when collapsed, and connected shapes with rounded outer ends, softly squared middle choices and pill-shaped selections when expanded. There is no enclosing capsule or empty spacer. Counts, full accessible names and 44 px targets stay. Scroll the sample's middle section; All and Less do not move.</p>
       <div className="tb-el-row">{(['ios', 'android'] as const).map(platform => <div key={platform} className="tb-app ux-screen dark tb-el-card tb-el-stack">
         <strong>{platform === 'ios' ? 'iPad' : 'Android'} · fixed ends</strong>
         <RosterFilterBar platform={platform} all={<button type="button" className="tb-filter tb-filter-start" aria-pressed={false}>All 26</button>}
           controls={<><button type="button" className="tb-filter tb-filter-system active" aria-pressed={true}><Check size={16} /><span>Open Field</span>17</button><button type="button" className="tb-filter tb-filter-system" aria-pressed={false}><span>Example System With A Long Name</span>9</button><button type="button" className="tb-filter">Needs attention 4</button><GroupToggle on={false} onChange={noop} /></>}
-          disclosure={<button type="button" className="tb-filter tb-filter-end" aria-expanded={true}><ChevronLeft size={16} />Less</button>} />
+          disclosure={<button type="button" className="tb-filter tb-filter-end" aria-expanded={true}>Less</button>} />
         <div className="tb-list"><GroupHeader name="Open Field" count={17} /><GroupHeader name="Example System With A Long Name That Runs On" count={9} /></div>
       </div>)}</div>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-rosters-system" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-portrait"><TabletWorkbench workflowScreen="tablet-rosters-grouped" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="split"><TabletWorkbench workflowScreen="tablet-rosters-grouped" /></TabletDeviceFrame></div>
