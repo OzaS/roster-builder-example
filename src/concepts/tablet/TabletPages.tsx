@@ -1,5 +1,5 @@
 import { type ReactNode, useMemo, useState } from 'react';
-import { ArrowRight, BookOpen, ChevronRight, Copy, Database, FileUp, FolderOpen, Hammer, Info, Layers3, ListTree, Pencil, Plus, RefreshCcw, Search, Trash2, ArrowDownToLine, BookMarked, Check, ChevronDown, ChevronLeft } from 'lucide-react';
+import { ArrowRight, BookOpen, ChevronRight, Copy, Database, FileUp, FolderOpen, Hammer, Info, Layers3, ListTree, Pencil, Plus, RefreshCcw, Search, Trash2, ArrowDownToLine, BookMarked, Check } from 'lucide-react';
 import { Chip as MobileChip } from '../ux/uxShared'; // the mobile chip; the workspace Chip (dtp-chip) is not used here, see MOBILE-PIECES.md
 import { ComingSoonCard } from '../ux/AppExtras';
 import { collectionSources, lookupEntries, type LookupEntry, type RosterSummary } from '../desktop/desktopData';
@@ -143,7 +143,7 @@ export const GroupHeader = ({ name, count }: { name: string; count: number }) =>
 export function RosterFilterBar({ platform, all, controls, disclosure }: { platform: 'ios' | 'android'; all: ReactNode; controls?: ReactNode; disclosure: ReactNode }) {
   return <div className="tb-filters tb-roster-filters" data-platform={platform} role="group" aria-label="Filter rosters">
     {all}
-    {controls === undefined ? <div className="tb-roster-filter-space" /> : <div className="tb-roster-filter-scroll" role="group" aria-label="Additional roster filters">{controls}</div>}
+    {controls === undefined ? null : <div className="tb-roster-filter-scroll" role="group" aria-label="Additional roster filters">{controls}</div>}
     {disclosure}
   </div>;
 }
@@ -193,15 +193,15 @@ export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster 
     <div className="tb-toolbar tb-toolbar-end">{actions}</div>
     <div className="tb-roster-search"><SearchField value={query} onChange={setQuery} label="Find a roster" placeholder="Find a roster or faction…" /></div>
     <RosterFilterBar platform={env.device.system}
-      all={<button type="button" className={`tb-filter tb-filter-start ${!attention && system === null ? 'active' : ''}`} aria-pressed={!attention && system === null} onClick={() => { setAttention(false); setSystem(null); }}>{!attention && system === null && <Check size={16} aria-hidden="true" />}All {rosters.length}</button>}
+      all={<button type="button" className={`tb-filter tb-filter-start ${!attention && system === null ? 'active' : ''}`} aria-pressed={!attention && system === null} onClick={() => { setAttention(false); setSystem(null); }}>All {rosters.length}</button>}
       controls={filtersExpanded ? <>
         {bySystem && systems.map(s => <button type="button" key={s.name} className={`tb-filter tb-filter-system ${system === s.name ? 'active' : ''}`} aria-pressed={system === s.name} aria-label={`${s.name}, ${plural(s.count, 'roster')}`} title={s.name} onClick={() => setSystem(system === s.name ? null : s.name)}>{system === s.name && <Check size={16} aria-hidden="true" />}<span>{s.name}</span> {s.count}</button>)}
         {attentionCount > 0 && <button type="button" className={`tb-filter ${attention ? 'active' : ''}`} aria-pressed={attention} onClick={() => setAttention(!attention)}>{attention && <Check size={16} aria-hidden="true" />}Needs attention {attentionCount}</button>}
         {bySystem && <GroupToggle on={grouped} onChange={setGrouped} />}
       </> : undefined}
       disclosure={filtersExpanded
-        ? <button type="button" className="tb-filter tb-filter-end" aria-expanded={true} onClick={() => setFiltersExpanded(false)}><ChevronLeft size={16} aria-hidden="true" />Less</button>
-        : <button type="button" className={`tb-filter tb-filter-system tb-filter-end ${system !== null || attention ? 'active' : ''}`} aria-expanded={false} title={[system, attention ? 'Needs attention' : null].filter(Boolean).join(', ')} onClick={() => setFiltersExpanded(true)}><ChevronDown size={16} aria-hidden="true" /><span>{['More', system, attention ? 'Needs attention' : null].filter(Boolean).join(' · ')}</span></button>} />
+        ? <button type="button" className="tb-filter tb-filter-end" aria-expanded={true} onClick={() => setFiltersExpanded(false)}>Less</button>
+        : <button type="button" className={`tb-filter tb-filter-system tb-filter-end ${system !== null || attention ? 'active' : ''}`} aria-expanded={false} title={[system, attention ? 'Needs attention' : null].filter(Boolean).join(', ')} onClick={() => setFiltersExpanded(true)}><span>{['More', system, attention ? 'Needs attention' : null].filter(Boolean).join(' · ')}</span></button>} />
     <ListDetail env={env} label="Rosters" open={open} onClose={() => setOpen(false)}
       list={<>
         <div className="tb-list scroll">
