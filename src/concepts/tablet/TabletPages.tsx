@@ -1,4 +1,4 @@
-import { type ReactNode, useMemo, useState } from 'react';
+import { type ReactNode, useId, useMemo, useState } from 'react';
 import { ArrowRight, BookOpen, ChevronDown, ChevronRight, Copy, Database, FileUp, FolderOpen, Hammer, Info, Layers3, Pencil, Plus, RefreshCcw, Search, ShieldCheck, Trash2, TriangleAlert, ArrowDownToLine, BookMarked, Check } from 'lucide-react';
 import { Chip as MobileChip } from '../ux/uxShared'; // the mobile chip; the workspace Chip (dtp-chip) is not used here, see MOBILE-PIECES.md
 import { ComingSoonCard } from '../ux/AppExtras';
@@ -129,7 +129,7 @@ export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRo
 
 const needsAttention = (r: RosterSummary) => r.status === 'data-changed' || r.status === 'faction-removed';
 const rosterNote = (r: RosterSummary) => r.status === 'ready' ? ['ok', 'Ready', 'All roster requirements met.']
-  : r.status === 'issues' ? ['warn', `${r.issues} ${r.issues === 1 ? 'item needs' : 'items need'} attention`, r.used > r.limit ? 'Over the points limit.' : 'Roster requirements not met.']
+  : r.status === 'issues' ? ['err', `${r.issues} ${r.issues === 1 ? 'item needs' : 'items need'} attention`, r.used > r.limit ? 'Over the points limit.' : 'Roster requirements not met.']
     : r.status === 'data-changed' ? ['warn', 'Game data changed', 'Some entries changed in the last update. Open to review them.']
       : ['err', 'Faction removed', 'The faction is no longer in the installed data. The roster opens read-only.'];
 
@@ -164,14 +164,21 @@ export function RosterFilterBar({ platform, all, controls, disclosure, group }: 
 
 const NOTE_ICONS = { ok: ShieldCheck, warn: TriangleAlert, err: TriangleAlert } as const;
 
-/** The status tile beside the roster's name (TFB-006): the avatar's size, tinted by the status, its icon, a count with
- * more than one note and a disclosure chevron. It shows or hides the full note under the header. */
-export const StatusTile = ({ tone, label, count = 1, expanded, onToggle }: { tone: string; label: string; count?: number; expanded: boolean; onToggle: () => void }) => {
+/** Compact form of the existing validation banner (TFB-010): severity icon, error count and disclosure. */
+export const StatusTile = ({ tone, label, count = 1, expanded, controls, onToggle }: { tone: string; label: string; count?: number; expanded: boolean; controls?: string; onToggle: () => void }) => {
   const Icon = NOTE_ICONS[tone as keyof typeof NOTE_ICONS] ?? Info;
-  return <button type="button" className={`tb-status-tile ${tone}`} aria-expanded={expanded} aria-label={label} title="Shows or hides the status details" onClick={onToggle}>
-    <Icon size={20} aria-hidden="true" /><span aria-hidden="true">{count > 1 ? <b>{count}</b> : null}<ChevronDown size={12} className={expanded ? 'flip' : ''} /></span>
+  return <button type="button" className={`tb-status-tile ${tone}`} aria-expanded={expanded} aria-controls={controls} aria-label={label} title="Shows or hides the status details" onClick={onToggle}>
+    <Icon size={20} aria-hidden="true" /><span aria-hidden="true">{count > 1 || tone === 'err' ? <b>{count}</b> : null}<ChevronDown size={12} className={expanded ? 'flip' : ''} /></span>
   </button>;
 };
+
+/** Separate preview selection from entering the roster, matching the user's row navigation schematic. */
+export function RosterNavigationRow({ roster, selected, onSelect, onOpen }: { roster: RosterSummary; selected: boolean; onSelect: () => void; onOpen: () => void }) {
+  return <div className={`tb-roster-nav-row ${selected ? 'selected' : ''}`}>
+    <Row selected={selected} mark={roster.mark} title={roster.name} sub={`${roster.faction} · ${roster.system}`} end={<><b>{pts(roster.used)} pts</b>{roster.status === 'issues' ? <MobileChip tone="error">{roster.issues} {roster.issues === 1 ? 'error' : 'errors'}</MobileChip> : rosterStatus(roster)}</>} onClick={onSelect} />
+    <button type="button" className="tb-roster-enter" aria-label={`Open ${roster.name}`} title="Navigate into this roster" onClick={onOpen}><ChevronRight size={22} aria-hidden="true" /></button>
+  </div>;
+}
 
 /** The roster's facts as cells, label above value (TFB-007): two columns, one in a narrow card or at large text. */
 export const FactsGrid = ({ rows }: { rows: Array<[string, ReactNode]> }) =>
@@ -186,10 +193,14 @@ export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster 
   const [chosenSystem, setSystem] = useState<string | null>(session.state === 'system' ? 'Example System Two' : null);
   // Kept on the device across launches, like the system chip.
   const [grouped, setGrouped] = useState(session.state === 'grouped');
-  const [selected, setSelected] = useState(rosters[0]?.name ?? '');
+  const [selected, setSelected] = useState(() => {
+    const status = session.state === 'validation-error' || session.state === 'status' ? 'issues' : session.state === 'validation-warning' ? 'data-changed' : 'ready';
+    return (rosters.find(r => r.status === status) ?? rosters[0])?.name ?? '';
+  });
   const [open, setOpen] = useState(false);
   const [renaming, setRenaming] = useState(false);
   const [statusOpen, setStatusOpen] = useState(session.state === 'status');
+  const validationId = useId();
   const q = query.trim().toLowerCase();
   const systems = useMemo(() => rosterSystems(rosters), [rosters]);
   // The chips (and grouping) show only when the rosters span two or more game systems.
@@ -217,7 +228,7 @@ export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster 
   const duplicate = (r: RosterSummary) => { const copy = { ...r, name: `Copy of ${r.name}`, opened: 'Just now' }; setRosters(list => [copy, ...list]); choose(copy.name); notify(`Duplicated as “${copy.name}”`); };
   const rename = (r: RosterSummary, name: string) => { if (name && name !== r.name) { setRosters(list => list.map(x => x.name === r.name ? { ...x, name } : x)); setSelected(name); } setRenaming(false); };
   const [noteTone, noteTitle, noteText] = current ? rosterNote(current) : ['', '', ''];
-  const row = (r: RosterSummary) => <Row key={r.name} selected={r.name === current?.name} mark={r.mark} title={r.name} sub={`${r.faction} · ${r.system}`} end={<><b>{pts(r.used)} / {pts(r.limit)}</b>{rosterStatus(r)}</>} onClick={() => choose(r.name)} />;
+  const row = (r: RosterSummary) => <RosterNavigationRow key={r.name} roster={r} selected={r.name === current?.name} onSelect={() => choose(r.name)} onOpen={() => onOpenRoster(r.name)} />;
   const filtered = q !== '' || attention || system !== null;
   return <div className="tb-page">
     <div className="tb-toolbar tb-toolbar-end">{actions}</div>
@@ -241,15 +252,19 @@ export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster 
         <p className="tb-list-foot" aria-live="polite">{!filtered ? `${plural(rosters.length, 'roster')} stored on this device` : `${visible.length} of ${rosters.length} rosters`}{groups ? ` · ${plural(groups.length, 'game system')}` : ''}</p>
       </>}
       detail={current ? <>
-        <div className="tb-detail-title"><span className="tb-mark large" aria-hidden="true">{current.mark}</span>
+        <div className="tb-roster-detail-header" onKeyDown={e => { if (e.key === 'Escape') setStatusOpen(false); }}>
           {renaming ? <form className="tb-rename" onSubmit={e => { e.preventDefault(); rename(current, (new FormData(e.currentTarget).get('name') as string).trim()); }}><input name="name" autoFocus maxLength={60} defaultValue={current.name} aria-label="Roster name" /><button type="submit" className="ux-job-btn primary">Save</button></form>
-            : <span><h2>{current.name}</h2><small>{current.faction} · {current.system}</small></span>}
-          <StatusTile tone={noteTone} label={`${noteTitle}. ${noteText}`} expanded={statusOpen} onToggle={() => setStatusOpen(!statusOpen)} />
+            : <div className="tb-roster-heading"><h2>{current.name}</h2><small>{current.faction} · {current.system}</small></div>}
+          <strong className="tb-roster-total">{pts(current.used)} <small>pts</small></strong>
+          <div className="tb-validation-anchor">
+            <StatusTile tone={noteTone} label={`${noteTitle}. ${noteText}`} count={current.issues ?? 1} expanded={statusOpen} controls={validationId} onToggle={() => setStatusOpen(!statusOpen)} />
+            {statusOpen && <section id={validationId} className={`tb-validation-popover tb-note ${noteTone}`} aria-label="Roster validation details">
+              <strong>{noteTitle}</strong><span>{noteText}</span>
+            </section>}
+          </div>
         </div>
-        {statusOpen && <p className={`tb-note ${noteTone}`}><Info size={15} /><span><strong>{noteTitle}</strong>{noteText}</span></p>}
-        <Meter used={current.used} limit={current.limit} />
-        <FactsGrid rows={[['Game system', current.system], ['Units', current.units], ['Forces', current.forces], ['Last opened', current.opened]]} />
-        <div className="tb-actions"><button type="button" className="ux-primary tb-primary" onClick={() => onOpenRoster(current.name)}>Open roster<ArrowRight size={17} /></button>
+        <FactsGrid rows={[[ 'Game system', current.system], ['Units', current.units], ['Forces', current.forces], ['Last opened', current.opened], ['Changed', 'Yesterday'], ['Created', '5 days ago']]} />
+        <div className="tb-roster-action-strip" role="toolbar" aria-label={`Actions for ${current.name}`}>
           <HintButton hint="Rename this roster" input={env.input} side="top" className="ux-job-btn" onClick={() => setRenaming(true)}><Pencil size={16} />Rename</HintButton>
           <HintButton hint="Make an editable copy" input={env.input} side="top" className="ux-job-btn" onClick={() => duplicate(current)}><Copy size={16} />Duplicate</HintButton>
           <HintButton hint="Export this roster as a file" input={env.input} side="top" className="ux-job-btn" onClick={() => notify(`“${current.name}” exported`)}><ArrowDownToLine size={16} />Export</HintButton>

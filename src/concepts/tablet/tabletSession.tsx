@@ -23,6 +23,8 @@ const stateRoutes: Record<string, TabletRoute> = {
   'tablet-rosters-search': { page: 'rosters', state: 'search' },
   'tablet-rosters-system': { page: 'rosters', state: 'system' },
   'tablet-rosters-grouped': { page: 'rosters', state: 'grouped' },
+  'tablet-rosters-validation-error': { page: 'rosters', state: 'validation-error' },
+  'tablet-rosters-validation-warning': { page: 'rosters', state: 'validation-warning' },
   'tablet-rosters-status': { page: 'rosters', state: 'status' },
   'tablet-sources-add': { page: 'sources', state: 'add' },
   'tablet-sources-installing': { page: 'sources', state: 'installing' },

@@ -262,3 +262,32 @@
 .tb-app:is([data-text="150"], [data-text="200"]) .tb-facts-grid > div:nth-child(2) { border-top: 1px solid var(--ux-line) }
 .tb-app:is([data-text="150"], [data-text="200"]) .tb-facts-grid > div:nth-child(even) { border-left: 0 }
 .tb-el-fill { width: 100%; min-width: 0 }
+
+/* TFB-010 design review: preview and enter targets are separate; name, total and validation share the header. */
+.tb-roster-nav-row { display: grid; grid-template-columns: minmax(0, 1fr) 48px; border: 1px solid var(--ux-line); border-radius: var(--ux-r-md); background: var(--ux-surface); overflow: hidden }
+.tb-roster-nav-row.selected { border-color: var(--ux-accent); background: color-mix(in srgb, var(--ux-accent) 12%, var(--ux-surface)) }
+.tb-app .tb-roster-nav-row button.tb-row, .tb-app .tb-roster-nav-row button.tb-row.selected { min-width: 0; border: 0; border-radius: 0; background: transparent }
+.tb-app button.tb-roster-enter { display: grid; place-items: center; padding: 0; border: 0; border-left: 1px solid var(--ux-line); background: transparent; color: var(--ux-accent-2); cursor: pointer }
+.tb-app button.tb-roster-enter:hover { background: var(--ux-surface-2) }
+.tb-app button.tb-roster-enter:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: -3px }
+.tb-roster-detail-header { display: flex; align-items: center; gap: 14px; min-width: 0; padding-bottom: 16px; border-bottom: 1px solid var(--ux-line) }
+.tb-roster-heading { flex: 1; min-width: 0 }
+.tb-roster-heading h2 { font-size: 21px; line-height: 1.2; font-weight: 800; overflow-wrap: anywhere }
+.tb-roster-heading small { display: block; margin-top: 4px; color: var(--ux-muted); font-size: 12.5px; overflow-wrap: anywhere }
+.tb-roster-total { flex: none; white-space: nowrap; font-size: 18px; font-variant-numeric: tabular-nums }
+.tb-roster-total small { font-size: 13px; font-weight: 500; color: var(--ux-muted) }
+.tb-validation-anchor { position: relative; flex: none }
+.tb-validation-popover.tb-note { position: absolute; top: calc(100% + 10px); right: 0; z-index: 5; display: grid; gap: 4px; width: min(300px, 66cqi); margin: 0; padding: 14px; border-radius: var(--ux-r-md); box-shadow: 0 8px 24px #0003; background: var(--ux-surface-2) }
+.tb-roster-action-strip { display: flex; align-items: stretch; justify-self: start; max-width: 100%; flex-wrap: wrap; overflow: hidden; border: 1px solid var(--ux-line-2); border-radius: 14px; background: var(--ux-surface-2) }
+.tb-app .tb-roster-action-strip .ux-job-btn { min-height: 48px; border: 0; border-radius: 0; background: transparent; padding: 0 12px }
+.tb-app .tb-roster-action-strip .ux-job-btn + .ux-job-btn { border-left: 1px solid var(--ux-line) }
+.tb-app .tb-roster-action-strip .ux-job-btn.destructive { color: var(--ux-err) }
+.tb-detail:has(> .tb-roster-detail-header) { align-content: start; container-type: inline-size }
+@container (max-width: 380px) {
+  .tb-roster-detail-header { gap: 8px }
+  .tb-roster-heading h2 { font-size: 17px }
+  .tb-roster-total { font-size: 15px }
+  .tb-roster-total small { font-size: 12px }
+  .tb-roster-detail-header .tb-status-tile { width: 44px; height: 44px }
+  .tb-roster-action-strip .ux-job-btn { flex: 1 1 40%; justify-content: center }
+}

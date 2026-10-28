@@ -29,6 +29,18 @@ function ResizerDemo({ input, menu }: { input: TabletInput; menu?: boolean }) {
   </div></div></div>;
 }
 
+/** The compact validation control replaces the existing full-width validation banner; inspect every tone. */
+function ValidationHeaderDemo({ tone, title, body, count = 1 }: { tone: string; title: string; body: string; count?: number }) {
+  const [open, setOpen] = useState(false);
+  return <div className="tb-app ux-screen dark tb-el-card tb-el-fill"><div className="tb-roster-detail-header">
+    <div className="tb-roster-heading"><h2>The Ashen Expedition</h2><small>Frontier Coalition · Open Field</small></div>
+    <strong className="tb-roster-total">770 <small>pts</small></strong>
+    <div className="tb-validation-anchor"><StatusTile tone={tone} label={`${title}. ${body}`} count={count} expanded={open} onToggle={() => setOpen(!open)} />
+      {open && <section className={`tb-validation-popover tb-note ${tone}`} aria-label="Roster validation details"><strong>{title}</strong><span>{body}</span></section>}
+    </div>
+  </div></div>;
+}
+
 /** The Elements view of the Tablet library: the rail, the device frames, the input switch and two framed compositions. */
 export function TabletElements() {
   const [deviceId, setDeviceId] = useState<TabletDeviceId>(defaultDeviceId);
@@ -85,15 +97,17 @@ export function TabletElements() {
         <div className="tb-list"><GroupHeader name="Open Field" count={17} /><GroupHeader name="Example System With A Long Name That Runs On" count={9} /></div>
       </div>)}</div>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-rosters-system" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-portrait"><TabletWorkbench workflowScreen="tablet-rosters-grouped" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="split"><TabletWorkbench workflowScreen="tablet-rosters-grouped" /></TabletDeviceFrame></div>
-      <h2>Roster card header and facts (TFB-006/007) · status tile beside the name, facts in two columns</h2>
-      <p>TFB-006: the status is a 48 px tile at the right of the header (the avatar's size), tinted by the worst notice (Ready ok, problems err, changed or removed data warn / neutral), with its icon, a count with more than one notice and a disclosure chevron. Tapping it shows or hides the full note(s) under the header; collapsed by default and again for another roster. The accessible label reads every notice's title and body; the hint says it shows or hides the details; aria-expanded. The title takes the remaining width, so long names wrap without crowding. TFB-007 (experiment): facts as cells, label above value, two columns; one column in a card narrower than 360 px or at 150% text and above. Long values wrap. Screen: Rosters · Status details.</p>
-      <div className="tb-el-row">{([['ok', 'Ready. All roster requirements met.', 1, false], ['err', '2 items need attention. Over the points limit.', 1, true], ['warn', 'Game data changed. 1 item needs attention.', 2, false]] as const).map(([tone, label, count, open]) => <div key={tone} className="tb-app ux-screen dark tb-el-card"><div className="tb-el-stack tb-el-fill">
-        <div className="tb-detail-title"><span className="tb-mark large" aria-hidden="true">AE</span><span><h2>{tone === 'warn' ? 'An example roster with a long name that wraps' : 'The Ashen Expedition'}</h2><small>Frontier Coalition · Open Field</small></span><StatusTile tone={tone} label={label} count={count} expanded={open} onToggle={noop} /></div>
-        {open && <p className={`tb-note ${tone}`}><span><strong>2 items need attention</strong>Over the points limit.</span></p>}
-      </div></div>)}</div>
+      <h2>Roster structure (TFB-010) · name, points and validation share the header</h2>
+      <p>The 48 px indicator replaces the existing large validation banner. It represents the same Ready, roster errors and data-warning information, with the appropriate icon, tone and problem count. It is not a separate success tick. Tap it to read the existing validation title and explanation in a compact popover; no full-width validation row is reserved. The name, points and indicator stay together above two-column metadata. Row selection previews the roster; its separate trailing chevron enters the roster. Rename, Duplicate, Export and Delete form one action strip below the metadata.</p>
+      <div className="tb-el-stack">
+        <ValidationHeaderDemo tone="ok" title="Ready" body="All roster requirements met." />
+        <ValidationHeaderDemo tone="err" title="2 items need attention" body="Roster requirements not met." count={2} />
+        <ValidationHeaderDemo tone="warn" title="Game data changed" body="Some entries changed in the last update. Open to review them." />
+      </div>
       <div className="tb-el-row" style={{ marginTop: 24 }}>{([420, 320] as const).map(width => <div key={width} className="tb-app ux-screen dark tb-el-card" style={{ width }}><div className="tb-el-stack tb-el-fill"><strong>{width === 420 ? 'Two columns' : 'Narrow card · one column'}</strong>
-        <FactsGrid rows={[['Game system', 'Example System With A Long Name That Wraps'], ['Units', 6], ['Last opened', '12 minutes ago'], ['Changed', 'Yesterday'], ['Created', 'Oct 3']]} /></div></div>)}</div>
-      <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-rosters-status" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="android"><TabletWorkbench workflowScreen="tablet-rosters-status" /></TabletDeviceFrame></div>
+        <FactsGrid rows={[[ 'Game system', 'Example System With A Long Name That Wraps'], ['Units', 6], ['Last opened', '12 minutes ago'], ['Changed', 'Yesterday'], ['Created', '5 days ago']]} /></div></div>)}</div>
+      <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-rosters-validation-error" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="android"><TabletWorkbench workflowScreen="tablet-rosters-validation-warning" /></TabletDeviceFrame></div>
+      <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-rosters-status" /></TabletDeviceFrame></div>
       <h2>Empty state card · first run, no rosters, no match</h2>
       <div className="tb-el-row"><div className="tb-app ux-screen dark tb-el-card"><EmptyState icon={Layers3} title="No rosters yet" text="Create a roster, or import one from a file."><button type="button" className="ux-primary tb-primary"><Plus size={17} />New roster</button><button type="button" className="ux-job-btn">Import a roster</button></EmptyState></div></div>
       <h2>Home and Sources progress · in-page controls, no global toolbar jobs button</h2>
