@@ -43,6 +43,8 @@ export type WorkflowScreen =
   | "tablet-rosters-text-200"
   | "tablet-rosters-system"
   | "tablet-rosters-grouped"
+  | "tablet-rosters-validation-error"
+  | "tablet-rosters-validation-warning"
   | "tablet-rosters-status"
   | "tablet-editor-import-result"
   | "tablet-lookup"
