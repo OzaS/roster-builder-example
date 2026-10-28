@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
-import { BookMarked, Check, Hammer, Layers3, Plus } from 'lucide-react';
+import { BookMarked, Check, FileUp, Hammer, Layers3, Plus } from 'lucide-react';
 import { LibrarySwitch } from '../../gallery/LibrarySwitch';
 import { ComingSoonCard } from '../ux/AppExtras';
 import { TabletControls } from './TabletControls';
+import { RosterToolbar } from './RosterToolbar';
 import { TabletDeviceFrame } from './TabletDeviceFrame';
 import { TabletRail } from './TabletRail';
 import { TabletResizer, type PanePresets } from './TabletResizer';
@@ -39,6 +40,14 @@ function ValidationHeaderDemo({ tone, title, body }: { tone: string; title: stri
       {open && <section className={`tb-validation-popover tb-note ${tone}`} aria-label="Roster validation details"><strong>{title}</strong><span>{body}</span></section>}
     </div>
   </div></div>;
+}
+
+function RosterSearchDemo({ open = false }: { open?: boolean }) {
+  const [query, setQuery] = useState(open ? 'Patrol' : '');
+  return <div className="tb-app ux-screen dark tb-el-card tb-el-fill"><RosterToolbar query={query} onQueryChange={setQuery} input="pointer" initialOpen={open}>
+    <button type="button" className="ux-job-btn" aria-label="Import roster"><FileUp size={18} /><span className="tb-command-label">Import</span></button>
+    <button type="button" className="ux-job-btn primary" aria-label="New roster"><Plus size={18} /><span className="tb-command-label">New roster</span></button>
+  </RosterToolbar></div>;
 }
 
 /** The Elements view of the Tablet library: the rail, the device frames, the input switch and two framed compositions. */
@@ -84,6 +93,9 @@ export function TabletElements() {
       <h2>Larger text and display zoom (UX-025) · Text size 100%, 150%, 200%</h2>
       <p>The Text size switch (gallery, and <code>text=</code> on a standalone link) scales the tablet type and controls. The layout gets the smaller logical width (device width ÷ scale) and collapses by width class instead of clipping: Expanded → Medium (two panes) → single pane; under 600 the rail drops its labels (they stay the accessible names and hints) and scrolls when taller than the window; under 440 the editor header keeps Back, the roster mark, the points and More (undo and redo move into More). Screens: Roster editor · Text 200%, Rosters · Text 200%.</p>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-editor-text-200" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="split"><TabletWorkbench workflowScreen="tablet-rosters-text-200" /></TabletDeviceFrame></div>
+      <h2>Roster toolbar search (TFB-011) · approved</h2>
+      <p>Search is an icon immediately before Import. Initially the top bar shows Rosters, with no separate search row. Search replaces the title with a focused field in the same row; Import and New roster stay in place. The Search icon becomes Close; Close or Escape clears only the search query, restores the title and returns focus. System and grouping choices stay. In narrow windows the adjacent action labels reduce to icons so the field stays on the top bar.</p>
+      <div className="tb-el-stack"><RosterSearchDemo /><RosterSearchDemo open /></div>
       <h2>Roster filters (TB-03) · game system chips, Group by game system toggle and the list section header</h2>
       <p>TFB-005: Group by game system is an icon-only toggle (layers icon, 44 px like the chips, accent fill while on, aria-pressed, the name as its accessible label and press-and-hold hint) fixed at the trailing end of the same row, after a small gap and outside the scroller: collapsed <code>[All][More] … [group]</code>, expanded <code>[All][scrolling middle][Less] [group]</code>. Grouping is not a filter, so collapsed More does not name it. The phone Lists screen uses the same row.</p>
       <p>TFB-003/004: search spans both panes. All stays fixed at the left, More / Less stays fixed at the right, and only the middle system and attention choices scroll. Less preserves the query; collapsed More names active filters. Both platforms follow the user's opened/closed references: compact adjacent All / More when collapsed, and connected shapes with rounded outer ends, softly squared middle choices and pill-shaped selections when expanded. There is no enclosing capsule or empty spacer. Counts, full accessible names and 44 px targets stay. Scroll the sample's middle section; All and Less do not move.</p>

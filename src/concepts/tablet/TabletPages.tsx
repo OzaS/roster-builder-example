@@ -7,6 +7,7 @@ import { HintButton } from './TabletHint';
 import type { TabletInput } from './tabletDevices';
 import { EmptyState, Facts, InstallRow, ListDetail, Meter, Progress, Row, SearchField, pts, rosterStatus, sourceStatus, plural, type PageProps, type SessionProps } from './TabletPieces';
 import { keyLabel } from './tabletKeys';
+import { RosterToolbar } from './RosterToolbar';
 
 // Pages of the tablet: Home, Rosters and Lookup (T2a). Sources and Settings have their own files. Synthetic rows only.
 
@@ -14,7 +15,7 @@ export type { PageProps };
 
 /** New roster at the trailing edge of a page toolbar (Rosters on every tablet; Home on iPad, where the rail has no FAB). */
 const NewRosterButton = ({ env, onNewRoster }: Pick<PageProps, 'env'> & { onNewRoster: () => void }) =>
-  <HintButton hint={`Create a roster${env.input === 'pointer' ? ` (${keyLabel('Mod+N', env.device.system)})` : ''}`} input={env.input} side="bottom" className="ux-job-btn primary" onClick={onNewRoster}><Plus size={16} />New roster</HintButton>;
+  <HintButton hint={`Create a roster${env.input === 'pointer' ? ` (${keyLabel('Mod+N', env.device.system)})` : ''}`} input={env.input} side="bottom" className="ux-job-btn primary" onClick={onNewRoster}><Plus size={16} /><span className="tb-command-label">New roster</span></HintButton>;
 
 /* --------------------------------- Home --------------------------------- */
 
@@ -215,11 +216,11 @@ export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster 
   const choose = (name: string) => { setSelected(name); setOpen(true); setRenaming(false); setStatusOpen(false); };
   const clearFilters = () => { setQuery(''); setAttention(false); setSystem(null); };
   const actions = <>
-    <HintButton hint="Import a roster from a file" input={env.input} side="bottom" className="ux-job-btn" onClick={() => notify('Import a roster file (prototype)')}><FileUp size={16} />Import</HintButton>
+    <HintButton aria-label="Import roster" hint="Import a roster from a file" input={env.input} side="bottom" className="ux-job-btn" onClick={() => notify('Import a roster file (prototype)')}><FileUp size={16} /><span className="tb-command-label">Import</span></HintButton>
     <NewRosterButton env={env} onNewRoster={onNewRoster} />
   </>;
   if (!rosters.length) return <div className="tb-page">
-    <div className="tb-toolbar tb-toolbar-end">{actions}</div>
+    <RosterToolbar query={query} onQueryChange={setQuery} input={env.input} initialOpen={session.state === 'search'}>{actions}</RosterToolbar>
     <EmptyState icon={Layers3} title="No rosters yet" text={hasData ? 'Create a roster, or import one from a file.' : 'Rosters are built from game data. Add a game system first, then create a roster.'}>
       <HintButton hint="Create a roster" input={env.input} side="top" className="ux-primary tb-primary" onClick={onNewRoster}><Plus size={17} />New roster</HintButton>
       <HintButton hint="Import a roster from a file" input={env.input} side="top" className="ux-job-btn" onClick={() => notify('Import a roster file (prototype)')}><FileUp size={16} />Import a roster</HintButton>
@@ -231,8 +232,7 @@ export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster 
   const row = (r: RosterSummary) => <RosterNavigationRow key={r.name} roster={r} selected={r.name === current?.name} onSelect={() => choose(r.name)} onOpen={() => onOpenRoster(r.name)} />;
   const filtered = q !== '' || attention || system !== null;
   return <div className="tb-page">
-    <div className="tb-toolbar tb-toolbar-end">{actions}</div>
-    <div className="tb-roster-search"><SearchField value={query} onChange={setQuery} label="Find a roster" placeholder="Find a roster or faction…" /></div>
+    <RosterToolbar query={query} onQueryChange={setQuery} input={env.input} initialOpen={session.state === 'search'}>{actions}</RosterToolbar>
     <RosterFilterBar platform={env.device.system}
       all={<button type="button" className={`tb-filter tb-filter-start ${!attention && system === null ? 'active' : ''}`} aria-pressed={!attention && system === null} onClick={() => { setAttention(false); setSystem(null); }}>All {rosters.length}</button>}
       controls={filtersExpanded ? <>
