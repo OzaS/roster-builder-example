@@ -1,3 +1,4 @@
+import { PhoneListsFilters } from "./PhoneListsFilters";
 import { AppearancePreferences } from "./AppearanceSettings";
 import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject } from "react";
 import { Activity, AlertTriangle, ArrowLeft, ArrowUp, BarChart3, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, Circle, CircleDot, ClipboardList, Cog, Coins, Command, Copy, Database, Dice5, Download, Ellipsis, FileInput, Filter, Folder, FolderOpen, Gamepad2, GripVertical, Hammer, Heart, ImagePlus, Languages, Layers, LibraryBig, Maximize2, Minimize2, Minus, Moon, MoveRight, Palette, PanelsTopLeft, Pencil, Plus, RotateCcw, Scale, Search, ShieldCheck, Sparkles, Split, Square, SquareCheck, Tag, Target, Timer, Trash2, Upload, UserRound, UsersRound, Wand2, X } from "lucide-react";
@@ -30,7 +31,7 @@ export function CodexWorkbench(props: ConceptProps) {
   const screen = props.screen;
   const isUnitDetail = screen === "unit-detail";
   const isMainTab = props.workflowScreen
-    ? (["library", "library-v2", "subscription-main", "source", "tools", "collections"] as const).some((tab) => tab === props.workflowScreen)
+    ? (["library", "library-v2", "library-filters", "subscription-main", "source", "tools", "collections"] as const).some((tab) => tab === props.workflowScreen)
     : screen === "library" || screen === "catalogue" || screen === "tools" || screen === "collections";
   const showTabBar = usesTabNavigation && isMainTab;
   const isWorkbenchScreen = screen !== "library" && screen !== "catalogue" && screen !== "tools" && screen !== "collections" && screen !== "app" && screen !== "settings" && screen !== "sources" && screen !== "add-source" && !SOURCE_FLOW_SCREENS.includes(screen) && screen !== "system";
@@ -1239,6 +1240,8 @@ function Rail({ props }: { props: ConceptProps }) {
 /** Library / home entry screen ("Main screen"). */
 function Library({ props }: { props: ConceptProps }) {
   const isV2 = props.workflowScreen === "library-v2";
+  // TFB-005: the phone Lists with search, the filter row and grouping (the tablet Rosters controls).
+  const isFilters = props.workflowScreen === "library-filters";
   const [promptOpen, setPromptOpen] = useState(true);
   const [organizerOpen, setOrganizerOpen] = useState(true);
   const [query, setQuery] = useState("");
@@ -1268,7 +1271,7 @@ function Library({ props }: { props: ConceptProps }) {
             <div className="ux-organizer-tags"><small>Tags</small><div><button type="button"><Tag size={12} />Competitive</button><button type="button"><Tag size={12} />Draft</button><button type="button"><Tag size={12} />Favourite</button></div></div>
           </aside>
         ) : null}
-        <main className="ux-lists-main">
+        {isFilters ? <PhoneListsFilters /> : <main className="ux-lists-main">
           {!isV2 && promptOpen ? <div className="ux-cmd-hero"><button type="button" className="ux-cmd-hero-close" aria-label="Close getting started prompt" onClick={() => setPromptOpen(false)}><X size={16} /></button><Wand2 size={20} /><h2>What do you want to build?</h2><p>Start a new roster. Lists you open will appear in Recent.</p></div> : null}
           <div className="ux-lists-actions">
             <div><strong>{isV2 ? "Your rosters" : "Lists"}</strong><small>{isV2 ? `${rosters.length} saved rosters` : "Your recent rosters"}</small></div>
@@ -1284,7 +1287,7 @@ function Library({ props }: { props: ConceptProps }) {
             <div className="ux-result-label" id="all-rosters-heading">{activeFilter}</div>
             {filteredRosters.length ? filteredRosters.map((r) => <button key={r.name} type="button" className="ux-list-card" onClick={() => props.onNavigate("overview")}><span><strong>{r.name}</strong><small>{r.sub}</small></span><b>{r.pts}</b></button>) : <div className="ux-search-empty"><Search size={19} /><strong>No matching rosters</strong><small>Try a different name or filter.</small></div>}
           </section> : null}
-        </main>
+        </main>}
       </div>
     </>
   );

@@ -1,9 +1,10 @@
 import { type ReactNode, useMemo, useState } from 'react';
-import { ArrowRight, BookOpen, ChevronRight, Copy, Database, FileUp, FolderOpen, Hammer, Info, Layers3, ListTree, Pencil, Plus, RefreshCcw, Search, Trash2, ArrowDownToLine, BookMarked, Check } from 'lucide-react';
+import { ArrowRight, BookOpen, ChevronDown, ChevronRight, Copy, Database, FileUp, FolderOpen, Hammer, Info, Layers3, Pencil, Plus, RefreshCcw, Search, ShieldCheck, Trash2, TriangleAlert, ArrowDownToLine, BookMarked, Check } from 'lucide-react';
 import { Chip as MobileChip } from '../ux/uxShared'; // the mobile chip; the workspace Chip (dtp-chip) is not used here, see MOBILE-PIECES.md
 import { ComingSoonCard } from '../ux/AppExtras';
 import { collectionSources, lookupEntries, type LookupEntry, type RosterSummary } from '../desktop/desktopData';
 import { HintButton } from './TabletHint';
+import type { TabletInput } from './tabletDevices';
 import { EmptyState, Facts, InstallRow, ListDetail, Meter, Progress, Row, SearchField, pts, rosterStatus, sourceStatus, plural, type PageProps, type SessionProps } from './TabletPieces';
 import { keyLabel } from './tabletKeys';
 
@@ -17,6 +18,9 @@ const NewRosterButton = ({ env, onNewRoster }: Pick<PageProps, 'env'> & { onNewR
 
 /* --------------------------------- Home --------------------------------- */
 
+/** Game systems Home's data card shows (TFB-001); More opens Sources with the rest. */
+const HOME_DATA_LIMIT = 4;
+
 const steps = [['Add game data', 'Install a game system from a collection or a file.'], ['Create a roster', 'Choose a faction, a force and a points limit.'], ['Build and check', 'Add units, see the points and the checks as you go.']];
 
 export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRoster }: SessionProps & { onPage: (page: 'rosters' | 'sources') => void; onNewRoster: () => void; onOpenRoster: (name: string) => void }) {
@@ -27,11 +31,15 @@ export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRo
   const startInstall = (c: typeof collectionSources[number]) => { jobs.startInstall(c); };
   const attention = rosters.filter(r => r.status !== 'ready').length;
 
-  // Every installed source keeps its own version, update and progress control.
+  // Every shown source keeps its own version, update and progress control. TFB-001: the four most used game systems (most
+  // rosters, then the latest roster activity, then name; never install order); More opens Sources with the rest.
   const history = jobs.jobs.length > 0 && <button type="button" className="ux-job-btn" onClick={() => setJobsOpen(true)}>Show progress · All jobs</button>;
-  const dataCard = <section className="tb-card" aria-label="Game data status">
+  const used = [...jobs.sources].sort((a, b) => b.rosters.length - a.rosters.length || a.name.localeCompare(b.name));
+  const hidden = Math.max(0, used.length - HOME_DATA_LIMIT);
+  // TFB-002: the data card and Recent rosters fill their columns and scroll inside; the page itself stays put.
+  const dataCard = <section className="tb-card tb-fill" aria-label="Game data status">
     <span className="ux-result-label">Game data</span>
-    {jobs.sources.map(source => {
+    {used.slice(0, HOME_DATA_LIMIT).map(source => {
       const progress = jobs.progressOf(source.id);
       return <div key={source.id} className="tb-section">
         <div className="tb-data-row"><span><strong>{source.name}</strong><small>{source.version} · checked {source.checked}</small></span>{sourceStatus(source)}</div>
@@ -40,6 +48,7 @@ export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRo
           : <p className="tb-note ok"><Check size={15} />Up to date</p>}
       </div>;
     })}
+    {hidden > 0 && <button type="button" className="ux-job-btn ux-src-ghost tb-more" aria-label={`${hidden} more game systems`} title="Opens Sources, which lists all installed game data" onClick={() => onPage('sources')}>More ({hidden})</button>}
     {history}
     <button type="button" className="ux-job-btn" onClick={() => onPage('sources')}>Sources</button>
   </section>;
@@ -54,11 +63,11 @@ export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRo
   const toolbar = create && <div className="tb-toolbar tb-toolbar-end"><NewRosterButton env={env} onNewRoster={onNewRoster} /></div>;
 
   /* First run: no game data on the device. */
-  if (!hasData) return <div className="tb-page">
+  if (!hasData) return <div className="tb-page tb-home-page">
     {toolbar}
     <div className="tb-home">
       <div className="tb-home-main">
-        <section className="tb-card" aria-label="Start with game data">
+        <section className="tb-card tb-fill" aria-label="Start with game data">
           <span className="ux-result-label">Get started</span>
           <div className="tb-card-head"><h2 className="tb-card-title">Start with game data</h2><p className="tb-body tb-muted">Rosters are built from a game system's data. Install one; it stays available offline.</p></div>
           <div className="tb-list">{collectionSources.map(c => <InstallRow key={c.id} title={c.name} sub={`${c.detail} · ${c.size}`} live={jobs.jobs.find(j => j.sourceId === c.id && (j.status === 'running' || j.status === 'needs-you'))} installed={jobs.sources.some(s => s.id === c.id)} onInstall={() => startInstall(c)} onJobs={() => setJobsOpen(true)} />)}</div>
@@ -76,11 +85,11 @@ export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRo
   </div>;
 
   /* Game data, no rosters yet. */
-  if (!current) return <div className="tb-page">
+  if (!current) return <div className="tb-page tb-home-page">
     {toolbar}
     <div className="tb-home">
       <div className="tb-home-main">
-        <section className="tb-card" aria-label="Ready when you are">
+        <section className="tb-card tb-fill" aria-label="Ready when you are">
           <span className="ux-result-label">Ready when you are</span>
           <EmptyState icon={Layers3} title="No rosters yet" text="Your first roster takes a minute: choose a faction, a force and a points limit.">
             <HintButton hint="Create a roster" input={env.input} side="top" className="ux-primary tb-primary" onClick={onNewRoster}><Plus size={17} />Create your first roster</HintButton>
@@ -93,7 +102,7 @@ export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRo
   </div>;
 
   /* The usual state. */
-  return <div className="tb-page">
+  return <div className="tb-page tb-home-page">
     {toolbar}
     <div className="tb-home">
       <div className="tb-home-main">
@@ -106,7 +115,7 @@ export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRo
             {!create && <HintButton hint="Create a roster" input={env.input} side="top" className="ux-job-btn" onClick={onNewRoster}><Plus size={17} />New roster</HintButton>}
           </div>
         </section>
-        <section className="tb-section" aria-label="Recent rosters">
+        <section className="tb-section tb-recent tb-fill" aria-label="Recent rosters">
           <div className="tb-section-head"><span className="ux-result-label">Recent rosters</span><button type="button" className="ux-job-btn ux-src-ghost" onClick={() => onPage('rosters')}>All rosters<ChevronRight size={15} /></button></div>
           <div className="tb-list">{recent.map((r, i) => <Row key={r.name} selected={false} mark={r.mark} title={r.name} sub={`${r.faction} · ${r.opened}`} end={<><b>{pts(r.used)} / {pts(r.limit)}</b>{i === 2 ? rosterStatus(r) : null}</>} onClick={() => onOpenRoster(r.name)} />)}</div>
         </section>
@@ -131,22 +140,42 @@ export function rosterSystems(rosters: RosterSummary[]): { name: string; count: 
   return [...counts].map(([name, count]) => ({ name, count }));
 }
 
-/** Toggle chip at the end of the filter row: groups the list by game system (TB-03, UX-055). */
-export const GroupToggle = ({ on, onChange }: { on: boolean; onChange: (on: boolean) => void }) =>
-  <button type="button" className={`tb-filter tb-filter-toggle ${on ? 'active' : ''}`} aria-pressed={on} onClick={() => onChange(!on)}>{on ? <Check size={16} aria-hidden="true" /> : <ListTree size={16} aria-hidden="true" />}Group by game system</button>;
+/** Icon-only toggle fixed at the trailing end of the filter row, outside the scroller (TFB-005): groups the list by game
+ * system (TB-03, UX-055). 44 px like the chips, accent fill while on, the name as its accessible label and hold hint. */
+export const GroupToggle = ({ on, onChange, input = 'touch' }: { on: boolean; onChange: (on: boolean) => void; input?: TabletInput }) =>
+  <HintButton hint="Group by game system: one section per game system" input={input} side="bottom" wrapClassName="tb-group-toggle-wrap" className={`tb-group-toggle ${on ? 'active' : ''}`} aria-pressed={on} aria-label="Group by game system" onClick={() => onChange(!on)}><Layers3 size={19} aria-hidden="true" /></HintButton>;
 
 /** Section header of a grouped list: the game system and how many of the shown rosters it holds. */
 export const GroupHeader = ({ name, count }: { name: string; count: number }) =>
   <h3 className="tb-group-head" aria-label={`${name}, ${plural(count, 'roster')}`}><span>{name}</span><span aria-hidden="true">·</span><span>{count}</span></h3>;
 
-/** Fixed end controls surround only the scrolling filter choices; keep selection semantics on each button. */
-export function RosterFilterBar({ platform, all, controls, disclosure }: { platform: 'ios' | 'android'; all: ReactNode; controls?: ReactNode; disclosure: ReactNode }) {
-  return <div className="tb-filters tb-roster-filters" data-platform={platform} role="group" aria-label="Filter rosters">
-    {all}
-    {controls === undefined ? null : <div className="tb-roster-filter-scroll" role="group" aria-label="Additional roster filters">{controls}</div>}
-    {disclosure}
+/** Fixed end controls surround only the scrolling filter choices; keep selection semantics on each button. The group
+ * toggle sits after them on the same row, fixed at its trailing end (TFB-005). */
+export function RosterFilterBar({ platform, all, controls, disclosure, group }: { platform: 'ios' | 'android'; all: ReactNode; controls?: ReactNode; disclosure: ReactNode; group?: ReactNode }) {
+  return <div className="tb-roster-filter-row">
+    <div className="tb-filters tb-roster-filters" data-platform={platform} role="group" aria-label="Filter rosters">
+      {all}
+      {controls === undefined ? null : <div className="tb-roster-filter-scroll" role="group" aria-label="Additional roster filters">{controls}</div>}
+      {disclosure}
+    </div>
+    {group}
   </div>;
 }
+
+const NOTE_ICONS = { ok: ShieldCheck, warn: TriangleAlert, err: TriangleAlert } as const;
+
+/** The status tile beside the roster's name (TFB-006): the avatar's size, tinted by the status, its icon, a count with
+ * more than one note and a disclosure chevron. It shows or hides the full note under the header. */
+export const StatusTile = ({ tone, label, count = 1, expanded, onToggle }: { tone: string; label: string; count?: number; expanded: boolean; onToggle: () => void }) => {
+  const Icon = NOTE_ICONS[tone as keyof typeof NOTE_ICONS] ?? Info;
+  return <button type="button" className={`tb-status-tile ${tone}`} aria-expanded={expanded} aria-label={label} title="Shows or hides the status details" onClick={onToggle}>
+    <Icon size={20} aria-hidden="true" /><span aria-hidden="true">{count > 1 ? <b>{count}</b> : null}<ChevronDown size={12} className={expanded ? 'flip' : ''} /></span>
+  </button>;
+};
+
+/** The roster's facts as cells, label above value (TFB-007): two columns, one in a narrow card or at large text. */
+export const FactsGrid = ({ rows }: { rows: Array<[string, ReactNode]> }) =>
+  <div className="tb-facts-wrap"><dl className="tb-facts-grid">{rows.map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl></div>;
 
 export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster }: SessionProps & { onNewRoster: () => void; onOpenRoster: (name: string) => void }) {
   const { rosters, setRosters, hasData } = session;
@@ -160,6 +189,7 @@ export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster 
   const [selected, setSelected] = useState(rosters[0]?.name ?? '');
   const [open, setOpen] = useState(false);
   const [renaming, setRenaming] = useState(false);
+  const [statusOpen, setStatusOpen] = useState(session.state === 'status');
   const q = query.trim().toLowerCase();
   const systems = useMemo(() => rosterSystems(rosters), [rosters]);
   // The chips (and grouping) show only when the rosters span two or more game systems.
@@ -171,7 +201,7 @@ export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster 
   const attentionCount = rosters.filter(needsAttention).length;
   // The detail follows the list: a roster the filters hide gives way to the first one shown.
   const current = visible.find(r => r.name === selected) ?? visible[0];
-  const choose = (name: string) => { setSelected(name); setOpen(true); setRenaming(false); };
+  const choose = (name: string) => { setSelected(name); setOpen(true); setRenaming(false); setStatusOpen(false); };
   const clearFilters = () => { setQuery(''); setAttention(false); setSystem(null); };
   const actions = <>
     <HintButton hint="Import a roster from a file" input={env.input} side="bottom" className="ux-job-btn" onClick={() => notify('Import a roster file (prototype)')}><FileUp size={16} />Import</HintButton>
@@ -197,8 +227,8 @@ export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster 
       controls={filtersExpanded ? <>
         {bySystem && systems.map(s => <button type="button" key={s.name} className={`tb-filter tb-filter-system ${system === s.name ? 'active' : ''}`} aria-pressed={system === s.name} aria-label={`${s.name}, ${plural(s.count, 'roster')}`} title={s.name} onClick={() => setSystem(system === s.name ? null : s.name)}>{system === s.name && <Check size={16} aria-hidden="true" />}<span>{s.name}</span> {s.count}</button>)}
         {attentionCount > 0 && <button type="button" className={`tb-filter ${attention ? 'active' : ''}`} aria-pressed={attention} onClick={() => setAttention(!attention)}>{attention && <Check size={16} aria-hidden="true" />}Needs attention {attentionCount}</button>}
-        {bySystem && <GroupToggle on={grouped} onChange={setGrouped} />}
       </> : undefined}
+      group={bySystem ? <GroupToggle on={grouped} onChange={setGrouped} input={env.input} /> : undefined}
       disclosure={filtersExpanded
         ? <button type="button" className="tb-filter tb-filter-end" aria-expanded={true} onClick={() => setFiltersExpanded(false)}>Less</button>
         : <button type="button" className={`tb-filter tb-filter-system tb-filter-end ${system !== null || attention ? 'active' : ''}`} aria-expanded={false} title={[system, attention ? 'Needs attention' : null].filter(Boolean).join(', ')} onClick={() => setFiltersExpanded(true)}><span>{['More', system, attention ? 'Needs attention' : null].filter(Boolean).join(' · ')}</span></button>} />
@@ -214,10 +244,11 @@ export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster 
         <div className="tb-detail-title"><span className="tb-mark large" aria-hidden="true">{current.mark}</span>
           {renaming ? <form className="tb-rename" onSubmit={e => { e.preventDefault(); rename(current, (new FormData(e.currentTarget).get('name') as string).trim()); }}><input name="name" autoFocus maxLength={60} defaultValue={current.name} aria-label="Roster name" /><button type="submit" className="ux-job-btn primary">Save</button></form>
             : <span><h2>{current.name}</h2><small>{current.faction} · {current.system}</small></span>}
+          <StatusTile tone={noteTone} label={`${noteTitle}. ${noteText}`} expanded={statusOpen} onToggle={() => setStatusOpen(!statusOpen)} />
         </div>
+        {statusOpen && <p className={`tb-note ${noteTone}`}><Info size={15} /><span><strong>{noteTitle}</strong>{noteText}</span></p>}
         <Meter used={current.used} limit={current.limit} />
-        <p className={`tb-note ${noteTone}`}><Info size={15} /><span><strong>{noteTitle}</strong>{noteText}</span></p>
-        <Facts rows={[['Status', rosterStatus(current)], ['Forces', current.forces], ['Units', current.units], ['Last opened', current.opened]]} />
+        <FactsGrid rows={[['Game system', current.system], ['Units', current.units], ['Forces', current.forces], ['Last opened', current.opened]]} />
         <div className="tb-actions"><button type="button" className="ux-primary tb-primary" onClick={() => onOpenRoster(current.name)}>Open roster<ArrowRight size={17} /></button>
           <HintButton hint="Rename this roster" input={env.input} side="top" className="ux-job-btn" onClick={() => setRenaming(true)}><Pencil size={16} />Rename</HintButton>
           <HintButton hint="Make an editable copy" input={env.input} side="top" className="ux-job-btn" onClick={() => duplicate(current)}><Copy size={16} />Duplicate</HintButton>

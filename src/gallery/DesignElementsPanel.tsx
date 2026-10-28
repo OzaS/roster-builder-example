@@ -1,3 +1,4 @@
+import { PhoneListsFilters } from "../concepts/ux/PhoneListsFilters";
 import { DesktopElements } from "../concepts/desktop/DesktopWorkbench";
 import { TabletElements } from "../concepts/tablet/TabletElements";
 import { LibrarySwitch } from "./LibrarySwitch";
@@ -820,6 +821,11 @@ function WorkbenchElements({
       <ElementSection title="Roster Data Tags">
         <div className="ux-src-chips"><RosterDataTag kind="changed" /><RosterDataTag kind="faction" /><RosterDataTag kind="source" /></div>
         <TaggedRosterRows />
+      </ElementSection>
+
+      <ElementSection title="Lists Search, Filters and Grouping">
+        <PhoneListsFilters initialExpanded />
+        <PhoneListsFilters initialGrouped />
       </ElementSection>
 
       <ElementSection title="Tools Workflow">
