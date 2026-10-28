@@ -23,6 +23,7 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "tablet-home-no-rosters", label: "Tablet · Home · No rosters" },
   { id: "tablet-rosters-many", label: "Tablet · Rosters · Many rosters" },
   { id: "tablet-rosters-search", label: "Tablet · Rosters · Search" },
+  { id: "tablet-rosters-status", label: "Tablet · Rosters · Status details" },
   { id: "tablet-rosters-empty", label: "Tablet · Rosters · Empty" },
   { id: "tablet-sources-add", label: "Tablet · Sources · Add game data" },
   { id: "tablet-sources-installing", label: "Tablet · Sources · Installing, every faction" },
@@ -51,6 +52,7 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "desktop-menus", label: "Desktop · Menu bar" },
   { id: "library", label: "Lists" },
   { id: "library-v2", label: "Lists · V2" },
+  { id: "library-filters", label: "Lists · Search, filters and grouping" },
   { id: "collections", label: "Library" },
   { id: "app", label: "App" },
   { id: "sources", label: "Sources" },
@@ -114,7 +116,7 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen === "desktop-settings") return "settings";
   if (screen === "desktop-first-run") return "library";
   if (screen === "desktop-menus") return "overview";
-  if (screen === "library-v2") return "library";
+  if (screen === "library-v2" || screen === "library-filters") return "library";
   if (screen === "subscription-main") return "library";
   if (screen === "subscription-edition") return "overview";
   if (screen === "create-roster") return "system";

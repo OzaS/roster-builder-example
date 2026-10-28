@@ -1,0 +1,27 @@
+/* Phone Lists: search, the filter row and grouping (TFB-005), the tablet Rosters controls at phone size. */
+.ux-lists-main.ux-lf { display: flex; flex-direction: column; gap: 10px }
+.ux-lf-search { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border: 1px solid var(--ux-line); border-radius: 14px; background: var(--ux-surface); color: var(--ux-muted) }
+.ux-lf-search input { flex: 1; min-width: 0; border: 0; background: none; color: var(--ux-ink); font: inherit; font-size: 15px; outline: none }
+.ux-lf-row { display: flex; align-items: stretch; gap: 8px; min-width: 0 }
+.ux-lf-filters { display: flex; align-items: stretch; gap: 4px; flex: 0 1 auto; min-width: 0 }
+.ux-lf-scroll { display: flex; gap: 4px; flex: 0 1 auto; min-width: 0; overflow-x: auto; scrollbar-width: none }
+.ux-lf-scroll::-webkit-scrollbar { display: none }
+.ux-lf-chip { display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex-shrink: 0; min-height: 44px; min-width: 44px; max-width: 220px; padding: 0 14px; border: 0; border-radius: 8px; background: color-mix(in srgb, var(--ux-accent) 22%, var(--ux-surface)); color: var(--ux-ink); font-size: 14px; font-weight: 750; white-space: nowrap; cursor: pointer }
+.ux-lf-chip > span { min-width: 0; overflow: hidden; text-overflow: ellipsis }
+.ux-lf-chip.start { padding-inline: 18px; border-radius: 24px 8px 8px 24px }
+.ux-lf-chip.end { padding-inline: 18px; border-radius: 8px 24px 24px 8px; max-width: min(220px, 55%) }
+.ux-lf-chip.active { border-radius: 24px; background: var(--ux-accent); color: var(--ux-accent-ink) }
+.ux-lf-group { display: inline-grid; place-items: center; flex: none; width: 44px; height: 44px; margin-left: auto; padding: 0; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--ux-accent) 22%, var(--ux-surface)); color: var(--ux-ink); cursor: pointer }
+.ux-lf-group.active { background: var(--ux-accent); color: var(--ux-accent-ink) }
+.ux-lf :is(.ux-lf-chip, .ux-lf-group):focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px }
+.ux-lf-list, .ux-lf-group-section { display: grid; gap: 8px }
+.ux-lf-group-section + .ux-lf-group-section { margin-top: 8px }
+.ux-lf-group-head { display: flex; gap: 6px; align-items: center; min-height: 32px; margin: 4px 0 0; padding: 0 4px; color: var(--ux-ink); font-size: 13px; font-weight: 800 }
+.ux-lf-group-head > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.ux-lf-group-head > span:last-child { color: var(--ux-muted) }
+.ux-lf-roster b.over { color: var(--ux-err) }
+.ux-lf-tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 750 }
+.ux-lf-tag.err { background: color-mix(in srgb, var(--ux-err) 14%, transparent); color: var(--ux-err) }
+.ux-lf-tag.info { background: color-mix(in srgb, var(--ux-accent) 14%, transparent); color: var(--ux-accent-2) }
+.ux-lf-tag.neutral { background: var(--ux-surface-2); color: var(--ux-muted) }
+.ux-lf .ux-search-empty .ux-job-btn { margin-top: 6px }
