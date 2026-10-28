@@ -36,10 +36,11 @@ export function TabletSources({ env, notify, session, onPage, onOpenRoster }: Se
   const openRoster = onOpenRoster;
   const chip = (s: SourceInfo) => progress[s.id] !== undefined ? <MobileChip tone="cool">Updating {progress[s.id]}%</MobileChip> : sourceStatus(s);
 
+  // TFB-009: Install from a file and Add game data take the Rosters toolbar's treatment (secondary, then primary at the trailing
+  // edge); on iPad they are native bar items in the app (icons, Add game data prominent), as Home's and Rosters' New roster.
   const list = <>
     <div className="tb-list scroll">
       {updates.length > 0 && <div className="tb-banner" role="status"><ArrowUpCircle size={20} /><span><strong>{plural(updates.length, 'update')} available</strong><small>New data for {updates.map(s => s.name).join(', ')}.</small></span><button type="button" className="ux-job-btn primary" onClick={() => update(updates.map(s => s.id))}>Update all</button></div>}
-      <span className="ux-result-label tb-list-label">Installed · {sources.length}</span>
       {sources.map(s => <Row key={s.id} selected={flowSourceId(detail) === s.id} title={s.name} sub={s.fromFile ? `${plural(s.factions.length, 'faction')} · from a file` : `${s.version} · ${plural(s.factions.length, 'faction')} · ${s.size}`} end={chip(s)} foot={progress[s.id] !== undefined ? <Progress percent={progress[s.id]} /> : undefined} onClick={() => go(s.id)} />)}
       {installing.map(j => <Row key={j.id} selected={false} title={j.name} sub={j.status === 'needs-you' ? 'Waiting for you to choose factions' : `${plural(j.factions.length, 'faction')} available`} end={j.status === 'needs-you' ? <MobileChip tone="warning"><AlertTriangle size={11} />Needs you</MobileChip> : <MobileChip tone="cool">Installing {jobPercent(j)}%</MobileChip>} foot={<Progress percent={jobPercent(j)} />} onClick={openJobs} />)}
       {!sources.length && !installing.length && <p className="tb-empty">No game data installed yet.</p>}
@@ -104,6 +105,8 @@ export function TabletSources({ env, notify, session, onPage, onOpenRoster }: Se
       <HintButton hint="Install game data from an archive, data files or a folder" input={env.input} side="bottom" className="ux-job-btn" onClick={() => notify('Choose an archive, data files or a folder (prototype)')}><FolderOpen size={16} />Install from a file</HintButton>
       <HintButton hint="Install from a collection, a repository link or GitHub search" input={env.input} side="bottom" className="ux-job-btn primary" onClick={() => go('add')}><Plus size={16} />Add game data</HintButton></div>
     {jobs.jobs.length > 0 && <div className="tb-actions"><button type="button" className="ux-job-btn" onClick={openJobs}>Show progress · All jobs</button></div>}
+    {/* TFB-008: the heading sits above both panes, so the first card and the detail share their top edge (as Rosters and Settings). */}
+    <h2 className="ux-result-label tb-panes-label">Installed · {sources.length}</h2>
     <ListDetail env={env} label="Installed sources" open={open} onClose={() => setOpen(false)} list={list} detail={pane} />
   </div>;
 }

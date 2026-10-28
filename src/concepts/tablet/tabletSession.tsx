@@ -3,7 +3,7 @@ import { JobsPanel, useWorkspaceJobs } from '../workspace/Jobs';
 import type { Notify } from '../workspace/Toasts';
 import { collectionSources, installedSources, rosterLibrary, type RosterSummary } from '../desktop/desktopData';
 import { isTabletPage, type TabletPage } from './TabletRail';
-import { manyRosters } from './tabletData';
+import { manyRosters, manySources } from './tabletData';
 
 // Prototype-session state the tablet pages share: the roster list, the install and update jobs, the Advanced installation
 // setting and where the Sources and Settings pages are pointing. State screens (`tablet-sources-add`, ...) start the
@@ -17,6 +17,7 @@ export type AppearanceImport = { kind: 'scheme' | 'language'; outcome: Appearanc
 const stateRoutes: Record<string, TabletRoute> = {
   'tablet-home-first-run': { page: 'home', state: 'first-run' },
   'tablet-home-no-rosters': { page: 'home', state: 'no-rosters' },
+  'tablet-home-many-systems': { page: 'home', state: 'many-systems' },
   'tablet-rosters-empty': { page: 'rosters', state: 'empty' },
   'tablet-rosters-many': { page: 'rosters', state: 'many' },
   'tablet-rosters-search': { page: 'rosters', state: 'search' },
@@ -60,7 +61,7 @@ export function useTabletSession({ route, notify, light, onViewSource }: { route
   const [sourceDetail, setSourceDetail] = useState<string | undefined>(route.page === 'sources' ? sourceDetailOf[state] : undefined);
   const [settingsSection, setSettingsSection] = useState<string | undefined>(route.page === 'settings' ? settingsSectionOf[state] : undefined);
   const viewSource = useCallback((id: string) => { setSourceDetail(id); setJobsOpen(false); onViewSource(); }, [onViewSource]);
-  const jobs = useWorkspaceJobs(state === 'first-run' ? [] : installedSources, notify, viewSource, advancedInstall);
+  const jobs = useWorkspaceJobs(state === 'first-run' ? [] : state === 'many-systems' ? manySources : installedSources, notify, viewSource, advancedInstall);
   useEffect(() => {
     if (state !== 'installing' && state !== 'choose-factions') return;
     jobs.startInstall(demoInstall);

@@ -1,5 +1,5 @@
 // Synthetic sample data for the tablet pages (DEC-001): a long roster list to show search and scrolling.
-import { rosterLibrary, type RosterStatus, type RosterSummary } from '../desktop/desktopData';
+import { installedSources, rosterLibrary, type RosterStatus, type RosterSummary, type SourceInfo } from '../desktop/desktopData';
 
 const names = ['Border patrol', 'Club night', 'Spring league', 'Harvest cup', 'Winter siege', 'Training squad', 'Quick match', 'River crossing', 'Hilltop watch', 'Tournament list', 'Beginner box', 'Scout screen', 'Campaign week 1', 'Campaign week 2', 'Campaign week 3', 'Garrison', 'Relief column', 'Night raid', 'Rearguard'];
 const pool: Array<[string, string]> = [['Frontier Coalition', 'Open Field'], ['Free Cities', 'Open Field'], ['Northern Realms', 'Open Field'], ['Glass Legion', 'Example System Two'], ['Tide Wardens', 'Example System Two']];
@@ -16,3 +16,7 @@ const generated: RosterSummary[] = names.map((name, i) => {
 
 /** The sample list of the many-rosters state: the standard seven plus nineteen more. */
 export const manyRosters: RosterSummary[] = [...rosterLibrary, ...generated];
+
+/** Six installed game systems for Home's many-systems state (TFB-001): Home shows the four most used, More opens Sources. */
+const extra = (id: string, name: string, rosters: string[], installed: string): SourceInfo => ({ id, name, factions: ['Faction One', 'Faction Two'], repo: `example/${id}`, version: 'v1.0', installed, upstream: 'Oct 1', checked: '8 minutes ago', size: '6.4 MB', documents: 3, status: 'ready', rosters });
+export const manySources: SourceInfo[] = [...installedSources, extra('system-three', 'Example System Three', ['Lantern patrol'], 'Oct 6'), extra('system-four', 'Example System Four', [], 'Oct 9'), extra('system-five', 'Example System Five', [], 'Oct 12')];

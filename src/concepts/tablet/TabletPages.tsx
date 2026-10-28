@@ -18,6 +18,9 @@ const NewRosterButton = ({ env, onNewRoster }: Pick<PageProps, 'env'> & { onNewR
 
 /* --------------------------------- Home --------------------------------- */
 
+/** Game systems Home's data card shows (TFB-001); More opens Sources with the rest. */
+const HOME_DATA_LIMIT = 4;
+
 const steps = [['Add game data', 'Install a game system from a collection or a file.'], ['Create a roster', 'Choose a faction, a force and a points limit.'], ['Build and check', 'Add units, see the points and the checks as you go.']];
 
 export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRoster }: SessionProps & { onPage: (page: 'rosters' | 'sources') => void; onNewRoster: () => void; onOpenRoster: (name: string) => void }) {
@@ -28,11 +31,15 @@ export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRo
   const startInstall = (c: typeof collectionSources[number]) => { jobs.startInstall(c); };
   const attention = rosters.filter(r => r.status !== 'ready').length;
 
-  // Every installed source keeps its own version, update and progress control.
+  // Every shown source keeps its own version, update and progress control. TFB-001: the four most used game systems (most
+  // rosters, then the latest roster activity, then name; never install order); More opens Sources with the rest.
   const history = jobs.jobs.length > 0 && <button type="button" className="ux-job-btn" onClick={() => setJobsOpen(true)}>Show progress · All jobs</button>;
-  const dataCard = <section className="tb-card" aria-label="Game data status">
+  const used = [...jobs.sources].sort((a, b) => b.rosters.length - a.rosters.length || a.name.localeCompare(b.name));
+  const hidden = Math.max(0, used.length - HOME_DATA_LIMIT);
+  // TFB-002: the data card and Recent rosters fill their columns and scroll inside; the page itself stays put.
+  const dataCard = <section className="tb-card tb-fill" aria-label="Game data status">
     <span className="ux-result-label">Game data</span>
-    {jobs.sources.map(source => {
+    {used.slice(0, HOME_DATA_LIMIT).map(source => {
       const progress = jobs.progressOf(source.id);
       return <div key={source.id} className="tb-section">
         <div className="tb-data-row"><span><strong>{source.name}</strong><small>{source.version} · checked {source.checked}</small></span>{sourceStatus(source)}</div>
@@ -41,6 +48,7 @@ export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRo
           : <p className="tb-note ok"><Check size={15} />Up to date</p>}
       </div>;
     })}
+    {hidden > 0 && <button type="button" className="ux-job-btn ux-src-ghost tb-more" aria-label={`${hidden} more game systems`} title="Opens Sources, which lists all installed game data" onClick={() => onPage('sources')}>More ({hidden})</button>}
     {history}
     <button type="button" className="ux-job-btn" onClick={() => onPage('sources')}>Sources</button>
   </section>;
@@ -55,11 +63,11 @@ export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRo
   const toolbar = create && <div className="tb-toolbar tb-toolbar-end"><NewRosterButton env={env} onNewRoster={onNewRoster} /></div>;
 
   /* First run: no game data on the device. */
-  if (!hasData) return <div className="tb-page">
+  if (!hasData) return <div className="tb-page tb-home-page">
     {toolbar}
     <div className="tb-home">
       <div className="tb-home-main">
-        <section className="tb-card" aria-label="Start with game data">
+        <section className="tb-card tb-fill" aria-label="Start with game data">
           <span className="ux-result-label">Get started</span>
           <div className="tb-card-head"><h2 className="tb-card-title">Start with game data</h2><p className="tb-body tb-muted">Rosters are built from a game system's data. Install one; it stays available offline.</p></div>
           <div className="tb-list">{collectionSources.map(c => <InstallRow key={c.id} title={c.name} sub={`${c.detail} · ${c.size}`} live={jobs.jobs.find(j => j.sourceId === c.id && (j.status === 'running' || j.status === 'needs-you'))} installed={jobs.sources.some(s => s.id === c.id)} onInstall={() => startInstall(c)} onJobs={() => setJobsOpen(true)} />)}</div>
@@ -77,11 +85,11 @@ export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRo
   </div>;
 
   /* Game data, no rosters yet. */
-  if (!current) return <div className="tb-page">
+  if (!current) return <div className="tb-page tb-home-page">
     {toolbar}
     <div className="tb-home">
       <div className="tb-home-main">
-        <section className="tb-card" aria-label="Ready when you are">
+        <section className="tb-card tb-fill" aria-label="Ready when you are">
           <span className="ux-result-label">Ready when you are</span>
           <EmptyState icon={Layers3} title="No rosters yet" text="Your first roster takes a minute: choose a faction, a force and a points limit.">
             <HintButton hint="Create a roster" input={env.input} side="top" className="ux-primary tb-primary" onClick={onNewRoster}><Plus size={17} />Create your first roster</HintButton>
@@ -94,7 +102,7 @@ export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRo
   </div>;
 
   /* The usual state. */
-  return <div className="tb-page">
+  return <div className="tb-page tb-home-page">
     {toolbar}
     <div className="tb-home">
       <div className="tb-home-main">
@@ -107,7 +115,7 @@ export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRo
             {!create && <HintButton hint="Create a roster" input={env.input} side="top" className="ux-job-btn" onClick={onNewRoster}><Plus size={17} />New roster</HintButton>}
           </div>
         </section>
-        <section className="tb-section" aria-label="Recent rosters">
+        <section className="tb-section tb-recent tb-fill" aria-label="Recent rosters">
           <div className="tb-section-head"><span className="ux-result-label">Recent rosters</span><button type="button" className="ux-job-btn ux-src-ghost" onClick={() => onPage('rosters')}>All rosters<ChevronRight size={15} /></button></div>
           <div className="tb-list">{recent.map((r, i) => <Row key={r.name} selected={false} mark={r.mark} title={r.name} sub={`${r.faction} · ${r.opened}`} end={<><b>{pts(r.used)} / {pts(r.limit)}</b>{i === 2 ? rosterStatus(r) : null}</>} onClick={() => onOpenRoster(r.name)} />)}</div>
         </section>

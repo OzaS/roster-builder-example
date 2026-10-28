@@ -46,6 +46,7 @@ const workflowScreenIds = [
   "tablet-settings",
   "tablet-home-first-run",
   "tablet-home-no-rosters",
+  "tablet-home-many-systems",
   "tablet-rosters-many",
   "tablet-rosters-status",
   "tablet-rosters-search",

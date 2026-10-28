@@ -6,11 +6,13 @@
 /* ------------------------------ shared ------------------------------ */
 .tb-toolbar-end { justify-content: flex-end }
 .tb-toolbar.wrap { flex-wrap: wrap }
-.tb-page > .tb-home { flex: 1; min-height: 0 }
+.tb-page > .tb-home { flex: 1 1 0; min-height: 520px }
+.tb-compact .tb-page > .tb-home { flex: none; min-height: 0 }
 .tb-muted { color: var(--ux-muted) }
 .tb-card-head { display: grid; gap: 6px }
 .tb-card-title { font-size: 22px; font-weight: 800; line-height: 1.2 }
 .tb-list-label { padding: 4px 2px 0 }
+.tb-panes-label { margin: 0; padding: 0 2px; min-height: 20px; display: flex; align-items: center }
 .tb-list-foot { display: flex; align-items: center; gap: 8px; margin: 0; padding: 0 4px; color: var(--ux-muted); font-size: 12.5px }
 .tb-list-foot .ux-job-btn { margin-left: auto }
 .tb-wide { width: 100% }
