@@ -104,7 +104,7 @@
 /* Tablet library (gallery): like the desktop library it has no V1/V2 switch. */
 .tablet-design-library .gallery-release-switch{display:none}
 
-/* DX-02 approved: desktop only; phone/tablet retain their existing palette. */
+/* DX-02 approved; phone and tablet take the same values since TB-11 (styles/ux.css, end). */
 .dt-app.ux-screen.dark{--dt-muted:#a3abbc;--dt-faint:#969fae;--ux-muted:var(--dt-muted);--ux-ink-tertiary:var(--dt-faint)}
 .dt-app.ux-screen.light{--dt-muted:#535d6e;--dt-faint:#606978;--ux-muted:var(--dt-muted);--ux-ink-tertiary:var(--dt-faint)}
 .dt-app.ux-screen.dark.ux-scheme-crimson{--dt-muted:#b0a59f;--dt-faint:#a19794;--ux-muted:var(--dt-muted);--ux-ink-tertiary:var(--dt-faint)}
