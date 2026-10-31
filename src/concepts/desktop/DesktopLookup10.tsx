@@ -3,6 +3,7 @@ import { ChevronLeft, Search, X } from 'lucide-react';
 import { lookupById, lookupSystems, sourceLine } from '../../data/lookupData';
 import { LookupEntryBody, LookupSection } from '../ux/PhoneLookup';
 import { plural, useLookup } from '../ux/useLookup';
+import { PageTitle } from './DesktopPages';
 
 /**
  * Desktop Lookup 1.0 (design session 2026-10-31): the earlier page (large search, chip row with the result count, results
@@ -17,7 +18,9 @@ export function DesktopLookup10({ initial = 'u-line-fc' }: { initial?: string })
   const current = lookupById(stack[stack.length - 1]);
   const previous = stack.length > 1 ? lookupById(stack[stack.length - 2]) : undefined;
   return <main className="dtp-page dtp-lookup10">
-    <div className="dtp-toolbar">
+    {/* DEC-050: no visible page title; the search fills the top row, as on Rosters and Sources. */}
+    <PageTitle>Lookup</PageTitle>
+    <div className="dtp-toolbar dtp-top-row">
       <label className="dtp-search large"><Search size={17} /><input ref={searchRef} placeholder="Search units, forces, upgrades and rules in the installed data…" aria-label="Search game data" value={lk.query} onChange={e => lk.setQuery(e.target.value)} />{lk.query && <button aria-label="Clear search" onClick={() => lk.setQuery('')}><X size={14} /></button>}</label>
     </div>
     <div className="dtp-toolbar tight">
