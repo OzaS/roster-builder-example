@@ -1,14 +1,14 @@
 /**
  * Lookup 1.0 synthetic reference data (game-neutral, DEC-001), shared by the phone, tablet and desktop Lookup designs.
- * Four result groups: Units, Detachments (force entries), Upgrades (entries picked inside a unit: weapons, gear,
- * unit upgrades) and Rules. A shared entry used by several factions is one entity listing every faction; separate
+ * Four result groups: Units, Forces & detachments (force entries: a root force and the detachments it can take),
+ * Upgrades (entries picked inside a unit: weapons, gear, unit upgrades) and Rules. A shared entry used by several factions is one entity listing every faction; separate
  * entries with the same name are separate entities, told apart by their source line (faction · system).
  */
-export type LookupGroupId = "unit" | "detachment" | "upgrade" | "rule";
+export type LookupGroupId = "unit" | "force" | "upgrade" | "rule";
 
 export const lookupGroups: Array<{ id: LookupGroupId; label: string; singular: string }> = [
   { id: "unit", label: "Units", singular: "Unit" },
-  { id: "detachment", label: "Detachments", singular: "Detachment" },
+  { id: "force", label: "Forces & detachments", singular: "Force" },
   { id: "upgrade", label: "Upgrades", singular: "Upgrade" },
   { id: "rule", label: "Rules", singular: "Rule" },
 ];
@@ -42,7 +42,13 @@ export type LookupEntity = {
   rules?: string[];
   options?: LookupOptionGroup[];
   categories?: string[];
-  slots?: Array<{ category: string; min: number; max: number; units: string[] }>;
+  /** Force entries: a root force or a detachment it can take. */
+  forceKind?: "force" | "detachment";
+  /** Slot categories with their minimum and maximum (max -1 = no limit); no unit examples. */
+  slots?: Array<{ category: string; min: number; max: number }>;
+  /** A force's detachments, or the force a detachment belongs to. */
+  detachments?: string[];
+  partOf?: string;
   takenBy?: Array<{ id: string; cost: string; limit: string }>;
   usedBy?: string[];
 };
@@ -96,21 +102,27 @@ export const lookupEntities: LookupEntity[] = [
   { id: "u-walker", group: "unit", name: "Patrol Walker", system: "Open Field", factions: ["Frontier Coalition"], summary: "Support · 1 model", cost: "145 pts", categories: ["Support", "Vehicle"] },
   { id: "u-harbour", group: "unit", name: "Harbour Guard", system: "Open Field", factions: ["Free Cities"], summary: "Core · 8 models", cost: "110 pts", categories: ["Core", "Infantry"] },
 
-  /* --------------------------- Detachments --------------------------- */
+  /* --------------------- Forces & detachments --------------------- */
   {
-    id: "d-line-formation", group: "detachment", name: "Line Formation", system: "Open Field", factions: ["Frontier Coalition"], summary: "4 slots",
-    rules: ["r-formation-drill", "r-hold-line"],
-    slots: [
-      { category: "Command", min: 1, max: 2, units: ["u-commander", "u-marshal"] },
-      { category: "Core", min: 2, max: 6, units: ["u-line-fc", "u-recon"] },
-      { category: "Elite", min: 0, max: 3, units: ["u-veteran-line"] },
-      { category: "Support", min: 0, max: 2, units: ["u-walker"] },
-    ],
+    id: "f-line-of-battle", group: "force", forceKind: "force", name: "Line of Battle", system: "Open Field", factions: ["Frontier Coalition"], summary: "Force · 5 slot categories",
+    rules: ["r-hold-line"], detachments: ["d-line-formation", "d-recon-screen", "d-walker-battery"],
+    slots: [{ category: "Command", min: 1, max: 2 }, { category: "Core", min: 2, max: 6 }, { category: "Elite", min: 0, max: 3 }, { category: "Support", min: 0, max: 3 }, { category: "Specialist", min: 0, max: 1 }],
   },
   {
-    id: "d-battle-line", group: "detachment", name: "Battle Line", system: "Example System Two", factions: ["Glass Legion"], summary: "3 slots",
+    id: "d-line-formation", group: "force", forceKind: "detachment", name: "Line Formation", system: "Open Field", factions: ["Frontier Coalition"], summary: "Detachment · 3 slot categories",
+    partOf: "f-line-of-battle", rules: ["r-formation-drill"],
+    slots: [{ category: "Command", min: 1, max: 1 }, { category: "Core", min: 1, max: 3 }, { category: "Support", min: 0, max: 2 }],
+  },
+  {
+    id: "d-recon-screen", group: "force", forceKind: "detachment", name: "Recon Screen", system: "Open Field", factions: ["Frontier Coalition"], summary: "Detachment · 2 slot categories",
+    partOf: "f-line-of-battle", conditional: "Available only under some conditions in a roster; the roster decides.", rules: ["r-steady"],
+    slots: [{ category: "Command", min: 1, max: 1 }, { category: "Recon", min: 1, max: 3 }],
+  },
+  { id: "d-walker-battery", group: "force", forceKind: "detachment", name: "Walker Battery", system: "Open Field", factions: ["Frontier Coalition"], summary: "Detachment · 1 slot category", partOf: "f-line-of-battle", slots: [{ category: "Support", min: 1, max: 4 }] },
+  {
+    id: "d-battle-line", group: "force", forceKind: "detachment", name: "Battle Line", system: "Example System Two", factions: ["Glass Legion"], summary: "Detachment · 3 slot categories",
     rules: ["r-unbroken"],
-    slots: [{ category: "Leaders", min: 1, max: 1, units: [] }, { category: "Troops", min: 2, max: 4, units: ["u-line-gl"] }, { category: "Support", min: 0, max: 2, units: [] }],
+    slots: [{ category: "Leaders", min: 1, max: 1 }, { category: "Troops", min: 2, max: -1 }, { category: "Support", min: 0, max: 2 }],
   },
 
   /* ----------------------------- Upgrades ----------------------------- */
@@ -135,7 +147,7 @@ export const lookupEntities: LookupEntity[] = [
   { id: "up-horn", group: "upgrade", name: "Signal horn", system: "Open Field", factions: ["Frontier Coalition"], summary: "Unit upgrade", cost: "+5 pts", takenBy: [{ id: "u-line-fc", cost: "+5 pts", limit: "Up to 1" }] },
 
   /* ------------------------------ Rules ------------------------------ */
-  { id: "r-hold-line", group: "rule", name: "Hold the line", system: "Open Field", factions: [], summary: "Unit ability", text: "While this unit is within 3\" of an objective it controls, it cannot be forced to fall back and adds 1 to its resolve.", usedBy: ["u-line-fc", "u-veteran-line", "d-line-formation"] },
+  { id: "r-hold-line", group: "rule", name: "Hold the line", system: "Open Field", factions: [], summary: "Unit ability", text: "While this unit is within 3\" of an objective it controls, it cannot be forced to fall back and adds 1 to its resolve.", usedBy: ["u-line-fc", "u-veteran-line", "f-line-of-battle"] },
   { id: "r-los", group: "rule", name: "Line of sight", system: "Open Field", factions: [], summary: "Core rule", text: "A model can see a target if a straight line can be drawn from any part of the model to any part of the target without passing through terrain that blocks sight." },
   { id: "r-unbroken", group: "rule", name: "Unbroken Line", system: "Example System Two", factions: ["Glass Legion"], summary: "Faction rule", text: "Units with this rule ignore the first failed morale test each battle.", usedBy: ["u-line-gl", "d-battle-line"] },
   { id: "r-steady", group: "rule", name: "Steady advance", system: "Open Field", factions: [], summary: "Unit ability", text: "This unit may make a normal move and keep its formation bonus while within range of its commander.", usedBy: ["u-line-fc"] },
@@ -144,6 +156,12 @@ export const lookupEntities: LookupEntity[] = [
 ];
 
 export const lookupById = (id: string) => lookupEntities.find((e) => e.id === id);
+
+/** "Unit", "Force", "Detachment", "Upgrade" or "Rule". */
+export function kindLabel(e: LookupEntity) {
+  if (e.group === "force") return e.forceKind === "detachment" ? "Detachment" : "Force";
+  return lookupGroups.find((g) => g.id === e.group)?.singular ?? "";
+}
 
 /** "Frontier Coalition", "Frontier Coalition, Free Cities", "4 factions" or "Core rules". */
 export function factionLabel(e: LookupEntity) {

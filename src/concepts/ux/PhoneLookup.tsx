@@ -1,13 +1,14 @@
 import { useState, type ReactNode } from "react";
-import { BookOpen, ChevronDown, ChevronLeft, ChevronRight, Clock3, Database, Info, Search, X } from "lucide-react";
-import { factionLabel, lookupById, lookupGroups, lookupSystems, searchLookup, sourceLine, systemVersion, type LookupEntity, type LookupGroupId } from "../../data/lookupData";
+import { Anchor, BookOpen, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Clock3, Compass, Crown, Database, Feather, Flag, Gem, Hexagon, Info, ListFilter, Search, Shield, Star, Target, X, type LucideIcon } from "lucide-react";
+import { factionLabel, kindLabel, lookupById, lookupEntities, lookupGroups, lookupSystems, searchLookup, sourceLine, systemVersion, type LookupEntity, type LookupGroupId } from "../../data/lookupData";
 import { FoldSection } from "./MobileUnitOptions";
 import "./phone-lists.css";
 import "./phone-lookup.css";
 
 /**
  * Lookup 1.0 on the phone (design session 2026-10-31). Name search over every installed game system, or the chosen
- * ones. Results sit in four sections with a count each: Units, Detachments, Upgrades, Rules. Units start open on top;
+ * ones; the system chips hide behind a tab under the search (accent while a filter is on) to save room. Results sit in
+ * four sections with a count each: Units, Forces & detachments, Upgrades, Rules. Units start open on top;
  * the others start folded, and folded sections always sort below the open ones (fixed group order inside each part).
  * No units → the first group with results opens instead. Fold state lasts for the search; clearing the field resets it.
  * A result opens a read-only reference page (a pushed page; Back names where it returns). D10: hidden-by-default or
@@ -22,6 +23,7 @@ export function PhoneLookup({ initialQuery = "line", initialStack = [], noData =
   const [open, setOpen] = useState<LookupGroupId[] | null>(null);
   const [stack, setStack] = useState<string[]>(initialStack);
   const [recent, setRecent] = useState(recentIds);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const results = searchLookup(query, systems);
   const allResults = searchLookup(query, null);
   const groups = lookupGroups.map((g) => ({ ...g, rows: results.filter((e) => e.group === g.id) })).filter((g) => g.rows.length > 0);
@@ -58,10 +60,13 @@ export function PhoneLookup({ initialQuery = "line", initialStack = [], noData =
           <div className="ux-search-empty ux-lk-empty"><BookOpen size={22} /><strong>Nothing to look up yet</strong><small>Lookup searches the units, detachments, upgrades and rules of your installed game data.</small><button type="button" className="ux-job-btn" onClick={onAddData}><Database size={15} />Add game data</button></div>
         ) : <>
           <label className="ux-lf-search"><Search size={16} aria-hidden /><input value={query} onChange={(e) => changeQuery(e.currentTarget.value)} placeholder="Search units, rules, upgrades…" aria-label="Search the game data" />{typed ? <button type="button" className="ux-lk-clear" aria-label="Clear search" onClick={() => changeQuery("")}><X size={16} /></button> : null}</label>
-          {lookupSystems.length > 1 ? <div className="ux-lf-row"><div className="ux-lf-filters ux-lf-scroll" role="group" aria-label="Game systems to search">
-            <button type="button" className={`ux-lf-chip ${systems === null ? "active" : ""}`} aria-pressed={systems === null} onClick={() => setSystems(null)}>All systems{typed ? ` ${allResults.length}` : ""}</button>
-            {lookupSystems.map((s) => { const on = systems?.includes(s.name) ?? false; const n = allResults.filter((e) => e.system === s.name).length; return <button type="button" key={s.name} className={`ux-lf-chip ${on ? "active" : ""}`} aria-pressed={on} aria-label={typed ? `${s.name}, ${plural(n, "result")}` : s.name} onClick={() => pickSystem(s.name)}><span>{s.name}</span>{typed ? ` ${n}` : ""}</button>; })}
-          </div></div> : null}
+          {lookupSystems.length > 1 ? <>
+            {filtersOpen ? <div className="ux-lf-row"><div className="ux-lf-filters ux-lf-scroll" id="lookup-filters" role="group" aria-label="Game systems to search">
+              <button type="button" className={`ux-lf-chip ${systems === null ? "active" : ""}`} aria-pressed={systems === null} aria-label={typed ? `All systems, ${plural(allResults.length, "result")}` : "All systems"} onClick={() => setSystems(null)}>All{typed ? ` ${allResults.length}` : ""}</button>
+              {lookupSystems.map((s) => { const on = systems?.includes(s.name) ?? false; const n = allResults.filter((e) => e.system === s.name).length; return <button type="button" key={s.name} className={`ux-lf-chip ${on ? "active" : ""}`} aria-pressed={on} aria-label={typed ? `${s.name}, ${plural(n, "result")}` : s.name} onClick={() => pickSystem(s.name)}><span>{s.name}</span>{typed ? ` ${n}` : ""}</button>; })}
+            </div></div> : null}
+            <div className="ux-lk-rule"><button type="button" className={`ux-lk-tab ${systems !== null && !filtersOpen ? "active" : ""}`} aria-expanded={filtersOpen} aria-controls="lookup-filters" aria-label={`${filtersOpen ? "Hide" : "Show"} game system filters${systems !== null ? `, searching ${systems.join(", ")}` : ""}`} title={filtersOpen ? "Hide filters" : "Show filters"} onClick={() => setFiltersOpen(!filtersOpen)}>{filtersOpen ? <ChevronUp size={18} aria-hidden /> : <ListFilter size={17} aria-hidden />}</button></div>
+          </> : null}
           {!typed ? (
             <section className="ux-lk-start" aria-label="Recently viewed">
               <p className="ux-lk-hint">Type a name, or part of one. Lookup searches units, detachments, upgrades and rules{systems === null ? " in every installed system" : ""}.</p>
@@ -93,7 +98,7 @@ export function PhoneLookup({ initialQuery = "line", initialStack = [], noData =
 
 /** Read-only reference page for one result. */
 export function LookupEntryPage({ entity: e, back, onBack, onOpen }: { entity: LookupEntity; back: string; onBack: () => void; onOpen: (id: string) => void }) {
-  const kind = lookupGroups.find((g) => g.id === e.group)?.singular ?? "";
+  const kind = kindLabel(e);
   return <section className="ux-mobile-unit-options ux-lk-detail" aria-label={`${kind}: ${e.name}`}>
     <header className="ux-5a-header ux-nested-back ios"><button type="button" onClick={onBack} aria-label={`Back to ${back}`}><ChevronLeft size={24} /><span>{back}</span></button></header>
     <LookupEntryBody entity={e} onOpen={onOpen} />
@@ -102,15 +107,15 @@ export function LookupEntryPage({ entity: e, back, onBack, onOpen }: { entity: L
 
 /** The reference content, shared by the phone page and the tablet/desktop detail panes. */
 export function LookupEntryBody({ entity: e, onOpen }: { entity: LookupEntity; onOpen: (id: string) => void }) {
-  const kind = lookupGroups.find((g) => g.id === e.group)?.singular ?? "";
+  const kind = kindLabel(e);
   return <>
     <div className="ux-lk-title">
-      <small className="ux-lk-kind">{kind} · {e.summary}</small><h2>{e.name}</h2><small>{factionLabel(e)} · {e.system} {systemVersion(e.system)}</small>
+      <small className="ux-lk-kind">{e.summary.startsWith(kind) ? e.summary : `${kind} · ${e.summary}`}</small><h2>{e.name}</h2><small>{factionLabel(e)} · {e.system} {systemVersion(e.system)}</small>
       {e.cost ? <p className="ux-lk-cost"><strong>{e.cost}</strong>{e.costNote ? <small>{e.costNote}</small> : null}</p> : null}
     </div>
     {e.conditional ? <div className="ux-5a-notice ux-lk-cond" role="note"><Info size={18} /><span><strong>Conditional</strong><small>{e.conditional}</small></span></div> : null}
     {e.group === "unit" ? <UnitBody e={e} onOpen={onOpen} /> : null}
-    {e.group === "detachment" ? <DetachmentBody e={e} onOpen={onOpen} /> : null}
+    {e.group === "force" ? <ForceBody e={e} onOpen={onOpen} /> : null}
     {e.group === "upgrade" ? <UpgradeBody e={e} onOpen={onOpen} /> : null}
     {e.group === "rule" ? <RuleBody e={e} onOpen={onOpen} /> : null}
     <small className="ux-lk-foot">Read-only reference from {e.system} {systemVersion(e.system)}.{e.cost || e.options ? " Costs are the data’s base values; a roster can change them." : ""}</small>
@@ -134,18 +139,55 @@ function UnitBody({ e, onOpen }: { e: LookupEntity; onOpen: (id: string) => void
   </>;
 }
 
-function DetachmentBody({ e, onOpen }: { e: LookupEntity; onOpen: (id: string) => void }) {
-  const [openSlot, setOpenSlot] = useState<string | null>(null);
+function ForceBody({ e, onOpen }: { e: LookupEntity; onOpen: (id: string) => void }) {
+  const parent = e.partOf ? lookupById(e.partOf) : undefined;
+  const detachments = (e.detachments ?? []).map((id) => lookupById(id)).filter((d): d is LookupEntity => !!d);
   return <>
     {e.rules?.length ? <><h4>Rules</h4>{e.rules.map((id) => lookupById(id)).filter((r): r is LookupEntity => !!r).map((r) => <div className="ux-5a-card ux-lk-rule-card" key={r.id}><button type="button" className="ux-5a-choice ux-lk-link-row" onClick={() => onOpen(r.id)}><span><strong>{r.name}</strong><small>{r.summary}</small></span><ChevronRight size={18} aria-hidden /></button><p>{r.text}</p></div>)}</> : null}
-    {e.slots?.length ? <><h4>Layout</h4><div className="ux-5a-card ux-lk-layout">
-      {e.slots.map((s) => { const isOpen = openSlot === s.category; return <div key={s.category} className="ux-lk-slot">
-        <button type="button" className="ux-5a-choice" aria-expanded={isOpen} disabled={!s.units.length} onClick={() => setOpenSlot(isOpen ? null : s.category)}><span><strong>{s.category}</strong><small>{s.units.length ? plural(s.units.length, "unit") : "No units in the installed data"}</small></span><b className="ux-lk-range">{s.min === s.max ? s.min : `${s.min}–${s.max}`}</b>{s.units.length ? isOpen ? <ChevronDown size={18} aria-hidden /> : <ChevronRight size={18} aria-hidden /> : null}</button>
-        {isOpen ? <div className="ux-lk-slot-units">{s.units.map((id) => lookupById(id)).filter((u): u is LookupEntity => !!u).map((u) => <button type="button" key={u.id} className="ux-5a-choice ux-lk-link-row" onClick={() => onOpen(u.id)}><span><strong>{u.name}</strong><small>{u.summary}</small></span>{u.cost ? <b>{u.cost}</b> : null}<ChevronRight size={18} aria-hidden /></button>)}</div> : null}
-      </div>; })}
-      <small className="ux-lk-limits">Minimum–maximum units of each category in this detachment.</small>
-    </div></> : null}
+    {e.slots?.length ? <><h4>Layout</h4><div className="ux-5a-card"><ForceSchema system={e.system} slots={e.slots} /></div></> : null}
+    {detachments.length ? <><h4>Detachments</h4><div className="ux-5a-card ux-lk-list">{detachments.map((d) => <button type="button" key={d.id} className="ux-5a-choice ux-lk-link-row" onClick={() => onOpen(d.id)}><span><strong>{d.name}</strong><small>{slotSummary(d)}</small></span>{d.conditional ? <span className="ux-lf-tag info">Conditional</span> : null}<ChevronRight size={18} aria-hidden /></button>)}</div></> : null}
+    {parent ? <><h4>Part of</h4><div className="ux-5a-card ux-lk-list"><button type="button" className="ux-5a-choice ux-lk-link-row" onClick={() => onOpen(parent.id)}><span><strong>{parent.name}</strong><small>Force · {slotSummary(parent)}</small></span><ChevronRight size={18} aria-hidden /></button></div></> : null}
   </>;
+}
+
+const rangeLabel = (min: number, max: number) => max < 0 ? `${min}+` : min === max ? `${min}` : `${min}–${max}`;
+const slotSummary = (e: LookupEntity) => (e.slots ?? []).map((s) => `${s.category} ${rangeLabel(s.min, s.max)}`).join(" · ");
+
+/** Neutral icons for slot categories. The data has none, so each game system's slot categories, sorted by name, take
+ * the icons in order: every category of a system has its own icon, the same in every force. The name is always printed,
+ * so the icon is decoration only. */
+const schemaIcons: LucideIcon[] = [Crown, Shield, Star, Flag, Compass, Hexagon, Gem, Anchor, Target, Feather];
+function slotIcon(system: string, name: string) {
+  const names = [...new Set(lookupEntities.filter((e) => e.system === system).flatMap((e) => e.slots ?? []).map((s) => s.category))].sort();
+  return schemaIcons[Math.max(0, names.indexOf(name)) % schemaIcons.length];
+}
+
+/**
+ * Force layout as a schema, after the printed force charts: one ring per slot, grouped by category, the category and
+ * its range under each group. Required slots (the minimum) have a heavy, spiked ring; optional ones a thin ring.
+ * At most 6 rings per category; the rest is a "+n" pill, and no maximum is a "+∞" pill.
+ */
+export function ForceSchema({ system, slots }: { system: string; slots: Array<{ category: string; min: number; max: number }> }) {
+  return <div className="ux-lk-schema-wrap">
+    <div className="ux-lk-schema" role="list" aria-label="Slots">
+      {slots.map((s) => {
+        const Icon = slotIcon(system, s.category);
+        const optional = s.max < 0 ? 1 : s.max - s.min;
+        const req = Math.min(s.min, 6);
+        const opt = Math.min(optional, 6 - req);
+        const more = s.max < 0 ? "+∞" : s.min - req + optional - opt > 0 ? `+${s.min - req + optional - opt}` : null;
+        return <div role="listitem" key={s.category} className="ux-lk-slotgroup" aria-label={`${s.category}: ${s.min ? `${s.min} required` : "optional"}${s.max < 0 ? ", no maximum" : s.max > s.min ? `, up to ${s.max}` : ""}`}>
+          <div className="ux-lk-rings" aria-hidden>
+            {Array.from({ length: req }, (_, i) => <span key={`r${i}`} className="ux-lk-ring req"><Icon size={18} /></span>)}
+            {Array.from({ length: opt }, (_, i) => <span key={`o${i}`} className="ux-lk-ring"><Icon size={18} /></span>)}
+            {more ? <span className="ux-lk-more">{more}</span> : null}
+          </div>
+          <span className="ux-lk-slotname" aria-hidden><strong>{s.category}</strong><small>{rangeLabel(s.min, s.max)}</small></span>
+        </div>;
+      })}
+    </div>
+    <div className="ux-lk-legend" aria-hidden><span><i className="ux-lk-ring req mini" />Required</span><span><i className="ux-lk-ring mini" />Optional</span></div>
+  </div>;
 }
 
 function UpgradeBody({ e, onOpen }: { e: LookupEntity; onOpen: (id: string) => void }) {
@@ -160,7 +202,7 @@ function UpgradeBody({ e, onOpen }: { e: LookupEntity; onOpen: (id: string) => v
 function RuleBody({ e, onOpen }: { e: LookupEntity; onOpen: (id: string) => void }) {
   return <>
     <div className="ux-5a-card"><p className="ux-lk-text">{e.text}</p></div>
-    {e.usedBy?.length ? <><h4>Used by</h4><div className="ux-5a-card ux-lk-list">{e.usedBy.map((id) => lookupById(id)).filter((u): u is LookupEntity => !!u).map((u) => <button type="button" key={u.id} className="ux-5a-choice ux-lk-link-row" onClick={() => onOpen(u.id)}><span><strong>{u.name}</strong><small>{lookupGroups.find((g) => g.id === u.group)?.singular} · {factionLabel(u)}</small></span><ChevronRight size={18} aria-hidden /></button>)}</div></> : null}
+    {e.usedBy?.length ? <><h4>Used by</h4><div className="ux-5a-card ux-lk-list">{e.usedBy.map((id) => lookupById(id)).filter((u): u is LookupEntity => !!u).map((u) => <button type="button" key={u.id} className="ux-5a-choice ux-lk-link-row" onClick={() => onOpen(u.id)}><span><strong>{u.name}</strong><small>{kindLabel(u)} · {factionLabel(u)}</small></span><ChevronRight size={18} aria-hidden /></button>)}</div></> : null}
   </>;
 }
 

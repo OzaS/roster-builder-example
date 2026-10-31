@@ -1783,7 +1783,7 @@ function LookupScreen({ props }: { props: ConceptProps }) {
 /** Lookup 1.0 (design session 2026-10-31): each workflow screen opens PhoneLookup in one state. */
 function PhoneLookupScreen({ props }: { props: ConceptProps }) {
   const s = props.workflowScreen;
-  const stack = s === "lookup-unit" ? ["u-line-fc"] : s === "lookup-detachment" ? ["d-line-formation"] : s === "lookup-upgrade" ? ["up-line-rifle"] : s === "lookup-rule" ? ["r-hold-line"] : [];
+  const stack = s === "lookup-unit" ? ["u-line-fc"] : s === "lookup-force" ? ["f-line-of-battle"] : s === "lookup-detachment" ? ["d-line-formation"] : s === "lookup-upgrade" ? ["up-line-rifle"] : s === "lookup-rule" ? ["r-hold-line"] : [];
   const query = s === "lookup-start" ? "" : s === "lookup-no-results" ? "lantern" : "line";
   return <PhoneLookup key={s} initialQuery={query} initialStack={stack} noData={s === "lookup-no-data"} trailing={<AppAvatarButton props={props} />} onAddData={() => props.onNavigate("add-source")} />;
 }

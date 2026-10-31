@@ -84,6 +84,7 @@ const workflowScreenIds = [
   "lookup-no-results",
   "lookup-no-data",
   "lookup-unit",
+  "lookup-force",
   "lookup-detachment",
   "lookup-upgrade",
   "lookup-rule",

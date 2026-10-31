@@ -73,6 +73,7 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "lookup-no-results", label: "Lookup · No results" },
   { id: "lookup-no-data", label: "Lookup · No game data" },
   { id: "lookup-unit", label: "Lookup · Unit" },
+  { id: "lookup-force", label: "Lookup · Force" },
   { id: "lookup-detachment", label: "Lookup · Detachment" },
   { id: "lookup-upgrade", label: "Lookup · Upgrade" },
   { id: "lookup-rule", label: "Lookup · Rule" },
