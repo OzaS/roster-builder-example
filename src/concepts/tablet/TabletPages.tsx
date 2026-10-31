@@ -7,7 +7,7 @@ import { HintButton } from './TabletHint';
 import type { TabletInput } from './tabletDevices';
 import { EmptyState, Facts, InstallRow, ListDetail, Meter, Progress, Row, SearchField, pts, rosterStatus, sourceStatus, plural, type PageProps, type SessionProps } from './TabletPieces';
 import { RosterToolbar } from './RosterToolbar';
-import { PageTitle, type ToolbarAction } from './TabletToolbar';
+import { PageTitle, TabletToolbar, type ToolbarAction } from './TabletToolbar';
 
 // Pages of the tablet: Home, Rosters and Lookup (T2a). Sources and Settings have their own files. Synthetic rows only.
 
@@ -276,8 +276,8 @@ export function TabletLookup({ env, session, onAddData }: SessionProps & { onAdd
   const current: LookupEntry = lookupEntries.find(e => e.id === selected) ?? lookupEntries[0];
   if (!session.hasData) return <div className="tb-page"><PageTitle>Lookup</PageTitle><EmptyState icon={BookOpen} title="Nothing to look up yet" text="Lookup searches the units, rules and equipment of your installed game data."><button type="button" className="ux-primary tb-primary" onClick={onAddData}><Database size={17} />Add game data</button></EmptyState></div>;
   return <div className="tb-page">
-    <PageTitle>Lookup</PageTitle>
-    <div className="tb-toolbar"><SearchField value={query} onChange={setQuery} label="Search the game data" placeholder="Search units, rules and equipment…" /></div>
+    {/* DEC-050: the search fills the top row, no title (the heading is visually hidden); the same row as Rosters and Sources. */}
+    <TabletToolbar title="Lookup" input={env.input} search={<SearchField value={query} onChange={setQuery} label="Search the game data" placeholder="Search units, rules and equipment…" />} />
     <div className="tb-filters" role="group" aria-label="Scope">{scopes.map(s => <button type="button" key={s} className={`tb-filter ${scope === s ? 'active' : ''}`} aria-pressed={scope === s} onClick={() => setScope(s)}>{s === 'All' ? 'All' : s === 'Equipment' ? 'Equipment' : `${s}s`}</button>)}</div>
     <ListDetail env={env} label="Lookup results" open={open} onClose={() => setOpen(false)}
       list={<div className="tb-list scroll">{visible.map(e => <Row key={e.id} selected={e.id === selected} title={e.name} sub={`${e.owner} · ${e.meta}`} end={e.cost ? <b>{e.cost}</b> : e.badge ? <MobileChip tone="neutral">{e.badge}</MobileChip> : null} onClick={() => { setSelected(e.id); setOpen(true); }} />)}{!visible.length && <p className="tb-empty">Nothing matches. Try another word or scope.</p>}</div>}
