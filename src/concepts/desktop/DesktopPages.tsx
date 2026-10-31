@@ -208,21 +208,24 @@ const settingsSections = [
   { id: 'data', label: 'Game data', icon: Database },
   { id: 'storage', label: 'Storage', icon: HardDrive },
   { id: 'keys', label: 'Key bindings', icon: Keyboard },
+  { id: 'advanced', label: 'Advanced', icon: SlidersHorizontal },
   { id: 'about', label: 'About', icon: Info },
 ] as const;
 
-export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, bindings, onBindings, advancedInstall, onAdvancedInstall, notify }: { themePref: 'system' | 'light' | 'dark'; onThemePref: (v: 'system' | 'light' | 'dark') => void; scheme: ColorScheme; onScheme: (v: ColorScheme) => void; bindings: KeyBindings; onBindings: (next: KeyBindings) => void; advancedInstall: boolean; onAdvancedInstall: (v: boolean) => void; notify: Notify }) {
-  const [active, setActive] = useState<string>('appearance');
+export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, bindings, onBindings, advancedInstall, onAdvancedInstall, focusSearch, onFocusSearch, initialSection, notify }: { themePref: 'system' | 'light' | 'dark'; onThemePref: (v: 'system' | 'light' | 'dark') => void; scheme: ColorScheme; onScheme: (v: ColorScheme) => void; bindings: KeyBindings; onBindings: (next: KeyBindings) => void; advancedInstall: boolean; onAdvancedInstall: (v: boolean) => void; focusSearch: boolean; onFocusSearch: (v: boolean) => void; initialSection?: string; notify: Notify }) {
+  const [active, setActive] = useState<string>(initialSection ?? 'appearance');
   const [language, setLanguage] = useState('en');
   const [toggles, setToggles] = useState({ rememberSections: true, restoreTabs: true, autoChecks: true });
   const [keep, setKeep] = useState(1);
   const scrollRef = useRef<HTMLDivElement>(null);
   const flip = (key: keyof typeof toggles) => (v: boolean) => setToggles(t => ({ ...t, [key]: v }));
   const go = (id: string) => { setActive(id); scrollRef.current?.querySelector(`#dtp-set-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+  // A standalone link can open a section (`&section=advanced`); the list keeps tracking the scroll from there.
+  useEffect(() => { if (initialSection) scrollRef.current?.querySelector(`#dtp-set-${initialSection}`)?.scrollIntoView({ block: 'start' }); }, [initialSection]);
   return <main className="dtp-page">
     <div className="dtp-settings">
       <nav className="dtp-settings-nav" aria-label="Settings sections">{settingsSections.map(s => <button key={s.id} className={active === s.id ? 'active' : ''} aria-current={active === s.id ? 'true' : undefined} onClick={() => go(s.id)}><s.icon size={15} />{s.label}</button>)}</nav>
-      <div className="dtp-settings-body" ref={scrollRef} onScroll={e => { const top = e.currentTarget.getBoundingClientRect().top + 48; const current = settingsSections.filter(sec => (e.currentTarget.querySelector(`#dtp-set-${sec.id}`)?.getBoundingClientRect().top ?? Infinity) <= top).pop(); if (current) setActive(current.id); }}>
+      <div className="dtp-settings-body" ref={scrollRef} onScroll={e => { const box = e.currentTarget; const top = box.getBoundingClientRect().top + 48; const chosen = box.querySelector(`#dtp-set-${active}`)?.getBoundingClientRect(); if (box.scrollTop + box.clientHeight >= box.scrollHeight - 2 && chosen && chosen.top >= box.getBoundingClientRect().top - 2) return; /* at the end a chosen short section stays chosen */ const current = settingsSections.filter(sec => (e.currentTarget.querySelector(`#dtp-set-${sec.id}`)?.getBoundingClientRect().top ?? Infinity) <= top).pop(); if (current) setActive(current.id); }}>
         <section id="dtp-set-appearance" className="dtp-card dtp-settings-card"><h2>Appearance</h2>
           <div className="dtp-setting-line"><span><strong>Theme</strong><small>System follows your desktop setting.</small></span><Segmented label="Theme" value={themePref} onChange={onThemePref} options={[{ value: 'system', label: 'System' }, { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }]} /></div>
           <div className="dtp-setting-block"><strong>Colour scheme</strong><div className="dtp-scheme-grid" role="radiogroup" aria-label="Colour scheme">{colourSchemes.map(c => <button key={c.id} role="radio" aria-checked={scheme === c.id} className={scheme === c.id ? 'active' : ''} onClick={() => onScheme(c.id)}><span className="dtp-swatch"><i style={{ background: 'var(--ux-bg)' }} /><i style={{ background: c.accent }} /><i style={{ background: 'var(--ux-surface-2)' }} /></span>{c.name}{scheme === c.id && <Check size={14} />}</button>)}<button onClick={() => notify('Choose a colour scheme file (JSON)')}><Upload size={15} />Import scheme</button></div></div>
@@ -246,6 +249,10 @@ export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, bind
           <div className="dtp-legend"><span><i />Game data 53.9 MB</span><span><i />Kept versions 12.8 MB</span><span><i />Rosters 0.4 MB</span></div>
         </section>
         <section id="dtp-set-keys" className="dtp-card dtp-settings-card"><KeyBindingsEditor bindings={bindings} onBindings={onBindings} /></section>
+        {/* DEC-050 (UX-059): Advanced, opt-in behaviour; off by default. The detail names the key of the menu's Find in catalogue. */}
+        <section id="dtp-set-advanced" className="dtp-card dtp-settings-card"><h2>Advanced</h2>
+          <Switch label="Focus search when opening the catalogue" detail={`Off: Add unit opens the catalogue for browsing. Find in catalogue (${formatCombo('Mod+Shift+F')}) always focuses the search.`} checked={focusSearch} onChange={onFocusSearch} />
+        </section>
         <section id="dtp-set-about" className="dtp-card dtp-settings-card"><h2>About</h2>
           <dl className="dtp-facts four"><div><dt>Version</dt><dd>1.0.0 · desktop preview</dd></div><div><dt>Engine</dt><dd>0.9.4</dd></div><div><dt>Protocol</dt><dd>12</dd></div><div><dt>SQLite</dt><dd>3.46</dd></div></dl>
           <p className="dtp-muted">Game data and rosters stay on this device.</p>
