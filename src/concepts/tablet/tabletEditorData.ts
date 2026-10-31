@@ -1,6 +1,7 @@
 // Synthetic, game-neutral sample data of the tablet roster editor (DEC-001). The roster document, its undo history and the
 // validation rules come from the desktop editor flows; this file adds the catalogue, the sample rosters and the unit detail.
 
+export { catalogueState, type CatalogueState } from '../desktop/DesktopEditorFlows';
 import { primaryForce, specialRoster, type EditorUnit, type Force, type ImportResult, type ReadOnlyInfo } from '../desktop/DesktopEditorFlows';
 import { lookupEntries, rosterLibrary } from '../desktop/desktopData';
 
@@ -14,6 +15,21 @@ export const editorCatalogue: CatalogueEntry[] = [
   { name: 'Support Battery', role: 'Support', models: 3, points: 180, weapon: 'Field cannon' },
   { name: 'Patrol Walker', role: 'Support', models: 1, points: 145, weapon: 'Twin autocannon' },
 ];
+
+/** DEC-050: a faction whose data has many unit roles (the role pills scroll in one row). Synthetic role names. */
+export const manyRoles = ['Command', 'Core', 'Specialist', 'Support', 'Vanguard', 'Heavy support', 'Transport', 'Air', 'Fortification', 'Auxiliary', 'Reserve', 'Allied'];
+export const manyRoleCatalogue: CatalogueEntry[] = [
+  ...editorCatalogue,
+  { name: 'Pathfinder Squad', role: 'Vanguard', models: 5, points: 95, weapon: 'Scout carbine' },
+  { name: 'Siege Battery', role: 'Heavy support', models: 2, points: 210, weapon: 'Siege mortar' },
+  { name: 'Armoured Carrier', role: 'Transport', models: 1, points: 110, weapon: 'Hull repeater' },
+  { name: 'Skimmer Wing', role: 'Air', models: 2, points: 175, weapon: 'Wing lances' },
+  { name: 'Field Bastion', role: 'Fortification', models: 1, points: 130, weapon: 'Fixed emplacement' },
+  { name: 'Militia Levy', role: 'Auxiliary', models: 10, points: 70, weapon: 'Service rifle' },
+  { name: 'Reserve Column', role: 'Reserve', models: 10, points: 100, weapon: 'Service rifle' },
+  { name: 'Allied Lancers', role: 'Allied', models: 5, points: 140, weapon: 'Lance' },
+];
+
 
 const baseUnits = (): EditorUnit[] => [
   { ...editorCatalogue[0], id: 1, upgrade: false },

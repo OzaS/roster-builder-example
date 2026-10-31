@@ -236,3 +236,7 @@
 .tb-compact .tb-main > .tb-page { overflow-y: auto; overscroll-behavior: contain }
 .tb-compact .tb-page > .tb-panes { flex: none; min-height: min(100%, 420px) }
 .tb-compact .tb-page .tb-list.scroll { flex: none; overflow: visible }
+
+/* DEC-050 Elements: state chips with their caption bubble. */
+.tb-el-chips { display: grid; gap: 14px; min-width: 260px }
+.tb-el-chip-line { display: flex; justify-content: flex-end; padding-left: 150px }

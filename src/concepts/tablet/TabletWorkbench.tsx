@@ -15,7 +15,7 @@ import { sampleImport, type ImportResult } from '../desktop/DesktopEditorFlows';
 import { rosterLibrary } from '../desktop/desktopData';
 import { tabletRoute, useTabletSession, TabletJobsPanel, type TabletRoute } from './tabletSession';
 import { TabletEnvContext, makeTabletEnv, useTabletEnv } from './tabletEnv';
-import type { TextScale } from './tabletDevices';
+import type { TabletDeviceId, TextScale } from './tabletDevices';
 import { IconHints } from './TabletHint';
 import { ShortcutOverlay, shortcutGroups, useShortcutOverlay, useShortcuts } from './tabletKeys';
 import './tablet.css';
@@ -29,11 +29,15 @@ type ThemePref = 'system' | 'light' | 'dark';
  * Screens `tablet-<page>` open that page (or a state of one, see `tabletRoute`); `tablet-editor*` open the roster editor
  * (from Home); `tablet-archive-sketch` (and any phone screen the sketch navigates to) shows the earlier three-pane sketch, unchanged.
  */
-const editorScreens: Record<string, EditorStart> = { 'tablet-editor': 'editor', 'tablet-editor-issues': 'issues', 'tablet-editor-add': 'add', 'tablet-editor-forces': 'forces', 'tablet-editor-add-force': 'add-force', 'tablet-editor-readonly': 'readonly', 'tablet-editor-export': 'export', 'tablet-editor-move-unit': 'move-unit' };
+const editorScreens: Record<string, EditorStart> = { 'tablet-editor': 'editor', 'tablet-editor-issues': 'issues', 'tablet-editor-add': 'add', 'tablet-editor-forces': 'forces', 'tablet-editor-add-force': 'add-force', 'tablet-editor-readonly': 'readonly', 'tablet-editor-export': 'export', 'tablet-editor-move-unit': 'move-unit',
+  'tablet-editor-add-roles': 'add-roles', 'tablet-editor-add-focus': 'add-focus', 'tablet-editor-chip-caption': 'chip-caption' };
 
 export function TabletWorkbench(props: Partial<ConceptProps>) {
   const shown: string | undefined = props.workflowScreen;
   // `<screen>-text-200`: that screen at 200% text whatever the gallery's Text size switch says (UX-025).
+  // `tablet-editor-chips-text-150`: the pressed state chip at 150 % in the Android tablet's 300 px catalogue pane (DEC-050; TB-12 saw
+  // the text chip truncate there), whatever the gallery's device and text size.
+  if (shown === 'tablet-editor-chips-text-150') return <TextScaled scale={150} device="android"><TabletWorkbench key={shown} {...props} workflowScreen="tablet-editor-chip-caption" /></TextScaled>;
   const textScale: TextScale | undefined = shown?.endsWith('-text-200') ? 200 : undefined;
   const screen = textScale ? shown?.slice(0, -'-text-200'.length) : shown;
   if (textScale) return <TextScaled scale={textScale}><TabletWorkbench key={shown} {...props} workflowScreen={screen as ConceptProps['workflowScreen']} /></TextScaled>;
@@ -47,9 +51,9 @@ export function TabletWorkbench(props: Partial<ConceptProps>) {
 }
 
 /** Overrides the text size of the gallery switch for the screens that show a fixed size. */
-function TextScaled({ scale, children }: { scale: TextScale; children: ReactNode }) {
+function TextScaled({ scale, device, children }: { scale: TextScale; device?: TabletDeviceId; children: ReactNode }) {
   const env = useTabletEnv();
-  return <TabletEnvContext.Provider value={makeTabletEnv(env.device.id, env.input, scale)}>{children}</TabletEnvContext.Provider>;
+  return <TabletEnvContext.Provider value={makeTabletEnv(device ?? env.device.id, env.input, scale)}>{children}</TabletEnvContext.Provider>;
 }
 
 type OpenEditor = { name: string; from: TabletPage; start: EditorStart; key: number; imported?: ImportResult };
@@ -67,6 +71,8 @@ function TabletShell({ route, initialEditor, initialImport = false, initialShort
   const [themePref, setThemePref] = useState<ThemePref>(props.themePreference ?? props.themeMode ?? 'dark');
   const [light, setLight] = useState(props.themeMode === 'light');
   const [scheme, setScheme] = useState<ColorScheme>(props.colorScheme ?? 'default');
+  // Settings › Advanced (DEC-050, UX-059): Add unit focuses the catalogue's search. Off by default; the gallery's focus state starts it on.
+  const [focusSearch, setFocusSearch] = useState(initialEditor === 'add-focus');
   const toasts = useToasts();
   const appRef = useRef<HTMLDivElement>(null);
   const { notify } = toasts;
@@ -112,7 +118,7 @@ function TabletShell({ route, initialEditor, initialImport = false, initialShort
     data-system={env.device.system} data-motion={experience.reducedMotion ? 'reduce' : 'standard'} data-transparency={experience.reducedTransparency ? 'reduce' : 'standard'}
     style={env.textScale !== 100 ? { zoom: env.textScale / 100 } : undefined}>
     {editor ? <TabletEditor key={editor.key} env={env} notify={notify} light={light} rosterName={editor.name} from={editor.from} start={editor.start}
-      onBack={() => setEditor(null)} onAllRosters={() => { setEditor(null); setPage('rosters'); }} onNewRoster={newRoster} onFindData={() => { setEditor(null); setPage('sources'); }} onImport={() => setImporting(sampleImport(true))} imported={editor.imported} /> : <>
+      onBack={() => setEditor(null)} onAllRosters={() => { setEditor(null); setPage('rosters'); }} onNewRoster={newRoster} onFindData={() => { setEditor(null); setPage('sources'); }} onImport={() => setImporting(sampleImport(true))} imported={editor.imported} focusSearch={focusSearch} /> : <>
     <TabletRail page={page} input={env.input} system={env.device.system} onPage={setPage} onNewRoster={newRoster} />
     <main className="tb-main" aria-label={page}>
       {page === 'home' ? <TabletHome {...shared} onPage={setPage} onNewRoster={newRoster} onOpenRoster={openRoster} />
@@ -121,7 +127,7 @@ function TabletShell({ route, initialEditor, initialImport = false, initialShort
             : page === 'tools' ? <TabletTools />
               : page === 'library' ? <TabletLibrary />
                 : page === 'sources' ? <TabletSources {...shared} onPage={setPage} onOpenRoster={openRoster} />
-                  : <TabletSettings {...shared} themePref={themePref} scheme={scheme} onTheme={chooseTheme} onScheme={chooseScheme} />}
+                  : <TabletSettings {...shared} themePref={themePref} scheme={scheme} onTheme={chooseTheme} onScheme={chooseScheme} focusSearch={focusSearch} onFocusSearch={setFocusSearch} />}
       <TabletJobsPanel session={session} />
     </main></>}
     {importing && <ImportResultSheet result={importing} version="v1.4" onClose={() => setImporting(null)} onOpen={() => {

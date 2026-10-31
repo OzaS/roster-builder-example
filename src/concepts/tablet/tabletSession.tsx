@@ -35,6 +35,7 @@ const stateRoutes: Record<string, TabletRoute> = {
   'tablet-sources-add-collection': { page: 'sources', state: 'add-collection' },
   'tablet-settings-game-data': { page: 'settings', state: 'game-data' },
   'tablet-settings-shortcuts': { page: 'settings', state: 'keys' },
+  'tablet-settings-advanced': { page: 'settings', state: 'advanced' },
   'tablet-settings-appearance-import': { page: 'settings', state: 'appearance-import' },
   'tablet-create': { page: 'home', state: 'create' },
   'tablet-create-review': { page: 'home', state: 'create-review' },
@@ -50,7 +51,7 @@ export function tabletRoute(screen: string | undefined): TabletRoute | undefined
 }
 
 const sourceDetailOf: Record<string, string> = { add: 'add', installing: 'add', 'choose-factions': 'add', 'update-report': 'report:system-two', collection: 'collection:default', github: 'github', 'add-collection': 'add' };
-const settingsSectionOf: Record<string, string> = { 'game-data': 'data', keys: 'keys', 'appearance-import': 'appearance' };
+const settingsSectionOf: Record<string, string> = { 'game-data': 'data', keys: 'keys', 'appearance-import': 'appearance', advanced: 'advanced' };
 /** The first install of the 'installing' and 'choose-factions' states: a source with six factions. */
 const demoInstall = collectionSources[2];
 

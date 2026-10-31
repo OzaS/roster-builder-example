@@ -31,3 +31,9 @@ export const isTextScale = (value: unknown): value is TextScale => textScales.in
 
 export const widthClassOf = (width: number): WidthClass => width < 600 ? 'compact' : width < 840 ? 'medium' : 'expanded';
 export const widthClassLabel: Record<WidthClass, string> = { compact: 'Compact <600', medium: 'Medium 600–839', expanded: 'Expanded ≥840' };
+
+/** Gallery screens drawn on a fixed device and text size whatever the gallery's switches say (DEC-050: the chip at 150 % in the
+ *  Android tablet's 300 px catalogue pane). */
+export const fixedFrames: Record<string, { device: TabletDeviceId; textScale: TextScale }> = {
+  'tablet-editor-chips-text-150': { device: 'android', textScale: 150 },
+};

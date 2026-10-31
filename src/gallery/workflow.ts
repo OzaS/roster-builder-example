@@ -12,6 +12,11 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "tablet-editor-export", label: "Tablet · Roster editor · Export" },
   { id: "tablet-editor-shortcuts", label: "Tablet · Roster editor · Keyboard shortcuts" },
   { id: "tablet-editor-text-200", label: "Tablet · Roster editor · Text 200%" },
+  { id: "tablet-editor-add-roles", label: "Tablet · Roster editor · Many unit roles" },
+  { id: "tablet-editor-add-focus", label: "Tablet · Roster editor · Add unit, search focused" },
+  { id: "tablet-editor-chip-caption", label: "Tablet · Roster editor · State chip caption" },
+  { id: "tablet-editor-chips-text-150", label: "Tablet · Roster editor · State chips, text 150%" },
+  { id: "tablet-settings-advanced", label: "Tablet · Settings · Advanced" },
   { id: "tablet-rosters-text-200", label: "Tablet · Rosters · Text 200%" },
   { id: "tablet-editor-import-result", label: "Tablet · Import result" },
   { id: "tablet-lookup", label: "Tablet · Lookup" },
@@ -105,7 +110,7 @@ export function resolveWorkflow(workflow?: WorkflowScreen[]): Array<{ id: Workfl
 
 export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScreen {
   if (screen === "tablet-archive-sketch") return "overview";
-  if (screen === "tablet-editor" || screen === "tablet-editor-issues" || screen === "tablet-editor-add" || screen === "tablet-editor-forces" || screen === "tablet-editor-add-force" || screen === "tablet-editor-readonly" || screen === "tablet-editor-export" || screen === "tablet-editor-import-result" || screen === "tablet-editor-move-unit" || screen === "tablet-editor-shortcuts" || screen === "tablet-editor-text-200") return "overview";
+  if (screen === "tablet-editor" || screen === "tablet-editor-issues" || screen === "tablet-editor-add" || screen === "tablet-editor-forces" || screen === "tablet-editor-add-force" || screen === "tablet-editor-readonly" || screen === "tablet-editor-export" || screen === "tablet-editor-import-result" || screen === "tablet-editor-move-unit" || screen === "tablet-editor-shortcuts" || screen === "tablet-editor-text-200" || screen === "tablet-editor-add-roles" || screen === "tablet-editor-add-focus" || screen === "tablet-editor-chip-caption" || screen === "tablet-editor-chips-text-150") return "overview";
   if (screen.startsWith("tablet-")) return "library"; // every other tablet screen is a page or a state of one
   if (screen === "tablet-home" || screen === "tablet-rosters" || screen === "tablet-lookup" || screen === "tablet-tools" || screen === "tablet-library" || screen === "tablet-sources" || screen === "tablet-settings") return "library";
   if (screen === "desktop-tools" || screen === "desktop-library") return "library";

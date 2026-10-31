@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { Check, ChevronRight, Database, FolderOpen, HardDrive, Info, Keyboard, Languages, Layers3, Palette, Upload } from 'lucide-react';
+import { Check, ChevronRight, Database, FolderOpen, HardDrive, Info, Keyboard, Languages, Layers3, Palette, SlidersHorizontal, Upload } from 'lucide-react';
 import type { ColorScheme } from '../../types';
 import { Segmented, Switch } from '../workspace/Primitives';
 import { colourSchemes } from '../desktop/desktopData';
@@ -19,12 +19,13 @@ const sections = [
   { id: 'data', label: 'Game data', sub: 'Updates and installation', icon: Database },
   { id: 'storage', label: 'Storage', sub: '67.1 MB used', icon: HardDrive },
   { id: 'keys', label: 'Keyboard shortcuts', sub: 'With a hardware keyboard', icon: Keyboard },
+  { id: 'advanced', label: 'Advanced', sub: 'Catalogue behaviour', icon: SlidersHorizontal },
   { id: 'about', label: 'About', sub: 'Version and licences', icon: Info },
 ] as const;
 
 const Group = ({ title, children }: { title?: string; children: ReactNode }) => <section className="tb-section">{title && <span className="ux-result-label">{title}</span>}{children}</section>;
 
-export function TabletSettings({ env, notify, session, themePref, scheme, onTheme, onScheme }: SessionProps & { themePref: ThemePref; scheme: ColorScheme; onTheme: (t: ThemePref) => void; onScheme: (s: ColorScheme) => void }) {
+export function TabletSettings({ env, notify, session, themePref, scheme, onTheme, onScheme, focusSearch, onFocusSearch }: SessionProps & { themePref: ThemePref; scheme: ColorScheme; onTheme: (t: ThemePref) => void; onScheme: (s: ColorScheme) => void; focusSearch: boolean; onFocusSearch: (on: boolean) => void }) {
   const { experience, choose } = useTabletExperience();
   const { light, advancedInstall, setAdvancedInstall, settingsSection, setSettingsSection, language, setLanguage, setAppearanceImport } = session;
   const [open, setOpen] = useState(settingsSection !== undefined);
@@ -65,6 +66,11 @@ export function TabletSettings({ env, notify, session, themePref, scheme, onThem
         <p className="tb-note"><Keyboard size={15} /><span>These shortcuts work with a hardware keyboard. {env.device.system === 'ios' ? 'Hold ⌘ to see them anywhere.' : 'Press Ctrl + / to see them anywhere.'} They are fixed; the key bindings editor is part of the desktop app.</span></p>
         {[generalShortcuts, editorShortcuts].map(group => <Group key={group.title} title={group.title}><div className="ux-src-group">{group.items.map(a => <div className="ux-src-kv tb-key-row" key={a.combo}><span>{a.label}</span><kbd className="tb-kbd">{keyLabel(a.combo, env.device.system)}</kbd></div>)}</div></Group>)}
       </>;
+      // DEC-050 (UX-059): Settings › Advanced, a new section for opt-in behaviour. Off keeps the catalogue for browsing (no keyboard over the list).
+      case 'advanced': return <WorkspaceScope light={light}>
+        <div className="ux-src-group tb-switches"><Switch label="Focus search when opening the catalogue" detail={`Off: Add unit opens the catalogue for browsing. ${keyLabel('Mod+F', env.device.system)} on a keyboard always focuses the search.`} checked={focusSearch} onChange={onFocusSearch} /></div>
+        <p className="tb-note"><Info size={15} />{focusSearch ? 'Add unit opens the catalogue with the search focused, so the on-screen keyboard appears at once.' : 'Add unit opens the catalogue without the on-screen keyboard, so the whole list stays in view.'}</p>
+      </WorkspaceScope>;
       default: return <>
         <Facts rows={[['Version', '1.0.0 · tablet preview'], ['Engine', '0.9.4'], ['Protocol', '12'], ['SQLite', '3.46']]} />
         <Row selected={false} title="Open source licences" sub="Libraries this app is built with" end={<ChevronRight size={17} />} onClick={() => notify('Licences (prototype)')} />
