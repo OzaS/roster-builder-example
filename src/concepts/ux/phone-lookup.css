@@ -1,0 +1,89 @@
+/* Lookup 1.0 (phone): search, system chips, foldable result sections and the read-only reference page. */
+.ux-wb-home-body.ux-lk-body { display: flex; flex-direction: column; gap: 10px }
+.ux-lk-body > * { flex-shrink: 0 }
+.ux-lk-clear { display: inline-grid; place-items: center; width: 44px; height: 44px; margin-right: -14px; border: 0; background: none; color: var(--ux-muted); cursor: pointer }
+.ux-lk-results, .ux-lk-rows { display: grid; gap: 8px }
+.ux-lk-results { gap: 4px }
+.ux-lk-section { display: grid; gap: 8px }
+.ux-lk-section:not(.folded) + .ux-lk-section { margin-top: 6px }
+.ux-lk-section:not(.folded) + .ux-lk-section.folded { margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--ux-line) }
+.ux-lk-section h3 { margin: 0 }
+.ux-lk-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 44px; padding: 4px 4px; border: 0; background: none; color: var(--ux-ink); text-align: left; cursor: pointer }
+.ux-lk-head > span { display: grid; gap: 1px; min-width: 0 }
+.ux-lk-head-title { display: flex; gap: 6px; align-items: baseline; font-size: 13px; font-weight: 800 }
+.ux-lk-head-title > span { color: var(--ux-muted) }
+.ux-lk-head small { overflow: hidden; color: var(--ux-muted); font-size: 12px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap }
+.ux-lk-head > svg { flex: none; color: var(--ux-muted) }
+.ux-lk-head:focus-visible, .ux-lk-row:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px }
+.ux-lk-row { width: 100%; font: inherit }
+.ux-lk-row .ux-lf-tag { white-space: nowrap }
+.ux-lk-hint { margin: 4px 4px 6px; color: var(--ux-muted); font-size: 13px; line-height: 1.45 }
+.ux-lk-recent-head { display: flex; align-items: center; gap: 6px; margin: 4px 4px 0; color: var(--ux-ink); font-size: 13px; font-weight: 800 }
+.ux-lk-start { display: grid; gap: 8px }
+.ux-lk-empty .ux-job-btn { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px }
+
+/* Reference page: pushed over Lookup (and its tab bar). */
+.ux-lk-page { position: absolute; inset: 0; z-index: 40; display: flex; flex-direction: column; background: var(--ux-bg) }
+.ux-lk-detail { gap: 10px }
+.ux-lk-title { display: grid; gap: 2px; min-width: 0 }
+.ux-lk-title h2 { margin: 0; font-size: 24px; line-height: 1.2; overflow-wrap: anywhere }
+.ux-mobile-unit-options .ux-lk-kind { color: var(--ux-accent-2); font-size: 12px; font-weight: 700 }
+.ux-lk-cost { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 6px 0 0 }
+.ux-lk-cost strong { color: var(--ux-accent-2); font-size: 20px; font-variant-numeric: tabular-nums }
+.ux-lk-cond svg { color: var(--ux-accent-2) !important }
+.ux-lk-cond > span { display: grid; gap: 2px }
+.ux-lk-layout { gap: 0 !important }
+.ux-lk-models { padding-bottom: 8px; font-size: 16px }
+.ux-lk-line { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding: 6px 0; border-top: 1px solid var(--ux-line) }
+.ux-lk-line b, .ux-lk-link-row b, .ux-lk-range { color: var(--ux-accent-2); font-size: 14px; font-variant-numeric: tabular-nums; white-space: nowrap }
+.ux-mobile-unit-options .ux-lk-limits { padding-top: 8px; border-top: 1px solid var(--ux-line) }
+.ux-lk-link-row > svg { color: var(--ux-muted) !important }
+.ux-lk-text { margin: 0; font-size: 14px; line-height: 1.5 }
+.ux-lk-rule-open { display: grid; gap: 2px; padding: 0 0 6px }
+.ux-lk-rule-card { gap: 4px !important; padding-top: 6px !important }
+.ux-lk-rule-card > .ux-5a-choice { border-top: 0 !important }
+.ux-lk-rule-card p { margin: 0; font-size: 14px; line-height: 1.5 }
+.ux-mobile-unit-options .ux-lk-foot { margin-top: 6px; color: var(--ux-ink-tertiary) }
+
+/* Elements view sample: the phone Lookup in a phone-sized box. */
+.ux-lk-element { position: relative; display: flex; flex-direction: column; width: 100%; max-width: 390px; height: 600px; overflow: hidden; border: 1px solid var(--ux-line); border-radius: 16px; background: var(--ux-bg) }
+.ux-lk-detail .ux-5a-card > div:first-child > .ux-5a-choice:first-child { border-top: 0 !important }
+
+/* Filters behind a tab under the search: a divider with a tab hanging at its trailing end. */
+.ux-lk-rule { display: flex; justify-content: flex-end; margin: 0 2px; border-top: 1px solid var(--ux-line) }
+.ux-lk-tab { position: relative; display: grid; place-items: center; width: 52px; height: 28px; margin: -1px 10px 0 0; padding: 0; border: 1px solid var(--ux-line); border-top: 0; border-radius: 0 0 12px 12px; background: var(--ux-surface); color: var(--ux-muted); cursor: pointer }
+.ux-lk-tab::after { content: ""; position: absolute; inset: -8px -4px }
+.ux-lk-tab.active { border-color: var(--ux-accent); background: var(--ux-accent); color: var(--ux-accent-ink) }
+.ux-lk-tab:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px }
+
+/* Force schema. */
+.ux-lk-schema-wrap { display: grid; gap: 14px }
+.ux-lk-schema { display: flex; flex-wrap: wrap; gap: 18px 22px; padding-top: 6px }
+.ux-lk-slotgroup { display: grid; justify-items: start; gap: 8px; max-width: 100% }
+.ux-lk-rings { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 6px }
+.ux-lk-ring { position: relative; display: inline-grid; place-items: center; width: 40px; height: 40px; box-sizing: border-box; border: 2px solid color-mix(in srgb, var(--ux-muted) 70%, transparent); border-radius: 50%; color: var(--ux-muted) }
+.ux-lk-ring.req { border: 3px solid var(--ux-accent); color: var(--ux-ink) }
+.ux-lk-ring.req::before { content: ""; position: absolute; inset: -9px; border-radius: 50%; background: repeating-conic-gradient(from -9deg, var(--ux-accent) 0 18deg, transparent 18deg 90deg); -webkit-mask: radial-gradient(circle closest-side, transparent 72%, #000 73%); mask: radial-gradient(circle closest-side, transparent 72%, #000 73%); clip-path: polygon(50% 0, 60% 22%, 78% 22%, 78% 40%, 100% 50%, 78% 60%, 78% 78%, 60% 78%, 50% 100%, 40% 78%, 22% 78%, 22% 60%, 0 50%, 22% 40%, 22% 22%, 40% 22%) }
+.ux-lk-ring.mini { width: 16px; height: 16px; border-width: 2px }
+.ux-lk-ring.req.mini::before { inset: -5px }
+.ux-lk-more { padding: 4px 10px; border-radius: 999px; background: var(--ux-surface-2); color: var(--ux-ink); font-size: 13px; font-weight: 750 }
+.ux-lk-slotname { display: flex; gap: 6px; align-items: baseline; padding-left: 4px }
+.ux-lk-slotname strong { font-size: 14px }
+.ux-mobile-unit-options .ux-lk-slotname small { color: var(--ux-accent-2); font-weight: 750; font-variant-numeric: tabular-nums }
+.ux-lk-legend { display: flex; gap: 16px; padding-top: 10px; border-top: 1px solid var(--ux-line); color: var(--ux-ink-secondary); font-size: 12px }
+.ux-lk-legend > span { display: inline-flex; align-items: center; gap: 8px }
+.ux-lk-list > .ux-5a-choice:first-child { border-top: 0 !important }
+.ux-lk-link-row .ux-lf-tag { flex: none }
+
+/* Tablet and desktop: the reference content inside a detail pane or card. */
+.ux-mobile-unit-options.ux-lk-pane { flex: none; padding: 0; overflow: visible; background: transparent }
+.ux-lk-pane-back { display: inline-flex; align-items: center; gap: 2px; align-self: flex-start; min-height: 44px; margin-left: -6px; color: var(--ux-accent) !important; font-size: 15px }
+.ux-lk-pane-back span { max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.tb-lookup10 .ux-lk-results { align-content: start }
+.dtp-lookup10 .ux-lk-results { display: grid; gap: 4px; padding: 6px 10px 12px }
+.dtp-lookup10 .ux-lk-head { min-height: 36px }
+.dtp-lookup10 .dtp-result .ux-ro-list-trailing { flex: none }
+.dt-app .dtp-lookup10 .ux-lk-head { justify-content: space-between; width: 100%; text-align: left }
+.dt-app .dtp-lookup10 .ux-lk-head > span { flex: 1 }
+.dt-app .dtp-lookup10 .dtp-result { overflow: hidden }
+.dt-app .dtp-lookup10 .dtp-result .ux-ro-list-trailing { flex: none; padding-right: 2px }

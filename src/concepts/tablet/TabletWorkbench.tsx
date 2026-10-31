@@ -5,6 +5,7 @@ import { CodexWorkbench } from '../ux/CodexWorkbench';
 import { ToastRegion, useToasts } from '../workspace/Toasts';
 import { TabletRail, railTop, type TabletPage } from './TabletRail';
 import { TabletHome, TabletLibrary, TabletLookup, TabletRosters, TabletTools } from './TabletPages';
+import { TabletLookup10 } from './TabletLookup10';
 import { TabletSources } from './TabletSources';
 import { TabletSettings } from './TabletSettings';
 import { TabletEditor, type EditorStart } from './TabletEditor';
@@ -113,7 +114,7 @@ function TabletShell({ route, initialEditor, initialImport = false, initialShort
     <main className="tb-main" aria-label={page}>
       {page === 'home' ? <TabletHome {...shared} onPage={setPage} onNewRoster={newRoster} onOpenRoster={openRoster} />
         : page === 'rosters' ? <TabletRosters {...shared} onNewRoster={newRoster} onOpenRoster={openRoster} />
-          : page === 'lookup' ? <TabletLookup {...shared} onAddData={addData} />
+          : page === 'lookup' ? route.state.startsWith('v1') ? <TabletLookup10 {...shared} onAddData={addData} initial={route.state === 'v1-force' ? 'f-line-of-battle' : undefined} /> : <TabletLookup {...shared} onAddData={addData} />
             : page === 'tools' ? <TabletTools />
               : page === 'library' ? <TabletLibrary />
                 : page === 'sources' ? <TabletSources {...shared} onPage={setPage} onOpenRoster={openRoster} />

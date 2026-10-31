@@ -1,4 +1,6 @@
 import { PhoneListsFilters } from "../concepts/ux/PhoneListsFilters";
+import { LookupEntryBody, PhoneLookup } from "../concepts/ux/PhoneLookup";
+import { lookupById } from "../data/lookupData";
 import { DesktopElements } from "../concepts/desktop/DesktopWorkbench";
 import { TabletElements } from "../concepts/tablet/TabletElements";
 import { LibrarySwitch } from "./LibrarySwitch";
@@ -557,6 +559,11 @@ function WorkbenchElements({
             <ChevronRight size={16} />
           </button>
         </div>
+      </ElementSection>
+
+      <ElementSection title="Lookup 1.0 · Grouped Results and Reference Page">
+        <div className="ux-lk-element"><PhoneLookup /></div>
+        <section className="ux-mobile-unit-options compact ux-lk-detail"><LookupEntryBody entity={lookupById("d-line-formation")!} onOpen={() => undefined} /></section>
       </ElementSection>
 
       <ElementSection title="Lookup & Sources">

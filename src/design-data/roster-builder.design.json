@@ -70,6 +70,42 @@
           "label": "Lookup"
         },
         {
+          "id": "lookup-results",
+          "label": "Lookup 1.0 · Results, grouped"
+        },
+        {
+          "id": "lookup-start",
+          "label": "Lookup 1.0 · Before a search"
+        },
+        {
+          "id": "lookup-no-results",
+          "label": "Lookup 1.0 · No results"
+        },
+        {
+          "id": "lookup-no-data",
+          "label": "Lookup 1.0 · No game data"
+        },
+        {
+          "id": "lookup-unit",
+          "label": "Lookup 1.0 · Unit"
+        },
+        {
+          "id": "lookup-force",
+          "label": "Lookup 1.0 · Force"
+        },
+        {
+          "id": "lookup-detachment",
+          "label": "Lookup 1.0 · Detachment"
+        },
+        {
+          "id": "lookup-upgrade",
+          "label": "Lookup 1.0 · Upgrade"
+        },
+        {
+          "id": "lookup-rule",
+          "label": "Lookup 1.0 · Rule"
+        },
+        {
           "id": "tools",
           "label": "Tools"
         },
@@ -197,6 +233,21 @@
           ]
         },
         {
+          "id": "lookup",
+          "label": "Lookup 1.0",
+          "screens": [
+            "lookup-results",
+            "lookup-start",
+            "lookup-no-results",
+            "lookup-no-data",
+            "lookup-unit",
+            "lookup-force",
+            "lookup-detachment",
+            "lookup-upgrade",
+            "lookup-rule"
+          ]
+        },
+        {
           "id": "unsorted",
           "label": "Unsorted",
           "screens": []
@@ -270,6 +321,7 @@
               { "id": "roster.data-tags", "title": "Roster Data Tags", "level": "primitive", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["changed-by-update", "faction-removed", "source-removed", "needs-attention-filter"], "screens": ["roster-read-only"], "reactNative": { "component": "Chip (ds) on Lists rows (rosterDataTag)", "behavior": "Built in battle-augur plan 2G part 1: Lists rows show the name, factions · system, \"Opened {when}\" / \"Changed {when}\" (relative), the points and the tag: Changed by update (info, circle-arrow-up) or Faction removed / Source removed (neutral, archive); Source removed replaces the earlier Data not installed chip. A Needs attention chip in the filter row (TFB-005; earlier a separate pill above Recent) shows only tagged rosters when there are any. The same tag sits in the roster's chip row. Tags clear when the roster is edited with the new data or its version is switched back.", "accessibility": "Icon plus word on every tag (VA-2)." } },
               { "id": "smart-search.main", "title": "Smart Search", "level": "screen-composition", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["idle", "searching", "results", "empty", "offline", "error"], "screens": ["smart-search"], "reactNative": { "component": "SmartSearchScreen", "behavior": "Debounce queries, cancel stale requests, and preserve scope filters.", "accessibility": "Announce result counts and async failures without stealing focus." } },
               { "id": "lookup.sources", "title": "Lookup & Sources", "level": "screen-composition", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["results", "empty", "importing", "offline", "error"], "screens": ["source"], "reactNative": { "component": "LookupScreen", "behavior": "Support local results while offline and report import progress.", "accessibility": "Group results by type and announce import status." } },
+              { "id": "lookup.phone-1-0", "title": "Lookup 1.0 · Grouped Results and Reference Page", "level": "screen-composition", "status": "needs-review", "platforms": ["phone"], "states": ["search field, then a divider with a filter tab at its trailing end; the tab shows the system chips (All n, one chip per installed system with its result count; several can be chosen) and turns to a chevron-up; closed with a filter on, the tab is accent-filled; only with two or more systems", "four result sections with a count in the header: Units, Forces & detachments, Upgrades, Rules; empty sections are left out", "Units start open on top; the others start folded with a one-line preview of the names; folded sections always sort below the open ones, fixed group order inside each part", "no units: the first group with results opens instead; fold state lasts for the search and clearing the field resets it", "row: name, kind line (role and size, or the entry type), source line (factions, plus the system when several systems are searched), base cost, Conditional tag (D10)", "a shared entry is one row listing its factions (“4 factions” when more than two); separate entries with the same name are separate rows told apart by the source line", "before a search: hint and Recently viewed; no results: Search all systems when filtered; no game data: Add game data", "reference page pushed over Lookup, Back names where it returns: header kind · summary, name, factions · system version, base cost with its note", "unit: Layout (model range, models with counts and costs, limits), Profiles tables, Rules expanding in place, Options as folded read-only groups with limits and costs (an upgrade opens its page), Categories", "force and detachment: rules with full text, Layout as a schema after printed force charts (one ring per slot grouped by category with its range; required slots heavy spiked rings, optional thin rings; over 6 a +n pill, no maximum +∞; a legend), no unit examples; a force lists its Detachments, a detachment names the force it is Part of; slot icons: each system's categories sorted by name take a neutral icon set in order, the name always printed", "upgrade: profiles, description, rules, Taken by (unit, cost and limit there); rule: text and Used by", "conditional entries: Conditional notice in plain words; costs are the data's base values and never an invented roster value"], "screens": ["lookup-results", "lookup-start", "lookup-no-results", "lookup-no-data", "lookup-unit", "lookup-force", "lookup-detachment", "lookup-upgrade", "lookup-rule"], "reactNative": { "component": "LookupScreen + LookupResultSection + LookupEntryScreen (app-core lookup store, worker query)", "behavior": "Name search runs in the worker (DEC-018), bounded and cancellable; results grouped by kind. Detail is a pushed route with its own back stack; opening a linked entry pushes another page.", "accessibility": "Section headers are headers with expanded state and spoken counts; rows speak name, kind, source, cost and Conditional; the result count is announced as the query changes. "}},
               { "id": "tools.workflow", "title": "Tools Workflow", "level": "screen-composition", "status": "specified", "platforms": ["phone", "tablet"], "states": ["default", "empty", "active"], "screens": ["tools", "roster-analytics", "comparison", "game-tracker", "dice-simulator"], "reactNative": { "component": "ToolsNavigator", "behavior": "Use nested navigation with restorable tool state.", "accessibility": "Provide text alternatives for charts and dice results." } },
               { "id": "lists.roster-import", "title": "Roster Import", "level": "composite", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["idle", "importing", "imported", "imported-with-gaps", "data-missing", "not-a-roster"], "screens": ["library", "library-v2"], "reactNative": { "component": "ListsImportAction", "behavior": "Lists header action: pick a New Recruit JSON file, import it in the engine worker, then open the roster; report unmatched parts without blocking, and send missing data to Sources. .ros/.rosz import comes later.", "accessibility": "Name the action, mark it busy while importing, and announce the result notice." } },
               { "id": "roster.export-sheet", "title": "Export Sheet", "level": "composite", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["loading", "preview", "has-errors", "copied", "failed", "stored", "stored-no-snapshot"], "screens": ["export"], "reactNative": { "component": "ExportRosterSheet", "behavior": "Sheet from the roster header: pick New Recruit JSON or text, preview the export (truncated for long texts), then Share (JSON as a file) or Copy. A roster with errors can still be exported; a banner says so. .ros/.rosz and more layouts come later. Stored mode (built in battle-augur plan 2G part 1; Export on a roster without its data, Export as it was on a changed one): title Export roster with \"{name} · read only\" below, three radio rows: Battle Augur roster file (\"The roster as stored. It opens fully once the data is back.\", always), Text and New Recruit JSON (\"As last saved {relative date}\" from the saved snapshot, else disabled with \"Needs the game data\"), then the preview, Copy and Share.", "accessibility": "Label the format control, keep the preview selectable, and announce the copied toast." } },
@@ -368,6 +420,8 @@
         { "id": "tablet-rosters-text-200", "label": "Rosters · Text 200%" },
         { "id": "tablet-editor-import-result", "label": "Roster editor · Import result" },
         { "id": "tablet-lookup", "label": "Lookup · Search and entry" },
+        { "id": "tablet-lookup-1-0", "label": "Lookup 1.0 · Grouped results and detail" },
+        { "id": "tablet-lookup-1-0-force", "label": "Lookup 1.0 · Force" },
         { "id": "tablet-tools", "label": "Tools · Coming soon" },
         { "id": "tablet-library", "label": "Library · Coming soon" },
         { "id": "tablet-sources", "label": "Sources · Installed data" },
@@ -408,6 +462,8 @@
             "tablet-rosters-empty",
             "tablet-rosters-text-200",
             "tablet-lookup",
+            "tablet-lookup-1-0",
+            "tablet-lookup-1-0-force",
             "tablet-tools",
             "tablet-library",
             "tablet-sources",
@@ -458,6 +514,7 @@
             "sections": [
               {"id": "tablet.rail", "title": "Tablet Rail", "level": "navigation", "status": "needs-review", "platforms": ["tablet"], "states": ["Android: New roster as an icon-only FAB on top (Material 3 rail: 56 px, tonal, no shadow, top-aligned with the content)", "iPad (HIG, TB-00 review 2026-10-26): no New roster on the rail; it sits at the trailing edge of the Home and Rosters toolbars, ⌘N everywhere", "Home, Rosters, Lookup, Tools, Library", "Sources and Settings pinned to the bottom", "labels under icons", "pill indicator behind the active icon and aria-current", "keyboard focus ring", "hint on every item: title in Pointer mode, press and hold in Touch mode", "targets of 48 px and more", "Rosters and Library use different icons; App foundation: logical height below 480 dp falls back to phone tabs; preserve the current page when the bar changes; App foundation: screen-reader hints; visible long-press hint bubbles remain to implement"], "screens": ["tablet-home", "tablet-rosters", "tablet-lookup", "tablet-tools", "tablet-library", "tablet-sources", "tablet-settings"]},
               {"id": "tablet.panes", "title": "List and Detail Panes", "level": "screen-composition", "status": "needs-review", "platforms": ["tablet"], "states": ["list and detail (Expanded and Medium)", "list only with a note, detail opens over the list (split view)", "selected row", "touch rows (72 px) and pointer rows (64 px)", "pointer hover state", "TFB-008: a page heading sits above both panes (Sources' Installed), so the first list card and the detail card share their top edge, as on Rosters and Settings"], "screens": ["tablet-rosters", "tablet-lookup", "tablet-sources", "tablet-settings"]},
+              {"id": "tablet.lookup-1-0", "title": "Lookup 1.0 · Grouped Results and Detail Pane", "level": "screen-composition", "status": "needs-review", "platforms": ["tablet"], "states": ["the earlier page: search toolbar, chip row, list and detail panes", "system chips: All n and one per installed system with its count; several can be chosen; always visible on tablet", "list: the phone's four foldable sections with counts; Units open on top, folded sections sort below the open ones; rows with kind, source line, base cost and Conditional tag", "detail pane: the phone's reference content; links push onto the pane's own stack and Back names the previous entry; choosing a result in the list starts a new stack", "split view: the detail opens over the list, as on the other list and detail pages"], "screens": ["tablet-lookup-1-0", "tablet-lookup-1-0-force"]},
               {"id": "tablet.home", "title": "Home Quick Start", "level": "screen-composition", "status": "needs-review", "platforms": ["tablet"], "states": ["continue roster", "new roster", "recent rosters", "data status with update", "update running", "first run (no game data)", "game data and no rosters", "iPad: New roster at the trailing edge of the toolbar once there is game data, and not in the Continue card (Android: the rail FAB and the Continue card)", "TB-02: per-source installed versions, Update and Show progress; real default-collection install rows in the app; collection loading, cached offline, failure and hidden states; All jobs remains reachable after the first installation changes Home state", "TFB-001: Game data shows at most four game systems, most used first (most rosters, then the latest roster activity, then name; never install order); More (N) with an accessible name and hint opens Sources with the rest", "TFB-002: widgets keep their places in the page and each scrolls its own content; Game data and Recent rosters take the spare height; below 520 px of page (larger text, short windows) and in compact windows the page scrolls as a whole; pull to refresh stays on the page"], "screens": ["tablet-home", "tablet-home-first-run", "tablet-home-no-rosters", "tablet-home-many-systems"]},
               {"id": "tablet.home-widgets", "title": "Home Widgets (fixed, inner scrolling)", "level": "screen-composition", "status": "needs-review", "platforms": ["tablet"], "states": ["Expanded: main column (Continue, Recent rosters) beside the side column (Game data, On this device)", "Medium: main cards over a row of side cards, three fifths and two fifths of the height", "summary cards keep their natural height; filling widgets scroll inside", "Game data: four most used systems and More (N) to Sources", "page scrolls as a whole below 520 px of page or in compact windows"], "screens": ["tablet-home", "tablet-home-many-systems"]},
               {"id": "tablet.empty-state", "title": "Empty State Card", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["icon, title, one line and the way forward", "first run on Home (no game data) with install rows", "no rosters on Home and on Rosters", "nothing to look up without game data", "no match, with Clear filters"], "screens": ["tablet-home-first-run", "tablet-home-no-rosters", "tablet-rosters-empty", "tablet-rosters-search"]},
@@ -543,6 +600,14 @@
           "label": "Lookup · Search and entry"
         },
         {
+          "id": "desktop-lookup-1-0",
+          "label": "Lookup 1.0 · Grouped results and entry"
+        },
+        {
+          "id": "desktop-lookup-1-0-force",
+          "label": "Lookup 1.0 · Force"
+        },
+        {
           "id": "desktop-tools",
           "label": "Tools · Coming soon"
         },
@@ -576,6 +641,8 @@
             "desktop-editor",
             "desktop-rosters",
             "desktop-lookup",
+            "desktop-lookup-1-0",
+            "desktop-lookup-1-0-force",
             "desktop-tools",
             "desktop-library",
             "desktop-sources",
@@ -889,6 +956,15 @@
                 "platforms": ["desktop"],
                 "states": ["grouped results", "scope chips", "no results", "unit", "rule", "equipment", "conditional cost", "in your rosters"],
                 "screens": ["desktop-lookup"]
+              },
+              {
+                "id": "desktop.lookup-1-0",
+                "title": "Lookup 1.0 · Grouped Results and Entry",
+                "level": "screen-composition",
+                "status": "needs-review",
+                "platforms": ["desktop"],
+                "states": ["the earlier page: large search, chip row with the result count, results card and entry card", "system chips: All n and one per installed system with its count; several can be chosen; always visible", "results in the phone's four foldable sections (Units, Forces & detachments, Upgrades, Rules) with counts; Units open on top, folded sections sort below the open ones", "row: name, kind and source on one line, base cost, Conditional tag (D10)", "entry card: the phone's reference content (unit layout, profiles, rules, read-only options, categories; force and detachment schema; upgrade Taken by; rule Used by)", "links in the entry card push onto its own stack; Back names the previous entry, Alt+Left returns; choosing a result starts a new stack", "no results with Search all systems when filtered"],
+                "screens": ["desktop-lookup-1-0", "desktop-lookup-1-0-force"]
               },
               {
                 "id": "desktop.sources",
