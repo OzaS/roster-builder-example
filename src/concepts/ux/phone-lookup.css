@@ -96,3 +96,10 @@
 .dt-app .dtp-lookup10 .ux-lk-head > span { flex: 1 }
 .dt-app .dtp-lookup10 .dtp-result { overflow: hidden }
 .dt-app .dtp-lookup10 .dtp-result .ux-ro-list-trailing { flex: none; padding-right: 2px }
+
+/* Phone reference: Back, entry name and base cost stay together in the sticky top bar. */
+.ux-mobile-unit-options > .ux-lk-phone-top { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 8px; min-height: 60px; padding: 8px 12px; box-sizing: border-box }
+.ux-lk-phone-top button { display: grid; place-items: center; width: 44px; padding: 0; color: var(--ux-accent) }
+.ux-lk-phone-top h2 { margin: 0; min-width: 0; font-size: 17px; line-height: 1.25; overflow-wrap: anywhere }
+.ux-lk-phone-top .ux-lk-base-cost { font-size: 17px }
+.ux-lk-phone-top button:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: -2px; border-radius: 22px }

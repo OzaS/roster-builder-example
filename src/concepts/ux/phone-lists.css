@@ -41,3 +41,6 @@
 .ux-lf-always .ux-lf-chip { border-radius: 24px }
 .ux-lf-always .ux-lf-chip:focus-visible { outline-offset: -3px }
 .ux-lf-roster { width: 100%; text-align: left; font: inherit; color: var(--ux-ink); cursor: pointer }
+
+/* Adjacent 44 pt targets, with no extra space between Clear and Close. */
+.ux-phone-search-actions { display: flex; flex: none; align-items: center; gap: 0 }

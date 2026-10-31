@@ -1,6 +1,6 @@
 import { PhoneSearchHeader } from "../concepts/ux/PhoneSearchHeader";
 import { PhoneListsFilters } from "../concepts/ux/PhoneListsFilters";
-import { LookupEntryBody, PhoneLookup } from "../concepts/ux/PhoneLookup";
+import { LookupEntryBody, LookupEntryPage, PhoneLookup } from "../concepts/ux/PhoneLookup";
 import { lookupById } from "../data/lookupData";
 import { DesktopElements } from "../concepts/desktop/DesktopWorkbench";
 import { TabletElements } from "../concepts/tablet/TabletElements";
@@ -568,6 +568,7 @@ function WorkbenchElements({
       </ElementSection>
 
       <ElementSection title="Lookup Compact Unit Reference">
+        <div className="ux-lk-element"><LookupEntryPage entity={lookupById("u-line-fc")!} back="Lookup" onBack={() => undefined} onOpen={() => undefined} /></div>
         <section className="ux-mobile-unit-options compact ux-lk-detail"><LookupEntryBody entity={lookupById("u-line-fc")!} onOpen={() => undefined} /></section>
       </ElementSection>
 

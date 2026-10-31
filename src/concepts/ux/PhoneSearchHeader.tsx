@@ -17,8 +17,10 @@ export function PhoneSearchHeader({ title, subtitle, query, onQueryChange, place
       <Search size={19} aria-hidden />
       <input ref={inputRef} type="search" autoFocus value={query} aria-label={placeholder} placeholder={placeholder}
         onChange={event => onQueryChange(event.currentTarget.value)} onKeyDown={event => { if (event.key === 'Escape') { event.preventDefault(); close(); } }} />
+      <span className="ux-phone-search-actions">
       {query && <button type="button" aria-label="Clear search" title="Clear search" onClick={() => { onQueryChange(''); inputRef.current?.focus(); }}><Eraser size={18} aria-hidden /></button>}
       <button type="button" className="ux-phone-search-close" aria-label="Close search" title="Close search" onClick={close}><X size={20} aria-hidden /></button>
+      </span>
     </div> : <>
       <div className="ux-wb-title"><strong>{title}</strong>{subtitle && <small>{subtitle}</small>}</div>
       {searchable && <button ref={toggleRef} type="button" className={`ux-icon-btn ux-phone-search-toggle ${query ? 'active' : ''}`}

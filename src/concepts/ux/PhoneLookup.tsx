@@ -79,19 +79,22 @@ export function LookupSection({ label, count, names, folded, onToggle, children 
 export function LookupEntryPage({ entity: e, back, onBack, onOpen }: { entity: LookupEntity; back: string; onBack: () => void; onOpen: (id: string) => void }) {
   const kind = kindLabel(e);
   return <section className="ux-mobile-unit-options ux-lk-detail" aria-label={`${kind}: ${e.name}`}>
-    <header className="ux-5a-header ux-nested-back ios"><button type="button" onClick={onBack} aria-label={`Back to ${back}`}><ChevronLeft size={24} /><span>{back}</span></button></header>
-    <LookupEntryBody entity={e} onOpen={onOpen} />
+    <header className="ux-5a-header ux-lk-phone-top">
+      <button type="button" onClick={onBack} aria-label={`Back to ${back}`} title={`Back to ${back}`}><ChevronLeft size={24} aria-hidden /></button>
+      <h2>{e.name}</h2>{e.cost ? <strong className="ux-lk-base-cost">{e.cost}</strong> : null}
+    </header>
+    <LookupEntryBody entity={e} onOpen={onOpen} showHeading={false} />
   </section>;
 }
 
 /** The reference content, shared by the phone page and the tablet/desktop detail panes. */
-export function LookupEntryBody({ entity: e, onOpen }: { entity: LookupEntity; onOpen: (id: string) => void }) {
+export function LookupEntryBody({ entity: e, onOpen, showHeading = true }: { entity: LookupEntity; onOpen: (id: string) => void; showHeading?: boolean }) {
   const kind = kindLabel(e);
   // The model range belongs to Layout; do not repeat it in the reference heading.
   const summary = e.layout ? e.summary.split(" · ").filter(part => part !== e.layout?.models).join(" · ") : e.summary;
   return <>
     <div className="ux-lk-title">
-      <div className="ux-lk-heading"><h2>{e.name}</h2>{e.cost ? <strong className="ux-lk-base-cost">{e.cost}</strong> : null}</div>
+      {showHeading ? <div className="ux-lk-heading"><h2>{e.name}</h2>{e.cost ? <strong className="ux-lk-base-cost">{e.cost}</strong> : null}</div> : null}
       <small className="ux-lk-kind">{summary.startsWith(kind) ? summary : `${kind} · ${summary}`}</small>
       <small>{factionLabel(e)} · {e.system} {systemVersion(e.system)}</small>
       {e.cost && e.costNote ? <small className="ux-lk-cost-note">{e.costNote}</small> : null}
