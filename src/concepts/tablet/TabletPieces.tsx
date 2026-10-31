@@ -45,8 +45,11 @@ export function ListDetail({ env, label, list, detail, open, onClose }: { env: T
 export const SearchField = ({ value, onChange, label, placeholder }: { value: string; onChange: (v: string) => void; label: string; placeholder: string }) =>
   <label className="ux-search tb-search"><Search size={16} /><input value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} aria-label={label} /></label>;
 
-export const Row = ({ selected, onClick, mark, title, sub, end, foot }: { selected: boolean; onClick: () => void; mark?: ReactNode; title: string; sub: string; end?: ReactNode; foot?: ReactNode }) =>
-  <button type="button" className={`ux-list-card tb-row ${selected ? 'selected' : ''}`} aria-current={selected ? 'true' : undefined} onClick={onClick}>
+/** The shared tablet pane row (C-07, DEC-050) of Sources, Rosters and Settings: a 40 px mark or tile, a one-line bold title
+ *  with an ellipsis, one secondary line, the trailing end (chip, points, chevron); 72 px tall on touch, 64 with a pointer;
+ *  selected: accent border and tint. `pressed` makes it a toggle (Sources' Select mode) instead of a navigation row. */
+export const Row = ({ selected, onClick, mark, title, sub, end, foot, pressed, label }: { selected: boolean; onClick: () => void; mark?: ReactNode; title: string; sub: string; end?: ReactNode; foot?: ReactNode; pressed?: boolean; label?: string }) =>
+  <button type="button" className={`ux-list-card tb-row ${selected || pressed ? 'selected' : ''}`} aria-current={selected && pressed === undefined ? 'true' : undefined} aria-pressed={pressed} aria-label={label} onClick={onClick}>
     {mark && <span className="tb-mark" aria-hidden="true">{mark}</span>}
     <span className="tb-row-main"><strong>{title}</strong><small>{sub}</small>{foot}</span>
     {end && <span className="tb-row-end">{end}</span>}

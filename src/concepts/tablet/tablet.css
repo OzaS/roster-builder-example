@@ -20,12 +20,6 @@
 .tb-rail { position: relative; z-index: 2; flex: 0 0 88px; display: flex; flex-direction: column; gap: 4px; padding: 16px 8px 30px; border-right: 1px solid var(--ux-line) }
 .tb-hint-wrap { position: relative; display: block }
 .tb-app .tb-rail button { width: 100%; margin: 0; font: inherit }
-/* Material 3 rail: icon-only FAB on top (56 px, 16 px corners, tonal container, no shadow), 20 px above the destinations. */
-.tb-app .tb-rail button.tb-rail-fab { display: grid; place-items: center; width: 56px; height: 56px; margin: 0 auto 20px; padding: 0; border: 0; border-radius: 16px; background: color-mix(in srgb, var(--ux-accent) 28%, var(--ux-surface)); color: var(--ux-accent-2); cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; transition: background .15s }
-.tb-app.light .tb-rail button.tb-rail-fab { background: color-mix(in srgb, var(--ux-accent) 18%, var(--ux-surface)); color: var(--ux-accent) }
-.tb-pointer .tb-rail button.tb-rail-fab:hover { background: color-mix(in srgb, var(--ux-accent) 36%, var(--ux-surface)) }
-.tb-app .tb-rail button.tb-rail-fab:active { background: color-mix(in srgb, var(--ux-accent) 44%, var(--ux-surface)) }
-/* Destinations: the pill indicator (56 × 32) sits behind the icon only; the label stays under it. */
 .tb-app button.tb-rail-item { position: relative; display: grid; justify-items: center; align-content: center; gap: 4px; min-height: 64px; padding: 4px 0; border: 0; background: transparent; color: var(--ux-muted); font-size: 12px; font-weight: 650; letter-spacing: .1px; line-height: 1.15; text-align: center; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent }
 .tb-pointer button.tb-rail-item { min-height: 56px }
 .tb-touch .tb-rail button { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none }
@@ -48,7 +42,6 @@
 .tb-page { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 14px }
 .tb-toolbar { display: flex; align-items: center; gap: 10px }
 .tb-toolbar .tb-search { flex: 1 }
-.tb-toolbar-note { flex: 1; color: var(--ux-muted); font-size: 13.5px }
 .tb-search { min-height: 48px; background: var(--ux-surface); font-size: 15px }
 .tb-search input { font-size: 15px }
 .tb-search input:focus-visible { outline: none }
@@ -227,7 +220,6 @@
 .tb-rail::-webkit-scrollbar { display: none }
 .tb-rail > * { flex-shrink: 0 }
 .tb-compact .tb-rail { flex-basis: 68px; padding: 10px 6px 16px }
-.tb-compact .tb-app .tb-rail button.tb-rail-fab, .tb-compact.tb-app .tb-rail button.tb-rail-fab { width: 52px; height: 52px; margin-bottom: 10px }
 .tb-compact.tb-app button.tb-rail-item { min-height: 52px }
 .tb-compact .tb-rail-ind { width: 52px }
 .tb-compact button.tb-rail-item > span:last-child { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap }

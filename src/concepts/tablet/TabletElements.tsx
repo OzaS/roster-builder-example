@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
-import { BookMarked, Check, FileUp, Hammer, Layers3, Plus } from 'lucide-react';
+import { BookMarked, Check, CheckSquare, FileUp, FolderOpen, Hammer, Layers3, Plus, Search } from 'lucide-react';
 import { LibrarySwitch } from '../../gallery/LibrarySwitch';
 import { ComingSoonCard } from '../ux/AppExtras';
 import { TabletControls } from './TabletControls';
 import { RosterToolbar } from './RosterToolbar';
+import { TabletToolbar, type ToolbarAction } from './TabletToolbar';
 import { TabletExperienceControls } from './tabletExperience';
 import { TabletDeviceFrame } from './TabletDeviceFrame';
 import { TabletRail } from './TabletRail';
@@ -45,10 +46,21 @@ function ValidationHeaderDemo({ tone, title, body }: { tone: string; title: stri
 
 function RosterSearchDemo({ open = false }: { open?: boolean }) {
   const [query, setQuery] = useState(open ? 'Patrol' : '');
-  return <div className="tb-app ux-screen dark tb-el-card tb-el-fill"><RosterToolbar query={query} onQueryChange={setQuery} input="pointer" initialOpen={open}>
-    <button type="button" className="ux-job-btn" aria-label="Import roster"><FileUp size={18} /><span className="tb-command-label">Import</span></button>
-    <button type="button" className="ux-job-btn primary" aria-label="New roster"><Plus size={18} /><span className="tb-command-label">New roster</span></button>
-  </RosterToolbar></div>;
+  return <div className="tb-app ux-screen dark tb-el-card tb-el-fill" data-system="ios"><RosterToolbar query={query} onQueryChange={setQuery} input="pointer"
+    actions={[{ id: 'import', label: 'Import roster', caption: 'Import', icon: FileUp, hint: 'Import a roster from a file', onClick: noop }]} /></div>;
+}
+
+/** DEC-050 toolbar actions: Sources' row at a given width; narrow rows move the lower-priority actions into More. */
+function ToolbarActionsDemo({ width, system, input = 'touch', text }: { width: number; system: 'ios' | 'android'; input?: TabletInput; text?: 200 }) {
+  const [selecting, setSelecting] = useState(false);
+  const actions: ToolbarAction[] = [
+    { id: 'select', label: selecting ? 'Done selecting' : 'Select game data', caption: selecting ? 'Done' : 'Select', icon: CheckSquare, pressed: selecting, priority: 2, hint: 'Select several game systems to update or remove them together', onClick: () => setSelecting(!selecting) },
+    { id: 'file', label: 'Install from a file', caption: 'From a file', icon: FolderOpen, priority: 1, hint: 'Install game data from an archive, data files or a folder', onClick: noop },
+    { id: 'add', label: 'Add game data', caption: 'Add game data', icon: Plus, prominent: true, hint: 'Install from a collection, a repository link or GitHub search', onClick: noop },
+  ];
+  return <div className={`tb-app ux-screen dark tb-el-card tb-${input}`} data-system={system} data-text={text} style={{ width, ...(text ? { zoom: 2 } : {}) }}>
+    <TabletToolbar title="Sources" input={input} actions={actions} search={<label className="ux-search tb-search"><Search size={18} aria-hidden="true" /><input type="search" aria-label="Find installed game data" placeholder="Find game data…" /></label>} />
+  </div>;
 }
 
 /** The Elements view of the Tablet library: the rail, the device frames, the input switch and two framed compositions. */
@@ -69,17 +81,20 @@ export function TabletElements() {
       <LibrarySwitch current="tablet" label="Design library examples" />
       <h2>Tablet rail · iPad Touch and Pointer, Android Touch (press and hold shows the hint; with a pointer, hover shows the title)</h2>
       <div className="tb-el-row">{railIn('touch', 'ipad-portrait')}{railIn('pointer', 'ipad-portrait')}{railIn('touch', 'android')}
-        <div className="tb-el-note"><strong>Hint bubble</strong><span className="tb-hint-bubble static">Rosters: find, open and manage your rosters</span><small>Home, Rosters, Lookup, Tools, Library; Sources and Settings pinned to the bottom. iPad: navigation destinations only; New roster is a trailing toolbar control. Android: an extended FAB and expanded rail at wide window sizes; an icon FAB in medium and compact windows. ⌘N / Ctrl+N remains available.</small></div>
+        <div className="tb-el-note"><strong>Hint bubble</strong><span className="tb-hint-bubble static">Rosters: find, open and manage your rosters</span><small>DEC-050: New roster is the top rail item on iPad and Android, icon over caption with a filled accent pill (it replaces the iPad toolbar control and the Android FAB). Then Home, Rosters, Lookup, Tools, Library; Sources and Settings pinned to the bottom. ⌘N / Ctrl+N remains available.</small></div>
       </div>
-      <h2>Home toolbar · iPad (New roster at the trailing edge) and Android (New roster on the rail)</h2>
+      <h2>Home without a title row (DEC-050) · iPad and Android, New roster on the rail</h2>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-home" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="android"><TabletWorkbench workflowScreen="tablet-home" /></TabletDeviceFrame></div>
       <h2>Home widgets (TFB-001, TFB-002) · four most used game systems with More, fixed widgets that scroll inside · iPad landscape and portrait, Android</h2>
       <p>Game data lists at most four game systems, most used first (most rosters, then the latest roster activity, then name); More (N) opens Sources with the rest. The widgets keep their places: Game data and Recent rosters take the spare height and scroll their own content, summary cards keep their height. Below 520 px of page, and in compact windows, the page scrolls as a whole.</p>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-home-many-systems" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-portrait"><TabletWorkbench workflowScreen="tablet-home-many-systems" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="android"><TabletWorkbench workflowScreen="tablet-home-many-systems" /></TabletDeviceFrame></div>
-      <h2>Sources panes and toolbar (TFB-008, TFB-009) · Installed above both panes, first card level with the detail; Install from a file and Add game data as the Rosters toolbar</h2>
+      <h2>Sources top row and panes (DEC-050, TFB-008) · search, then Select, Install from a file and Add game data; shared pane rows; count and offline note in the list foot; pane tops aligned</h2>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-sources" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="android"><TabletWorkbench workflowScreen="tablet-sources" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="split"><TabletWorkbench workflowScreen="tablet-sources" /></TabletDeviceFrame></div>
-      <h2>Platform action toolbars · Liquid Glass and M3 Expressive</h2>
-      <p>New roster is a separate trailing icon on iPad and one rail FAB on Android. Continue and Open stay with their roster. Rename, Duplicate, Export and Delete form a contextual toolbar for the selected roster. Reading surfaces remain solid.</p>
+      <h2>Toolbar actions (DEC-050) · icon over caption, as the rail items · iPad and Android</h2>
+      <p>One component for the top-row actions of Rosters and Sources: an icon inside a 56 × 32 pill with a short caption under it, 64 px tall on touch (56 with a pointer), at least 64 px wide; the accessible name is the full label and every action has a hint. Prominent: filled accent pill (Add game data). Toggles (Select) show the rail's active indicator. The same on iPad and Android; on iPad the resting pill takes the glass material, solid with Reduce transparency. When the row cannot fit, the search shrinks to 200 px first; then lower-priority actions move into More (⋯), whose menu lists them with their full names. At larger text the captions stay, their scale capped at 150 % like the rail labels.</p>
+      <div className="tb-el-stack"><ToolbarActionsDemo width={860} system="ios" /><ToolbarActionsDemo width={860} system="android" input="pointer" /><ToolbarActionsDemo width={500} system="ios" /><ToolbarActionsDemo width={380} system="android" /><ToolbarActionsDemo width={300} system="ios" text={200} /></div>
+      <h2>Contextual roster actions and platform materials · Liquid Glass and M3 Expressive</h2>
+      <p>Continue and Open stay with their roster. Rename, Duplicate, Export and Delete form a contextual toolbar for the selected roster. Reading surfaces remain solid.</p>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-rosters" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="android"><TabletWorkbench workflowScreen="tablet-rosters" /></TabletDeviceFrame></div>
       <h2>Motion and materials · accessibility variants</h2>
       <p>Toolbar press feedback, Android shape changes and sheet springs respond to interaction. These switches apply to all tablet previews, including standalone pages; device accessibility settings also apply.</p>
@@ -100,8 +115,8 @@ export function TabletElements() {
       <h2>Larger text and display zoom (UX-025) · Text size 100%, 150%, 200%</h2>
       <p>The Text size switch (gallery, and <code>text=</code> on a standalone link) scales the tablet type and controls. The layout gets the smaller logical width (device width ÷ scale) and collapses by width class instead of clipping: Expanded → Medium (two panes) → single pane; under 600 the rail drops its labels (they stay the accessible names and hints) and scrolls when taller than the window; under 440 the editor header keeps Back, the roster mark, the points and More (undo and redo move into More). Screens: Roster editor · Text 200%, Rosters · Text 200%.</p>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-editor-text-200" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="split"><TabletWorkbench workflowScreen="tablet-rosters-text-200" /></TabletDeviceFrame></div>
-      <h2>Roster toolbar search (TFB-011) · approved</h2>
-      <p>Search is an icon immediately before Import. Initially the top bar shows Rosters, with no separate search row. Search replaces the title with a focused field in the same row; Import and New roster stay in place. The Search icon becomes Close; Close or Escape clears only the search query, restores the title and returns focus. System and grouping choices stay. In narrow windows the adjacent action labels reduce to icons so the field stays on the top bar.</p>
+      <h2>Roster top row (DEC-050, supersedes TFB-011's search toggle) · search always shown, then Import</h2>
+      <p>No title row: the search is always there and fills the row, Import trails it as an icon-over-caption action; New roster lives on the rail. The query filters by roster name, faction and game system; Escape or the clear button empties it. System and grouping choices stay. The page heading is visually hidden.</p>
       <div className="tb-el-stack"><RosterSearchDemo /><RosterSearchDemo open /></div>
       <h2>Roster filters (TB-03) · game system chips, Group by game system toggle and the list section header</h2>
       <p>TFB-005: Group by game system is an icon-only toggle (layers icon, 44 px like the chips, accent fill while on, aria-pressed, the name as its accessible label and press-and-hold hint) fixed at the trailing end of the same row, after a small gap and outside the scroller: collapsed <code>[All][More] … [group]</code>, expanded <code>[All][scrolling middle][Less] [group]</code>. Grouping is not a filter, so collapsed More does not name it. The phone Lists screen uses the same row.</p>

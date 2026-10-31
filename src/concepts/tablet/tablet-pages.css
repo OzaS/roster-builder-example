@@ -12,7 +12,6 @@
 .tb-card-head { display: grid; gap: 6px }
 .tb-card-title { font-size: 22px; font-weight: 800; line-height: 1.2 }
 .tb-list-label { padding: 4px 2px 0 }
-.tb-panes-label { margin: 0; padding: 0 2px; min-height: 20px; display: flex; align-items: center }
 .tb-list-foot { display: flex; align-items: center; gap: 8px; margin: 0; padding: 0 4px; color: var(--ux-muted); font-size: 12.5px }
 .tb-list-foot .ux-job-btn { margin-left: auto }
 .tb-wide { width: 100% }
@@ -290,17 +289,17 @@
   .tb-roster-action-strip .ux-job-btn { flex: 1 1 40%; justify-content: center }
 }
 
-/* TFB-011 (approved): search is an icon beside Import and occupies the title slot only while open. */
-.tb-roster-toolbar { display: flex; align-items: center; flex-wrap: nowrap; gap: 14px; min-height: 56px; flex: none; width: 100%; min-width: 0; container: roster-toolbar / inline-size }
-.tb-roster-toolbar-slot { flex: 1; min-width: 0 }
-.tb-roster-toolbar h1 { margin: 0; color: var(--ux-ink); font-size: 26px; font-weight: 750; letter-spacing: -.6px; line-height: 1.2 }
-.tb-roster-toolbar [hidden] { display: none !important }
-.tb-roster-toolbar .tb-toolbar-search-field { width: 100%; max-width: none; min-width: 0; margin: 0; box-sizing: border-box }
-.tb-roster-toolbar .tb-toolbar-search-field input { min-width: 0; width: 100%; font-size: 16px }
-.tb-roster-toolbar-commands { display: flex; flex: none; align-items: center; gap: 8px; margin-left: auto }
-.tb-app .tb-roster-toolbar button.tb-search-toggle { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border-radius: 50%; flex: none }
-.tb-app .tb-roster-toolbar button.tb-search-toggle[aria-expanded=true] { border-color: var(--ux-accent); background: color-mix(in srgb, var(--ux-accent) 14%, var(--ux-surface-2)) }
-@container roster-toolbar (max-width: 700px) {
-  .tb-roster-toolbar-commands .tb-command-label { display: none }
-  .tb-app .tb-roster-toolbar-commands .ux-job-btn { width: 44px; height: 44px; padding: 0; justify-content: center; border-radius: 50% }
-}
+/* DEC-050: the search field of a list page's top row (Rosters, Sources); a 44 px clear button once there is a query. */
+.tb-top-search .tb-search input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none }
+.tb-app button.tb-search-clear { display: grid; place-items: center; width: 44px; height: 44px; margin-right: -10px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--ux-muted); cursor: pointer; flex: none }
+.tb-app button.tb-search-clear:hover { color: var(--ux-ink); background: var(--ux-surface-2) }
+.tb-app button.tb-search-clear:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: -2px }
+/* Sources' list foot (DEC-050): the count and "Everything works offline" over the update check, as Rosters' foot. */
+.tb-list-foot-stack { display: grid; gap: 2px }
+.tb-list-foot-stack > span { display: flex; align-items: center; gap: 8px; min-width: 0 }
+.tb-select-foot { flex-wrap: wrap }
+.tb-select-foot > span { flex: 1; min-width: 0 }
+.tb-select-foot .ux-job-btn + .ux-job-btn { margin-left: 0 }
+/* Sources' Select mode: the row tile becomes a check box. */
+.tb-pick { display: grid; place-items: center; width: 24px; height: 24px; border: 2px solid var(--ux-line-2); border-radius: 7px; color: var(--ux-accent-ink) }
+.tb-pick.on { border-color: var(--ux-accent); background: var(--ux-accent) }

@@ -6,17 +6,12 @@ import { collectionSources, lookupEntries, type LookupEntry, type RosterSummary 
 import { HintButton } from './TabletHint';
 import type { TabletInput } from './tabletDevices';
 import { EmptyState, Facts, InstallRow, ListDetail, Meter, Progress, Row, SearchField, pts, rosterStatus, sourceStatus, plural, type PageProps, type SessionProps } from './TabletPieces';
-import { keyLabel } from './tabletKeys';
 import { RosterToolbar } from './RosterToolbar';
-import { TabletToolbar } from './TabletToolbar';
+import { PageTitle, type ToolbarAction } from './TabletToolbar';
 
 // Pages of the tablet: Home, Rosters and Lookup (T2a). Sources and Settings have their own files. Synthetic rows only.
 
 export type { PageProps };
-
-/** iPad toolbar primary action. Android owns one creation FAB in its navigation rail. */
-const NewRosterButton = ({ env, onNewRoster }: Pick<PageProps, 'env'> & { onNewRoster: () => void }) =>
-  env.device.system === 'ios' ? <HintButton aria-label="New roster" hint={`Create a roster${env.input === 'pointer' ? ` (${keyLabel('Mod+N', env.device.system)})` : ''}`} input={env.input} side="bottom" className="tb-native-new" onClick={onNewRoster}><Plus size={23} /></HintButton> : null;
 
 /* --------------------------------- Home --------------------------------- */
 
@@ -59,7 +54,8 @@ export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRo
     <Facts rows={[['Rosters', rosters.length], ['Game systems', jobs.sources.length], ['Needs attention', attention]]} />
   </section>;
 
-  const toolbar = <TabletToolbar title="Home">{hasData && <NewRosterButton env={env} onNewRoster={onNewRoster} />}</TabletToolbar>;
+  // DEC-050: no top row; the rail shows the page and holds New roster. The heading stays for screen readers.
+  const toolbar = <PageTitle>Home</PageTitle>;
 
   /* First run: no game data on the device. */
   if (!hasData) return <div className="tb-page tb-home-page">
@@ -212,12 +208,10 @@ export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster 
   const current = visible.find(r => r.name === selected) ?? visible[0];
   const choose = (name: string) => { setSelected(name); setOpen(true); setRenaming(false); setStatusOpen(false); };
   const clearFilters = () => { setQuery(''); setAttention(false); setSystem(null); };
-  const actions = <>
-    <HintButton aria-label="Import roster" hint="Import a roster from a file" input={env.input} side="bottom" className="ux-job-btn tb-toolbar-secondary" onClick={() => notify('Import a roster file (prototype)')}><FileUp size={20} /><span className="tb-command-label">Import</span></HintButton>
-    <NewRosterButton env={env} onNewRoster={onNewRoster} />
-  </>;
+  // DEC-050: New roster lives on the rail; the top row keeps Import after the search.
+  const actions: ToolbarAction[] = [{ id: 'import', label: 'Import roster', caption: 'Import', icon: FileUp, hint: 'Import a roster from a file', onClick: () => notify('Import a roster file (prototype)') }];
   if (!rosters.length) return <div className="tb-page">
-    <RosterToolbar query={query} onQueryChange={setQuery} input={env.input} initialOpen={session.state === 'search'}>{actions}</RosterToolbar>
+    <RosterToolbar query={query} onQueryChange={setQuery} input={env.input} actions={actions} />
     <EmptyState icon={Layers3} title="No rosters yet" text={hasData ? 'Create a roster, or import one from a file.' : 'Rosters are built from game data. Add a game system first, then create a roster.'}>
       <HintButton hint="Create a roster" input={env.input} side="top" className="ux-primary tb-primary" onClick={onNewRoster}><Plus size={17} />New roster</HintButton>
       <HintButton hint="Import a roster from a file" input={env.input} side="top" className="ux-job-btn" onClick={() => notify('Import a roster file (prototype)')}><FileUp size={16} />Import a roster</HintButton>
@@ -229,7 +223,7 @@ export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster 
   const row = (r: RosterSummary) => <RosterNavigationRow key={r.name} roster={r} selected={r.name === current?.name} onSelect={() => choose(r.name)} onOpen={() => onOpenRoster(r.name)} />;
   const filtered = q !== '' || attention || system !== null;
   return <div className="tb-page">
-    <RosterToolbar query={query} onQueryChange={setQuery} input={env.input} initialOpen={session.state === 'search'}>{actions}</RosterToolbar>
+    <RosterToolbar query={query} onQueryChange={setQuery} input={env.input} actions={actions} />
     <RosterFilterBar platform={env.device.system}
       all={<button type="button" className={`tb-filter tb-filter-start ${!attention && system === null ? 'active' : ''}`} aria-pressed={!attention && system === null} onClick={() => { setAttention(false); setSystem(null); }}>All {rosters.length}</button>}
       controls={filtersExpanded ? <>
@@ -280,8 +274,9 @@ export function TabletLookup({ env, session, onAddData }: SessionProps & { onAdd
   const [open, setOpen] = useState(false);
   const visible = useMemo(() => lookupEntries.filter(e => (scope === 'All' || e.kind === scope) && (e.name + e.owner).toLowerCase().includes(query.toLowerCase())), [query, scope]);
   const current: LookupEntry = lookupEntries.find(e => e.id === selected) ?? lookupEntries[0];
-  if (!session.hasData) return <div className="tb-page"><EmptyState icon={BookOpen} title="Nothing to look up yet" text="Lookup searches the units, rules and equipment of your installed game data."><button type="button" className="ux-primary tb-primary" onClick={onAddData}><Database size={17} />Add game data</button></EmptyState></div>;
+  if (!session.hasData) return <div className="tb-page"><PageTitle>Lookup</PageTitle><EmptyState icon={BookOpen} title="Nothing to look up yet" text="Lookup searches the units, rules and equipment of your installed game data."><button type="button" className="ux-primary tb-primary" onClick={onAddData}><Database size={17} />Add game data</button></EmptyState></div>;
   return <div className="tb-page">
+    <PageTitle>Lookup</PageTitle>
     <div className="tb-toolbar"><SearchField value={query} onChange={setQuery} label="Search the game data" placeholder="Search units, rules and equipment…" /></div>
     <div className="tb-filters" role="group" aria-label="Scope">{scopes.map(s => <button type="button" key={s} className={`tb-filter ${scope === s ? 'active' : ''}`} aria-pressed={scope === s} onClick={() => setScope(s)}>{s === 'All' ? 'All' : s === 'Equipment' ? 'Equipment' : `${s}s`}</button>)}</div>
     <ListDetail env={env} label="Lookup results" open={open} onClose={() => setOpen(false)}
@@ -298,5 +293,5 @@ export function TabletLookup({ env, session, onAddData }: SessionProps & { onAdd
 
 /* ------------------------------ Placeholders ------------------------------ */
 
-export const TabletTools = () => <div className="tb-page tb-soon"><ComingSoonCard icon={Hammer} title="Tools" description="Roster analytics, comparison, a game tracker and a dice simulator, for when the roster is done and the game starts." planned="Planned for a later release" covers="" /></div>;
-export const TabletLibrary = () => <div className="tb-page tb-soon"><ComingSoonCard icon={BookMarked} title="Library" description="Units and detachments you saved from your rosters, ready to reuse in the next one." planned="Planned for an early update" covers="" /></div>;
+export const TabletTools = () => <div className="tb-page tb-soon"><PageTitle>Tools</PageTitle><ComingSoonCard icon={Hammer} title="Tools" description="Roster analytics, comparison, a game tracker and a dice simulator, for when the roster is done and the game starts." planned="Planned for a later release" covers="" /></div>;
+export const TabletLibrary = () => <div className="tb-page tb-soon"><PageTitle>Library</PageTitle><ComingSoonCard icon={BookMarked} title="Library" description="Units and detachments you saved from your rosters, ready to reuse in the next one." planned="Planned for an early update" covers="" /></div>;

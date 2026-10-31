@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { AlertTriangle, ArrowUpCircle, Check, ChevronRight, ExternalLink, FolderOpen, Github, Layers3, Link2, Plus, RefreshCcw, Trash2 } from 'lucide-react';
+import { AlertTriangle, ArrowUpCircle, Check, CheckSquare, ChevronRight, ExternalLink, FolderOpen, Github, Layers3, Link2, Plus, RefreshCcw, Search, Trash2, X } from 'lucide-react';
 import { Chip as MobileChip } from '../ux/uxShared'; // the mobile chip; the workspace Chip (dtp-chip) is not used here, see MOBILE-PIECES.md
 import { jobPercent } from '../workspace/Jobs';
 import type { SourceInfo } from '../desktop/desktopData';
 import { AddDataCollections, CollectionView, GitHubSearchView, LastUpdateCard, LastUpdateStates, UpdateReportView, flowSourceId, isAddFlow, useRosterChecks } from '../desktop/DesktopSourceFlows';
 import '../desktop/desktop-pages.css';
 import { HintButton } from './TabletHint';
-import { Facts, ListDetail, Row, WorkspaceScope, plural, sourceStatus, Progress, type SessionProps } from './TabletPieces';
+import { EmptyState, Facts, ListDetail, Row, WorkspaceScope, plural, sourceStatus, Progress, type SessionProps } from './TabletPieces';
+import { TabletToolbar, type ToolbarAction } from './TabletToolbar';
 import type { TabletPage } from './TabletRail';
 
 // Sources (T2b): installed game data as list + detail, in-page progress controls and requested jobs details, and the add flows.
@@ -20,6 +21,9 @@ export function TabletSources({ env, notify, session, onPage, onOpenRoster }: Se
   const [open, setOpen] = useState(sourceDetail !== undefined);
   const [confirmRemove, setConfirmRemove] = useState(false);
   const [link, setLink] = useState('');
+  const [query, setQuery] = useState('');
+  const [selecting, setSelecting] = useState(false);
+  const [picked, setPicked] = useState<string[]>([]);
   const detail = sourceDetail ?? sources[0]?.id ?? 'add';
   const go = (next: string) => { setSourceDetail(next); setOpen(true); };
   const first = useRef(true);
@@ -35,18 +39,55 @@ export function TabletSources({ env, notify, session, onPage, onOpenRoster }: Se
   const flow = { jobs, notify, go, onOpenJobs: openJobs };
   const openRoster = onOpenRoster;
   const chip = (s: SourceInfo) => progress[s.id] !== undefined ? <MobileChip tone="cool">Updating {progress[s.id]}%</MobileChip> : sourceStatus(s);
+  const q = query.trim().toLowerCase();
+  const shown = sources.filter(s => (s.name + s.repo + s.factions.join(' ')).toLowerCase().includes(q));
+  const shownInstalls = installing.filter(j => j.name.toLowerCase().includes(q));
+  const mark = (name: string) => name.split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+  const pick = (id: string) => setPicked(list => list.includes(id) ? list.filter(x => x !== id) : [...list, id]);
+  const endSelect = () => { setSelecting(false); setPicked([]); };
+  const pickedUpdates = picked.filter(id => sources.find(s => s.id === id)?.next && progress[id] === undefined);
 
-  // TFB-009: Install from a file and Add game data take the Rosters toolbar's treatment (secondary, then primary at the trailing
-  // edge); on iPad they are native bar items in the app (icons, Add game data prominent), as Home's and Rosters' New roster.
+  // DEC-050: the top row is the search (filters the installed game data), then Select, Install from a file and Add game
+  // data (prominent) as icon-over-caption actions. Install from a file moves into More before Add game data does.
+  const actions: ToolbarAction[] = [
+    { id: 'select', label: selecting ? 'Done selecting' : 'Select game data', caption: selecting ? 'Done' : 'Select', icon: CheckSquare, pressed: selecting, priority: 2, hint: selecting ? 'Leave selection' : 'Select several game systems to update or remove them together', onClick: () => selecting ? endSelect() : setSelecting(true) },
+    { id: 'file', label: 'Install from a file', caption: 'From a file', icon: FolderOpen, priority: 1, hint: 'Install game data from an archive, data files or a folder', onClick: () => notify('Choose an archive, data files or a folder (prototype)') },
+    { id: 'add', label: 'Add game data', caption: 'Add game data', icon: Plus, prominent: true, hint: 'Install from a collection, a repository link or GitHub search', onClick: () => go('add') },
+  ];
+  const search = <label className="ux-search tb-search">
+    <Search size={18} aria-hidden="true" />
+    <input type="search" value={query} aria-label="Find installed game data" placeholder="Find game data…" onChange={e => setQuery(e.target.value)}
+      onKeyDown={e => { if (e.key === 'Escape' && query) { e.preventDefault(); e.stopPropagation(); setQuery(''); } }} />
+    {query && <button type="button" className="tb-search-clear" aria-label="Clear search" title="Clear search (Esc)" onClick={() => setQuery('')}><X size={16} aria-hidden="true" /></button>}
+  </label>;
+
+  // DEC-050 / C-07: the shared pane row. Second line: repository · version · size; the status chip trails; no third line
+  // (progress shows in the chip and in the detail).
+  const sourceRow = (s: SourceInfo) => {
+    const on = picked.includes(s.id);
+    return <Row key={s.id} selected={!selecting && flowSourceId(detail) === s.id} pressed={selecting ? on : undefined}
+      mark={selecting ? <span className={`tb-pick ${on ? 'on' : ''}`}>{on ? <Check size={20} strokeWidth={2.6} /> : null}</span> : mark(s.name)}
+      title={s.name} sub={`${s.fromFile ? 'From a file' : s.repo} · ${s.version === 'local' ? 'local' : s.version} · ${s.size}`} end={chip(s)}
+      onClick={() => selecting ? pick(s.id) : go(s.id)} />;
+  };
+  const foot = selecting
+    ? <p className="tb-list-foot tb-select-foot" aria-live="polite"><span>{picked.length ? `${picked.length} selected` : 'Choose game systems'}</span>
+      <button type="button" className="ux-job-btn ux-src-ghost" disabled={!pickedUpdates.length} onClick={() => { update(pickedUpdates); endSelect(); }}><RefreshCcw size={15} />Update</button>
+      <button type="button" className="ux-job-btn ux-src-ghost destructive" disabled={!picked.length} onClick={() => { notify(`${plural(picked.length, 'game system')} removed (prototype)`); endSelect(); }}><Trash2 size={15} />Remove</button></p>
+    : <div className="tb-list-foot tb-list-foot-stack" aria-live="polite">
+      <span>{q ? `${shown.length} of ${plural(sources.length, 'game system')}` : `${plural(sources.length, 'game system')} installed`} · Everything works offline</span>
+      <span><RefreshCcw size={13} />Checked for updates 8 minutes ago<button type="button" className="ux-job-btn ux-src-ghost" onClick={() => notify('Checked for updates. Nothing new.')}>Check now</button></span>
+    </div>;
   const list = <>
     <div className="tb-list scroll">
-      {updates.length > 0 && <div className="tb-banner" role="status"><ArrowUpCircle size={20} /><span><strong>{plural(updates.length, 'update')} available</strong><small>New data for {updates.map(s => s.name).join(', ')}.</small></span><button type="button" className="ux-job-btn primary" onClick={() => update(updates.map(s => s.id))}>Update all</button></div>}
-      {sources.map(s => <Row key={s.id} selected={flowSourceId(detail) === s.id} title={s.name} sub={s.fromFile ? `${plural(s.factions.length, 'faction')} · from a file` : `${s.version} · ${plural(s.factions.length, 'faction')} · ${s.size}`} end={chip(s)} foot={progress[s.id] !== undefined ? <Progress percent={progress[s.id]} /> : undefined} onClick={() => go(s.id)} />)}
-      {installing.map(j => <Row key={j.id} selected={false} title={j.name} sub={j.status === 'needs-you' ? 'Waiting for you to choose factions' : `${plural(j.factions.length, 'faction')} available`} end={j.status === 'needs-you' ? <MobileChip tone="warning"><AlertTriangle size={11} />Needs you</MobileChip> : <MobileChip tone="cool">Installing {jobPercent(j)}%</MobileChip>} foot={<Progress percent={jobPercent(j)} />} onClick={openJobs} />)}
+      {updates.length > 0 && !q && !selecting && <div className="tb-banner" role="status"><ArrowUpCircle size={20} /><span><strong>{plural(updates.length, 'update')} available</strong><small>New data for {updates.map(s => s.name).join(', ')}.</small></span><button type="button" className="ux-job-btn primary" onClick={() => update(updates.map(s => s.id))}>Update all</button></div>}
+      {shown.map(sourceRow)}
+      {!selecting && shownInstalls.map(j => <Row key={j.id} selected={false} mark={mark(j.name)} title={j.name} sub={j.status === 'needs-you' ? 'Waiting for you to choose factions' : `${plural(j.factions.length, 'faction')} available`} end={j.status === 'needs-you' ? <MobileChip tone="warning"><AlertTriangle size={11} />Needs you</MobileChip> : <MobileChip tone="cool">Installing {jobPercent(j)}%</MobileChip>} onClick={openJobs} />)}
       {!sources.length && !installing.length && <p className="tb-empty">No game data installed yet.</p>}
-      <Row selected={isAddFlow(detail)} mark={<Plus size={20} />} title="Add game data" sub="Collections, a repository link, or GitHub search" end={<ChevronRight size={17} />} onClick={() => go('add')} />
+      {q && !shown.length && !shownInstalls.length && sources.length > 0 && <EmptyState icon={Search} title={`No game data matches “${query.trim()}”`} text="Try another name, repository or faction."><button type="button" className="ux-job-btn" onClick={() => setQuery('')}>Clear search</button></EmptyState>}
+      {!q && !selecting && <Row selected={isAddFlow(detail)} mark={<Plus size={20} />} title="Add game data" sub="Collections, a repository link, or GitHub search" end={<ChevronRight size={17} />} onClick={() => go('add')} />}
     </div>
-    <p className="tb-list-foot"><RefreshCcw size={13} />Checked for updates 8 minutes ago<button type="button" className="ux-job-btn ux-src-ghost" onClick={() => notify('Checked for updates. Nothing new.')}>Check now</button></p>
+    {foot}
   </>;
 
   const addPane = <>
@@ -100,13 +141,11 @@ export function TabletSources({ env, notify, session, onPage, onOpenRoster }: Se
         : detail.startsWith('report:') ? flowPane(<UpdateReportView key={detail} sourceId={flowSourceId(detail)} onOpenRoster={openRoster} {...flow} />)
           : selected ? sourcePane(selected) : addPane;
 
+  // DEC-050: no title row, toolbar note or "Installed" heading; the count and "Everything works offline" sit in the list
+  // foot (as Rosters'). TFB-008: both panes start right under the top row, so their tops align.
   return <div className="tb-page">
-    <div className="tb-toolbar wrap"><span className="tb-toolbar-note">{plural(sources.length, 'game system')} installed. Everything works offline.</span>
-      <HintButton hint="Install game data from an archive, data files or a folder" input={env.input} side="bottom" className="ux-job-btn" onClick={() => notify('Choose an archive, data files or a folder (prototype)')}><FolderOpen size={16} />Install from a file</HintButton>
-      <HintButton hint="Install from a collection, a repository link or GitHub search" input={env.input} side="bottom" className="ux-job-btn primary" onClick={() => go('add')}><Plus size={16} />Add game data</HintButton></div>
+    <TabletToolbar title="Sources" search={search} actions={actions} input={env.input} />
     {jobs.jobs.length > 0 && <div className="tb-actions"><button type="button" className="ux-job-btn" onClick={openJobs}>Show progress · All jobs</button></div>}
-    {/* TFB-008: the heading sits above both panes, so the first card and the detail share their top edge (as Rosters and Settings). */}
-    <h2 className="ux-result-label tb-panes-label">Installed · {sources.length}</h2>
     <ListDetail env={env} label="Installed sources" open={open} onClose={() => setOpen(false)} list={list} detail={pane} />
   </div>;
 }
