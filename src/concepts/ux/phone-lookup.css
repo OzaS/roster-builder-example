@@ -1,0 +1,52 @@
+/* Lookup 1.0 (phone): search, system chips, foldable result sections and the read-only reference page. */
+.ux-wb-home-body.ux-lk-body { display: flex; flex-direction: column; gap: 10px }
+.ux-lk-body > * { flex-shrink: 0 }
+.ux-lk-clear { display: inline-grid; place-items: center; width: 44px; height: 44px; margin-right: -14px; border: 0; background: none; color: var(--ux-muted); cursor: pointer }
+.ux-lk-results, .ux-lk-rows { display: grid; gap: 8px }
+.ux-lk-results { gap: 4px }
+.ux-lk-section { display: grid; gap: 8px }
+.ux-lk-section:not(.folded) + .ux-lk-section { margin-top: 6px }
+.ux-lk-section:not(.folded) + .ux-lk-section.folded { margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--ux-line) }
+.ux-lk-section h3 { margin: 0 }
+.ux-lk-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 44px; padding: 4px 4px; border: 0; background: none; color: var(--ux-ink); text-align: left; cursor: pointer }
+.ux-lk-head > span { display: grid; gap: 1px; min-width: 0 }
+.ux-lk-head-title { display: flex; gap: 6px; align-items: baseline; font-size: 13px; font-weight: 800 }
+.ux-lk-head-title > span { color: var(--ux-muted) }
+.ux-lk-head small { overflow: hidden; color: var(--ux-muted); font-size: 12px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap }
+.ux-lk-head > svg { flex: none; color: var(--ux-muted) }
+.ux-lk-head:focus-visible, .ux-lk-row:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px }
+.ux-lk-row { width: 100%; font: inherit }
+.ux-lk-row .ux-lf-tag { white-space: nowrap }
+.ux-lk-hint { margin: 4px 4px 6px; color: var(--ux-muted); font-size: 13px; line-height: 1.45 }
+.ux-lk-recent-head { display: flex; align-items: center; gap: 6px; margin: 4px 4px 0; color: var(--ux-ink); font-size: 13px; font-weight: 800 }
+.ux-lk-start { display: grid; gap: 8px }
+.ux-lk-empty .ux-job-btn { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px }
+
+/* Reference page: pushed over Lookup (and its tab bar). */
+.ux-lk-page { position: absolute; inset: 0; z-index: 40; display: flex; flex-direction: column; background: var(--ux-bg) }
+.ux-lk-detail { gap: 10px }
+.ux-lk-title { display: grid; gap: 2px; min-width: 0 }
+.ux-lk-title h2 { margin: 0; font-size: 24px; line-height: 1.2; overflow-wrap: anywhere }
+.ux-mobile-unit-options .ux-lk-kind { color: var(--ux-accent-2); font-size: 12px; font-weight: 700 }
+.ux-lk-cost { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 6px 0 0 }
+.ux-lk-cost strong { color: var(--ux-accent-2); font-size: 20px; font-variant-numeric: tabular-nums }
+.ux-lk-cond svg { color: var(--ux-accent-2) !important }
+.ux-lk-cond > span { display: grid; gap: 2px }
+.ux-lk-layout { gap: 0 !important }
+.ux-lk-models { padding-bottom: 8px; font-size: 16px }
+.ux-lk-line { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding: 6px 0; border-top: 1px solid var(--ux-line) }
+.ux-lk-line b, .ux-lk-link-row b, .ux-lk-range { color: var(--ux-accent-2); font-size: 14px; font-variant-numeric: tabular-nums; white-space: nowrap }
+.ux-mobile-unit-options .ux-lk-limits { padding-top: 8px; border-top: 1px solid var(--ux-line) }
+.ux-lk-layout > .ux-lk-slot:first-child .ux-5a-choice, .ux-lk-list > .ux-5a-choice:first-child { border-top: 0 !important }
+.ux-lk-slot-units { padding-left: 14px }
+.ux-lk-link-row > svg { color: var(--ux-muted) !important }
+.ux-lk-text { margin: 0; font-size: 14px; line-height: 1.5 }
+.ux-lk-rule-open { display: grid; gap: 2px; padding: 0 0 6px }
+.ux-lk-rule-card { gap: 4px !important; padding-top: 6px !important }
+.ux-lk-rule-card > .ux-5a-choice { border-top: 0 !important }
+.ux-lk-rule-card p { margin: 0; font-size: 14px; line-height: 1.5 }
+.ux-mobile-unit-options .ux-lk-foot { margin-top: 6px; color: var(--ux-ink-tertiary) }
+
+/* Elements view sample: the phone Lookup in a phone-sized box. */
+.ux-lk-element { position: relative; display: flex; flex-direction: column; width: 100%; max-width: 390px; height: 600px; overflow: hidden; border: 1px solid var(--ux-line); border-radius: 16px; background: var(--ux-bg) }
+.ux-lk-detail .ux-5a-card > div:first-child > .ux-5a-choice:first-child { border-top: 0 !important }

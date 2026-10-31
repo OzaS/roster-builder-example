@@ -1,4 +1,5 @@
 import { PhoneListsFilters } from "./PhoneListsFilters";
+import { PhoneLookup } from "./PhoneLookup";
 import { AppearancePreferences } from "./AppearanceSettings";
 import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject } from "react";
 import { Activity, AlertTriangle, ArrowLeft, ArrowUp, BarChart3, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, Circle, CircleDot, ClipboardList, Cog, Coins, Command, Copy, Database, Dice5, Download, Ellipsis, FileInput, Filter, Folder, FolderOpen, Gamepad2, GripVertical, Hammer, Heart, ImagePlus, Languages, Layers, LibraryBig, Maximize2, Minimize2, Minus, Moon, MoveRight, Palette, PanelsTopLeft, Pencil, Plus, RotateCcw, Scale, Search, ShieldCheck, Sparkles, Split, Square, SquareCheck, Tag, Target, Timer, Trash2, Upload, UserRound, UsersRound, Wand2, X } from "lucide-react";
@@ -31,7 +32,7 @@ export function CodexWorkbench(props: ConceptProps) {
   const screen = props.screen;
   const isUnitDetail = screen === "unit-detail";
   const isMainTab = props.workflowScreen
-    ? (["library", "library-v2", "library-filters", "subscription-main", "source", "tools", "collections"] as const).some((tab) => tab === props.workflowScreen)
+    ? (["library", "library-v2", "library-filters", "subscription-main", "source", "lookup-results", "lookup-start", "lookup-no-results", "lookup-no-data", "tools", "collections"] as const).some((tab) => tab === props.workflowScreen)
     : screen === "library" || screen === "catalogue" || screen === "tools" || screen === "collections";
   const showTabBar = usesTabNavigation && isMainTab;
   const isWorkbenchScreen = screen !== "library" && screen !== "catalogue" && screen !== "tools" && screen !== "collections" && screen !== "app" && screen !== "settings" && screen !== "sources" && screen !== "add-source" && !SOURCE_FLOW_SCREENS.includes(screen) && screen !== "system";
@@ -138,6 +139,8 @@ export function CodexWorkbench(props: ConceptProps) {
     body = <Library props={props} />;
   } else if (screen === "collections") {
     body = <CollectionsLibrary props={props} />;
+  } else if (screen === "catalogue" && props.workflowScreen?.startsWith("lookup-")) {
+    body = <PhoneLookupScreen props={props} />;
   } else if (screen === "catalogue") {
     body = <LookupScreen props={props} />;
   } else if (screen === "tools") {
@@ -1775,6 +1778,14 @@ function LookupScreen({ props }: { props: ConceptProps }) {
       </div>
     </>
   );
+}
+
+/** Lookup 1.0 (design session 2026-10-31): each workflow screen opens PhoneLookup in one state. */
+function PhoneLookupScreen({ props }: { props: ConceptProps }) {
+  const s = props.workflowScreen;
+  const stack = s === "lookup-unit" ? ["u-line-fc"] : s === "lookup-detachment" ? ["d-line-formation"] : s === "lookup-upgrade" ? ["up-line-rifle"] : s === "lookup-rule" ? ["r-hold-line"] : [];
+  const query = s === "lookup-start" ? "" : s === "lookup-no-results" ? "lantern" : "line";
+  return <PhoneLookup key={s} initialQuery={query} initialStack={stack} noData={s === "lookup-no-data"} trailing={<AppAvatarButton props={props} />} onAddData={() => props.onNavigate("add-source")} />;
 }
 
 function LookupGroup({ title, icon, children }: { title: string; icon: ReactNode; children: ReactNode }) {

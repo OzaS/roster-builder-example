@@ -68,6 +68,14 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "create-roster", label: "Create Roster" },
   { id: "drafts", label: "Drafts" },
   { id: "source", label: "Lookup" },
+  { id: "lookup-results", label: "Lookup · Results, grouped" },
+  { id: "lookup-start", label: "Lookup · Before a search" },
+  { id: "lookup-no-results", label: "Lookup · No results" },
+  { id: "lookup-no-data", label: "Lookup · No game data" },
+  { id: "lookup-unit", label: "Lookup · Unit" },
+  { id: "lookup-detachment", label: "Lookup · Detachment" },
+  { id: "lookup-upgrade", label: "Lookup · Upgrade" },
+  { id: "lookup-rule", label: "Lookup · Rule" },
   { id: "tools", label: "Tools" },
   { id: "roster-analytics", label: "Roster Analytics" },
   { id: "comparison", label: "Comparison" },
@@ -122,7 +130,7 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen === "subscription-edition") return "overview";
   if (screen === "create-roster") return "system";
   if (screen === "drafts") return "library";
-  if (screen === "source") return "catalogue";
+  if (screen === "source" || screen.startsWith("lookup-")) return "catalogue";
   if (screen === "add-detachment") return "detachment";
   if (screen === "option-drilldown") return "unit-detail";
   if (screen === "diagnostics") return "validation";
