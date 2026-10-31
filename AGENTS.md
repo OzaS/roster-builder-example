@@ -16,3 +16,7 @@
 ## Comments
 - Screen review comments live in `design.comments` inside `src/design-data/roster-builder.design.json`.
 - Review comments when the user asks about screen feedback, comment state, Glance view, or design review notes.
+
+## Release Tracks And Design Freeze (DEC-051)
+- The MVP 0.5.0 designs are the read-only annotated tag `design-mvp-0.5.0`; view them with `git worktree add <dir> design-mvp-0.5.0`. Never move or edit it.
+- `main` is the 1.0 design track. Designs are made and approved during R0. Once implementation starts (R1 on), do not change a design: show the proposed change visually (a mockup or capture beside the current design) and ask the user first. Only approved changes go into the gallery.
