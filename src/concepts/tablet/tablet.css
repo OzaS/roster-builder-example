@@ -238,5 +238,5 @@
 .tb-compact .tb-page .tb-list.scroll { flex: none; overflow: visible }
 
 /* DEC-050 Elements: state chips with their caption bubble. */
-.tb-el-chips { display: grid; gap: 14px; min-width: 260px }
-.tb-el-chip-line { display: flex; justify-content: flex-end; padding-left: 150px }
+.tb-app.tb-el-chips { display: grid !important; grid-template-columns: minmax(0, 1fr); align-content: start; gap: 6px; width: 300px; margin-bottom: 16px }
+.tb-el-chip-line { display: flex; justify-content: flex-end; align-items: center; min-height: 48px; padding-left: 150px }
