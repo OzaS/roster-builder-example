@@ -142,3 +142,7 @@
 .dt-catalogue-add strong, .dt-catalogue-add small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
 .dt-app .dt-catalogue-unit.warn .dt-catalogue-reason { color: var(--dt-warn) }
 .dt-app .dt-catalogue-unit.unavailable :is(strong, .dt-catalogue-price) { opacity: .5 }
+
+/* DEC-050: Welcome has no top row; its readiness note moves into the footer. */
+.dt-view-welcome .dt-welcome { padding-top: 58px }
+.dt-welcome-status { display: flex; align-items: center; gap: 9px; letter-spacing: 0; color: var(--dt-muted) }
