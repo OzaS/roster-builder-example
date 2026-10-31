@@ -58,8 +58,8 @@ function ToolbarActionsDemo({ width, system, input = 'touch', text }: { width: n
     { id: 'file', label: 'Install from a file', caption: 'From a file', icon: FolderOpen, priority: 1, hint: 'Install game data from an archive, data files or a folder', onClick: noop },
     { id: 'add', label: 'Add game data', caption: 'Add game data', icon: Plus, prominent: true, hint: 'Install from a collection, a repository link or GitHub search', onClick: noop },
   ];
-  return <div className={`tb-app ux-screen dark tb-el-card tb-${input}`} data-system={system} data-text={text} style={{ width, ...(text ? { zoom: 2 } : {}) }}>
-    <TabletToolbar title="Sources" input={input} actions={actions} search={<label className="ux-search tb-search"><Search size={18} aria-hidden="true" /><input type="search" aria-label="Find installed game data" placeholder="Find game data…" /></label>} />
+  return <div className={`tb-app ux-screen dark tb-el-card tb-${input}`} data-system={system} data-text={text} style={{ width, boxSizing: 'border-box', ...(text ? { zoom: 2 } : {}) }}>
+    <div style={{ width: '100%', minWidth: 0 }}><TabletToolbar title="Sources" input={input} actions={actions} search={<label className="ux-search tb-search"><Search size={18} aria-hidden="true" /><input type="search" aria-label="Find installed game data" placeholder="Find game data…" /></label>} /></div>
   </div>;
 }
 
