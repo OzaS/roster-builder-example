@@ -28,15 +28,24 @@
 .ux-lk-title { display: grid; gap: 2px; min-width: 0 }
 .ux-lk-title h2 { margin: 0; font-size: 24px; line-height: 1.2; overflow-wrap: anywhere }
 .ux-mobile-unit-options .ux-lk-kind { color: var(--ux-accent-2); font-size: 12px; font-weight: 700 }
-.ux-lk-cost { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 6px 0 0 }
-.ux-lk-cost strong { color: var(--ux-accent-2); font-size: 20px; font-variant-numeric: tabular-nums }
+.ux-lk-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 16px; min-width: 0 }
+.ux-lk-heading h2 { flex: 1 1 180px; min-width: 0 }
+.ux-lk-base-cost { flex: none; color: var(--ux-accent-2); font-size: 20px; line-height: 1.2; font-variant-numeric: tabular-nums; white-space: nowrap }
+.ux-mobile-unit-options .ux-lk-cost-note { color: var(--ux-muted) }
 .ux-lk-cond svg { color: var(--ux-accent-2) !important }
 .ux-lk-cond > span { display: grid; gap: 2px }
-.ux-lk-layout { gap: 0 !important }
-.ux-lk-models { padding-bottom: 8px; font-size: 16px }
-.ux-lk-line { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding: 6px 0; border-top: 1px solid var(--ux-line) }
-.ux-lk-line b, .ux-lk-link-row b, .ux-lk-range { color: var(--ux-accent-2); font-size: 14px; font-variant-numeric: tabular-nums; white-space: nowrap }
-.ux-mobile-unit-options .ux-lk-limits { padding-top: 8px; border-top: 1px solid var(--ux-line) }
+/* Compact, borderless model layout: range and limits share the heading, counts sit beside model names. */
+.ux-lk-composition { display: grid; gap: 4px; margin-top: 4px; min-width: 0 }
+.ux-lk-composition > header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px }
+.ux-mobile-unit-options .ux-lk-composition h4 { margin: 0; font-size: 12px; line-height: 1.5; letter-spacing: 0; text-transform: none }
+.ux-lk-composition h4 span { color: var(--ux-ink); font-weight: 650 }
+.ux-mobile-unit-options .ux-lk-composition > header > small { font-size: 12px; color: var(--ux-muted) }
+.ux-lk-composition dl { display: grid; margin: 0 }
+.ux-lk-model-row { display: flex; align-items: baseline; justify-content: space-between; gap: 4px 16px; padding: 8px 0; border-top: 1px solid var(--ux-line) }
+.ux-lk-model-row dt { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; min-width: 0; font-size: 14px; font-weight: 650; overflow-wrap: anywhere }
+.ux-mobile-unit-options .ux-lk-model-row dt small { font-size: 12px; color: var(--ux-muted); font-weight: 400 }
+.ux-lk-model-row dd { flex: none; margin: 0; color: var(--ux-accent-2); font-size: 13px; font-weight: 650; font-variant-numeric: tabular-nums; white-space: nowrap }
+.ux-lk-link-row b, .ux-lk-range { color: var(--ux-accent-2); font-size: 14px; font-variant-numeric: tabular-nums; white-space: nowrap }
 .ux-lk-link-row > svg { color: var(--ux-muted) !important }
 .ux-lk-text { margin: 0; font-size: 14px; line-height: 1.5 }
 .ux-lk-rule-open { display: grid; gap: 2px; padding: 0 0 6px }

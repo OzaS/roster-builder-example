@@ -87,10 +87,14 @@ export function LookupEntryPage({ entity: e, back, onBack, onOpen }: { entity: L
 /** The reference content, shared by the phone page and the tablet/desktop detail panes. */
 export function LookupEntryBody({ entity: e, onOpen }: { entity: LookupEntity; onOpen: (id: string) => void }) {
   const kind = kindLabel(e);
+  // The model range belongs to Layout; do not repeat it in the reference heading.
+  const summary = e.layout ? e.summary.split(" · ").filter(part => part !== e.layout?.models).join(" · ") : e.summary;
   return <>
     <div className="ux-lk-title">
-      <small className="ux-lk-kind">{e.summary.startsWith(kind) ? e.summary : `${kind} · ${e.summary}`}</small><h2>{e.name}</h2><small>{factionLabel(e)} · {e.system} {systemVersion(e.system)}</small>
-      {e.cost ? <p className="ux-lk-cost"><strong>{e.cost}</strong>{e.costNote ? <small>{e.costNote}</small> : null}</p> : null}
+      <div className="ux-lk-heading"><h2>{e.name}</h2>{e.cost ? <strong className="ux-lk-base-cost">{e.cost}</strong> : null}</div>
+      <small className="ux-lk-kind">{summary.startsWith(kind) ? summary : `${kind} · ${summary}`}</small>
+      <small>{factionLabel(e)} · {e.system} {systemVersion(e.system)}</small>
+      {e.cost && e.costNote ? <small className="ux-lk-cost-note">{e.costNote}</small> : null}
     </div>
     {e.conditional ? <div className="ux-5a-notice ux-lk-cond" role="note"><Info size={18} /><span><strong>Conditional</strong><small>{e.conditional}</small></span></div> : null}
     {e.group === "unit" ? <UnitBody e={e} onOpen={onOpen} /> : null}
@@ -104,11 +108,12 @@ export function LookupEntryBody({ entity: e, onOpen }: { entity: LookupEntity; o
 function UnitBody({ e, onOpen }: { e: LookupEntity; onOpen: (id: string) => void }) {
   const [folds, setFolds] = useState<string[]>([]);
   return <>
-    {e.layout ? <><h4>Layout</h4><div className="ux-5a-card ux-lk-layout">
-      <strong className="ux-lk-models">{e.layout.models}</strong>
-      {e.layout.rows.map((r) => <div className="ux-lk-line" key={r.name}><span><strong>{r.name}</strong><small>{r.count} {r.count === "1" ? "model" : "models"}</small></span><b>{r.cost}</b></div>)}
-      {e.layout.limits?.length ? <small className="ux-lk-limits">{e.layout.limits.join(" · ")}</small> : null}
-    </div></> : null}
+    {e.layout ? <section className="ux-lk-composition" aria-label="Model layout">
+      <header><h4>Layout <span>· {e.layout.models}</span></h4>{e.layout.limits?.length ? <small>{e.layout.limits.join(" · ")}</small> : null}</header>
+      <dl>{e.layout.rows.map((r) => <div className="ux-lk-model-row" key={r.name}>
+        <dt>{r.name} <small>{r.count} {r.count === "1" ? "model" : "models"}</small></dt><dd>{r.cost}</dd>
+      </div>)}</dl>
+    </section> : null}
     <Profiles e={e} />
     <RuleList ids={e.rules} onOpen={onOpen} />
     {e.options?.length ? <><h4>Options</h4><div className="ux-5a-card">{e.options.map((o) => <FoldSection key={o.title} title={o.title} counter={o.limit} folded={!folds.includes(o.title)} onFold={() => setFolds((f) => f.includes(o.title) ? f.filter((x) => x !== o.title) : [...f, o.title])}>

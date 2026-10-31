@@ -567,6 +567,10 @@ function WorkbenchElements({
         <section className="ux-mobile-unit-options compact ux-lk-detail"><LookupEntryBody entity={lookupById("d-line-formation")!} onOpen={() => undefined} /></section>
       </ElementSection>
 
+      <ElementSection title="Lookup Compact Unit Reference">
+        <section className="ux-mobile-unit-options compact ux-lk-detail"><LookupEntryBody entity={lookupById("u-line-fc")!} onOpen={() => undefined} /></section>
+      </ElementSection>
+
       <ElementSection title="Lookup & Sources · Earlier design">
         <div className="ux-source-filters">
           {["All sources", roster.system, roster.faction].map((label, index) => (
