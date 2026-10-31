@@ -245,3 +245,5 @@
 .tbe-narrow-head .tbe-header .dt-summary-toggle { gap: 4px; padding: 0 8px 0 12px !important; font-size: 0 }
 .tbe-narrow-head .tbe-header .dt-summary-toggle b { font-size: 16px }
 .tbe-narrow-head .tbe-menu.end { max-width: calc(100vw - 24px) }
+/* DEC-050 (UX-060): on iPad the catalogue footer clears the home indicator (bottom safe area) in the pane and the slide-over, at every text size. */
+.tb-app[data-system=ios] .tbe-catalogue .tbe-pane-foot { min-height: 64px; padding-bottom: 20px }
