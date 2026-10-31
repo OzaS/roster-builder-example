@@ -12,7 +12,9 @@ import './duo.css';
 const BEZEL = 10;
 const SPINE = 12;
 const CAPTION = 44;
-export type DuoFit = 'none' | 'both';
+/** `both`: fit the host's width and height (single screen). `width`: fit the width only, for hosts whose height follows the
+ *  frame (the All screens board, Glance); scaling by height there would feed back into the measured height. */
+export type DuoFit = 'none' | 'width' | 'both';
 
 export function DuoDeviceFrame({ pose: poseId, themeMode = 'dark', colorScheme = 'default', fit = 'both', caption = true, children }: {
   pose: DuoPoseId; themeMode?: ThemeMode; colorScheme?: ColorScheme; fit?: DuoFit; caption?: boolean; children: ReactNode;
@@ -28,7 +30,8 @@ export function DuoDeviceFrame({ pose: poseId, themeMode = 'dark', colorScheme =
     const host = hostRef.current;
     if (!host || fit === 'none') { setScale(1); return; }
     const measure = () => {
-      const next = Math.min(1, (host.clientWidth - 8) / outerW, (host.clientHeight - (caption ? CAPTION : 0) - 8) / outerH);
+      const byHeight = fit === 'both' ? (host.clientHeight - (caption ? CAPTION : 0) - 8) / outerH : Infinity;
+      const next = Math.min(1, (host.clientWidth - 8) / outerW, byHeight);
       setScale(next > 0.05 && Number.isFinite(next) ? next : 1);
     };
     measure();

@@ -27,7 +27,7 @@ export function PreviewFrame({ concept, screen, platform, themeMode, colorScheme
     return <TabletDeviceFrame device={fixed?.device} textScale={fixed?.textScale} themeMode={themeMode} colorScheme={colorScheme} fit={fit}>{children}</TabletDeviceFrame>;
   }
   if (concept.id === "duo-workbench" && screen.startsWith("duo-")) {
-    return <DuoDeviceFrame pose={duoScreenOf(screen).pose} themeMode={themeMode} colorScheme={colorScheme} fit={fit === "none" ? "none" : "both"}>{children}</DuoDeviceFrame>;
+    return <DuoDeviceFrame pose={duoScreenOf(screen).pose} themeMode={themeMode} colorScheme={colorScheme} fit={fit}>{children}</DuoDeviceFrame>;
   }
   return <DeviceFrame desktop={concept.id === "desktop-workbench"} platform={platform} themeMode={themeMode} colorScheme={colorScheme} statusBarUsesDesignBackground={statusBarUsesDesignBackground}>{children}</DeviceFrame>;
 }

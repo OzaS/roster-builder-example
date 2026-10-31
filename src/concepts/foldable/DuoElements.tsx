@@ -65,7 +65,7 @@ export function DuoElements() {
 
     <h2>Fold · reserved region when partially folded</h2>
     <p>Fully open, panes keep their regular proportions (list narrower than detail). Partially folded, the panes divide at the fold with the folding region between them, and the page's search and filters stay with the leading pane. No control sits in the fold.</p>
-    <div className="tb-el-frames"><DuoDeviceFrame fit="both" pose="open"><DuoWorkbench workflowScreen="duo-open-rosters" /></DuoDeviceFrame><DuoDeviceFrame fit="both" pose="open-folded"><DuoWorkbench workflowScreen="duo-folded-rosters" /></DuoDeviceFrame></div>
+    <div className="tb-el-frames"><DuoDeviceFrame fit="width" pose="open"><DuoWorkbench workflowScreen="duo-open-rosters" /></DuoDeviceFrame><DuoDeviceFrame fit="width" pose="open-folded"><DuoWorkbench workflowScreen="duo-folded-rosters" /></DuoDeviceFrame></div>
 
     <h2>Poses · same scale</h2>
     <div className="tb-el-devices">{duoPoses.map(p => <figure key={p.id}><i style={{ width: p.width / 6, height: p.height / 6 }} className={`duo-el-pose ${p.id}`} /><figcaption><strong>{p.label}</strong>{p.width} × {p.height} pt · {p.bars === 'vertical' ? 'bars on the trailing edge' : 'horizontal bars'}</figcaption></figure>)}</div>
