@@ -363,7 +363,7 @@
             "label": "Design Gallery UI",
             "description": "Web-only review and gallery tooling; excluded from the React Native product implementation.",
             "sections": [
-              {"id": "gallery.library-navigation", "title": "Design Library Navigation", "level": "gallery-tooling", "status": "specified", "platforms": ["gallery"], "states": ["phone library", "tablet library", "desktop library", "independent preferences"], "screens": []},
+              {"id": "gallery.library-navigation", "title": "Design Library Navigation", "level": "gallery-tooling", "status": "specified", "platforms": ["gallery"], "states": ["phone library", "tablet library", "foldable library", "desktop library", "independent preferences"], "screens": []},
               { "id": "gallery.designer-rail", "title": "Designer Rail Controls", "level": "gallery-tooling", "status": "implemented", "platforms": ["gallery"], "states": ["default", "expanded", "editing"], "screens": [] },
               { "id": "gallery.workflow-board", "title": "Workflow Board Group", "level": "gallery-tooling", "status": "implemented", "platforms": ["gallery"], "states": ["default", "selected"], "screens": [] },
               { "id": "gallery.glance-comments", "title": "Glance Comments", "level": "gallery-tooling", "status": "implemented", "platforms": ["gallery"], "states": ["point", "element", "done"], "screens": [] },
@@ -768,10 +768,187 @@
             "label": "Gallery UI",
             "description": "Gallery-only tooling of the Tablet library. Not part of the product.",
             "sections": [
-              {"id": "gallery.library-navigation", "title": "Design Library Navigation", "level": "gallery-tooling", "status": "specified", "platforms": ["gallery"], "states": ["phone library", "tablet library", "desktop library", "independent preferences"], "screens": []},
+              {"id": "gallery.library-navigation", "title": "Design Library Navigation", "level": "gallery-tooling", "status": "specified", "platforms": ["gallery"], "states": ["phone library", "tablet library", "foldable library", "desktop library", "independent preferences"], "screens": []},
               {"id": "gallery.tablet-frames", "title": "Tablet Device Frames", "level": "gallery-tooling", "status": "specified", "platforms": ["gallery"], "states": ["iPad 11\" landscape 1194 x 834", "iPad 11\" portrait 834 x 1194", "Android tablet 1280 x 800", "Foldable unfolded 884 x 1104", "split view 600 x 834", "scaled to fit, aspect ratio kept", "caption with name, size and width class", "standalone link at real size"], "screens": []},
               {"id": "gallery.tablet-input", "title": "Input Mode Switch", "level": "gallery-tooling", "status": "specified", "platforms": ["gallery"], "states": ["Touch", "Pointer", "independent of theme and colour scheme"], "screens": []},
               {"id": "gallery.tablet-text-size", "title": "Text Size Switch", "level": "gallery-tooling", "status": "needs-review", "platforms": ["gallery"], "states": ["100%, 150%, 200%", "persisted with the other gallery switches", "standalone link: text=100|150|200", "shows the logical layout width and its width class", "frame caption names the text size"], "screens": []}
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "duo-workbench",
+      "status": "active",
+      "name": "Battle Augur · Foldable",
+      "eyebrow": "Foldable · Passport, side bars",
+      "icon": "TabletSmartphone",
+      "component": "DuoWorkbench",
+      "bestFor": "A passport-shaped foldable phone after Apple's iPhone Duo (HIG “Designing for iPhone Duo”, September 2026): the closed outer display (466 × 678 pt, wider and shorter than other iPhones) and the inner display that opens like a book (951 × 669 pt), with the same functionality and state on both.",
+      "direction": "Closed, and open in landscape, the status, toolbar and tab bar sit on the trailing (right) edge, top to bottom: Dynamic Island (closed), status, toolbar (Back or Close on top, then the prominent action, then the rest in a capsule, More last), tab bar at the bottom (Rosters, Tools, Library, Settings as icon-only tabs; Lookup apart below them with the search role). Screens declare toolbar items and the bar lays them out and overflows them into More. Content keeps the shared mobile and tablet pieces: compact width and one pane at a time on the outer display (as on the phone), the tablet's panes on the inner display. Open in portrait the bars are horizontal (tab bar at the bottom). Partially folded, panes divide at the fold and nothing sits in the folding region.",
+      "interaction": "Each screen is drawn in its pose; navigate inside it (tabs, Back, open a roster, Add unit, More). Press and hold an icon to see its hint. In the roster editor the tab bar is minimized to one button; tap it for the tabs. Standalone: ?duo=closed-editor (any screen id without duo-), &theme=light.",
+      "tradeoff": "Proposal for review (R0, 2026-10-31); every screen is needs-review. Foldables are after 1.0 on the roadmap, so this is design only. One tab set on every display (HIG: consistent functionality): Home stays a tablet page and Sources opens from Settings, as on the phone. New roster is the prominent toolbar action of the pages (one prominent item per toolbar: Sources keeps Add game data instead). The editor keeps Add unit above the roster pane on the inner display (controls near the content they affect) and puts it in the bar on the outer display. Sheets other than the Add units catalogue keep their horizontal headers. The landscape camera position follows Apple's diagrams (bottom of the bar). Sample data and prototype state, not connected to the engine.",
+      "screens": [
+        {
+          "id": "duo-closed-rosters",
+          "label": "Closed · Rosters"
+        },
+        {
+          "id": "duo-closed-roster-detail",
+          "label": "Closed · Roster detail over the list"
+        },
+        {
+          "id": "duo-closed-editor",
+          "label": "Closed · Roster editor, tab bar minimized"
+        },
+        {
+          "id": "duo-closed-unit",
+          "label": "Closed · Unit details"
+        },
+        {
+          "id": "duo-closed-add",
+          "label": "Closed · Add units sheet"
+        },
+        {
+          "id": "duo-closed-lookup",
+          "label": "Closed · Lookup"
+        },
+        {
+          "id": "duo-closed-settings",
+          "label": "Closed · Settings"
+        },
+        {
+          "id": "duo-closed-landscape-rosters",
+          "label": "Closed landscape · Rosters"
+        },
+        {
+          "id": "duo-closed-landscape-editor",
+          "label": "Closed landscape · Roster editor"
+        },
+        {
+          "id": "duo-open-rosters",
+          "label": "Open · Rosters, list and detail"
+        },
+        {
+          "id": "duo-open-editor",
+          "label": "Open · Roster editor, roster and unit details"
+        },
+        {
+          "id": "duo-open-add",
+          "label": "Open · Add units over the leading half"
+        },
+        {
+          "id": "duo-open-lookup",
+          "label": "Open · Lookup"
+        },
+        {
+          "id": "duo-open-settings",
+          "label": "Open · Settings"
+        },
+        {
+          "id": "duo-open-sources",
+          "label": "Open · Sources (from Settings)"
+        },
+        {
+          "id": "duo-folded-rosters",
+          "label": "Partially folded · Rosters divide at the fold"
+        },
+        {
+          "id": "duo-folded-editor",
+          "label": "Partially folded · Roster editor divides at the fold"
+        },
+        {
+          "id": "duo-portrait-rosters",
+          "label": "Open portrait · Rosters, horizontal bars"
+        },
+        {
+          "id": "duo-portrait-editor",
+          "label": "Open portrait · Roster editor, horizontal bars"
+        }
+      ],
+      "workflows": [
+        {
+          "id": "closed",
+          "label": "Closed · outer display",
+          "screens": [
+            "duo-closed-rosters",
+            "duo-closed-roster-detail",
+            "duo-closed-editor",
+            "duo-closed-unit",
+            "duo-closed-add",
+            "duo-closed-lookup",
+            "duo-closed-settings"
+          ]
+        },
+        {
+          "id": "closed-landscape",
+          "label": "Closed · landscape (bar compression)",
+          "screens": [
+            "duo-closed-landscape-rosters",
+            "duo-closed-landscape-editor"
+          ]
+        },
+        {
+          "id": "open",
+          "label": "Open · inner display",
+          "screens": [
+            "duo-open-rosters",
+            "duo-open-editor",
+            "duo-open-add",
+            "duo-open-lookup",
+            "duo-open-settings",
+            "duo-open-sources"
+          ]
+        },
+        {
+          "id": "folded",
+          "label": "Partially folded",
+          "screens": [
+            "duo-folded-rosters",
+            "duo-folded-editor"
+          ]
+        },
+        {
+          "id": "portrait",
+          "label": "Open · portrait (horizontal bars)",
+          "screens": [
+            "duo-portrait-rosters",
+            "duo-portrait-editor"
+          ]
+        },
+        {
+          "id": "unsorted",
+          "label": "Unsorted",
+          "screens": []
+        }
+      ],
+      "comments": [],
+      "trash": {
+        "screens": []
+      },
+      "elements": {
+        "release": "Foldable 00",
+        "groups": [
+          {
+            "id": "product-ui",
+            "label": "Foldable UI",
+            "description": "The foldable's controls (side bar, vertical toolbar, tab bar, horizontal bars of the open portrait display) and the fold. The content pieces are the tablet's and the phone's.",
+            "sections": [
+              {"id": "duo.side-bar", "title": "Side Bar", "level": "navigation", "status": "needs-review", "platforms": ["foldable"], "states": ["HIG order top to bottom on the trailing edge: Dynamic Island (outer display), status (time over the Wi-Fi glyph in the battery ring), toolbar, tab bar", "80 pt column; 46 pt glass buttons and capsules; content does not run under it (safe area)", "closed landscape: camera at the bottom of the bar, status hidden", "inner display: no camera (hidden until active), status on top", "stays on the right in right-to-left languages (aligned with the hardware)"], "screens": ["duo-closed-rosters", "duo-closed-roster-detail", "duo-closed-editor", "duo-closed-unit", "duo-closed-add", "duo-closed-lookup", "duo-closed-settings", "duo-closed-landscape-rosters", "duo-closed-landscape-editor", "duo-open-rosters", "duo-open-editor", "duo-open-add", "duo-open-lookup", "duo-open-settings", "duo-open-sources", "duo-folded-rosters", "duo-folded-editor"]},
+              {"id": "duo.vertical-toolbar", "title": "Vertical Toolbar and More", "level": "navigation", "status": "needs-review", "platforms": ["foldable"], "states": ["items declared by the screen: nav (Back, Close) on top, then the prominent action (accent fill), then the rest in one capsule", "More (ellipsis) is the system overflow menu: fixed entries plus items that do not fit; opens beside the bar", "overflow from the bottom up; lower priority stays longer; Back and the prominent item stay", "icon-only with accessible name and press-and-hold hint; disabled items dimmed", "one prominent item per toolbar (Sources: Add game data, not New roster)"], "screens": ["duo-closed-rosters", "duo-closed-roster-detail", "duo-closed-editor", "duo-closed-unit", "duo-closed-add", "duo-closed-lookup", "duo-closed-settings", "duo-closed-landscape-rosters", "duo-closed-landscape-editor", "duo-open-rosters", "duo-open-editor", "duo-open-add", "duo-open-lookup", "duo-open-settings", "duo-open-sources", "duo-folded-rosters", "duo-folded-editor"]},
+              {"id": "duo.tab-bar", "title": "Vertical Tab Bar", "level": "navigation", "status": "needs-review", "platforms": ["foldable"], "states": ["Rosters, Tools, Library, Settings: icon-only tabs in a capsule, active tab tinted, aria-current", "Lookup: the search tab, apart below the capsule", "minimized to one button showing the current tab on task screens (roster editor); tap shows the tabs", "navigation screens keep the tab bar and move toolbar items into More when space runs out; task screens minimize the tab bar", "Sources is reached from Settings and highlights the Settings tab"], "screens": ["duo-closed-rosters", "duo-closed-roster-detail", "duo-closed-editor", "duo-closed-unit", "duo-closed-add", "duo-closed-lookup", "duo-closed-settings", "duo-closed-landscape-rosters", "duo-closed-landscape-editor", "duo-open-rosters", "duo-open-editor", "duo-open-add", "duo-open-lookup", "duo-open-settings", "duo-open-sources", "duo-folded-rosters", "duo-folded-editor"]},
+              {"id": "duo.horizontal-bars", "title": "Horizontal Bars (open, portrait)", "level": "navigation", "status": "needs-review", "platforms": ["foldable"], "states": ["standard horizontal bars when the inner display is in portrait", "floating tab bar at the bottom with labels, search tab beside it", "New roster at the trailing corner on Rosters", "page and editor toolbars stay on top, as on the tablet"], "screens": ["duo-portrait-rosters", "duo-portrait-editor"]},
+              {"id": "duo.fold", "title": "Fold and Folded Layout", "level": "composite", "status": "needs-review", "platforms": ["foldable"], "states": ["fully open: hairline crease, panes keep regular proportions (list narrower than detail)", "partially folded: 24 pt reserved folding region, panes divide at the fold, halves shaded", "the page's search and filters stay with the leading pane", "roster editor: two panes on the inner display in landscape, flat or folded (no extreme layout change as it folds)", "Add units covers the leading half up to the fold"], "screens": ["duo-open-rosters", "duo-open-editor", "duo-open-add", "duo-open-lookup", "duo-open-settings", "duo-open-sources", "duo-folded-rosters", "duo-folded-editor"]},
+              {"id": "duo.editor", "title": "Roster Editor on the Foldable", "level": "screen-composition", "status": "needs-review", "platforms": ["foldable"], "states": ["outer display: one pane; Back, Add unit (prominent), Undo, Redo in the bar; More: export, rename, duplicate, add force", "unit details open over the roster with Back to the roster in the bar", "Add units is a full-width sheet with Close on top of the bar", "inner display: roster and unit details; Add unit stays above the roster pane (controls near their content)", "title and points stay in the horizontal header (text stays horizontal); the title ellipsizes"], "screens": ["duo-closed-editor", "duo-closed-unit", "duo-closed-add", "duo-closed-landscape-editor", "duo-open-editor", "duo-open-add", "duo-folded-editor", "duo-portrait-editor"]}
+            ]
+          },
+          {
+            "id": "gallery-ui",
+            "label": "Gallery UI",
+            "description": "Gallery-only tooling of the Foldable library. Not part of the product.",
+            "sections": [
+              {"id": "gallery.library-navigation", "title": "Design Library Navigation", "level": "gallery-tooling", "status": "specified", "platforms": ["gallery"], "states": ["phone library", "tablet library", "foldable library", "desktop library", "independent preferences"], "screens": []},
+              {"id": "gallery.duo-frames", "title": "Foldable Device Frames", "level": "gallery-tooling", "status": "specified", "platforms": ["gallery"], "states": ["closed 466 x 678 with the spine on the leading edge", "closed landscape 678 x 466 with the spine on top", "open 951 x 669 with the crease", "partially folded 951 x 669 with the folding region", "open portrait 669 x 951 with a status bar", "each screen fixed to its pose; scaled to fit; caption with pose, size, width class and bar placement"], "screens": []}
             ]
           }
         ]
@@ -886,7 +1063,7 @@
             "label": "Desktop UI",
             "description": "Desktop workspace components. Representative interactive compositions in the Elements view.",
             "sections": [
-              {"id": "gallery.library-navigation", "title": "Design Library Navigation", "level": "gallery-tooling", "status": "specified", "platforms": ["gallery"], "states": ["phone library", "tablet library", "desktop library", "independent preferences"], "screens": []},
+              {"id": "gallery.library-navigation", "title": "Design Library Navigation", "level": "gallery-tooling", "status": "specified", "platforms": ["gallery"], "states": ["phone library", "tablet library", "foldable library", "desktop library", "independent preferences"], "screens": []},
               {
                 "id": "desktop.tokens",
                 "title": "Desktop Tokens",

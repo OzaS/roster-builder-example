@@ -78,6 +78,25 @@ export type WorkflowScreen =
   | "tablet-settings-appearance-import"
   | "tablet-editor-move-unit"
   | "tablet-confirm-delete"
+  | "duo-closed-rosters"
+  | "duo-closed-roster-detail"
+  | "duo-closed-editor"
+  | "duo-closed-unit"
+  | "duo-closed-add"
+  | "duo-closed-lookup"
+  | "duo-closed-settings"
+  | "duo-closed-landscape-rosters"
+  | "duo-closed-landscape-editor"
+  | "duo-open-rosters"
+  | "duo-open-editor"
+  | "duo-open-add"
+  | "duo-open-lookup"
+  | "duo-open-settings"
+  | "duo-open-sources"
+  | "duo-folded-rosters"
+  | "duo-folded-editor"
+  | "duo-portrait-rosters"
+  | "duo-portrait-editor"
   | "tablet-archive-sketch"
   | "desktop-welcome"
   | "desktop-editor"
@@ -285,7 +304,7 @@ export type FavoriteLibrary = {
   detachments: DetachmentFavorite[];
 };
 
-export type ConceptId = "ux-workbench" | "tablet-workbench" | "desktop-workbench";
+export type ConceptId = "ux-workbench" | "tablet-workbench" | "desktop-workbench" | "duo-workbench";
 
 export type PrototypeScreen =
   | "library"

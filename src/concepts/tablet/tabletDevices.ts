@@ -1,7 +1,8 @@
 // Device frames and input modes of the tablet prototype (gallery chrome plus the facts the shell needs).
 // Sizes are the logical window sizes of the device; the width class follows the Material window size classes.
 
-export type TabletDeviceId = 'ipad-landscape' | 'ipad-portrait' | 'android' | 'fold' | 'split';
+/** `duo` is the Foldable library's passport foldable; it is not one of the Tablet library's frames. */
+export type TabletDeviceId = 'ipad-landscape' | 'ipad-portrait' | 'android' | 'fold' | 'split' | 'duo';
 export type TabletInput = 'touch' | 'pointer';
 export type WidthClass = 'compact' | 'medium' | 'expanded';
 export type TabletDevice = { id: TabletDeviceId; label: string; short: string; width: number; height: number; system: 'ios' | 'android' };

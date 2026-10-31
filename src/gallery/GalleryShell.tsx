@@ -88,7 +88,7 @@ type Props = {
   onDesignDataChange: (data: DesignData) => void;
 };
 
-const libraryName: Record<LibraryId, string> = { phone: "Phone", tablet: "Tablet", desktop: "Desktop" };
+const libraryName: Record<LibraryId, string> = { phone: "Phone", tablet: "Tablet", foldable: "Foldable", desktop: "Desktop" };
 
 const navStyleOptions: Array<{ id: Exclude<NavStyle, "top">; label: string; icon: typeof PanelBottom }> = [
   { id: "tabs", label: "Bottom tabs", icon: PanelBottom },
@@ -126,7 +126,7 @@ export function GalleryShell({
   onCapture,
   onDesignDataChange,
 }: Props) {
-  const library: LibraryId = concept.id === "desktop-workbench" ? "desktop" : concept.id === "tablet-workbench" ? "tablet" : "phone";
+  const library: LibraryId = concept.id === "desktop-workbench" ? "desktop" : concept.id === "tablet-workbench" ? "tablet" : concept.id === "duo-workbench" ? "foldable" : "phone";
   const [railWidth, setRailWidth] = useState(280);
   const [workflowSelection, setWorkflowSelection] = useState<WorkflowPickerSelection>("all");
   const [glance, setGlance] = useState<null | { screen: WorkflowScreen; placement?: GlancePlacement }>(null);

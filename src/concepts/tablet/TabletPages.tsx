@@ -191,7 +191,8 @@ export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster 
     const status = session.state === 'validation-error' || session.state === 'status' ? 'issues' : session.state === 'validation-warning' ? 'data-changed' : 'ready';
     return (rosters.find(r => r.status === status) ?? rosters[0])?.name ?? '';
   });
-  const [open, setOpen] = useState(false);
+  // `detail`: the Foldable library's closed display with the selected roster's detail open over the list.
+  const [open, setOpen] = useState(session.state === 'detail');
   const [renaming, setRenaming] = useState(false);
   const [statusOpen, setStatusOpen] = useState(session.state === 'status');
   const validationId = useId();

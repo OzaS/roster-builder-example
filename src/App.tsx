@@ -8,14 +8,15 @@ import { TabletPrefsContext } from "./concepts/tablet/tabletEnv";
 import { defaultDeviceId, defaultInput, defaultTextScale, isDeviceId, isTabletInput, isTextScale, type TabletDeviceId, type TabletInput, type TextScale } from "./concepts/tablet/tabletDevices";
 import type { AppLanguage, ColorScheme, ConceptId, DetachmentFavorite, FavoriteLibrary, ForceCreationMode, GalleryRelease, NavigatorView, NavStyle, PlatformPreview, PrototypeScreen, Roster, RosterForce, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, ThemePreference, UnitDetailView, UnitFavorite, WorkflowScreen } from "./types";
 
-// Three separate design libraries (DEC-039): ?gallery=tablet and ?gallery=desktop select theirs, the phone library is the default.
+// Separate design libraries (DEC-039): ?gallery=tablet, ?gallery=foldable and ?gallery=desktop select theirs, the phone library is the default.
 const libraryParams = [new URLSearchParams(location.search).get("gallery"), new URLSearchParams(location.search).get("design")];
-const libraryKind: "phone" | "tablet" | "desktop" = libraryParams.includes("desktop") ? "desktop" : libraryParams.includes("tablet") ? "tablet" : "phone";
+const libraryKind: "phone" | "tablet" | "foldable" | "desktop" = libraryParams.includes("desktop") ? "desktop" : libraryParams.includes("tablet") ? "tablet" : libraryParams.includes("foldable") ? "foldable" : "phone";
 const desktopLibrary = libraryKind === "desktop";
 const tabletLibrary = libraryKind === "tablet";
-const GALLERY_STATE_KEY = desktopLibrary ? "roster-builder.desktop-gallery-state.v1" : tabletLibrary ? "roster-builder.tablet-gallery-state.v1" : "roster-builder.gallery-state.v1";
+const foldableLibrary = libraryKind === "foldable";
+const GALLERY_STATE_KEY = desktopLibrary ? "roster-builder.desktop-gallery-state.v1" : tabletLibrary ? "roster-builder.tablet-gallery-state.v1" : foldableLibrary ? "roster-builder.foldable-gallery-state.v1" : "roster-builder.gallery-state.v1";
 const FAVORITES_KEY = "roster-builder.favorites.v1";
-const conceptIds = ["ux-workbench", "tablet-workbench", "desktop-workbench"] satisfies ConceptId[];
+const conceptIds = ["ux-workbench", "tablet-workbench", "desktop-workbench", "duo-workbench"] satisfies ConceptId[];
 const themeModes = ["dark", "light"] satisfies ThemeMode[];
 const themePreferences = ["system", "dark", "light"] satisfies ThemePreference[];
 const appLanguages = ["en", "fr"] satisfies AppLanguage[];
@@ -72,6 +73,25 @@ const workflowScreenIds = [
   "tablet-editor-move-unit",
   "tablet-confirm-delete",
   "tablet-archive-sketch",
+  "duo-closed-rosters",
+  "duo-closed-roster-detail",
+  "duo-closed-editor",
+  "duo-closed-unit",
+  "duo-closed-add",
+  "duo-closed-lookup",
+  "duo-closed-settings",
+  "duo-closed-landscape-rosters",
+  "duo-closed-landscape-editor",
+  "duo-open-rosters",
+  "duo-open-editor",
+  "duo-open-add",
+  "duo-open-lookup",
+  "duo-open-settings",
+  "duo-open-sources",
+  "duo-folded-rosters",
+  "duo-folded-editor",
+  "duo-portrait-rosters",
+  "duo-portrait-editor",
   "desktop-welcome",
   "desktop-editor",
   "desktop-rosters",
@@ -186,19 +206,20 @@ function App() {
   const initialState = useMemo((): PersistedGalleryState => {
     const saved = readPersistedGalleryState();
     if (desktopLibrary) return { ...saved, selectedConcept: "desktop-workbench", workflowScreen: saved.workflowScreen?.startsWith("desktop-") ? saved.workflowScreen : "desktop-welcome", navigatorView: saved.navigatorView ?? "all-screens" };
+    if (foldableLibrary) return { ...saved, selectedConcept: "duo-workbench", workflowScreen: saved.workflowScreen?.startsWith("duo-") ? saved.workflowScreen : "duo-closed-rosters", screen: "library", navigatorView: saved.navigatorView ?? "all-screens" };
     if (tabletLibrary) {
       // After using the archived sketch the workflow screen can be a phone screen; fall back to Home then.
       const keep = saved.workflowScreen?.startsWith("tablet-");
       return { ...saved, selectedConcept: "tablet-workbench", workflowScreen: keep ? saved.workflowScreen : "tablet-home", screen: keep ? workflowToPrototypeScreen(saved.workflowScreen!) : workflowToPrototypeScreen("tablet-home"), navigatorView: saved.navigatorView ?? "single" };
     }
-    if (saved.selectedConcept === "desktop-workbench" || saved.selectedConcept === "tablet-workbench" || saved.workflowScreen?.startsWith("tablet-") || saved.workflowScreen?.startsWith("desktop-")) return { ...saved, selectedConcept: "ux-workbench", workflowScreen: "library", screen: "library" };
+    if (saved.selectedConcept === "desktop-workbench" || saved.selectedConcept === "tablet-workbench" || saved.selectedConcept === "duo-workbench" || saved.workflowScreen?.startsWith("tablet-") || saved.workflowScreen?.startsWith("desktop-") || saved.workflowScreen?.startsWith("duo-")) return { ...saved, selectedConcept: "ux-workbench", workflowScreen: "library", screen: "library" };
     return saved;
   }, []);
   const [designData, setDesignData] = useState<DesignData>(bundledDesignData);
   const [designDataWritable, setDesignDataWritable] = useState(false);
   const [selectedConcept, setSelectedConcept] = useState<ConceptId>(initialState.selectedConcept ?? "ux-workbench");
   // The phone library always shows phone (old saved `platform` values are ignored); the tablet library shows tablet frames.
-  const platform: PlatformPreview = tabletLibrary ? "tablet" : "phone";
+  const platform: PlatformPreview = tabletLibrary || foldableLibrary ? "tablet" : "phone";
   const [tabletDeviceId, setTabletDeviceId] = useState<TabletDeviceId>(initialState.tabletDevice ?? defaultDeviceId);
   const [tabletInputMode, setTabletInputMode] = useState<TabletInput>(initialState.tabletInput ?? defaultInput);
   const [tabletTextScale, setTabletTextScale] = useState<TextScale>(initialState.tabletTextScale ?? defaultTextScale);
@@ -305,7 +326,7 @@ function App() {
     }
   }, [favorites]);
 
-  const conceptGroups = useMemo(() => buildConceptGroups({ ...designData, designs: designData.designs.filter(design => design.id === (desktopLibrary ? "desktop-workbench" : tabletLibrary ? "tablet-workbench" : "ux-workbench")) }), [designData]);
+  const conceptGroups = useMemo(() => buildConceptGroups({ ...designData, designs: designData.designs.filter(design => design.id === (desktopLibrary ? "desktop-workbench" : tabletLibrary ? "tablet-workbench" : foldableLibrary ? "duo-workbench" : "ux-workbench")) }), [designData]);
   const concept = findConceptInData(designData, selectedConcept);
   const Concept = concept.component;
   const captureRef = useRef<HTMLElement>(null);

@@ -1,0 +1,110 @@
+/* Foldable library: the passport foldable after Apple's iPhone Duo (HIG "Designing for iPhone Duo").
+   The app inside is the tablet's .tb-app (pages, panes, editor); this file adds the device, the fold and the vertical bars. */
+
+/* ------------------------------ device ------------------------------ */
+.duo-device { position: absolute; display: flex; flex-direction: column; overflow: hidden; transform-origin: 0 0; border-radius: 44px; background: #101416;
+  box-shadow: 0 0 0 10px #14191b, 0 28px 70px rgba(20, 29, 32, .32) }
+.duo-device.theme-light { background: #f7f8fa }
+/* Closed: the spine (hinge) on the leading edge in portrait, on top in landscape; large radii on the free corners. */
+.duo-device.pose-closed { border-radius: 16px 60px 60px 16px; box-shadow: 0 0 0 10px #14191b, -12px 0 0 10px #353d41, 0 28px 70px rgba(20, 29, 32, .32) }
+.duo-device.pose-closed-landscape { border-radius: 16px 16px 60px 60px; box-shadow: 0 0 0 10px #14191b, 0 -12px 0 10px #353d41, 0 28px 70px rgba(20, 29, 32, .32) }
+.duo-device .duo-statusbar { flex: 0 0 auto; height: 28px }
+.duo-device.theme-light .tb-statusbar { color: #141a26; background: #f7f8fa }
+.duo-viewport { position: relative; flex: 1 1 auto; min-height: 0; overflow: hidden }
+.duo-viewport > * { height: 100% }
+.duo-device .duo-home { z-index: 70 }
+
+/* The fold of the inner display: a hairline crease when fully open; partially folded, the reserved folding region and the
+   shading of the two halves turning away from each other. */
+.duo-fold { position: absolute; z-index: 60; top: 0; bottom: 0; left: 50%; width: 2px; margin-left: -1px; pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .06), transparent) }
+.duo-device.theme-light .duo-fold { background: linear-gradient(90deg, transparent, rgba(0, 0, 0, .06), transparent) }
+.duo-fold.horizontal { left: 0; right: 0; top: 50%; bottom: auto; width: auto; height: 2px; margin: -1px 0 0; background: linear-gradient(180deg, transparent, rgba(255, 255, 255, .06), transparent) }
+.duo-fold.folded { width: var(--fold-gap); margin-left: calc(var(--fold-gap) / -2); background: linear-gradient(90deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, .38) 50%, rgba(0, 0, 0, 0)) }
+.duo-fold.folded::before, .duo-fold.folded::after { content: ''; position: absolute; top: 0; bottom: 0; width: 360px }
+.duo-fold.folded::before { right: 100%; background: linear-gradient(90deg, transparent, rgba(0, 0, 0, .16)) }
+.duo-fold.folded::after { left: 100%; background: linear-gradient(90deg, rgba(255, 255, 255, .05), transparent 70%) }
+.duo-device.theme-light .duo-fold.folded { background: linear-gradient(90deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, .16) 50%, rgba(0, 0, 0, 0)) }
+.duo-device.theme-light .duo-fold.folded::before { background: linear-gradient(90deg, transparent, rgba(0, 0, 0, .07)) }
+
+/* ------------------------------ app ------------------------------ */
+.duo-app.tb-app { position: relative }
+.duo-v .tb-main { padding: 14px 8px 24px 16px }
+.duo-outer.duo-v .tb-main { padding: 12px 6px 22px 14px }
+.duo-h .tb-main { padding-bottom: 100px }
+/* Partially folded: list and detail divide at the fold (HIG: equal panes, nothing in the folding region); the page's search and
+   filters stay with the leading pane, as a leading pane's controls do. */
+.duo-folded .tb-main .tb-panes:not(.single) { grid-template-columns: calc(var(--duo-fold-x) - 16px - var(--duo-fold-gap) / 2) minmax(0, 1fr); column-gap: var(--duo-fold-gap) }
+.duo-folded .tb-main :is(.tb-top-row, .tb-roster-filter-row) { max-width: calc(var(--duo-fold-x) - 16px - var(--duo-fold-gap) / 2) }
+
+/* ------------------------------ vertical bars ------------------------------ */
+.duo-bar { position: relative; z-index: 30; flex: 0 0 80px; display: flex; flex-direction: column; align-items: center; gap: 10px; min-height: 0; padding: 12px 0 20px }
+.duo-bar.camera-bottom { padding: 14px 0 12px }
+.duo-bar.camera-none { padding-top: 16px }
+.duo-island { flex: 0 0 auto; display: block; width: 38px; height: 38px; border-radius: 50%; background: #000; box-shadow: inset 0 0 0 1px #1c2125 }
+.duo-status { flex: 0 0 auto; display: grid; justify-items: center; gap: 5px; margin-bottom: 2px; color: var(--ux-ink); font: 750 13px/1 var(--font); font-variant-numeric: tabular-nums }
+.duo-ring { position: relative; display: grid; place-items: center; width: 32px; height: 32px }
+.duo-ring::before { content: ''; position: absolute; inset: 0; border-radius: 50%;
+  background: conic-gradient(from 180deg, var(--ux-ink) 0 80%, color-mix(in srgb, var(--ux-ink) 22%, transparent) 80% 100%);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px)); mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px)) }
+.duo-tools { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; align-items: center; gap: 10px }
+.duo-tabs { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 10px }
+.duo-capsule { display: flex; flex-direction: column; border-radius: 23px }
+
+/* Liquid Glass: single buttons and capsules float over the app's background; the prominent action is filled. */
+.duo-app button.duo-btn { position: relative; display: grid; place-items: center; width: 46px; height: 46px; margin: 0; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--ux-ink); cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none }
+.duo-capsule, .duo-tools > .tb-hint-wrap > .duo-btn, .duo-tabs > .tb-hint-wrap > .duo-btn, .duo-capsule-h, .duo-app button.duo-search-h,
+.duo-app button.duo-new-h {
+  background: color-mix(in srgb, var(--ux-surface-2) 80%, transparent); box-shadow: 0 6px 18px rgba(0, 0, 0, .28), inset 0 0 0 1px color-mix(in srgb, var(--ux-ink) 10%, transparent), inset 0 1px 0 rgba(255, 255, 255, .07);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4); backdrop-filter: blur(16px) saturate(1.4) }
+.duo-app.light :is(.duo-capsule, .duo-tools > .tb-hint-wrap > .duo-btn, .duo-tabs > .tb-hint-wrap > .duo-btn, .duo-capsule-h, button.duo-search-h) {
+  background: color-mix(in srgb, #fff 86%, transparent); box-shadow: 0 6px 18px rgba(20, 26, 38, .12), inset 0 0 0 1px rgba(20, 26, 38, .08) }
+.duo-app[data-transparency=reduce] :is(.duo-capsule, .duo-tools > .tb-hint-wrap > .duo-btn, .duo-tabs > .tb-hint-wrap > .duo-btn, .duo-capsule-h, button.duo-search-h) { background: var(--ux-surface-2); -webkit-backdrop-filter: none; backdrop-filter: none }
+.duo-app.light[data-transparency=reduce] :is(.duo-capsule, .duo-tools > .tb-hint-wrap > .duo-btn, .duo-tabs > .tb-hint-wrap > .duo-btn, .duo-capsule-h, button.duo-search-h) { background: #fff }
+.duo-app .duo-tools > .tb-hint-wrap > button.duo-btn.prominent, .duo-app button.duo-new-h { background: var(--ux-accent); color: var(--ux-accent-ink); box-shadow: 0 8px 20px color-mix(in srgb, var(--ux-accent) 40%, transparent) }
+.duo-app button.duo-btn.active, .duo-app button.duo-tab-h.active { background: color-mix(in srgb, var(--ux-accent) 24%, transparent); color: var(--ux-accent-2) }
+.duo-app.light button.duo-btn.active, .duo-app.light button.duo-tab-h.active { background: color-mix(in srgb, var(--ux-accent) 16%, transparent); color: var(--ux-accent) }
+.duo-app button.duo-btn:disabled { opacity: .36; cursor: default }
+.duo-app button.duo-btn:not(:disabled):active { transform: scale(.94) }
+.duo-app :is(button.duo-btn, button.duo-tab-h, .duo-menu button):focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px }
+
+/* More: the system overflow menu, beside the bar. */
+.duo-more { position: relative }
+.duo-menu { position: absolute; z-index: 90; right: calc(100% + 12px); top: 50%; transform: translateY(-50%); min-width: 236px; padding: 6px; border: 1px solid var(--ux-line-2); border-radius: 18px; background: var(--ux-surface); box-shadow: 0 18px 44px rgba(0, 0, 0, .42) }
+.duo-app.light .duo-menu { box-shadow: 0 18px 44px rgba(20, 26, 38, .18) }
+.duo-menu button { display: flex; align-items: center; gap: 11px; width: 100%; min-height: 44px; padding: 0 12px; border: 0; border-radius: 12px; background: transparent; color: var(--ux-ink); font: inherit; font-size: 15px; font-weight: 600; text-align: left; cursor: pointer }
+.duo-menu button:not(:disabled):active { background: var(--ux-surface-2) }
+.duo-menu button:disabled { opacity: .45; cursor: default }
+.duo-menu button.danger { color: var(--ux-err) }
+.duo-menu hr { margin: 5px 8px; border: 0; border-top: 1px solid var(--ux-line) }
+
+/* ------------------------------ horizontal bars (open, portrait) ------------------------------ */
+.duo-tabs-h { position: absolute; z-index: 20; left: 0; right: 0; bottom: 20px; display: flex; justify-content: center; align-items: center; gap: 10px; pointer-events: none }
+.duo-tabs-h > * { pointer-events: auto }
+.duo-capsule-h { display: flex; gap: 2px; padding: 4px; border-radius: 32px }
+.duo-app button.duo-tab-h { display: grid; justify-items: center; align-content: center; gap: 3px; min-width: 78px; height: 54px; padding: 0 10px; border: 0; border-radius: 27px; background: transparent; color: var(--ux-muted); font: inherit; font-size: 11px; font-weight: 700; cursor: pointer }
+.duo-app button.duo-search-h { width: 62px; height: 62px }
+.duo-app button.duo-new-h { position: absolute; z-index: 20; right: 24px; bottom: 23px; width: 56px; height: 56px }
+
+/* ------------------------------ Elements view ------------------------------ */
+.duo-el-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 22px }
+.duo-el-bar { margin: 0; display: grid; gap: 8px; max-width: 200px }
+.duo-el-bar > .tb-app { display: flex; border-radius: 22px; overflow: visible }
+.duo-el-bar figcaption { color: var(--muted, #6b7280); font-size: 12.5px; line-height: 1.35 }
+.duo-el-content { flex: 1; border-radius: 22px 0 0 22px; background: repeating-linear-gradient(180deg, var(--ux-surface) 0 52px, transparent 52px 60px) }
+.duo-app.duo-el-hbar { position: relative; width: 669px; max-width: 100%; height: 110px; border-radius: 24px }
+.duo-el-pose { display: block; border-radius: 10px; background: #1b2124; box-shadow: 0 0 0 3px #14191b }
+.duo-el-pose.closed { border-radius: 4px 12px 12px 4px; box-shadow: 0 0 0 3px #14191b, -4px 0 0 3px #353d41 }
+.duo-el-pose.closed-landscape { border-radius: 4px 4px 12px 12px; box-shadow: 0 0 0 3px #14191b, 0 -4px 0 3px #353d41 }
+.duo-el-pose.open-folded { background: linear-gradient(90deg, #1b2124 46%, #0c0f11 50%, #22292c 54%) }
+
+/* ------------------------------ shared pieces in the foldable ------------------------------ */
+/* The tablet's split-view note explains a tablet frame; the foldable's list simply opens its detail over itself. */
+.duo-app .tb-split-note { display: none }
+/* The catalogue: a full-width sheet on the outer display; on the inner display it covers the leading half, up to the fold. */
+.duo-outer .tbe-slide { width: 100%; border-right: 0; border-radius: 0 }
+.duo-inner.duo-v .tbe-slide { width: calc(var(--duo-fold-x) - var(--duo-fold-gap) / 2) }
+/* Roster title in the editor's header: one line with an ellipsis when the points leave little room. */
+.duo-app .tbe-title { min-width: 0 }
+.duo-app .tbe-title-text { min-width: 0; overflow: hidden }
+.duo-app .tbe-title-text :is(strong, small) { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
