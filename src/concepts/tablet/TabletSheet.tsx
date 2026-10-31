@@ -37,7 +37,7 @@ export function TabletSheet({ title, sub, action, cancelLabel = 'Cancel', wide =
     window.addEventListener('keydown', onKey);
     return () => { window.removeEventListener('keydown', onKey); previous?.focus?.({ preventScroll: true }); };
   }, []);
-  const reveal = (e: FocusEvent<HTMLElement>) => { const t = e.target; if (t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement || t instanceof HTMLSelectElement) t.scrollIntoView({ block: 'center', behavior: 'smooth' }); };
+  const reveal = (e: FocusEvent<HTMLElement>) => { const t = e.target; const reduced = t.closest('[data-motion="reduce"]') || window.matchMedia('(prefers-reduced-motion: reduce)').matches; if (t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement || t instanceof HTMLSelectElement) t.scrollIntoView({ block: 'center', behavior: reduced ? 'instant' : 'smooth' }); };
   return <div className="tbs-scrim" onClick={onClose}>
     <form ref={ref} className={`tbs-sheet ${wide ? 'wide' : ''}`} role="dialog" aria-modal="true" aria-labelledby={titleId} onClick={e => e.stopPropagation()} onFocus={reveal}
       onSubmit={e => { e.preventDefault(); if (action && !action.disabled) action.onClick(); }}>

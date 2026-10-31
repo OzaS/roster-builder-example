@@ -5,6 +5,7 @@ import { Segmented, Switch } from '../workspace/Primitives';
 import { colourSchemes } from '../desktop/desktopData';
 import { Facts, ListDetail, Row, WorkspaceScope, type SessionProps } from './TabletPieces';
 import { editorShortcuts, generalShortcuts, keyLabel } from './tabletKeys';
+import { useTabletExperience } from './tabletExperience';
 
 // Settings (T2b): sections as a list, each one a real page in the detail pane. Key bindings are a read-only list here: the
 // shortcuts work with a hardware keyboard and appear in the system overlay; the editor stays on the desktop.
@@ -23,6 +24,7 @@ const sections = [
 const Group = ({ title, children }: { title?: string; children: ReactNode }) => <section className="tb-section">{title && <span className="ux-result-label">{title}</span>}{children}</section>;
 
 export function TabletSettings({ env, notify, session, themePref, scheme, onTheme, onScheme }: SessionProps & { themePref: ThemePref; scheme: ColorScheme; onTheme: (t: ThemePref) => void; onScheme: (s: ColorScheme) => void }) {
+  const { experience, choose } = useTabletExperience();
   const { light, advancedInstall, setAdvancedInstall, settingsSection, setSettingsSection, language, setLanguage, setAppearanceImport } = session;
   const [open, setOpen] = useState(settingsSection !== undefined);
   const [limit, setLimit] = useState(1000);
@@ -33,6 +35,7 @@ export function TabletSettings({ env, notify, session, themePref, scheme, onThem
   const page = (() => {
     switch (current.id) {
       case 'appearance': return <>
+        <WorkspaceScope light={light}><div className="ux-src-group tb-switches"><Switch label="Reduce motion" detail="Use direct transitions instead of spring and shape motion. Device accessibility preferences also apply." checked={experience.reducedMotion} onChange={value => choose('reducedMotion', value)} /><Switch label="Reduce transparency" detail="Use solid backgrounds for toolbars and controls." checked={experience.reducedTransparency} onChange={value => choose('reducedTransparency', value)} /></div></WorkspaceScope>
         <WorkspaceScope light={light}><div className="tb-setting"><span><strong>Theme</strong><small>System follows the device setting.</small></span><Segmented<ThemePref> label="Theme" value={themePref} onChange={onTheme} options={[{ value: 'system', label: 'System' }, { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }]} /></div></WorkspaceScope>
         <Group title="Colour scheme"><div className="tb-schemes" role="radiogroup" aria-label="Colour scheme">{colourSchemes.map(c => <button type="button" key={c.id} role="radio" aria-checked={scheme === c.id} className={`ux-start-row tb-scheme ${scheme === c.id ? 'on' : ''}`} onClick={() => onScheme(c.id)}><i style={{ background: c.accent }} /><span><strong>{c.name}</strong></span>{scheme === c.id && <Check size={18} />}</button>)}</div>
           <button type="button" className="ux-job-btn tb-wide" onClick={() => setAppearanceImport({ kind: 'scheme', outcome: 'idle' })}><Upload size={16} />Import colour scheme</button></Group>

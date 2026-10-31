@@ -4,6 +4,7 @@ import { LibrarySwitch } from '../../gallery/LibrarySwitch';
 import { ComingSoonCard } from '../ux/AppExtras';
 import { TabletControls } from './TabletControls';
 import { RosterToolbar } from './RosterToolbar';
+import { TabletExperienceControls } from './tabletExperience';
 import { TabletDeviceFrame } from './TabletDeviceFrame';
 import { TabletRail } from './TabletRail';
 import { TabletResizer, type PanePresets } from './TabletResizer';
@@ -57,7 +58,7 @@ export function TabletElements() {
   const [textScale, setTextScale] = useState<TextScale>(defaultTextScale);
   const prefs = useMemo(() => ({ deviceId, input, textScale, setDeviceId, setInput, setTextScale }), [deviceId, input, textScale]);
   const [page, setPage] = useState<'home' | 'rosters' | 'tools'>('rosters');
-  const railIn = (mode: TabletInput, device: 'ipad-portrait' | 'android') => <div className="tb-app ux-screen ux-size-regular dark tb-medium" style={{ height: 'auto', flex: 'none', background: 'var(--ux-bg)', borderRadius: 18, overflow: 'visible', width: 'max-content' }}>
+  const railIn = (mode: TabletInput, device: 'ipad-portrait' | 'android') => <div className={`tb-app ux-screen ux-size-regular dark ${device === 'android' ? 'tb-expanded' : 'tb-medium'}`} data-system={device === 'android' ? 'android' : 'ios'} style={{ height: 'auto', flex: 'none', background: 'var(--ux-bg)', borderRadius: 18, overflow: 'visible', width: 'max-content' }}>
     <TabletEnvContext.Provider value={makeTabletEnv(device, mode)}><div style={{ height: 620, display: 'flex' }}><TabletRail page={page} input={mode} system={device === 'android' ? 'android' : 'ios'} onPage={p => setPage(p as typeof page)} onNewRoster={() => {}} /></div></TabletEnvContext.Provider>
   </div>;
   return <TabletPrefsContext.Provider value={prefs}>
@@ -68,7 +69,7 @@ export function TabletElements() {
       <LibrarySwitch current="tablet" label="Design library examples" />
       <h2>Tablet rail · iPad Touch and Pointer, Android Touch (press and hold shows the hint; with a pointer, hover shows the title)</h2>
       <div className="tb-el-row">{railIn('touch', 'ipad-portrait')}{railIn('pointer', 'ipad-portrait')}{railIn('touch', 'android')}
-        <div className="tb-el-note"><strong>Hint bubble</strong><span className="tb-hint-bubble static">Rosters: find, open and manage your rosters</span><small>Home, Rosters, Lookup, Tools, Library; Sources and Settings pinned to the bottom. Pill indicator behind the active icon, aria-current, focus ring, 56 px and larger targets. iPad (HIG): destinations only; New roster sits at the trailing edge of the Home and Rosters toolbars, ⌘N everywhere. Android (Material 3 rail): New roster is an icon-only FAB on top (56 px, tonal, no shadow, aligned with the page content). TB-00 review, 2026-10-26.</small></div>
+        <div className="tb-el-note"><strong>Hint bubble</strong><span className="tb-hint-bubble static">Rosters: find, open and manage your rosters</span><small>Home, Rosters, Lookup, Tools, Library; Sources and Settings pinned to the bottom. iPad: navigation destinations only; New roster is a trailing toolbar control. Android: an extended FAB and expanded rail at wide window sizes; an icon FAB in medium and compact windows. ⌘N / Ctrl+N remains available.</small></div>
       </div>
       <h2>Home toolbar · iPad (New roster at the trailing edge) and Android (New roster on the rail)</h2>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-home" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="android"><TabletWorkbench workflowScreen="tablet-home" /></TabletDeviceFrame></div>
@@ -77,6 +78,12 @@ export function TabletElements() {
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-home-many-systems" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-portrait"><TabletWorkbench workflowScreen="tablet-home-many-systems" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="android"><TabletWorkbench workflowScreen="tablet-home-many-systems" /></TabletDeviceFrame></div>
       <h2>Sources panes and toolbar (TFB-008, TFB-009) · Installed above both panes, first card level with the detail; Install from a file and Add game data as the Rosters toolbar</h2>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-sources" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="android"><TabletWorkbench workflowScreen="tablet-sources" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="split"><TabletWorkbench workflowScreen="tablet-sources" /></TabletDeviceFrame></div>
+      <h2>Platform action toolbars · Liquid Glass and M3 Expressive</h2>
+      <p>New roster is a separate trailing icon on iPad and one rail FAB on Android. Continue and Open stay with their roster. Rename, Duplicate, Export and Delete form a contextual toolbar for the selected roster. Reading surfaces remain solid.</p>
+      <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-rosters" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="android"><TabletWorkbench workflowScreen="tablet-rosters" /></TabletDeviceFrame></div>
+      <h2>Motion and materials · accessibility variants</h2>
+      <p>Toolbar press feedback, Android shape changes and sheet springs respond to interaction. These switches apply to all tablet previews, including standalone pages; device accessibility settings also apply.</p>
+      <TabletExperienceControls />
       <h2>Device frames · same scale</h2>
       <div className="tb-el-devices">{tabletDevices.map(d => <figure key={d.id}><i style={{ width: d.width / 8, height: d.height / 8 }} className={d.system} /><figcaption><strong>{d.label}</strong>{d.width} × {d.height} · {widthClassLabel[widthClassOf(d.width)]}</figcaption></figure>)}</div>
       <h2>Device, input mode and text size switches</h2>

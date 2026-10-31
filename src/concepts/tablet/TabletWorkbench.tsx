@@ -19,6 +19,8 @@ import type { TextScale } from './tabletDevices';
 import { IconHints } from './TabletHint';
 import { ShortcutOverlay, shortcutGroups, useShortcutOverlay, useShortcuts } from './tabletKeys';
 import './tablet.css';
+import './tablet-platform.css';
+import { useTabletExperience } from './tabletExperience';
 
 type ThemePref = 'system' | 'light' | 'dark';
 
@@ -56,6 +58,7 @@ const editorAt = (start: EditorStart | undefined, key = 0): OpenEditor | null =>
 function TabletShell({ route, initialEditor, initialImport = false, initialShortcuts = false, ...props }: Partial<ConceptProps> & { route: TabletRoute; initialEditor?: EditorStart; initialImport?: boolean; initialShortcuts?: boolean }) {
   const initialPage = route.page;
   const env = useTabletEnv();
+  const { experience } = useTabletExperience();
   const [page, setPage] = useState<TabletPage>(initialPage);
   // One roster at a time (DEC-039): the editor covers the rail; Back returns to the page it was opened from.
   const [editor, setEditor] = useState<OpenEditor | null>(() => editorAt(initialEditor));
@@ -106,6 +109,7 @@ function TabletShell({ route, initialEditor, initialImport = false, initialShort
   const [shortcuts, setShortcuts] = useShortcutOverlay(appRef, env.device.system, initialShortcuts);
   const openRoster = (name: string) => setEditor(current => ({ name, from: page, start: 'editor', key: (current?.key ?? 0) + 1 }));
   return <div ref={appRef} className={`tb-app ux-screen ux-size-regular ${light ? 'light' : 'dark'} ux-scheme-${scheme} tb-${env.widthClass} tb-${env.input} ${editor ? 'tb-editing' : ''}`} data-device={env.device.id} data-text={env.textScale}
+    data-system={env.device.system} data-motion={experience.reducedMotion ? 'reduce' : 'standard'} data-transparency={experience.reducedTransparency ? 'reduce' : 'standard'}
     style={env.textScale !== 100 ? { zoom: env.textScale / 100 } : undefined}>
     {editor ? <TabletEditor key={editor.key} env={env} notify={notify} light={light} rosterName={editor.name} from={editor.from} start={editor.start}
       onBack={() => setEditor(null)} onAllRosters={() => { setEditor(null); setPage('rosters'); }} onNewRoster={newRoster} onFindData={() => { setEditor(null); setPage('sources'); }} onImport={() => setImporting(sampleImport(true))} imported={editor.imported} /> : <>
