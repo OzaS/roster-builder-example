@@ -3,6 +3,7 @@ import type { ColorScheme, PlatformPreview, ThemeMode, WorkflowScreen } from "..
 import type { GalleryConcept } from "../gallery/galleryTypes";
 import { DeviceFrame } from "./DeviceFrame";
 import { TabletDeviceFrame, type FrameFit } from "../concepts/tablet/TabletDeviceFrame";
+import { fixedFrames } from "../concepts/tablet/tabletDevices";
 
 /**
  * The frame around a concept screen: the desktop window, the phone or, for the Tablet library, the selectable tablet device frame.
@@ -19,7 +20,8 @@ export function PreviewFrame({ concept, screen, platform, themeMode, colorScheme
   children: ReactNode;
 }) {
   if (concept.id === "tablet-workbench" && screen.startsWith("tablet-") && screen !== "tablet-archive-sketch") {
-    return <TabletDeviceFrame themeMode={themeMode} colorScheme={colorScheme} fit={fit}>{children}</TabletDeviceFrame>;
+    const fixed = fixedFrames[screen];
+    return <TabletDeviceFrame device={fixed?.device} textScale={fixed?.textScale} themeMode={themeMode} colorScheme={colorScheme} fit={fit}>{children}</TabletDeviceFrame>;
   }
   return <DeviceFrame desktop={concept.id === "desktop-workbench"} platform={platform} themeMode={themeMode} colorScheme={colorScheme} statusBarUsesDesignBackground={statusBarUsesDesignBackground}>{children}</DeviceFrame>;
 }

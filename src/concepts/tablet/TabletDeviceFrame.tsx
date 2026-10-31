@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { BatteryFull, Signal, Wifi } from 'lucide-react';
 import type { ColorScheme, ThemeMode } from '../../types';
-import { deviceById, widthClassLabel, type TabletDeviceId, type TabletInput } from './tabletDevices';
+import { deviceById, widthClassLabel, type TabletDeviceId, type TabletInput, type TextScale } from './tabletDevices';
 import { TabletEnvContext, makeTabletEnv, useTabletPrefs } from './tabletEnv';
 import './tablet-frame.css';
 
@@ -12,12 +12,12 @@ const BEZEL = 10;
 const CAPTION = 44;
 export type FrameFit = 'none' | 'width' | 'both';
 
-export function TabletDeviceFrame({ device, input, themeMode = 'dark', colorScheme = 'default', fit = 'both', caption = true, children }: {
-  device?: TabletDeviceId; input?: TabletInput; themeMode?: ThemeMode; colorScheme?: ColorScheme; fit?: FrameFit; caption?: boolean; children: ReactNode;
+export function TabletDeviceFrame({ device, input, textScale, themeMode = 'dark', colorScheme = 'default', fit = 'both', caption = true, children }: {
+  device?: TabletDeviceId; input?: TabletInput; textScale?: TextScale; themeMode?: ThemeMode; colorScheme?: ColorScheme; fit?: FrameFit; caption?: boolean; children: ReactNode;
 }) {
   const prefs = useTabletPrefs();
   const spec = deviceById(device ?? prefs.deviceId);
-  const env = makeTabletEnv(spec.id, input ?? prefs.input, prefs.textScale);
+  const env = makeTabletEnv(spec.id, input ?? prefs.input, textScale ?? prefs.textScale);
   const hostRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
   const outerW = spec.width + 2 * BEZEL;

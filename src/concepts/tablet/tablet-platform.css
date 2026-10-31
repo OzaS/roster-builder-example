@@ -1,0 +1,92 @@
+/* Platform control layers. Data cards, rows and reading surfaces remain opaque. */
+.tb-app {
+  --tb-press-time: 150ms;
+  --tb-spring: cubic-bezier(.2, 1.25, .3, 1);
+  --tb-glass: color-mix(in srgb, var(--ux-surface-2) 88%, transparent);
+}
+.tb-context-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 6px; border-radius: 28px; justify-self: start; max-width: 100% }
+.tb-app .tb-context-actions .ux-job-btn { min-height: 48px; padding: 0 12px; border: 0; border-radius: 24px; background: transparent; color: var(--ux-ink) }
+.tb-app .tb-context-actions .ux-job-btn.destructive { color: var(--ux-err) }
+.tb-app[data-system=ios] :is(.tb-context-actions, .tbe-icon, .tbe-back, .tbe-header .dt-summary-toggle) {
+  background: linear-gradient(145deg, color-mix(in srgb, var(--ux-ink) 7%, transparent), transparent 65%), var(--tb-glass);
+  border: 1px solid var(--ux-line-2);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ux-ink) 12%, transparent), 0 4px 14px #0001;
+  -webkit-backdrop-filter: blur(20px) saturate(1.3); backdrop-filter: blur(20px) saturate(1.3);
+}
+.tb-app[data-system=ios] :is(.tbe-icon, .tbe-back) { border-radius: 24px }
+.tb-app[data-system=ios] .tbs-head .tbs-primary { border-radius: 24px }
+.tb-app[data-system=ios] .tbs-sheet { animation: tb-glass-open 280ms cubic-bezier(.16, 1, .3, 1) }
+.tb-app[data-system=android] { --tb-press-time: 220ms }
+.tb-app[data-system=android] .tb-context-actions { background: var(--ux-surface-2); border: 1px solid var(--ux-line); box-shadow: 0 6px 18px #0002; border-radius: 30px }
+.tb-app[data-system=android] .tb-context-actions .ux-job-btn { border-radius: 26px }
+.tb-app[data-system=android] .tbs-sheet { border-radius: 28px; animation: tb-expressive-open 380ms var(--tb-spring) }
+.tb-app[data-system=android] .tbs-head .tbs-primary { border-radius: 26px }
+.tb-app :is(.tb-tool-ind, .tb-filter, .tb-context-actions button, .tbe-icon, .tbe-back, .tbs-primary) { transition: transform var(--tb-press-time) var(--tb-spring), border-radius 260ms var(--tb-spring), background 160ms ease }
+.tb-app :is(.tb-context-actions button, .tbe-icon, .tbe-back, .tbs-primary):not(:disabled):active { transform: scale(.94) }
+.tb-app[data-system=android] :is(button.tb-tool-action:active .tb-tool-ind, button.tb-rail-item.prominent:active .tb-rail-ind) { border-radius: 10px }
+.tb-app[data-system=android] button.tb-filter.active { border-radius: 16px }
+.tb-app .tb-rail-ind { transition: background 180ms ease, transform 240ms var(--tb-spring), border-radius 240ms var(--tb-spring) }
+.tb-app :is(button.tb-rail-item, button.tb-tool-action):active :is(.tb-rail-ind, .tb-tool-ind) { transform: scale(.92) }
+@keyframes tb-glass-open { from { opacity: .3; transform: translateY(10px) scale(.97) } to { opacity: 1; transform: none } }
+@keyframes tb-expressive-open { from { opacity: .3; transform: translateY(22px) scale(.94) } to { opacity: 1; transform: none } }
+/* A split-view form sheet stays edge-to-edge, regardless of its platform material. */
+@container tbs (max-width: 700px) {
+  .tb-app[data-system] .tbs-sheet { border-radius: 0 }
+}
+.tablet-experience-controls { display: grid; gap: 10px; color: var(--ink); font-size: 13px }
+.tablet-experience-controls label { display: flex; align-items: center; gap: 8px; min-height: 36px }
+.tablet-experience-controls input { width: 18px; height: 18px; accent-color: var(--accent) }
+.tablet-experience-controls small { color: var(--muted); font-size: 12px; line-height: 1.5 }
+.tb-app[data-transparency=reduce] { --tb-glass: var(--ux-surface-2) }
+.tb-app[data-transparency=reduce] :is(.tb-context-actions, .tb-tool-action:not(.prominent):not(.active) .tb-tool-ind, .tbe-icon, .tbe-back, .tbe-header .dt-summary-toggle, .tbk-panel) { background: var(--ux-surface-2); -webkit-backdrop-filter: none; backdrop-filter: none }
+@media (prefers-reduced-transparency: reduce) {
+  .tb-app { --tb-glass: var(--ux-surface-2) }
+  .tb-app :is(.tb-context-actions, .tb-tool-action:not(.prominent):not(.active) .tb-tool-ind, .tbe-icon, .tbe-back, .tbe-header .dt-summary-toggle, .tbk-panel) { background: var(--ux-surface-2); -webkit-backdrop-filter: none; backdrop-filter: none }
+}
+.tb-app[data-motion=reduce] *, .tb-app[data-motion=reduce] *::before, .tb-app[data-motion=reduce] *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important }
+.tb-app[data-motion=reduce] button:active, .tb-app[data-motion=reduce] button:active :is(.tb-rail-ind, .tb-tool-ind) { transform: none !important }
+@media (prefers-reduced-motion: reduce) {
+  .tb-app *, .tb-app *::before, .tb-app *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important }
+  .tb-app button:active, .tb-app button:active :is(.tb-rail-ind, .tb-tool-ind) { transform: none !important }
+}
+
+/* ------------------------------ DEC-050: top row and toolbar actions ------------------------------ */
+/* No page title rows: the rail shows where you are; each page keeps a visually hidden h1. */
+.tb-visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0 }
+/* List pages: the search fills the row, the actions sit at its trailing end. The search gives way first, down to 200 px
+   (SEARCH_MIN); then lower-priority actions move into More. */
+.tb-top-row { position: relative; display: flex; align-items: center; gap: 12px; min-height: 64px; flex: none; min-width: 0 }
+.tb-top-search { flex: 1 1 auto; min-width: 0 }
+.tb-top-search .tb-search { width: 100%; box-sizing: border-box; margin: 0 }
+.tb-top-search .tb-search input { width: 100%; min-width: 0; font-size: 16px }
+.tb-top-row > .tb-tool-actions { margin-left: auto }
+.tb-tool-actions { position: relative; display: flex; align-items: center; gap: 4px; flex: none }
+/* Toolbar action: the rail's item language. Icon inside a 56 × 32 pill, a short caption under it; 64 px tall on touch
+   (56 with a pointer), at least 64 px wide. Prominent: filled accent pill. Toggles show the rail's active indicator. */
+.tb-app button.tb-tool-action, .tb-tool-action { position: relative; display: grid; justify-items: center; align-content: center; gap: 4px; min-width: 64px; min-height: 64px; margin: 0; padding: 4px 6px; border: 0; border-radius: 16px; background: transparent; color: var(--ux-ink); font: inherit; font-size: 12px; font-weight: 650; letter-spacing: .1px; line-height: 1.15; text-align: center; white-space: nowrap; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; box-sizing: border-box }
+.tb-pointer button.tb-tool-action { min-height: 56px }
+.tb-touch button.tb-tool-action { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none }
+.tb-tool-ind { display: grid; place-items: center; width: 56px; height: 32px; border-radius: 16px; border: 1px solid var(--ux-line-2); background: var(--ux-surface-2); color: var(--ux-ink); box-sizing: border-box }
+.tb-app[data-system=ios] .tb-tool-action:not(.prominent):not(.active) .tb-tool-ind { background: linear-gradient(145deg, color-mix(in srgb, var(--ux-ink) 7%, transparent), transparent 65%), var(--tb-glass); -webkit-backdrop-filter: blur(20px) saturate(1.3); backdrop-filter: blur(20px) saturate(1.3) }
+.tb-tool-caption { max-width: 112px; overflow: hidden; text-overflow: ellipsis }
+.tb-app button.tb-tool-action.active { font-weight: 800 }
+.tb-app button.tb-tool-action.active .tb-tool-ind { border-color: transparent; background: color-mix(in srgb, var(--ux-accent) 26%, transparent); color: var(--ux-accent-2) }
+.tb-app.light button.tb-tool-action.active .tb-tool-ind { background: color-mix(in srgb, var(--ux-accent) 18%, transparent); color: var(--ux-accent) }
+.tb-app button.tb-tool-action.prominent .tb-tool-ind, .tb-app button.tb-rail-item.prominent .tb-rail-ind { border-color: transparent; background: var(--ux-accent); color: var(--ux-accent-ink) }
+.tb-app button.tb-tool-action.prominent, .tb-app button.tb-rail-item.prominent { color: var(--ux-ink); font-weight: 750 }
+.tb-pointer button.tb-tool-action:not(.prominent):not(.active):hover .tb-tool-ind { background: var(--ux-surface-3) }
+.tb-pointer :is(button.tb-tool-action, button.tb-rail-item).prominent:hover :is(.tb-tool-ind, .tb-rail-ind) { background: color-mix(in srgb, var(--ux-accent) 86%, var(--ux-ink)) }
+.tb-app button.tb-tool-action:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px }
+.tb-tool-measure { position: absolute; top: 0; right: 0; display: flex; gap: 4px; visibility: hidden; pointer-events: none; height: 0; overflow: hidden }
+.tb-tool-measure .tb-tool-action { flex: none }
+.tb-tool-more { position: relative }
+.tb-tool-menu { position: absolute; z-index: 20; top: calc(100% + 6px); right: 0; display: grid; min-width: 220px; padding: 6px; border: 1px solid var(--ux-line-2); border-radius: 16px; background: var(--ux-surface); box-shadow: 0 16px 40px #0006 }
+.tb-app .tb-tool-menu button { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 14px; border: 0; border-radius: 12px; background: transparent; color: var(--ux-ink); font: inherit; font-size: 15px; font-weight: 650; text-align: left; cursor: pointer }
+.tb-app .tb-tool-menu button.prominent { color: var(--ux-accent-2) }
+.tb-app .tb-tool-menu button:hover, .tb-app .tb-tool-menu button:focus-visible { background: var(--ux-surface-2); outline: none }
+/* New roster on the rail (iPad and Android): the top item, the rail's language with a filled pill, set apart from the
+   destinations below it. */
+.tb-app .tb-rail button.tb-rail-item.prominent { margin-bottom: 14px }
+/* Larger text: captions stay, their scale capped at 150 % (as the rail labels); the icons and targets still grow. */
+.tb-app[data-text="200"] :is(.tb-tool-caption, button.tb-rail-item > span:last-child) { font-size: 9px }
+.tb-compact .tb-top-row { gap: 8px }

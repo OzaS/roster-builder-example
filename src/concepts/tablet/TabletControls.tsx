@@ -1,6 +1,7 @@
 import { Hand, MousePointer2 } from 'lucide-react';
 import { defaultTextScale, tabletDevices, tabletInputs, textScales, widthClassLabel, widthClassOf } from './tabletDevices';
 import { useTabletPrefs } from './tabletEnv';
+import { TabletExperienceControls } from './tabletExperience';
 
 /** Gallery chrome of the Tablet library: the device frame, the input mode (Touch | Pointer) and the text size (UX-025).
  *  Theme, colour scheme and Ambient sit in Display. */
@@ -18,6 +19,8 @@ export function TabletControls() {
     <div className="navigator-control-buttons" role="group" aria-label="Input mode">
       {tabletInputs.map(i => <button key={i.id} type="button" className={input === i.id ? 'active' : ''} aria-pressed={input === i.id} onClick={() => setInput(i.id)}>{i.id === 'touch' ? <Hand size={16} /> : <MousePointer2 size={16} />}{i.label}</button>)}
     </div>
+    <h3>Motion and materials</h3>
+    <TabletExperienceControls />
     {setTextScale && <>
       <h3>Text size</h3>
       <div className="navigator-control-buttons" role="group" aria-label="Text size" title="Larger text and display zoom: iOS accessibility sizes, Android font scale up to 2.0. Panes collapse to the next width class instead of clipping.">

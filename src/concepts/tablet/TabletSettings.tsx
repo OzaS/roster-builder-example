@@ -1,10 +1,12 @@
 import { useState, type ReactNode } from 'react';
-import { Check, ChevronRight, Database, FolderOpen, HardDrive, Info, Keyboard, Languages, Layers3, Palette, Upload } from 'lucide-react';
+import { Check, ChevronRight, Database, FolderOpen, HardDrive, Info, Keyboard, Languages, Layers3, Palette, SlidersHorizontal, Upload } from 'lucide-react';
 import type { ColorScheme } from '../../types';
 import { Segmented, Switch } from '../workspace/Primitives';
 import { colourSchemes } from '../desktop/desktopData';
 import { Facts, ListDetail, Row, WorkspaceScope, type SessionProps } from './TabletPieces';
 import { editorShortcuts, generalShortcuts, keyLabel } from './tabletKeys';
+import { useTabletExperience } from './tabletExperience';
+import { PageTitle } from './TabletToolbar';
 
 // Settings (T2b): sections as a list, each one a real page in the detail pane. Key bindings are a read-only list here: the
 // shortcuts work with a hardware keyboard and appear in the system overlay; the editor stays on the desktop.
@@ -17,12 +19,14 @@ const sections = [
   { id: 'data', label: 'Game data', sub: 'Updates and installation', icon: Database },
   { id: 'storage', label: 'Storage', sub: '67.1 MB used', icon: HardDrive },
   { id: 'keys', label: 'Keyboard shortcuts', sub: 'With a hardware keyboard', icon: Keyboard },
+  { id: 'advanced', label: 'Advanced', sub: 'Catalogue behaviour', icon: SlidersHorizontal },
   { id: 'about', label: 'About', sub: 'Version and licences', icon: Info },
 ] as const;
 
 const Group = ({ title, children }: { title?: string; children: ReactNode }) => <section className="tb-section">{title && <span className="ux-result-label">{title}</span>}{children}</section>;
 
-export function TabletSettings({ env, notify, session, themePref, scheme, onTheme, onScheme }: SessionProps & { themePref: ThemePref; scheme: ColorScheme; onTheme: (t: ThemePref) => void; onScheme: (s: ColorScheme) => void }) {
+export function TabletSettings({ env, notify, session, themePref, scheme, onTheme, onScheme, focusSearch, onFocusSearch }: SessionProps & { themePref: ThemePref; scheme: ColorScheme; onTheme: (t: ThemePref) => void; onScheme: (s: ColorScheme) => void; focusSearch: boolean; onFocusSearch: (on: boolean) => void }) {
+  const { experience, choose } = useTabletExperience();
   const { light, advancedInstall, setAdvancedInstall, settingsSection, setSettingsSection, language, setLanguage, setAppearanceImport } = session;
   const [open, setOpen] = useState(settingsSection !== undefined);
   const [limit, setLimit] = useState(1000);
@@ -33,6 +37,7 @@ export function TabletSettings({ env, notify, session, themePref, scheme, onThem
   const page = (() => {
     switch (current.id) {
       case 'appearance': return <>
+        <WorkspaceScope light={light}><div className="ux-src-group tb-switches"><Switch label="Reduce motion" detail="Use direct transitions instead of spring and shape motion. Device accessibility preferences also apply." checked={experience.reducedMotion} onChange={value => choose('reducedMotion', value)} /><Switch label="Reduce transparency" detail="Use solid backgrounds for toolbars and controls." checked={experience.reducedTransparency} onChange={value => choose('reducedTransparency', value)} /></div></WorkspaceScope>
         <WorkspaceScope light={light}><div className="tb-setting"><span><strong>Theme</strong><small>System follows the device setting.</small></span><Segmented<ThemePref> label="Theme" value={themePref} onChange={onTheme} options={[{ value: 'system', label: 'System' }, { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }]} /></div></WorkspaceScope>
         <Group title="Colour scheme"><div className="tb-schemes" role="radiogroup" aria-label="Colour scheme">{colourSchemes.map(c => <button type="button" key={c.id} role="radio" aria-checked={scheme === c.id} className={`ux-start-row tb-scheme ${scheme === c.id ? 'on' : ''}`} onClick={() => onScheme(c.id)}><i style={{ background: c.accent }} /><span><strong>{c.name}</strong></span>{scheme === c.id && <Check size={18} />}</button>)}</div>
           <button type="button" className="ux-job-btn tb-wide" onClick={() => setAppearanceImport({ kind: 'scheme', outcome: 'idle' })}><Upload size={16} />Import colour scheme</button></Group>
@@ -61,6 +66,11 @@ export function TabletSettings({ env, notify, session, themePref, scheme, onThem
         <p className="tb-note"><Keyboard size={15} /><span>These shortcuts work with a hardware keyboard. {env.device.system === 'ios' ? 'Hold ⌘ to see them anywhere.' : 'Press Ctrl + / to see them anywhere.'} They are fixed; the key bindings editor is part of the desktop app.</span></p>
         {[generalShortcuts, editorShortcuts].map(group => <Group key={group.title} title={group.title}><div className="ux-src-group">{group.items.map(a => <div className="ux-src-kv tb-key-row" key={a.combo}><span>{a.label}</span><kbd className="tb-kbd">{keyLabel(a.combo, env.device.system)}</kbd></div>)}</div></Group>)}
       </>;
+      // DEC-050 (UX-059): Settings › Advanced, a new section for opt-in behaviour. Off keeps the catalogue for browsing (no keyboard over the list).
+      case 'advanced': return <WorkspaceScope light={light}>
+        <div className="ux-src-group tb-switches"><Switch label="Focus search when opening the catalogue" detail={`Off: Add unit opens the catalogue for browsing. ${keyLabel('Mod+F', env.device.system)} on a keyboard always focuses the search.`} checked={focusSearch} onChange={onFocusSearch} /></div>
+        <p className="tb-note"><Info size={15} />{focusSearch ? 'Add unit opens the catalogue with the search focused, so the on-screen keyboard appears at once.' : 'Add unit opens the catalogue without the on-screen keyboard, so the whole list stays in view.'}</p>
+      </WorkspaceScope>;
       default: return <>
         <Facts rows={[['Version', '1.0.0 · tablet preview'], ['Engine', '0.9.4'], ['Protocol', '12'], ['SQLite', '3.46']]} />
         <Row selected={false} title="Open source licences" sub="Libraries this app is built with" end={<ChevronRight size={17} />} onClick={() => notify('Licences (prototype)')} />
@@ -68,7 +78,9 @@ export function TabletSettings({ env, notify, session, themePref, scheme, onThem
       </>;
     }
   })();
+  // DEC-050: no title row; the rail shows the page. Section pages keep their own heading (and Back when they open over the list).
   return <div className="tb-page">
+    <PageTitle>Settings</PageTitle>
     <ListDetail env={env} label="Settings" open={open} onClose={() => setOpen(false)}
       list={<div className="tb-list scroll">{sections.map(s => <Row key={s.id} selected={s.id === current.id} mark={<s.icon size={20} />} title={s.label} sub={s.sub} end={<ChevronRight size={17} />} onClick={() => { setSettingsSection(s.id); setOpen(true); }} />)}</div>}
       detail={<><div className="tb-detail-title"><span><h2>{current.label}</h2><small>{current.sub}</small></span></div>{page}</>} />

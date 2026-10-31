@@ -4,6 +4,7 @@ import { lookupById, lookupSystems, sourceLine, type LookupEntity } from '../../
 import { LookupEntryBody, LookupSection } from '../ux/PhoneLookup';
 import { plural, useLookup } from '../ux/useLookup';
 import { EmptyState, ListDetail, Row, SearchField, type SessionProps } from './TabletPieces';
+import { TabletToolbar } from './TabletToolbar';
 
 /**
  * Tablet Lookup 1.0 (design session 2026-10-31): the earlier page layout (search, chip row, list and detail panes) with
@@ -21,7 +22,8 @@ export function TabletLookup10({ env, session, onAddData, initial = 'u-line-fc' 
   const choose = (e: LookupEntity) => { setStack([e.id]); setOpen(true); };
   const end = (e: LookupEntity) => e.cost || e.conditional ? <span className="ux-ro-list-trailing">{e.cost ? <b>{e.cost}</b> : null}{e.conditional ? <span className="ux-lf-tag info">Conditional</span> : null}</span> : undefined;
   return <div className="tb-page tb-lookup10">
-    <div className="tb-toolbar"><SearchField value={lk.query} onChange={lk.setQuery} label="Search the game data" placeholder="Search units, forces, upgrades and rules…" /></div>
+    {/* DEC-050: the search fills the shared top row (heading visually hidden), level with Rosters and Sources. */}
+    <TabletToolbar title="Lookup" input={env.input} search={<SearchField value={lk.query} onChange={lk.setQuery} label="Search the game data" placeholder="Search units, forces, upgrades and rules…" />} />
     {lookupSystems.length > 1 ? <div className="tb-filters" role="group" aria-label="Game systems to search">
       <button type="button" className={`tb-filter ${lk.systems === null ? 'active' : ''}`} aria-pressed={lk.systems === null} onClick={() => lk.setSystems(null)}>All{lk.typed ? ` ${lk.allResults.length}` : ''}</button>
       {lookupSystems.map(s => { const on = lk.systems?.includes(s.name) ?? false; return <button type="button" key={s.name} className={`tb-filter ${on ? 'active' : ''}`} aria-pressed={on} aria-label={lk.typed ? `${s.name}, ${plural(lk.countIn(s.name), 'result')}` : s.name} onClick={() => lk.pickSystem(s.name)}>{s.name}{lk.typed ? ` ${lk.countIn(s.name)}` : ''}</button>; })}

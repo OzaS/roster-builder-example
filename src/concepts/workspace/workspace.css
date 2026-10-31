@@ -165,3 +165,17 @@
 .dt-limit-example-chrome .dt-tab-progress {top:auto;bottom:0}
 .dt-limit-elements .dt-summary {position:relative;top:auto;right:auto;margin:12px 0;width:min(100%,330px)}
 .dt-limit-example-hint {max-width:400px;color:var(--dt-muted);font-size:12px;margin-top:12px}
+
+/* DEC-050: icon-only catalogue state chips; the caption shows in the hint bubble (tablet.css .tb-hint-bubble). */
+.ws-state-chip-wrap { position: relative; z-index: 1; display: inline-flex }
+button.ws-state-chip { --chip-tone: var(--ux-warn); display: grid; place-items: center; width: 40px; height: 40px; margin: -4px; padding: 0; border: 0; border-radius: 999px; background: transparent; color: var(--chip-tone); cursor: pointer; touch-action: manipulation }
+button.ws-state-chip.err { --chip-tone: var(--ux-err) }
+.ws-state-chip i { display: grid; place-items: center; width: 30px; height: 24px; border: 1px solid color-mix(in srgb, var(--chip-tone) 42%, transparent); border-radius: 999px; background: color-mix(in srgb, var(--chip-tone) 14%, transparent); transition: background 120ms ease }
+.ws-state-chip.open i, .ws-state-chip:hover i { background: color-mix(in srgb, var(--chip-tone) 28%, transparent) }
+.ws-state-chip:focus-visible { outline: none }
+.ws-state-chip:focus-visible i { outline: 2px solid var(--ux-accent-2); outline-offset: 2px }
+.tb-hint-bubble.ws-chip-bubble.left { left: auto; right: calc(100% + 6px); top: 50%; transform: translateY(-50%) }
+.tb-hint-bubble.ws-chip-bubble.top { left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%) }
+.tb-pointer button.ws-state-chip, .dt-app button.ws-state-chip { width: 32px; height: 32px; margin: 0 }
+.dt-app .ws-state-chip i { width: 26px; height: 20px }
+.dt-app .tb-hint-bubble.ws-chip-bubble { padding: 7px 10px; border-radius: 8px; font-size: 12px; font-weight: 600 }

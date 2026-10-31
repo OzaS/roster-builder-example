@@ -235,3 +235,10 @@
 .dt-soon .ux-cs-card{width:min(520px,100%)}
 .dt-soon .ux-cs-card>p{max-width:420px}
 .dt-soon .ux-chip{text-transform:none}
+
+/* DEC-050: no page title rows. Screen readers keep a heading; a list page's search fills the top row, its buttons at the end. */
+.dt-visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0 }
+.dtp-toolbar.dtp-top-row { flex-wrap: nowrap }
+.dtp-top-row .dtp-search { flex: 1 1 auto; min-width: 200px; max-width: none }
+.dtp-top-row > .dtp-btn { flex: none; height: 36px }
+.dtp-no-match { padding: 8px 12px; font-size: 12px }

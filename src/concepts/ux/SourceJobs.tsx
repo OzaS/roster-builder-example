@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { Archive, ArrowLeft, Bell, Check, ChevronDown, ChevronRight, Circle, CircleArrowUp, CircleCheck, Clock, Copy, Database, Download, Ellipsis, FileArchive, FileInput, FileText, FolderGit2, FolderOpen, Globe, Hand, History, Info, Library, ListChecks, LoaderCircle, Lock, Minus, OctagonAlert, Plus, RefreshCw, Search, Star, Trash2, TriangleAlert, Upload, Wifi, X } from "lucide-react";
+import { Archive, ArrowLeft, Bell, Check, ChevronDown, ChevronRight, Circle, CircleArrowUp, CircleCheck, Clock, Copy, Database, Download, Ellipsis, FileArchive, FileInput, FileText, FolderGit2, FolderOpen, Globe, Hand, History, Info, Library, ListChecks, LoaderCircle, Lock, Minus, OctagonAlert, Plus, RefreshCw, Search, Star, Trash2, TextCursorInput, TriangleAlert, Upload, Wifi, X } from "lucide-react";
 import type { ConceptProps } from "../shared";
 import { Chip } from "./uxShared";
 
@@ -251,6 +251,21 @@ export function RememberSectionsSetting({ on, onToggle }: { on: boolean; onToggl
     <button type="button" className={`ux-setting-row ${on ? "on" : ""}`} role="switch" aria-checked={on} onClick={onToggle}>
       <span className="ux-setting-icon"><ChevronDown size={17} /></span>
       <span className="ux-setting-text"><strong>Remember option sections</strong><small>Reopen a unit's option sections as you left them. Off: every visit starts folded; you can still open sections while you are there.</small></span>
+      <span className="ux-switch" aria-hidden />
+    </button>
+  );
+}
+
+/**
+ * Settings → Advanced → Focus search when opening the catalogue (DEC-050, UX-059; a user preference, off by default). Off: Add
+ * unit opens the catalogue for browsing, so the on-screen keyboard does not cover the list. `keys`: the platform's find shortcut,
+ * named only where the platform has one (phone without a keyboard: left out).
+ */
+export function FocusCatalogueSearchSetting({ on, onToggle, keys }: { on: boolean; onToggle?: () => void; keys?: string }) {
+  return (
+    <button type="button" className={`ux-setting-row ${on ? "on" : ""}`} role="switch" aria-checked={on} onClick={onToggle}>
+      <span className="ux-setting-icon"><TextCursorInput size={17} /></span>
+      <span className="ux-setting-text"><strong>Focus search when opening the catalogue</strong><small>Off: Add unit opens the catalogue for browsing.{keys ? ` ${keys} always focuses the search.` : " The keyboard appears when you tap the search."}</small></span>
       <span className="ux-switch" aria-hidden />
     </button>
   );

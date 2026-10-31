@@ -33,6 +33,18 @@ export const FORCE_TYPES: ForceType[] = [
 ];
 const typeOf = (force: Force) => FORCE_TYPES.find(t => t.name === force.type) ?? FORCE_TYPES[0];
 /** The requirement shown next to a group heading, e.g. "/ 2+". */
+/**
+ * A catalogue row's state for the force units are added to (the app's catalogue view: Available, Adds over limit,
+ * Unavailable). The gallery's rules: each Command entry at most once per force, one Support entry per force.
+ */
+export type CatalogueState = { tone: 'warn' | 'err'; caption: string; reason: string };
+export function catalogueState(entry: { name: string; role: string }, own: readonly { name: string; role: string }[]): CatalogueState | null {
+  const selected = own.filter(u => u.name === entry.name).length;
+  if (entry.role === 'Command' && selected > 0) return { tone: 'err', caption: 'Unavailable', reason: `Maximum reached · ${selected} selected` };
+  if (entry.role === 'Support' && own.some(u => u.role === 'Support')) return { tone: 'warn', caption: 'Adds over limit', reason: 'Slot full' };
+  return null;
+}
+
 export const groupLimit = (force: Force, group: string) => { const t = typeOf(force); return group === 'Command' && t.command ? `/ ${t.command}+` : group === 'Core' && t.core ? `/ ${t.core}+` : group === 'Support' && t.noSupport ? '/ none' : ''; };
 /** Why a force type cannot be added right now, or null. */
 export function forceTypeBlocked(t: ForceType, forces: Force[], limit: number) {

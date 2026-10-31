@@ -9,12 +9,13 @@ import { rosterLibrary } from '../desktop/desktopData';
 import type { RosterUnit } from '../../types';
 import type { TabletEnv } from './tabletEnv';
 import { HintButton } from './TabletHint';
+import { StateChip } from '../workspace/StateChip';
 import { TabletResizer, type PanePresets } from './TabletResizer';
 import { keyLabel, useShortcuts } from './tabletKeys';
 import { AddForceSheet, ExportSheet, RenameSheet } from './TabletEditorSheets';
 import { MoveRight } from 'lucide-react';
 import { MoveUnitSheet } from './TabletSheets';
-import { editorCatalogue, loadRoster, rosterFromImport, unitCategories, unitProfile, unitRules, weaponChoices, weaponProfile, type CatalogueEntry } from './tabletEditorData';
+import { catalogueState, editorCatalogue, manyRoleCatalogue, manyRoles, loadRoster, rosterFromImport, unitCategories, unitProfile, unitRules, weaponChoices, weaponProfile, type CatalogueEntry } from './tabletEditorData';
 import './tablet-editor.css';
 
 // The tablet roster editor (T1a Expanded, T1b Medium; DEC-039: desktop structure, mobile feel, one roster at a time).
@@ -24,7 +25,9 @@ import './tablet-editor.css';
 //   Medium (600-839): force tree · unit details; the catalogue is a slide-over from Add unit.
 //   Split view (< 700 wide, also any window whose logical width drops under 700 at a larger text size): the tree alone; a unit's details open over it (like ListDetail on the pages).
 
-export type EditorStart = 'editor' | 'issues' | 'add' | 'forces' | 'add-force' | 'readonly' | 'export' | 'move-unit';
+export type EditorStart = 'editor' | 'issues' | 'add' | 'forces' | 'add-force' | 'readonly' | 'export' | 'move-unit' | 'add-roles' | 'add-focus' | 'chip-caption';
+/** Gallery starts that open the catalogue as Add unit does (DEC-050: many roles, opened with the search focused, a chip's caption shown). */
+const addStarts: EditorStart[] = ['add', 'add-roles', 'add-focus', 'chip-caption'];
 type Pop = 'switcher' | 'more' | 'summary' | `unit-${number}` | `force-${string}` | null;
 type Sheet = { kind: 'add-force' } | { kind: 'rename' } | { kind: 'rename-force'; id: string } | { kind: 'export' } | { kind: 'move'; id: number } | null;
 /** The sample roster each gallery start opens: two forces, a roster whose faction was removed, or the default. */
@@ -50,8 +53,10 @@ function reveal(root: RefObject<HTMLElement | null>, selector: string, focus = f
   }));
 }
 
-export function TabletEditor({ env, notify, light, rosterName, from, start = 'editor', imported, onBack, onAllRosters, onNewRoster, onImport, onFindData }: {
+export function TabletEditor({ env, notify, light, rosterName, from, start = 'editor', imported, focusSearch = false, onBack, onAllRosters, onNewRoster, onImport, onFindData }: {
   env: TabletEnv; notify: Notify; light: boolean; rosterName: string; from: string; start?: EditorStart; imported?: ImportResult;
+  /** Settings › Advanced › Focus search when opening the catalogue (DEC-050, UX-059; off by default). */
+  focusSearch?: boolean;
   onBack: () => void; onAllRosters: () => void; onNewRoster: () => void; onImport: () => void; onFindData: () => void;
 }) {
   const mode: Mode = env.widthClass === 'expanded' ? 'three' : env.width < 700 ? 'single' : 'two';
@@ -72,11 +77,11 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
   const [showInspector, setShowInspector] = useState(true);
   const [catWidth, setCatWidth] = useState(PANES.catalogue.initial);
   const [inspWidth, setInspWidth] = useState(mode === 'three' ? PANES.inspector.initial : PANES.inspectorMedium.initial);
-  const [slideOver, setSlideOver] = useState(start === 'add' && mode !== 'three');
+  const [slideOver, setSlideOver] = useState(addStarts.includes(start) && mode !== 'three');
   const [detailOpen, setDetailOpen] = useState(false);
   const [sheet, setSheet] = useState<Sheet>(start === 'add-force' ? { kind: 'add-force' } : start === 'export' ? { kind: 'export' } : start === 'move-unit' ? { kind: 'move', id: 1 } : null);
   const [query, setQuery] = useState('');
-  const [role, setRole] = useState(start === 'add' ? 'Core' : 'All');
+  const [role, setRole] = useState(start === 'add' || start === 'add-focus' ? 'Core' : 'All');
   const rootRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const nextId = useRef(100);
@@ -187,18 +192,23 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
   };
 
   /* ---------------------------------------------------------------- panes */
-  const openCatalogue = (group?: string, forceId?: string) => {
+  // DEC-050 (UX-059): Add unit opens the catalogue for browsing; the search takes focus only with Settings › Advanced › Focus
+  // search when opening the catalogue (off by default, so the on-screen keyboard does not cover the list). ⌘F / Ctrl+F always focuses it.
+  const focusCatalogueSearch = () => requestAnimationFrame(() => requestAnimationFrame(() => searchRef.current?.focus({ preventScroll: true })));
+  const openCatalogue = (group?: string, forceId?: string, focus = focusSearch) => {
     if (readOnly) return;
     if (group) setRole(group);
     if (forceId) setActiveForce(forceId);
-    if (mode === 'three') { setShowCatalogue(true); requestAnimationFrame(() => searchRef.current?.focus({ preventScroll: true })); }
+    if (mode === 'three') setShowCatalogue(true);
     else { setDetailOpen(false); setSlideOver(true); }
+    if (focus) focusCatalogueSearch();
   };
+  useEffect(() => { if (start === 'add-focus') focusCatalogueSearch(); }, []); // eslint-disable-line react-hooks/exhaustive-deps -- the gallery state, once
   // Hardware keyboard (T4): fixed shortcuts; the shell adds ⌘N, ⌘1–5 and the overlay. Undo and redo leave text fields alone.
   useShortcuts(rootRef, {
     'Mod+Z': undo, 'Mod+Shift+Z': redo,
     'Mod+E': () => { setPop(null); setSheet({ kind: 'export' }); },
-    'Mod+F': () => { if (readOnly) return; setPop(null); openCatalogue(); requestAnimationFrame(() => requestAnimationFrame(() => searchRef.current?.focus({ preventScroll: true }))); },
+    'Mod+F': () => { if (readOnly) return; setPop(null); openCatalogue(undefined, undefined, true); },
     Escape: () => { if (!pop && !slideOver && detailOpen) setDetailOpen(false); },
   }, ['Mod+E', 'Mod+F']);
   const keys = (combo: string) => env.input === 'pointer' ? ` (${keyLabel(combo, env.device.system)})` : '';
@@ -226,6 +236,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
     ? `${showCatalogue ? `${catWidth}px ` : ''}minmax(300px, 1fr)${showInspector ? ` ${inspWidth}px` : ''}`
     : mode === 'two' ? `minmax(300px, 1fr)${showInspector ? ` ${inspWidth}px` : ''}` : 'minmax(0, 1fr)';
   const catalogue = (variant: 'pane' | 'slide') => <CataloguePanel env={env} variant={variant} query={query} onQuery={setQuery} role={role} onRole={setRole} forces={forces} target={target} onTarget={setActiveForce} searchRef={searchRef} onAdd={addUnit}
+    roles={start === 'add-roles' ? manyRoles : ROLES} entries={start === 'add-roles' ? manyRoleCatalogue : editorCatalogue} own={units.filter(u => forceOf(u) === target.id)} captionShown={start === 'chip-caption' ? 'Patrol Walker' : undefined}
     onClose={() => variant === 'pane' ? setShowCatalogue(false) : setSlideOver(false)} faction={roster.faction} system={roster.system} />;
   const inspectorLimits = mode === 'three' ? PANES.inspector : PANES.inspectorMedium;
   const fromLabel = from === 'rosters' ? 'Rosters' : 'Home';
@@ -381,12 +392,22 @@ function IssueList({ issues, readOnly, onShow }: { issues: RosterIssue[]; readOn
 
 /* ---------------------------------------------------------------- catalogue (pane or slide-over) */
 
-function CataloguePanel({ env, variant, query, onQuery, role, onRole, forces, target, onTarget, searchRef, onAdd, onClose, faction, system }: {
+function CataloguePanel({ env, variant, query, onQuery, role, onRole, forces, target, onTarget, searchRef, onAdd, onClose, faction, system, roles, entries, own, captionShown }: {
   env: TabletEnv; variant: 'pane' | 'slide'; query: string; onQuery: (q: string) => void; role: string; onRole: (r: string) => void; forces: Force[]; target: Force; onTarget: (id: string) => void;
   searchRef: RefObject<HTMLInputElement | null>; onAdd: (entry: CatalogueEntry) => void; onClose: () => void; faction: string; system: string;
+  roles: readonly string[]; entries: CatalogueEntry[]; own: EditorUnit[]; captionShown?: string;
 }) {
   const matches = (e: CatalogueEntry) => e.name.toLowerCase().includes(query.trim().toLowerCase()) && (role === 'All' || e.role === role);
-  const any = editorCatalogue.some(matches);
+  const any = entries.some(matches);
+  const rolesRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  useEdgeFade(rolesRef, role);
+  // The gallery's pressed-chip state: the row whose caption is shown is scrolled into the list's view.
+  useEffect(() => {
+    if (!captionShown) return;
+    const row = listRef.current?.querySelector<HTMLElement>(`[data-cat-entry="${captionShown}"]`); const list = listRef.current;
+    if (row && list) list.scrollTop = row.offsetTop - list.clientHeight / 2 + row.offsetHeight / 2;
+  }, [captionShown]);
   return <aside className={`tbe-pane tbe-catalogue ${variant}`} aria-label="Unit catalogue">
     <header className="tbe-pane-head">
       <span><strong>Add units</strong><small>to {forces.length > 1 ? target.name : 'this roster'}</small></span>
@@ -394,20 +415,48 @@ function CataloguePanel({ env, variant, query, onQuery, role, onRole, forces, ta
     </header>
     <div className="tbe-cat-tools">
       <label className="ux-search tb-search"><Search size={17} /><input ref={searchRef} value={query} onChange={e => onQuery(e.target.value)} placeholder="Find a unit…" aria-label="Find a unit" />{query && <button type="button" className="tbe-clear" aria-label="Clear search" onClick={() => onQuery('')}><X size={16} /></button>}</label>
-      <div className="tb-filters tbe-roles" role="group" aria-label="Unit role">{['All', ...ROLES].map(r => <button type="button" key={r} className={`tb-filter ${role === r ? 'active' : ''}`} aria-pressed={role === r} onClick={() => onRole(r)}>{r}</button>)}</div>
+      {/* DEC-050: the role pills stay in one row that scrolls sideways, with an edge fade where more pills are hidden. */}
+      <div ref={rolesRef} className="tb-filters tbe-roles" role="group" aria-label="Unit role">{['All', ...roles].map(r => <button type="button" key={r} className={`tb-filter ${role === r ? 'active' : ''}`} aria-pressed={role === r} onClick={() => onRole(r)}>{r}</button>)}</div>
       {forces.length > 1 && <label className="tbe-target"><span>Adds to</span><select value={target.id} onChange={e => onTarget(e.target.value)} aria-label="Force that new units join">{forces.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}</select></label>}
     </div>
-    <div className="tbe-cat-list">
-      {ROLES.map(group => { const entries = editorCatalogue.filter(e => e.role === group && matches(e)); return entries.length ? <section key={group}>
-        <h4>{group}<span>{entries.length}</span></h4>
-        {entries.map(e => <button type="button" key={e.name} className="tbe-cat-row" aria-label={`Add ${e.name}, ${e.points} points`} onClick={() => onAdd(e)}>
-          <span><strong>{e.name}</strong><small>{e.models} {e.models === 1 ? 'model' : 'models'} · {e.weapon}</small></span><b>{e.points}<small> pts</small></b><span className="tbe-cat-plus" aria-hidden="true"><Plus size={18} /></span>
-        </button>)}
+    <div className="tbe-cat-list" ref={listRef}>
+      {roles.map(group => { const shown = entries.filter(e => e.role === group && matches(e)); return shown.length ? <section key={group}>
+        <h4>{group}<span>{shown.length}</span></h4>
+        {shown.map(e => { const state = catalogueState(e, own); const unavailable = state?.tone === 'err';
+          // The row adds the unit (the whole row is its target); the state chip sits above it and only shows its caption.
+          return <div key={e.name} data-cat-entry={e.name} className={`tbe-cat-row ${state ? state.tone : ''} ${unavailable ? 'unavailable' : ''}`}>
+            <button type="button" className="tbe-cat-add" disabled={unavailable} aria-label={`Add ${e.name}, ${e.points} points${state ? `, ${state.caption}, ${state.reason}` : ''}`} onClick={() => onAdd(e)}>
+              <span><strong>{e.name}</strong>{state ? <small className="reason">{state.reason}</small> : <small>{e.models} {e.models === 1 ? 'model' : 'models'} · {e.weapon}</small>}</span>
+            </button>
+            {state ? <StateChip tone={state.tone} caption={state.caption} input={env.input} open={captionShown === e.name} /> : <span aria-hidden="true" />}
+            <b aria-hidden="true">{e.points}<small> pts</small></b><span className="tbe-cat-plus" aria-hidden="true"><Plus size={18} /></span>
+          </div>; })}
       </section> : null; })}
       {!any && <p className="tb-empty">No units match. Try another word or role.</p>}
     </div>
     <footer className="tbe-pane-foot"><Database size={15} />{faction}<span>{system} · v1.4</span></footer>
   </aside>;
+}
+
+/** A sideways-scrolling row fades at an edge that has more content beyond it (`data-fade="start end"`), and keeps the active choice in view. */
+function useEdgeFade(ref: RefObject<HTMLElement | null>, active: string) {
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    const update = () => {
+      const fades = [el.scrollLeft > 1 ? 'start' : '', el.scrollLeft + el.clientWidth < el.scrollWidth - 1 ? 'end' : ''].filter(Boolean).join(' ');
+      if (fades) el.dataset.fade = fades; else delete el.dataset.fade;
+    };
+    update();
+    el.addEventListener('scroll', update, { passive: true });
+    const observer = new ResizeObserver(update); observer.observe(el);
+    return () => { el.removeEventListener('scroll', update); observer.disconnect(); };
+  }, [ref]);
+  useEffect(() => {
+    const el = ref.current; const pill = el?.querySelector<HTMLElement>('[aria-pressed="true"]'); if (!el || !pill) return;
+    const pad = 40;
+    if (pill.offsetLeft - pad < el.scrollLeft) el.scrollLeft = pill.offsetLeft - pad;
+    else if (pill.offsetLeft + pill.offsetWidth + pad > el.scrollLeft + el.clientWidth) el.scrollLeft = pill.offsetLeft + pill.offsetWidth + pad - el.clientWidth;
+  }, [ref, active]);
 }
 
 function ReadOnlyCataloguePane({ env, info, onFindData, onClose }: { env: TabletEnv; info: ReadOnlyInfo; onFindData: () => void; onClose: () => void }) {

@@ -4,7 +4,10 @@ import type { ColorScheme } from '../../types';
 import { collectionSources, colourSchemes, installedSources, lookupEntries, rosterLibrary, type LookupKind, type RosterSummary, type SourceInfo } from './desktopData';
 import { comboFromEvent, defaultBindings, formatCombo, hasCommandModifier, keyActions, type KeyAction, type KeyBindings } from './desktopKeys';
 import { jobPercent, type WorkspaceJobs } from '../workspace/Jobs';
-import { Chip, PageActions, Segmented, Switch } from '../workspace/Primitives';
+import { Chip, Segmented, Switch } from '../workspace/Primitives';
+
+/** DEC-050: desktop pages have no title row (the rail and the hub tab show where you are); screen readers keep a heading. */
+export const PageTitle = ({ children }: { children: ReactNode }) => <h1 className="dt-visually-hidden">{children}</h1>;
 import type { Notify } from '../workspace/Toasts';
 import './desktop-pages.css';
 import { ExportDialog, primaryForce, specialRoster, type ExportRoster } from './DesktopEditorFlows';
@@ -18,7 +21,7 @@ const statusChip = (r: RosterSummary) => r.status === 'issues' ? <Chip tone="war
 
 /* ------------------------------ Rosters ------------------------------ */
 
-export function DesktopRosters({ initialRosters, onOpen, onCreate, onImport, notify, actionSlot }: { initialRosters: RosterSummary[]; onOpen: (name: string) => void; onCreate: () => void; onImport: () => void; notify: Notify; actionSlot: HTMLElement | null }) {
+export function DesktopRosters({ initialRosters, onOpen, onCreate, onImport, notify }: { initialRosters: RosterSummary[]; onOpen: (name: string) => void; onCreate: () => void; onImport: () => void; notify: Notify }) {
   const [rosters, setRosters] = useState(initialRosters);
   const [exporting, setExporting] = useState<RosterSummary | null>(null);
   const exportSnapshot = (r: RosterSummary): ExportRoster => {
@@ -47,12 +50,14 @@ export function DesktopRosters({ initialRosters, onOpen, onCreate, onImport, not
   const duplicate = (r: RosterSummary) => { const copy = { ...r, name: `Copy of ${r.name}`, opened: 'Just now', mark: r.mark }; setRosters(list => [copy, ...list]); setSelected(copy.name); notify(`Duplicated as “${copy.name}”`); };
   const remove = (r: RosterSummary) => { const before = rosters; setRosters(list => list.filter(x => x.name !== r.name)); setSelected(rosters.find(x => x.name !== r.name)?.name ?? ''); notify(`Deleted “${r.name}”`, { action: { label: 'Undo', run: () => { setRosters(before); setSelected(r.name); } } }); };
   return <main className="dtp-page">
-    <PageActions slot={actionSlot}>
+    <PageTitle>Rosters</PageTitle>
+    {/* DEC-050: no page title row; the search fills the top row and the page's buttons end it (they left the tab row). */}
+    <div className="dtp-toolbar dtp-top-row">
+      <label className="dtp-search"><Search size={15} /><input placeholder="Find a roster or faction…" aria-label="Find a roster" value={query} onChange={e => setQuery(e.target.value)} />{query && <button aria-label="Clear search" onClick={() => setQuery('')}><X size={13} /></button>}</label>
       <button className="dtp-btn" onClick={onImport} title="Import a roster from a file"><FileUp size={15} />Import</button>
       <button className="dtp-btn primary" onClick={onCreate} title="Create a roster"><Plus size={15} />New roster</button>
-    </PageActions>
-    <div className="dtp-toolbar">
-      <label className="dtp-search"><Search size={15} /><input placeholder="Find a roster or faction…" aria-label="Find a roster" value={query} onChange={e => setQuery(e.target.value)} />{query && <button aria-label="Clear search" onClick={() => setQuery('')}><X size={13} /></button>}</label>
+    </div>
+    <div className="dtp-toolbar tight">
       <div className="dtp-chips"><button className={!attention ? 'active' : ''} onClick={() => setAttention(false)}>All <b>{rosters.length}</b></button>{attentionCount > 0 && <button className={attention ? 'active' : ''} onClick={() => setAttention(true)}><CircleAlert size={13} />Needs attention <b>{attentionCount}</b></button>}</div>
       <label className="dtp-select"><ListFilter size={14} /><select aria-label="Game system" value={system} onChange={e => setSystem(e.target.value)}>{['All game systems', 'Open Field', 'Example System Two'].map(s => <option key={s}>{s}</option>)}</select></label>
       <label className="dtp-select"><SlidersHorizontal size={14} /><select aria-label="Sort rosters" value={sort} onChange={e => setSort(e.target.value)}>{['Recently opened', 'Name', 'Points'].map(s => <option key={s}>{s}</option>)}</select></label>
@@ -109,7 +114,8 @@ export function DesktopLookup({ onOpenRoster }: { onOpenRoster: (name: string) =
   const selected = results.find(e => e.id === selectedId) ?? results[0];
   const groups: Array<{ kind: LookupKind; label: string; icon: ReactNode }> = [{ kind: 'Unit', label: 'Units', icon: <Users size={14} /> }, { kind: 'Rule', label: 'Rules', icon: <BookOpen size={14} /> }, { kind: 'Equipment', label: 'Equipment', icon: <Shield size={14} /> }];
   return <main className="dtp-page">
-    <div className="dtp-toolbar">
+    <PageTitle>Lookup</PageTitle>
+    <div className="dtp-toolbar dtp-top-row">
       <label className="dtp-search large"><Search size={17} /><input ref={searchRef} placeholder="Search units, rules and equipment in the installed data…" aria-label="Search game data" value={query} onChange={e => setQuery(e.target.value)} />{query && <button aria-label="Clear search" onClick={() => setQuery('')}><X size={14} /></button>}</label>
     </div>
     <div className="dtp-toolbar tight"><span className="dtp-muted">Open Field v1.4</span><div className="dtp-chips">{scopes.map(s => <button key={s} className={scope === s ? 'active' : ''} onClick={() => setScope(s)}>{s}</button>)}</div><span className="dtp-muted dtp-push">{results.length} results</span></div>
@@ -135,11 +141,12 @@ export function DesktopLookup({ onOpenRoster }: { onOpenRoster: (name: string) =
 
 /* ------------------------------ Sources ------------------------------ */
 
-export function DesktopSources({ notify, actionSlot, jobs, selectedId, onSelect, onOpenJobs, onOpenRoster }: { notify: Notify; actionSlot: HTMLElement | null; jobs: WorkspaceJobs; selectedId: string; onSelect: (id: string) => void; onOpenJobs: () => void; onOpenRoster?: (name: string) => void }) {
+export function DesktopSources({ notify, jobs, selectedId, onSelect, onOpenJobs, onOpenRoster }: { notify: Notify; jobs: WorkspaceJobs; selectedId: string; onSelect: (id: string) => void; onOpenJobs: () => void; onOpenRoster?: (name: string) => void }) {
   const { sources, setSources } = jobs;
   const setSelectedId = onSelect;
   const progress: Record<string, number> = Object.fromEntries(sources.flatMap(s => { const p = jobs.progressOf(s.id); return p ? [[s.id, p.percent]] : []; }));
   const [link, setLink] = useState('');
+  const [query, setQuery] = useState('');
   const [confirmRemove, setConfirmRemove] = useState(false);
   const [addingCollection, setAddingCollection] = useState(false);
   useEffect(() => { setConfirmRemove(false); }, [selectedId]);
@@ -150,19 +157,25 @@ export function DesktopSources({ notify, actionSlot, jobs, selectedId, onSelect,
   const selected = sources.find(s => s.id === selectedId);
   const flow = { jobs, notify, go: setSelectedId, onOpenJobs };
   const chip = (s: SourceInfo) => progress[s.id] !== undefined ? <Chip tone="accent">Updating {progress[s.id]}%</Chip> : s.status === 'update' ? <Chip tone="accent"><ArrowUpCircle size={11} />Update</Chip> : s.status === 'review' ? <Chip tone="warn"><AlertTriangle size={11} />Review</Chip> : <Chip tone="ok"><Check size={11} />Ready</Chip>;
+  const q = query.trim().toLowerCase();
+  const shown = sources.filter(s => !q || [s.name, s.repo ?? '', ...s.factions].some(t => t.toLowerCase().includes(q)));
   return <main className="dtp-page">
-    <PageActions slot={actionSlot}>
+    <PageTitle>Sources</PageTitle>
+    {/* DEC-050: no page title row; a search over the installed game data fills the top row, the page's buttons end it. */}
+    <div className="dtp-toolbar dtp-top-row">
+      <label className="dtp-search"><Search size={15} /><input placeholder="Find installed game data…" aria-label="Find installed game data" value={query} onChange={e => setQuery(e.target.value)} />{query && <button aria-label="Clear search" onClick={() => setQuery('')}><X size={13} /></button>}</label>
       <button className="dtp-btn" onClick={() => notify('Choose an archive, data files or a folder')} title="Install game data from an archive, data files or a folder"><FolderOpen size={15} />Install from a file</button>
       <button className="dtp-btn primary" onClick={() => setSelectedId('add')} title="Install from a collection, a repository link or GitHub search"><Plus size={15} />Add game data</button>
-    </PageActions>
+    </div>
     {updates.length > 0 && <div className="dtp-banner"><ArrowUpCircle size={17} /><span><strong>{updates.length} {updates.length === 1 ? 'update' : 'updates'} available</strong><small>New data for {updates.map(s => s.name).join(', ')}. Last checked 8 minutes ago.</small></span><button className="dtp-btn primary small" onClick={() => update(updates.map(s => s.id))}>Update all</button></div>}
     <div className="dtp-split sources">
       <section className="dtp-card dtp-list" aria-label="Installed sources"><div className="dtp-scroll">
-        <div className="dtp-group"><h3><Database size={14} />Installed<span>{sources.length}</span></h3>
-          {sources.map(s => <button key={s.id} className={`dtp-row dtp-source ${flowSourceId(selectedId) === s.id ? 'selected' : ''}`} onClick={() => setSelectedId(s.id)}>
+        <div className="dtp-group"><h3><Database size={14} />Installed<span>{q ? `${shown.length} of ${sources.length}` : sources.length}</span></h3>
+          {shown.map(s => <button key={s.id} className={`dtp-row dtp-source ${flowSourceId(selectedId) === s.id ? 'selected' : ''}`} onClick={() => setSelectedId(s.id)}>
             <span><strong>{s.name}</strong><small>{s.factions.length} factions · {s.factions.slice(0, 2).join(', ')}{s.factions.length > 2 ? '…' : ''}</small><small className="dtp-faint">{s.fromFile ? `From a file · imported ${s.installed}` : `${s.repo}@${s.version} · ${s.installed} · ${s.size}`}</small>{progress[s.id] !== undefined && <i className="dtp-progress"><em style={{ width: `${progress[s.id]}%` }} /></i>}</span>
             {chip(s)}
           </button>)}
+          {q && !shown.length && <p className="dtp-muted dtp-no-match">No installed game data matches “{query}”.</p>}
           {installing.map(j => <button key={j.id} className="dtp-row dtp-source" onClick={onOpenJobs}><span><strong>{j.name}</strong><small>{j.status === 'needs-you' ? 'Waiting for you to choose factions' : `${j.factions.length} factions available`}</small><i className="dtp-progress"><em style={{ width: `${jobPercent(j)}%` }} /></i></span>{j.status === 'needs-you' ? <Chip tone="warn"><AlertTriangle size={11} />Needs you</Chip> : <Chip tone="accent">Installing {jobPercent(j)}%</Chip>}</button>)}
         </div>
         <button className={`dtp-row dtp-add-row ${isAddFlow(selectedId) ? 'selected' : ''}`} onClick={() => setSelectedId('add')}><span className="dtp-add-icon"><Plus size={16} /></span><span><strong>Add game data</strong><small>Collections, a repository link, or GitHub search</small></span><ChevronRight size={15} /></button>
@@ -208,21 +221,25 @@ const settingsSections = [
   { id: 'data', label: 'Game data', icon: Database },
   { id: 'storage', label: 'Storage', icon: HardDrive },
   { id: 'keys', label: 'Key bindings', icon: Keyboard },
+  { id: 'advanced', label: 'Advanced', icon: SlidersHorizontal },
   { id: 'about', label: 'About', icon: Info },
 ] as const;
 
-export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, bindings, onBindings, advancedInstall, onAdvancedInstall, notify }: { themePref: 'system' | 'light' | 'dark'; onThemePref: (v: 'system' | 'light' | 'dark') => void; scheme: ColorScheme; onScheme: (v: ColorScheme) => void; bindings: KeyBindings; onBindings: (next: KeyBindings) => void; advancedInstall: boolean; onAdvancedInstall: (v: boolean) => void; notify: Notify }) {
-  const [active, setActive] = useState<string>('appearance');
+export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, bindings, onBindings, advancedInstall, onAdvancedInstall, focusSearch, onFocusSearch, initialSection, notify }: { themePref: 'system' | 'light' | 'dark'; onThemePref: (v: 'system' | 'light' | 'dark') => void; scheme: ColorScheme; onScheme: (v: ColorScheme) => void; bindings: KeyBindings; onBindings: (next: KeyBindings) => void; advancedInstall: boolean; onAdvancedInstall: (v: boolean) => void; focusSearch: boolean; onFocusSearch: (v: boolean) => void; initialSection?: string; notify: Notify }) {
+  const [active, setActive] = useState<string>(initialSection ?? 'appearance');
   const [language, setLanguage] = useState('en');
   const [toggles, setToggles] = useState({ rememberSections: true, restoreTabs: true, autoChecks: true });
   const [keep, setKeep] = useState(1);
   const scrollRef = useRef<HTMLDivElement>(null);
   const flip = (key: keyof typeof toggles) => (v: boolean) => setToggles(t => ({ ...t, [key]: v }));
   const go = (id: string) => { setActive(id); scrollRef.current?.querySelector(`#dtp-set-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+  // A standalone link can open a section (`&section=advanced`); the list keeps tracking the scroll from there.
+  useEffect(() => { if (initialSection) scrollRef.current?.querySelector(`#dtp-set-${initialSection}`)?.scrollIntoView({ block: 'start' }); }, [initialSection]);
   return <main className="dtp-page">
+    <PageTitle>Settings</PageTitle>
     <div className="dtp-settings">
       <nav className="dtp-settings-nav" aria-label="Settings sections">{settingsSections.map(s => <button key={s.id} className={active === s.id ? 'active' : ''} aria-current={active === s.id ? 'true' : undefined} onClick={() => go(s.id)}><s.icon size={15} />{s.label}</button>)}</nav>
-      <div className="dtp-settings-body" ref={scrollRef} onScroll={e => { const top = e.currentTarget.getBoundingClientRect().top + 48; const current = settingsSections.filter(sec => (e.currentTarget.querySelector(`#dtp-set-${sec.id}`)?.getBoundingClientRect().top ?? Infinity) <= top).pop(); if (current) setActive(current.id); }}>
+      <div className="dtp-settings-body" ref={scrollRef} onScroll={e => { const box = e.currentTarget; const top = box.getBoundingClientRect().top + 48; const chosen = box.querySelector(`#dtp-set-${active}`)?.getBoundingClientRect(); if (box.scrollTop + box.clientHeight >= box.scrollHeight - 2 && chosen && chosen.top >= box.getBoundingClientRect().top - 2) return; /* at the end a chosen short section stays chosen */ const current = settingsSections.filter(sec => (e.currentTarget.querySelector(`#dtp-set-${sec.id}`)?.getBoundingClientRect().top ?? Infinity) <= top).pop(); if (current) setActive(current.id); }}>
         <section id="dtp-set-appearance" className="dtp-card dtp-settings-card"><h2>Appearance</h2>
           <div className="dtp-setting-line"><span><strong>Theme</strong><small>System follows your desktop setting.</small></span><Segmented label="Theme" value={themePref} onChange={onThemePref} options={[{ value: 'system', label: 'System' }, { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }]} /></div>
           <div className="dtp-setting-block"><strong>Colour scheme</strong><div className="dtp-scheme-grid" role="radiogroup" aria-label="Colour scheme">{colourSchemes.map(c => <button key={c.id} role="radio" aria-checked={scheme === c.id} className={scheme === c.id ? 'active' : ''} onClick={() => onScheme(c.id)}><span className="dtp-swatch"><i style={{ background: 'var(--ux-bg)' }} /><i style={{ background: c.accent }} /><i style={{ background: 'var(--ux-surface-2)' }} /></span>{c.name}{scheme === c.id && <Check size={14} />}</button>)}<button onClick={() => notify('Choose a colour scheme file (JSON)')}><Upload size={15} />Import scheme</button></div></div>
@@ -246,6 +263,10 @@ export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, bind
           <div className="dtp-legend"><span><i />Game data 53.9 MB</span><span><i />Kept versions 12.8 MB</span><span><i />Rosters 0.4 MB</span></div>
         </section>
         <section id="dtp-set-keys" className="dtp-card dtp-settings-card"><KeyBindingsEditor bindings={bindings} onBindings={onBindings} /></section>
+        {/* DEC-050 (UX-059): Advanced, opt-in behaviour; off by default. The detail names the key of the menu's Find in catalogue. */}
+        <section id="dtp-set-advanced" className="dtp-card dtp-settings-card"><h2>Advanced</h2>
+          <Switch label="Focus search when opening the catalogue" detail={`Off: Add unit opens the catalogue for browsing. Find in catalogue (${formatCombo('Mod+Shift+F')}) always focuses the search.`} checked={focusSearch} onChange={onFocusSearch} />
+        </section>
         <section id="dtp-set-about" className="dtp-card dtp-settings-card"><h2>About</h2>
           <dl className="dtp-facts four"><div><dt>Version</dt><dd>1.0.0 · desktop preview</dd></div><div><dt>Engine</dt><dd>0.9.4</dd></div><div><dt>Protocol</dt><dd>12</dd></div><div><dt>SQLite</dt><dd>3.46</dd></div></dl>
           <p className="dtp-muted">Game data and rosters stay on this device.</p>
