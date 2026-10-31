@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from "react";
 import { Anchor, BookOpen, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Clock3, Compass, Crown, Database, Feather, Flag, Gem, Hexagon, Info, ListFilter, Search, Shield, Star, Target, X, type LucideIcon } from "lucide-react";
-import { factionLabel, kindLabel, lookupById, lookupEntities, lookupGroups, lookupSystems, searchLookup, sourceLine, systemVersion, type LookupEntity, type LookupGroupId } from "../../data/lookupData";
+import { factionLabel, kindLabel, lookupById, lookupEntities, lookupSystems, sourceLine, systemVersion, type LookupEntity } from "../../data/lookupData";
 import { FoldSection } from "./MobileUnitOptions";
+import { plural, useLookup } from "./useLookup";
 import "./phone-lists.css";
 import "./phone-lookup.css";
 
@@ -14,32 +15,14 @@ import "./phone-lookup.css";
  * A result opens a read-only reference page (a pushed page; Back names where it returns). D10: hidden-by-default or
  * conditional entries are listed with a Conditional tag and explained on their page; costs are the data's base values.
  */
-const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 const recentIds = ["r-hold-line", "u-line-fc", "d-line-formation"];
 
 export function PhoneLookup({ initialQuery = "line", initialStack = [], noData = false, trailing, onAddData }: { initialQuery?: string; initialStack?: string[]; noData?: boolean; trailing?: ReactNode; onAddData?: () => void }) {
-  const [query, setQuery] = useState(initialQuery);
-  const [systems, setSystems] = useState<string[] | null>(null);
-  const [open, setOpen] = useState<LookupGroupId[] | null>(null);
+  const lk = useLookup(initialQuery);
+  const { query, systems, results, allResults, ordered, openIds, typed, withSystem } = lk;
   const [stack, setStack] = useState<string[]>(initialStack);
   const [recent, setRecent] = useState(recentIds);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const results = searchLookup(query, systems);
-  const allResults = searchLookup(query, null);
-  const groups = lookupGroups.map((g) => ({ ...g, rows: results.filter((e) => e.group === g.id) })).filter((g) => g.rows.length > 0);
-  const defaultOpen: LookupGroupId[] = groups.some((g) => g.id === "unit") ? ["unit"] : groups.slice(0, 1).map((g) => g.id);
-  const openIds = open ?? defaultOpen;
-  const ordered = [...groups.filter((g) => openIds.includes(g.id)), ...groups.filter((g) => !openIds.includes(g.id))];
-  const withSystem = systems === null ? lookupSystems.length > 1 : systems.length > 1;
-  const typed = query.trim().length > 0;
-
-  const toggle = (id: LookupGroupId) => setOpen(openIds.includes(id) ? openIds.filter((x) => x !== id) : [...openIds, id]);
-  const changeQuery = (next: string) => { setQuery(next); if (!next.trim()) setOpen(null); };
-  const pickSystem = (name: string) => {
-    const current = systems ?? [];
-    const next = current.includes(name) ? current.filter((s) => s !== name) : [...current, name];
-    setSystems(next.length === 0 || next.length === lookupSystems.length ? null : next);
-  };
   const push = (id: string) => { setStack((s) => [...s, id]); setRecent((r) => [id, ...r.filter((x) => x !== id)].slice(0, 5)); };
   const row = (e: LookupEntity, wide = withSystem) => (
     <button type="button" key={e.id} className="ux-source-row ux-src-row ux-lk-row" onClick={() => push(e.id)} aria-label={[e.name, e.summary, sourceLine(e, true), e.cost, e.conditional ? "Conditional" : ""].filter(Boolean).join(", ")}>
@@ -59,11 +42,11 @@ export function PhoneLookup({ initialQuery = "line", initialStack = [], noData =
         {noData ? (
           <div className="ux-search-empty ux-lk-empty"><BookOpen size={22} /><strong>Nothing to look up yet</strong><small>Lookup searches the units, detachments, upgrades and rules of your installed game data.</small><button type="button" className="ux-job-btn" onClick={onAddData}><Database size={15} />Add game data</button></div>
         ) : <>
-          <label className="ux-lf-search"><Search size={16} aria-hidden /><input value={query} onChange={(e) => changeQuery(e.currentTarget.value)} placeholder="Search units, rules, upgrades…" aria-label="Search the game data" />{typed ? <button type="button" className="ux-lk-clear" aria-label="Clear search" onClick={() => changeQuery("")}><X size={16} /></button> : null}</label>
+          <label className="ux-lf-search"><Search size={16} aria-hidden /><input value={query} onChange={(e) => lk.setQuery(e.currentTarget.value)} placeholder="Search units, rules, upgrades…" aria-label="Search the game data" />{typed ? <button type="button" className="ux-lk-clear" aria-label="Clear search" onClick={() => lk.setQuery("")}><X size={16} /></button> : null}</label>
           {lookupSystems.length > 1 ? <>
             {filtersOpen ? <div className="ux-lf-row"><div className="ux-lf-filters ux-lf-scroll" id="lookup-filters" role="group" aria-label="Game systems to search">
-              <button type="button" className={`ux-lf-chip ${systems === null ? "active" : ""}`} aria-pressed={systems === null} aria-label={typed ? `All systems, ${plural(allResults.length, "result")}` : "All systems"} onClick={() => setSystems(null)}>All{typed ? ` ${allResults.length}` : ""}</button>
-              {lookupSystems.map((s) => { const on = systems?.includes(s.name) ?? false; const n = allResults.filter((e) => e.system === s.name).length; return <button type="button" key={s.name} className={`ux-lf-chip ${on ? "active" : ""}`} aria-pressed={on} aria-label={typed ? `${s.name}, ${plural(n, "result")}` : s.name} onClick={() => pickSystem(s.name)}><span>{s.name}</span>{typed ? ` ${n}` : ""}</button>; })}
+              <button type="button" className={`ux-lf-chip ${systems === null ? "active" : ""}`} aria-pressed={systems === null} aria-label={typed ? `All systems, ${plural(allResults.length, "result")}` : "All systems"} onClick={() => lk.setSystems(null)}>All{typed ? ` ${allResults.length}` : ""}</button>
+              {lookupSystems.map((s) => { const on = systems?.includes(s.name) ?? false; const n = lk.countIn(s.name); return <button type="button" key={s.name} className={`ux-lf-chip ${on ? "active" : ""}`} aria-pressed={on} aria-label={typed ? `${s.name}, ${plural(n, "result")}` : s.name} onClick={() => lk.pickSystem(s.name)}><span>{s.name}</span>{typed ? ` ${n}` : ""}</button>; })}
             </div></div> : null}
             <div className="ux-lk-rule"><button type="button" className={`ux-lk-tab ${systems !== null && !filtersOpen ? "active" : ""}`} aria-expanded={filtersOpen} aria-controls="lookup-filters" aria-label={`${filtersOpen ? "Hide" : "Show"} game system filters${systems !== null ? `, searching ${systems.join(", ")}` : ""}`} title={filtersOpen ? "Hide filters" : "Show filters"} onClick={() => setFiltersOpen(!filtersOpen)}>{filtersOpen ? <ChevronUp size={18} aria-hidden /> : <ListFilter size={17} aria-hidden />}</button></div>
           </> : null}
@@ -73,20 +56,11 @@ export function PhoneLookup({ initialQuery = "line", initialStack = [], noData =
               <h3 className="ux-lk-recent-head"><Clock3 size={14} aria-hidden />Recently viewed</h3>
               <div className="ux-lk-rows">{recent.map((id) => lookupById(id)).filter((e): e is LookupEntity => !!e).map((e) => row(e, true))}</div>
             </section>
-          ) : groups.length === 0 ? (
-            <div className="ux-search-empty ux-lk-empty"><Search size={19} /><strong>Nothing found for “{query.trim()}”</strong><small>Check the spelling, or try part of the name.</small>{systems !== null ? <button type="button" className="ux-job-btn" onClick={() => setSystems(null)}>Search all systems</button> : null}</div>
+          ) : ordered.length === 0 ? (
+            <div className="ux-search-empty ux-lk-empty"><Search size={19} /><strong>Nothing found for “{query.trim()}”</strong><small>Check the spelling, or try part of the name.</small>{systems !== null ? <button type="button" className="ux-job-btn" onClick={() => lk.setSystems(null)}>Search all systems</button> : null}</div>
           ) : (
             <div className="ux-lk-results" role="status" aria-label={`${plural(results.length, "result")}`}>
-              {ordered.map((g) => {
-                const folded = !openIds.includes(g.id);
-                return <section key={g.id} className={`ux-lk-section ${folded ? "folded" : ""}`} aria-label={g.label}>
-                  <h3><button type="button" className="ux-lk-head" aria-expanded={!folded} aria-label={`${g.label}, ${plural(g.rows.length, "result")}`} onClick={() => toggle(g.id)}>
-                    <span><span className="ux-lk-head-title"><strong>{g.label}</strong><span>· {g.rows.length}</span></span>{folded ? <small>{g.rows.map((e) => e.name).join(", ")}</small> : null}</span>
-                    {folded ? <ChevronRight size={18} aria-hidden /> : <ChevronDown size={18} aria-hidden />}
-                  </button></h3>
-                  {folded ? null : <div className="ux-lk-rows">{g.rows.map((e) => row(e))}</div>}
-                </section>;
-              })}
+              {ordered.map((g) => <LookupSection key={g.id} label={g.label} count={g.rows.length} names={g.rows.map((e) => e.name)} folded={!openIds.includes(g.id)} onToggle={() => lk.toggle(g.id)}>{g.rows.map((e) => row(e))}</LookupSection>)}
             </div>
           )}
         </>}
@@ -94,6 +68,17 @@ export function PhoneLookup({ initialQuery = "line", initialStack = [], noData =
       {top ? <div className="ux-lk-page"><LookupEntryPage key={top.id} entity={top} back={stack.length > 1 ? lookupById(stack[stack.length - 2])?.name ?? "Lookup" : "Lookup"} onBack={() => setStack((s) => s.slice(0, -1))} onOpen={push} /></div> : null}
     </>
   );
+}
+
+/** A result section: header button with the group's count (and a preview of the names while folded), then its rows. */
+export function LookupSection({ label, count, names, folded, onToggle, children }: { label: string; count: number; names: string[]; folded: boolean; onToggle: () => void; children: ReactNode }) {
+  return <section className={`ux-lk-section ${folded ? "folded" : ""}`} aria-label={label}>
+    <h3><button type="button" className="ux-lk-head" aria-expanded={!folded} aria-label={`${label}, ${plural(count, "result")}`} onClick={onToggle}>
+      <span><span className="ux-lk-head-title"><strong>{label}</strong><span>· {count}</span></span>{folded ? <small>{names.join(", ")}</small> : null}</span>
+      {folded ? <ChevronRight size={18} aria-hidden /> : <ChevronDown size={18} aria-hidden />}
+    </button></h3>
+    {folded ? null : <div className="ux-lk-rows">{children}</div>}
+  </section>;
 }
 
 /** Read-only reference page for one result. */

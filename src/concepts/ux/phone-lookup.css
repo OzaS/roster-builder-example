@@ -74,3 +74,16 @@
 .ux-lk-legend > span { display: inline-flex; align-items: center; gap: 8px }
 .ux-lk-list > .ux-5a-choice:first-child { border-top: 0 !important }
 .ux-lk-link-row .ux-lf-tag { flex: none }
+
+/* Tablet and desktop: the reference content inside a detail pane or card. */
+.ux-mobile-unit-options.ux-lk-pane { flex: none; padding: 0; overflow: visible; background: transparent }
+.ux-lk-pane-back { display: inline-flex; align-items: center; gap: 2px; align-self: flex-start; min-height: 44px; margin-left: -6px; color: var(--ux-accent) !important; font-size: 15px }
+.ux-lk-pane-back span { max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.tb-lookup10 .ux-lk-results { align-content: start }
+.dtp-lookup10 .ux-lk-results { display: grid; gap: 4px; padding: 6px 10px 12px }
+.dtp-lookup10 .ux-lk-head { min-height: 36px }
+.dtp-lookup10 .dtp-result .ux-ro-list-trailing { flex: none }
+.dt-app .dtp-lookup10 .ux-lk-head { justify-content: space-between; width: 100%; text-align: left }
+.dt-app .dtp-lookup10 .ux-lk-head > span { flex: 1 }
+.dt-app .dtp-lookup10 .dtp-result { overflow: hidden }
+.dt-app .dtp-lookup10 .dtp-result .ux-ro-list-trailing { flex: none; padding-right: 2px }

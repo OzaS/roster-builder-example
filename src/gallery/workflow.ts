@@ -15,6 +15,8 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "tablet-rosters-text-200", label: "Tablet · Rosters · Text 200%" },
   { id: "tablet-editor-import-result", label: "Tablet · Import result" },
   { id: "tablet-lookup", label: "Tablet · Lookup" },
+  { id: "tablet-lookup-1-0", label: "Tablet · Lookup 1.0" },
+  { id: "tablet-lookup-1-0-force", label: "Tablet · Lookup 1.0 · Force" },
   { id: "tablet-tools", label: "Tablet · Tools" },
   { id: "tablet-library", label: "Tablet · Library" },
   { id: "tablet-sources", label: "Tablet · Sources" },
@@ -45,6 +47,8 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "desktop-editor", label: "Desktop · Roster editor" },
   { id: "desktop-rosters", label: "Desktop · Rosters" },
   { id: "desktop-lookup", label: "Desktop · Lookup" },
+  { id: "desktop-lookup-1-0", label: "Desktop · Lookup 1.0" },
+  { id: "desktop-lookup-1-0-force", label: "Desktop · Lookup 1.0 · Force" },
   { id: "desktop-tools", label: "Desktop · Tools" },
   { id: "desktop-library", label: "Desktop · Library" },
   { id: "desktop-sources", label: "Desktop · Sources" },
@@ -121,7 +125,7 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen === "desktop-welcome") return "library";
   if (screen === "desktop-editor") return "overview";
   if (screen === "desktop-rosters") return "library";
-  if (screen === "desktop-lookup") return "catalogue";
+  if (screen === "desktop-lookup" || screen.startsWith("desktop-lookup-1-0")) return "catalogue";
   if (screen === "desktop-sources") return "sources";
   if (screen === "desktop-settings") return "settings";
   if (screen === "desktop-first-run") return "library";
