@@ -150,6 +150,9 @@ export function TabletElements() {
         <FactsGrid rows={[[ 'Game system', 'Example System With A Long Name That Wraps'], ['Units', 6], ['Last opened', '12 minutes ago'], ['Changed', 'Yesterday'], ['Created', '5 days ago']]} /></div></div>)}</div>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-rosters-validation-error" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="android"><TabletWorkbench workflowScreen="tablet-rosters-validation-warning" /></TabletDeviceFrame></div>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-rosters-status" /></TabletDeviceFrame></div>
+      <h2>Lookup 1.0 · grouped results and detail pane (design session 2026-10-31)</h2>
+      <p>The earlier Lookup page with the phone's grouping: system chips (All n, one per system with its count), four foldable sections with counts (Units open on top, folded sections below the open ones), and the phone's reference content in the detail pane, where links push onto the pane's own stack.</p>
+      <div className="tb-el-frames"><TabletDeviceFrame fit="width"><TabletWorkbench workflowScreen="tablet-lookup-1-0" /></TabletDeviceFrame><TabletDeviceFrame fit="width"><TabletWorkbench workflowScreen="tablet-lookup-1-0-force" /></TabletDeviceFrame></div>
       <h2>Empty state card · first run, no rosters, no match</h2>
       <div className="tb-el-row"><div className="tb-app ux-screen dark tb-el-card"><EmptyState icon={Layers3} title="No rosters yet" text="Create a roster, or import one from a file."><button type="button" className="ux-primary tb-primary"><Plus size={17} />New roster</button><button type="button" className="ux-job-btn">Import a roster</button></EmptyState></div></div>
       <h2>Home and Sources progress · in-page controls, no global toolbar jobs button</h2>
