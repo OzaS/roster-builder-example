@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Archive, Check, CircleArrowUp, Layers3, Search, Wand2, X } from "lucide-react";
 import { rosterLibrary, type RosterSummary } from "../desktop/desktopData";
 import "./phone-lists.css";
 
 /**
- * Phone Lists with search, the filter row and grouping (TFB-005): the tablet Rosters controls on the phone. All and
- * More / Less stay fixed with only the game system and Needs attention choices scrolling between them; the icon-only
+ * Phone Lists with search, the filter row and grouping (TFB-005): the tablet Rosters controls on the phone. All,
+ * game system and Needs attention choices are always visible in one scrolling row; the icon-only
  * Group by game system toggle is fixed at the trailing end of the same row. Grouping shows a section per game system.
- * The search and filters share the tablet page's state, so a width change keeps them. Synthetic rosters only.
+ * Search comes from the page's expanding top bar. Synthetic rosters only.
  */
 const needsAttention = (r: RosterSummary) => r.status === "data-changed" || r.status === "faction-removed";
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
@@ -25,10 +25,8 @@ function Tag({ r }: { r: RosterSummary }) {
   return null;
 }
 
-export function PhoneListsFilters({ initialGrouped = false, initialExpanded = false }: { initialGrouped?: boolean; initialExpanded?: boolean }) {
+export function PhoneListsFilters({ initialGrouped = false, query = "", onQueryChange, actions, onOpenRoster }: { initialGrouped?: boolean; query?: string; onQueryChange?: (query: string) => void; actions?: ReactNode; onOpenRoster?: () => void }) {
   const [promptOpen, setPromptOpen] = useState(true);
-  const [query, setQuery] = useState("");
-  const [expanded, setExpanded] = useState(initialExpanded);
   const [system, setSystem] = useState<string | null>(null);
   const [attention, setAttention] = useState(false);
   const [grouped, setGrouped] = useState(initialGrouped);
@@ -39,28 +37,22 @@ export function PhoneListsFilters({ initialGrouped = false, initialExpanded = fa
   const q = query.trim().toLowerCase();
   const visible = rosters.filter((r) => `${r.name} ${r.faction} ${r.system}`.toLowerCase().includes(q) && (!attention || needsAttention(r)) && (system === null || r.system === system));
   const groups = bySystem && grouped ? systems.map((s) => ({ name: s.name, rows: visible.filter((r) => r.system === s.name) })).filter((g) => g.rows.length > 0) : null;
-  const more = ["More", system, attention ? "Needs attention" : null].filter(Boolean).join(" · ");
-  const clear = () => { setQuery(""); setSystem(null); setAttention(false); };
+  const clear = () => { onQueryChange?.(""); setSystem(null); setAttention(false); };
   const row = (r: RosterSummary) => (
-    <article key={r.name} className="ux-source-row ux-src-row ux-lf-roster">
+    <button type="button" key={r.name} className="ux-source-row ux-src-row ux-lf-roster" onClick={onOpenRoster}>
       <span><strong>{r.name}</strong><small>{r.faction} · {r.system}</small><small>Opened {r.opened}</small></span>
       <span className="ux-ro-list-trailing"><b className={r.used > r.limit ? "over" : ""}>{r.used} / {r.limit} pts</b><Tag r={r} /></span>
-    </article>
+    </button>
   );
   return (
     <main className="ux-lists-main ux-lf">
       {promptOpen ? <div className="ux-cmd-hero"><button type="button" className="ux-cmd-hero-close" aria-label="Close getting started prompt" onClick={() => setPromptOpen(false)}><X size={16} /></button><Wand2 size={20} /><h2>What do you want to build?</h2><p>Start a new roster. Rosters you open stay here, most recent first.</p></div> : null}
-      <label className="ux-lf-search"><Search size={16} aria-hidden /><input value={query} onChange={(e) => setQuery(e.currentTarget.value)} placeholder="Find a roster or faction…" aria-label="Find a roster" /></label>
+      {actions}
       <div className="ux-lf-row">
-        <div className="ux-lf-filters" role="group" aria-label="Show rosters">
-          <button type="button" className={`ux-lf-chip start ${!attention && system === null ? "active" : ""}`} aria-pressed={!attention && system === null} onClick={() => { setSystem(null); setAttention(false); }}>All {rosters.length}</button>
-          {expanded ? <div className="ux-lf-scroll" role="group" aria-label="Additional roster filters">
-            {bySystem && systems.map((s) => <button type="button" key={s.name} className={`ux-lf-chip ${system === s.name ? "active" : ""}`} aria-pressed={system === s.name} aria-label={`${s.name}, ${plural(s.count, "roster")}`} onClick={() => setSystem(system === s.name ? null : s.name)}>{system === s.name ? <Check size={15} aria-hidden /> : null}<span>{s.name}</span> {s.count}</button>)}
-            {attentionCount > 0 ? <button type="button" className={`ux-lf-chip ${attention ? "active" : ""}`} aria-pressed={attention} onClick={() => setAttention(!attention)}>{attention ? <Check size={15} aria-hidden /> : null}Needs attention {attentionCount}</button> : null}
-          </div> : null}
-          {expanded
-            ? <button type="button" className="ux-lf-chip end" aria-expanded={true} onClick={() => setExpanded(false)}>Less</button>
-            : <button type="button" className={`ux-lf-chip end ${system !== null || attention ? "active" : ""}`} aria-expanded={false} onClick={() => setExpanded(true)}><span>{more}</span></button>}
+        <div className="ux-lf-filters ux-lf-scroll ux-lf-always" role="group" aria-label="Show rosters">
+          <button type="button" className={`ux-lf-chip ${!attention && system === null ? "active" : ""}`} aria-pressed={!attention && system === null} onClick={() => { setSystem(null); setAttention(false); }}>All {rosters.length}</button>
+          {bySystem && systems.map((s) => <button type="button" key={s.name} className={`ux-lf-chip ${system === s.name ? "active" : ""}`} aria-pressed={system === s.name} aria-label={`${s.name}, ${plural(s.count, "roster")}`} onClick={() => setSystem(system === s.name ? null : s.name)}>{system === s.name ? <Check size={15} aria-hidden /> : null}<span>{s.name}</span> {s.count}</button>)}
+          {attentionCount > 0 ? <button type="button" className={`ux-lf-chip ${attention ? "active" : ""}`} aria-pressed={attention} onClick={() => setAttention(!attention)}>{attention ? <Check size={15} aria-hidden /> : null}Needs attention {attentionCount}</button> : null}
         </div>
         {bySystem ? <button type="button" className={`ux-lf-group ${grouped ? "active" : ""}`} aria-pressed={grouped} aria-label="Group by game system" title="Group by game system" onClick={() => setGrouped(!grouped)}><Layers3 size={19} aria-hidden /></button> : null}
       </div>

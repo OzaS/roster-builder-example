@@ -25,8 +25,8 @@ export const isTabletPage = (value: string): value is TabletPage => tabletPages.
 /**
  * The main navigation of the tablet: New roster on top, the five features, Sources and Settings pinned to the bottom;
  * destinations show a pill indicator behind the icon with the label under it. DEC-050: New roster is the top rail item on
- * iPad and Android alike, in the same icon-over-caption language with a filled accent pill (it replaces the iPad toolbar
- * control and the Android FAB); it is an action, so it never takes aria-current. ⌘N / Ctrl+N works everywhere.
+ * iPad and Android alike, as an icon-only action (Liquid Glass on iOS, an icon button on Android); destinations keep
+ * their labels. It is an action, so it never takes aria-current. ⌘N / Ctrl+N works everywhere.
  */
 export function TabletRail({ page, input, system = 'ios', onPage, onNewRoster }: { page: TabletPage; input: TabletInput; system?: 'ios' | 'android'; onPage: (page: TabletPage) => void; onNewRoster: () => void }) {
   // With a pointer (and so most likely a keyboard) the title names the shortcut too.
@@ -36,8 +36,8 @@ export function TabletRail({ page, input, system = 'ios', onPage, onNewRoster }:
     <span className="tb-rail-ind"><Icon size={22} strokeWidth={page === id ? 2.3 : 2} /></span><span>{label}</span>
   </HintButton>;
   return <nav className="tb-rail" aria-label="Main navigation">
-    <HintButton hint={`Create a roster${keys('Mod+N')}`} input={input} aria-label="New roster" className="tb-rail-item prominent" onClick={onNewRoster}>
-      <span className="tb-rail-ind"><Plus size={22} strokeWidth={2.4} /></span><span>New roster</span>
+    <HintButton hint={`Create a roster${keys('Mod+N')}`} input={input} aria-label="New roster" className="tb-rail-item prominent tb-rail-create" onClick={onNewRoster}>
+      <span className="tb-rail-ind"><Plus size={22} strokeWidth={2.4} /></span>
     </HintButton>
     {railTop.map(item)}
     <span className="tb-rail-spacer" />

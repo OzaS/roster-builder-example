@@ -1,3 +1,4 @@
+import { PhoneSearchHeader } from "./PhoneSearchHeader";
 import { PhoneListsFilters } from "./PhoneListsFilters";
 import { PhoneLookup } from "./PhoneLookup";
 import { AppearancePreferences } from "./AppearanceSettings";
@@ -139,7 +140,7 @@ export function CodexWorkbench(props: ConceptProps) {
     body = <Library props={props} />;
   } else if (screen === "collections") {
     body = <CollectionsLibrary props={props} />;
-  } else if (screen === "catalogue" && props.workflowScreen?.startsWith("lookup-")) {
+  } else if (screen === "catalogue" && props.workflowScreen !== "source-legacy") {
     body = <PhoneLookupScreen props={props} />;
   } else if (screen === "catalogue") {
     body = <LookupScreen props={props} />;
@@ -1244,7 +1245,7 @@ function Rail({ props }: { props: ConceptProps }) {
 function Library({ props }: { props: ConceptProps }) {
   const isV2 = props.workflowScreen === "library-v2";
   // TFB-005: the phone Lists with search, the filter row and grouping (the tablet Rosters controls).
-  const isFilters = props.workflowScreen === "library-filters";
+  const isFilters = !isV2;
   const [promptOpen, setPromptOpen] = useState(true);
   const [organizerOpen, setOrganizerOpen] = useState(true);
   const [query, setQuery] = useState("");
@@ -1257,13 +1258,8 @@ function Library({ props }: { props: ConceptProps }) {
   const filteredRosters = rosters.filter((roster) => `${roster.name} ${roster.sub}`.toLowerCase().includes(query.trim().toLowerCase()));
   return (
     <>
-      <header className="ux-wb-top ux-wb-home-top">
-        <div className="ux-wb-title">
-          <strong>Roster Builder</strong>
-          <small>{props.roster.system}</small>
-        </div>
-        <AppAvatarButton props={props} />
-      </header>
+      <PhoneSearchHeader title="Lists" subtitle="Your rosters" query={query} onQueryChange={setQuery}
+        placeholder="Find a roster or faction…" trailing={<AppAvatarButton props={props} />} />
       <div className={`ux-wb-home-body ux-lists-body ${isV2 ? "is-v2" : "is-v1"} ${isV2 && organizerOpen ? "organizer-open" : ""}`}>
         {isV2 && organizerOpen ? (
           <aside className="ux-roster-organizer" aria-label="Organize rosters">
@@ -1274,7 +1270,10 @@ function Library({ props }: { props: ConceptProps }) {
             <div className="ux-organizer-tags"><small>Tags</small><div><button type="button"><Tag size={12} />Competitive</button><button type="button"><Tag size={12} />Draft</button><button type="button"><Tag size={12} />Favourite</button></div></div>
           </aside>
         ) : null}
-        {isFilters ? <PhoneListsFilters /> : <main className="ux-lists-main">
+        {isFilters ? <PhoneListsFilters query={query} onQueryChange={setQuery} onOpenRoster={() => props.onNavigate("overview")} actions={<div className="ux-lists-actions">
+          <button type="button" className="ux-organizer-toggle" aria-label="Import a roster file"><Upload size={15} />Import</button>
+          <button type="button" className="ux-new-roster ux-new-roster-compact" onClick={() => props.onNavigate("system")}><Plus size={18} /><span><strong>New roster</strong></span></button>
+        </div>} /> : <main className="ux-lists-main">
           {!isV2 && promptOpen ? <div className="ux-cmd-hero"><button type="button" className="ux-cmd-hero-close" aria-label="Close getting started prompt" onClick={() => setPromptOpen(false)}><X size={16} /></button><Wand2 size={20} /><h2>What do you want to build?</h2><p>Start a new roster. Lists you open will appear in Recent.</p></div> : null}
           <div className="ux-lists-actions">
             <div><strong>{isV2 ? "Your rosters" : "Lists"}</strong><small>{isV2 ? `${rosters.length} saved rosters` : "Your recent rosters"}</small></div>
@@ -1784,7 +1783,7 @@ function LookupScreen({ props }: { props: ConceptProps }) {
 function PhoneLookupScreen({ props }: { props: ConceptProps }) {
   const s = props.workflowScreen;
   const stack = s === "lookup-unit" ? ["u-line-fc"] : s === "lookup-force" ? ["f-line-of-battle"] : s === "lookup-detachment" ? ["d-line-formation"] : s === "lookup-upgrade" ? ["up-line-rifle"] : s === "lookup-rule" ? ["r-hold-line"] : [];
-  const query = s === "lookup-start" ? "" : s === "lookup-no-results" ? "lantern" : "line";
+  const query = s === "lookup-start" || s === "source" ? "" : s === "lookup-no-results" ? "lantern" : "line";
   return <PhoneLookup key={s} initialQuery={query} initialStack={stack} noData={s === "lookup-no-data"} trailing={<AppAvatarButton props={props} />} onAddData={() => props.onNavigate("add-source")} />;
 }
 

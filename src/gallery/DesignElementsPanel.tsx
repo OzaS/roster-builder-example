@@ -1,3 +1,4 @@
+import { PhoneSearchHeader } from "../concepts/ux/PhoneSearchHeader";
 import { PhoneListsFilters } from "../concepts/ux/PhoneListsFilters";
 import { LookupEntryBody, PhoneLookup } from "../concepts/ux/PhoneLookup";
 import { lookupById } from "../data/lookupData";
@@ -566,7 +567,7 @@ function WorkbenchElements({
         <section className="ux-mobile-unit-options compact ux-lk-detail"><LookupEntryBody entity={lookupById("d-line-formation")!} onOpen={() => undefined} /></section>
       </ElementSection>
 
-      <ElementSection title="Lookup & Sources">
+      <ElementSection title="Lookup & Sources · Earlier design">
         <div className="ux-source-filters">
           {["All sources", roster.system, roster.faction].map((label, index) => (
             <button key={label} type="button" className={`ux-filter-pill ${index === 0 ? "on" : ""}`}>
@@ -837,8 +838,12 @@ function WorkbenchElements({
         <TaggedRosterRows />
       </ElementSection>
 
+      <ElementSection title="Phone Top Bar Search">
+        <PhoneSearchExamples />
+      </ElementSection>
+
       <ElementSection title="Lists Search, Filters and Grouping">
-        <PhoneListsFilters initialExpanded />
+        <PhoneListsFilters />
         <PhoneListsFilters initialGrouped />
       </ElementSection>
 
@@ -1454,4 +1459,12 @@ function ManySlotsElement() {
     </div>)}
     <p>Configuration and nested forces retain their order; collapse choices survive model updates while the roster is open.</p>
   </div>;
+}
+
+function PhoneSearchExamples() {
+  const [query, setQuery] = useState("");
+  const [expandedQuery, setExpandedQuery] = useState("line");
+  const avatar = <button type="button" className="ux-icon-btn" aria-label="Account"><UserRound size={20} /></button>;
+  return <><PhoneSearchHeader title="Lists" query={query} onQueryChange={setQuery} placeholder="Find a roster or faction…" trailing={avatar} />
+    <PhoneSearchHeader title="Lookup" query={expandedQuery} onQueryChange={setExpandedQuery} placeholder="Search units, rules, upgrades…" trailing={avatar} initialOpen /></>;
 }

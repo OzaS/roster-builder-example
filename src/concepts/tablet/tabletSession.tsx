@@ -19,6 +19,7 @@ const stateRoutes: Record<string, TabletRoute> = {
   'tablet-home-no-rosters': { page: 'home', state: 'no-rosters' },
   'tablet-home-many-systems': { page: 'home', state: 'many-systems' },
   'tablet-rosters-empty': { page: 'rosters', state: 'empty' },
+  'tablet-lookup-legacy': { page: 'lookup', state: 'legacy' },
   'tablet-lookup-1-0': { page: 'lookup', state: 'v1' },
   'tablet-lookup-1-0-force': { page: 'lookup', state: 'v1-force' },
   'tablet-rosters-many': { page: 'rosters', state: 'many' },

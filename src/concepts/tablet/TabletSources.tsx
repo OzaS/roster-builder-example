@@ -48,7 +48,7 @@ export function TabletSources({ env, notify, session, onPage, onOpenRoster }: Se
   const pickedUpdates = picked.filter(id => sources.find(s => s.id === id)?.next && progress[id] === undefined);
 
   // DEC-050: the top row is the search (filters the installed game data), then Select, Install from a file and Add game
-  // data (prominent) as icon-over-caption actions. Install from a file moves into More before Add game data does.
+  // data (prominent) as platform icon buttons. Install from a file moves into More before Add game data does.
   const actions: ToolbarAction[] = [
     { id: 'select', label: selecting ? 'Done selecting' : 'Select game data', caption: selecting ? 'Done' : 'Select', icon: CheckSquare, pressed: selecting, priority: 2, hint: selecting ? 'Leave selection' : 'Select several game systems to update or remove them together', onClick: () => selecting ? endSelect() : setSelecting(true) },
     { id: 'file', label: 'Install from a file', caption: 'From a file', icon: FolderOpen, priority: 1, hint: 'Install game data from an archive, data files or a folder', onClick: () => notify('Choose an archive, data files or a folder (prototype)') },

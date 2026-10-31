@@ -3,9 +3,7 @@ import { MoreHorizontal } from 'lucide-react';
 import type { TabletInput } from './tabletDevices';
 import { HintButton } from './TabletHint';
 
-// DEC-050: tablet pages have no title rows; the rail shows where you are. List pages put their search in the top row and
-// the page actions at its trailing end, drawn as the rail draws its items: an icon inside a pill indicator with a short
-// caption under it (48 px and more). The same on iPad and Android (the iPad no longer depicts native icon-only bar items).
+// 1.0 revision: iOS Liquid Glass icon buttons; Android icon buttons. Labels remain in hints and More.
 
 /** The page heading for screen readers only: the rail already shows the page. */
 export const PageTitle = ({ children }: { children: ReactNode }) => <h1 className="tb-visually-hidden">{children}</h1>;
@@ -14,7 +12,7 @@ export type ToolbarAction = {
   id: string;
   /** Accessible name; also the label in the More menu. */
   label: string;
-  /** Short caption under the icon (defaults to the label). */
+  /** Short action name retained for gallery callers; visible names live in hints and More. */
   caption?: string;
   icon: ComponentType<{ size?: number; strokeWidth?: number }>;
   hint: string;
@@ -36,7 +34,6 @@ const Item = ({ action, input }: { action: ToolbarAction; input: TabletInput }) 
     aria-expanded={action.expanded} aria-haspopup={action.expanded === undefined ? undefined : 'menu'}
     className={`tb-tool-action ${action.prominent ? 'prominent' : ''} ${on ? 'active' : ''}`} onClick={action.onClick}>
     <span className="tb-tool-ind" aria-hidden="true"><Icon size={21} strokeWidth={on || action.prominent ? 2.3 : 2} /></span>
-    <span className="tb-tool-caption" aria-hidden="true">{action.caption ?? action.label}</span>
   </HintButton>;
 };
 
@@ -52,7 +49,7 @@ export function ToolbarActions({ actions, input, label, reserve = 0 }: { actions
   const [hidden, setHidden] = useState<string[]>([]);
   const [menu, setMenu] = useState(false);
   const moreRef = useRef<HTMLDivElement>(null);
-  const signature = actions.map(a => `${a.id}:${a.caption ?? a.label}:${a.prominent ? 1 : 0}:${a.priority ?? ''}`).join('|');
+  const signature = actions.map(a => `${a.id}:${a.prominent ? 1 : 0}:${a.priority ?? ''}`).join('|');
 
   useLayoutEffect(() => {
     const row = wrap.current?.parentElement;
@@ -106,7 +103,7 @@ export function ToolbarActions({ actions, input, label, reserve = 0 }: { actions
     </div>}
     {/* Measuring copies: every action and More at their natural width, never seen or read. */}
     <div ref={measure} className="tb-tool-measure" aria-hidden="true">
-      {[...actions, more].map(a => <span key={a.id} className={`tb-tool-action ${a.prominent ? 'prominent' : ''}`}><span className="tb-tool-ind"><a.icon size={21} /></span><span className="tb-tool-caption">{a.caption ?? a.label}</span></span>)}
+      {[...actions, more].map(a => <span key={a.id} className={`tb-tool-action ${a.prominent ? 'prominent' : ''}`}><span className="tb-tool-ind"><a.icon size={21} /></span></span>)}
     </div>
   </div>;
 }

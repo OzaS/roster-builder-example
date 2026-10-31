@@ -20,6 +20,7 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "tablet-rosters-text-200", label: "Tablet · Rosters · Text 200%" },
   { id: "tablet-editor-import-result", label: "Tablet · Import result" },
   { id: "tablet-lookup", label: "Tablet · Lookup" },
+  { id: "tablet-lookup-legacy", label: "Archive · Earlier tablet Lookup" },
   { id: "tablet-lookup-1-0", label: "Tablet · Lookup 1.0" },
   { id: "tablet-lookup-1-0-force", label: "Tablet · Lookup 1.0 · Force" },
   { id: "tablet-tools", label: "Tablet · Tools" },
@@ -52,6 +53,7 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "desktop-editor", label: "Desktop · Roster editor" },
   { id: "desktop-rosters", label: "Desktop · Rosters" },
   { id: "desktop-lookup", label: "Desktop · Lookup" },
+  { id: "desktop-lookup-legacy", label: "Archive · Earlier desktop Lookup" },
   { id: "desktop-lookup-1-0", label: "Desktop · Lookup 1.0" },
   { id: "desktop-lookup-1-0-force", label: "Desktop · Lookup 1.0 · Force" },
   { id: "desktop-tools", label: "Desktop · Tools" },
@@ -77,6 +79,7 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "create-roster", label: "Create Roster" },
   { id: "drafts", label: "Drafts" },
   { id: "source", label: "Lookup" },
+  { id: "source-legacy", label: "Archive · Earlier phone Lookup" },
   { id: "lookup-results", label: "Lookup · Results, grouped" },
   { id: "lookup-start", label: "Lookup · Before a search" },
   { id: "lookup-no-results", label: "Lookup · No results" },
@@ -130,7 +133,7 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen === "desktop-welcome") return "library";
   if (screen === "desktop-editor") return "overview";
   if (screen === "desktop-rosters") return "library";
-  if (screen === "desktop-lookup" || screen.startsWith("desktop-lookup-1-0")) return "catalogue";
+  if (screen === "desktop-lookup-legacy" || screen === "desktop-lookup" || screen.startsWith("desktop-lookup-1-0")) return "catalogue";
   if (screen === "desktop-sources") return "sources";
   if (screen === "desktop-settings") return "settings";
   if (screen === "desktop-first-run") return "library";
@@ -140,7 +143,7 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen === "subscription-edition") return "overview";
   if (screen === "create-roster") return "system";
   if (screen === "drafts") return "library";
-  if (screen === "source" || screen.startsWith("lookup-")) return "catalogue";
+  if (screen === "source-legacy" || screen === "source" || screen.startsWith("lookup-")) return "catalogue";
   if (screen === "add-detachment") return "detachment";
   if (screen === "option-drilldown") return "unit-detail";
   if (screen === "diagnostics") return "validation";

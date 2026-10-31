@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
-import { Anchor, BookOpen, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Clock3, Compass, Crown, Database, Feather, Flag, Gem, Hexagon, Info, ListFilter, Search, Shield, Star, Target, X, type LucideIcon } from "lucide-react";
+import { Anchor, BookOpen, ChevronDown, ChevronLeft, ChevronRight, Clock3, Compass, Crown, Database, Feather, Flag, Gem, Hexagon, Info, Search, Shield, Star, Target, X, type LucideIcon } from "lucide-react";
 import { factionLabel, kindLabel, lookupById, lookupEntities, lookupSystems, sourceLine, systemVersion, type LookupEntity } from "../../data/lookupData";
+import { PhoneSearchHeader } from "./PhoneSearchHeader";
 import { FoldSection } from "./MobileUnitOptions";
 import { plural, useLookup } from "./useLookup";
 import "./phone-lists.css";
@@ -8,7 +9,7 @@ import "./phone-lookup.css";
 
 /**
  * Lookup 1.0 on the phone (design session 2026-10-31). Name search over every installed game system, or the chosen
- * ones; the system chips hide behind a tab under the search (accent while a filter is on) to save room. Results sit in
+ * ones; search expands across the top bar, replacing the title and avatar. System chips stay visible and scroll. Results sit in
  * four sections with a count each: Units, Forces & detachments, Upgrades, Rules. Units start open on top;
  * the others start folded, and folded sections always sort below the open ones (fixed group order inside each part).
  * No units → the first group with results opens instead. Fold state lasts for the search; clearing the field resets it.
@@ -22,7 +23,6 @@ export function PhoneLookup({ initialQuery = "line", initialStack = [], noData =
   const { query, systems, results, allResults, ordered, openIds, typed, withSystem } = lk;
   const [stack, setStack] = useState<string[]>(initialStack);
   const [recent, setRecent] = useState(recentIds);
-  const [filtersOpen, setFiltersOpen] = useState(false);
   const push = (id: string) => { setStack((s) => [...s, id]); setRecent((r) => [id, ...r.filter((x) => x !== id)].slice(0, 5)); };
   const row = (e: LookupEntity, wide = withSystem) => (
     <button type="button" key={e.id} className="ux-source-row ux-src-row ux-lk-row" onClick={() => push(e.id)} aria-label={[e.name, e.summary, sourceLine(e, true), e.cost, e.conditional ? "Conditional" : ""].filter(Boolean).join(", ")}>
@@ -34,22 +34,16 @@ export function PhoneLookup({ initialQuery = "line", initialStack = [], noData =
   const top = stack.length ? lookupById(stack[stack.length - 1]) : undefined;
   return (
     <>
-      <header className="ux-wb-top ux-wb-home-top">
-        <div className="ux-wb-title"><strong>Lookup</strong><small>{noData ? "No game data yet" : `${plural(lookupSystems.length, "game system")} installed`}</small></div>
-        {trailing}
-      </header>
+      <PhoneSearchHeader title="Lookup" subtitle={noData ? "No game data yet" : `${plural(lookupSystems.length, "game system")} installed`}
+        query={query} onQueryChange={lk.setQuery} placeholder="Search units, rules, upgrades…" trailing={trailing} initialOpen={!!initialQuery} searchable={!noData} />
       <div className="ux-wb-home-body ux-lk-body">
         {noData ? (
           <div className="ux-search-empty ux-lk-empty"><BookOpen size={22} /><strong>Nothing to look up yet</strong><small>Lookup searches the units, detachments, upgrades and rules of your installed game data.</small><button type="button" className="ux-job-btn" onClick={onAddData}><Database size={15} />Add game data</button></div>
         ) : <>
-          <label className="ux-lf-search"><Search size={16} aria-hidden /><input value={query} onChange={(e) => lk.setQuery(e.currentTarget.value)} placeholder="Search units, rules, upgrades…" aria-label="Search the game data" />{typed ? <button type="button" className="ux-lk-clear" aria-label="Clear search" onClick={() => lk.setQuery("")}><X size={16} /></button> : null}</label>
-          {lookupSystems.length > 1 ? <>
-            {filtersOpen ? <div className="ux-lf-row"><div className="ux-lf-filters ux-lf-scroll" id="lookup-filters" role="group" aria-label="Game systems to search">
-              <button type="button" className={`ux-lf-chip ${systems === null ? "active" : ""}`} aria-pressed={systems === null} aria-label={typed ? `All systems, ${plural(allResults.length, "result")}` : "All systems"} onClick={() => lk.setSystems(null)}>All{typed ? ` ${allResults.length}` : ""}</button>
-              {lookupSystems.map((s) => { const on = systems?.includes(s.name) ?? false; const n = lk.countIn(s.name); return <button type="button" key={s.name} className={`ux-lf-chip ${on ? "active" : ""}`} aria-pressed={on} aria-label={typed ? `${s.name}, ${plural(n, "result")}` : s.name} onClick={() => lk.pickSystem(s.name)}><span>{s.name}</span>{typed ? ` ${n}` : ""}</button>; })}
-            </div></div> : null}
-            <div className="ux-lk-rule"><button type="button" className={`ux-lk-tab ${systems !== null && !filtersOpen ? "active" : ""}`} aria-expanded={filtersOpen} aria-controls="lookup-filters" aria-label={`${filtersOpen ? "Hide" : "Show"} game system filters${systems !== null ? `, searching ${systems.join(", ")}` : ""}`} title={filtersOpen ? "Hide filters" : "Show filters"} onClick={() => setFiltersOpen(!filtersOpen)}>{filtersOpen ? <ChevronUp size={18} aria-hidden /> : <ListFilter size={17} aria-hidden />}</button></div>
-          </> : null}
+          {lookupSystems.length > 1 ? <div className="ux-lf-row"><div className="ux-lf-filters ux-lf-scroll ux-lf-always" role="group" aria-label="Game systems to search">
+            <button type="button" className={`ux-lf-chip ${systems === null ? "active" : ""}`} aria-pressed={systems === null} aria-label={typed ? `All systems, ${plural(allResults.length, "result")}` : "All systems"} onClick={() => lk.setSystems(null)}>All{typed ? ` ${allResults.length}` : ""}</button>
+            {lookupSystems.map((s) => { const on = systems?.includes(s.name) ?? false; const n = lk.countIn(s.name); return <button type="button" key={s.name} className={`ux-lf-chip ${on ? "active" : ""}`} aria-pressed={on} aria-label={typed ? `${s.name}, ${plural(n, "result")}` : s.name} onClick={() => lk.pickSystem(s.name)}><span>{s.name}</span>{typed ? ` ${n}` : ""}</button>; })}
+          </div></div> : null}
           {!typed ? (
             <section className="ux-lk-start" aria-label="Recently viewed">
               <p className="ux-lk-hint">Type a name, or part of one. Lookup searches units, detachments, upgrades and rules{systems === null ? " in every installed system" : ""}.</p>

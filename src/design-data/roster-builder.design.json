@@ -164,6 +164,10 @@
         {
           "id": "unit-options-mobile",
           "label": "Unit detail · Mobile 5A + 5B + links"
+        },
+        {
+          "id": "source-legacy",
+          "label": "Archive · Earlier Lookup"
         }
       ],
       "workflows": [
@@ -175,7 +179,6 @@
             "library-v2",
             "library-filters",
             "subscription-main",
-            "source",
             "collections"
           ]
         },
@@ -234,8 +237,9 @@
         },
         {
           "id": "lookup",
-          "label": "Lookup 1.0",
+          "label": "Lookup",
           "screens": [
+            "source",
             "lookup-results",
             "lookup-start",
             "lookup-no-results",
@@ -245,6 +249,13 @@
             "lookup-detachment",
             "lookup-upgrade",
             "lookup-rule"
+          ]
+        },
+        {
+          "id": "archive",
+          "label": "Archive",
+          "screens": [
+            "source-legacy"
           ]
         },
         {
@@ -321,8 +332,8 @@
               { "id": "roster.stored-outline", "title": "Stored Roster Outline", "level": "composite", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["saved-costs", "no-saved-costs", "empty"], "screens": ["roster-read-only"], "reactNative": { "component": "StoredRoster (outlineRows, storedHeader)", "behavior": "Built in battle-augur plan 2G part 1: a roster without its data is shown from the stored roster and its saved snapshot, in a virtualised list. A group with \"Total · as last saved {relative date}\" (main total with its limit, other totals as a subtitle) and \"Checks · as last saved\" (No errors / {n} errors); force rows with an accent left edge (catalogue as the title, the force name below); selection rows with the name, a muted ×{count} above one, the options on one line, and the saved cost on the right when the snapshot has costs. A footer says \"Costs as last saved\" or \"No saved costs for this roster\", and that profiles and rules need the game data.", "accessibility": "Each row is one element whose label has the name, quantity, options, cost and level." } },
               { "id": "roster.data-tags", "title": "Roster Data Tags", "level": "primitive", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["changed-by-update", "faction-removed", "source-removed", "needs-attention-filter"], "screens": ["roster-read-only"], "reactNative": { "component": "Chip (ds) on Lists rows (rosterDataTag)", "behavior": "Built in battle-augur plan 2G part 1: Lists rows show the name, factions · system, \"Opened {when}\" / \"Changed {when}\" (relative), the points and the tag: Changed by update (info, circle-arrow-up) or Faction removed / Source removed (neutral, archive); Source removed replaces the earlier Data not installed chip. A Needs attention chip in the filter row (TFB-005; earlier a separate pill above Recent) shows only tagged rosters when there are any. The same tag sits in the roster's chip row. Tags clear when the roster is edited with the new data or its version is switched back.", "accessibility": "Icon plus word on every tag (VA-2)." } },
               { "id": "smart-search.main", "title": "Smart Search", "level": "screen-composition", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["idle", "searching", "results", "empty", "offline", "error"], "screens": ["smart-search"], "reactNative": { "component": "SmartSearchScreen", "behavior": "Debounce queries, cancel stale requests, and preserve scope filters.", "accessibility": "Announce result counts and async failures without stealing focus." } },
-              { "id": "lookup.sources", "title": "Lookup & Sources", "level": "screen-composition", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["results", "empty", "importing", "offline", "error"], "screens": ["source"], "reactNative": { "component": "LookupScreen", "behavior": "Support local results while offline and report import progress.", "accessibility": "Group results by type and announce import status." } },
-              { "id": "lookup.phone-1-0", "title": "Lookup 1.0 · Grouped Results and Reference Page", "level": "screen-composition", "status": "needs-review", "platforms": ["phone"], "states": ["search field, then a divider with a filter tab at its trailing end; the tab shows the system chips (All n, one chip per installed system with its result count; several can be chosen) and turns to a chevron-up; closed with a filter on, the tab is accent-filled; only with two or more systems", "four result sections with a count in the header: Units, Forces & detachments, Upgrades, Rules; empty sections are left out", "Units start open on top; the others start folded with a one-line preview of the names; folded sections always sort below the open ones, fixed group order inside each part", "no units: the first group with results opens instead; fold state lasts for the search and clearing the field resets it", "row: name, kind line (role and size, or the entry type), source line (factions, plus the system when several systems are searched), base cost, Conditional tag (D10)", "a shared entry is one row listing its factions (“4 factions” when more than two); separate entries with the same name are separate rows told apart by the source line", "before a search: hint and Recently viewed; no results: Search all systems when filtered; no game data: Add game data", "reference page pushed over Lookup, Back names where it returns: header kind · summary, name, factions · system version, base cost with its note", "unit: Layout (model range, models with counts and costs, limits), Profiles tables, Rules expanding in place, Options as folded read-only groups with limits and costs (an upgrade opens its page), Categories", "force and detachment: rules with full text, Layout as a schema after printed force charts (one ring per slot grouped by category with its range; required slots heavy spiked rings, optional thin rings; over 6 a +n pill, no maximum +∞; a legend), no unit examples; a force lists its Detachments, a detachment names the force it is Part of; slot icons: each system's categories sorted by name take a neutral icon set in order, the name always printed", "upgrade: profiles, description, rules, Taken by (unit, cost and limit there); rule: text and Used by", "conditional entries: Conditional notice in plain words; costs are the data's base values and never an invented roster value"], "screens": ["lookup-results", "lookup-start", "lookup-no-results", "lookup-no-data", "lookup-unit", "lookup-force", "lookup-detachment", "lookup-upgrade", "lookup-rule"], "reactNative": { "component": "LookupScreen + LookupResultSection + LookupEntryScreen (app-core lookup store, worker query)", "behavior": "Name search runs in the worker (DEC-018), bounded and cancellable; results grouped by kind. Detail is a pushed route with its own back stack; opening a linked entry pushes another page.", "accessibility": "Section headers are headers with expanded state and spoken counts; rows speak name, kind, source, cost and Conditional; the result count is announced as the query changes. "}},
+              {"id": "lookup.sources", "title": "Lookup & Sources · Earlier design", "level": "screen-composition", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["results", "empty", "importing", "offline", "error"], "screens": ["source-legacy"], "reactNative": {"component": "LookupScreen", "behavior": "Support local results while offline and report import progress.", "accessibility": "Group results by type and announce import status."}},
+              {"id": "lookup.phone-1-0", "title": "Lookup 1.0 · Grouped Results and Reference Page", "level": "screen-composition", "status": "needs-review", "platforms": ["phone"], "states": ["Main Lookup destination: top-bar magnifying glass expands search across the full bar, replacing title and avatar; Cancel or Escape closes it and restores focus, preserving query and filters; Clear keeps search open. System chips stay visible in one horizontally scrolling row, with All and per-system result counts; several systems can be chosen. No filter folding.", "four result sections with a count in the header: Units, Forces & detachments, Upgrades, Rules; empty sections are left out", "Units start open on top; the others start folded with a one-line preview of the names; folded sections always sort below the open ones, fixed group order inside each part", "no units: the first group with results opens instead; fold state lasts for the search and clearing the field resets it", "row: name, kind line (role and size, or the entry type), source line (factions, plus the system when several systems are searched), base cost, Conditional tag (D10)", "a shared entry is one row listing its factions (“4 factions” when more than two); separate entries with the same name are separate rows told apart by the source line", "before a search: hint and Recently viewed; no results: Search all systems when filtered; no game data: Add game data", "reference page pushed over Lookup, Back names where it returns: header kind · summary, name, factions · system version, base cost with its note", "unit: Layout (model range, models with counts and costs, limits), Profiles tables, Rules expanding in place, Options as folded read-only groups with limits and costs (an upgrade opens its page), Categories", "force and detachment: rules with full text, Layout as a schema after printed force charts (one ring per slot grouped by category with its range; required slots heavy spiked rings, optional thin rings; over 6 a +n pill, no maximum +∞; a legend), no unit examples; a force lists its Detachments, a detachment names the force it is Part of; slot icons: each system's categories sorted by name take a neutral icon set in order, the name always printed", "upgrade: profiles, description, rules, Taken by (unit, cost and limit there); rule: text and Used by", "conditional entries: Conditional notice in plain words; costs are the data's base values and never an invented roster value"], "screens": ["source", "lookup-results", "lookup-start", "lookup-no-results", "lookup-no-data", "lookup-unit", "lookup-force", "lookup-detachment", "lookup-upgrade", "lookup-rule"], "reactNative": {"component": "LookupScreen + LookupResultSection + LookupEntryScreen (app-core lookup store, worker query)", "behavior": "Name search runs in the worker (DEC-018), bounded and cancellable; results grouped by kind. Detail is a pushed route with its own back stack; opening a linked entry pushes another page.", "accessibility": "Section headers are headers with expanded state and spoken counts; rows speak name, kind, source, cost and Conditional; the result count is announced as the query changes. "}},
               { "id": "tools.workflow", "title": "Tools Workflow", "level": "screen-composition", "status": "specified", "platforms": ["phone", "tablet"], "states": ["default", "empty", "active"], "screens": ["tools", "roster-analytics", "comparison", "game-tracker", "dice-simulator"], "reactNative": { "component": "ToolsNavigator", "behavior": "Use nested navigation with restorable tool state.", "accessibility": "Provide text alternatives for charts and dice results." } },
               { "id": "lists.roster-import", "title": "Roster Import", "level": "composite", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["idle", "importing", "imported", "imported-with-gaps", "data-missing", "not-a-roster"], "screens": ["library", "library-v2"], "reactNative": { "component": "ListsImportAction", "behavior": "Lists header action: pick a New Recruit JSON file, import it in the engine worker, then open the roster; report unmatched parts without blocking, and send missing data to Sources. .ros/.rosz import comes later.", "accessibility": "Name the action, mark it busy while importing, and announce the result notice." } },
               { "id": "roster.export-sheet", "title": "Export Sheet", "level": "composite", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["loading", "preview", "has-errors", "copied", "failed", "stored", "stored-no-snapshot"], "screens": ["export"], "reactNative": { "component": "ExportRosterSheet", "behavior": "Sheet from the roster header: pick New Recruit JSON or text, preview the export (truncated for long texts), then Share (JSON as a file) or Copy. A roster with errors can still be exported; a banner says so. .ros/.rosz and more layouts come later. Stored mode (built in battle-augur plan 2G part 1; Export on a roster without its data, Export as it was on a changed one): title Export roster with \"{name} · read only\" below, three radio rows: Battle Augur roster file (\"The roster as stored. It opens fully once the data is back.\", always), Text and New Recruit JSON (\"As last saved {relative date}\" from the saved snapshot, else disabled with \"Needs the game data\"), then the preview, Copy and Share.", "accessibility": "Label the format control, keep the preview selectable, and announce the copied toast." } },
@@ -331,7 +342,7 @@
               { "id": "navigation.main-tabs", "title": "Main Tab Bar", "level": "navigation", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["selected", "unselected", "badge", "keyboard-visible"], "screens": ["library", "source", "tools", "collections"], "reactNative": { "component": "MainTabNavigator", "behavior": "Use the native navigation library and safe-area insets.", "accessibility": "Expose tab role, selected state, and badge value." } },
               { "id": "lists.organizer", "title": "Roster Organizer", "level": "composite", "status": "specified", "platforms": ["phone", "tablet"], "states": ["open", "closed", "searching", "filtered", "empty"], "screens": ["library-v2"], "reactNative": { "component": "RosterOrganizer", "behavior": "Keep the roster list available when organization controls are dismissed; adapt the organizer between an inline panel and a sheet. Roster action sheets disable actions during Duplicate or Delete (including confirmation); a failure keeps the sheet open with an inline error notice, cleared on retry. A successful action closes the sheet; late results after dismissal do not navigate or show feedback.", "accessibility": "Name search, folder, game-system, and tag controls and preserve the active filter when the panel closes." } },
               { "id": "lists.getting-started-prompt", "title": "Lists Getting Started Prompt", "level": "composite", "status": "specified", "platforms": ["phone", "tablet"], "states": ["visible", "dismissed"], "screens": ["library"], "reactNative": { "component": "GettingStartedPrompt", "behavior": "Allow the introductory prompt to be dismissed without hiding the empty roster state or creation action.", "accessibility": "Give the close button a descriptive label and retain logical focus after dismissal." } },
-              {"id": "lists.filters", "title": "Lists Search, Filters and Grouping", "level": "composite", "status": "ready-for-rn", "platforms": ["phone"], "states": ["search field above the filter row", "collapsed: All n, More, and the icon-only group toggle at the trailing end", "expanded: All fixed left, game system chips and Needs attention n scrolling, Less fixed right, group toggle after a small gap", "collapsed More names the active game system and Needs attention with accent fill", "group toggle on: sections per game system (System · n) replace Recent", "no match with Clear filters (keeps the grouping)", "shared with the tablet Rosters page state: a width change keeps search, More/Less and grouping; grouping and the system chip persist on the device", "focused search stays above the keyboard"], "screens": ["library-filters"], "reactNative": {"component": "ListsScreen + RosterFilters (RosterFilterRow, GroupToggle, GroupHeader, useRosterList)", "behavior": "TFB-005 (2026-10-28): the phone Lists uses the tablet's filter row over app-core rosterListView (search, the system chips, Needs attention, grouping); the Needs attention chip replaces the separate pill. Phone rows, the getting-started card and the empty states stay.", "accessibility": "Chips: button role, selected state and full names with counts; More/Less expanded state; the group toggle's accessible name Group by game system, a hint and selected state; group headers are headers."}},
+              {"id": "lists.filters", "title": "Lists Search, Filters and Grouping", "level": "composite", "status": "needs-review", "platforms": ["phone"], "states": ["Search from the top-bar magnifying glass; expanded field fills the bar and hides the avatar; Cancel or Escape restores the bar and focus without clearing the query", "All, system and Needs attention chips always visible in one horizontally scrolling row; no More/Less folding", "Group by game system fixed at the trailing end; selected state and headers with counts", "No match with Clear filters (keeps grouping)", "44 px controls, full spoken labels and counts; active filters and query survive opening and closing search"], "screens": ["library", "library-filters"], "reactNative": {"component": "ListsScreen + RosterFilters (RosterFilterRow, GroupToggle, GroupHeader, useRosterList)", "behavior": "1.0 revision (2026-10-31): Lists and Lookup share the expanding top-bar search. Phone filters stay visible; no fold control. The current synthetic Lists view is the main phone Lists design.", "accessibility": "Named search, Clear and Cancel actions; focus search when opened, return focus when closed; chips expose selected state and full counts; horizontal filters scroll to focused controls; grouping has a spoken name and pressed state."}},
               { "id": "states.coming-soon", "title": "Coming Soon Placeholder", "level": "screen-composition", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["tab-root", "pushed"], "screens": ["source", "tools", "collections"], "reactNative": { "component": "ComingSoonTab / ComingSoonScreen", "behavior": "Built in plan 1A (DEC-021/022): every tab shows; a tab or feature that is not built shows this card (icon, Coming soon, title, what it will do, its tier and catalogue IDs, a note that it is switched on for testing). Tab roots keep the tab header with the avatar.", "accessibility": "The title is a header; chips carry words." } },
               { "id": "app.developer-options", "title": "Developer Options", "level": "screen-composition", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["hidden", "unlocking", "unlocked", "dev-build"], "screens": ["app"], "reactNative": { "component": "AppScreen + DeveloperScreen", "behavior": "Built in plan 1A (DEC-022): hidden until seven quick taps on App → About → Version (each within 1.5 s; a toast confirms; saved in preferences); always shown in dev builds. Developer holds the performance overlay, Imports at once (1 / 2, segmented; for measuring concurrent installs) with install measurements (last 10 lines, Copy / Clear; plan 2E part 3), feature flags by area with tier and build status, the component gallery and engine bench, the engine worker, and Hide developer options.", "accessibility": "The version row stays a plain row; the unlock toast is announced." } },
               { "id": "states.system", "title": "Component State Matrix", "level": "foundation", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["loading", "empty", "offline", "error", "disabled", "subscription-locked"], "screens": [], "reactNative": { "component": "AsyncState", "behavior": "Use consistent recovery actions and preserve content during refresh.", "accessibility": "Announce state transitions and make recovery actions reachable." } },
@@ -342,7 +353,8 @@
               {"id": "content.rich-text", "title": "Formatted Data Text", "level": "primitive", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["plain", "bold", "italic", "keyword", "bullets", "paragraphs", "unmatched-markers"], "screens": ["unit-options-mobile"], "reactNative": {"component": "ds RichText (parseRichText)", "behavior": "Implemented. Renders data text formatting codes in rule descriptions and profile table cells: **bold**, *italic*, ^^keyword^^ in the accent text tone (semibold, bold inside bold), line breaks, blank-line paragraph gaps, '- ' and '■ ' lines as bullets with a hanging indent. Unmatched markers stay literal. Column widths use the plain text. Exports keep the codes.", "accessibility": "Screen readers read the text without markers; bullet glyphs are hidden; follows OS font scaling."}},
               {"id": "unit.nested-back", "title": "Nested Detail Back", "level": "navigation", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["ios-back-title", "ios-shortened", "android-parent-line", "top-level"], "screens": ["unit-options-mobile"], "reactNative": {"component": "UnitDetailScreen header options (detailParent / detailBackOptions; Android NestedTitle)", "behavior": "Built (2026-10-21, user feedback: navigating back must be explicit). On a nested detail (a selection inside another selection) Back names its immediate parent, the worker breadcrumb before the subject. iOS: native-stack headerBackButtonDisplayMode default with headerBackTitle = parent, so the Back button reads '‹ Parent' and UIKit shortens it to 'Back', then the arrow, when the bar is tight. Android: native headers have no back titles, so a second header line 'in Parent' (muted, one line) sits under the title (20, bold), next to the Up arrow. Top-level details and every other screen keep the arrow-only Back. The breadcrumb row is unchanged. Android predictive back stays off (no predictive animation in the native stack on RN 0.86 / react-native-screens 4.26).", "accessibility": "iOS: the system Back button with the parent name. Android: the header is one element read 'Title, in Parent'; both lines cap the font scale at 1.2x to fit the bar while breadcrumbs scale fully."}},
               {"id": "unit.option-fold", "title": "Foldable Option Sections", "level": "composite", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["folded", "folded-with-summary", "folded-nothing-selected", "expanded", "folded-with-issue", "nested", "parent-folded", "read-only", "remembered", "not-remembered"], "screens": ["unit-options-mobile", "settings"], "reactNative": {"component": "UnitDetailScreen / Section / Options (selectedSummary, summaryText)", "behavior": "Implemented (UX-005, DEC-035; folded defaults and memory built 2026-10-20; folded summary 2026-10-21). Every option section, at every nesting level and inside model loadouts, has a header button that folds its own body; sections start folded, opening a parent leaves its nested sections folded, and opening one never closes another (no accordion, unconfirmed). The header keeps the name, 'x/y selections', limits and errors, and a folded header with an error beneath it adds 'Issues inside'. A folded header also shows a muted summary under the title and counter of what is selected inside (nested sections included, display order, comma-separated, '2× Name' when more than one, selected hidden options included), at most two lines with an ellipsis; nothing selected shows no summary line, and an open section shows the header as before. The summary is derived from the option sections the worker already sends (no engine work on the UI thread). The screen holds the open section keys (parent selection and group path), so they survive worker refreshes, the Profile tab, a collapsed model card and drill-down, and are never shared between selections or groups. With Settings → Rosters → Remember option sections on (default) the open sections are kept per roster for later visits and restart; off, every new visit and restart starts folded while sections still open during the visit, and turning it off forgets what was remembered. Model cards keep their own folding (expanded by default). Folding is presentation only: it works while read-only or busy, and controls and commands are unchanged.", "accessibility": "The header is a button with expanded state, a label of name, counter, issue note and, when folded, the full summary ('selected: A, B'), and a Hides/Shows hint; 44 pt minimum height. The summary text scales with the OS text size."}},
-              {"id": "unit.model-split", "title": "Model Stack Split and Selection Controls", "level": "composite", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["stack", "split-count", "split-stacks", "independent-loadouts", "checkbox", "radio", "restored"], "screens": ["unit-options-mobile"], "reactNative": {"component": "UnitDetailScreen / ModelCard / splitSelection", "behavior": "Split moves 1..N-1 models and proportional equipment into an independently editable stack atomically; model totals stay unchanged. Undo restores the original stack. A single optional leaf through wrappers uses a checkbox; max-one ancestors share descendant radio choices, with None only at the outer optional group. Independent picks and genuine quantities keep their controls. Unit-wide allowances are not multiplied by stack size. Unit detail restores selection, tab, hidden entries, section and model folds; controls reload from the worker. Split drafts and pending edits are not restored.", "accessibility": "Checkbox/radio checked state; visible glyphs 21-22 px; 48 px targets on both platforms (minimum 44 pt iOS / 48 dp Android)."}}
+              {"id": "unit.model-split", "title": "Model Stack Split and Selection Controls", "level": "composite", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["stack", "split-count", "split-stacks", "independent-loadouts", "checkbox", "radio", "restored"], "screens": ["unit-options-mobile"], "reactNative": {"component": "UnitDetailScreen / ModelCard / splitSelection", "behavior": "Split moves 1..N-1 models and proportional equipment into an independently editable stack atomically; model totals stay unchanged. Undo restores the original stack. A single optional leaf through wrappers uses a checkbox; max-one ancestors share descendant radio choices, with None only at the outer optional group. Independent picks and genuine quantities keep their controls. Unit-wide allowances are not multiplied by stack size. Unit detail restores selection, tab, hidden entries, section and model folds; controls reload from the worker. Split drafts and pending edits are not restored.", "accessibility": "Checkbox/radio checked state; visible glyphs 21-22 px; 48 px targets on both platforms (minimum 44 pt iOS / 48 dp Android)."}},
+              {"id": "phone.top-bar-search", "title": "Phone Top Bar Search", "level": "control", "status": "needs-review", "platforms": ["phone"], "states": ["closed: title, magnifying glass, avatar", "open: full-width search replaces title and avatar; Clear and Cancel actions", "Cancel or Escape preserves query and filters; restores focus to magnifying glass", "clear keeps the input focused; active query indicated when collapsed"], "screens": ["source", "lookup-results", "lookup-start", "library", "library-filters"], "reactNative": {"component": "PhoneSearchHeader", "behavior": "Shared expanding search for Lookup and Lists; no filter folding.", "accessibility": "44 pt controls, labelled input, focus on opening, restore trigger focus on closing."}}
             ]
           },
           {
@@ -396,57 +408,214 @@
       "interaction": "Pick a device frame and an input mode in the designer rail. Switch pages with the rail; in Touch mode press and hold an item for about half a second to see its hint, in Pointer mode hover it. Standalone: ?tablet=rosters&device=ipad-portrait&input=pointer.",
       "tradeoff": "Covers the rail pages (T2), the roster editor and its flows (T1), dialogs and sheets (T3) and the interaction pass (T4: targets, hints, pane presets, keyboard shortcuts, text size). Every screen is needs-review. Sample data and prototype-session state; not connected to the Battle Augur engine. Text size zooms the whole layout (display zoom), not only the type. TB-00 review (2026-10-26, DEC-044): iPad has no New roster on the rail (HIG; trailing toolbar action on Home and Rosters, ⌘N everywhere), Android keeps the rail FAB; option sections start open in the tablet unit details (folded on the phone); text size zooms the whole layout and panes collapse to the next width class (UX-025); Tools and Library stay on the rail as Coming soon. Screens otherwise stay needs-review. App foundation (2026-10-22): rail, responsive Home and existing phone content are implemented; editor/list-detail panes, visible hint bubbles and the richer data card remain targets. Compact logical height below 480 dp keeps the phone tabs, including a phone held sideways. The first app slice links Settings → About to the existing App screen; the section shown here remains the target. TB-11 (UX-025, 2026-10-28): phone and tablet take DX-02's readability values as desktop does: muted and faint text at least 4.5 : 1 on every pane and soft fill in every scheme (styles/ux.css, end; the app's readableColors) and unit names at weight 600 in the phone tree.",
       "screens": [
-        { "id": "tablet-home", "label": "Home · Quick start" },
-        { "id": "tablet-home-first-run", "label": "Home · First run, no game data" },
-        { "id": "tablet-home-no-rosters", "label": "Home · Game data, no rosters" },
-        { "id": "tablet-home-many-systems", "label": "Home · Many game systems (four shown, More)" },
-        { "id": "tablet-rosters", "label": "Rosters · List and details" },
-        { "id": "tablet-rosters-many", "label": "Rosters · Many rosters" },
-        { "id": "tablet-rosters-search", "label": "Rosters · Search" },
-        { "id": "tablet-rosters-system", "label": "Rosters · Game system filter" },
-        { "id": "tablet-rosters-grouped", "label": "Rosters · Grouped by game system" },
-        { "id": "tablet-rosters-validation-error", "label": "Rosters · Validation errors (compact)" },
-        { "id": "tablet-rosters-validation-warning", "label": "Rosters · Data warning (compact)" },
-        { "id": "tablet-rosters-status", "label": "Rosters · Status details" },
-        { "id": "tablet-rosters-empty", "label": "Rosters · Empty" },
-        { "id": "tablet-editor", "label": "Roster editor · Panes by width" },
-        { "id": "tablet-editor-issues", "label": "Roster editor · Summary with issues" },
-        { "id": "tablet-editor-add", "label": "Roster editor · Add unit" },
-        { "id": "tablet-editor-forces", "label": "Roster editor · Several forces" },
-        { "id": "tablet-editor-add-force", "label": "Roster editor · Add force" },
-        { "id": "tablet-editor-readonly", "label": "Roster editor · Read-only roster" },
-        { "id": "tablet-editor-export", "label": "Roster editor · Export" },
-        { "id": "tablet-editor-shortcuts", "label": "Roster editor · Keyboard shortcuts (hold ⌘, Ctrl + /)" },
-        { "id": "tablet-editor-text-200", "label": "Roster editor · Text 200%" },
-        { "id": "tablet-editor-add-roles", "label": "Roster editor · Add unit, many roles (scrolling pills)" },
-        { "id": "tablet-editor-chip-caption", "label": "Roster editor · State chip pressed, caption shown" },
-        { "id": "tablet-editor-chips-text-150", "label": "Roster editor · State chips, text 150% (Android, 300 px pane)" },
-        { "id": "tablet-editor-add-focus", "label": "Roster editor · Add unit with the search focused (Advanced option on)" },
-        { "id": "tablet-rosters-text-200", "label": "Rosters · Text 200%" },
-        { "id": "tablet-editor-import-result", "label": "Roster editor · Import result" },
-        { "id": "tablet-lookup", "label": "Lookup · Search and entry" },
-        { "id": "tablet-lookup-1-0", "label": "Lookup 1.0 · Grouped results and detail" },
-        { "id": "tablet-lookup-1-0-force", "label": "Lookup 1.0 · Force" },
-        { "id": "tablet-tools", "label": "Tools · Coming soon" },
-        { "id": "tablet-library", "label": "Library · Coming soon" },
-        { "id": "tablet-sources", "label": "Sources · Installed data" },
-        { "id": "tablet-sources-add", "label": "Sources · Add game data" },
-        { "id": "tablet-sources-installing", "label": "Sources · Installing, every faction" },
-        { "id": "tablet-sources-choose-factions", "label": "Sources · Faction picker (Advanced installation)" },
-        { "id": "tablet-sources-update-report", "label": "Sources · Update report" },
-        { "id": "tablet-sources-collection", "label": "Sources · Collection" },
-        { "id": "tablet-sources-github", "label": "Sources · Search GitHub" },
-        { "id": "tablet-sources-add-collection", "label": "Sources · Add a collection" },
-        { "id": "tablet-settings", "label": "Settings · Sections" },
-        { "id": "tablet-settings-game-data", "label": "Settings · Game data" },
-        { "id": "tablet-settings-shortcuts", "label": "Settings · Keyboard shortcuts" },
-        { "id": "tablet-settings-advanced", "label": "Settings · Advanced" },
-        { "id": "tablet-create", "label": "New roster · Guided creation" },
-        { "id": "tablet-create-review", "label": "New roster · Name and summary" },
-        { "id": "tablet-settings-appearance-import", "label": "Settings · Appearance import" },
-        { "id": "tablet-editor-move-unit", "label": "Roster editor · Move unit" },
-        { "id": "tablet-confirm-delete", "label": "Confirm · Delete roster" },
-        { "id": "tablet-archive-sketch", "label": "Archive · Earlier tablet sketch" }
+        {
+          "id": "tablet-home",
+          "label": "Home · Quick start"
+        },
+        {
+          "id": "tablet-home-first-run",
+          "label": "Home · First run, no game data"
+        },
+        {
+          "id": "tablet-home-no-rosters",
+          "label": "Home · Game data, no rosters"
+        },
+        {
+          "id": "tablet-home-many-systems",
+          "label": "Home · Many game systems (four shown, More)"
+        },
+        {
+          "id": "tablet-rosters",
+          "label": "Rosters · List and details"
+        },
+        {
+          "id": "tablet-rosters-many",
+          "label": "Rosters · Many rosters"
+        },
+        {
+          "id": "tablet-rosters-search",
+          "label": "Rosters · Search"
+        },
+        {
+          "id": "tablet-rosters-system",
+          "label": "Rosters · Game system filter"
+        },
+        {
+          "id": "tablet-rosters-grouped",
+          "label": "Rosters · Grouped by game system"
+        },
+        {
+          "id": "tablet-rosters-validation-error",
+          "label": "Rosters · Validation errors (compact)"
+        },
+        {
+          "id": "tablet-rosters-validation-warning",
+          "label": "Rosters · Data warning (compact)"
+        },
+        {
+          "id": "tablet-rosters-status",
+          "label": "Rosters · Status details"
+        },
+        {
+          "id": "tablet-rosters-empty",
+          "label": "Rosters · Empty"
+        },
+        {
+          "id": "tablet-editor",
+          "label": "Roster editor · Panes by width"
+        },
+        {
+          "id": "tablet-editor-issues",
+          "label": "Roster editor · Summary with issues"
+        },
+        {
+          "id": "tablet-editor-add",
+          "label": "Roster editor · Add unit"
+        },
+        {
+          "id": "tablet-editor-forces",
+          "label": "Roster editor · Several forces"
+        },
+        {
+          "id": "tablet-editor-add-force",
+          "label": "Roster editor · Add force"
+        },
+        {
+          "id": "tablet-editor-readonly",
+          "label": "Roster editor · Read-only roster"
+        },
+        {
+          "id": "tablet-editor-export",
+          "label": "Roster editor · Export"
+        },
+        {
+          "id": "tablet-editor-shortcuts",
+          "label": "Roster editor · Keyboard shortcuts (hold ⌘, Ctrl + /)"
+        },
+        {
+          "id": "tablet-editor-text-200",
+          "label": "Roster editor · Text 200%"
+        },
+        {
+          "id": "tablet-editor-add-roles",
+          "label": "Roster editor · Add unit, many roles (scrolling pills)"
+        },
+        {
+          "id": "tablet-editor-chip-caption",
+          "label": "Roster editor · State chip pressed, caption shown"
+        },
+        {
+          "id": "tablet-editor-chips-text-150",
+          "label": "Roster editor · State chips, text 150% (Android, 300 px pane)"
+        },
+        {
+          "id": "tablet-editor-add-focus",
+          "label": "Roster editor · Add unit with the search focused (Advanced option on)"
+        },
+        {
+          "id": "tablet-rosters-text-200",
+          "label": "Rosters · Text 200%"
+        },
+        {
+          "id": "tablet-editor-import-result",
+          "label": "Roster editor · Import result"
+        },
+        {
+          "id": "tablet-lookup",
+          "label": "Lookup · Search and entry"
+        },
+        {
+          "id": "tablet-lookup-1-0",
+          "label": "Lookup 1.0 · Grouped results and detail"
+        },
+        {
+          "id": "tablet-lookup-1-0-force",
+          "label": "Lookup 1.0 · Force"
+        },
+        {
+          "id": "tablet-tools",
+          "label": "Tools · Coming soon"
+        },
+        {
+          "id": "tablet-library",
+          "label": "Library · Coming soon"
+        },
+        {
+          "id": "tablet-sources",
+          "label": "Sources · Installed data"
+        },
+        {
+          "id": "tablet-sources-add",
+          "label": "Sources · Add game data"
+        },
+        {
+          "id": "tablet-sources-installing",
+          "label": "Sources · Installing, every faction"
+        },
+        {
+          "id": "tablet-sources-choose-factions",
+          "label": "Sources · Faction picker (Advanced installation)"
+        },
+        {
+          "id": "tablet-sources-update-report",
+          "label": "Sources · Update report"
+        },
+        {
+          "id": "tablet-sources-collection",
+          "label": "Sources · Collection"
+        },
+        {
+          "id": "tablet-sources-github",
+          "label": "Sources · Search GitHub"
+        },
+        {
+          "id": "tablet-sources-add-collection",
+          "label": "Sources · Add a collection"
+        },
+        {
+          "id": "tablet-settings",
+          "label": "Settings · Sections"
+        },
+        {
+          "id": "tablet-settings-game-data",
+          "label": "Settings · Game data"
+        },
+        {
+          "id": "tablet-settings-shortcuts",
+          "label": "Settings · Keyboard shortcuts"
+        },
+        {
+          "id": "tablet-settings-advanced",
+          "label": "Settings · Advanced"
+        },
+        {
+          "id": "tablet-create",
+          "label": "New roster · Guided creation"
+        },
+        {
+          "id": "tablet-create-review",
+          "label": "New roster · Name and summary"
+        },
+        {
+          "id": "tablet-settings-appearance-import",
+          "label": "Settings · Appearance import"
+        },
+        {
+          "id": "tablet-editor-move-unit",
+          "label": "Roster editor · Move unit"
+        },
+        {
+          "id": "tablet-confirm-delete",
+          "label": "Confirm · Delete roster"
+        },
+        {
+          "id": "tablet-archive-sketch",
+          "label": "Archive · Earlier tablet sketch"
+        },
+        {
+          "id": "tablet-lookup-legacy",
+          "label": "Archive · Earlier Lookup"
+        }
       ],
       "workflows": [
         {
@@ -489,17 +658,41 @@
         {
           "id": "editor",
           "label": "Roster editor",
-          "screens": ["tablet-editor", "tablet-editor-issues", "tablet-editor-add", "tablet-editor-forces", "tablet-editor-add-force", "tablet-editor-readonly", "tablet-editor-export", "tablet-editor-import-result", "tablet-editor-shortcuts", "tablet-editor-text-200", "tablet-editor-add-roles", "tablet-editor-chip-caption", "tablet-editor-chips-text-150", "tablet-editor-add-focus"]
+          "screens": [
+            "tablet-editor",
+            "tablet-editor-issues",
+            "tablet-editor-add",
+            "tablet-editor-forces",
+            "tablet-editor-add-force",
+            "tablet-editor-readonly",
+            "tablet-editor-export",
+            "tablet-editor-import-result",
+            "tablet-editor-shortcuts",
+            "tablet-editor-text-200",
+            "tablet-editor-add-roles",
+            "tablet-editor-chip-caption",
+            "tablet-editor-chips-text-150",
+            "tablet-editor-add-focus"
+          ]
         },
         {
           "id": "dialogs",
           "label": "Dialogs and sheets",
-          "screens": ["tablet-create", "tablet-create-review", "tablet-settings-appearance-import", "tablet-confirm-delete", "tablet-editor-move-unit"]
+          "screens": [
+            "tablet-create",
+            "tablet-create-review",
+            "tablet-settings-appearance-import",
+            "tablet-confirm-delete",
+            "tablet-editor-move-unit"
+          ]
         },
         {
           "id": "archive",
           "label": "Archive",
-          "screens": ["tablet-archive-sketch"]
+          "screens": [
+            "tablet-archive-sketch",
+            "tablet-lookup-legacy"
+          ]
         },
         {
           "id": "unsorted",
@@ -519,18 +712,18 @@
             "label": "Tablet UI",
             "description": "Tablet shell components: the rail, the list and detail panes and the placeholders. Built from the workspace layer and the mobile content pieces.",
             "sections": [
-              {"id": "tablet.rail", "title": "Tablet Rail", "level": "navigation", "status": "needs-review", "platforms": ["tablet"], "states": ["DEC-050: New roster is the top rail item on iPad and Android, icon over caption (New roster) with a filled accent pill, set apart from the destinations; accessible name New roster, hint Create a roster (⌘N / Ctrl + N with a pointer); it replaces the iPad toolbar control and the Android FAB (extended or icon), and never takes aria-current", "DEC-050: one rail on both platforms (icon over caption); the draft's Android expanded rail with labels beside the icons is dropped", "Home, Rosters, Lookup, Tools, Library", "Sources and Settings pinned to the bottom", "labels under icons", "pill indicator behind the active icon and aria-current", "keyboard focus ring", "hint on every item: title in Pointer mode, press and hold in Touch mode", "targets of 48 px and more", "Rosters and Library use different icons; App foundation: logical height below 480 dp falls back to phone tabs; preserve the current page when the bar changes; App foundation: screen-reader hints; visible long-press hint bubbles remain to implement"], "screens": ["tablet-home", "tablet-rosters", "tablet-lookup", "tablet-tools", "tablet-library", "tablet-sources", "tablet-settings"]},
+              {"id": "tablet.rail", "title": "Tablet Rail", "level": "navigation", "status": "needs-review", "platforms": ["tablet"], "states": ["DEC-050: New roster is the top rail item on iPad and Android, icon-only action (New roster) with a filled accent pill, set apart from the destinations; accessible name New roster, hint Create a roster (⌘N / Ctrl + N with a pointer); it replaces the iPad toolbar control and the Android FAB (extended or icon), and never takes aria-current", "DEC-050: one rail on both platforms (icon-only action); the draft's Android expanded rail with labels beside the icons is dropped", "Home, Rosters, Lookup, Tools, Library", "Sources and Settings pinned to the bottom", "labels under icons", "pill indicator behind the active icon and aria-current", "keyboard focus ring", "hint on every item: title in Pointer mode, press and hold in Touch mode", "targets of 48 px and more", "Rosters and Library use different icons; App foundation: logical height below 480 dp falls back to phone tabs; preserve the current page when the bar changes; App foundation: screen-reader hints; visible long-press hint bubbles remain to implement"], "screens": ["tablet-home", "tablet-rosters", "tablet-lookup", "tablet-tools", "tablet-library", "tablet-sources", "tablet-settings"]},
               {"id": "tablet.platform-actions", "title": "Contextual Roster Actions and Platform Materials", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["DEC-050: no iPad trailing New roster and no Android FAB; New roster is on the rail on both platforms", "Rename, Duplicate, Export and Delete grouped in a contextual toolbar for the selected roster (iPad glass, Android tonal)", "Continue remains in its card; Rosters uses row entry chevrons; card and reading backgrounds remain opaque", "Toolbar and editor controls retain their existing accessible labels, hints, shortcuts and actions"], "screens": ["tablet-rosters", "tablet-editor"]},
-              {"id": "tablet.toolbar-actions", "title": "Toolbar Actions (icon over caption)", "level": "control", "status": "needs-review", "platforms": ["tablet"], "states": ["DEC-050: one component for the top-row actions of Rosters and Sources, in the rail items' language: icon inside a 56 × 32 pill, a short caption under it; 64 px tall on touch, 56 with a pointer, at least 64 px wide", "DEC-050: the same on iPad and Android; the iPad no longer depicts native icon-only bar items (C-11); the resting pill takes the glass material on iPad, solid with Reduce transparency", "DEC-050: prominent variant with a filled accent pill (Add game data); toggles (Select) show the rail's active indicator and aria-pressed", "DEC-050: accessible name is the full label (Import roster, Select game data, Install from a file, Add game data); every action has a hint (title with a pointer, press and hold on touch)", "DEC-050: when the row cannot fit, the search shrinks to 200 px first; then lower-priority actions move into More (⋯, icon over caption, aria-expanded) whose menu lists them with full names; the prominent action goes last; a single overflowing action stays instead of More", "DEC-050: at larger text the captions stay, their scale capped at 150 % like the rail labels"], "screens": ["tablet-rosters", "tablet-sources", "tablet-rosters-text-200"]},
+              {"id": "tablet.toolbar-actions", "title": "Toolbar Actions · iOS Liquid Glass and Android icon buttons", "level": "control", "status": "needs-review", "platforms": ["tablet"], "states": ["1.0 revision (2026-10-31), supersedes DEC-050 C-11: icon-only toolbar actions, no captions underneath; 48 px targets", "iOS Liquid Glass circular buttons, solid material with Reduce transparency; Android plain icon buttons", "Accent prominent Add game data; Select exposes pressed state; New roster stays at the top of the rail as an icon button, navigation destinations retain labels", "Full accessible names, hover or long-press hints, keyboard focus rings", "Search shrinks to 200 px first; lower-priority actions move into an icon-only More menu with full labels"], "screens": ["tablet-rosters", "tablet-sources", "tablet-rosters-text-200"]},
               {"id": "tablet.top-row", "title": "Page Top Row (no page titles)", "level": "screen-composition", "status": "needs-review", "platforms": ["tablet"], "states": ["DEC-050: no page title rows; the rail shows where you are; every page keeps a visually hidden h1 for screen readers", "DEC-050: Home, Settings, Tools and Library have no top row at all; content starts at the top, level with the rail's New roster", "DEC-050: list pages put their search in the top row, filling it, with the actions at its trailing end: Rosters (search, Import), Sources (search, Select, Install from a file, Add game data); Lookup keeps its search row without a title", "DEC-050: sub-page Back rows stay (Settings sections and Sources' detail over the list in narrow windows)", "TFB-008: list and detail pane tops stay aligned under the top row"], "screens": ["tablet-home", "tablet-rosters", "tablet-lookup", "tablet-tools", "tablet-library", "tablet-sources", "tablet-settings"]},
               {"id": "tablet.motion-materials", "title": "Motion and Materials", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["iPad: restrained glass controls, press feedback and sheet settling", "Android: expressive pill shape changes on toolbar actions and New roster, spring sheet transitions (DEC-050: no FAB)", "Reduce motion and Reduce transparency in gallery controls and Settings Appearance", "Preferences persist and synchronize across framed and standalone previews", "Operating system accessibility preferences take precedence; keyboard reveal uses direct scrolling with reduced motion"], "screens": ["tablet-home", "tablet-rosters", "tablet-settings", "tablet-create", "tablet-editor"]},
               {"id": "tablet.panes", "title": "List and Detail Panes", "level": "screen-composition", "status": "needs-review", "platforms": ["tablet"], "states": ["list and detail (Expanded and Medium)", "list only with a note, detail opens over the list (split view)", "selected row", "touch rows (72 px) and pointer rows (64 px)", "pointer hover state", "DEC-050 / C-07: one shared pane row for Sources, Rosters and Settings: one-line bold title with an ellipsis, a 40 px mark or tile, one secondary line, 72 px minimum on touch (64 with a pointer), selected state as Rosters' (accent border and tint)", "DEC-050: Sources rows move to it: initials tile, second line {repository} · {version} · {size}, status chip trailing, no third line (progress shows in the chip)", "TFB-008 with DEC-050: no heading above the panes; both panes start under the top row, so the first list card and the detail card share their top edge"], "screens": ["tablet-rosters", "tablet-lookup", "tablet-sources", "tablet-settings"]},
-              {"id": "tablet.lookup-1-0", "title": "Lookup 1.0 · Grouped Results and Detail Pane", "level": "screen-composition", "status": "needs-review", "platforms": ["tablet"], "states": ["DEC-050: no visible page title (visually hidden h1); the search fills the shared top row (tablet.top-row), level with Rosters and Sources; New roster is on the rail", "the earlier page: search toolbar, chip row, list and detail panes", "system chips: All n and one per installed system with its count; several can be chosen; always visible on tablet", "list: the phone's four foldable sections with counts; Units open on top, folded sections sort below the open ones; rows with kind, source line, base cost and Conditional tag", "detail pane: the phone's reference content; links push onto the pane's own stack and Back names the previous entry; choosing a result in the list starts a new stack", "split view: the detail opens over the list, as on the other list and detail pages"], "screens": ["tablet-lookup-1-0", "tablet-lookup-1-0-force"]},
+              {"id": "tablet.lookup-1-0", "title": "Lookup 1.0 · Grouped Results and Detail Pane", "level": "screen-composition", "status": "needs-review", "platforms": ["tablet"], "states": ["Main Lookup destination from navigation and the canonical screen ID; earlier composition remains in Archive", "DEC-050: no visible page title (visually hidden h1); the search fills the shared top row (tablet.top-row), level with Rosters and Sources; New roster is on the rail", "the earlier page: search toolbar, chip row, list and detail panes", "system chips: All n and one per installed system with its count; several can be chosen; always visible on tablet", "list: the phone's four foldable sections with counts; Units open on top, folded sections sort below the open ones; rows with kind, source line, base cost and Conditional tag", "detail pane: the phone's reference content; links push onto the pane's own stack and Back names the previous entry; choosing a result in the list starts a new stack", "split view: the detail opens over the list, as on the other list and detail pages"], "screens": ["tablet-lookup", "tablet-lookup-1-0", "tablet-lookup-1-0-force"]},
               {"id": "tablet.home", "title": "Home Quick Start", "level": "screen-composition", "status": "needs-review", "platforms": ["tablet"], "states": ["continue roster", "new roster", "recent rosters", "data status with update", "update running", "first run (no game data)", "game data and no rosters", "TB-02: per-source installed versions, Update and Show progress; real default-collection install rows in the app; collection loading, cached offline, failure and hidden states; All jobs remains reachable after the first installation changes Home state", "TFB-001: Game data shows at most four game systems, most used first (most rosters, then the latest roster activity, then name; never install order); More (N) with an accessible name and hint opens Sources with the rest", "TFB-002: widgets keep their places in the page and each scrolls its own content; Game data and Recent rosters take the spare height; below 520 px of page (larger text, short windows) and in compact windows the page scrolls as a whole; pull to refresh stays on the page", "DEC-050: no top row (no title, no toolbar); a visually hidden Home heading; New roster on the rail on iPad and Android; Continue stays inline with its roster"], "screens": ["tablet-home", "tablet-home-first-run", "tablet-home-no-rosters", "tablet-home-many-systems"]},
               {"id": "tablet.home-widgets", "title": "Home Widgets (fixed, inner scrolling)", "level": "screen-composition", "status": "needs-review", "platforms": ["tablet"], "states": ["Expanded: main column (Continue, Recent rosters) beside the side column (Game data, On this device)", "Medium: main cards over a row of side cards, three fifths and two fifths of the height", "summary cards keep their natural height; filling widgets scroll inside", "Game data: four most used systems and More (N) to Sources", "page scrolls as a whole below 520 px of page or in compact windows"], "screens": ["tablet-home", "tablet-home-many-systems"]},
               {"id": "tablet.empty-state", "title": "Empty State Card", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["icon, title, one line and the way forward", "first run on Home (no game data) with install rows", "no rosters on Home and on Rosters", "nothing to look up without game data", "no match, with Clear filters"], "screens": ["tablet-home-first-run", "tablet-home-no-rosters", "tablet-rosters-empty", "tablet-rosters-search"]},
-              {"id": "tablet.roster-list", "title": "Roster List with Search and Filters", "level": "screen-composition", "status": "needs-review", "platforms": ["tablet"], "states": ["TFB-010: distinct row selection previews the roster; a separate trailing chevron enters it", "DEC-050 (supersedes the TFB-011 search toggle): the search is always shown and fills the top row, then Import as an icon-over-caption action; no Rosters title, no New roster in the row (it is on the rail)", "name, points and compact validation indicator share one detail header", "two-column metadata and one contextual action strip below", "no full-width status banner or separate points/Open roster row", "User approved TFB-010 on 2026-10-28, including the icon-only validation control; implement in app for 1.0 (CT-14). Filters/grouping remain the separate D13 design question."], "screens": ["tablet-rosters", "tablet-rosters-many", "tablet-rosters-search", "tablet-rosters-system", "tablet-rosters-grouped"]},
-              {"id": "tablet.roster-toolbar-search", "title": "Roster Top Row Search", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["DEC-050 supersedes the TFB-011 toggle: no Search icon and no title; the field is always shown and fills the row", "Import trails it (toolbar action); New roster is on the rail", "the query filters by roster name, faction and game system; Escape or the 44 px clear button empties it; Mod+F focuses it", "system and grouping choices stay; the page heading is visually hidden", "narrow and larger text: the field shrinks to 200 px; Import stays (one action never moves into More)"], "screens": ["tablet-rosters", "tablet-rosters-search", "tablet-rosters-empty", "tablet-rosters-text-200"]},
+              {"id": "tablet.roster-list", "title": "Roster List with Search and Filters", "level": "screen-composition", "status": "needs-review", "platforms": ["tablet"], "states": ["TFB-010: distinct row selection previews the roster; a separate trailing chevron enters it", "DEC-050 (supersedes the TFB-011 search toggle): the search is always shown and fills the top row, then Import as a platform icon button; no Rosters title, no New roster in the row (it is on the rail)", "name, points and compact validation indicator share one detail header", "two-column metadata and one contextual action strip below", "no full-width status banner or separate points/Open roster row", "User approved TFB-010 on 2026-10-28, including the icon-only validation control; implement in app for 1.0 (CT-14). Filters/grouping remain the separate D13 design question."], "screens": ["tablet-rosters", "tablet-rosters-many", "tablet-rosters-search", "tablet-rosters-system", "tablet-rosters-grouped"]},
+              {"id": "tablet.roster-toolbar-search", "title": "Roster Top Row Search", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["DEC-050 supersedes the TFB-011 toggle: no Search icon and no title; the field is always shown and fills the row", "Import trails it (icon button); New roster is on the rail", "the query filters by roster name, faction and game system; Escape or the 44 px clear button empties it; Mod+F focuses it", "system and grouping choices stay; the page heading is visually hidden", "narrow and larger text: the field shrinks to 200 px; Import stays (one action never moves into More)"], "screens": ["tablet-rosters", "tablet-rosters-search", "tablet-rosters-empty", "tablet-rosters-text-200"]},
               {"id": "tablet.system-chips", "title": "Game System Filter Chips", "level": "control", "status": "needs-review", "platforms": ["tablet"], "states": ["filter chips in the filter row: All n, one chip per game system with its count, Needs attention n", "44 px targets, aria-pressed, the accessible name says the system and how many rosters it has", "Both platforms follow the user opened/closed reference: adjacent compact All/More with no enclosing track or spacer; expanding inserts scrolling choices between fixed ends; rounded outer ends, softly squared middle choices and filled pill selections", "selected chip with a check and theme accent fill; tapping it again shows every roster", "long names end with an ellipsis at 280 px", "TFB-004: only the middle choices scroll horizontally at narrower widths; All and More/Less stay fixed; collapsed More names active filters", "hidden with a single game system"], "screens": ["tablet-rosters-system", "tablet-rosters-grouped"]},
               {"id": "tablet.group-toggle", "title": "Group by Toggle (icon only)", "level": "control", "status": "needs-review", "platforms": ["tablet"], "states": ["TFB-005: icon-only layers button, 44 px like the chips, fixed at the trailing end of the filter row after a small gap, outside the scroller: collapsed [All][More] … [group], expanded [All][scrolling middle][Less] [group]", "off: tonal fill; on: accent fill (as a selected chip), aria-pressed / accessibilityState.selected", "accessible name Group by game system with a hint; press and hold (touch) or hover (pointer) shows the name", "shown with the system chips (two or more game systems); grouping is not named by collapsed More", "the same toggle on the phone Lists filter row"], "screens": ["tablet-rosters", "tablet-rosters-grouped", "library-filters"]},
               {"id": "tablet.roster-navigation", "title": "Roster Row Preview and Enter", "level": "composite", "status": "ready-for-rn", "platforms": ["tablet"], "states": ["row body selects a roster and previews details", "separate 48 px trailing chevron navigates into the roster (folder arrow in user schematic)", "no nested buttons; independent keyboard and screen-reader targets", "selected row, unselected row, pointer and touch", "User approved TFB-010 on 2026-10-28, including the icon-only validation control; implement in app for 1.0 (CT-14). Filters/grouping remain the separate D13 design question."], "screens": ["tablet-rosters", "tablet-rosters-validation-error"]},
@@ -642,6 +835,10 @@
         {
           "id": "desktop-menus",
           "label": "Menu bar · Application menus"
+        },
+        {
+          "id": "desktop-lookup-legacy",
+          "label": "Archive · Earlier Lookup"
         }
       ],
       "workflows": [
@@ -661,6 +858,13 @@
             "desktop-settings",
             "desktop-first-run",
             "desktop-menus"
+          ]
+        },
+        {
+          "id": "archive",
+          "label": "Archive",
+          "screens": [
+            "desktop-lookup-legacy"
           ]
         },
         {
@@ -747,7 +951,7 @@
                   "desktop-settings"
                 ]
               },
-              {"id": "desktop.top-row", "title": "Page Top Row (no page titles)", "level": "screen-composition", "status": "needs-review", "platforms": ["desktop"], "states": ["DEC-050: no page title rows; the rail and the hub tab show where you are; every page keeps a visually hidden h1 (Rosters, Lookup, Sources, Settings, Tools, Library; Welcome keeps its hero heading)", "DEC-050: list pages put their search in the top row, filling it, with the page's desktop buttons at its trailing end: Rosters (Import, New roster), Sources (Install from a file, Add game data); Lookup's search fills its row alone", "DEC-050: pages without search or actions have no top row: Welcome, Settings, Tools, Library", "DEC-050: desktop keeps its own buttons (outlined and filled, text beside the icon); icon-over-caption actions are tablet only", "DEC-050: the roster editor's content header (force, points, validation) stays; the window chrome (menu bar, tab row, Jobs, points button, panel toggles) is unchanged"], "screens": ["desktop-welcome", "desktop-rosters", "desktop-lookup", "desktop-sources", "desktop-settings", "desktop-tools", "desktop-library", "desktop-first-run"]},
+              {"id": "desktop.top-row", "title": "Page Top Row (no page titles)", "level": "screen-composition", "status": "needs-review", "platforms": ["desktop"], "states": ["DEC-050: no page title rows; the rail and the hub tab show where you are; every page keeps a visually hidden h1 (Rosters, Lookup, Sources, Settings, Tools, Library; Welcome keeps its hero heading)", "DEC-050: list pages put their search in the top row, filling it, with the page's desktop buttons at its trailing end: Rosters (Import, New roster), Sources (Install from a file, Add game data); Lookup's search fills its row alone", "DEC-050: pages without search or actions have no top row: Welcome, Settings, Tools, Library", "DEC-050: desktop keeps its own buttons (outlined and filled, text beside the icon); tablet actions use platform icon buttons", "DEC-050: the roster editor's content header (force, points, validation) stays; the window chrome (menu bar, tab row, Jobs, points button, panel toggles) is unchanged"], "screens": ["desktop-welcome", "desktop-rosters", "desktop-lookup", "desktop-sources", "desktop-settings", "desktop-tools", "desktop-library", "desktop-first-run"]},
               {
                 "id": "desktop.welcome",
                 "title": "Welcome & Recent Rows",
@@ -967,21 +1171,50 @@
               },
               {
                 "id": "desktop.lookup",
-                "title": "Lookup Results & Entry",
+                "title": "Lookup Results & Entry · Earlier design",
                 "level": "screen-composition",
                 "status": "needs-review",
-                "platforms": ["desktop"],
-                "states": ["grouped results", "scope chips", "no results", "unit", "rule", "equipment", "conditional cost", "in your rosters"],
-                "screens": ["desktop-lookup"]
+                "platforms": [
+                  "desktop"
+                ],
+                "states": [
+                  "grouped results",
+                  "scope chips",
+                  "no results",
+                  "unit",
+                  "rule",
+                  "equipment",
+                  "conditional cost",
+                  "in your rosters"
+                ],
+                "screens": [
+                  "desktop-lookup-legacy"
+                ]
               },
               {
                 "id": "desktop.lookup-1-0",
                 "title": "Lookup 1.0 · Grouped Results and Entry",
                 "level": "screen-composition",
                 "status": "needs-review",
-                "platforms": ["desktop"],
-                "states": ["DEC-050: no visible page title (visually hidden h1); the search fills the top row (desktop.top-row), as on Rosters and Sources", "the earlier page: large search, chip row with the result count, results card and entry card", "system chips: All n and one per installed system with its count; several can be chosen; always visible", "results in the phone's four foldable sections (Units, Forces & detachments, Upgrades, Rules) with counts; Units open on top, folded sections sort below the open ones", "row: name, kind and source on one line, base cost, Conditional tag (D10)", "entry card: the phone's reference content (unit layout, profiles, rules, read-only options, categories; force and detachment schema; upgrade Taken by; rule Used by)", "links in the entry card push onto its own stack; Back names the previous entry, Alt+Left returns; choosing a result starts a new stack", "no results with Search all systems when filtered"],
-                "screens": ["desktop-lookup-1-0", "desktop-lookup-1-0-force"]
+                "platforms": [
+                  "desktop"
+                ],
+                "states": [
+                  "Main Lookup destination from navigation and the canonical screen ID; earlier composition remains in Archive",
+                  "DEC-050: no visible page title (visually hidden h1); the search fills the top row (desktop.top-row), as on Rosters and Sources",
+                  "the earlier page: large search, chip row with the result count, results card and entry card",
+                  "system chips: All n and one per installed system with its count; several can be chosen; always visible",
+                  "results in the phone's four foldable sections (Units, Forces & detachments, Upgrades, Rules) with counts; Units open on top, folded sections sort below the open ones",
+                  "row: name, kind and source on one line, base cost, Conditional tag (D10)",
+                  "entry card: the phone's reference content (unit layout, profiles, rules, read-only options, categories; force and detachment schema; upgrade Taken by; rule Used by)",
+                  "links in the entry card push onto its own stack; Back names the previous entry, Alt+Left returns; choosing a result starts a new stack",
+                  "no results with Search all systems when filtered"
+                ],
+                "screens": [
+                  "desktop-lookup",
+                  "desktop-lookup-1-0",
+                  "desktop-lookup-1-0-force"
+                ]
               },
               {
                 "id": "desktop.sources",

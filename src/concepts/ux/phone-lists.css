@@ -25,3 +25,19 @@
 .ux-lf-tag.info { background: color-mix(in srgb, var(--ux-accent) 14%, transparent); color: var(--ux-accent-2) }
 .ux-lf-tag.neutral { background: var(--ux-surface-2); color: var(--ux-muted) }
 .ux-lf .ux-search-empty .ux-job-btn { margin-top: 6px }
+
+/* 1.0 phone list pages: the search takes the whole bar; filters never fold. */
+.ux-wb-top.ux-wb-home-top.ux-phone-search-header { display: flex; min-height: 64px; box-sizing: border-box; gap: 8px }
+.ux-phone-search-header > .ux-wb-title { flex: 1; min-width: 0 }
+.ux-phone-search-header .ux-phone-search-toggle { flex: none; width: 44px; height: 44px }
+.ux-phone-search-toggle.active { color: var(--ux-accent-2); background: var(--ux-surface-2) }
+.ux-phone-search-field { display: flex; align-items: center; gap: 8px; width: 100%; min-width: 0; min-height: 44px; padding-left: 12px; border: 1px solid var(--ux-line-2); border-radius: 22px; background: var(--ux-surface); color: var(--ux-muted); box-sizing: border-box }
+.ux-phone-search-field input { flex: 1; width: 0; min-width: 0; border: 0; outline: none; background: transparent; color: var(--ux-ink); font: inherit; font-size: 16px; appearance: none }
+.ux-phone-search-field input::-webkit-search-cancel-button { display: none }
+.ux-phone-search-field button { display: inline-grid; place-items: center; min-width: 44px; min-height: 44px; padding: 0 10px; border: 0; border-radius: 22px; background: transparent; color: var(--ux-accent-2); font: inherit; font-size: 14px; cursor: pointer }
+.ux-phone-search-field:focus-within { border-color: var(--ux-accent-2) }
+.ux-phone-search-header button:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px }
+.ux-lf-always { flex: 1 1 auto; padding-block: 2px }
+.ux-lf-always .ux-lf-chip { border-radius: 24px }
+.ux-lf-always .ux-lf-chip:focus-visible { outline-offset: -3px }
+.ux-lf-roster { width: 100%; text-align: left; font: inherit; color: var(--ux-ink); cursor: pointer }
