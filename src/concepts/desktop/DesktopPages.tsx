@@ -225,7 +225,7 @@ const settingsSections = [
   { id: 'about', label: 'About', icon: Info },
 ] as const;
 
-export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, bindings, onBindings, advancedInstall, onAdvancedInstall, focusSearch, onFocusSearch, initialSection, notify }: { themePref: 'system' | 'light' | 'dark'; onThemePref: (v: 'system' | 'light' | 'dark') => void; scheme: ColorScheme; onScheme: (v: ColorScheme) => void; bindings: KeyBindings; onBindings: (next: KeyBindings) => void; advancedInstall: boolean; onAdvancedInstall: (v: boolean) => void; focusSearch: boolean; onFocusSearch: (v: boolean) => void; initialSection?: string; notify: Notify }) {
+export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, bindings, onBindings, advancedInstall, onAdvancedInstall, focusSearch, onFocusSearch, separateAll, onSeparateAll, initialSection, notify }: { themePref: 'system' | 'light' | 'dark'; onThemePref: (v: 'system' | 'light' | 'dark') => void; scheme: ColorScheme; onScheme: (v: ColorScheme) => void; bindings: KeyBindings; onBindings: (next: KeyBindings) => void; advancedInstall: boolean; onAdvancedInstall: (v: boolean) => void; focusSearch: boolean; onFocusSearch: (v: boolean) => void; separateAll: boolean; onSeparateAll: (v: boolean) => void; initialSection?: string; notify: Notify }) {
   const [active, setActive] = useState<string>(initialSection ?? 'appearance');
   const [language, setLanguage] = useState('en');
   const [toggles, setToggles] = useState({ rememberSections: true, restoreTabs: true, autoChecks: true });
@@ -263,9 +263,11 @@ export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, bind
           <div className="dtp-legend"><span><i />Game data 53.9 MB</span><span><i />Kept versions 12.8 MB</span><span><i />Rosters 0.4 MB</span></div>
         </section>
         <section id="dtp-set-keys" className="dtp-card dtp-settings-card"><KeyBindingsEditor bindings={bindings} onBindings={onBindings} /></section>
-        {/* DEC-050 (UX-059): Advanced, opt-in behaviour; off by default. The detail names the key of the menu's Find in catalogue. */}
-        <section id="dtp-set-advanced" className="dtp-card dtp-settings-card"><h2>Advanced</h2>
+        {/* DEC-054: Advanced holds two opt-in preferences, both off by default, as plain rows without an enclosing card
+            (DEC-050 / UX-059 catalogue search focus; Separate all). The first detail names the key of the menu's Find in catalogue. */}
+        <section id="dtp-set-advanced" className="dtp-settings-card dtp-settings-plain" aria-labelledby="dtp-set-advanced-title"><h2 id="dtp-set-advanced-title">Advanced</h2>
           <Switch label="Focus search when opening the catalogue" detail={`Off: Add unit opens the catalogue for browsing. Find in catalogue (${formatCombo('Mod+Shift+F')}) always focuses the search.`} checked={focusSearch} onChange={onFocusSearch} />
+          <Switch label="Enable Separate all" detail="A unit with several models also offers Separate all, which splits it into single-model units in one step. Off: only Separate 1 is offered." checked={separateAll} onChange={onSeparateAll} />
         </section>
         <section id="dtp-set-about" className="dtp-card dtp-settings-card"><h2>About</h2>
           <dl className="dtp-facts four"><div><dt>Version</dt><dd>1.0.0 · desktop preview</dd></div><div><dt>Engine</dt><dd>0.9.4</dd></div><div><dt>Protocol</dt><dd>12</dd></div><div><dt>SQLite</dt><dd>3.46</dd></div></dl>

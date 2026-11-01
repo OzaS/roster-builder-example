@@ -242,3 +242,10 @@
 .dtp-top-row .dtp-search { flex: 1 1 auto; min-width: 200px; max-width: none }
 .dtp-top-row > .dtp-btn { flex: none; height: 36px }
 .dtp-no-match { padding: 8px 12px; font-size: 12px }
+
+/* DEC-054: Settings › Advanced is a plain section, no enclosing card: the heading, then the rows with dividers between them. */
+.dtp-settings-plain { padding: 18px 4px 0; background: none; border: 0; gap: 0 }
+.dt-app .dtp-settings-plain > h2 { padding: 0 16px; margin-bottom: 6px }
+.dt-app .dtp-settings-plain .dtp-setting-row { padding: 13px 16px; border-top: 1px solid var(--dt-border) }
+.dt-app .dtp-settings-plain .dtp-setting-row:last-child { border-bottom: 1px solid var(--dt-border) }
+.dt-app .dtp-settings-plain .dtp-setting-row:focus-visible { outline-offset: -2px; border-radius: 10px }
