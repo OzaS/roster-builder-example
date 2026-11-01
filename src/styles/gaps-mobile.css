@@ -5,3 +5,37 @@
 .ux-mobile-unit-options .ux-5a-separate-btn,
 .ux-5a-separate-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 14px; border: 1px solid var(--ux-line-2); border-radius: 12px; background: var(--ux-surface-2); color: var(--ux-ink); font: inherit; font-size: 14px; font-weight: 750; cursor: pointer; }
 .ux-5a-separate > small { flex: 1 1 100%; margin: 0; }
+
+/* O2 (proposal): on the phone Add unit sheet a unit at its maximum keeps the quota chip on the line under the name, as the tablet and desktop catalogues do (DEC-054), so a long name keeps the row width and the right edge holds the price and the unavailable Add only. */
+.ux-pool-quota { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-top: 4px; }
+.ux-pool-quota .ws-quota-chip { flex: none; }
+
+/* O3 (proposal): in panes of 400 px or less a row keeps its points figure, on the same own line as the status chip (the layout the rows already use at 300 px or less). Applied only where a frame carries .tb-points-own-line; the approved screens keep omitting the figure until the proposal is approved. */
+@container (max-width: 400px) {
+  .tb-app.tb-points-own-line .tb-row-end b { display: inline }
+  .tb-app.tb-points-own-line button.tb-row:has(> .tb-row-end > b) { flex-wrap: wrap; row-gap: 6px }
+  .tb-app.tb-points-own-line button.tb-row > .tb-row-end:has(> b) { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; flex-basis: 100%; justify-content: flex-start }
+  .tb-app.tb-points-own-line button.tb-row:has(> .tb-mark) > .tb-row-end:has(> b) { padding-left: 52px }
+}
+
+/* Gallery-only on-screen keyboard illustration (SoftKeyboard): 290 px at the bottom of the phone screen; the app content above it shrinks, the tab bar stays behind it. */
+.ux-has-kbd { --ux-kbd-h: 290px; padding-bottom: var(--ux-kbd-h); box-sizing: border-box; }
+.ux-has-kbd > .ux-tabbar, .ux-has-kbd > .ux-dock-handle { display: none; }
+.ux-soft-kbd { position: absolute; left: 0; right: 0; bottom: 0; height: var(--ux-kbd-h, 290px); z-index: 60; padding: 10px 4px 22px; box-sizing: border-box; background: color-mix(in srgb, var(--ux-surface-2) 80%, var(--ux-ink) 8%); border-top: 1px solid var(--ux-line); }
+.ux-soft-kbd-rows { display: grid; gap: 10px; height: 100%; grid-template-rows: repeat(4, 1fr); }
+.ux-soft-kbd-row { display: flex; justify-content: center; gap: 5px; }
+.ux-soft-kbd-key { display: grid; place-items: center; flex: 1 1 0; max-width: 34px; border-radius: 6px; background: var(--ux-surface); color: var(--ux-ink); font-size: 18px; box-shadow: 0 1px 0 var(--ux-line-2); }
+.ux-soft-kbd-key.wide { flex: 0 0 46px; max-width: none; background: color-mix(in srgb, var(--ux-surface) 60%, var(--ux-ink) 10%); font-size: 14px; }
+.ux-soft-kbd-key.space { flex: 1 1 0; max-width: none; font-size: 14px; color: var(--ux-ink-secondary); }
+.ux-soft-kbd-key.action { flex-basis: 88px; background: var(--ux-accent); color: var(--ux-accent-ink); font-weight: 750; }
+
+/* Phone Add unit sheet at 200 % text (same device as the Lookup large-text frame: the content area is zoomed, the status bar and tab bar are not). */
+.ux-wb-detail.ux-text-200 { zoom: 2; }
+.ux-wb-detail.ux-text-200 .ux-wb-search { min-width: 0; }
+.ux-wb-detail.ux-text-200 .ux-wb-search input { min-width: 0; width: 100%; flex: 1 1 0; text-overflow: ellipsis; }
+.ux-wb-detail.ux-text-200 .ux-suggest, .ux-wb-detail.ux-text-200 .ux-suggest-chips { min-width: 0; }
+/* At 200 % text the Add unit rows put points and the availability chip on their own line under the name (the three columns no longer fit), the Add mark stays at the row end. */
+.ux-wb-detail.ux-text-200 .ux-pool-row, .ux-wb-detail.ux-text-200 .ux-pool-row.locked { grid-template-columns: minmax(0, 1fr) auto; row-gap: 6px; }
+.ux-wb-detail.ux-text-200 .ux-pool-row > span:first-child { grid-column: 1; grid-row: 1; }
+.ux-wb-detail.ux-text-200 .ux-pool-row > :is(svg, .ux-pool-limit-add) { grid-column: 2; grid-row: 1; align-self: start; }
+.ux-wb-detail.ux-text-200 .ux-pool-meta { grid-column: 1 / -1; grid-row: 2; display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 4px 10px; }

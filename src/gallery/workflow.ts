@@ -82,6 +82,9 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "library", label: "Lists" },
   { id: "library-v2", label: "Lists · V2" },
   { id: "library-filters", label: "Lists · Search, filters and grouping" },
+  { id: "library-filters-search", label: "Lists · Search open with a query" },
+  { id: "library-filters-no-match", label: "Lists · No match, Clear filters" },
+  { id: "library-filters-keyboard", label: "Lists · Search with keyboard, long system name" },
   { id: "collections", label: "Library" },
   { id: "app", label: "App" },
   { id: "sources", label: "Sources" },
@@ -121,6 +124,8 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "add-detachment", label: "Add Detachment" },
   { id: "add-unit", label: "Add Unit" },
   { id: "add-unit-limit", label: "Add Unit · Limit reached, reason shown" },
+  { id: "add-unit-focus-keyboard", label: "Add unit · Focus search on, keyboard shown" },
+  { id: "add-unit-text-200", label: "Add unit · 200% text, limit reached" },
   { id: "unit-detail", label: "Unit Detail" },
   { id: "unit-options-mobile", label: "Unit detail · Mobile 5A + 5B + links" },
   { id: "unit-options-separate-all", label: "Unit detail · Separate 1 and Separate all (opt-in on)" },
@@ -163,14 +168,14 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen === "desktop-settings" || screen === "desktop-settings-advanced") return "settings";
   if (screen === "desktop-first-run") return "library";
   if (screen === "desktop-menus") return "overview";
-  if (screen === "library-v2" || screen === "library-filters") return "library";
+  if (screen === "library-v2" || screen.startsWith("library-filters")) return "library";
   if (screen === "subscription-main") return "library";
   if (screen === "subscription-edition") return "overview";
   if (screen === "create-roster") return "system";
   if (screen === "drafts") return "library";
   if (screen === "source-legacy" || screen === "source" || screen.startsWith("lookup-")) return "catalogue";
   if (screen === "add-detachment") return "detachment";
-  if (screen === "add-unit-limit") return "add-unit";
+  if (screen === "add-unit-limit" || screen === "add-unit-focus-keyboard" || screen === "add-unit-text-200") return "add-unit";
   if (screen === "unit-options-separate-all" || screen === "unit-options-separated") return "unit-options-mobile";
   if (screen === "option-drilldown") return "unit-detail";
   if (screen === "diagnostics") return "validation";

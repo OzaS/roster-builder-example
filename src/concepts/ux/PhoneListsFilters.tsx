@@ -25,12 +25,12 @@ function Tag({ r }: { r: RosterSummary }) {
   return null;
 }
 
-export function PhoneListsFilters({ initialGrouped = false, query = "", onQueryChange, actions, onOpenRoster }: { initialGrouped?: boolean; query?: string; onQueryChange?: (query: string) => void; actions?: ReactNode; onOpenRoster?: () => void }) {
-  const [promptOpen, setPromptOpen] = useState(true);
-  const [system, setSystem] = useState<string | null>(null);
+export function PhoneListsFilters({ initialGrouped = false, initialSystem = null, longSystem, promptDismissed = false, query = "", onQueryChange, actions, onOpenRoster }: { initialGrouped?: boolean; initialSystem?: string | null; promptDismissed?: boolean; /** Gallery state: shows this game system under a long name (the chip truncates it). */ longSystem?: string; query?: string; onQueryChange?: (query: string) => void; actions?: ReactNode; onOpenRoster?: () => void }) {
+  const [promptOpen, setPromptOpen] = useState(!promptDismissed);
+  const [system, setSystem] = useState<string | null>(initialSystem);
   const [attention, setAttention] = useState(false);
   const [grouped, setGrouped] = useState(initialGrouped);
-  const rosters = rosterLibrary;
+  const rosters = longSystem ? rosterLibrary.map((r) => r.system === "Example System Two" ? { ...r, system: longSystem } : r) : rosterLibrary;
   const systems = systemsOf(rosters);
   const bySystem = systems.length >= 2;
   const attentionCount = rosters.filter(needsAttention).length;

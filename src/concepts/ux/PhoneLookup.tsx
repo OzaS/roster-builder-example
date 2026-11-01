@@ -44,7 +44,7 @@ export function PhoneLookup({ initialQuery = "line", initialStack = [], noData =
   return (
     <>
       <PhoneSearchHeader title="Lookup" subtitle={noData ? "No game data yet" : `${plural(lookupSystems.length, "game system")} installed`}
-        query={query} onQueryChange={lk.setQuery} placeholder="Search units, rules, upgrades…" trailing={trailing} initialOpen={!!initialQuery} searchable={!noData} />
+        query={query} onQueryChange={lk.setQuery} placeholder="Search units, rules, upgrades…" trailing={trailing} initialOpen={!!initialQuery && !noData} searchable={!noData} />
       <div className="ux-wb-home-body ux-lk-body">
         {noData ? (
           <div className="ux-search-empty ux-lk-empty"><BookOpen size={22} /><strong>Nothing to look up yet</strong><small>Lookup searches the units, detachments, upgrades and rules of your installed game data.</small><button type="button" className="ux-job-btn" onClick={onAddData}><Database size={15} />Add game data</button></div>

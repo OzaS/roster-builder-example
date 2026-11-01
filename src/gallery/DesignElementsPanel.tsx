@@ -8,6 +8,7 @@ import { TabletElements } from "../concepts/tablet/TabletElements";
 import { DuoElements } from "../concepts/foldable/DuoElements";
 import { LibrarySwitch } from "./LibrarySwitch";
 import { AppearancePreferences } from "../concepts/ux/AppearanceSettings";
+import { SoftKeyboard } from "../concepts/ux/SoftKeyboard";
 import { MobileUnitOptions, ModelStackSamples, OptionFoldSamples } from "../concepts/ux/MobileUnitOptions";
 import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BarChart3, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, Circle, CircleDot, Cog, Coins, Command, Copy, Database, Dice5, Download, Ellipsis, FileInput, Gamepad2, GripVertical, Hammer, Heart, ImagePlus, Languages, Layers, LibraryBig, Maximize2, MessageCircle, Minus, Moon, MoveRight, Palette, PanelsTopLeft, Pencil, Plus, RotateCcw, Rows3, Scale, Search, Smartphone, Sparkles, Split, Trash2, Upload, UserRound, Wand2, X, SquareCheck } from "lucide-react";
 import { createContext, useContext, useState } from "react";
@@ -1058,6 +1059,10 @@ function WorkbenchElements({
       </CatalogGroup>
 
       <CatalogGroup groupId="gallery-ui">
+      <ElementSection title="On-screen Keyboard Illustration">
+        <small>Gallery-only drawing (R0 gap frames library-filters-keyboard and add-unit-focus-keyboard): a neutral 290 px keyboard at the bottom of the phone screen. It takes no input and is not an app component; the frames show the app's content shrinking above it with the focused field visible.</small>
+        <div className="ux-elements-stack"><div className="ux-screen ux-workbench light" style={{ position: "relative", height: 310, width: 360, overflow: "hidden" }}><SoftKeyboard /></div></div>
+      </ElementSection>
       <ElementSection title="Design Library Navigation"><LibrarySwitch current="phone" label="Design library examples" /></ElementSection>
       <ElementSection title="Designer Rail Controls">
         <div className="rail-actions">
