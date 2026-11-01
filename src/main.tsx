@@ -5,6 +5,7 @@ import { DesktopWorkbench } from "./concepts/desktop/DesktopWorkbench";
 import type { ColorScheme, WorkflowScreen } from "./types";
 import { applyStoredAmbient } from "./concepts/desktop/desktopAmbient";
 import { TabletStandalone } from "./concepts/tablet/TabletStandalone";
+import { DuoStandalone } from "./concepts/foldable/DuoStandalone";
 
 import "./styles/base.css";
 import "./styles/tokens.css";
@@ -17,6 +18,6 @@ applyStoredAmbient(ambientParam === null ? undefined : ambientParam !== "0");
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    {new URLSearchParams(location.search).has("desktop") ? <div className="dt-standalone"><DesktopWorkbench workflowScreen={`desktop-${new URLSearchParams(location.search).get("desktop") || "welcome"}` as WorkflowScreen} themeMode={new URLSearchParams(location.search).get("theme") === "light" ? "light" : "dark"} colorScheme={(new URLSearchParams(location.search).get("scheme") ?? "default") as ColorScheme} /><a className="dt-standalone-link" href="?gallery=desktop">← Desktop design library</a></div> : new URLSearchParams(location.search).has("tablet") ? <TabletStandalone params={new URLSearchParams(location.search)} /> : <App />}
+    {new URLSearchParams(location.search).has("desktop") ? <div className="dt-standalone"><DesktopWorkbench workflowScreen={`desktop-${new URLSearchParams(location.search).get("desktop") || "welcome"}` as WorkflowScreen} themeMode={new URLSearchParams(location.search).get("theme") === "light" ? "light" : "dark"} colorScheme={(new URLSearchParams(location.search).get("scheme") ?? "default") as ColorScheme} /><a className="dt-standalone-link" href="?gallery=desktop">← Desktop design library</a></div> : new URLSearchParams(location.search).has("tablet") ? <TabletStandalone params={new URLSearchParams(location.search)} /> : new URLSearchParams(location.search).has("duo") ? <DuoStandalone params={new URLSearchParams(location.search)} /> : <App />}
   </StrictMode>,
 );

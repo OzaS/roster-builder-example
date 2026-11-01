@@ -9,6 +9,7 @@ import { rosterLibrary } from '../desktop/desktopData';
 import type { RosterUnit } from '../../types';
 import type { TabletEnv } from './tabletEnv';
 import { HintButton } from './TabletHint';
+import { useBarItems, type BarItem, type BarMenuItem } from '../foldable/duoBarItems';
 import { StateChip } from '../workspace/StateChip';
 import { LimitAddButton, QuotaChip } from '../workspace/CatalogueLimit';
 import { TabletResizer, type PanePresets } from './TabletResizer';
@@ -26,7 +27,7 @@ import './tablet-editor.css';
 //   Medium (600-839): force tree · unit details; the catalogue is a slide-over from Add unit.
 //   Split view (< 700 wide, also any window whose logical width drops under 700 at a larger text size): the tree alone; a unit's details open over it (like ListDetail on the pages).
 
-export type EditorStart = 'editor' | 'issues' | 'add' | 'forces' | 'add-force' | 'readonly' | 'export' | 'move-unit' | 'add-roles' | 'add-focus' | 'chip-caption' | 'limit-caption';
+export type EditorStart = 'editor' | 'issues' | 'add' | 'forces' | 'add-force' | 'readonly' | 'export' | 'move-unit' | 'add-roles' | 'add-focus' | 'chip-caption' | 'limit-caption' | 'unit';
 /** Gallery starts that open the catalogue as Add unit does (DEC-050: many roles, opened with the search focused, a chip's caption shown). */
 const addStarts: EditorStart[] = ['add', 'add-roles', 'add-focus', 'chip-caption', 'limit-caption'];
 type Pop = 'switcher' | 'more' | 'summary' | `unit-${number}` | `force-${string}` | null;
@@ -60,10 +61,14 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
   focusSearch?: boolean;
   onBack: () => void; onAllRosters: () => void; onNewRoster: () => void; onImport: () => void; onFindData: () => void;
 }) {
-  const mode: Mode = env.widthClass === 'expanded' ? 'three' : env.width < 700 ? 'single' : 'two';
+  // Foldable (env.fold): two panes on the open display in every pose (the panes divide at the fold when it is partially
+  // folded, HIG: avoid extreme layout changes as people fold), one on the closed display; the catalogue is a slide-over.
+  const fold = env.fold;
+  const vertical = env.bars === 'vertical';
+  const mode: Mode = fold ? (env.width >= 700 ? 'two' : 'single') : env.widthClass === 'expanded' ? 'three' : env.width < 700 ? 'single' : 'two';
   // Under 440 logical px (split view at a larger text size) the header keeps Back, the roster mark, the points and More;
-  // undo and redo move into More (UX-025: collapse rather than clip).
-  const narrowHead = env.width < 440;
+  // undo and redo move into More (UX-025: collapse rather than clip). With vertical bars they are toolbar items instead.
+  const narrowHead = !vertical && env.width < 440;
   const first = useRef(imported ? rosterFromImport(imported) : loadRoster(startRoster(start, rosterName))).current;
   const [roster, setRoster] = useState(first);
   const history = useRosterHistory<EditorUnit>({ units: first.units, forces: first.forces });
@@ -79,7 +84,8 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
   const [catWidth, setCatWidth] = useState(PANES.catalogue.initial);
   const [inspWidth, setInspWidth] = useState(mode === 'three' ? PANES.inspector.initial : PANES.inspectorMedium.initial);
   const [slideOver, setSlideOver] = useState(addStarts.includes(start) && mode !== 'three');
-  const [detailOpen, setDetailOpen] = useState(false);
+  // `unit`: the Foldable library's closed display with the selected unit's details open over the roster.
+  const [detailOpen, setDetailOpen] = useState(start === 'unit' && mode === 'single');
   const [sheet, setSheet] = useState<Sheet>(start === 'add-force' ? { kind: 'add-force' } : start === 'export' ? { kind: 'export' } : start === 'move-unit' ? { kind: 'move', id: 1 } : null);
   const [query, setQuery] = useState('');
   const [role, setRole] = useState(start === 'add' || start === 'add-focus' ? 'Core' : 'All');
@@ -233,18 +239,41 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
     file: { name: roster.name, system: roster.system, faction: roster.faction, limit, forces, units },
   };
 
-  const cols = mode === 'three'
+  const foldCols = fold?.active && mode === 'two' ? `${fold.x - fold.gap / 2}px minmax(0, 1fr)` : null;
+  const cols = foldCols ?? (mode === 'three'
     ? `${showCatalogue ? `${catWidth}px ` : ''}minmax(300px, 1fr)${showInspector ? ` ${inspWidth}px` : ''}`
-    : mode === 'two' ? `minmax(300px, 1fr)${showInspector ? ` ${inspWidth}px` : ''}` : 'minmax(0, 1fr)';
+    : mode === 'two' ? `minmax(300px, 1fr)${showInspector ? ` ${inspWidth}px` : ''}` : 'minmax(0, 1fr)');
   const catalogue = (variant: 'pane' | 'slide') => <CataloguePanel env={env} variant={variant} query={query} onQuery={setQuery} role={role} onRole={setRole} forces={forces} target={target} onTarget={setActiveForce} searchRef={searchRef} onAdd={addUnit}
     roles={start === 'add-roles' ? manyRoles : ROLES} entries={start === 'add-roles' ? manyRoleCatalogue : editorCatalogue} own={units.filter(u => forceOf(u) === target.id)} captionShown={start === 'chip-caption' ? 'Patrol Walker' : start === 'limit-caption' ? 'Force Commander' : undefined}
     onClose={() => variant === 'pane' ? setShowCatalogue(false) : setSlideOver(false)} faction={roster.faction} system={roster.system} />;
   const inspectorLimits = mode === 'three' ? PANES.inspector : PANES.inspectorMedium;
   const fromLabel = from === 'rosters' ? 'Rosters' : 'Home';
 
+  // Foldable: the header's Back, undo, redo and More become vertical toolbar items (Back on top, then the prominent Add unit
+  // where the roster is the only pane, then undo and redo; More is the system overflow menu with the roster actions).
+  const barMenu: BarMenuItem[] = [
+    { id: 'ed-export', label: 'Export roster…', icon: ArrowDownToLine, onClick: () => { setPop(null); setSheet({ kind: 'export' }); } },
+    { id: 'ed-rename', label: 'Rename roster', icon: Pencil, disabled: !!readOnly, onClick: () => { setPop(null); setSheet({ kind: 'rename' }); } },
+    { id: 'ed-duplicate', label: 'Duplicate roster', icon: Copy, onClick: () => duplicateRoster() },
+    { id: 'ed-add-force', label: 'Add force…', icon: Flag, disabled: !!readOnly, onClick: () => { setPop(null); setSheet({ kind: 'add-force' }); } },
+    ...(mode !== 'single' ? [{ id: 'ed-inspector', label: showInspector ? 'Hide unit details' : 'Show unit details', icon: showInspector ? PanelRightClose : PanelRightOpen, divider: true, onClick: () => setShowInspector(v => !v) }] : []),
+  ];
+  const undoItems: BarItem[] = [
+    { id: 'ed-undo', label: history.undoLabel ? `Undo ${history.undoLabel}` : 'Undo', hint: readOnly ? 'Read-only roster: nothing to undo' : history.undoLabel ? `Undo “${history.undoLabel}”` : 'Nothing to undo', icon: Undo2, group: 'secondary', disabled: !history.undoLabel || !!readOnly, onClick: undo },
+    { id: 'ed-redo', label: history.redoLabel ? `Redo ${history.redoLabel}` : 'Redo', hint: readOnly ? 'Read-only roster: nothing to redo' : history.redoLabel ? `Redo “${history.redoLabel}”` : 'Nothing to redo', icon: Redo2, group: 'secondary', disabled: !history.redoLabel || !!readOnly, onClick: redo },
+  ];
+  const sliding = slideOver && mode !== 'three';
+  useBarItems('editor', !vertical ? null
+    : sliding ? { items: [{ id: 'ed-close-catalogue', label: 'Close catalogue', hint: 'Close the catalogue', icon: X, group: 'nav', onClick: () => setSlideOver(false) }] }
+      : mode === 'single' && detailOpen && selected ? { items: [{ id: 'ed-detail-back', label: 'Back to the roster', hint: 'Back to the roster tree', icon: ChevronLeft, group: 'nav', onClick: () => setDetailOpen(false) }, ...undoItems], menu: barMenu }
+        : { items: [
+          { id: 'ed-back', label: `Back to ${fromLabel}`, hint: `Back to ${fromLabel}`, icon: ChevronLeft, group: 'nav', onClick: onBack },
+          ...(mode === 'single' && !readOnly ? [{ id: 'ed-add', label: 'Add unit', hint: `Add a unit to ${forces.length > 1 ? target.name : 'this roster'} from the catalogue`, icon: Plus, group: 'primary' as const, prominent: true, onClick: () => openCatalogue() }] : []),
+          ...undoItems], menu: barMenu });
+
   return <div ref={rootRef} className={`tbe tbe-${mode} ${narrowHead ? 'tbe-narrow-head' : ''}`} aria-label={`Roster editor: ${roster.name}`}>
     <header className="tbe-header">
-      <HintButton hint={`Back to ${fromLabel}`} input={env.input} side="bottom" wrapClassName="start" aria-label={`Back to ${fromLabel}`} className="tbe-back" onClick={onBack}><ChevronLeft size={24} /><span>{fromLabel}</span></HintButton>
+      {!vertical && <HintButton hint={`Back to ${fromLabel}`} input={env.input} side="bottom" wrapClassName="start" aria-label={`Back to ${fromLabel}`} className="tbe-back" onClick={onBack}><ChevronLeft size={24} /><span>{fromLabel}</span></HintButton>}
       <div className="tbe-title-wrap" data-pop="switcher">
         <HintButton hint="Switch to another recent roster" input={env.input} side="bottom" className="tbe-title" aria-haspopup="menu" aria-expanded={pop === 'switcher'} onClick={() => setPop(pop === 'switcher' ? null : 'switcher')}>
           <span className="tb-mark" aria-hidden="true">{roster.mark}</span>
@@ -254,10 +283,10 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
         {pop === 'switcher' && <RosterSwitcher current={roster.name} onPick={switchRoster} onClose={() => setPop(null)} onAll={onAllRosters} onNew={onNewRoster} onImport={() => { setPop(null); onImport(); }} />}
       </div>
       <span className="tbe-header-spacer" />
-      {!narrowHead && <><HintButton hint={readOnly ? 'Read-only roster: nothing to undo' : history.undoLabel ? `Undo “${history.undoLabel}”${keys('Mod+Z')}` : 'Nothing to undo'} input={env.input} side="bottom" aria-label={history.undoLabel ? `Undo ${history.undoLabel}` : 'Undo'} className="tbe-icon" disabled={!history.undoLabel || !!readOnly} onClick={undo}><Undo2 size={20} /></HintButton>
+      {!narrowHead && !vertical && <><HintButton hint={readOnly ? 'Read-only roster: nothing to undo' : history.undoLabel ? `Undo “${history.undoLabel}”${keys('Mod+Z')}` : 'Nothing to undo'} input={env.input} side="bottom" aria-label={history.undoLabel ? `Undo ${history.undoLabel}` : 'Undo'} className="tbe-icon" disabled={!history.undoLabel || !!readOnly} onClick={undo}><Undo2 size={20} /></HintButton>
       <HintButton hint={readOnly ? 'Read-only roster: nothing to redo' : history.redoLabel ? `Redo “${history.redoLabel}”${keys('Mod+Shift+Z')}` : 'Nothing to redo'} input={env.input} side="bottom" aria-label={history.redoLabel ? `Redo ${history.redoLabel}` : 'Redo'} className="tbe-icon" disabled={!history.redoLabel || !!readOnly} onClick={redo}><Redo2 size={20} /></HintButton></>}
       <span className={`dt-app tb-shim ${light ? 'light' : ''}`} data-pop="summary"><SummaryToggle total={total} limit={limit} open={pop === 'summary'} onToggle={() => setPop(pop === 'summary' ? null : 'summary')} /></span>
-      <div className="tbe-more-wrap" data-pop="more">
+      {!vertical && <div className="tbe-more-wrap" data-pop="more">
         <HintButton hint="More: export, panes and roster actions" input={env.input} side="bottom" wrapClassName="end" aria-label="More actions" aria-haspopup="menu" aria-expanded={pop === 'more'} className="tbe-icon" onClick={() => setPop(pop === 'more' ? null : 'more')}><Ellipsis size={20} /></HintButton>
         {pop === 'more' && <div className="tbe-menu end" role="menu" aria-label="More actions">
           {narrowHead && <><button type="button" role="menuitem" disabled={!history.undoLabel || !!readOnly} onClick={() => { setPop(null); undo(); }}><Undo2 size={18} />{history.undoLabel ? `Undo “${history.undoLabel}”` : 'Undo'}</button>
@@ -270,7 +299,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
           {mode === 'three' && <button type="button" role="menuitem" onClick={() => { setShowCatalogue(v => !v); setPop(null); }}>{showCatalogue ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}{showCatalogue ? 'Hide catalogue' : 'Show catalogue'}</button>}
           {mode !== 'single' && <button type="button" role="menuitem" onClick={() => { setShowInspector(v => !v); setPop(null); }}>{showInspector ? <PanelRightClose size={18} /> : <PanelRightOpen size={18} />}{showInspector ? 'Hide unit details' : 'Show unit details'}</button>}
         </div>}
-      </div>
+      </div>}
       {pop !== 'summary' && <PointsLine total={total} limit={limit} />}
     </header>
 
@@ -281,15 +310,15 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
     </div>}
 
     <div className="tbe-body">
-      <div className="tbe-panes" style={{ gridTemplateColumns: cols }}>
-        {mode === 'three' && showCatalogue && <TabletResizer side="left" width={catWidth} presets={PANES.catalogue} label="Resize catalogue" pane="catalogue" input={env.input} onWidth={setCatWidth} onHide={() => setShowCatalogue(false)} />}
-        {mode !== 'single' && showInspector && <TabletResizer side="right" width={inspWidth} presets={inspectorLimits} label="Resize unit details" pane="unit details" input={env.input} onWidth={setInspWidth} onHide={() => setShowInspector(false)} />}
+      <div className="tbe-panes" style={{ gridTemplateColumns: cols, columnGap: foldCols ? fold?.gap : undefined }}>
+        {mode === 'three' && showCatalogue && !fold && <TabletResizer side="left" width={catWidth} presets={PANES.catalogue} label="Resize catalogue" pane="catalogue" input={env.input} onWidth={setCatWidth} onHide={() => setShowCatalogue(false)} />}
+        {mode !== 'single' && showInspector && !fold && <TabletResizer side="right" width={inspWidth} presets={inspectorLimits} label="Resize unit details" pane="unit details" input={env.input} onWidth={setInspWidth} onHide={() => setShowInspector(false)} />}
         {mode === 'three' && showCatalogue && (readOnly ? <ReadOnlyCataloguePane env={env} info={readOnly} onFindData={onFindData} onClose={() => setShowCatalogue(false)} /> : catalogue('pane'))}
 
         <section className="tbe-pane tbe-tree" aria-label="Roster">
           <header className="tbe-pane-head">
             <span><strong>{forces.length > 1 ? 'Your forces' : 'Your force'}</strong><small>{units.length} units{forces.length > 1 ? ` · ${forces.length} forces` : ''} · {pts(total)} pts</small></span>
-            {!readOnly && (mode !== 'three' || !showCatalogue) && <HintButton hint={`Add a unit to ${forces.length > 1 ? target.name : 'this roster'} from the catalogue`} input={env.input} side="bottom" className="ux-job-btn primary tbe-add" onClick={() => openCatalogue()}><Plus size={18} />Add unit</HintButton>}
+            {!readOnly && (mode !== 'three' || !showCatalogue) && !(vertical && mode === 'single') && <HintButton hint={`Add a unit to ${forces.length > 1 ? target.name : 'this roster'} from the catalogue`} input={env.input} side="bottom" className="ux-job-btn primary tbe-add" onClick={() => openCatalogue()}><Plus size={18} />Add unit</HintButton>}
           </header>
           {readOnly && <section className="tbe-readonly" role="region" aria-label="Read-only roster" tabIndex={-1}><Lock size={20} />
             <div><strong>This roster is read-only</strong><p>{readOnly.faction} was removed from the installed {readOnly.system} data, so its units can't be checked or changed. The roster is kept as it was saved.</p>
@@ -348,7 +377,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
       </div>
 
       {mode === 'single' && detailOpen && selected && <aside className="tbe-over" aria-label="Unit details">
-        <header className="tbe-pane-head"><HintButton hint="Back to the roster tree" input={env.input} side="bottom" wrapClassName="start" className="tbe-back inline" onClick={() => setDetailOpen(false)}><ChevronLeft size={22} /><span>Roster</span></HintButton></header>
+        {!vertical && <header className="tbe-pane-head"><HintButton hint="Back to the roster tree" input={env.input} side="bottom" wrapClassName="start" className="tbe-back inline" onClick={() => setDetailOpen(false)}><ChevronLeft size={22} /><span>Roster</span></HintButton></header>}
         <UnitDetail key={selected.id} unit={selected} env={env} force={forceById(forceOf(selected))} faction={roster.faction} total={total} issue={unitIssue(selected.id)} readOnly={!!readOnly} onUpdate={update} onDuplicate={() => duplicateUnit(selected)} onRemove={() => removeUnit(selected)} />
       </aside>}
 
@@ -417,7 +446,7 @@ function CataloguePanel({ env, variant, query, onQuery, role, onRole, forces, ta
   return <aside className={`tbe-pane tbe-catalogue ${variant}`} aria-label="Unit catalogue">
     <header className="tbe-pane-head">
       <span><strong>Add units</strong><small>to {forces.length > 1 ? target.name : 'this roster'}</small></span>
-      <HintButton hint={variant === 'pane' ? 'Hide the catalogue (More → Show catalogue brings it back)' : 'Close the catalogue'} input={env.input} side="bottom" wrapClassName="end" aria-label={variant === 'pane' ? 'Hide catalogue' : 'Close catalogue'} className="tbe-icon small" onClick={onClose}>{variant === 'pane' ? <PanelLeftClose size={18} /> : <X size={20} />}</HintButton>
+      {!(variant === 'slide' && env.bars === 'vertical') && <HintButton hint={variant === 'pane' ? 'Hide the catalogue (More → Show catalogue brings it back)' : 'Close the catalogue'} input={env.input} side="bottom" wrapClassName="end" aria-label={variant === 'pane' ? 'Hide catalogue' : 'Close catalogue'} className="tbe-icon small" onClick={onClose}>{variant === 'pane' ? <PanelLeftClose size={18} /> : <X size={20} />}</HintButton>}
     </header>
     <div className="tbe-cat-tools">
       <label className="ux-search tb-search"><Search size={17} /><input ref={searchRef} value={query} onChange={e => onQuery(e.target.value)} placeholder="Find a unit…" aria-label="Find a unit" />{query && <button type="button" className="tbe-clear" aria-label="Clear search" onClick={() => onQuery('')}><X size={16} /></button>}</label>

@@ -2,6 +2,8 @@ import { useEffect, useLayoutEffect, useRef, useState, type ComponentType, type 
 import { MoreHorizontal } from 'lucide-react';
 import type { TabletInput } from './tabletDevices';
 import { HintButton } from './TabletHint';
+import { useTabletEnv } from './tabletEnv';
+import { useBarItems } from '../foldable/duoBarItems';
 
 // 1.0 revision: iOS Liquid Glass icon buttons; Android icon buttons. Labels remain in hints and More.
 
@@ -116,9 +118,13 @@ export const SEARCH_MIN = 200;
  * end. Pages without a search or actions have no top row at all; they render `PageTitle` alone.
  */
 export function TabletToolbar({ title, search, actions = [], input }: { title: string; search?: ReactNode; actions?: ToolbarAction[]; input: TabletInput }) {
+  // Foldable (vertical bars): the actions are toolbar items on the trailing edge; the search stays with the content.
+  const vertical = useTabletEnv().bars === 'vertical';
+  useBarItems(`toolbar:${title}`, vertical && actions.length ? { items: actions.map(a => ({ id: `${title}:${a.id}`, label: a.label, icon: a.icon, hint: a.hint, group: a.prominent ? 'primary' : 'secondary', prominent: a.prominent, pressed: a.pressed, priority: a.priority, onClick: a.onClick })) } : null);
+  if (vertical && !search) return <PageTitle>{title}</PageTitle>;
   return <header className="tb-top-row">
     <PageTitle>{title}</PageTitle>
     {search && <div className="tb-top-search">{search}</div>}
-    {actions.length > 0 && <ToolbarActions actions={actions} input={input} label={`${title} actions`} reserve={search ? SEARCH_MIN : 0} />}
+    {actions.length > 0 && !vertical && <ToolbarActions actions={actions} input={input} label={`${title} actions`} reserve={search ? SEARCH_MIN : 0} />}
   </header>;
 }

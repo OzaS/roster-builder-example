@@ -5,6 +5,7 @@ import { QuotaChip, limitReason } from "../concepts/workspace/CatalogueLimit";
 import { lookupById } from "../data/lookupData";
 import { DesktopElements } from "../concepts/desktop/DesktopWorkbench";
 import { TabletElements } from "../concepts/tablet/TabletElements";
+import { DuoElements } from "../concepts/foldable/DuoElements";
 import { LibrarySwitch } from "./LibrarySwitch";
 import { AppearancePreferences } from "../concepts/ux/AppearanceSettings";
 import { MobileUnitOptions, ModelStackSamples, OptionFoldSamples } from "../concepts/ux/MobileUnitOptions";
@@ -51,6 +52,7 @@ export function DesignElementsPanel({
 }: Props) {
   if (concept.id === "desktop-workbench") return <DesktopElements />;
   if (concept.id === "tablet-workbench") return <TabletElements />;
+  if (concept.id === "duo-workbench") return <DuoElements />;
   const rootClass = `design-elements-panel ux-screen ux-workbench ${shellClass(themeMode, colorScheme)} ${platform}`;
 
   return (

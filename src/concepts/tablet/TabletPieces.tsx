@@ -1,5 +1,6 @@
 import type { ComponentType, CSSProperties, ReactNode } from 'react';
-import { ArrowDownToLine, ArrowLeft, ArrowUpCircle, Check, Info, Search } from 'lucide-react';
+import { ArrowDownToLine, ArrowLeft, ArrowUpCircle, Check, ChevronLeft, Info, Search } from 'lucide-react';
+import { useBarItems } from '../foldable/duoBarItems';
 import { Chip as MobileChip } from '../ux/uxShared'; // the mobile chip; the workspace Chip (dtp-chip) is not used here, see MOBILE-PIECES.md
 import { JobProgressBar } from '../ux/SourceJobs';
 import { jobPercent, type Job } from '../workspace/Jobs';
@@ -35,10 +36,12 @@ export const narrow = (env: TabletEnv) => env.width < 700;
 
 /** List and detail panes. Where the width is too small for both (split view), the list stays and the detail opens over it. */
 export function ListDetail({ env, label, list, detail, open, onClose }: { env: TabletEnv; label: string; list: ReactNode; detail: ReactNode; open: boolean; onClose: () => void }) {
+  const vertical = env.bars === 'vertical';
+  useBarItems(`detail:${label}`, vertical && narrow(env) && open ? { items: [{ id: `detail-back:${label}`, label: `Back to ${label}`, hint: `Back to ${label}`, icon: ChevronLeft, group: 'nav', onClick: onClose }] } : null);
   if (!narrow(env)) return <div className="tb-panes"><section className="tb-pane" aria-label={label}>{list}</section><section className="tb-pane tb-detail" aria-label={`${label} details`}>{detail}</section></div>;
   return <div className="tb-panes single">
-    <section className="tb-pane" aria-label={label}>{list}<p className="tb-split-note"><Info size={15} />At this width the detail opens over the list.</p></section>
-    {open && <section className="tb-pane tb-detail over" aria-label={`${label} details`}><button type="button" className="ux-job-btn tb-back" onClick={onClose}><ArrowLeft size={16} />Back to the list</button>{detail}</section>}
+    <section className="tb-pane" aria-label={label}>{list}{!vertical && <p className="tb-split-note"><Info size={15} />At this width the detail opens over the list.</p>}</section>
+    {open && <section className="tb-pane tb-detail over" aria-label={`${label} details`}>{!vertical && <button type="button" className="ux-job-btn tb-back" onClick={onClose}><ArrowLeft size={16} />Back to the list</button>}{detail}</section>}
   </div>;
 }
 

@@ -1,6 +1,7 @@
 import { DesktopWorkbench } from "../concepts/desktop/DesktopWorkbench";
 import { PanelsTopLeft, TabletSmartphone } from "lucide-react";
 import { TabletWorkbench } from "../concepts/tablet/TabletWorkbench";
+import { DuoWorkbench } from "../concepts/foldable/DuoWorkbench";
 import { CodexWorkbench } from "../concepts/ux/CodexWorkbench";
 import type { ConceptId, WorkflowScreen } from "../types";
 import type { GalleryConcept } from "../gallery/galleryTypes";
@@ -34,7 +35,7 @@ export type DesignComment = {
 
 export type DesignElementStatus = "specified" | "ready-for-rn" | "implemented" | "needs-review";
 export type DesignElementLevel = "foundation" | "primitive" | "composite" | "navigation" | "overlay" | "screen-composition" | "gallery-tooling";
-export type DesignElementPlatform = "phone" | "tablet" | "desktop" | "gallery";
+export type DesignElementPlatform = "phone" | "tablet" | "foldable" | "desktop" | "gallery";
 
 export type DesignElementSection = {
   id: string;
@@ -69,7 +70,7 @@ export type EditableDesign = {
   name: string;
   eyebrow: string;
   icon: "PanelsTopLeft" | "TabletSmartphone";
-  component: "CodexWorkbench" | "DesktopWorkbench" | "TabletWorkbench";
+  component: "CodexWorkbench" | "DesktopWorkbench" | "TabletWorkbench" | "DuoWorkbench";
   bestFor: string;
   direction: string;
   interaction: string;
@@ -94,6 +95,7 @@ const iconMap = {
 const componentMap = {
   DesktopWorkbench,
   TabletWorkbench,
+  DuoWorkbench,
   CodexWorkbench,
 };
 

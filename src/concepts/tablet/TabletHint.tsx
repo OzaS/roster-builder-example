@@ -7,7 +7,7 @@ export const HOLD_MS = 500;
 const SHOW_MS = 1800;
 
 export function HintButton({ hint, input, side = 'right', wrapClassName = '', onClick, children, ...rest }: {
-  hint: string; input: TabletInput; side?: 'right' | 'top' | 'bottom'; wrapClassName?: string; onClick?: (event: MouseEvent<HTMLButtonElement>) => void; children: ReactNode;
+  hint: string; input: TabletInput; side?: 'right' | 'left' | 'top' | 'bottom'; wrapClassName?: string; onClick?: (event: MouseEvent<HTMLButtonElement>) => void; children: ReactNode;
 } & Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'title' | 'onClick'>) {
   const [shown, setShown] = useState(false);
   const hold = useRef<number>(undefined);
