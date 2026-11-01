@@ -129,7 +129,7 @@ function TabletShell({ route, initialEditor, initialImport = false, initialShort
             : page === 'tools' ? <TabletTools />
               : page === 'library' ? <TabletLibrary />
                 : page === 'sources' ? <TabletSources {...shared} onPage={setPage} onOpenRoster={openRoster} />
-                  : <TabletSettings {...shared} themePref={themePref} scheme={scheme} onTheme={chooseTheme} onScheme={chooseScheme} focusSearch={focusSearch} onFocusSearch={setFocusSearch} separateAll={separateAll} onSeparateAll={setSeparateAll} />}
+                  : <TabletSettings {...shared} themePref={themePref} scheme={scheme} onTheme={chooseTheme} onScheme={chooseScheme} focusSearch={focusSearch} onFocusSearch={setFocusSearch} separateAll={separateAll} onSeparateAll={setSeparateAll} searchable />}
       <TabletJobsPanel session={session} />
     </main></>}
     {importing && <ImportResultSheet result={importing} version="v1.4" onClose={() => setImporting(null)} onOpen={() => {

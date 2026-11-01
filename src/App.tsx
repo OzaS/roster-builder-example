@@ -45,6 +45,9 @@ const workflowScreenIds = [
   "tablet-editor-separate-all",
   "tablet-editor-chips-text-150",
   "tablet-settings-advanced",
+  "tablet-settings-search",
+  "tablet-settings-search-no-results",
+  "tablet-settings-search-developer",
   "tablet-rosters-text-200",
   "tablet-editor-import-result",
   "tablet-lookup",
@@ -178,6 +181,9 @@ const workflowScreenIds = [
   "option-drilldown",
   "diagnostics",
   "settings",
+  "settings-search",
+  "settings-search-no-results",
+  "settings-search-developer",
   "export",
 ] satisfies WorkflowScreen[];
 const prototypeScreenIds = [

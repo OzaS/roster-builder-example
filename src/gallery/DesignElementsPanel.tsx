@@ -1026,7 +1026,13 @@ function WorkbenchElements({
       </ElementSection>
 
       <ElementSection title="Developer Options">
+        <small>Proposal for review (UX-052): Show hidden entries is a Developer options switch, off by default, on every platform; it is no longer an ordinary control. With it on, hidden catalogue entries and unit options are listed where they belong, tagged Hidden; with it off (and while Developer options are locked) nothing about them shows, and the inline "Show hidden (n)" links leave Add unit and the unit options. Settings search lists the row only while Developer options are unlocked.</small>
         <DeveloperOptionsPreview />
+        <small>Add unit with Show hidden entries on (hidden rows tagged, no inline link):</small>
+        <div className="ux-screen light ux-workbench" style={{ padding: 12, maxWidth: 380 }}><div className="ux-pool">
+          <div className="ux-pool-item"><button type="button" className="ux-pool-row available"><span><strong>Bastion Squad</strong><small>Veterans</small></span><span className="ux-pool-meta"><b>185 pts</b><Chip tone="valid">available</Chip></span><Plus size={16} /></button></div>
+          <div className="ux-pool-item"><button type="button" className="ux-pool-row available"><span><strong>Cache Warden</strong><small>Hidden by the game data</small></span><span className="ux-pool-meta"><b>60 pts</b><Chip tone="neutral">Hidden</Chip></span><Plus size={16} /></button></div>
+        </div></div>
       </ElementSection>
 
       <ElementSection title="Main Tab Bar">

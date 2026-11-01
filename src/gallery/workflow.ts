@@ -19,6 +19,9 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "tablet-editor-separate-all", label: "Tablet · Roster editor · Separate 1 and Separate all (opt-in on)" },
   { id: "tablet-editor-chips-text-150", label: "Tablet · Roster editor · State chips, text 150%" },
   { id: "tablet-settings-advanced", label: "Tablet · Settings · Advanced" },
+  { id: "tablet-settings-search", label: "Tablet · Settings · Search, results" },
+  { id: "tablet-settings-search-no-results", label: "Tablet · Settings · Search, no results" },
+  { id: "tablet-settings-search-developer", label: "Tablet · Settings · Search, Developer options unlocked" },
   { id: "tablet-rosters-text-200", label: "Tablet · Rosters · Text 200%" },
   { id: "tablet-editor-import-result", label: "Tablet · Import result" },
   { id: "tablet-lookup", label: "Tablet · Lookup" },
@@ -133,6 +136,9 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "option-drilldown", label: "Option Drilldown" },
   { id: "diagnostics", label: "Diagnostics" },
   { id: "settings", label: "Settings" },
+  { id: "settings-search", label: "Settings · Search, results" },
+  { id: "settings-search-no-results", label: "Settings · Search, no results" },
+  { id: "settings-search-developer", label: "Settings · Search, Developer options unlocked" },
   { id: "export", label: "Export" },
 ];
 
@@ -174,6 +180,7 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen === "create-roster") return "system";
   if (screen === "drafts") return "library";
   if (screen === "source-legacy" || screen === "source" || screen.startsWith("lookup-")) return "catalogue";
+  if (screen.startsWith("settings-search")) return "settings";
   if (screen === "add-detachment") return "detachment";
   if (screen === "add-unit-limit" || screen === "add-unit-focus-keyboard" || screen === "add-unit-text-200") return "add-unit";
   if (screen === "unit-options-separate-all" || screen === "unit-options-separated") return "unit-options-mobile";

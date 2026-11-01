@@ -47,6 +47,9 @@ export type WorkflowScreen =
   | "tablet-editor-separate-all"
   | "tablet-editor-chips-text-150"
   | "tablet-settings-advanced"
+  | "tablet-settings-search"
+  | "tablet-settings-search-no-results"
+  | "tablet-settings-search-developer"
   | "tablet-rosters-text-200"
   | "tablet-rosters-system"
   | "tablet-rosters-grouped"
@@ -184,6 +187,9 @@ export type WorkflowScreen =
   | "option-drilldown"
   | "diagnostics"
   | "settings"
+  | "settings-search"
+  | "settings-search-no-results"
+  | "settings-search-developer"
   | "export";
 
 export type RosterOption = {

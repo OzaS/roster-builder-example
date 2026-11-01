@@ -12,6 +12,7 @@ import { AddGameDataScreen, AdvancedInstallSetting, AutoUpdateChecksSetting, Reo
 import { MobileUnitOptions } from "./MobileUnitOptions";
 import { QuotaChip, limitReason } from "../workspace/CatalogueLimit";
 import { SoftKeyboard } from "./SoftKeyboard";
+import { SettingsResults } from "./SettingsSearch";
 import { BackOrTitle, BudgetMeter, Chip, ExpandableBudget, RosterMoreMenu, RosterShareButton, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "./uxShared";
 
 /** Screens of the source-data flow designed in Battle Augur plan 2D (SourceJobs.tsx). */
@@ -2241,18 +2242,15 @@ function SettingsScreen({ props }: { props: ConceptProps }) {
   const [autoChecks, setAutoChecks] = useState(true);
   const [focusSearch, setFocusSearch] = useState(false);
   const [separateAll, setSeparateAll] = useState(false);
+  // UX-053 (proposal): Settings search in the top bar (the shared phone search pattern); gallery states settings-search*, the last one with Developer options unlocked.
+  const searchState = props.workflowScreen === "settings-search" ? "found" : props.workflowScreen === "settings-search-no-results" ? "none" : props.workflowScreen === "settings-search-developer" ? "developer" : undefined;
+  const [settingsQuery, setSettingsQuery] = useState(searchState === "found" ? "search" : searchState === "none" ? "lantern" : searchState === "developer" ? "hidden" : "");
   return (
     <>
-      <header className="ux-wb-top ux-wb-home-top reversed">
-        <button type="button" className="ux-icon-btn" aria-label="Back" onClick={props.onBack}>
-          <ArrowLeft size={18} />
-        </button>
-        <div className="ux-wb-title">
-          <strong>Settings</strong>
-          <small>Tune your builder</small>
-        </div>
-      </header>
+      <PhoneSearchHeader title="Settings" subtitle="Tune your builder" query={settingsQuery} onQueryChange={setSettingsQuery} placeholder="Search settings" initialOpen={searchState !== undefined}
+        leading={<button type="button" className="ux-icon-btn" aria-label="Back" onClick={props.onBack}><ArrowLeft size={18} /></button>} />
       <div className="ux-wb-home-body">
+        {settingsQuery.trim() ? <SettingsResults platform="phone" query={settingsQuery} developerUnlocked={searchState === "developer"} onClear={() => setSettingsQuery("")} /> : <>
         <AppearancePreferences props={props} states />
         <div className="ux-result-label">Search & assistance</div>
         <button type="button" className={`ux-setting-row ${smart ? "on" : ""}`} onClick={props.onToggleSmartSearch}>
@@ -2285,6 +2283,7 @@ function SettingsScreen({ props }: { props: ConceptProps }) {
           <FocusCatalogueSearchSetting on={focusSearch} onToggle={() => setFocusSearch((value) => !value)} />
           <SeparateAllSetting on={separateAll} onToggle={() => setSeparateAll((value) => !value)} />
         </AdvancedSettingsRows>
+        </>}
       </div>
     </>
   );

@@ -39,3 +39,17 @@
 .ux-wb-detail.ux-text-200 .ux-pool-row > span:first-child { grid-column: 1; grid-row: 1; }
 .ux-wb-detail.ux-text-200 .ux-pool-row > :is(svg, .ux-pool-limit-add) { grid-column: 2; grid-row: 1; align-self: start; }
 .ux-wb-detail.ux-text-200 .ux-pool-meta { grid-column: 1 / -1; grid-row: 2; display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 4px 10px; }
+
+/* UX-053 (proposal): Settings search results, phone and tablet. Rows are the Settings rows themselves (switches stay operable), grouped under their section; the match is highlighted by weight and an underline, never by colour alone. */
+.ux-settings-results { display: grid; gap: 10px; }
+.ux-settings-results .ux-result-label { margin-top: 6px; }
+.ux-settings-group { display: grid; gap: 8px; }
+.ux-settings-row { grid-template-columns: 38px minmax(0, 1fr) auto; }
+.ux-settings-text strong { display: block; font-size: 14.5px; }
+.ux-settings-text small { display: block; color: var(--ux-muted); font-size: 12.5px; line-height: 1.45; margin-top: 2px; }
+.ux-settings-mark { background: color-mix(in srgb, var(--ux-accent) 22%, transparent); color: inherit; font-weight: 800; text-decoration: underline; text-underline-offset: 2px; border-radius: 3px; padding: 0 1px; }
+.ux-settings-count { color: var(--ux-ink-secondary); font-size: 12px; }
+.ux-settings-dev-tag { margin-left: 8px; padding: 1px 7px; border: 1px solid var(--ux-line-2); border-radius: 99px; font-size: 10.5px; letter-spacing: .02em; text-transform: none; }
+.ux-settings-empty { margin-top: 24px; }
+.ux-settings-results.tablet .ux-settings-row { border: 0; border-radius: 0; background: transparent; padding: 12px 0; }
+.ux-settings-results.tablet .ux-settings-row + .ux-settings-row { border-top: 1px solid var(--ux-line); }
