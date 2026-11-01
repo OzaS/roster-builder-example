@@ -10,6 +10,7 @@ import type { RosterReferenceDefinition, RosterUnit } from "../../types";
 import type { ConceptProps } from "../shared";
 import { AddGameDataScreen, AdvancedInstallSetting, AutoUpdateChecksSetting, FocusCatalogueSearchSetting, SeparateAllSetting, AdvancedSettingsRows, CollectionScreen, InstallJobScreen, KeepVersionsSetting, MigrationReportScreen, NotificationsSetting, ReadOnlyRosterScreen, RememberSectionsSetting, SearchGitHubScreen, SourceDetailScreen, SourcesManageScreen, SourcesNavRow, UpdateAvatarButton, WifiOnlySetting } from "./SourceJobs";
 import { MobileUnitOptions } from "./MobileUnitOptions";
+import { QuotaChip, limitReason } from "../workspace/CatalogueLimit";
 import { BackOrTitle, BudgetMeter, Chip, ExpandableBudget, RosterMoreMenu, RosterShareButton, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "./uxShared";
 
 /** Screens of the source-data flow designed in Battle Augur plan 2D (SourceJobs.tsx). */
@@ -180,7 +181,7 @@ export function CodexWorkbench(props: ConceptProps) {
     body = <SmartSearchScreen props={props} />;
   } else {
     const smartClass = navStyle === "top" && smart ? "ux-smart" : "";
-    modifier = [isUnitDetail ? "show-detail has-detail-toggle" : "", screen === "overview" ? "roster-overview" : "", screen === "validation" ? "show-checks" : "", smartClass].filter(Boolean).join(" ");
+    modifier = [isUnitDetail ? "show-detail has-detail-toggle" : props.workflowScreen === "add-unit-limit" ? "show-detail" : "", screen === "overview" ? "roster-overview" : "", screen === "validation" ? "show-checks" : "", smartClass].filter(Boolean).join(" ");
     body = (
       <>
         <WorkbenchHeader
@@ -1144,9 +1145,16 @@ function AddPane({ props }: { props: ConceptProps }) {
   const [added, setAdded] = useState<Record<string, number>>({});
   const [lastAdded, setLastAdded] = useState<string | null>(null);
   const [showHidden, setShowHidden] = useState(false);
-  const pool = flattenUnits(props.roster).filter((u) => u.sectionId === props.selectedSectionId);
+  // Gallery state add-unit-limit (DEC-054): the sheet opened on a section with a unit at its maximum, its reason shown.
+  const limitState = props.workflowScreen === "add-unit-limit";
+  const sectionId = limitState ? flattenUnits(props.roster).find((u) => u.availability === "locked")?.sectionId ?? props.selectedSectionId : props.selectedSectionId;
+  const pool = flattenUnits(props.roster).filter((u) => u.sectionId === sectionId);
+  const [explained, setExplained] = useState<string | null>(() => limitState ? pool.find((u) => u.availability === "locked")?.id ?? null : null);
+  const explainTimer = useRef<number>(undefined);
+  useEffect(() => () => window.clearTimeout(explainTimer.current), []);
+  const explain = (id: string) => { window.clearTimeout(explainTimer.current); setExplained((current) => current === id ? null : id); explainTimer.current = window.setTimeout(() => setExplained(null), 4000); };
   const smart = props.smartSearch ?? false;
-  const section = props.selectedSection.name;
+  const section = pool[0]?.sectionName ?? props.selectedSection.name;
   const suggestions = [`legal ${section.toLowerCase()} under 120`, "fills this slot", "best value pick"];
   return (
     <section className="ux-wb-detail">
@@ -1187,19 +1195,26 @@ function AddPane({ props }: { props: ConceptProps }) {
         {(pool.length ? pool : flattenUnits(props.roster)).map((unit) => {
           const locked = unit.availability === "locked";
           const count = added[unit.id] ?? 0;
-          const reason = unit.availability === "limited" ? "Slot full: adding breaks its limit" : locked ? "Maximum reached" : undefined;
+          const reason = unit.availability === "limited" ? "Slot full: adding breaks its limit" : locked ? "Limit reached" : undefined;
+          // DEC-054: a unit at its maximum is not dimmed: quota chip 1 / 1 and an unavailable Add; pressing the row explains instead of adding.
           return (
-            <button key={unit.id} type="button" className={`ux-pool-row ${unit.availability}`} disabled={locked} onClick={() => { setAdded((current) => ({ ...current, [unit.id]: count + 1 })); setLastAdded(unitDisplayName(unit)); }}>
-              <span>
-                <strong>{unitDisplayName(unit)}{count ? <em className="ux-pool-count"> ({count}/3)</em> : null}</strong>
-                <small>{reason ?? unit.role}</small>
-              </span>
-              <span className="ux-pool-meta">
-                <b>{unit.points} pts</b>
-                <Chip tone={unit.availability === "available" ? "valid" : unit.availability === "limited" ? "warning" : "error"}>{unit.availability}</Chip>
-              </span>
-              <Plus size={16} />
-            </button>
+            <div key={unit.id} className="ux-pool-item">
+              <button type="button" className={`ux-pool-row ${unit.availability}`} aria-disabled={locked || undefined}
+                aria-label={locked ? `${unitDisplayName(unit)}, ${unit.points} points. Unavailable: limit reached, 1 of 1 selected` : undefined}
+                aria-describedby={locked && explained === unit.id ? `limit-${unit.id}` : undefined}
+                onClick={() => { if (locked) { explain(unit.id); return; } setAdded((current) => ({ ...current, [unit.id]: count + 1 })); setLastAdded(unitDisplayName(unit)); }}>
+                <span>
+                  <strong>{unitDisplayName(unit)}{count ? <em className="ux-pool-count"> ({count}/3)</em> : null}</strong>
+                  <small>{reason ?? unit.role}</small>
+                </span>
+                <span className="ux-pool-meta">
+                  <b>{unit.points} pts</b>
+                  {locked ? <QuotaChip selected={1} max={1} /> : <Chip tone={unit.availability === "available" ? "valid" : "warning"}>{unit.availability}</Chip>}
+                </span>
+                {locked ? <span className="ws-limit-add ux-pool-limit-add" aria-hidden><i><Plus size={15} /></i></span> : <Plus size={16} />}
+              </button>
+              {locked && explained === unit.id ? <span id={`limit-${unit.id}`} role="tooltip" className="tb-hint-bubble ws-limit-bubble ux-pool-bubble">{limitReason(1, 1)}</span> : null}
+            </div>
           );
         })}
       </div>

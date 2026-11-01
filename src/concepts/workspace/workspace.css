@@ -179,3 +179,15 @@ button.ws-state-chip.err { --chip-tone: var(--ux-err) }
 .tb-pointer button.ws-state-chip, .dt-app button.ws-state-chip { width: 32px; height: 32px; margin: 0 }
 .dt-app .ws-state-chip i { width: 26px; height: 20px }
 .dt-app .tb-hint-bubble.ws-chip-bubble { padding: 7px 10px; border-radius: 8px; font-size: 12px; font-weight: 600 }
+
+/* DEC-054 (R0-08): a reached limit is a quota chip ("1 / 1") and an unavailable Add button; name and price stay fully readable. */
+.ws-quota-chip { display: inline-grid; place-items: center; min-width: 42px; height: 24px; padding: 0 8px; border: 1px solid var(--ux-line-2, var(--dt-border)); border-radius: 999px; background: var(--ux-surface-2, var(--dt-hover)); color: var(--ux-ink, var(--dt-text)); font-size: 12.5px; font-weight: 750; font-variant-numeric: tabular-nums; white-space: nowrap; box-sizing: border-box }
+.ws-quota-chip.full { border-color: color-mix(in srgb, var(--ux-err, #e5484d) 50%, transparent); background: color-mix(in srgb, var(--ux-err, #e5484d) 13%, var(--ux-surface, transparent)) }
+.ws-limit-add-wrap { position: relative; z-index: 1; display: inline-flex }
+button.ws-limit-add { display: grid; place-items: center; width: 44px; height: 44px; margin: -4px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--ux-muted, var(--dt-muted)); cursor: help; touch-action: manipulation }
+.ws-limit-add i { display: grid; place-items: center; width: 36px; height: 36px; border: 1.5px dashed var(--ux-line-2, var(--dt-border)); border-radius: 50%; background: transparent }
+.ws-limit-add.open i, .ws-limit-add:hover i { border-style: solid; border-color: var(--ux-muted, var(--dt-muted)) }
+.ws-limit-add:focus-visible { outline: none }
+.ws-limit-add:focus-visible i { outline: 2px solid var(--ux-accent-2, var(--dt-accent)); outline-offset: 2px }
+.tb-hint-bubble.ws-limit-bubble { width: max-content; max-width: 240px; white-space: normal }
+.tb-hint-bubble.ws-limit-bubble.below { left: auto; right: -2px; top: calc(100% + 6px); bottom: auto; transform: none }

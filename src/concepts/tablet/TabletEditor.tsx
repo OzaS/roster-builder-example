@@ -10,12 +10,13 @@ import type { RosterUnit } from '../../types';
 import type { TabletEnv } from './tabletEnv';
 import { HintButton } from './TabletHint';
 import { StateChip } from '../workspace/StateChip';
+import { LimitAddButton, QuotaChip } from '../workspace/CatalogueLimit';
 import { TabletResizer, type PanePresets } from './TabletResizer';
 import { keyLabel, useShortcuts } from './tabletKeys';
 import { AddForceSheet, ExportSheet, RenameSheet } from './TabletEditorSheets';
 import { MoveRight } from 'lucide-react';
 import { MoveUnitSheet } from './TabletSheets';
-import { catalogueState, editorCatalogue, manyRoleCatalogue, manyRoles, loadRoster, rosterFromImport, unitCategories, unitProfile, unitRules, weaponChoices, weaponProfile, type CatalogueEntry } from './tabletEditorData';
+import { catalogueLimit, catalogueState, editorCatalogue, manyRoleCatalogue, manyRoles, loadRoster, rosterFromImport, unitCategories, unitProfile, unitRules, weaponChoices, weaponProfile, type CatalogueEntry } from './tabletEditorData';
 import './tablet-editor.css';
 
 // The tablet roster editor (T1a Expanded, T1b Medium; DEC-039: desktop structure, mobile feel, one roster at a time).
@@ -25,9 +26,9 @@ import './tablet-editor.css';
 //   Medium (600-839): force tree · unit details; the catalogue is a slide-over from Add unit.
 //   Split view (< 700 wide, also any window whose logical width drops under 700 at a larger text size): the tree alone; a unit's details open over it (like ListDetail on the pages).
 
-export type EditorStart = 'editor' | 'issues' | 'add' | 'forces' | 'add-force' | 'readonly' | 'export' | 'move-unit' | 'add-roles' | 'add-focus' | 'chip-caption';
+export type EditorStart = 'editor' | 'issues' | 'add' | 'forces' | 'add-force' | 'readonly' | 'export' | 'move-unit' | 'add-roles' | 'add-focus' | 'chip-caption' | 'limit-caption';
 /** Gallery starts that open the catalogue as Add unit does (DEC-050: many roles, opened with the search focused, a chip's caption shown). */
-const addStarts: EditorStart[] = ['add', 'add-roles', 'add-focus', 'chip-caption'];
+const addStarts: EditorStart[] = ['add', 'add-roles', 'add-focus', 'chip-caption', 'limit-caption'];
 type Pop = 'switcher' | 'more' | 'summary' | `unit-${number}` | `force-${string}` | null;
 type Sheet = { kind: 'add-force' } | { kind: 'rename' } | { kind: 'rename-force'; id: string } | { kind: 'export' } | { kind: 'move'; id: number } | null;
 /** The sample roster each gallery start opens: two forces, a roster whose faction was removed, or the default. */
@@ -236,7 +237,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
     ? `${showCatalogue ? `${catWidth}px ` : ''}minmax(300px, 1fr)${showInspector ? ` ${inspWidth}px` : ''}`
     : mode === 'two' ? `minmax(300px, 1fr)${showInspector ? ` ${inspWidth}px` : ''}` : 'minmax(0, 1fr)';
   const catalogue = (variant: 'pane' | 'slide') => <CataloguePanel env={env} variant={variant} query={query} onQuery={setQuery} role={role} onRole={setRole} forces={forces} target={target} onTarget={setActiveForce} searchRef={searchRef} onAdd={addUnit}
-    roles={start === 'add-roles' ? manyRoles : ROLES} entries={start === 'add-roles' ? manyRoleCatalogue : editorCatalogue} own={units.filter(u => forceOf(u) === target.id)} captionShown={start === 'chip-caption' ? 'Patrol Walker' : undefined}
+    roles={start === 'add-roles' ? manyRoles : ROLES} entries={start === 'add-roles' ? manyRoleCatalogue : editorCatalogue} own={units.filter(u => forceOf(u) === target.id)} captionShown={start === 'chip-caption' ? 'Patrol Walker' : start === 'limit-caption' ? 'Force Commander' : undefined}
     onClose={() => variant === 'pane' ? setShowCatalogue(false) : setSlideOver(false)} faction={roster.faction} system={roster.system} />;
   const inspectorLimits = mode === 'three' ? PANES.inspector : PANES.inspectorMedium;
   const fromLabel = from === 'rosters' ? 'Rosters' : 'Home';
@@ -398,6 +399,11 @@ function CataloguePanel({ env, variant, query, onQuery, role, onRole, forces, ta
   roles: readonly string[]; entries: CatalogueEntry[]; own: EditorUnit[]; captionShown?: string;
 }) {
   const matches = (e: CatalogueEntry) => e.name.toLowerCase().includes(query.trim().toLowerCase()) && (role === 'All' || e.role === role);
+  // DEC-054: the limit explanation of one row at a time; a press shows it for a few seconds, a second press hides it.
+  const [explained, setExplained] = useState<string | null>(null);
+  const explainTimer = useRef<number>(undefined);
+  useEffect(() => () => window.clearTimeout(explainTimer.current), []);
+  const explain = (name: string) => { window.clearTimeout(explainTimer.current); setExplained(current => current === name ? null : name); explainTimer.current = window.setTimeout(() => setExplained(null), 4000); };
   const any = entries.some(matches);
   const rolesRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -422,14 +428,18 @@ function CataloguePanel({ env, variant, query, onQuery, role, onRole, forces, ta
     <div className="tbe-cat-list" ref={listRef}>
       {roles.map(group => { const shown = entries.filter(e => e.role === group && matches(e)); return shown.length ? <section key={group}>
         <h4>{group}<span>{shown.length}</span></h4>
-        {shown.map(e => { const state = catalogueState(e, own); const unavailable = state?.tone === 'err';
+        {shown.map(e => { const limit = catalogueLimit(e, own); const state = limit ? null : catalogueState(e, own); const unavailable = !!limit || state?.tone === 'err';
           // The row adds the unit (the whole row is its target); the state chip sits above it and only shows its caption.
+          // DEC-054: no dimming. A reached limit shows the quota chip and the unavailable Add button; pressing the row or the button explains.
           return <div key={e.name} data-cat-entry={e.name} className={`tbe-cat-row ${state ? state.tone : ''} ${unavailable ? 'unavailable' : ''}`}>
-            <button type="button" className="tbe-cat-add" disabled={unavailable} aria-label={`Add ${e.name}, ${e.points} points${state ? `, ${state.caption}, ${state.reason}` : ''}`} onClick={() => onAdd(e)}>
-              <span><strong>{e.name}</strong>{state ? <small className="reason">{state.reason}</small> : <small>{e.models} {e.models === 1 ? 'model' : 'models'} · {e.weapon}</small>}</span>
+            <button type="button" className="tbe-cat-add" aria-disabled={unavailable || undefined} tabIndex={limit ? -1 : undefined}
+              aria-label={limit ? `${e.name}, ${e.points} points, limit reached` : `Add ${e.name}, ${e.points} points${state ? `, ${state.caption}, ${state.reason}` : ''}`} onClick={() => limit ? explain(e.name) : unavailable ? undefined : onAdd(e)}>
+              <span><strong>{e.name}</strong>{limit ? <small className="reason">Limit reached</small> : state ? <small className="reason">{state.reason}</small> : <small>{e.models} {e.models === 1 ? 'model' : 'models'} · {e.weapon}</small>}</span>
             </button>
-            {state ? <StateChip tone={state.tone} caption={state.caption} input={env.input} open={captionShown === e.name} /> : <span aria-hidden="true" />}
-            <b aria-hidden="true">{e.points}<small> pts</small></b><span className="tbe-cat-plus" aria-hidden="true"><Plus size={18} /></span>
+            {limit ? <QuotaChip selected={limit.selected} max={limit.max} /> : state ? <StateChip tone={state.tone} caption={state.caption} input={env.input} open={captionShown === e.name} /> : <span aria-hidden="true" />}
+            <b aria-hidden="true">{e.points}<small> pts</small></b>
+            {limit ? <LimitAddButton name={e.name} points={e.points} selected={limit.selected} max={limit.max} input={env.input} open={explained === e.name || captionShown === e.name} onPress={() => explain(e.name)} />
+              : <span className="tbe-cat-plus" aria-hidden="true"><Plus size={18} /></span>}
           </div>; })}
       </section> : null; })}
       {!any && <p className="tb-empty">No units match. Try another word or role.</p>}

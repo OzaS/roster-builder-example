@@ -1,6 +1,7 @@
 import { PhoneSearchHeader } from "../concepts/ux/PhoneSearchHeader";
 import { PhoneListsFilters } from "../concepts/ux/PhoneListsFilters";
 import { LookupEntryBody, LookupEntryPage, PhoneLookup } from "../concepts/ux/PhoneLookup";
+import { QuotaChip, limitReason } from "../concepts/workspace/CatalogueLimit";
 import { lookupById } from "../data/lookupData";
 import { DesktopElements } from "../concepts/desktop/DesktopWorkbench";
 import { TabletElements } from "../concepts/tablet/TabletElements";
@@ -490,7 +491,8 @@ function WorkbenchElements({
         {/* Plan 4B: multi-add feedback, an added count, a refused row and the hidden toggle. */}
         <div className="ux-pool-added" role="status"><Check size={14} />Added {flattenUnits(roster)[0]?.name}</div>
         <button type="button" className="ux-pool-row"><span><strong>{flattenUnits(roster)[0]?.name}<em className="ux-pool-count"> (1/3)</em></strong><small>{flattenUnits(roster)[0]?.role}</small></span><span className="ux-pool-meta"><b>{flattenUnits(roster)[0]?.points} pts</b><Chip tone="valid">available</Chip></span><Plus size={16} /></button>
-        <button type="button" className="ux-pool-row locked" disabled><span><strong>{flattenUnits(roster)[1]?.name}</strong><small>Maximum reached</small></span><span className="ux-pool-meta"><b>{flattenUnits(roster)[1]?.points} pts</b><Chip tone="error">locked</Chip></span><Plus size={16} /></button>
+        {/* DEC-054: a unit at its maximum: not dimmed; quota chip, unavailable Add, the reason in the hint bubble on press. */}
+        <div className="ux-pool-item" style={{ marginBottom: 72 }}><button type="button" className="ux-pool-row locked" aria-disabled="true" aria-label={`${flattenUnits(roster)[1]?.name}, ${flattenUnits(roster)[1]?.points} points. Unavailable: limit reached, 1 of 1 selected`}><span><strong>{flattenUnits(roster)[1]?.name}</strong><small>Limit reached</small></span><span className="ux-pool-meta"><b>{flattenUnits(roster)[1]?.points} pts</b><QuotaChip selected={1} max={1} /></span><span className="ws-limit-add ux-pool-limit-add" aria-hidden><i><Plus size={15} /></i></span></button><span role="tooltip" className="tb-hint-bubble ws-limit-bubble ux-pool-bubble">{limitReason(1, 1)}</span></div>
         <button type="button" className="ux-pool-hidden">Show hidden (2)</button>
       </ElementSection>
 

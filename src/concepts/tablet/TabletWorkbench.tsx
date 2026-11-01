@@ -31,7 +31,7 @@ type ThemePref = 'system' | 'light' | 'dark';
  * (from Home); `tablet-archive-sketch` (and any phone screen the sketch navigates to) shows the earlier three-pane sketch, unchanged.
  */
 const editorScreens: Record<string, EditorStart> = { 'tablet-editor': 'editor', 'tablet-editor-issues': 'issues', 'tablet-editor-add': 'add', 'tablet-editor-forces': 'forces', 'tablet-editor-add-force': 'add-force', 'tablet-editor-readonly': 'readonly', 'tablet-editor-export': 'export', 'tablet-editor-move-unit': 'move-unit',
-  'tablet-editor-add-roles': 'add-roles', 'tablet-editor-add-focus': 'add-focus', 'tablet-editor-chip-caption': 'chip-caption' };
+  'tablet-editor-add-roles': 'add-roles', 'tablet-editor-add-focus': 'add-focus', 'tablet-editor-chip-caption': 'chip-caption', 'tablet-editor-limit-caption': 'limit-caption' };
 
 export function TabletWorkbench(props: Partial<ConceptProps>) {
   const shown: string | undefined = props.workflowScreen;
