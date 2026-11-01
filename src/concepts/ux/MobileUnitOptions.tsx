@@ -140,11 +140,11 @@ export function OptionFoldSamples() {
 }
 
 /** UX-023 (1.0, approved 2026-11-01, mirrors the desktop unit dialog): a model group's Separate 1 action, and Separate all only when Settings › Advanced › Enable Separate all is on. Absent on a group of one model. Separating never makes a unit or a roster entry; it only lets the user choose those models' options individually inside the same unit. */
-export function SeparateRow({ count, separateAll, onOne, onAll }: { count: number; separateAll: boolean; onOne: () => void; onAll: () => void }) {
+export function SeparateRow({ separateAll, onOne, onAll }: { separateAll: boolean; onOne: () => void; onAll: () => void }) {
   return <div className="ux-5a-separate" role="group" aria-label="Separate models">
     <button type="button" className="ux-5a-separate-btn" onClick={onOne}><Scissors size={17} />Separate 1</button>
     {separateAll ? <button type="button" className="ux-5a-separate-btn" onClick={onAll}><Scissors size={17} />Separate all</button> : null}
-    <small>{separateAll ? `Give one model its own options, or every one of the ${count}. They stay in this unit and keep the loadout.` : "Give one model its own options. It stays in this unit and keeps its loadout."}</small>
+    <small>{separateAll ? "Give one model its own options, or every model. They stay in this unit and keep the loadout." : "Give one model its own options. It stays in this unit and keeps its loadout."}</small>
   </div>;
 }
 
@@ -168,7 +168,7 @@ export function ModelStackSamples({ onCost, separateAll = false, initialStacks }
   return <><small>{total} models total · At least 3 · Up to 10 · Soft limit</small>{stacks.map(s => <article key={s.id} className="ux-5a-card">
     <strong>Lancer ×{s.count}</strong>
     <Count name="Lancer" value={s.count} min={0} disabled={false} onChange={count => update(s.id, { count })} />
-    {s.count > 1 ? <SeparateRow count={s.count} separateAll={separateAll} onOne={() => separate(s.id, false)} onAll={() => separate(s.id, true)} /> : null}
+    {s.count > 1 ? <SeparateRow separateAll={separateAll} onOne={() => separate(s.id, false)} onAll={() => separate(s.id, true)} /> : null}
     <FoldSection title="Sidearm" counter={`${s.sidearm ? s.count : 0}/${s.count} selections`} summary={summarise([[s.sidearm, s.sidearm ? s.count : 0], ["Long scope", s.scope ? s.count : 0]])} {...fold(`${s.id}/sidearm`)}><div role="radiogroup" aria-label="Sidearm">{["", "Pistol", "Axe"].map(name => <button type="button" role="radio" aria-checked={s.sidearm === name} className="ux-5a-choice" key={name} onClick={() => update(s.id, { sidearm: name })}>{s.sidearm === name ? <CircleDot size={22} /> : <Circle size={22} />}<span><strong>{name || "None"}</strong><small>{name ? `+${name === "Pistol" ? 2 : 1} Credits per model` : "No added cost"}</small></span></button>)}</div>
     <div className="ux-fold-nested"><FoldSection title="Exchange its scope" {...fold(`${s.id}/scope`)}><ToggleRow name="Long scope" cost="+1 Credits per model" value={s.scope} disabled={false} onChange={() => update(s.id, { scope: !s.scope })} /></FoldSection></div></FoldSection>
   </article>)}</>;

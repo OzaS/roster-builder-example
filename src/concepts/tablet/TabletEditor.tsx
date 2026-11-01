@@ -585,7 +585,7 @@ function UnitDetail({ unit, env, force, faction, total, issue, readOnly, separat
         <div className="ux-5a-model-title"><span><strong>{memberLabel(unit)} ×{count}</strong><small>{pinned ? 'Always 1 model' : '+12 pts per extra model'}</small></span></div>
         {pinned ? null : <>{i === 0 && <small className={sizeIssue ? 'ux-5a-invalid' : ''}>{sizeIssue && <AlertTriangle size={13} />}{unit.role === 'Support' ? 'At least 1' : 'At least 3'} · Up to 20 · {sizeIssue ? 'Needs more models' : 'Soft limit'}</small>}
           <Count name={stacks.length > 1 ? `Models in group ${i + 1}` : 'Models'} value={count} min={1} max={20} over={sizeIssue} disabled={readOnly} onChange={n => setStacks(stacks.map((c, k) => k === i ? n : c))} />
-          {count > 1 && !readOnly ? <SeparateRow count={count} separateAll={separateAll} onOne={() => setStacks(stacks.flatMap((c, k) => k === i ? [c - 1, 1] : [c]))} onAll={() => setStacks(stacks.flatMap((c, k) => k === i ? Array<number>(c).fill(1) : [c]))} /> : null}</>}
+          {count > 1 && !readOnly ? <SeparateRow separateAll={separateAll} onOne={() => setStacks(stacks.flatMap((c, k) => k === i ? [c - 1, 1] : [c]))} onAll={() => setStacks(stacks.flatMap((c, k) => k === i ? Array<number>(c).fill(1) : [c]))} /> : null}</>}
       </article>)}
       <div className="ux-5a-card"><FoldSection title="Primary weapon" counter="1/1 selections" summary={unit.weapon} {...fold('weapon')}>
         <div role="radiogroup" aria-label="Primary weapon">{weaponChoices(unit).map(w => <RadioRow key={w} name={w} cost="Included in unit cost" selected={unit.weapon === w} onChange={() => onUpdate({ weapon: w })} />)}</div>
