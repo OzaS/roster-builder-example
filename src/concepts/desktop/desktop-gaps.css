@@ -28,3 +28,23 @@
 .dt-standalone .dtz { --dtz-h: calc(100vh - 36px) }
 .dtz > .dt-app, .dt-standalone .dtz > .dt-app { zoom: var(--dtz); width: 100%; min-width: 0; height: calc(var(--dtz-h) / var(--dtz)); min-height: 0 }
 .dtz-label { position: absolute; z-index: 9; right: 18px; bottom: 12px; padding: 4px 9px; border-radius: 999px; background: #0b0c10cc; color: #c9cfdd; font: 600 12px/1.3 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif }
+
+/* Lookup (R0 gaps): no game data, Recently viewed, narrow window. */
+.dtl-nodata { flex: 1; min-height: 0; display: grid; place-items: center }
+.dtl-nodata .dtp-empty { max-width: 460px; gap: 8px }
+.dtl-nodata .dtp-empty p { font-size: 13px; line-height: 1.45 }
+.dtl-nodata .dtl-unavailable-icon { margin-bottom: 4px }
+.dtp-lookup10 .dtp-search input:disabled { cursor: default; opacity: .7 }
+.dtl-start { display: grid; gap: 4px; align-content: start }
+.dtl-start .ux-lk-hint { margin: 6px 18px 10px }
+.dt-app .dtl-recent-head { display: flex; align-items: center; gap: 8px; margin: 6px 0 4px; padding: 0 18px; color: var(--dt-muted); font-size: 12px; font-weight: 600; letter-spacing: .3px; text-transform: none }
+/* Narrow window (page under 700 px wide, about a window of 800 px): the results and the entry take turns, like the tablet's narrow detail over the list.
+   The page at 200 % zoom (desktop-lookup-1-0-text-200, approved) keeps its two panes: .dtl-keep-split. */
+.dtp-page.dtp-lookup10 { container-type: inline-size }
+.dtl-narrow-back { display: none !important }
+@container (max-width: 700px) {
+  .dtp-lookup10:not(.dtl-keep-split) .dtp-split.lookup { grid-template-columns: minmax(0, 1fr) }
+  .dtp-lookup10:not(.dtl-keep-split) .dtp-split.lookup[data-pane="list"] .lookup-detail,
+  .dtp-lookup10:not(.dtl-keep-split) .dtp-split.lookup[data-pane="entry"] .dtp-list { display: none }
+  .dtp-lookup10:not(.dtl-keep-split) .dtl-narrow-back { display: inline-flex !important }
+}

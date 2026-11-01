@@ -1052,6 +1052,10 @@
           "label": "Roster editor · Unit dialog, read-only roster"
         },
         {
+          "id": "desktop-editor-unit-dialog-zoom-200",
+          "label": "Unit dialog · Page zoom 200 % (proposal)"
+        },
+        {
           "id": "desktop-editor-catalogue-limit",
           "label": "Roster editor · Catalogue limit reached"
         },
@@ -1086,6 +1090,38 @@
         {
           "id": "desktop-lookup-1-0-text-200",
           "label": "Lookup 1.0 · Page zoom 200 %"
+        },
+        {
+          "id": "desktop-lookup-1-0-text-150",
+          "label": "Lookup 1.0 · Page zoom 150 % (proposal)"
+        },
+        {
+          "id": "desktop-lookup-1-0-no-data",
+          "label": "Lookup 1.0 · No game data, Add game data (proposal)"
+        },
+        {
+          "id": "desktop-lookup-1-0-start",
+          "label": "Lookup 1.0 · Recently viewed (proposal)"
+        },
+        {
+          "id": "desktop-lookup-1-0-upgrade",
+          "label": "Lookup 1.0 · Upgrade reference (proposal)"
+        },
+        {
+          "id": "desktop-lookup-1-0-rule",
+          "label": "Lookup 1.0 · Rule reference (proposal)"
+        },
+        {
+          "id": "desktop-lookup-1-0-detachment",
+          "label": "Lookup 1.0 · Detachment reference (proposal)"
+        },
+        {
+          "id": "desktop-lookup-1-0-narrow",
+          "label": "Lookup 1.0 · Narrow window, results (proposal)"
+        },
+        {
+          "id": "desktop-lookup-1-0-narrow-entry",
+          "label": "Lookup 1.0 · Narrow window, entry (proposal)"
         },
         {
           "id": "desktop-tools",
@@ -1151,6 +1187,7 @@
             "desktop-editor-unit-dialog-nested",
             "desktop-editor-unit-dialog-narrow",
             "desktop-editor-unit-dialog-readonly",
+            "desktop-editor-unit-dialog-zoom-200",
             "desktop-editor-catalogue-limit",
             "desktop-rosters",
             "desktop-lookup",
@@ -1160,6 +1197,14 @@
             "desktop-lookup-1-0-failed",
             "desktop-lookup-1-0-unavailable",
             "desktop-lookup-1-0-text-200",
+            "desktop-lookup-1-0-text-150",
+            "desktop-lookup-1-0-no-data",
+            "desktop-lookup-1-0-start",
+            "desktop-lookup-1-0-upgrade",
+            "desktop-lookup-1-0-rule",
+            "desktop-lookup-1-0-detachment",
+            "desktop-lookup-1-0-narrow",
+            "desktop-lookup-1-0-narrow-entry",
             "desktop-tools",
             "desktop-library",
             "desktop-sources",
@@ -1412,6 +1457,7 @@
                   "opens from a unit row (click, Enter on the focused row) or Edit › Edit unit… (↩); closes with × (Close {unit}), Escape on the top level or a click on the dimmed roster; focus returns to the unit row (after Remove: the neighbouring row)",
                   "normal window: centred, at most 680 px wide and the window minus 32 px high; header and tabs stay, the body scrolls, footer fixed",
                   "narrow window (dialog area under 760 × 560): fills the window minus 8 px margins (desktop-editor-unit-dialog-narrow, 720 × 520)",
+                  "R0 gap, proposal for approval: page zoom 200 % (desktop-editor-unit-dialog-zoom-200): a 1,500 × 900 window at 200 % is laid out at 750 × 432, so the dialog takes the narrow and the short rules (fills the window minus 8 px); the fixed header, tabs and footer take most of the height and the body scrolls (about one and a half rows show at once); nothing is clipped or hidden, Close stays reachable and keeps its focus ring; no sizing change is proposed (open question: compact the header in short windows)",
                   "header: eyebrow role / N models, name, points, force; Duplicate and Remove; Undo / Redo with the step names; Close",
                   "Options / Profile / Rules tabs (pill style); Options: unit size stepper, Separate 1 (and Separate all when enabled in Settings › Advanced), Members, equipment, upgrades, notes",
                   "live session: each change autosaves and is an Undo step (⌘Z / ⇧⌘Z work inside, text fields keep their own undo); no Save / Cancel draft; footer: Changes save as you edit · source and version",
@@ -1424,7 +1470,8 @@
                   "desktop-editor-unit-dialog",
                   "desktop-editor-unit-dialog-nested",
                   "desktop-editor-unit-dialog-narrow",
-                  "desktop-editor-unit-dialog-readonly"
+                  "desktop-editor-unit-dialog-readonly",
+                  "desktop-editor-unit-dialog-zoom-200"
                 ]
               },
               {
@@ -1605,6 +1652,35 @@
                   "desktop-lookup-1-0-failed",
                   "desktop-lookup-1-0-unavailable",
                   "desktop-lookup-1-0-text-200"
+                ]
+              },
+              {
+                "id": "desktop.lookup-1-0.gaps",
+                "title": "Lookup 1.0 · Gap States (R0 proposals)",
+                "level": "screen-composition",
+                "status": "needs-review",
+                "platforms": [
+                  "desktop"
+                ],
+                "states": [
+                  "R0 gaps, proposals for approval (LK-09, LK-10); composed from the approved Lookup 1.0 patterns, no approved screen changed (the approved screens render pixel-identical)",
+                  "no game data (desktop-lookup-1-0-no-data): the search field is disabled and the chip row is absent; one card says Nothing to look up yet · Lookup searches the units, forces, upgrades and rules of your installed game data. Install a game system and it is here, offline. · Add game data (opens Sources › Add game data); same wording as the phone and tablet",
+                  "Recently viewed (desktop-lookup-1-0-start): before a search is typed the results card shows the hint and a Recently viewed list (clock icon, up to 5 references, newest first, each row with name, summary · source and cost or Conditional tag); choosing one opens it in the entry card and moves it to the top; the entry card says Choose a result to read its reference. The phone has the same list (lookup-start); the tablet does not draw it yet",
+                  "static references for the kinds that had none: Upgrade (desktop-lookup-1-0-upgrade: profile table, Taken by with cost and limit), Rule (desktop-lookup-1-0-rule: rule text, Used by) and Detachment (desktop-lookup-1-0-detachment: slot categories, rules); each opens its group in the list; the reference body is the shared LookupEntryBody, the same as the phone",
+                  "narrow window (desktop-lookup-1-0-narrow, -narrow-entry; a 720 × 520 window): when the page is under 700 px wide (a window of about 800 px or less) the results and the entry take turns, as the tablet's narrow detail over the list: the results fill the width; choosing one shows the entry with a Results back button above it (Back to results; focus returns to the results), and the earlier-reference Back below it when links were followed",
+                  "the approved page zoom 200 % screen (desktop-lookup-1-0-text-200) has the same effective width as the narrow window but keeps its two panes unchanged (its entry pane is about 170 px wide); whether it should use the narrow layout too is an open question",
+                  "page zoom 150 % (desktop-lookup-1-0-text-150): the page at 150 % keeps its two panes; titles stop at two lines with the Full name disclosure, as at 200 %; the two-line cap applies to titles only",
+                  "LK-09 refresh with earlier results: not drawn, on purpose. Recommendation: show the drawn Loading state during a refresh (query and chips kept, Searching installed data…, skeleton rows). Earlier results may name entries the refresh removes (the Reference unavailable state exists for exactly that), and a marker would add a third result state to build, test and explain; the desktop already shows an empty entry card while loading, so the tablet should do the same (observation O1)"
+                ],
+                "screens": [
+                  "desktop-lookup-1-0-no-data",
+                  "desktop-lookup-1-0-start",
+                  "desktop-lookup-1-0-upgrade",
+                  "desktop-lookup-1-0-rule",
+                  "desktop-lookup-1-0-detachment",
+                  "desktop-lookup-1-0-narrow",
+                  "desktop-lookup-1-0-narrow-entry",
+                  "desktop-lookup-1-0-text-150"
                 ]
               },
               {
