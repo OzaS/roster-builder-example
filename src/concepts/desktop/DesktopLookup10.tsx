@@ -8,7 +8,7 @@ import './desktop-lookup-states.css';
 
 /** R0-03 (DEC-054): lifecycle states of Lookup 1.0, each with its own gallery screen. */
 export type LookupState = 'loading' | 'failed' | 'unavailable' | 'text-200' | 'text-150' | 'no-data' | 'start' | 'narrow';
-/** R0 gaps (proposals): references the static screens open, in groups that start folded. */
+/** R0 gaps (approved 2026-11-01): references the static screens open, in groups that start folded. */
 const RECENT_IDS = ['r-hold-line', 'u-line-fc', 'd-line-formation'];
 /** Synthetic long title for the large-text state (DEC-001: game-neutral). */
 const LONG_NAME = 'Veteran Line Infantry with Reinforced Field Equipment and Additional Support Options';

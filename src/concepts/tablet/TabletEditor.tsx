@@ -43,7 +43,7 @@ const PANES: { catalogue: PanePresets; inspector: PanePresets; inspectorMedium: 
   inspectorMedium: { min: 320, max: 500, narrow: 340, initial: 420, wide: 480 },
 };
 const pts = (n: number) => n.toLocaleString('en-US');
-/** UX-023 (proposal): a unit's models form groups, each with its own options; Separate 1 / Separate all split a group inside the same unit (never a new unit or roster entry). `stacks` is absent while the unit is one group. */
+/** UX-023 (approved 2026-11-01): a unit's models form groups, each with its own options; Separate 1 / Separate all split a group inside the same unit (never a new unit or roster entry). `stacks` is absent while the unit is one group. */
 type StackUnit = EditorUnit & { stacks?: number[] };
 const memberLabel = (u: EditorUnit) => u.role === 'Command' ? 'Commander' : u.models === 1 ? 'Crew' : 'Unit members';
 

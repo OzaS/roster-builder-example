@@ -139,7 +139,7 @@ export function OptionFoldSamples() {
   </section>;
 }
 
-/** UX-023 (1.0 proposal, mirrors the desktop unit dialog): a model group's Separate 1 action, and Separate all only when Settings › Advanced › Enable Separate all is on. Absent on a group of one model. Separating never makes a unit or a roster entry; it only lets the user choose those models' options individually inside the same unit. */
+/** UX-023 (1.0, approved 2026-11-01, mirrors the desktop unit dialog): a model group's Separate 1 action, and Separate all only when Settings › Advanced › Enable Separate all is on. Absent on a group of one model. Separating never makes a unit or a roster entry; it only lets the user choose those models' options individually inside the same unit. */
 export function SeparateRow({ count, separateAll, onOne, onAll }: { count: number; separateAll: boolean; onOne: () => void; onAll: () => void }) {
   return <div className="ux-5a-separate" role="group" aria-label="Separate models">
     <button type="button" className="ux-5a-separate-btn" onClick={onOne}><Scissors size={17} />Separate 1</button>
@@ -157,7 +157,7 @@ export function ModelStackSamples({ onCost, separateAll = false, initialStacks }
   const cost = stacks.reduce((n, s) => n + s.count * (s.sidearm === "Pistol" ? 14 : s.sidearm === "Axe" ? 13 : 12) + (s.scope ? s.count : 0), 0);
   useEffect(() => onCost?.(cost), [onCost, cost]);
   const update = (id: number, values: Partial<(typeof stacks)[number]>) => setStacks(all => all.map(s => s.id === id ? { ...s, ...values } : s));
-  /** UX-023 / DEC-046 (proposal for R0-07): Separate 1 splits one model off its group inside the same unit, with the same loadout, so its options can be chosen on their own (5 → 4 + 1); Separate all (Settings › Advanced, off by default) does that for every model. The unit stays one roster entry; one undoable step each; totals and cost are unchanged. */
+  /** UX-023 / DEC-046 (approved 2026-11-01): Separate 1 splits one model off its group inside the same unit, with the same loadout, so its options can be chosen on their own (5 → 4 + 1); Separate all (Settings › Advanced, off by default) does that for every model. The unit stays one roster entry; one undoable step each; totals and cost are unchanged. */
   const separate = (id: number, all: boolean) => setStacks(list => {
     const s = list.find(x => x.id === id);
     if (!s || s.count < 2) return list;

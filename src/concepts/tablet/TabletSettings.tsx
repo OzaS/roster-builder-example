@@ -27,7 +27,7 @@ const sections = [
 
 const Group = ({ title, children }: { title?: string; children: ReactNode }) => <section className="tb-section">{title && <span className="ux-result-label">{title}</span>}{children}</section>;
 
-export function TabletSettings({ env, notify, session, themePref, scheme, onTheme, onScheme, focusSearch, onFocusSearch, separateAll: separateAllProp, onSeparateAll: onSeparateAllProp, searchable = false }: SessionProps & { themePref: ThemePref; scheme: ColorScheme; onTheme: (t: ThemePref) => void; onScheme: (s: ColorScheme) => void; focusSearch: boolean; onFocusSearch: (on: boolean) => void; separateAll?: boolean; onSeparateAll?: (on: boolean) => void; /** UX-053 proposal: the page's top row with the Settings search (tablet library only; the foldable shell is unchanged). */ searchable?: boolean }) {
+export function TabletSettings({ env, notify, session, themePref, scheme, onTheme, onScheme, focusSearch, onFocusSearch, separateAll: separateAllProp, onSeparateAll: onSeparateAllProp, searchable = false }: SessionProps & { themePref: ThemePref; scheme: ColorScheme; onTheme: (t: ThemePref) => void; onScheme: (s: ColorScheme) => void; focusSearch: boolean; onFocusSearch: (on: boolean) => void; separateAll?: boolean; onSeparateAll?: (on: boolean) => void; /** UX-053 (approved 2026-11-01): the page's top row with the Settings search (tablet library only; the foldable shell is unchanged). */ searchable?: boolean }) {
   // Controlled by the tablet workbench so the editor's unit pane follows it; the foldable shell keeps it local.
   const [separateAllLocal, setSeparateAllLocal] = useState(false);
   const separateAll = separateAllProp ?? separateAllLocal;
@@ -35,7 +35,7 @@ export function TabletSettings({ env, notify, session, themePref, scheme, onThem
   const { experience, choose } = useTabletExperience();
   const { light, advancedInstall, setAdvancedInstall, settingsSection, setSettingsSection, language, setLanguage, setAppearanceImport } = session;
   const [open, setOpen] = useState(settingsSection !== undefined);
-  // UX-053 (proposal): search in the page's top row; results replace the section list and stay operable. Gallery states tablet-settings-search*.
+  // UX-053 (approved 2026-11-01): search in the page's top row; results replace the section list and stay operable. Gallery states tablet-settings-search*.
   const [query, setQuery] = useState(session.state === 'search' ? 'search' : session.state === 'search-no-results' ? 'lantern' : session.state === 'search-developer' ? 'hidden' : '');
   const [limit, setLimit] = useState(1000);
   const [toggles, setToggles] = useState({ rememberSections: true, reopenLast: false, autoChecks: true });

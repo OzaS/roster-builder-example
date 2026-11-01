@@ -15,7 +15,7 @@ import { TabletToolbar } from './TabletToolbar';
  * is gone (v1-unavailable) and a long name for the 200 % text screen (v1-long).
  */
 const recentIds = ['r-hold-line', 'u-line-fc', 'd-line-formation'];
-/** R0 gap states (proposals): the start page with Recently viewed (v1-start); the upgrade, rule and detachment references (v1-upgrade, v1-rule, v1-detachment); the detail pane empty while the search runs or after it failed (v1-loading-empty, v1-failed-empty, aligned to the desktop). */
+/** R0 gap states (approved 2026-11-01): the start page with Recently viewed (v1-start); the upgrade, rule and detachment references (v1-upgrade, v1-rule, v1-detachment); the detail pane empty while the search runs or after it failed (v1-loading-empty, v1-failed-empty, aligned to the desktop). */
 const referenceOf: Record<string, string> = { 'v1-upgrade': 'up-line-rifle', 'v1-rule': 'r-hold-line', 'v1-detachment': 'd-line-formation' };
 
 export function TabletLookup10({ env, session, onAddData, initial = 'u-line-fc', state = '' }: SessionProps & { onAddData: () => void; initial?: string; state?: string }) {

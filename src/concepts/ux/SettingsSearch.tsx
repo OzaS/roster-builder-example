@@ -3,7 +3,7 @@ import { Bell, Bug, ChevronDown, ChevronRight, Eye, Gauge, History, Info, Keyboa
 import type { LucideIcon } from "lucide-react";
 
 /**
- * UX-053 (proposal for R0-07): search in Settings, phone and tablet. The query matches a setting's name and its description; results keep
+ * UX-053 (approved 2026-11-01): search in Settings, phone and tablet. The query matches a setting's name and its description; results keep
  * the section name as a group heading so a row can be placed, switches stay operable in place, and the match is highlighted. No
  * results says so and offers Clear search. Developer rows (UX-052: Show hidden entries, Performance overlay) are in the index only
  * while Developer options are unlocked (DEC-022): a locked app neither lists them nor hints that they exist. Synthetic names only.

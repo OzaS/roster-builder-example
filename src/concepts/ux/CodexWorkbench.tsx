@@ -2238,7 +2238,7 @@ function SettingsScreen({ props }: { props: ConceptProps }) {
   const [autoChecks, setAutoChecks] = useState(true);
   const [focusSearch, setFocusSearch] = useState(false);
   const [separateAll, setSeparateAll] = useState(false);
-  // UX-053 (proposal): Settings search in the top bar (the shared phone search pattern); gallery states settings-search*, the last one with Developer options unlocked.
+  // UX-053 (approved 2026-11-01): Settings search in the top bar (the shared phone search pattern); gallery states settings-search*, the last one with Developer options unlocked.
   const searchState = props.workflowScreen === "settings-search" ? "found" : props.workflowScreen === "settings-search-no-results" ? "none" : props.workflowScreen === "settings-search-developer" ? "developer" : undefined;
   const [settingsQuery, setSettingsQuery] = useState(searchState === "found" ? "search" : searchState === "none" ? "lantern" : searchState === "developer" ? "hidden" : "");
   return (
