@@ -1812,11 +1812,11 @@ function LookupScreen({ props }: { props: ConceptProps }) {
 /** Lookup 1.0 (design session 2026-10-31): each workflow screen opens PhoneLookup in one state. */
 function PhoneLookupScreen({ props }: { props: ConceptProps }) {
   const s = props.workflowScreen;
-  const stack = s === "lookup-unit" ? ["u-line-fc"] : s === "lookup-force" ? ["f-line-of-battle"] : s === "lookup-detachment" ? ["d-line-formation"] : s === "lookup-upgrade" ? ["up-line-rifle"] : s === "lookup-rule" ? ["r-hold-line"] : s === "lookup-large-text" ? ["u-veteran-reinforced"] : [];
+  const stack = s === "lookup-unit" || s === "lookup-unit-text-150" ? ["u-line-fc"] : s === "lookup-force" ? ["f-line-of-battle"] : s === "lookup-detachment" ? ["d-line-formation"] : s === "lookup-upgrade" ? ["up-line-rifle"] : s === "lookup-rule" ? ["r-hold-line"] : s === "lookup-large-text" ? ["u-veteran-reinforced"] : [];
   const query = s === "lookup-start" || s === "source" ? "" : s === "lookup-no-results" ? "lantern" : s === "lookup-large-text" ? "reinforced" : "line";
   // R0-03 (DEC-054) lifecycle states: loading, failure / retry, a saved reference whose source is gone, large text.
   const phase = s === "lookup-loading" ? "loading" : s === "lookup-failed" ? "failed" : "ready";
-  return <PhoneLookup key={s} initialQuery={query} initialStack={stack} noData={s === "lookup-no-data"} phase={phase} unavailable={s === "lookup-unavailable"} largeText={s === "lookup-large-text"} trailing={<AppAvatarButton props={props} />} onAddData={() => props.onNavigate("add-source")} />;
+  return <PhoneLookup key={s} initialQuery={query} initialStack={stack} noData={s === "lookup-no-data"} phase={phase} unavailable={s === "lookup-unavailable"} largeText={s === "lookup-large-text"} text150={s === "lookup-results-text-150" || s === "lookup-unit-text-150"} trailing={<AppAvatarButton props={props} />} onAddData={() => props.onNavigate("add-source")} />;
 }
 
 function LookupGroup({ title, icon, children }: { title: string; icon: ReactNode; children: ReactNode }) {

@@ -53,3 +53,11 @@
 .ux-settings-empty { margin-top: 24px; }
 .ux-settings-results.tablet .ux-settings-row { border: 0; border-radius: 0; background: transparent; padding: 12px 0; }
 .ux-settings-results.tablet .ux-settings-row + .ux-settings-row { border-top: 1px solid var(--ux-line); }
+
+/* Tablet Lookup (proposals): the detail pane when there is nothing to show yet, as the desktop's empty pane. */
+.ux-lk-pane-empty { display: grid; justify-items: center; align-content: center; gap: 10px; min-height: 240px; padding: 24px; text-align: center; color: var(--ux-ink-secondary); }
+.ux-lk-pane-empty p { margin: 0; max-width: 28ch; font-size: 14px; line-height: 1.5; }
+
+/* Phone Lookup at 150 % text (R0 gaps): the results and a reference page, zoomed like the 200 % frame. */
+.ux-lk-body.ux-lk-text-150 { zoom: 1.5; }
+.ux-lk-page.ux-lk-text-150 { zoom: 1.5; }

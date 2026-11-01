@@ -39,7 +39,8 @@ export function TabletWorkbench(props: Partial<ConceptProps>) {
   // `tablet-editor-chips-text-150`: the pressed state chip at 150 % in the Android tablet's 300 px catalogue pane (DEC-050; TB-12 saw
   // the text chip truncate there), whatever the gallery's device and text size.
   if (shown === 'tablet-editor-chips-text-150') return <TextScaled scale={150} device="android"><TabletWorkbench key={shown} {...props} workflowScreen="tablet-editor-chip-caption" /></TextScaled>;
-  const textScale: TextScale | undefined = shown?.endsWith('-text-200') ? 200 : undefined;
+  // R0 gaps: `<screen>-text-150` is the same at 150 % text.
+  const textScale: TextScale | undefined = shown?.endsWith('-text-200') ? 200 : shown?.endsWith('-text-150') ? 150 : undefined;
   const screen = textScale ? shown?.slice(0, -'-text-200'.length) : shown;
   if (textScale) return <TextScaled scale={textScale}><TabletWorkbench key={shown} {...props} workflowScreen={screen as ConceptProps['workflowScreen']} /></TextScaled>;
   if (screen === 'tablet-editor-shortcuts') return <TabletShell key={screen} {...props} route={tabletRoute('tablet-home')!} initialEditor="editor" initialShortcuts />;
