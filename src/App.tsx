@@ -914,6 +914,22 @@ function insertAfter(units: RosterUnit[], sourceId: string, unit: RosterUnit) {
 
 function readPersistedGalleryState(): PersistedGalleryState {
   if (typeof window === "undefined") return {};
+  return { ...readStoredGalleryState(), ...readUrlGalleryState() };
+}
+
+/** `?screen=<workflow screen>&theme=light|dark`: open one screen directly (review links, headless captures); wins over the saved state. */
+function readUrlGalleryState(): PersistedGalleryState {
+  const params = new URLSearchParams(location.search);
+  const screen = params.get("screen");
+  const theme = params.get("theme");
+  const known = screen !== null && bundledDesignData.designs.some((design) => design.screens.some((item) => item.id === screen));
+  return {
+    ...(known ? { workflowScreen: screen as WorkflowScreen, screen: workflowToPrototypeScreen(screen as WorkflowScreen), navigatorView: "single" as NavigatorView } : {}),
+    ...(isOneOf(theme, themeModes) ? { themeMode: theme, themePreference: theme } : {}),
+  };
+}
+
+function readStoredGalleryState(): PersistedGalleryState {
   try {
     const stored = window.localStorage.getItem(GALLERY_STATE_KEY);
     if (!stored) return {};
