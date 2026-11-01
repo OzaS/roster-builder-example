@@ -34,7 +34,7 @@ export function CodexWorkbench(props: ConceptProps) {
   const screen = props.screen;
   const isUnitDetail = screen === "unit-detail";
   const isMainTab = props.workflowScreen
-    ? (["library", "library-v2", "library-filters", "subscription-main", "source", "lookup-results", "lookup-start", "lookup-no-results", "lookup-no-data", "tools", "collections"] as const).some((tab) => tab === props.workflowScreen)
+    ? (["library", "library-v2", "library-filters", "subscription-main", "source", "lookup-results", "lookup-start", "lookup-no-results", "lookup-no-data", "lookup-loading", "lookup-failed", "tools", "collections"] as const).some((tab) => tab === props.workflowScreen)
     : screen === "library" || screen === "catalogue" || screen === "tools" || screen === "collections";
   const showTabBar = usesTabNavigation && isMainTab;
   const isWorkbenchScreen = screen !== "library" && screen !== "catalogue" && screen !== "tools" && screen !== "collections" && screen !== "app" && screen !== "settings" && screen !== "sources" && screen !== "add-source" && !SOURCE_FLOW_SCREENS.includes(screen) && screen !== "system";
@@ -1797,9 +1797,11 @@ function LookupScreen({ props }: { props: ConceptProps }) {
 /** Lookup 1.0 (design session 2026-10-31): each workflow screen opens PhoneLookup in one state. */
 function PhoneLookupScreen({ props }: { props: ConceptProps }) {
   const s = props.workflowScreen;
-  const stack = s === "lookup-unit" ? ["u-line-fc"] : s === "lookup-force" ? ["f-line-of-battle"] : s === "lookup-detachment" ? ["d-line-formation"] : s === "lookup-upgrade" ? ["up-line-rifle"] : s === "lookup-rule" ? ["r-hold-line"] : [];
-  const query = s === "lookup-start" || s === "source" ? "" : s === "lookup-no-results" ? "lantern" : "line";
-  return <PhoneLookup key={s} initialQuery={query} initialStack={stack} noData={s === "lookup-no-data"} trailing={<AppAvatarButton props={props} />} onAddData={() => props.onNavigate("add-source")} />;
+  const stack = s === "lookup-unit" ? ["u-line-fc"] : s === "lookup-force" ? ["f-line-of-battle"] : s === "lookup-detachment" ? ["d-line-formation"] : s === "lookup-upgrade" ? ["up-line-rifle"] : s === "lookup-rule" ? ["r-hold-line"] : s === "lookup-large-text" ? ["u-veteran-reinforced"] : [];
+  const query = s === "lookup-start" || s === "source" ? "" : s === "lookup-no-results" ? "lantern" : s === "lookup-large-text" ? "reinforced" : "line";
+  // R0-03 (DEC-054) lifecycle states: loading, failure / retry, a saved reference whose source is gone, large text.
+  const phase = s === "lookup-loading" ? "loading" : s === "lookup-failed" ? "failed" : "ready";
+  return <PhoneLookup key={s} initialQuery={query} initialStack={stack} noData={s === "lookup-no-data"} phase={phase} unavailable={s === "lookup-unavailable"} largeText={s === "lookup-large-text"} trailing={<AppAvatarButton props={props} />} onAddData={() => props.onNavigate("add-source")} />;
 }
 
 function LookupGroup({ title, icon, children }: { title: string; icon: ReactNode; children: ReactNode }) {

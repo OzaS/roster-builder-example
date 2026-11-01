@@ -106,6 +106,22 @@
           "label": "Lookup 1.0 · Rule"
         },
         {
+          "id": "lookup-loading",
+          "label": "Lookup 1.0 · Loading"
+        },
+        {
+          "id": "lookup-failed",
+          "label": "Lookup 1.0 · Failure, retry"
+        },
+        {
+          "id": "lookup-unavailable",
+          "label": "Lookup 1.0 · Reference unavailable (source removed)"
+        },
+        {
+          "id": "lookup-large-text",
+          "label": "Lookup 1.0 · Large text 200 % (two-line title, full name)"
+        },
+        {
           "id": "tools",
           "label": "Tools"
         },
@@ -253,7 +269,11 @@
             "lookup-force",
             "lookup-detachment",
             "lookup-upgrade",
-            "lookup-rule"
+            "lookup-rule",
+            "lookup-loading",
+            "lookup-failed",
+            "lookup-unavailable",
+            "lookup-large-text"
           ]
         },
         {
