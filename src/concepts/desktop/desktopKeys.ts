@@ -1,6 +1,7 @@
 // Editable key bindings for the desktop prototype. "Mod" is Command on macOS and Ctrl elsewhere.
+// DEC-055: the inspector pane became the unit dialog, so its toggle (Mod+Alt+B) is retired; units open with Enter or a click.
 
-export type KeyAction = 'palette' | 'newRoster' | 'rosters' | 'lookup' | 'settings' | 'summary' | 'toggleCatalogue' | 'toggleInspector' | 'undo' | 'redo' | 'exportRoster';
+export type KeyAction = 'palette' | 'newRoster' | 'rosters' | 'lookup' | 'settings' | 'summary' | 'toggleCatalogue' | 'undo' | 'redo' | 'exportRoster';
 export type KeyBindings = Record<KeyAction, string>;
 
 export const keyActions: Array<{ id: KeyAction; label: string; group: 'General' | 'Roster editor' }> = [
@@ -11,7 +12,6 @@ export const keyActions: Array<{ id: KeyAction; label: string; group: 'General' 
   { id: 'settings', label: 'Settings', group: 'General' },
   { id: 'summary', label: 'Roster summary', group: 'Roster editor' },
   { id: 'toggleCatalogue', label: 'Show or hide the catalogue', group: 'Roster editor' },
-  { id: 'toggleInspector', label: 'Show or hide the inspector', group: 'Roster editor' },
   { id: 'undo', label: 'Undo', group: 'Roster editor' },
   { id: 'redo', label: 'Redo', group: 'Roster editor' },
   { id: 'exportRoster', label: 'Export roster', group: 'Roster editor' },
@@ -19,7 +19,7 @@ export const keyActions: Array<{ id: KeyAction; label: string; group: 'General' 
 
 export const defaultBindings: KeyBindings = {
   palette: 'Mod+K', newRoster: 'Mod+N', rosters: 'Mod+Shift+R', lookup: 'Mod+F', settings: 'Mod+,',
-  summary: 'Mod+I', toggleCatalogue: 'Mod+B', toggleInspector: 'Mod+Alt+B',
+  summary: 'Mod+I', toggleCatalogue: 'Mod+B',
   undo: 'Mod+Z', redo: 'Mod+Shift+Z', exportRoster: 'Mod+E',
 };
 

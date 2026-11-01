@@ -9,7 +9,7 @@ import './desktop-editor.css';
 
 export type Role = 'Command' | 'Core' | 'Specialist' | 'Support';
 export const ROLES: Role[] = ['Command', 'Core', 'Specialist', 'Support'];
-export type EditorUnit = { id: number; name: string; role: string; models: number; points: number; weapon: string; upgrade: boolean; notes?: string; forceId?: string };
+export type EditorUnit = { id: number; name: string; role: string; models: number; points: number; weapon: string; upgrade: boolean; notes?: string; forceId?: string; leaderWeapon?: string; signalKit?: boolean; signal?: string };
 export type Force = { id: string; name: string; type: string; faction: string };
 export type RosterDoc<U extends EditorUnit> = { units: U[]; forces: Force[] };
 export type ReadOnlyInfo = { faction: string; system: string; sourceId: string };
@@ -19,7 +19,7 @@ export const PRIMARY_FORCE_ID = 'f1';
 export const primaryForce = (type = 'Expedition force', faction = 'Frontier Coalition'): Force => ({ id: PRIMARY_FORCE_ID, name: type === 'Expedition force' ? 'Expedition detachment' : type, type, faction });
 export type EditorFlowState = { kind: 'export' } | { kind: 'add-force' } | { kind: 'import'; result: ImportResult };
 export const forceOf = (u: EditorUnit) => u.forceId ?? PRIMARY_FORCE_ID;
-export const unitCost = (u: EditorUnit) => u.points + (u.upgrade ? 10 : 0);
+export const unitCost = (u: EditorUnit) => u.points + (u.upgrade ? 10 : 0) + (u.signalKit ? 5 : 0);
 
 /* ---------------------------------------------------------------- Force types */
 
@@ -37,10 +37,12 @@ const typeOf = (force: Force) => FORCE_TYPES.find(t => t.name === force.type) ??
  * A catalogue row's state for the force units are added to (the app's catalogue view: Available, Adds over limit,
  * Unavailable). The gallery's rules: each Command entry at most once per force, one Support entry per force.
  */
-export type CatalogueState = { tone: 'warn' | 'err'; caption: string; reason: string };
-export function catalogueState(entry: { name: string; role: string }, own: readonly { name: string; role: string }[]): CatalogueState | null {
+export type CatalogueState = { tone: 'warn' | 'err'; caption: string; reason: string; limit?: { selected: number; max: number } };
+/** R0-08 (DEC-054): a reached limit carries the quota (selected / maximum), shown as a chip with an unavailable Add. */
+export function catalogueState(entry: { name: string; role: string }, own: readonly { name: string; role: string }[], force?: Force): CatalogueState | null {
   const selected = own.filter(u => u.name === entry.name).length;
-  if (entry.role === 'Command' && selected > 0) return { tone: 'err', caption: 'Unavailable', reason: `Maximum reached · ${selected} selected` };
+  if (entry.role === 'Command' && selected > 0) return { tone: 'err', caption: 'Limit reached', reason: `Limit reached: ${selected} of 1 selected. Remove the existing unit before adding another.`, limit: { selected, max: 1 } };
+  if (entry.role === 'Support' && force && typeOf(force).noSupport) return { tone: 'err', caption: 'Unavailable', reason: `Not allowed in a ${force.type}` };
   if (entry.role === 'Support' && own.some(u => u.role === 'Support')) return { tone: 'warn', caption: 'Adds over limit', reason: 'Slot full' };
   return null;
 }
