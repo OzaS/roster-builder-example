@@ -1,0 +1,7 @@
+/* R0 gap proposals for phone and tablet (gallery worker M). Additive: every rule here belongs to a state drawn for review. */
+
+/* UX-023 / DEC-046: Separate 1 and the opt-in Separate all, replacing the older "Models to split" count. Mirrors the desktop unit dialog (.dtu-separate): small scissors buttons under the model count, a hairline above. */
+.ux-5a-separate { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-top: 10px; border-top: 1px solid var(--ux-line); }
+.ux-mobile-unit-options .ux-5a-separate-btn,
+.ux-5a-separate-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 14px; border: 1px solid var(--ux-line-2); border-radius: 12px; background: var(--ux-surface-2); color: var(--ux-ink); font: inherit; font-size: 14px; font-weight: 750; cursor: pointer; }
+.ux-5a-separate > small { flex: 1 1 100%; margin: 0; }

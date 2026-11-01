@@ -338,9 +338,11 @@ function WorkbenchElements({
         </div>
       </ElementSection>
 
-      <ElementSection title="Model Stack Split and Selection Controls">
-        <small>Radio: one of several; max-one ancestors share that choice across nested alternatives, with None only on the outer group. Checkbox: independent optional picks, including a single option or nothing. Switch: immediate Settings only. Stepper: counts. Visible glyphs 21–22 px; target 48 px (≥44 pt / 48 dp). Restart restores selection, tab, hidden entries and folds; pending edits and split drafts reset. Controls reload from the worker.</small>
+      <ElementSection title="Model Stack Separate and Selection Controls">
+        <small>Proposal for review (UX-023, DEC-046): Separate 1 replaces the Split count; Separate all appears only with Settings › Advanced › Enable Separate all. Radio: one of several; max-one ancestors share that choice across nested alternatives, with None only on the outer group. Checkbox: independent optional picks, including a single option or nothing. Switch: immediate Settings only. Stepper: counts. Visible glyphs 21–22 px; target 48 px (≥44 pt / 48 dp). Restart restores selection, tab, hidden entries and folds; pending edits and split drafts reset. Controls reload from the worker.</small>
         <div className="ux-mobile-unit-options"><ModelStackSamples /></div>
+        <small>Separate all on, and the result of Separate 1 on a stack of five (4 + 1). A single-model stack offers neither.</small>
+        <div className="ux-elements-stack"><div className="ux-mobile-unit-options"><ModelStackSamples separateAll /></div><div className="ux-mobile-unit-options"><ModelStackSamples separateAll initialStacks={[{ id: 1, count: 4, sidearm: "Pistol", scope: false }, { id: 2, count: 1, sidearm: "Pistol", scope: false }]} /></div></div>
       </ElementSection>
 
       <ElementSection title="Unit Profile Tab · Mobile 5B">

@@ -12,6 +12,7 @@ import "./styles/tokens.css";
 import "./styles/concepts.css";
 import "./styles/ux.css";
 import "./styles/sources.css";
+import "./styles/gaps-mobile.css";
 
 const ambientParam = new URLSearchParams(location.search).get("ambient");
 applyStoredAmbient(ambientParam === null ? undefined : ambientParam !== "0");

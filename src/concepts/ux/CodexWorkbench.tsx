@@ -136,7 +136,9 @@ export function CodexWorkbench(props: ConceptProps) {
   let modifier = "";
 
   if (screen === "unit-options-mobile") {
-    body = <MobileUnitOptions onBack={() => props.onNavigate("overview")} />;
+    body = props.workflowScreen === "unit-options-separate-all" ? <MobileUnitOptions key="sep-all" focusStacks separateAll onBack={() => props.onNavigate("overview")} />
+      : props.workflowScreen === "unit-options-separated" ? <MobileUnitOptions key="sep-done" focusStacks separateAll initialStacks={[{ id: 1, count: 4, sidearm: "Pistol", scope: false }, { id: 2, count: 1, sidearm: "Pistol", scope: false }]} onBack={() => props.onNavigate("overview")} />
+      : <MobileUnitOptions onBack={() => props.onNavigate("overview")} />;
   } else if (screen === "library") {
     body = <Library props={props} />;
   } else if (screen === "collections") {

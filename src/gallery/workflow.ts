@@ -16,6 +16,7 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "tablet-editor-add-focus", label: "Tablet · Roster editor · Add unit, search focused" },
   { id: "tablet-editor-chip-caption", label: "Tablet · Roster editor · State chip caption" },
   { id: "tablet-editor-limit-caption", label: "Tablet · Roster editor · Limit reached, reason shown" },
+  { id: "tablet-editor-separate-all", label: "Tablet · Roster editor · Separate 1 and Separate all (opt-in on)" },
   { id: "tablet-editor-chips-text-150", label: "Tablet · Roster editor · State chips, text 150%" },
   { id: "tablet-settings-advanced", label: "Tablet · Settings · Advanced" },
   { id: "tablet-rosters-text-200", label: "Tablet · Rosters · Text 200%" },
@@ -122,6 +123,8 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "add-unit-limit", label: "Add Unit · Limit reached, reason shown" },
   { id: "unit-detail", label: "Unit Detail" },
   { id: "unit-options-mobile", label: "Unit detail · Mobile 5A + 5B + links" },
+  { id: "unit-options-separate-all", label: "Unit detail · Separate 1 and Separate all (opt-in on)" },
+  { id: "unit-options-separated", label: "Unit detail · After Separate 1 (4 + 1)" },
   { id: "option-drilldown", label: "Option Drilldown" },
   { id: "diagnostics", label: "Diagnostics" },
   { id: "settings", label: "Settings" },
@@ -147,7 +150,7 @@ export function resolveWorkflow(workflow?: WorkflowScreen[]): Array<{ id: Workfl
 
 export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScreen {
   if (screen === "tablet-archive-sketch") return "overview";
-  if (screen === "tablet-editor" || screen === "tablet-editor-issues" || screen === "tablet-editor-add" || screen === "tablet-editor-forces" || screen === "tablet-editor-add-force" || screen === "tablet-editor-readonly" || screen === "tablet-editor-export" || screen === "tablet-editor-import-result" || screen === "tablet-editor-move-unit" || screen === "tablet-editor-shortcuts" || screen === "tablet-editor-text-200" || screen === "tablet-editor-add-roles" || screen === "tablet-editor-add-focus" || screen === "tablet-editor-chip-caption" || screen === "tablet-editor-limit-caption" || screen === "tablet-editor-chips-text-150") return "overview";
+  if (screen === "tablet-editor" || screen.startsWith("tablet-editor-") || screen === "tablet-editor-issues" || screen === "tablet-editor-add" || screen === "tablet-editor-forces" || screen === "tablet-editor-add-force" || screen === "tablet-editor-readonly" || screen === "tablet-editor-export" || screen === "tablet-editor-import-result" || screen === "tablet-editor-move-unit" || screen === "tablet-editor-shortcuts" || screen === "tablet-editor-text-200" || screen === "tablet-editor-add-roles" || screen === "tablet-editor-add-focus" || screen === "tablet-editor-chip-caption" || screen === "tablet-editor-limit-caption" || screen === "tablet-editor-chips-text-150") return "overview";
   if (screen.startsWith("tablet-")) return "library"; // every other tablet screen is a page or a state of one
   if (screen.startsWith("duo-")) return "library"; // Foldable screens: a pose, a page and a state (DuoWorkbench)
   if (screen === "tablet-home" || screen === "tablet-rosters" || screen === "tablet-lookup" || screen === "tablet-tools" || screen === "tablet-library" || screen === "tablet-sources" || screen === "tablet-settings") return "library";
@@ -168,6 +171,7 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen === "source-legacy" || screen === "source" || screen.startsWith("lookup-")) return "catalogue";
   if (screen === "add-detachment") return "detachment";
   if (screen === "add-unit-limit") return "add-unit";
+  if (screen === "unit-options-separate-all" || screen === "unit-options-separated") return "unit-options-mobile";
   if (screen === "option-drilldown") return "unit-detail";
   if (screen === "diagnostics") return "validation";
   return screen as PrototypeScreen; // the tablet screens returned above are not narrowed away by startsWith

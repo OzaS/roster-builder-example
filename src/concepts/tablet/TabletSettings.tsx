@@ -26,14 +26,17 @@ const sections = [
 
 const Group = ({ title, children }: { title?: string; children: ReactNode }) => <section className="tb-section">{title && <span className="ux-result-label">{title}</span>}{children}</section>;
 
-export function TabletSettings({ env, notify, session, themePref, scheme, onTheme, onScheme, focusSearch, onFocusSearch }: SessionProps & { themePref: ThemePref; scheme: ColorScheme; onTheme: (t: ThemePref) => void; onScheme: (s: ColorScheme) => void; focusSearch: boolean; onFocusSearch: (on: boolean) => void }) {
+export function TabletSettings({ env, notify, session, themePref, scheme, onTheme, onScheme, focusSearch, onFocusSearch, separateAll: separateAllProp, onSeparateAll: onSeparateAllProp }: SessionProps & { themePref: ThemePref; scheme: ColorScheme; onTheme: (t: ThemePref) => void; onScheme: (s: ColorScheme) => void; focusSearch: boolean; onFocusSearch: (on: boolean) => void; separateAll?: boolean; onSeparateAll?: (on: boolean) => void }) {
+  // Controlled by the tablet workbench so the editor's unit pane follows it; the foldable shell keeps it local.
+  const [separateAllLocal, setSeparateAllLocal] = useState(false);
+  const separateAll = separateAllProp ?? separateAllLocal;
+  const onSeparateAll = onSeparateAllProp ?? setSeparateAllLocal;
   const { experience, choose } = useTabletExperience();
   const { light, advancedInstall, setAdvancedInstall, settingsSection, setSettingsSection, language, setLanguage, setAppearanceImport } = session;
   const [open, setOpen] = useState(settingsSection !== undefined);
   const [limit, setLimit] = useState(1000);
   const [toggles, setToggles] = useState({ rememberSections: true, reopenLast: false, autoChecks: true });
   const [keep, setKeep] = useState(1);
-  const [separateAll, setSeparateAll] = useState(false);
   const flip = (key: keyof typeof toggles) => (v: boolean) => setToggles(t => ({ ...t, [key]: v }));
   const current = sections.find(s => s.id === (settingsSection ?? 'appearance')) ?? sections[0];
   const page = (() => {
@@ -72,7 +75,7 @@ export function TabletSettings({ env, notify, session, themePref, scheme, onThem
       case 'advanced': return <WorkspaceScope light={light}>
         <div className="tb-plain-rows" role="group" aria-label="Advanced">
           <Switch label="Focus search when opening the catalogue" detail={`Off: Add unit opens the catalogue for browsing. ${keyLabel('Mod+F', env.device.system)} on a keyboard always focuses the search.`} checked={focusSearch} onChange={onFocusSearch} />
-          <Switch label="Enable Separate all" detail="Units with several models also offer Separate all, which splits them into single-model units in one step. Off: only Separate 1." checked={separateAll} onChange={setSeparateAll} />
+          <Switch label="Enable Separate all" detail="Units with several models also offer Separate all, which splits them into single-model units in one step. Off: only Separate 1." checked={separateAll} onChange={onSeparateAll} />
         </div>
       </WorkspaceScope>;
       default: return <>

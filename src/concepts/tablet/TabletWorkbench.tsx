@@ -31,7 +31,7 @@ type ThemePref = 'system' | 'light' | 'dark';
  * (from Home); `tablet-archive-sketch` (and any phone screen the sketch navigates to) shows the earlier three-pane sketch, unchanged.
  */
 const editorScreens: Record<string, EditorStart> = { 'tablet-editor': 'editor', 'tablet-editor-issues': 'issues', 'tablet-editor-add': 'add', 'tablet-editor-forces': 'forces', 'tablet-editor-add-force': 'add-force', 'tablet-editor-readonly': 'readonly', 'tablet-editor-export': 'export', 'tablet-editor-move-unit': 'move-unit',
-  'tablet-editor-add-roles': 'add-roles', 'tablet-editor-add-focus': 'add-focus', 'tablet-editor-chip-caption': 'chip-caption', 'tablet-editor-limit-caption': 'limit-caption' };
+  'tablet-editor-add-roles': 'add-roles', 'tablet-editor-add-focus': 'add-focus', 'tablet-editor-chip-caption': 'chip-caption', 'tablet-editor-limit-caption': 'limit-caption', 'tablet-editor-separate-all': 'separate-all' };
 
 export function TabletWorkbench(props: Partial<ConceptProps>) {
   const shown: string | undefined = props.workflowScreen;
@@ -74,6 +74,7 @@ function TabletShell({ route, initialEditor, initialImport = false, initialShort
   const [scheme, setScheme] = useState<ColorScheme>(props.colorScheme ?? 'default');
   // Settings › Advanced (DEC-050, UX-059): Add unit focuses the catalogue's search. Off by default; the gallery's focus state starts it on.
   const [focusSearch, setFocusSearch] = useState(initialEditor === 'add-focus');
+  const [separateAll, setSeparateAll] = useState(initialEditor === 'separate-all');
   const toasts = useToasts();
   const appRef = useRef<HTMLDivElement>(null);
   const { notify } = toasts;
@@ -119,7 +120,7 @@ function TabletShell({ route, initialEditor, initialImport = false, initialShort
     data-system={env.device.system} data-motion={experience.reducedMotion ? 'reduce' : 'standard'} data-transparency={experience.reducedTransparency ? 'reduce' : 'standard'}
     style={env.textScale !== 100 ? { zoom: env.textScale / 100 } : undefined}>
     {editor ? <TabletEditor key={editor.key} env={env} notify={notify} light={light} rosterName={editor.name} from={editor.from} start={editor.start}
-      onBack={() => setEditor(null)} onAllRosters={() => { setEditor(null); setPage('rosters'); }} onNewRoster={newRoster} onFindData={() => { setEditor(null); setPage('sources'); }} onImport={() => setImporting(sampleImport(true))} imported={editor.imported} focusSearch={focusSearch} /> : <>
+      onBack={() => setEditor(null)} onAllRosters={() => { setEditor(null); setPage('rosters'); }} onNewRoster={newRoster} onFindData={() => { setEditor(null); setPage('sources'); }} onImport={() => setImporting(sampleImport(true))} imported={editor.imported} focusSearch={focusSearch} separateAll={separateAll} /> : <>
     <TabletRail page={page} input={env.input} system={env.device.system} onPage={setPage} onNewRoster={newRoster} />
     <main className="tb-main" aria-label={page}>
       {page === 'home' ? <TabletHome {...shared} onPage={setPage} onNewRoster={newRoster} onOpenRoster={openRoster} />
@@ -128,7 +129,7 @@ function TabletShell({ route, initialEditor, initialImport = false, initialShort
             : page === 'tools' ? <TabletTools />
               : page === 'library' ? <TabletLibrary />
                 : page === 'sources' ? <TabletSources {...shared} onPage={setPage} onOpenRoster={openRoster} />
-                  : <TabletSettings {...shared} themePref={themePref} scheme={scheme} onTheme={chooseTheme} onScheme={chooseScheme} focusSearch={focusSearch} onFocusSearch={setFocusSearch} />}
+                  : <TabletSettings {...shared} themePref={themePref} scheme={scheme} onTheme={chooseTheme} onScheme={chooseScheme} focusSearch={focusSearch} onFocusSearch={setFocusSearch} separateAll={separateAll} onSeparateAll={setSeparateAll} />}
       <TabletJobsPanel session={session} />
     </main></>}
     {importing && <ImportResultSheet result={importing} version="v1.4" onClose={() => setImporting(null)} onOpen={() => {
