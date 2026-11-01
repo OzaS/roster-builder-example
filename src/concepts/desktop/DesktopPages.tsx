@@ -11,7 +11,7 @@ export const PageTitle = ({ children }: { children: ReactNode }) => <h1 classNam
 import type { Notify } from '../workspace/Toasts';
 import './desktop-pages.css';
 import { ExportDialog, primaryForce, specialRoster, type ExportRoster } from './DesktopEditorFlows';
-import { AddCollectionDialog, AddDataCollections, CollectionView, GitHubSearchView, LastUpdateCard, LastUpdateStates, UpdateReportView, flowSourceId, isAddFlow, useRosterChecks } from './DesktopSourceFlows';
+import { AddCollectionDialog, AddDataCollections, CollectionView, GitHubSearchView, LastUpdateCard, LastUpdateStates, SourceStatus, UpdateReportView, flowSourceId, isAddFlow, sourceStatusText, useRosterChecks, type SourceStatusKind } from './DesktopSourceFlows';
 
 
 const statusChip = (r: RosterSummary) => r.status === 'issues' ? <Chip tone="warn"><AlertTriangle size={11} />{r.issues} {r.issues === 1 ? 'issue' : 'issues'}</Chip>
@@ -156,6 +156,9 @@ export function DesktopSources({ notify, jobs, selectedId, onSelect, onOpenJobs,
   const updates = sources.filter(s => s.next && progress[s.id] === undefined);
   const selected = sources.find(s => s.id === selectedId);
   const flow = { jobs, notify, go: setSelectedId, onOpenJobs };
+  const statusKind = (s: SourceInfo): SourceStatusKind => progress[s.id] !== undefined ? 'updating' : s.status === 'update' ? 'update' : s.status === 'review' ? 'review' : s.fromFile ? 'file' : 'ready';
+  // `&status=<source id>` on a standalone link shows that row's status caption, as on hover.
+  const [statusShown] = useState(() => new URLSearchParams(location.search).get('status'));
   const chip = (s: SourceInfo) => progress[s.id] !== undefined ? <Chip tone="accent">Updating {progress[s.id]}%</Chip> : s.status === 'update' ? <Chip tone="accent"><ArrowUpCircle size={11} />Update</Chip> : s.status === 'review' ? <Chip tone="warn"><AlertTriangle size={11} />Review</Chip> : <Chip tone="ok"><Check size={11} />Ready</Chip>;
   const q = query.trim().toLowerCase();
   const shown = sources.filter(s => !q || [s.name, s.repo ?? '', ...s.factions].some(t => t.toLowerCase().includes(q)));
@@ -171,12 +174,12 @@ export function DesktopSources({ notify, jobs, selectedId, onSelect, onOpenJobs,
     <div className="dtp-split sources">
       <section className="dtp-card dtp-list" aria-label="Installed sources"><div className="dtp-scroll">
         <div className="dtp-group"><h3><Database size={14} />Installed<span>{q ? `${shown.length} of ${sources.length}` : sources.length}</span></h3>
-          {shown.map(s => <button key={s.id} className={`dtp-row dtp-source ${flowSourceId(selectedId) === s.id ? 'selected' : ''}`} onClick={() => setSelectedId(s.id)}>
-            <span><strong>{s.name}</strong><small>{s.factions.length} factions · {s.factions.slice(0, 2).join(', ')}{s.factions.length > 2 ? '…' : ''}</small><small className="dtp-faint">{s.fromFile ? `From a file · imported ${s.installed}` : `${s.repo}@${s.version} · ${s.installed} · ${s.size}`}</small>{progress[s.id] !== undefined && <i className="dtp-progress"><em style={{ width: `${progress[s.id]}%` }} /></i>}</span>
-            {chip(s)}
-          </button>)}
+          {/* R0-08 (DEC-054): the status is a compact icon (Update is an icon button) instead of a text chip; the name keeps the width. */}
+          {shown.map(s => { const kind = statusKind(s); return <div key={s.id} className={`dts-source-row ${flowSourceId(selectedId) === s.id ? 'selected' : ''}`}><button className="dtp-row dtp-source" aria-current={flowSourceId(selectedId) === s.id ? 'true' : undefined} onClick={() => setSelectedId(s.id)}>
+            <span><strong>{s.name}</strong><small>{s.factions.length} factions · {s.factions.slice(0, 2).join(', ')}{s.factions.length > 2 ? '…' : ''}</small><small className="dtp-faint">{s.fromFile ? `From a file · imported ${s.installed}` : `${s.repo}@${s.version} · ${s.installed} · ${s.size}`}</small>{progress[s.id] !== undefined && <i className="dtp-progress"><em style={{ width: `${progress[s.id]}%` }} /></i>}<span className="dt-visually-hidden">, {sourceStatusText(kind, s, progress[s.id])}</span></span>
+          </button><SourceStatus kind={kind} source={s} percent={progress[s.id]} open={statusShown === s.id} onAction={kind === 'update' ? () => update([s.id]) : kind === 'updating' ? onOpenJobs : undefined} /></div>; })}
           {q && !shown.length && <p className="dtp-muted dtp-no-match">No installed game data matches “{query}”.</p>}
-          {installing.map(j => <button key={j.id} className="dtp-row dtp-source" onClick={onOpenJobs}><span><strong>{j.name}</strong><small>{j.status === 'needs-you' ? 'Waiting for you to choose factions' : `${j.factions.length} factions available`}</small><i className="dtp-progress"><em style={{ width: `${jobPercent(j)}%` }} /></i></span>{j.status === 'needs-you' ? <Chip tone="warn"><AlertTriangle size={11} />Needs you</Chip> : <Chip tone="accent">Installing {jobPercent(j)}%</Chip>}</button>)}
+          {installing.map(j => <div key={j.id} className="dts-source-row"><button className="dtp-row dtp-source" onClick={onOpenJobs}><span><strong>{j.name}</strong><small>{j.status === 'needs-you' ? 'Waiting for you to choose factions' : `${j.factions.length} factions available`}</small><i className="dtp-progress"><em style={{ width: `${jobPercent(j)}%` }} /></i></span></button><SourceStatus kind={j.status === 'needs-you' ? 'needs-you' : 'installing'} source={j} percent={jobPercent(j)} onAction={onOpenJobs} /></div>)}
         </div>
         <button className={`dtp-row dtp-add-row ${isAddFlow(selectedId) ? 'selected' : ''}`} onClick={() => setSelectedId('add')}><span className="dtp-add-icon"><Plus size={16} /></span><span><strong>Add game data</strong><small>Collections, a repository link, or GitHub search</small></span><ChevronRight size={15} /></button>
       </div><footer className="dtp-list-foot"><RefreshCcw size={12} />Checked for updates 8 minutes ago<button onClick={() => notify('Checked for updates. Nothing new.')}>Check now</button></footer></section>
