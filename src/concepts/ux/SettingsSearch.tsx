@@ -28,7 +28,7 @@ export const settingsIndex = (platform: "phone" | "tablet"): SettingEntry[] => (
   { id: "notify", section: "Game data", title: "Job notifications", detail: "Notifications are off · Open system settings", icon: Bell, kind: "link", platform: "phone" },
   { id: "shortcuts", section: "Keyboard shortcuts", title: "Keyboard shortcuts", detail: "With a hardware keyboard.", icon: Keyboard, kind: "link", platform: "tablet" },
   { id: "focus", section: "Advanced", title: "Focus search when opening the catalogue", detail: FIND(platform), icon: TextCursorInput, kind: "switch" },
-  { id: "separate", section: "Advanced", title: "Enable Separate all", detail: "Units with several models also offer Separate all, which splits them into single-model units in one step. Off: only Separate 1.", icon: Ungroup, kind: "switch" },
+  { id: "separate", section: "Advanced", title: "Enable Separate all", detail: "Units with several models also offer Separate all, which gives every model its own options in one step. Off: only Separate 1.", icon: Ungroup, kind: "switch" },
   { id: "about", section: "About", title: "Version and licences", detail: "Version 1.0.0 · open source licences.", icon: Info, kind: "link" },
   { id: "perf", section: "Developer", title: "Performance overlay", detail: "UI frame drops and tap → view latency, per screen.", icon: Gauge, kind: "switch", developer: true },
   { id: "hidden", section: "Developer", title: "Show hidden entries", detail: "List the entries and options the game data marks as hidden in Add unit and in unit options. Off by default.", icon: Bug, kind: "switch", developer: true },

@@ -78,7 +78,7 @@ export function TabletSettings({ env, notify, session, themePref, scheme, onThem
       case 'advanced': return <WorkspaceScope light={light}>
         <div className="tb-plain-rows" role="group" aria-label="Advanced">
           <Switch label="Focus search when opening the catalogue" detail={`Off: Add unit opens the catalogue for browsing. ${keyLabel('Mod+F', env.device.system)} on a keyboard always focuses the search.`} checked={focusSearch} onChange={onFocusSearch} />
-          <Switch label="Enable Separate all" detail="Units with several models also offer Separate all, which splits them into single-model units in one step. Off: only Separate 1." checked={separateAll} onChange={onSeparateAll} />
+          <Switch label="Enable Separate all" detail="Units with several models also offer Separate all, which gives every model its own options in one step. Off: only Separate 1." checked={separateAll} onChange={onSeparateAll} />
         </div>
       </WorkspaceScope>;
       default: return <>

@@ -43,7 +43,7 @@ const PANES: { catalogue: PanePresets; inspector: PanePresets; inspectorMedium: 
   inspectorMedium: { min: 320, max: 500, narrow: 340, initial: 420, wide: 480 },
 };
 const pts = (n: number) => n.toLocaleString('en-US');
-/** UX-023 (proposal): a unit's models are stacks, each with its own loadout; Separate 1 / Separate all split a stack. `stacks` is absent while the unit is one stack. */
+/** UX-023 (proposal): a unit's models form groups, each with its own options; Separate 1 / Separate all split a group inside the same unit (never a new unit or roster entry). `stacks` is absent while the unit is one group. */
 type StackUnit = EditorUnit & { stacks?: number[] };
 const memberLabel = (u: EditorUnit) => u.role === 'Command' ? 'Commander' : u.models === 1 ? 'Crew' : 'Unit members';
 
@@ -61,7 +61,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
   env: TabletEnv; notify: Notify; light: boolean; rosterName: string; from: string; start?: EditorStart; imported?: ImportResult;
   /** Settings › Advanced › Focus search when opening the catalogue (DEC-050, UX-059; off by default). */
   focusSearch?: boolean;
-  /** Settings › Advanced › Enable Separate all (DEC-046/054; off by default): the unit pane also offers Separate all on a stack of several models. */
+  /** Settings › Advanced › Enable Separate all (DEC-046/054; off by default): the unit pane also offers Separate all on a group of several models. */
   separateAll?: boolean;
   onBack: () => void; onAllRosters: () => void; onNewRoster: () => void; onImport: () => void; onFindData: () => void;
 }) {
@@ -140,7 +140,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
   const withUndo = (step: number) => ({ action: { label: 'Undo', run: () => { history.undoStep(step); settle(); } } });
   const update = (change: Partial<StackUnit>) => {
     if (readOnly || !selected) return;
-    const what = change.stacks !== undefined ? 'model stacks' : change.notes !== undefined ? 'notes' : change.models !== undefined ? 'unit size' : change.weapon !== undefined ? change.weapon : change.upgrade !== undefined ? `Field standard ${change.upgrade ? 'on' : 'off'}` : 'options';
+    const what = change.stacks !== undefined ? 'model groups' : change.notes !== undefined ? 'notes' : change.models !== undefined ? 'unit size' : change.weapon !== undefined ? change.weapon : change.upgrade !== undefined ? `Field standard ${change.upgrade ? 'on' : 'off'}` : 'options';
     history.edit(`${selected.name}: ${what}`, d => ({ ...d, units: d.units.map(u => u.id === selected.id ? { ...u, ...change } : u) }), { focus: selected.id, merge: change.notes !== undefined ? `notes-${selected.id}` : undefined });
   };
   const addUnit = (entry: CatalogueEntry) => {
@@ -563,7 +563,7 @@ function UnitDetail({ unit, env, force, faction, total, issue, readOnly, separat
   const standardIssue = issue?.id.endsWith('-standard');
   const sizeIssue = issue?.id.endsWith('-size');
   const stacks = (unit as StackUnit).stacks ?? [unit.models];
-  // The unit's model count is the sum of its stacks; every model beyond the first of the unit costs the same (+12 pts).
+  // The unit's model count is the sum of its groups; every model beyond the first of the unit costs the same (+12 pts).
   const setStacks = (next: number[]) => { const models = next.reduce((n, c) => n + c, 0); onUpdate({ stacks: next.length > 1 ? next : undefined, models, points: unit.points + (models - unit.models) * 12 }); };
   const [move, defence, resolve, health] = unitProfile(unit);
   return <section className="ux-mobile-unit-options tbe-detail">
@@ -584,7 +584,7 @@ function UnitDetail({ unit, env, force, faction, total, issue, readOnly, separat
       {stacks.map((count, i) => <article className="ux-5a-card" key={i}>
         <div className="ux-5a-model-title"><span><strong>{memberLabel(unit)} ×{count}</strong><small>{pinned ? 'Always 1 model' : '+12 pts per extra model'}</small></span></div>
         {pinned ? null : <>{i === 0 && <small className={sizeIssue ? 'ux-5a-invalid' : ''}>{sizeIssue && <AlertTriangle size={13} />}{unit.role === 'Support' ? 'At least 1' : 'At least 3'} · Up to 20 · {sizeIssue ? 'Needs more models' : 'Soft limit'}</small>}
-          <Count name={stacks.length > 1 ? `Models in stack ${i + 1}` : 'Models'} value={count} min={1} max={20} over={sizeIssue} disabled={readOnly} onChange={n => setStacks(stacks.map((c, k) => k === i ? n : c))} />
+          <Count name={stacks.length > 1 ? `Models in group ${i + 1}` : 'Models'} value={count} min={1} max={20} over={sizeIssue} disabled={readOnly} onChange={n => setStacks(stacks.map((c, k) => k === i ? n : c))} />
           {count > 1 && !readOnly ? <SeparateRow count={count} separateAll={separateAll} onOne={() => setStacks(stacks.flatMap((c, k) => k === i ? [c - 1, 1] : [c]))} onAll={() => setStacks(stacks.flatMap((c, k) => k === i ? Array<number>(c).fill(1) : [c]))} /> : null}</>}
       </article>)}
       <div className="ux-5a-card"><FoldSection title="Primary weapon" counter="1/1 selections" summary={unit.weapon} {...fold('weapon')}>

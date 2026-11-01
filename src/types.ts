@@ -144,6 +144,7 @@ export type WorkflowScreen =
   | "desktop-editor-unit-dialog-nested"
   | "desktop-editor-unit-dialog-readonly"
   | "desktop-editor-unit-dialog-zoom-200"
+  | "desktop-editor-unit-dialog-separated"
   | "desktop-editor-catalogue-limit"
   | "desktop-settings-advanced"
   | "desktop-lookup-1-0-loading"

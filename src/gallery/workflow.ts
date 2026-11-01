@@ -87,6 +87,7 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "desktop-editor-unit-dialog-nested", label: "Desktop · Roster editor · Unit dialog, nested element" },
   { id: "desktop-editor-unit-dialog-readonly", label: "Desktop · Roster editor · Unit dialog, read-only" },
   { id: "desktop-editor-unit-dialog-zoom-200", label: "Desktop · Roster editor · Unit dialog, page zoom 200%" },
+  { id: "desktop-editor-unit-dialog-separated", label: "Desktop · Roster editor · Unit dialog, after Separate 1 (4 + 1)" },
   { id: "desktop-editor-catalogue-limit", label: "Desktop · Roster editor · Catalogue limit reached" },
   { id: "desktop-settings-advanced", label: "Desktop · Settings · Advanced" },
   { id: "desktop-lookup-1-0-loading", label: "Desktop · Lookup 1.0 · Loading" },

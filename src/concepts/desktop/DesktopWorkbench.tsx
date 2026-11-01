@@ -81,7 +81,7 @@ export function DesktopWorkbench(props: Partial<ConceptProps>) {
   // R0-02: a narrow window (720 × 520) on the gallery canvas; the unit dialog fills it minus small margins.
   if (props.workflowScreen === 'desktop-editor-unit-dialog-narrow') return <div className={`dtu-window-preview ${props.themeMode === 'light' ? 'light' : ''}`}><span className="dtu-window-label">Narrow window · 720 × 520</span><Workbench {...props} /></div>;
   // First run and the read-only unit dialog load their own roster, so each gets its own instance.
-  return <Workbench key={props.workflowScreen === 'desktop-first-run' ? 'first-run' : props.workflowScreen === 'desktop-editor-unit-dialog-readonly' || props.workflowScreen === 'desktop-editor-catalogue-limit' ? props.workflowScreen : 'workspace'} {...props} />;
+  return <Workbench key={props.workflowScreen === 'desktop-first-run' ? 'first-run' : props.workflowScreen === 'desktop-editor-unit-dialog-readonly' || props.workflowScreen === 'desktop-editor-unit-dialog-separated' || props.workflowScreen === 'desktop-editor-catalogue-limit' ? props.workflowScreen : 'workspace'} {...props} />;
 }
 function Workbench(props: Partial<ConceptProps>) {
   const firstRun = props.workflowScreen === 'desktop-first-run';
@@ -92,7 +92,7 @@ function Workbench(props: Partial<ConceptProps>) {
   const [scheme, setScheme] = useState<ColorScheme>(props.colorScheme ?? 'default');
   const [summary, setSummary] = useState(false);
   // The roster document (units + forces) lives in an undo/redo history; see DesktopEditorFlows.tsx.
-  const history = useRosterHistory<Unit>({ units: initialUnits, forces: [primaryForce()] });
+  const history = useRosterHistory<Unit>({ units: props.workflowScreen === 'desktop-editor-unit-dialog-separated' ? initialUnits.map(u => u.id === 2 ? { ...u, groups: [{ models: u.models - 1, weapon: u.weapon }, { models: 1, weapon: u.weapon }] } : u) : initialUnits, forces: [primaryForce()] });
   const { units, forces } = history.doc;
   const [activeForce, setActiveForce] = useState(PRIMARY_FORCE_ID);
   const [flow, setFlow] = useState<EditorFlowState | null>(null);
@@ -110,7 +110,7 @@ function Workbench(props: Partial<ConceptProps>) {
   const [unitDialog, setUnitDialog] = useState(() => screenDialog(props.workflowScreen));
   const rosterRef = useRef<HTMLDivElement>(null);
   // DEC-054: Settings › Advanced › Enable Separate all (off by default).
-  const [separateAll, setSeparateAll] = useState(false);
+  const [separateAll, setSeparateAll] = useState(props.workflowScreen === 'desktop-editor-unit-dialog-separated');
   const [command, setCommand] = useState(false);
   const [create, setCreate] = useState(false);
   const [rosterOpen, setRosterOpen] = useState(!firstRun);
@@ -217,14 +217,15 @@ function Workbench(props: Partial<ConceptProps>) {
     const what = change.notes !== undefined ? 'notes' : change.models !== undefined ? 'unit size' : change.weapon !== undefined ? change.weapon : change.upgrade !== undefined ? `Field standard ${change.upgrade ? 'on' : 'off'}` : change.leaderWeapon !== undefined ? `squad leader ${change.leaderWeapon}` : change.signalKit !== undefined ? `signal kit ${change.signalKit ? 'on' : 'off'}` : change.signal !== undefined ? `signal ${change.signal}` : 'options';
     history.edit(`${target.name}: ${what}`, d => ({ ...d, units: d.units.map(u => u.id === target.id ? { ...u, ...change } : u) }), { focus: target.id, merge: change.notes !== undefined ? `notes-${target.id}` : undefined });
   };
-  // DEC-054: Separate 1 makes one model a unit of its own; Separate all (opt-in in Settings › Advanced) splits every model.
-  const separate = (all: boolean) => {
-    const target = editing; if (readOnly || !target || target.models < 2) return;
-    const single = { ...target, models: 1, points: target.points - 12 * (target.models - 1), upgrade: false, signalKit: false, notes: undefined };
-    const ids = Array.from({ length: all ? target.models : 1 }, () => nextId.current++);
-    const step = history.edit(all ? `Separate all of ${target.name}` : `Separate 1 from ${target.name}`, d => ({ ...d, units: all ? [...d.units.filter(u => u.id !== target.id), ...ids.map(id => ({ ...single, id }))] : [...d.units.map(u => u.id === target.id ? { ...u, models: u.models - 1, points: u.points - 12 } : u), { ...single, id: ids[0] }] }), { focus: all ? ids[0] : target.id });
-    if (all) { setSelectedId(ids[0]); closeUnit(ids[0]); }
-    notify(all ? `${target.name} separated into ${ids.length} units` : `1 model separated from ${target.name}`, withUndo(step));
+  // DEC-054 / UX-023: Separate 1 gives one model its own options; Separate all (opt-in in Settings › Advanced) does it for every model of the group.
+  // The models stay in the same unit (a group of five becomes 4 + 1): no new unit, no new roster entry, totals unchanged.
+  const separate = (index: number, all: boolean) => {
+    const target = editing; if (readOnly || !target) return;
+    const groups = target.groups ?? [{ models: target.models, weapon: target.weapon }];
+    const group = groups[index]; if (!group || group.models < 2) return;
+    const next = groups.flatMap((g, k) => k !== index ? [g] : all ? Array.from({ length: g.models }, () => ({ ...g, models: 1 })) : [{ ...g, models: g.models - 1 }, { ...g, models: 1 }]);
+    const step = history.edit(all ? `Separate all of ${target.name}` : `Separate 1 from ${target.name}`, d => ({ ...d, units: d.units.map(u => u.id === target.id ? { ...u, groups: next } : u) }), { focus: target.id });
+    notify(all ? `Every model of ${target.name} has its own options` : `1 model of ${target.name} has its own options`, withUndo(step));
   };
   // After undo/redo: keep a selection that exists, reveal the unit the step was about, offer the opposite step.
   const settle = (focus?: number) => { const doc = history.peek(); const keep = doc.units.find(u => u.id === focus) ?? doc.units.find(u => u.id === selectedId) ?? doc.units[0]; setSelectedId(keep?.id ?? 0); if (!doc.forces.some(f => f.id === activeForce)) setActiveForce(doc.forces[0]?.id ?? PRIMARY_FORCE_ID); return keep; };

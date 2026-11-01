@@ -9,7 +9,8 @@ import './desktop-editor.css';
 
 export type Role = 'Command' | 'Core' | 'Specialist' | 'Support';
 export const ROLES: Role[] = ['Command', 'Core', 'Specialist', 'Support'];
-export type EditorUnit = { id: number; name: string; role: string; models: number; points: number; weapon: string; upgrade: boolean; notes?: string; forceId?: string; leaderWeapon?: string; signalKit?: boolean; signal?: string };
+export type EditorUnit = { id: number; name: string; role: string; models: number; points: number; weapon: string; upgrade: boolean; notes?: string; forceId?: string; leaderWeapon?: string; signalKit?: boolean; signal?: string; /** UX-023: model groups inside the unit, each with its own options; absent while all models share one set. The sizes always add up to `models`. */ groups?: ModelGroup[] };
+export type ModelGroup = { models: number; weapon: string };
 export type Force = { id: string; name: string; type: string; faction: string };
 export type RosterDoc<U extends EditorUnit> = { units: U[]; forces: Force[] };
 export type ReadOnlyInfo = { faction: string; system: string; sourceId: string };

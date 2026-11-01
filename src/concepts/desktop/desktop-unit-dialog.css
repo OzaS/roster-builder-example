@@ -42,6 +42,10 @@
 .dtu-drill b { color: var(--dt-accent); font-size: 12px; font-weight: 500 }
 .dtu-drill > svg:last-child { color: var(--dt-muted) }
 .dtu-separate { display: flex; gap: 8px; padding: 12px 0 2px }
+/* UX-023: model groups of one unit; each group has its own count, Separate buttons and options. */
+.dtu-group { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--dt-border); border-radius: 10px }
+.dtu-group + .dtu-group { margin-top: 8px }
+.dtu-group .dtu-separate { padding: 0 }
 .dtu-radios { display: grid; gap: 8px }
 .dtu-radios .dt-checkbox-row { align-items: center }
 .dtu-radios .dt-checkbox-row > svg { color: var(--dt-accent) }

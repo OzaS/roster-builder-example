@@ -339,10 +339,10 @@ function WorkbenchElements({
         </div>
       </ElementSection>
 
-      <ElementSection title="Model Stack Separate and Selection Controls">
-        <small>Proposal for review (UX-023, DEC-046): Separate 1 replaces the Split count; Separate all appears only with Settings › Advanced › Enable Separate all. Radio: one of several; max-one ancestors share that choice across nested alternatives, with None only on the outer group. Checkbox: independent optional picks, including a single option or nothing. Switch: immediate Settings only. Stepper: counts. Visible glyphs 21–22 px; target 48 px (≥44 pt / 48 dp). Restart restores selection, tab, hidden entries and folds; pending edits and split drafts reset. Controls reload from the worker.</small>
+      <ElementSection title="Model Groups, Separate and Selection Controls">
+        <small>Approved (UX-023, DEC-046): Separate 1 replaces the Split count; Separate all appears only with Settings › Advanced › Enable Separate all. Separating never makes a unit or a roster entry: the models stay in the same unit and only get their own options (a group of five becomes 4 + 1, totals unchanged). Radio: one of several; max-one ancestors share that choice across nested alternatives, with None only on the outer group. Checkbox: independent optional picks, including a single option or nothing. Switch: immediate Settings only. Stepper: counts. Visible glyphs 21–22 px; target 48 px (≥44 pt / 48 dp). Restart restores selection, tab, hidden entries and folds; pending edits and split drafts reset. Controls reload from the worker.</small>
         <div className="ux-mobile-unit-options"><ModelStackSamples /></div>
-        <small>Separate all on, and the result of Separate 1 on a stack of five (4 + 1). A single-model stack offers neither.</small>
+        <small>Separate all on, and the result of Separate 1 on a group of five models (4 + 1, still one unit). A group of one model offers neither.</small>
         <div className="ux-elements-stack"><div className="ux-mobile-unit-options"><ModelStackSamples separateAll /></div><div className="ux-mobile-unit-options"><ModelStackSamples separateAll initialStacks={[{ id: 1, count: 4, sidearm: "Pistol", scope: false }, { id: 2, count: 1, sidearm: "Pistol", scope: false }]} /></div></div>
       </ElementSection>
 
@@ -792,7 +792,7 @@ function WorkbenchElements({
           <FocusCatalogueSearchSetting on={false} />
           <SeparateAllSetting on />
         </AdvancedSettingsRows>
-        <small className="ux-elements-note">DEC-054 (R0-02): Settings › Advanced holds two preferences, both off by default, as plain rows: no card around the section and none per row, a hairline between rows, the usual switch. Enable Separate all is a user opt-in: on, a unit with several models also offers Separate all (single-model units in one step); off, only Separate 1.</small>
+        <small className="ux-elements-note">DEC-054 (R0-02): Settings › Advanced holds two preferences, both off by default, as plain rows: no card around the section and none per row, a hairline between rows, the usual switch. Enable Separate all is a user opt-in: on, a unit with several models also offers Separate all (every model gets its own options in one step; the models stay in the same unit); off, only Separate 1.</small>
       </ElementSection>
 
       <ElementSection title="Reopen Roster on Launch Setting">
