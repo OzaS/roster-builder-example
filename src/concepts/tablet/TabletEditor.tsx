@@ -430,13 +430,13 @@ function CataloguePanel({ env, variant, query, onQuery, role, onRole, forces, ta
         <h4>{group}<span>{shown.length}</span></h4>
         {shown.map(e => { const limit = catalogueLimit(e, own); const state = limit ? null : catalogueState(e, own); const unavailable = !!limit || state?.tone === 'err';
           // The row adds the unit (the whole row is its target); the state chip sits above it and only shows its caption.
-          // DEC-054: no dimming. A reached limit shows the quota chip and the unavailable Add button; pressing the row or the button explains.
+          // DEC-054: no dimming. A reached limit shows the quota chip under the name (the name keeps the row's width) and the unavailable Add button; pressing the row or the button explains.
           return <div key={e.name} data-cat-entry={e.name} className={`tbe-cat-row ${state ? state.tone : ''} ${unavailable ? 'unavailable' : ''}`}>
             <button type="button" className="tbe-cat-add" aria-disabled={unavailable || undefined} tabIndex={limit ? -1 : undefined}
               aria-label={limit ? `${e.name}, ${e.points} points, limit reached` : `Add ${e.name}, ${e.points} points${state ? `, ${state.caption}, ${state.reason}` : ''}`} onClick={() => limit ? explain(e.name) : unavailable ? undefined : onAdd(e)}>
-              <span><strong>{e.name}</strong>{limit ? <small className="reason">Limit reached</small> : state ? <small className="reason">{state.reason}</small> : <small>{e.models} {e.models === 1 ? 'model' : 'models'} · {e.weapon}</small>}</span>
+              <span><strong>{e.name}</strong>{limit ? <small className="reason quota"><QuotaChip selected={limit.selected} max={limit.max} />Limit reached</small> : state ? <small className="reason">{state.reason}</small> : <small>{e.models} {e.models === 1 ? 'model' : 'models'} · {e.weapon}</small>}</span>
             </button>
-            {limit ? <QuotaChip selected={limit.selected} max={limit.max} /> : state ? <StateChip tone={state.tone} caption={state.caption} input={env.input} open={captionShown === e.name} /> : <span aria-hidden="true" />}
+            {limit ? <span aria-hidden="true" /> : state ? <StateChip tone={state.tone} caption={state.caption} input={env.input} open={captionShown === e.name} /> : <span aria-hidden="true" />}
             <b aria-hidden="true">{e.points}<small> pts</small></b>
             {limit ? <LimitAddButton name={e.name} points={e.points} selected={limit.selected} max={limit.max} input={env.input} open={explained === e.name || captionShown === e.name} onPress={() => explain(e.name)} />
               : <span className="tbe-cat-plus" aria-hidden="true"><Plus size={18} /></span>}
