@@ -82,6 +82,11 @@
 .tb-row-main strong, .tb-row-main small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
 .tb-row-end { display: grid; justify-items: end; gap: 5px; flex-shrink: 0 }
 .tb-row-end svg { color: var(--ux-muted) }
+/* DEC-054: a row with its own trailing action (Sources' compact status): the action sits over the row's end, outside the row button. */
+.tb-row-host { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0 }
+.tb-app button.tb-row.with-action { padding-right: 62px }
+.tb-row-action { position: absolute; z-index: 1; top: 50%; right: 10px; transform: translateY(-50%) }
+.tb-row-action .ux-src-status-wrap { margin: 0 }
 .tb-app button.tb-row.selected { border-color: var(--ux-accent); background: color-mix(in srgb, var(--ux-accent) 12%, var(--ux-surface)) }
 .tb-touch .ux-list-card:hover { transform: none; border-color: var(--ux-line) }
 .tb-touch button.tb-row.selected:hover { border-color: var(--ux-accent) }
@@ -128,6 +133,9 @@
 .tb-scheme { min-height: 56px; cursor: pointer }
 .tb-scheme i { width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0 }
 .tb-switches { padding: 4px 14px }
+/* DEC-054: Settings › Advanced rows sit plain in the detail pane (no card); the shared row divider stays. */
+.tb-plain-rows { display: grid; padding: 0 2px }
+.tb-plain-rows .dtp-setting-row:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px; border-radius: 8px }
 .tb-app .dtp-setting-row { min-height: 60px; padding: 8px 0 }
 .tb-app .dtp-setting-row + .dtp-setting-row { border-top: 1px solid var(--ux-line) }
 .tb-app .dtp-setting-row strong { font-size: 15px; font-weight: 700 }
@@ -221,7 +229,13 @@
 /* Destination labels are visually hidden (screen readers and the hints name them). */
 .tb-rail button.tb-rail-item > .tb-rail-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap }
 .tb-compact .tb-main { padding: 12px 12px 20px }
-@container (max-width: 300px) { .tb-row-end { display: none } }
+/* DEC-054 (R0-08): row status stays visible at every pane width (the rule that hid .tb-row-end below 300 px is gone). In a pane of
+   300 px or less a row's trailing text (points, text chips; not a lone chevron) moves to its own line under the title, so the name keeps its width. */
+@container (max-width: 300px) {
+  .tb-app button.tb-row:has(> .tb-row-end > :not(svg)) { flex-wrap: wrap; row-gap: 6px }
+  .tb-app button.tb-row > .tb-row-end:has(> :not(svg)) { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; flex-basis: 100%; justify-content: flex-start }
+  .tb-app button.tb-row:has(> .tb-mark) > .tb-row-end:has(> :not(svg)) { padding-left: 52px }
+}
 .tb-toolbar { flex-wrap: wrap }
 .tb-toolbar .tb-search { flex: 1 1 260px }
 .tb-compact .tb-home, .tb-compact.tb-app .tb-home-side { grid-template-columns: minmax(0, 1fr) }
