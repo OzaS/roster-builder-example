@@ -1,6 +1,6 @@
 import { PhoneSearchHeader } from "../concepts/ux/PhoneSearchHeader";
 import { PhoneListsFilters } from "../concepts/ux/PhoneListsFilters";
-import { LookupEntryBody, LookupEntryPage, PhoneLookup } from "../concepts/ux/PhoneLookup";
+import { LookupEntryBody, LookupEntryPage, LookupFailure, LookupLoading, LookupUnavailable, PhoneLookup, unavailableSample } from "../concepts/ux/PhoneLookup";
 import { QuotaChip, limitReason } from "../concepts/workspace/CatalogueLimit";
 import { lookupById } from "../data/lookupData";
 import { DesktopElements } from "../concepts/desktop/DesktopWorkbench";
@@ -567,6 +567,16 @@ function WorkbenchElements({
       <ElementSection title="Lookup 1.0 · Grouped Results and Reference Page">
         <div className="ux-lk-element"><PhoneLookup /></div>
         <section className="ux-mobile-unit-options compact ux-lk-detail"><LookupEntryBody entity={lookupById("d-line-formation")!} onOpen={() => undefined} /></section>
+      </ElementSection>
+
+      <ElementSection title="Lookup Lifecycle States">
+        <div className="ux-lk-states-demo">
+          <section className="ux-mobile-unit-options compact ux-lk-detail"><small className="ux-result-label">Loading</small><LookupLoading /></section>
+          <section className="ux-mobile-unit-options compact ux-lk-detail"><small className="ux-result-label">Failure · Retry</small><LookupFailure /></section>
+          <section className="ux-mobile-unit-options compact ux-lk-detail"><small className="ux-result-label">Source unavailable</small><LookupUnavailable saved={unavailableSample} /></section>
+        </div>
+        <div className="ux-lk-element ux-lk-text-200-demo"><PhoneLookup initialQuery="reinforced" initialStack={["u-veteran-reinforced"]} largeText /></div>
+        <small className="ux-elements-note">DEC-054 (R0-03): Loading keeps the query and filters (chips without counts) and shows skeleton rows with "Searching installed data…", never a false "no results". Failure says "Search could not finish · Your installed data is still on this device." with Retry; the query and filters stay and it is not shown as zero results. A saved or opened reference whose source is no longer installed shows "Reference unavailable", names what was saved and offers Back to results; it never opens a same-name entry from another source or version. Large text (200 %): result and reference titles stop at two lines with an ellipsis; the heading keeps the whole name for screen readers, and Full name (or a tap on the title) shows it. The cap is for titles only, not reference text or explanations. Screens: Lookup · Loading, Failure, Source unavailable, Large text 200 % (phone and tablet).</small>
       </ElementSection>
 
       <ElementSection title="Lookup Compact Unit Reference">

@@ -132,3 +132,10 @@
 /* At large text the cost leaves the title's row and sits under it, so the capped title keeps the width. */
 .ux-lk-text-200 .ux-mobile-unit-options > .ux-lk-phone-top { grid-template-columns: 44px minmax(0, 1fr); row-gap: 0 }
 .ux-lk-text-200 .ux-lk-phone-top .ux-lk-base-cost { grid-column: 2; justify-self: start }
+/* Elements view: the three Lookup states side by side. */
+.ux-lk-states-demo { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 14px }
+.ux-lk-states-demo > section { padding: 12px; border: 1px solid var(--ux-line); border-radius: 14px; background: var(--ux-bg) }
+/* Elements view: the panel's section-heading style must not restyle the Lookup titles inside the demos. */
+.design-elements-panel.ux-screen .ux-element-section :is(.ux-lk-phone-top, .ux-lk-heading) h2 { color: var(--ux-ink); font-weight: 750; letter-spacing: 0; text-transform: none }
+.design-elements-panel.ux-screen .ux-element-section .ux-lk-phone-top h2 { font-size: 17px }
+.design-elements-panel.ux-screen .ux-element-section .ux-lk-heading h2 { font-size: 24px }

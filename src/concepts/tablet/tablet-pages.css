@@ -303,3 +303,6 @@
 /* Sources' Select mode: the row tile becomes a check box. */
 .tb-pick { display: grid; place-items: center; width: 24px; height: 24px; border: 2px solid var(--ux-line-2); border-radius: 7px; color: var(--ux-accent-ink) }
 .tb-pick.on { border-color: var(--ux-accent); background: var(--ux-accent) }
+/* R0-03 (DEC-054): Lookup result titles wrap to two lines at most, with an ellipsis; the row keeps the whole name as its text. */
+.tb-lookup10 .tb-row-main strong { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; white-space: normal; overflow-wrap: anywhere }
+.tb-lookup10 .ux-lk-results .ux-lk-state, .tb-lookup10 .ux-lk-results .ux-lk-failure { margin-top: 4px }
