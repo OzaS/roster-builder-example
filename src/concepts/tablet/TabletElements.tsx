@@ -9,7 +9,8 @@ import { TabletExperienceControls } from './tabletExperience';
 import { TabletDeviceFrame } from './TabletDeviceFrame';
 import { TabletRail } from './TabletRail';
 import { TabletResizer, type PanePresets } from './TabletResizer';
-import { EmptyState, InstallRow } from './TabletPieces';
+import { EmptyState, InstallRow, Row } from './TabletPieces';
+import { Chip as MobileChip } from '../ux/uxShared';
 import { FactsGrid, GroupHeader, GroupToggle, RosterFilterBar, StatusTile } from './TabletPages';
 import type { Job } from '../workspace/Jobs';
 import { editorShortcuts, keyLabel } from './tabletKeys';
@@ -103,6 +104,13 @@ export function TabletElements() {
         <span><SourceStatusAction status="failed" name="Example System Five" /><small>Failed</small></span>
       </div></div></div>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="split" textScale={150}><TabletWorkbench workflowScreen="tablet-sources" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="android" textScale={150}><TabletWorkbench workflowScreen="tablet-rosters" /></TabletDeviceFrame></div>
+      <h2>Narrow pane (300 px or less) · Sources and Rosters rows keep their status (DEC-054, R0-08)</h2>
+      <p>The same shared pane rows in a 280 px pane, touch and pointer: Sources keeps the compact status action at the row end (outside the row button); Rosters' status chip moves to its own line under the title instead of being hidden. Existing behaviour, unchanged here: a row's bold points figure is omitted in panes of 400 px or less.</p>
+      <div className="tb-el-row">{(['dark', 'light'] as const).map(theme => <div key={theme} className={`tb-app ux-screen ${theme} tb-el-card ${theme === 'dark' ? 'tb-touch' : 'tb-pointer'}`} style={{ width: 280 }}><div className="tb-pane" style={{ width: '100%' }}><div className="tb-list">
+        <Row selected mark="OF" title="Open Field" sub="example/open-field · v1.4 → v1.5 · 14.2 MB" action={<SourceStatusAction status="update" name="Open Field" next="v1.5" />} onClick={noop} />
+        <Row selected={false} mark="ES" title="Example System Two" sub="example/system-two · v3.0.2 · 38.6 MB" action={<SourceStatusAction status="review" name="Example System Two" />} onClick={noop} />
+        <Row selected={false} mark="AE" title="The Ashen Expedition" sub="Frontier Coalition · Example System One" end={<><b>770 pts</b><MobileChip tone="error">2 errors</MobileChip></>} onClick={noop} />
+      </div></div></div>)}</div>
       <h2>Toolbar Actions · iOS Liquid Glass and Android icon buttons</h2>
       <p>Rosters and Sources share 48 px icon buttons with full accessible names and hover or long-press hints. iOS uses Liquid Glass, with a solid fallback for Reduce transparency; Android uses plain icon buttons. Add game data uses an accent fill and Select has a pressed state. No captions below action icons. Search fills the remaining row; lower-priority actions move into More when space is short. New roster stays at the top of the rail as an icon button; navigation destinations keep their labels.</p>
       <div className="tb-el-stack"><ToolbarActionsDemo width={860} system="ios" /><ToolbarActionsDemo width={860} system="android" input="pointer" /><ToolbarActionsDemo width={500} system="ios" /><ToolbarActionsDemo width={380} system="android" /><ToolbarActionsDemo width={300} system="ios" text={200} /></div>
