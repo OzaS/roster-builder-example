@@ -17,14 +17,14 @@
 .dt-ambient-on .tb-app.light::before { opacity: .3 }
 
 /* ------------------------------ rail ------------------------------ */
-.tb-rail { position: relative; z-index: 2; flex: 0 0 88px; display: flex; flex-direction: column; gap: 4px; padding: 16px 8px 30px; border-right: 1px solid var(--ux-line) }
+/* The rail is icon-only on every tablet platform and at every width (2026-11-01): 68 px wide; the labels stay as the accessible names and the hold/hover hints. */
+.tb-rail { position: relative; z-index: 2; flex: 0 0 68px; display: flex; flex-direction: column; gap: 4px; padding: 10px 6px 16px; border-right: 1px solid var(--ux-line) }
 .tb-hint-wrap { position: relative; display: block }
 .tb-app .tb-rail button { width: 100%; margin: 0; font: inherit }
-.tb-app button.tb-rail-item { position: relative; display: grid; justify-items: center; align-content: center; gap: 4px; min-height: 64px; padding: 4px 0; border: 0; background: transparent; color: var(--ux-muted); font-size: 12px; font-weight: 650; letter-spacing: .1px; line-height: 1.15; text-align: center; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent }
-.tb-pointer button.tb-rail-item { min-height: 56px }
+.tb-app button.tb-rail-item { position: relative; display: grid; justify-items: center; align-content: center; min-height: 52px; padding: 0; border: 0; background: transparent; color: var(--ux-muted); cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent }
 .tb-touch .tb-rail button { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none }
-.tb-rail-ind { display: grid; place-items: center; width: 56px; height: 32px; border-radius: 16px; transition: background .15s }
-.tb-app button.tb-rail-item.active { color: var(--ux-ink); font-weight: 800 }
+.tb-rail-ind { display: grid; place-items: center; width: 52px; height: 32px; border-radius: 16px; transition: background .15s }
+.tb-app button.tb-rail-item.active { color: var(--ux-ink) }
 .tb-app button.tb-rail-item.active .tb-rail-ind { background: color-mix(in srgb, var(--ux-accent) 26%, transparent); color: var(--ux-accent-2) }
 .tb-app.light button.tb-rail-item.active .tb-rail-ind { background: color-mix(in srgb, var(--ux-accent) 18%, transparent); color: var(--ux-accent) }
 .tb-pointer button.tb-rail-item:not(.active):hover { color: var(--ux-ink) }
@@ -83,6 +83,11 @@
 .tb-row-main strong, .tb-row-main small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
 .tb-row-end { display: grid; justify-items: end; gap: 5px; flex-shrink: 0 }
 .tb-row-end svg { color: var(--ux-muted) }
+/* DEC-054: a row with its own trailing action (Sources' compact status): the action sits over the row's end, outside the row button. */
+.tb-row-host { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0 }
+.tb-app button.tb-row.with-action { padding-right: 62px }
+.tb-row-action { position: absolute; z-index: 1; top: 50%; right: 10px; transform: translateY(-50%) }
+.tb-row-action .ux-src-status-wrap { margin: 0 }
 .tb-app button.tb-row.selected { border-color: var(--ux-accent); background: color-mix(in srgb, var(--ux-accent) 12%, var(--ux-surface)) }
 .tb-touch .ux-list-card:hover { transform: none; border-color: var(--ux-line) }
 .tb-touch button.tb-row.selected:hover { border-color: var(--ux-accent) }
@@ -129,6 +134,9 @@
 .tb-scheme { min-height: 56px; cursor: pointer }
 .tb-scheme i { width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0 }
 .tb-switches { padding: 4px 14px }
+/* DEC-054: Settings › Advanced rows sit plain in the detail pane (no card); the shared row divider stays. */
+.tb-plain-rows { display: grid; padding: 0 2px }
+.tb-plain-rows .dtp-setting-row:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px; border-radius: 8px }
 .tb-app .dtp-setting-row { min-height: 60px; padding: 8px 0 }
 .tb-app .dtp-setting-row + .dtp-setting-row { border-top: 1px solid var(--ux-line) }
 .tb-app .dtp-setting-row strong { font-size: 15px; font-weight: 700 }
@@ -215,17 +223,20 @@
 
 /* ------------------------------ T4: larger text and display zoom (UX-025) ------------------------------ */
 /* The text size zooms the app root, so the layout gets a smaller logical window and collapses by width class: Expanded →
-   Medium → single pane. The rail scrolls when it is taller than the window; at Compact logical width it drops its labels
-   (they stay the accessible names and the hints) so the content keeps its room. */
+   Medium → single pane. The rail is icon-only at every width and scrolls when it is taller than the window. */
 .tb-rail { overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none }
 .tb-rail::-webkit-scrollbar { display: none }
 .tb-rail > * { flex-shrink: 0 }
-.tb-compact .tb-rail { flex-basis: 68px; padding: 10px 6px 16px }
-.tb-compact.tb-app button.tb-rail-item { min-height: 52px }
-.tb-compact .tb-rail-ind { width: 52px }
-.tb-compact button.tb-rail-item > span:last-child { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap }
+/* Destination labels are visually hidden (screen readers and the hints name them). */
+.tb-rail button.tb-rail-item > .tb-rail-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap }
 .tb-compact .tb-main { padding: 12px 12px 20px }
-@container (max-width: 300px) { .tb-row-end { display: none } }
+/* DEC-054 (R0-08): row status stays visible at every pane width (the rule that hid .tb-row-end below 300 px is gone). In a pane of
+   300 px or less a row's trailing text (points, text chips; not a lone chevron) moves to its own line under the title, so the name keeps its width. */
+@container (max-width: 300px) {
+  .tb-app button.tb-row:has(> .tb-row-end > :not(svg)) { flex-wrap: wrap; row-gap: 6px }
+  .tb-app button.tb-row > .tb-row-end:has(> :not(svg)) { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; flex-basis: 100%; justify-content: flex-start }
+  .tb-app button.tb-row:has(> .tb-mark) > .tb-row-end:has(> :not(svg)) { padding-left: 52px }
+}
 .tb-toolbar { flex-wrap: wrap }
 .tb-toolbar .tb-search { flex: 1 1 260px }
 .tb-compact .tb-home, .tb-compact.tb-app .tb-home-side { grid-template-columns: minmax(0, 1fr) }

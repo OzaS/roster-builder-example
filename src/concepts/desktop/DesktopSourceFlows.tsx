@@ -503,3 +503,35 @@ export function AddCollectionDialog({ jobs, notify, go, onOpenJobs, onClose }: {
     </section>
   </div>;
 }
+
+/* ------------------- Compact source status (R0-08, DEC-054) ------------------- */
+
+export type SourceStatusKind = 'update' | 'updating' | 'installing' | 'needs-you' | 'failed' | 'review' | 'ready' | 'file';
+
+/** What a source row's status says, for its caption and the row's accessible name. */
+export function sourceStatusText(kind: SourceStatusKind, s: { name: string; next?: string }, percent?: number) {
+  return { update: `Update available · ${s.next}`, updating: `Updating · ${percent ?? 0} %`, installing: `Installing · ${percent ?? 0} %`, 'needs-you': 'Waiting for you: choose factions', failed: 'Update failed · Retry', review: 'Review: 3 import warnings', ready: 'Up to date', file: 'Installed from a file' }[kind];
+}
+
+/**
+ * A source row's status as one compact, recognisable icon instead of a text chip, so the name keeps the row's width.
+ * Actions are icon buttons with an accessible name that says what happens (Update {name} to {version}); states are
+ * icons whose shape differs (arrow, ring with the percentage, triangle, check, file), never colour alone. Hover or
+ * focus shows the caption in the hint bubble; the row's accessible name carries the status text as well.
+ */
+export function SourceStatus({ kind, source, percent, open: forced = false, onAction }: { kind: SourceStatusKind; source: { name: string; next?: string }; percent?: number; open?: boolean; onAction?: () => void }) {
+  const [open, setOpen] = useState(forced);
+  useEffect(() => { setOpen(forced); }, [forced]);
+  const caption = sourceStatusText(kind, source, percent);
+  const show = { onPointerEnter: () => setOpen(true), onPointerLeave: () => !forced && setOpen(false), onFocus: () => setOpen(true), onBlur: () => !forced && setOpen(false) };
+  const ring = (p: number) => <span className="dts-ring" style={{ ['--p' as string]: `${p}%` }}><b>{p}</b></span>;
+  const icon = kind === 'update' ? <ArrowDownToLine size={16} strokeWidth={2.2} /> : kind === 'updating' || kind === 'installing' ? ring(percent ?? 0) : kind === 'needs-you' ? <ListChecks size={16} /> : kind === 'failed' ? <RefreshCcw size={15} strokeWidth={2.2} /> : kind === 'review' ? <AlertTriangle size={15} /> : kind === 'file' ? <FileText size={15} /> : <Check size={15} strokeWidth={2.4} />;
+  const tone = kind === 'update' || kind === 'updating' || kind === 'installing' ? 'accent' : kind === 'needs-you' || kind === 'review' ? 'warn' : kind === 'failed' ? 'err' : 'quiet';
+  const label = kind === 'update' ? `Update ${source.name} to ${source.next}` : kind === 'failed' ? `Retry the update of ${source.name}` : kind === 'needs-you' ? `Choose factions for ${source.name}` : kind === 'updating' || kind === 'installing' ? `${caption}. Show installs and updates` : undefined;
+  const bubble = open && <span role="tooltip" className="tb-hint-bubble dts-status-bubble">{caption}</span>;
+  return <span className="tb-hint-wrap dts-status-wrap">
+    {label ? <button type="button" className={`dts-status ${tone} ${kind}`} aria-label={label} onClick={e => { e.stopPropagation(); onAction?.(); }} {...show}>{icon}</button>
+      : <span className={`dts-status ${tone} ${kind}`} aria-hidden="true" onPointerEnter={show.onPointerEnter} onPointerLeave={show.onPointerLeave}>{icon}</span>}
+    {bubble}
+  </span>;
+}

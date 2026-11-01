@@ -1,6 +1,7 @@
 import { PhoneSearchHeader } from "../concepts/ux/PhoneSearchHeader";
 import { PhoneListsFilters } from "../concepts/ux/PhoneListsFilters";
-import { LookupEntryBody, LookupEntryPage, PhoneLookup } from "../concepts/ux/PhoneLookup";
+import { LookupEntryBody, LookupEntryPage, LookupFailure, LookupLoading, LookupUnavailable, PhoneLookup, unavailableSample } from "../concepts/ux/PhoneLookup";
+import { QuotaChip, limitReason } from "../concepts/workspace/CatalogueLimit";
 import { lookupById } from "../data/lookupData";
 import { DesktopElements } from "../concepts/desktop/DesktopWorkbench";
 import { TabletElements } from "../concepts/tablet/TabletElements";
@@ -17,7 +18,7 @@ import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, T
 import { BudgetMeter, Chip, ExpandableBudget, RosterMoreMenu, RosterShareButton, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
 import { ComingSoonCard, DeveloperOptionsPreview } from "../concepts/ux/AppExtras";
-import { ActionMenuDialog, AddCollectionSheet, LOCAL_ERRORS, LOCAL_FILE, LOCAL_SOURCE, LocalImportChoiceDialog, LocalImportError, LocalImportRow, LocalInterruptedNotice, LocalRefusedNotice, LocalSourceNote, LocalSourceRows, localSteps, AdvancedInstallSetting, AppDialog, AutoUpdateChecksSetting, FocusCatalogueSearchSetting, ImportReportGroups, CollectionMenuDialog, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RememberSectionsSetting, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceUpdateCard, SourceVersions, SourcesNavRow, TaggedRosterRows, UpdateAvatarButton, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
+import { ActionMenuDialog, AddCollectionSheet, LOCAL_ERRORS, LOCAL_FILE, LOCAL_SOURCE, LocalImportChoiceDialog, LocalImportError, LocalImportRow, LocalInterruptedNotice, LocalRefusedNotice, LocalSourceNote, LocalSourceRows, localSteps, AdvancedInstallSetting, AppDialog, AutoUpdateChecksSetting, FocusCatalogueSearchSetting, SeparateAllSetting, AdvancedSettingsRows, ImportReportGroups, CollectionMenuDialog, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RememberSectionsSetting, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceStatusAction, SourceUpdateCard, SourceVersions, SourcesNavRow, TaggedRosterRows, UpdateAvatarButton, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
 
 type Props = {
   concept: GalleryConcept;
@@ -492,7 +493,8 @@ function WorkbenchElements({
         {/* Plan 4B: multi-add feedback, an added count, a refused row and the hidden toggle. */}
         <div className="ux-pool-added" role="status"><Check size={14} />Added {flattenUnits(roster)[0]?.name}</div>
         <button type="button" className="ux-pool-row"><span><strong>{flattenUnits(roster)[0]?.name}<em className="ux-pool-count"> (1/3)</em></strong><small>{flattenUnits(roster)[0]?.role}</small></span><span className="ux-pool-meta"><b>{flattenUnits(roster)[0]?.points} pts</b><Chip tone="valid">available</Chip></span><Plus size={16} /></button>
-        <button type="button" className="ux-pool-row locked" disabled><span><strong>{flattenUnits(roster)[1]?.name}</strong><small>Maximum reached</small></span><span className="ux-pool-meta"><b>{flattenUnits(roster)[1]?.points} pts</b><Chip tone="error">locked</Chip></span><Plus size={16} /></button>
+        {/* DEC-054: a unit at its maximum: not dimmed; quota chip, unavailable Add, the reason in the hint bubble on press. */}
+        <div className="ux-pool-item" style={{ marginBottom: 72 }}><button type="button" className="ux-pool-row locked" aria-disabled="true" aria-label={`${flattenUnits(roster)[1]?.name}, ${flattenUnits(roster)[1]?.points} points. Unavailable: limit reached, 1 of 1 selected`}><span><strong>{flattenUnits(roster)[1]?.name}</strong><small>Limit reached</small></span><span className="ux-pool-meta"><b>{flattenUnits(roster)[1]?.points} pts</b><QuotaChip selected={1} max={1} /></span><span className="ws-limit-add ux-pool-limit-add" aria-hidden><i><Plus size={15} /></i></span></button><span role="tooltip" className="tb-hint-bubble ws-limit-bubble ux-pool-bubble">{limitReason(1, 1)}</span></div>
         <button type="button" className="ux-pool-hidden">Show hidden (2)</button>
       </ElementSection>
 
@@ -569,6 +571,16 @@ function WorkbenchElements({
         <section className="ux-mobile-unit-options compact ux-lk-detail"><LookupEntryBody entity={lookupById("d-line-formation")!} onOpen={() => undefined} /></section>
       </ElementSection>
 
+      <ElementSection title="Lookup Lifecycle States">
+        <div className="ux-lk-states-demo">
+          <section className="ux-mobile-unit-options compact ux-lk-detail"><small className="ux-result-label">Loading</small><LookupLoading /></section>
+          <section className="ux-mobile-unit-options compact ux-lk-detail"><small className="ux-result-label">Failure · Retry</small><LookupFailure /></section>
+          <section className="ux-mobile-unit-options compact ux-lk-detail"><small className="ux-result-label">Source unavailable</small><LookupUnavailable saved={unavailableSample} /></section>
+        </div>
+        <div className="ux-lk-element ux-lk-text-200-demo"><PhoneLookup initialQuery="reinforced" initialStack={["u-veteran-reinforced"]} largeText /></div>
+        <small className="ux-elements-note">DEC-054 (R0-03): Loading keeps the query and filters (chips without counts) and shows skeleton rows with "Searching installed data…", never a false "no results". Failure says "Search could not finish · Your installed data is still on this device." with Retry; the query and filters stay and it is not shown as zero results. A saved or opened reference whose source is no longer installed shows "Reference unavailable", names what was saved and offers Back to results; it never opens a same-name entry from another source or version. Large text (200 %): result and reference titles stop at two lines with an ellipsis; the heading keeps the whole name for screen readers, and Full name (or a tap on the title) shows it. The cap is for titles only, not reference text or explanations. Screens: Lookup · Loading, Failure, Source unavailable, Large text 200 % (phone and tablet).</small>
+      </ElementSection>
+
       <ElementSection title="Lookup Compact Unit Reference">
         <div className="ux-lk-element"><LookupEntryPage entity={lookupById("u-line-fc")!} back="Lookup" onBack={() => undefined} onOpen={() => undefined} /></div>
         <section className="ux-mobile-unit-options compact ux-lk-detail"><LookupEntryBody entity={lookupById("u-line-fc")!} onOpen={() => undefined} /></section>
@@ -635,6 +647,23 @@ function WorkbenchElements({
         </div>
         <div className="ux-src-chips"><SourceStatusChip status="ready" /><SourceStatusChip status="update" /><SourceStatusChip status="updating" /><SourceStatusChip status="review" /><SourceStatusChip status="broken" /></div>
         <section className="ux-sources-empty"><span><Database size={25} /></span><strong>No game data yet</strong><small>Add game data from a collection, a repository link or GitHub search.</small><button type="button"><Plus size={16} />Add game data</button></section>
+      </ElementSection>
+
+      <ElementSection title="Compact Source Status Action">
+        <div className="ux-src-status-demo">
+          <span><SourceStatusAction status="update" name={EXAMPLE_SYSTEM.name} next="b7c8d9e" /><small>Update available</small></span>
+          <span><SourceStatusAction status="updating" name={EXAMPLE_SYSTEM.name} percent={46} /><small>Updating 46 %</small></span>
+          <span><SourceStatusAction status="installing" name="Example System Five" percent={12} /><small>Installing</small></span>
+          <span><SourceStatusAction status="needs-you" name="Example System Five" /><small>Choose factions</small></span>
+          <span><SourceStatusAction status="review" name="Example System Four" /><small>Needs review</small></span>
+          <span><SourceStatusAction status="broken" name="Example System Six" /><small>Unreadable / failed</small></span>
+          <span><SourceStatusAction status="ready" name="Example System Three" showReady /><small>Up to date (Select mode)</small></span>
+        </div>
+        <div className="ux-source-list ux-managed-source-list ux-src-list ux-src-caption-demo">
+          <SourceRow source={EXAMPLE_SOURCES[0]} captionShown />
+          <SourceRow source={EXAMPLE_SOURCES[2]} />
+        </div>
+        <small className="ux-elements-note">DEC-054 (R0-08): the wide text chip leaves the Sources rows, so the source name keeps its width. A 44 px icon action trails the row: a download arrow when an update is available (pressing it is Update; accessible name "Update Example System One to b7c8d9e"), a progress ring with the percent while updating or installing, a hand when an install waits for Choose factions, a warning triangle for Needs review, an octagon for failed or unreadable data. Up to date shows nothing (a quiet check in Select mode). Each state has its own shape, never colour alone. Hover, keyboard focus or press and hold shows the caption in the hint bubble (first row); the sub-line names the new version. Tablet rows use the same action, visible at every pane width.</small>
       </ElementSection>
 
       <ElementSection title="Source Update Card">
@@ -748,6 +777,19 @@ function WorkbenchElements({
         <FocusCatalogueSearchSetting on={false} />
         <FocusCatalogueSearchSetting on />
         <small className="ux-elements-note">DEC-050 (UX-059): Settings › Advanced, off by default. Off: Add unit opens the Add unit sheet (phone), the catalogue pane or slide-over (tablet) or the catalogue (desktop) for browsing, so the on-screen keyboard does not cover the list; on: the search takes focus. ⌘F / Ctrl + F always focuses it where there is a keyboard; the phone's detail names no shortcut.</small>
+      </ElementSection>
+
+      <ElementSection title="Advanced Settings · Plain Rows">
+        <div className="ux-result-label">Advanced</div>
+        <AdvancedSettingsRows>
+          <FocusCatalogueSearchSetting on={false} />
+          <SeparateAllSetting on={false} />
+        </AdvancedSettingsRows>
+        <AdvancedSettingsRows>
+          <FocusCatalogueSearchSetting on={false} />
+          <SeparateAllSetting on />
+        </AdvancedSettingsRows>
+        <small className="ux-elements-note">DEC-054 (R0-02): Settings › Advanced holds two preferences, both off by default, as plain rows: no card around the section and none per row, a hairline between rows, the usual switch. Enable Separate all is a user opt-in: on, a unit with several models also offers Separate all (single-model units in one step); off, only Separate 1.</small>
       </ElementSection>
 
       <ElementSection title="Remember Option Sections Setting">

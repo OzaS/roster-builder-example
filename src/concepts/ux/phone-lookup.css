@@ -103,3 +103,39 @@
 .ux-lk-phone-top h2 { margin: 0; min-width: 0; font-size: 17px; line-height: 1.25; overflow-wrap: anywhere }
 .ux-lk-phone-top .ux-lk-base-cost { font-size: 17px }
 .ux-lk-phone-top button:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: -2px; border-radius: 22px }
+
+/* R0-03 (DEC-054): lifecycle states and the two-line title cap. */
+.ux-lk-clamp { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden }
+.ux-lk-row strong { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; white-space: normal; overflow-wrap: anywhere }
+.ux-lk-fullname { display: grid; justify-items: start; gap: 2px; margin-top: 4px }
+.ux-mobile-unit-options .ux-lk-fullname .ux-5a-link { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0; border: 0; background: none; color: var(--ux-accent-2); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer }
+.ux-lk-fullname p { margin: 0; color: var(--ux-ink); font-size: 15px; font-weight: 650; line-height: 1.35; overflow-wrap: anywhere }
+.ux-lk-clamp[onclick], h2.ux-lk-clamp { cursor: default }
+.ux-lk-state { display: grid; gap: 10px }
+.ux-lk-progress { display: flex; align-items: center; gap: 8px; margin: 4px 4px 0; color: var(--ux-muted); font-size: 13px; font-weight: 650 }
+.ux-lk-progress svg { color: var(--ux-accent-2) }
+.ux-lk-skeleton { display: grid; gap: 8px }
+.ux-lk-skeleton .head { display: block; width: 38%; height: 14px; margin: 6px 4px 2px; border-radius: 6px; background: var(--ux-line) }
+.ux-lk-skeleton .ux-skeleton-row { cursor: default }
+.ux-lk-skeleton .ux-skeleton-row small + small { width: 52% }
+.ux-5a-notice.ux-lk-failure svg { color: var(--ux-warn) }
+.ux-lk-failure > span { display: grid; justify-items: start; gap: 3px }
+.ux-lk-failure strong { color: var(--ux-ink); font-size: 14px }
+.ux-lk-failure small { color: var(--ux-muted); font-size: 13px; line-height: 1.4 }
+.ux-lk-failure .ux-job-btn { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; color: var(--ux-ink) }
+.ux-lk-unavailable { padding: 32px 20px }
+.ux-lk-unavailable > svg { color: var(--ux-muted) }
+.ux-lk-unavailable small { font-size: 13px; line-height: 1.45 }
+.ux-lk-unavailable .ux-lk-saved { color: var(--ux-ink); font-weight: 600 }
+/* Gallery state: the reference page at 200 % text (display zoom, as the tablet's text-size switch). */
+.ux-lk-page.ux-lk-text-200 { zoom: 2 }
+/* At large text the cost leaves the title's row and sits under it, so the capped title keeps the width. */
+.ux-lk-text-200 .ux-mobile-unit-options > .ux-lk-phone-top { grid-template-columns: 44px minmax(0, 1fr); row-gap: 0 }
+.ux-lk-text-200 .ux-lk-phone-top .ux-lk-base-cost { grid-column: 2; justify-self: start }
+/* Elements view: the three Lookup states side by side. */
+.ux-lk-states-demo { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 14px }
+.ux-lk-states-demo > section { padding: 12px; border: 1px solid var(--ux-line); border-radius: 14px; background: var(--ux-bg) }
+/* Elements view: the panel's section-heading style must not restyle the Lookup titles inside the demos. */
+.design-elements-panel.ux-screen .ux-element-section :is(.ux-lk-phone-top, .ux-lk-heading) h2 { color: var(--ux-ink); font-weight: 750; letter-spacing: 0; text-transform: none }
+.design-elements-panel.ux-screen .ux-element-section .ux-lk-phone-top h2 { font-size: 17px }
+.design-elements-panel.ux-screen .ux-element-section .ux-lk-heading h2 { font-size: 24px }

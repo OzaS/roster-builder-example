@@ -15,6 +15,7 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "tablet-editor-add-roles", label: "Tablet · Roster editor · Many unit roles" },
   { id: "tablet-editor-add-focus", label: "Tablet · Roster editor · Add unit, search focused" },
   { id: "tablet-editor-chip-caption", label: "Tablet · Roster editor · State chip caption" },
+  { id: "tablet-editor-limit-caption", label: "Tablet · Roster editor · Limit reached, reason shown" },
   { id: "tablet-editor-chips-text-150", label: "Tablet · Roster editor · State chips, text 150%" },
   { id: "tablet-settings-advanced", label: "Tablet · Settings · Advanced" },
   { id: "tablet-rosters-text-200", label: "Tablet · Rosters · Text 200%" },
@@ -23,6 +24,10 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "tablet-lookup-legacy", label: "Archive · Earlier tablet Lookup" },
   { id: "tablet-lookup-1-0", label: "Tablet · Lookup 1.0" },
   { id: "tablet-lookup-1-0-force", label: "Tablet · Lookup 1.0 · Force" },
+  { id: "tablet-lookup-1-0-loading", label: "Tablet · Lookup 1.0 · Loading" },
+  { id: "tablet-lookup-1-0-failed", label: "Tablet · Lookup 1.0 · Failure, retry" },
+  { id: "tablet-lookup-1-0-unavailable", label: "Tablet · Lookup 1.0 · Source unavailable" },
+  { id: "tablet-lookup-1-0-long-text-200", label: "Tablet · Lookup 1.0 · Large text 200%" },
   { id: "tablet-tools", label: "Tablet · Tools" },
   { id: "tablet-library", label: "Tablet · Library" },
   { id: "tablet-sources", label: "Tablet · Sources" },
@@ -62,6 +67,16 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "desktop-settings", label: "Desktop · Settings" },
   { id: "desktop-first-run", label: "Desktop · First run" },
   { id: "desktop-menus", label: "Desktop · Menu bar" },
+  { id: "desktop-editor-unit-dialog", label: "Desktop · Roster editor · Unit dialog" },
+  { id: "desktop-editor-unit-dialog-narrow", label: "Desktop · Roster editor · Unit dialog, narrow window" },
+  { id: "desktop-editor-unit-dialog-nested", label: "Desktop · Roster editor · Unit dialog, nested element" },
+  { id: "desktop-editor-unit-dialog-readonly", label: "Desktop · Roster editor · Unit dialog, read-only" },
+  { id: "desktop-editor-catalogue-limit", label: "Desktop · Roster editor · Catalogue limit reached" },
+  { id: "desktop-settings-advanced", label: "Desktop · Settings · Advanced" },
+  { id: "desktop-lookup-1-0-loading", label: "Desktop · Lookup 1.0 · Loading" },
+  { id: "desktop-lookup-1-0-failed", label: "Desktop · Lookup 1.0 · Search failed" },
+  { id: "desktop-lookup-1-0-unavailable", label: "Desktop · Lookup 1.0 · Reference unavailable" },
+  { id: "desktop-lookup-1-0-text-200", label: "Desktop · Lookup 1.0 · Text 200%" },
   { id: "library", label: "Lists" },
   { id: "library-v2", label: "Lists · V2" },
   { id: "library-filters", label: "Lists · Search, filters and grouping" },
@@ -89,6 +104,10 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "lookup-detachment", label: "Lookup · Detachment" },
   { id: "lookup-upgrade", label: "Lookup · Upgrade" },
   { id: "lookup-rule", label: "Lookup · Rule" },
+  { id: "lookup-loading", label: "Lookup · Loading" },
+  { id: "lookup-failed", label: "Lookup · Failure, retry" },
+  { id: "lookup-unavailable", label: "Lookup · Source unavailable" },
+  { id: "lookup-large-text", label: "Lookup · Large text 200%" },
   { id: "tools", label: "Tools" },
   { id: "roster-analytics", label: "Roster Analytics" },
   { id: "comparison", label: "Comparison" },
@@ -99,6 +118,7 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "smart-search", label: "Smart search" },
   { id: "add-detachment", label: "Add Detachment" },
   { id: "add-unit", label: "Add Unit" },
+  { id: "add-unit-limit", label: "Add Unit · Limit reached, reason shown" },
   { id: "unit-detail", label: "Unit Detail" },
   { id: "unit-options-mobile", label: "Unit detail · Mobile 5A + 5B + links" },
   { id: "option-drilldown", label: "Option Drilldown" },
@@ -126,17 +146,17 @@ export function resolveWorkflow(workflow?: WorkflowScreen[]): Array<{ id: Workfl
 
 export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScreen {
   if (screen === "tablet-archive-sketch") return "overview";
-  if (screen === "tablet-editor" || screen === "tablet-editor-issues" || screen === "tablet-editor-add" || screen === "tablet-editor-forces" || screen === "tablet-editor-add-force" || screen === "tablet-editor-readonly" || screen === "tablet-editor-export" || screen === "tablet-editor-import-result" || screen === "tablet-editor-move-unit" || screen === "tablet-editor-shortcuts" || screen === "tablet-editor-text-200" || screen === "tablet-editor-add-roles" || screen === "tablet-editor-add-focus" || screen === "tablet-editor-chip-caption" || screen === "tablet-editor-chips-text-150") return "overview";
+  if (screen === "tablet-editor" || screen === "tablet-editor-issues" || screen === "tablet-editor-add" || screen === "tablet-editor-forces" || screen === "tablet-editor-add-force" || screen === "tablet-editor-readonly" || screen === "tablet-editor-export" || screen === "tablet-editor-import-result" || screen === "tablet-editor-move-unit" || screen === "tablet-editor-shortcuts" || screen === "tablet-editor-text-200" || screen === "tablet-editor-add-roles" || screen === "tablet-editor-add-focus" || screen === "tablet-editor-chip-caption" || screen === "tablet-editor-limit-caption" || screen === "tablet-editor-chips-text-150") return "overview";
   if (screen.startsWith("tablet-")) return "library"; // every other tablet screen is a page or a state of one
   if (screen.startsWith("duo-")) return "library"; // Foldable screens: a pose, a page and a state (DuoWorkbench)
   if (screen === "tablet-home" || screen === "tablet-rosters" || screen === "tablet-lookup" || screen === "tablet-tools" || screen === "tablet-library" || screen === "tablet-sources" || screen === "tablet-settings") return "library";
   if (screen === "desktop-tools" || screen === "desktop-library") return "library";
   if (screen === "desktop-welcome") return "library";
-  if (screen === "desktop-editor") return "overview";
+  if (screen === "desktop-editor" || screen.startsWith("desktop-editor-")) return "overview";
   if (screen === "desktop-rosters") return "library";
   if (screen === "desktop-lookup-legacy" || screen === "desktop-lookup" || screen.startsWith("desktop-lookup-1-0")) return "catalogue";
   if (screen === "desktop-sources") return "sources";
-  if (screen === "desktop-settings") return "settings";
+  if (screen === "desktop-settings" || screen === "desktop-settings-advanced") return "settings";
   if (screen === "desktop-first-run") return "library";
   if (screen === "desktop-menus") return "overview";
   if (screen === "library-v2" || screen === "library-filters") return "library";
@@ -146,6 +166,7 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen === "drafts") return "library";
   if (screen === "source-legacy" || screen === "source" || screen.startsWith("lookup-")) return "catalogue";
   if (screen === "add-detachment") return "detachment";
+  if (screen === "add-unit-limit") return "add-unit";
   if (screen === "option-drilldown") return "unit-detail";
   if (screen === "diagnostics") return "validation";
   return screen as PrototypeScreen; // the tablet screens returned above are not narrowed away by startsWith

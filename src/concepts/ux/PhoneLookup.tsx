@@ -1,5 +1,5 @@
-import { useState, type ReactNode } from "react";
-import { Anchor, BookOpen, ChevronDown, ChevronLeft, ChevronRight, Clock3, Compass, Crown, Database, Feather, Flag, Gem, Hexagon, Info, Search, Shield, Star, Target, X, type LucideIcon } from "lucide-react";
+import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { AlertTriangle, Anchor, BookOpen, ChevronDown, ChevronLeft, ChevronRight, Clock3, Compass, Crown, Database, Feather, Flag, Gem, Hexagon, Info, LoaderCircle, RotateCcw, Search, SearchX, Shield, Star, Target, X, type LucideIcon } from "lucide-react";
 import { factionLabel, kindLabel, lookupById, lookupEntities, lookupSystems, sourceLine, systemVersion, type LookupEntity } from "../../data/lookupData";
 import { PhoneSearchHeader } from "./PhoneSearchHeader";
 import { FoldSection } from "./MobileUnitOptions";
@@ -18,10 +18,19 @@ import "./phone-lookup.css";
  */
 const recentIds = ["r-hold-line", "u-line-fc", "d-line-formation"];
 
-export function PhoneLookup({ initialQuery = "line", initialStack = [], noData = false, trailing, onAddData }: { initialQuery?: string; initialStack?: string[]; noData?: boolean; trailing?: ReactNode; onAddData?: () => void }) {
+export function PhoneLookup({ initialQuery = "line", initialStack = [], noData = false, trailing, onAddData, phase: initialPhase = "ready", unavailable = false, largeText = false }: {
+  initialQuery?: string; initialStack?: string[]; noData?: boolean; trailing?: ReactNode; onAddData?: () => void;
+  /** R0-03 (DEC-054) gallery states: the search in progress or failed; a saved reference whose source is gone; the page at 200 % text. */
+  phase?: LookupPhase; unavailable?: boolean; largeText?: boolean;
+}) {
   const lk = useLookup(initialQuery);
   const { query, systems, results, allResults, ordered, openIds, typed, withSystem } = lk;
   const [stack, setStack] = useState<string[]>(initialStack);
+  const [phase, setPhase] = useState<LookupPhase>(initialPhase);
+  const [missing, setMissing] = useState(unavailable);
+  const retry = () => { setPhase("loading"); window.setTimeout(() => setPhase("ready"), 1400); };
+  // Counts are known only once a search has finished; while it runs or after it failed the chips keep the filters without counts.
+  const counted = typed && phase === "ready";
   const [recent, setRecent] = useState(recentIds);
   const push = (id: string) => { setStack((s) => [...s, id]); setRecent((r) => [id, ...r.filter((x) => x !== id)].slice(0, 5)); };
   const row = (e: LookupEntity, wide = withSystem) => (
@@ -41,8 +50,8 @@ export function PhoneLookup({ initialQuery = "line", initialStack = [], noData =
           <div className="ux-search-empty ux-lk-empty"><BookOpen size={22} /><strong>Nothing to look up yet</strong><small>Lookup searches the units, detachments, upgrades and rules of your installed game data.</small><button type="button" className="ux-job-btn" onClick={onAddData}><Database size={15} />Add game data</button></div>
         ) : <>
           {lookupSystems.length > 1 ? <div className="ux-lf-row"><div className="ux-lf-filters ux-lf-scroll ux-lf-always" role="group" aria-label="Game systems to search">
-            <button type="button" className={`ux-lf-chip ${systems === null ? "active" : ""}`} aria-pressed={systems === null} aria-label={typed ? `All systems, ${plural(allResults.length, "result")}` : "All systems"} onClick={() => lk.setSystems(null)}>All{typed ? ` ${allResults.length}` : ""}</button>
-            {lookupSystems.map((s) => { const on = systems?.includes(s.name) ?? false; const n = lk.countIn(s.name); return <button type="button" key={s.name} className={`ux-lf-chip ${on ? "active" : ""}`} aria-pressed={on} aria-label={typed ? `${s.name}, ${plural(n, "result")}` : s.name} onClick={() => lk.pickSystem(s.name)}><span>{s.name}</span>{typed ? ` ${n}` : ""}</button>; })}
+            <button type="button" className={`ux-lf-chip ${systems === null ? "active" : ""}`} aria-pressed={systems === null} aria-label={counted ? `All systems, ${plural(allResults.length, "result")}` : "All systems"} onClick={() => lk.setSystems(null)}>All{counted ? ` ${allResults.length}` : ""}</button>
+            {lookupSystems.map((s) => { const on = systems?.includes(s.name) ?? false; const n = lk.countIn(s.name); return <button type="button" key={s.name} className={`ux-lf-chip ${on ? "active" : ""}`} aria-pressed={on} aria-label={counted ? `${s.name}, ${plural(n, "result")}` : s.name} onClick={() => lk.pickSystem(s.name)}><span>{s.name}</span>{counted ? ` ${n}` : ""}</button>; })}
           </div></div> : null}
           {!typed ? (
             <section className="ux-lk-start" aria-label="Recently viewed">
@@ -50,7 +59,7 @@ export function PhoneLookup({ initialQuery = "line", initialStack = [], noData =
               <h3 className="ux-lk-recent-head"><Clock3 size={14} aria-hidden />Recently viewed</h3>
               <div className="ux-lk-rows">{recent.map((id) => lookupById(id)).filter((e): e is LookupEntity => !!e).map((e) => row(e, true))}</div>
             </section>
-          ) : ordered.length === 0 ? (
+          ) : phase === "loading" ? <LookupLoading /> : phase === "failed" ? <LookupFailure onRetry={retry} /> : ordered.length === 0 ? (
             <div className="ux-search-empty ux-lk-empty"><Search size={19} /><strong>Nothing found for “{query.trim()}”</strong><small>Check the spelling, or try part of the name.</small>{systems !== null ? <button type="button" className="ux-job-btn" onClick={() => lk.setSystems(null)}>Search all systems</button> : null}</div>
           ) : (
             <div className="ux-lk-results" role="status" aria-label={`${plural(results.length, "result")}`}>
@@ -59,9 +68,48 @@ export function PhoneLookup({ initialQuery = "line", initialStack = [], noData =
           )}
         </>}
       </div>
-      {top ? <div className="ux-lk-page"><LookupEntryPage key={top.id} entity={top} back={stack.length > 1 ? lookupById(stack[stack.length - 2])?.name ?? "Lookup" : "Lookup"} onBack={() => setStack((s) => s.slice(0, -1))} onOpen={push} /></div> : null}
+      {missing ? <div className="ux-lk-page"><section className="ux-mobile-unit-options ux-lk-detail" aria-label="Reference unavailable">
+        <header className="ux-5a-header ux-lk-phone-top"><button type="button" onClick={() => setMissing(false)} aria-label="Back to Lookup" title="Back to Lookup"><ChevronLeft size={24} aria-hidden /></button><h2>Saved reference</h2></header>
+        <LookupUnavailable saved={unavailableSample} onBack={() => setMissing(false)} />
+      </section></div>
+        : top ? <div className={`ux-lk-page ${largeText ? "ux-lk-text-200" : ""}`}><LookupEntryPage key={top.id} entity={top} fullNameOpen={largeText} back={stack.length > 1 ? lookupById(stack[stack.length - 2])?.name ?? "Lookup" : "Lookup"} onBack={() => setStack((s) => s.slice(0, -1))} onOpen={push} /></div> : null}
     </>
   );
+}
+
+export type LookupPhase = "ready" | "loading" | "failed";
+
+/** R0-03 (DEC-054): a search in progress over the installed data. Query and filters stay; skeleton rows, never a false "no results". */
+export function LookupLoading() {
+  return <div className="ux-lk-state" role="status" aria-live="polite" aria-busy="true">
+    <p className="ux-lk-progress"><LoaderCircle size={16} className="ux-spin" aria-hidden />Searching installed data…</p>
+    <div className="ux-lk-skeleton" aria-hidden><i className="head" />{[0, 1, 2].map((i) => <article key={i} className="ux-source-row ux-src-row ux-skeleton-row"><span><strong>&nbsp;</strong><small>&nbsp;</small><small>&nbsp;</small></span></article>)}</div>
+  </div>;
+}
+
+/** R0-03: the search could not finish. Query and filters stay; an actionable failure with Retry, not zero results. */
+export function LookupFailure({ onRetry }: { onRetry?: () => void }) {
+  return <div className="ux-5a-notice ux-lk-failure" role="alert">
+    <AlertTriangle size={18} aria-hidden /><span><strong>Search could not finish</strong><small>Your installed data is still on this device.</small>
+      <button type="button" className="ux-job-btn" onClick={onRetry}><RotateCcw size={15} aria-hidden />Retry</button></span>
+  </div>;
+}
+
+export type SavedReference = { name: string; faction: string; source: string };
+/** Synthetic sample (DEC-001): a reference saved from a game system that has since been removed. */
+export const unavailableSample: SavedReference = { name: "Line Infantry", faction: "Iron Choir", source: "Example System Three v2.0" };
+
+/**
+ * R0-03: an opened or saved reference whose source is no longer installed. Never opens a same-name entry from another source or
+ * version instead; it names what was saved and offers the way back.
+ */
+export function LookupUnavailable({ saved, onBack, backLabel = "Back to results" }: { saved: SavedReference; onBack?: () => void; backLabel?: string }) {
+  return <div className="ux-search-empty ux-lk-empty ux-lk-unavailable" role="status">
+    <SearchX size={22} aria-hidden /><strong>Reference unavailable</strong>
+    <small>The source for this saved reference is no longer installed.</small>
+    <small className="ux-lk-saved">Saved: {saved.name} · {saved.faction} · {saved.source}</small>
+    <button type="button" className="ux-job-btn" onClick={onBack}><ChevronLeft size={15} aria-hidden />{backLabel}</button>
+  </div>;
 }
 
 /** A result section: header button with the group's count (and a preview of the names while folded), then its rows. */
@@ -75,29 +123,60 @@ export function LookupSection({ label, count, names, folded, onToggle, children 
   </section>;
 }
 
-/** Read-only reference page for one result. */
-export function LookupEntryPage({ entity: e, back, onBack, onOpen }: { entity: LookupEntity; back: string; onBack: () => void; onOpen: (id: string) => void }) {
+/** Read-only reference page for one result. `fullNameOpen`: the gallery's large-text state starts with the full name shown. */
+export function LookupEntryPage({ entity: e, back, onBack, onOpen, fullNameOpen = false }: { entity: LookupEntity; back: string; onBack: () => void; onOpen: (id: string) => void; fullNameOpen?: boolean }) {
   const kind = kindLabel(e);
+  const title = useTitleCap(e.name, fullNameOpen);
   return <section className="ux-mobile-unit-options ux-lk-detail" aria-label={`${kind}: ${e.name}`}>
     <header className="ux-5a-header ux-lk-phone-top">
       <button type="button" onClick={onBack} aria-label={`Back to ${back}`} title={`Back to ${back}`}><ChevronLeft size={24} aria-hidden /></button>
-      <h2>{e.name}</h2>{e.cost ? <strong className="ux-lk-base-cost">{e.cost}</strong> : null}
+      <h2 ref={title.ref} className="ux-lk-clamp" onClick={title.clamped ? title.toggle : undefined}>{e.name}</h2>{e.cost ? <strong className="ux-lk-base-cost">{e.cost}</strong> : null}
     </header>
-    <LookupEntryBody entity={e} onOpen={onOpen} showHeading={false} />
+    <LookupEntryBody entity={e} onOpen={onOpen} showHeading={false} fullName={title} />
   </section>;
 }
 
-/** The reference content, shared by the phone page and the tablet/desktop detail panes. */
-export function LookupEntryBody({ entity: e, onOpen, showHeading = true }: { entity: LookupEntity; onOpen: (id: string) => void; showHeading?: boolean }) {
+type TitleCap = ReturnType<typeof useTitleCap>;
+/**
+ * R0-03 (DEC-054): reference and result titles are capped at two lines with an ellipsis (large text). The heading keeps the whole
+ * name as its text, so screen readers read it in full; when the cap cuts it, a Full name disclosure (or a tap on the title) shows it.
+ */
+function useTitleCap(name: string, initialOpen = false) {
+  const ref = useRef<HTMLHeadingElement>(null);
+  const [clamped, setClamped] = useState(false);
+  const [open, setOpen] = useState(initialOpen);
+  useLayoutEffect(() => {
+    const el = ref.current; if (!el) return;
+    const check = () => setClamped(el.scrollHeight > el.clientHeight + 1);
+    check();
+    const observer = new ResizeObserver(check); observer.observe(el);
+    return () => observer.disconnect();
+  }, [name]);
+  return { ref, clamped, open, toggle: () => setOpen((v) => !v) };
+}
+
+function FullName({ name, cap }: { name: string; cap: TitleCap }) {
+  if (!cap.clamped) return null;
+  return <div className="ux-lk-fullname">
+    <button type="button" className="ux-5a-link" aria-expanded={cap.open} onClick={cap.toggle}>Full name {cap.open ? <ChevronDown size={15} aria-hidden /> : <ChevronRight size={15} aria-hidden />}</button>
+    {cap.open ? <p>{name}</p> : null}
+  </div>;
+}
+
+/** The reference content, shared by the phone page and the tablet/desktop detail panes. `fullName`: the page's title cap (phone). */
+export function LookupEntryBody({ entity: e, onOpen, showHeading = true, fullName, fullNameOpen = false }: { entity: LookupEntity; onOpen: (id: string) => void; showHeading?: boolean; fullName?: TitleCap; fullNameOpen?: boolean }) {
   const kind = kindLabel(e);
+  const own = useTitleCap(e.name, fullNameOpen);
+  const cap = fullName ?? own;
   // The model range belongs to Layout; do not repeat it in the reference heading.
   const summary = e.layout ? e.summary.split(" · ").filter(part => part !== e.layout?.models).join(" · ") : e.summary;
   return <>
     <div className="ux-lk-title">
-      {showHeading ? <div className="ux-lk-heading"><h2>{e.name}</h2>{e.cost ? <strong className="ux-lk-base-cost">{e.cost}</strong> : null}</div> : null}
+      {showHeading ? <div className="ux-lk-heading"><h2 ref={own.ref} className="ux-lk-clamp" onClick={own.clamped ? own.toggle : undefined}>{e.name}</h2>{e.cost ? <strong className="ux-lk-base-cost">{e.cost}</strong> : null}</div> : null}
       <small className="ux-lk-kind">{summary.startsWith(kind) ? summary : `${kind} · ${summary}`}</small>
       <small>{factionLabel(e)} · {e.system} {systemVersion(e.system)}</small>
       {e.cost && e.costNote ? <small className="ux-lk-cost-note">{e.costNote}</small> : null}
+      <FullName name={e.name} cap={cap} />
     </div>
     {e.conditional ? <div className="ux-5a-notice ux-lk-cond" role="note"><Info size={18} /><span><strong>Conditional</strong><small>{e.conditional}</small></span></div> : null}
     {e.group === "unit" ? <UnitBody e={e} onOpen={onOpen} /> : null}

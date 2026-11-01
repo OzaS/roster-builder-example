@@ -89,6 +89,4 @@
 /* New roster on the rail (iPad and Android): the top item, the rail's language with a filled pill, set apart from the
    destinations below it. */
 .tb-app .tb-rail button.tb-rail-item.prominent { margin-bottom: 14px }
-/* Navigation labels retain the rail’s larger-text treatment. Actions have no captions. */
-.tb-app[data-text="200"] :is(button.tb-rail-item:not(.tb-rail-create) > span:last-child) { font-size: 9px }
 .tb-compact .tb-top-row { gap: 8px }
