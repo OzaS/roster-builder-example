@@ -10,7 +10,6 @@ export function MobileUnitOptions({ onBack, state = "ready", compact = false, in
   const [drills, setDrills] = useState(true);
   const [drilled, setDrilled] = useState(initialDrilled);
   const [drill, setDrill] = useState<string | undefined>("Drill A");
-  const [showHidden, setShowHidden] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(state === "error");
   const [tab, setTab] = useState(initialTab);
@@ -72,8 +71,6 @@ export function MobileUnitOptions({ onBack, state = "ready", compact = false, in
         </FoldSection></div>
         <h4>Links</h4>
         <div className="ux-5a-card"><h4>Escorting</h4><small className={escort ? "" : "ux-5a-invalid"}>{escort ? "1/1 linked" : <><AlertTriangle size={13} />0/1 linked · Needs 1 more link</>}</small><div role="radiogroup" aria-label="Escorting">{["Squad A", "Squad B"].map(name => <button type="button" role="radio" aria-checked={escort === name} className="ux-5a-choice" key={name} onClick={() => change(() => setEscort(escort === name ? undefined : name))}>{escort === name ? <CheckCircle2 size={21} /> : <Circle size={21} />}<span><strong>{name}</strong></span></button>)}<div className="ux-5a-choice"><Circle size={21} /><span><strong>Squad C</strong><small className="ux-5b-warn">No longer eligible</small></span></div></div></div>
-        <button className="ux-5a-link" type="button" onClick={() => setShowHidden(!showHidden)}>{showHidden ? "Hide hidden options" : "Show hidden options (1)"}</button>
-        {showHidden ? <div className="ux-5a-card"><strong>Secret option</strong><small>Hidden</small><small>No added cost</small><Count name="Secret option" value={0} min={0} disabled={true} onChange={() => {}} /></div> : null}
       </div>
     </>}
     <h4>Categories</h4>

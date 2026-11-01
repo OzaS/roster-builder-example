@@ -699,7 +699,6 @@ function InlineForceDraft({ props, onClose }: { props: ConceptProps; onClose: ()
 function ForceSelector({ props, onClose }: { props: ConceptProps; onClose: () => void }) {
   const [query, setQuery] = useState("");
   const [catalogueId, setCatalogueId] = useState(mockCatalogues[0]?.id ?? "");
-  const [showHidden, setShowHidden] = useState(false);
   const [choosingFaction, setChoosingFaction] = useState(false);
   const match = (name: string) => name.toLowerCase().includes(query.trim().toLowerCase());
   const detachments = mockDetachments.filter((item) => match(item.name));
@@ -733,7 +732,6 @@ function ForceSelector({ props, onClose }: { props: ConceptProps; onClose: () =>
           <div className="ux-force-choice-list" aria-label="Top-level forces">
             {detachments.length ? detachments.map((item, index) => <button type="button" key={item.id} onClick={() => add(item.id)}><span><strong>{item.name} {index === 0 ? "(1)" : "(0)"}</strong>{index === 0 ? null : <small>{item.fit}</small>}</span><Plus size={15} /></button>) : <div className="ux-loadout-selector-empty"><strong>No matching forces</strong><small>Try another name.</small></div>}
           </div>
-          <button type="button" className="ux-pool-hidden" aria-pressed={showHidden} onClick={() => setShowHidden((value) => !value)}>{showHidden ? "Hide hidden entries" : "Show hidden (3)"}</button>
         </div>
         <footer><button type="button" onClick={onClose}>Close</button></footer>
       </section>
@@ -1151,7 +1149,6 @@ function ReferenceDefinition({ reference, onOpenReference }: { reference: Roster
 function AddPane({ props }: { props: ConceptProps }) {
   const [added, setAdded] = useState<Record<string, number>>({});
   const [lastAdded, setLastAdded] = useState<string | null>(null);
-  const [showHidden, setShowHidden] = useState(false);
   // Gallery state add-unit-limit (DEC-054): the sheet opened on a section with a unit at its maximum, its reason shown.
   const limitState = props.workflowScreen === "add-unit-limit" || props.workflowScreen === "add-unit-text-200";
   // R0 gap frames: "Focus search when opening the catalogue" on (search focused, keyboard shown) and the sheet at 200 % text.
@@ -1231,7 +1228,6 @@ function AddPane({ props }: { props: ConceptProps }) {
           );
         })}
       </div>
-      <button type="button" className="ux-pool-hidden" aria-pressed={showHidden} onClick={() => setShowHidden((value) => !value)}>{showHidden ? "Hide hidden entries" : "Show hidden (2)"}</button>
     </section>
   );
 }

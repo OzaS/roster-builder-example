@@ -6044,17 +6044,6 @@ button.ux-reference-tag:focus-visible {
   background: color-mix(in srgb, currentColor 8%, transparent);
 }
 
-.ux-pool-hidden {
-  margin-top: 8px;
-  border: 0;
-  background: none;
-  color: inherit;
-  opacity: 0.7;
-  font-size: 12px;
-  text-align: left;
-  cursor: pointer;
-}
-
 .ux-force-required {
   font-style: normal;
   color: #d64545;
