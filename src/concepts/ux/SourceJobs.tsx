@@ -245,6 +245,23 @@ export function installSteps(stage: "download" | "import" | "failed" | "done", i
 
 // ---------------------------------------------------------------- advanced installation (plan 2B)
 
+/**
+ * Settings → Rosters → Reopen roster on launch (DEC-056; a user preference, off by default). Off: a new launch starts on the
+ * usual landing page. On: the roster that was open when the app was quit opens again. It never restores a deep Settings,
+ * Account or Sources page. The same wording is used on the phone and the tablet.
+ */
+export const REOPEN_ROSTER_TITLE = "Reopen roster on launch";
+export const REOPEN_ROSTER_DETAIL = "The roster open when you quit opens again.";
+export function ReopenRosterSetting({ on, onToggle }: { on: boolean; onToggle?: () => void }) {
+  return (
+    <button type="button" className={`ux-setting-row ${on ? "on" : ""}`} role="switch" aria-checked={on} onClick={onToggle}>
+      <span className="ux-setting-icon"><History size={17} /></span>
+      <span className="ux-setting-text"><strong>{REOPEN_ROSTER_TITLE}</strong><small>{REOPEN_ROSTER_DETAIL}</small></span>
+      <span className="ux-switch" aria-hidden />
+    </button>
+  );
+}
+
 /** Settings → Rosters → Remember option sections (UX-005, DEC-035; a user preference, on by default). */
 export function RememberSectionsSetting({ on, onToggle }: { on: boolean; onToggle?: () => void }) {
   return (
