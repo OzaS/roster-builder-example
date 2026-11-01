@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { AlertTriangle, ArrowDownToLine, ArrowRight, ArrowUpCircle, BookOpen, Check, ChevronRight, CircleAlert, Copy, Database, ExternalLink, FileUp, FolderOpen, Github, HardDrive, Info, Keyboard, Languages, Layers3, Link2, ListFilter, Palette, Pencil, Plus, RefreshCcw, Search, Shield, SlidersHorizontal, Trash2, Upload, Users, X } from 'lucide-react';
+import { AlertTriangle, ArrowDownToLine, ArrowRight, ArrowUpCircle, BookOpen, Check, ChevronRight, CircleAlert, Copy, Database, ExternalLink, FileUp, FolderOpen, Github, HardDrive, Info, Keyboard, Languages, Layers3, Link2, ListFilter, Minus, Palette, Pencil, Plus, RefreshCcw, Search, Shield, SlidersHorizontal, Trash2, Upload, Users, Wrench, X } from 'lucide-react';
 import type { ColorScheme } from '../../types';
 import { collectionSources, colourSchemes, installedSources, lookupEntries, rosterLibrary, type LookupKind, type RosterSummary, type SourceInfo } from './desktopData';
 import { comboFromEvent, defaultBindings, formatCombo, hasCommandModifier, keyActions, type KeyAction, type KeyBindings } from './desktopKeys';
@@ -10,6 +10,7 @@ import { Chip, Segmented, Switch } from '../workspace/Primitives';
 export const PageTitle = ({ children }: { children: ReactNode }) => <h1 className="dt-visually-hidden">{children}</h1>;
 import type { Notify } from '../workspace/Toasts';
 import './desktop-pages.css';
+import './desktop-gaps.css';
 import { ExportDialog, primaryForce, specialRoster, type ExportRoster } from './DesktopEditorFlows';
 import { AddCollectionDialog, AddDataCollections, CollectionView, GitHubSearchView, LastUpdateCard, LastUpdateStates, SourceStatus, UpdateReportView, flowSourceId, isAddFlow, sourceStatusText, useRosterChecks, type SourceStatusKind } from './DesktopSourceFlows';
 
@@ -226,56 +227,102 @@ const settingsSections = [
   { id: 'keys', label: 'Key bindings', icon: Keyboard },
   { id: 'advanced', label: 'Advanced', icon: SlidersHorizontal },
   { id: 'about', label: 'About', icon: Info },
+  { id: 'developer', label: 'Developer options', icon: Wrench },
 ] as const;
 
-export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, bindings, onBindings, advancedInstall, onAdvancedInstall, focusSearch, onFocusSearch, separateAll, onSeparateAll, initialSection, notify }: { themePref: 'system' | 'light' | 'dark'; onThemePref: (v: 'system' | 'light' | 'dark') => void; scheme: ColorScheme; onScheme: (v: ColorScheme) => void; bindings: KeyBindings; onBindings: (next: KeyBindings) => void; advancedInstall: boolean; onAdvancedInstall: (v: boolean) => void; focusSearch: boolean; onFocusSearch: (v: boolean) => void; separateAll: boolean; onSeparateAll: (v: boolean) => void; initialSection?: string; notify: Notify }) {
+/** UX-053: what Settings search matches, per row: the name, its description and the words of its choices. */
+const settingsIndex: Record<string, Record<string, string>> = {
+  appearance: { theme: 'Theme System follows your desktop setting. System Light Dark', scale: 'UI scale Zoom in, zoom out and actual size. Larger or smaller text and controls. Reset', scheme: 'Colour scheme Default Crimson Gilded Azure Verdant Import scheme' },
+  language: { pick: 'Language English Français imported', pack: 'Import language pack Only the app is translated. Game data is shown as written.' },
+  rosters: { remember: 'Remember option sections Folded option sections stay folded the next time you open a unit.', reopen: 'Reopen tabs on launch Rosters open when you quit come back as tabs.' },
+  data: { checks: 'Check for updates automatically When the app starts and every few hours while it is open.', install: 'Advanced installation Choose which factions to install when you add game data. Off: everything is installed.', keep: 'Keep previous versions Older versions are deleted after an update. Uses about 13 MB per source.' },
+  storage: { folder: 'Data folder Show in Finder', usage: 'Storage used Game data Kept versions Rosters' },
+  keys: { all: `Key bindings Select a binding and press the new keys. ${keyActions.map(a => a.label).join(' ')}` },
+  advanced: { focus: 'Focus search when opening the catalogue Find in catalogue', separate: 'Enable Separate all A unit with several models also offers Separate all' },
+  about: { facts: 'About Version Engine Protocol SQLite Game data and rosters stay on this device.' },
+  developer: { hidden: 'Show hidden Shows entries the game data marks as hidden, in the catalogue and in option lists. Developer options' },
+};
+/** The zoom steps behind View › Zoom in / Zoom out; Actual size and Reset are 100 %. */
+const SCALE_STEPS = [50, 67, 75, 80, 90, 100, 110, 125, 150, 175, 200, 250, 300];
+
+export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, bindings, onBindings, advancedInstall, onAdvancedInstall, focusSearch, onFocusSearch, separateAll, onSeparateAll, initialSection, initialQuery = '', initialDeveloper = false, initialScale = 100, notify }: { themePref: 'system' | 'light' | 'dark'; onThemePref: (v: 'system' | 'light' | 'dark') => void; scheme: ColorScheme; onScheme: (v: ColorScheme) => void; bindings: KeyBindings; onBindings: (next: KeyBindings) => void; advancedInstall: boolean; onAdvancedInstall: (v: boolean) => void; focusSearch: boolean; onFocusSearch: (v: boolean) => void; separateAll: boolean; onSeparateAll: (v: boolean) => void; initialSection?: string; initialQuery?: string; initialDeveloper?: boolean; initialScale?: number; notify: Notify }) {
   const [active, setActive] = useState<string>(initialSection ?? 'appearance');
   const [language, setLanguage] = useState('en');
   const [toggles, setToggles] = useState({ rememberSections: true, restoreTabs: true, autoChecks: true });
   const [keep, setKeep] = useState(1);
+  const [query, setQuery] = useState(initialQuery);
+  // UX-052: Show hidden lives under Developer options, which exist only after the unlock (seven clicks on Version in About, DEC-022).
+  const [developer, setDeveloper] = useState(initialDeveloper);
+  const [showHidden, setShowHidden] = useState(false);
+  const versionClicks = useRef(0);
+  // UX-054: the UI scale is the window's page zoom, the same value View › Zoom in / Zoom out / Actual size change.
+  const [scale, setScale] = useState(initialScale);
+  const stepScale = (dir: 1 | -1) => { const at = Math.max(0, SCALE_STEPS.findIndex(s => s >= scale)); const next = SCALE_STEPS[Math.min(SCALE_STEPS.length - 1, Math.max(0, at + dir))]; setScale(next); notify(`UI scale ${next} %. The whole window follows.`); };
   const scrollRef = useRef<HTMLDivElement>(null);
   const flip = (key: keyof typeof toggles) => (v: boolean) => setToggles(t => ({ ...t, [key]: v }));
+  // Search: a row shows when its name, description or choices contain the query; a matching section title shows the whole section.
+  // Developer options are searched only while they are unlocked, so search never reveals them.
+  const q = query.trim().toLowerCase();
+  const sectionsOn = settingsSections.filter(s => s.id !== 'developer' || developer);
+  const rowOn = (sec: string, row: string) => !q || (sec === 'developer' ? 'developer options' : settingsSections.find(s => s.id === sec)?.label ?? '').toLowerCase().includes(q) || settingsIndex[sec][row].toLowerCase().includes(q);
+  const countIn = (sec: string) => Object.keys(settingsIndex[sec]).filter(row => rowOn(sec, row)).length;
+  const hits = sectionsOn.filter(s => countIn(s.id) > 0);
+  const total = hits.reduce((n, s) => n + countIn(s.id), 0);
+  const show = (sec: string) => countIn(sec) > 0;
   const go = (id: string) => { setActive(id); scrollRef.current?.querySelector(`#dtp-set-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
   // A standalone link can open a section (`&section=advanced`); the list keeps tracking the scroll from there.
   useEffect(() => { if (initialSection) scrollRef.current?.querySelector(`#dtp-set-${initialSection}`)?.scrollIntoView({ block: 'start' }); }, [initialSection]);
   return <main className="dtp-page">
     <PageTitle>Settings</PageTitle>
+    {/* UX-051: the list and the cards are centred in the content area; UX-053: Find a setting spans the same width. */}
     <div className="dtp-settings">
-      <nav className="dtp-settings-nav" aria-label="Settings sections">{settingsSections.map(s => <button key={s.id} className={active === s.id ? 'active' : ''} aria-current={active === s.id ? 'true' : undefined} onClick={() => go(s.id)}><s.icon size={15} />{s.label}</button>)}</nav>
-      <div className="dtp-settings-body" ref={scrollRef} onScroll={e => { const box = e.currentTarget; const top = box.getBoundingClientRect().top + 48; const chosen = box.querySelector(`#dtp-set-${active}`)?.getBoundingClientRect(); if (box.scrollTop + box.clientHeight >= box.scrollHeight - 2 && chosen && chosen.top >= box.getBoundingClientRect().top - 2) return; /* at the end a chosen short section stays chosen */ const current = settingsSections.filter(sec => (e.currentTarget.querySelector(`#dtp-set-${sec.id}`)?.getBoundingClientRect().top ?? Infinity) <= top).pop(); if (current) setActive(current.id); }}>
-        <section id="dtp-set-appearance" className="dtp-card dtp-settings-card"><h2>Appearance</h2>
-          <div className="dtp-setting-line"><span><strong>Theme</strong><small>System follows your desktop setting.</small></span><Segmented label="Theme" value={themePref} onChange={onThemePref} options={[{ value: 'system', label: 'System' }, { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }]} /></div>
-          <div className="dtp-setting-block"><strong>Colour scheme</strong><div className="dtp-scheme-grid" role="radiogroup" aria-label="Colour scheme">{colourSchemes.map(c => <button key={c.id} role="radio" aria-checked={scheme === c.id} className={scheme === c.id ? 'active' : ''} onClick={() => onScheme(c.id)}><span className="dtp-swatch"><i style={{ background: 'var(--ux-bg)' }} /><i style={{ background: c.accent }} /><i style={{ background: 'var(--ux-surface-2)' }} /></span>{c.name}{scheme === c.id && <Check size={14} />}</button>)}<button onClick={() => notify('Choose a colour scheme file (JSON)')}><Upload size={15} />Import scheme</button></div></div>
-        </section>
-        <section id="dtp-set-language" className="dtp-card dtp-settings-card"><h2>Language</h2>
-          <div className="dtp-rows" role="radiogroup" aria-label="Language">{[['en', 'English'], ['fr', 'Français · imported']].map(([id, name]) => <button key={id} role="radio" aria-checked={language === id} className="dtp-setting-row" onClick={() => setLanguage(id)}><span><strong>{name}</strong></span>{language === id && <Check size={16} />}</button>)}</div>
-          <div className="dtp-setting-foot"><button className="dtp-btn" onClick={() => notify('Choose a language pack (JSON)')}><Upload size={14} />Import language pack</button><small>Only the app is translated. Game data is shown as written.</small></div>
-        </section>
-        <section id="dtp-set-rosters" className="dtp-card dtp-settings-card"><h2>Rosters</h2>
-          <Switch label="Remember option sections" detail="Folded option sections stay folded the next time you open a unit." checked={toggles.rememberSections} onChange={flip('rememberSections')} />
-          <Switch label="Reopen tabs on launch" detail="Rosters open when you quit come back as tabs." checked={toggles.restoreTabs} onChange={flip('restoreTabs')} />
-        </section>
-        <section id="dtp-set-data" className="dtp-card dtp-settings-card"><h2>Game data</h2>
-          <Switch label="Check for updates automatically" detail="When the app starts and every few hours while it is open." checked={toggles.autoChecks} onChange={flip('autoChecks')} />
-          <Switch label="Advanced installation" detail="Choose which factions to install when you add game data. Off: everything is installed." checked={advancedInstall} onChange={onAdvancedInstall} />
-          <div className="dtp-setting-line"><span><strong>Keep previous versions</strong><small>{keep === 0 ? 'Older versions are deleted after an update.' : `Uses about ${keep * 13} MB per source.`}</small></span><Segmented label="Keep previous versions" value={keep} onChange={setKeep} options={[0, 1, 2, 3].map(v => ({ value: v, label: v === 0 ? 'Off' : String(v) }))} /></div>
-        </section>
-        <section id="dtp-set-storage" className="dtp-card dtp-settings-card"><h2>Storage</h2>
-          <div className="dtp-setting-line"><span><strong>Data folder</strong><small className="dtp-mono">~/Library/Application Support/Battle Augur</small></span><button className="dtp-btn" onClick={() => notify('Opens the folder in Finder')}><FolderOpen size={14} />Show in Finder</button></div>
-          <div className="dtp-storage-bar" aria-label="Storage used"><i style={{ width: '62%' }} /><i style={{ width: '8%' }} /><i style={{ width: '4%' }} /></div>
-          <div className="dtp-legend"><span><i />Game data 53.9 MB</span><span><i />Kept versions 12.8 MB</span><span><i />Rosters 0.4 MB</span></div>
-        </section>
-        <section id="dtp-set-keys" className="dtp-card dtp-settings-card"><KeyBindingsEditor bindings={bindings} onBindings={onBindings} /></section>
+      <div className="dtp-settings-find">
+        <label className="dtp-search"><Search size={15} /><input type="search" placeholder="Find a setting…" aria-label="Find a setting" value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => { if (e.key === 'Escape' && query) { e.stopPropagation(); setQuery(''); } }} />{query && <button aria-label="Clear search" onClick={() => setQuery('')}><X size={13} /></button>}</label>
+        <span className="dtp-muted" role="status" aria-live="polite" hidden={!q}>{q ? (total ? `${total} ${total === 1 ? 'setting' : 'settings'} in ${hits.length} ${hits.length === 1 ? 'section' : 'sections'}` : 'No settings match') : ''}</span>
+      </div>
+      <nav className="dtp-settings-nav" aria-label={q ? 'Sections with matches' : 'Settings sections'}>{(q ? hits : sectionsOn).map(s => <button key={s.id} className={active === s.id ? 'active' : ''} aria-current={active === s.id ? 'true' : undefined} onClick={() => go(s.id)}><s.icon size={15} />{s.label}{q && <b className="dtp-count">{countIn(s.id)}</b>}</button>)}</nav>
+      <div className="dtp-settings-body" ref={scrollRef} aria-label={q ? 'Search results' : undefined} onScroll={e => { if (q) return; const box = e.currentTarget; const top = box.getBoundingClientRect().top + 48; const chosen = box.querySelector(`#dtp-set-${active}`)?.getBoundingClientRect(); if (box.scrollTop + box.clientHeight >= box.scrollHeight - 2 && chosen && chosen.top >= box.getBoundingClientRect().top - 2) return; /* at the end a chosen short section stays chosen */ const current = sectionsOn.filter(sec => (e.currentTarget.querySelector(`#dtp-set-${sec.id}`)?.getBoundingClientRect().top ?? Infinity) <= top).pop(); if (current) setActive(current.id); }}>
+        {q && !total && <div className="dtp-card dtp-empty" role="status"><Search size={22} /><strong>No settings match “{query.trim()}”</strong><p>Check the spelling, or try a shorter word.</p><button className="dtp-btn" onClick={() => setQuery('')}>Clear search</button></div>}
+        {show('appearance') && <section id="dtp-set-appearance" className="dtp-card dtp-settings-card"><h2>Appearance</h2>
+          {rowOn('appearance', 'theme') && <div className="dtp-setting-line"><span><strong>Theme</strong><small>System follows your desktop setting.</small></span><Segmented label="Theme" value={themePref} onChange={onThemePref} options={[{ value: 'system', label: 'System' }, { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }]} /></div>}
+          {rowOn('appearance', 'scale') && <div className="dtp-setting-line" role="group" aria-label="UI scale"><span><strong>UI scale</strong><small>Larger or smaller text and controls. Same as View › Zoom in, Zoom out and Actual size (⌘ +, ⌘ −, ⌘ 0).</small></span>
+            <span className="dtp-scale"><button className="dtp-icon" aria-label="Zoom out" title="Zoom out" disabled={scale <= SCALE_STEPS[0]} onClick={() => stepScale(-1)}><Minus size={14} /></button><output aria-live="polite" aria-label={`UI scale ${scale} percent`}>{scale} %</output><button className="dtp-icon" aria-label="Zoom in" title="Zoom in" disabled={scale >= SCALE_STEPS[SCALE_STEPS.length - 1]} onClick={() => stepScale(1)}><Plus size={14} /></button><button className="dtp-btn small" disabled={scale === 100} onClick={() => { setScale(100); notify('UI scale 100 %. Actual size.'); }}><RefreshCcw size={13} />Reset</button></span></div>}
+          {rowOn('appearance', 'scheme') && <div className="dtp-setting-block"><strong>Colour scheme</strong><div className="dtp-scheme-grid" role="radiogroup" aria-label="Colour scheme">{colourSchemes.map(c => <button key={c.id} role="radio" aria-checked={scheme === c.id} className={scheme === c.id ? 'active' : ''} onClick={() => onScheme(c.id)}><span className="dtp-swatch"><i style={{ background: 'var(--ux-bg)' }} /><i style={{ background: c.accent }} /><i style={{ background: 'var(--ux-surface-2)' }} /></span>{c.name}{scheme === c.id && <Check size={14} />}</button>)}<button onClick={() => notify('Choose a colour scheme file (JSON)')}><Upload size={15} />Import scheme</button></div></div>}
+        </section>}
+        {show('language') && <section id="dtp-set-language" className="dtp-card dtp-settings-card"><h2>Language</h2>
+          {rowOn('language', 'pick') && <div className="dtp-rows" role="radiogroup" aria-label="Language">{[['en', 'English'], ['fr', 'Français · imported']].map(([id, name]) => <button key={id} role="radio" aria-checked={language === id} className="dtp-setting-row" onClick={() => setLanguage(id)}><span><strong>{name}</strong></span>{language === id && <Check size={16} />}</button>)}</div>}
+          {rowOn('language', 'pack') && <div className="dtp-setting-foot"><button className="dtp-btn" onClick={() => notify('Choose a language pack (JSON)')}><Upload size={14} />Import language pack</button><small>Only the app is translated. Game data is shown as written.</small></div>}
+        </section>}
+        {show('rosters') && <section id="dtp-set-rosters" className="dtp-card dtp-settings-card"><h2>Rosters</h2>
+          {rowOn('rosters', 'remember') && <Switch label="Remember option sections" detail="Folded option sections stay folded the next time you open a unit." checked={toggles.rememberSections} onChange={flip('rememberSections')} />}
+          {rowOn('rosters', 'reopen') && <Switch label="Reopen tabs on launch" detail="Rosters open when you quit come back as tabs." checked={toggles.restoreTabs} onChange={flip('restoreTabs')} />}
+        </section>}
+        {show('data') && <section id="dtp-set-data" className="dtp-card dtp-settings-card"><h2>Game data</h2>
+          {rowOn('data', 'checks') && <Switch label="Check for updates automatically" detail="When the app starts and every few hours while it is open." checked={toggles.autoChecks} onChange={flip('autoChecks')} />}
+          {rowOn('data', 'install') && <Switch label="Advanced installation" detail="Choose which factions to install when you add game data. Off: everything is installed." checked={advancedInstall} onChange={onAdvancedInstall} />}
+          {rowOn('data', 'keep') && <div className="dtp-setting-line"><span><strong>Keep previous versions</strong><small>{keep === 0 ? 'Older versions are deleted after an update.' : `Uses about ${keep * 13} MB per source.`}</small></span><Segmented label="Keep previous versions" value={keep} onChange={setKeep} options={[0, 1, 2, 3].map(v => ({ value: v, label: v === 0 ? 'Off' : String(v) }))} /></div>}
+        </section>}
+        {show('storage') && <section id="dtp-set-storage" className="dtp-card dtp-settings-card"><h2>Storage</h2>
+          {rowOn('storage', 'folder') && <div className="dtp-setting-line"><span><strong>Data folder</strong><small className="dtp-mono">~/Library/Application Support/Battle Augur</small></span><button className="dtp-btn" onClick={() => notify('Opens the folder in Finder')}><FolderOpen size={14} />Show in Finder</button></div>}
+          {rowOn('storage', 'usage') && <><div className="dtp-storage-bar" aria-label="Storage used"><i style={{ width: '62%' }} /><i style={{ width: '8%' }} /><i style={{ width: '4%' }} /></div>
+          <div className="dtp-legend"><span><i />Game data 53.9 MB</span><span><i />Kept versions 12.8 MB</span><span><i />Rosters 0.4 MB</span></div></>}
+        </section>}
+        {show('keys') && <section id="dtp-set-keys" className="dtp-card dtp-settings-card"><KeyBindingsEditor bindings={bindings} onBindings={onBindings} /></section>}
         {/* DEC-054: Advanced holds two opt-in preferences, both off by default, as plain rows without an enclosing card
             (DEC-050 / UX-059 catalogue search focus; Separate all). The first detail names the key of the menu's Find in catalogue. */}
-        <section id="dtp-set-advanced" className="dtp-settings-card dtp-settings-plain" aria-labelledby="dtp-set-advanced-title"><h2 id="dtp-set-advanced-title">Advanced</h2>
-          <Switch label="Focus search when opening the catalogue" detail={`Off: Add unit opens the catalogue for browsing. Find in catalogue (${formatCombo('Mod+Shift+F')}) always focuses the search.`} checked={focusSearch} onChange={onFocusSearch} />
-          <Switch label="Enable Separate all" detail="A unit with several models also offers Separate all, which splits it into single-model units in one step. Off: only Separate 1 is offered." checked={separateAll} onChange={onSeparateAll} />
-        </section>
-        <section id="dtp-set-about" className="dtp-card dtp-settings-card"><h2>About</h2>
-          <dl className="dtp-facts four"><div><dt>Version</dt><dd>1.0.0 · desktop preview</dd></div><div><dt>Engine</dt><dd>0.9.4</dd></div><div><dt>Protocol</dt><dd>12</dd></div><div><dt>SQLite</dt><dd>3.46</dd></div></dl>
+        {show('advanced') && <section id="dtp-set-advanced" className="dtp-settings-card dtp-settings-plain" aria-labelledby="dtp-set-advanced-title"><h2 id="dtp-set-advanced-title">Advanced</h2>
+          {rowOn('advanced', 'focus') && <Switch label="Focus search when opening the catalogue" detail={`Off: Add unit opens the catalogue for browsing. Find in catalogue (${formatCombo('Mod+Shift+F')}) always focuses the search.`} checked={focusSearch} onChange={onFocusSearch} />}
+          {rowOn('advanced', 'separate') && <Switch label="Enable Separate all" detail="A unit with several models also offers Separate all, which splits it into single-model units in one step. Off: only Separate 1 is offered." checked={separateAll} onChange={onSeparateAll} />}
+        </section>}
+        {show('about') && <section id="dtp-set-about" className="dtp-card dtp-settings-card"><h2>About</h2>
+          <dl className="dtp-facts four"><div><dt>Version</dt><dd><button type="button" className="dtp-version" aria-label="Version 1.0.0 · desktop preview" onClick={() => { if (developer) return; versionClicks.current += 1; if (versionClicks.current >= 7) { setDeveloper(true); notify('Developer options are on'); } }}>1.0.0 · desktop preview</button></dd></div><div><dt>Engine</dt><dd>0.9.4</dd></div><div><dt>Protocol</dt><dd>12</dd></div><div><dt>SQLite</dt><dd>3.46</dd></div></dl>
           <p className="dtp-muted">Game data and rosters stay on this device.</p>
-        </section>
+        </section>}
+        {/* UX-052: Developer options appear after the unlock (DEC-022); Show hidden is the first row there, not an ordinary setting. */}
+        {developer && show('developer') && <section id="dtp-set-developer" className="dtp-card dtp-settings-card"><h2>Developer options</h2>
+          <p className="dtp-muted dtp-dev-note">For checking game data. You do not need these to build rosters.</p>
+          {rowOn('developer', 'hidden') && <Switch label="Show hidden" detail="Shows entries the game data marks as hidden, in the catalogue and in option lists. They are labelled Hidden." checked={showHidden} onChange={setShowHidden} />}
+        </section>}
       </div>
     </div>
   </main>;
