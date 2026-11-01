@@ -366,3 +366,37 @@
 .ux-setting-plain .ux-setting-row + .ux-setting-row { border-top: 1px solid var(--ux-line); }
 .ux-setting-plain .ux-setting-row.on { background: transparent; }
 .ux-setting-plain .ux-setting-row:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px; border-radius: 8px; }
+
+/* DEC-054 (R0-08): compact source status. A 44 px icon action at the row's end; the row's own target covers the row underneath. */
+.ux-src-row { position: relative; }
+.ux-src-row-open { min-width: 0; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.ux-src-row-open::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.ux-src-row-open:focus-visible { outline: none; }
+.ux-src-row:has(.ux-src-row-open:focus-visible) { outline: 2px solid var(--ux-accent-2); outline-offset: 2px; }
+.ux-src-status-wrap { position: relative; z-index: 1; display: grid; margin: -6px -6px -6px 0; }
+.ux-src-status { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--ux-muted); cursor: pointer; touch-action: manipulation; }
+span.ux-src-status { cursor: default; }
+.ux-src-status > i { position: relative; display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid var(--ux-line-2); border-radius: 50%; background: var(--ux-surface); font-style: normal; transition: background 0.15s ease, border-color 0.15s ease; }
+.ux-src-status.accent { color: var(--ux-accent-2); }
+.ux-src-status.accent > i { border-color: color-mix(in srgb, var(--ux-accent-2) 45%, transparent); background: color-mix(in srgb, var(--ux-accent) 18%, var(--ux-surface)); }
+.ux-src-status.cool { color: var(--ux-cool); }
+.ux-src-status.warn { color: var(--ux-warn); }
+.ux-src-status.warn > i { border-color: color-mix(in srgb, var(--ux-warn) 45%, transparent); background: color-mix(in srgb, var(--ux-warn) 14%, var(--ux-surface)); }
+.ux-src-status.err { color: var(--ux-err); }
+.ux-src-status.err > i { border-color: color-mix(in srgb, var(--ux-err) 45%, transparent); background: color-mix(in srgb, var(--ux-err) 13%, var(--ux-surface)); }
+.ux-src-status.cool > i { border-color: color-mix(in srgb, var(--ux-cool) 45%, transparent); background: color-mix(in srgb, var(--ux-cool) 12%, var(--ux-surface)); }
+.ux-src-status > i.ux-src-ring { border: 0; background: transparent; }
+.ux-src-status:hover > i, .ux-src-status.open > i { border-color: currentColor; }
+.ux-src-status:focus-visible { outline: none; }
+.ux-src-status:focus-visible > i { outline: 2px solid var(--ux-accent-2); outline-offset: 2px; }
+.ux-src-ring svg { position: absolute; inset: 0; width: 34px; height: 34px; transform: rotate(-90deg); }
+.ux-src-ring circle { fill: none; stroke-width: 3; }
+.ux-src-ring circle:first-child { stroke: var(--ux-line-2); }
+.ux-src-ring circle + circle { stroke: currentColor; stroke-linecap: round; }
+.ux-src-ring b { color: var(--ux-ink); font-size: 10.5px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.2px; }
+.tb-hint-bubble.ux-src-status-bubble { left: auto; right: calc(100% + 4px); top: 50%; transform: translateY(-50%); width: max-content; max-width: 220px; }
+/* Elements view: the status action states in a row, each with its name. */
+.ux-src-status-demo { display: flex; flex-wrap: wrap; gap: 10px 14px; }
+.ux-src-status-demo > span { display: grid; justify-items: center; gap: 2px; width: 84px; text-align: center; }
+.ux-src-status-demo small { color: var(--ux-muted); font-size: 11px; line-height: 1.25; }
+.ux-src-caption-demo { padding-top: 4px; }

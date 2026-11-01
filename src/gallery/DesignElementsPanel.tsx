@@ -16,7 +16,7 @@ import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, T
 import { BudgetMeter, Chip, ExpandableBudget, RosterMoreMenu, RosterShareButton, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
 import { ComingSoonCard, DeveloperOptionsPreview } from "../concepts/ux/AppExtras";
-import { ActionMenuDialog, AddCollectionSheet, LOCAL_ERRORS, LOCAL_FILE, LOCAL_SOURCE, LocalImportChoiceDialog, LocalImportError, LocalImportRow, LocalInterruptedNotice, LocalRefusedNotice, LocalSourceNote, LocalSourceRows, localSteps, AdvancedInstallSetting, AppDialog, AutoUpdateChecksSetting, FocusCatalogueSearchSetting, SeparateAllSetting, AdvancedSettingsRows, ImportReportGroups, CollectionMenuDialog, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RememberSectionsSetting, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceUpdateCard, SourceVersions, SourcesNavRow, TaggedRosterRows, UpdateAvatarButton, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
+import { ActionMenuDialog, AddCollectionSheet, LOCAL_ERRORS, LOCAL_FILE, LOCAL_SOURCE, LocalImportChoiceDialog, LocalImportError, LocalImportRow, LocalInterruptedNotice, LocalRefusedNotice, LocalSourceNote, LocalSourceRows, localSteps, AdvancedInstallSetting, AppDialog, AutoUpdateChecksSetting, FocusCatalogueSearchSetting, SeparateAllSetting, AdvancedSettingsRows, ImportReportGroups, CollectionMenuDialog, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RememberSectionsSetting, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceStatusAction, SourceUpdateCard, SourceVersions, SourcesNavRow, TaggedRosterRows, UpdateAvatarButton, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
 
 type Props = {
   concept: GalleryConcept;
@@ -633,6 +633,23 @@ function WorkbenchElements({
         </div>
         <div className="ux-src-chips"><SourceStatusChip status="ready" /><SourceStatusChip status="update" /><SourceStatusChip status="updating" /><SourceStatusChip status="review" /><SourceStatusChip status="broken" /></div>
         <section className="ux-sources-empty"><span><Database size={25} /></span><strong>No game data yet</strong><small>Add game data from a collection, a repository link or GitHub search.</small><button type="button"><Plus size={16} />Add game data</button></section>
+      </ElementSection>
+
+      <ElementSection title="Compact Source Status Action">
+        <div className="ux-src-status-demo">
+          <span><SourceStatusAction status="update" name={EXAMPLE_SYSTEM.name} next="b7c8d9e" /><small>Update available</small></span>
+          <span><SourceStatusAction status="updating" name={EXAMPLE_SYSTEM.name} percent={46} /><small>Updating 46 %</small></span>
+          <span><SourceStatusAction status="installing" name="Example System Five" percent={12} /><small>Installing</small></span>
+          <span><SourceStatusAction status="needs-you" name="Example System Five" /><small>Choose factions</small></span>
+          <span><SourceStatusAction status="review" name="Example System Four" /><small>Needs review</small></span>
+          <span><SourceStatusAction status="broken" name="Example System Six" /><small>Unreadable / failed</small></span>
+          <span><SourceStatusAction status="ready" name="Example System Three" showReady /><small>Up to date (Select mode)</small></span>
+        </div>
+        <div className="ux-source-list ux-managed-source-list ux-src-list ux-src-caption-demo">
+          <SourceRow source={EXAMPLE_SOURCES[0]} captionShown />
+          <SourceRow source={EXAMPLE_SOURCES[2]} />
+        </div>
+        <small className="ux-elements-note">DEC-054 (R0-08): the wide text chip leaves the Sources rows, so the source name keeps its width. A 44 px icon action trails the row: a download arrow when an update is available (pressing it is Update; accessible name "Update Example System One to b7c8d9e"), a progress ring with the percent while updating or installing, a hand when an install waits for Choose factions, a warning triangle for Needs review, an octagon for failed or unreadable data. Up to date shows nothing (a quiet check in Select mode). Each state has its own shape, never colour alone. Hover, keyboard focus or press and hold shows the caption in the hint bubble (first row); the sub-line names the new version. Tablet rows use the same action, visible at every pane width.</small>
       </ElementSection>
 
       <ElementSection title="Source Update Card">

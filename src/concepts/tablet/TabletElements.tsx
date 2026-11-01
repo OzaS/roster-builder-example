@@ -15,6 +15,7 @@ import type { Job } from '../workspace/Jobs';
 import { editorShortcuts, keyLabel } from './tabletKeys';
 import { TabletWorkbench } from './TabletWorkbench';
 import { StateChip } from '../workspace/StateChip';
+import { SourceStatusAction } from '../ux/SourceJobs';
 import { TabletPrefsContext, makeTabletEnv, TabletEnvContext } from './tabletEnv';
 import { defaultDeviceId, defaultInput, defaultTextScale, tabletDevices, widthClassLabel, widthClassOf, type TabletDeviceId, type TabletInput, type TextScale } from './tabletDevices';
 import './tablet.css';
@@ -89,8 +90,18 @@ export function TabletElements() {
       <h2>Home widgets (TFB-001, TFB-002) · four most used game systems with More, fixed widgets that scroll inside · iPad landscape and portrait, Android</h2>
       <p>Game data lists at most four game systems, most used first (most rosters, then the latest roster activity, then name); More (N) opens Sources with the rest. The widgets keep their places: Game data and Recent rosters take the spare height and scroll their own content, summary cards keep their height. Below 520 px of page, and in compact windows, the page scrolls as a whole.</p>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-home-many-systems" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-portrait"><TabletWorkbench workflowScreen="tablet-home-many-systems" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="android"><TabletWorkbench workflowScreen="tablet-home-many-systems" /></TabletDeviceFrame></div>
-      <h2>Sources top row and panes (DEC-050, TFB-008) · search, then Select, Install from a file and Add game data; shared pane rows; count and offline note in the list foot; pane tops aligned</h2>
+      <h2>Sources top row and panes (DEC-050, TFB-008) · search, then Select, Install from a file and Add game data; shared pane rows with the compact status action (DEC-054); count and offline note in the list foot; pane tops aligned</h2>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-sources" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="android"><TabletWorkbench workflowScreen="tablet-sources" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="split"><TabletWorkbench workflowScreen="tablet-sources" /></TabletDeviceFrame></div>
+      <h2>Compact source status (DEC-054, R0-08) · icon action instead of the text chip, visible at every pane width</h2>
+      <p>Sources rows trail a 44 px icon action: download arrow (Update available; pressing it updates, accessible name "Update Open Field to v1.5"), progress ring with the percent (updating, installing), hand (choose factions), warning triangle (needs review), octagon (failed). Up to date shows nothing. Press and hold (touch) or hover and focus (pointer) shows the caption in the hint bubble; the sub-line names the new version (v1.4 → v1.5). The rule that hid row status in panes under 300 px is gone: in a pane of 300 px or less a row's trailing text (Rosters' points and status chips) moves to its own line under the title.</p>
+      <div className="tb-el-row"><div className="tb-app ux-screen dark tb-el-card tb-touch"><div className="ux-src-status-demo">
+        <span><SourceStatusAction status="update" name="Open Field" next="v1.5" captionShown /><small>Update · caption shown</small></span>
+        <span><SourceStatusAction status="updating" name="Open Field" percent={46} /><small>Updating</small></span>
+        <span><SourceStatusAction status="needs-you" name="Example System Three" /><small>Choose factions</small></span>
+        <span><SourceStatusAction status="review" name="Example System Two" /><small>Needs review</small></span>
+        <span><SourceStatusAction status="failed" name="Example System Five" /><small>Failed</small></span>
+      </div></div></div>
+      <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="split" textScale={150}><TabletWorkbench workflowScreen="tablet-sources" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="android" textScale={150}><TabletWorkbench workflowScreen="tablet-rosters" /></TabletDeviceFrame></div>
       <h2>Toolbar Actions · iOS Liquid Glass and Android icon buttons</h2>
       <p>Rosters and Sources share 48 px icon buttons with full accessible names and hover or long-press hints. iOS uses Liquid Glass, with a solid fallback for Reduce transparency; Android uses plain icon buttons. Add game data uses an accent fill and Select has a pressed state. No captions below action icons. Search fills the remaining row; lower-priority actions move into More when space is short. New roster stays at the top of the rail as an icon button; navigation destinations keep their labels.</p>
       <div className="tb-el-stack"><ToolbarActionsDemo width={860} system="ios" /><ToolbarActionsDemo width={860} system="android" input="pointer" /><ToolbarActionsDemo width={500} system="ios" /><ToolbarActionsDemo width={380} system="android" /><ToolbarActionsDemo width={300} system="ios" text={200} /></div>

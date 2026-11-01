@@ -917,15 +917,17 @@ function readPersistedGalleryState(): PersistedGalleryState {
   return { ...readStoredGalleryState(), ...readUrlGalleryState() };
 }
 
-/** `?screen=<workflow screen>&theme=light|dark`: open one screen directly (review links, headless captures); wins over the saved state. */
+/** `?screen=<workflow screen>&theme=light|dark&view=single|all-screens|elements`: open one screen directly (review links, headless captures); wins over the saved state. */
 function readUrlGalleryState(): PersistedGalleryState {
   const params = new URLSearchParams(location.search);
   const screen = params.get("screen");
   const theme = params.get("theme");
+  const view = params.get("view");
   const known = screen !== null && bundledDesignData.designs.some((design) => design.screens.some((item) => item.id === screen));
   return {
     ...(known ? { workflowScreen: screen as WorkflowScreen, screen: workflowToPrototypeScreen(screen as WorkflowScreen), navigatorView: "single" as NavigatorView } : {}),
     ...(isOneOf(theme, themeModes) ? { themeMode: theme, themePreference: theme } : {}),
+    ...(isOneOf(view, navigatorViews) ? { navigatorView: view } : {}),
   };
 }
 
