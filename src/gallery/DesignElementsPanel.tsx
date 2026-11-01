@@ -8,6 +8,7 @@ import { TabletElements } from "../concepts/tablet/TabletElements";
 import { DuoElements } from "../concepts/foldable/DuoElements";
 import { LibrarySwitch } from "./LibrarySwitch";
 import { AppearancePreferences } from "../concepts/ux/AppearanceSettings";
+import { SoftKeyboard } from "../concepts/ux/SoftKeyboard";
 import { MobileUnitOptions, ModelStackSamples, OptionFoldSamples } from "../concepts/ux/MobileUnitOptions";
 import { AlertTriangle, Archive, ArrowLeft, ArrowUp, BarChart3, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, Circle, CircleDot, Cog, Coins, Command, Copy, Database, Dice5, Download, Ellipsis, FileInput, Gamepad2, GripVertical, Hammer, Heart, ImagePlus, Languages, Layers, LibraryBig, Maximize2, MessageCircle, Minus, Moon, MoveRight, Palette, PanelsTopLeft, Pencil, Plus, RotateCcw, Rows3, Scale, Search, Smartphone, Sparkles, Split, Trash2, Upload, UserRound, Wand2, X, SquareCheck } from "lucide-react";
 import { createContext, useContext, useState } from "react";
@@ -338,9 +339,11 @@ function WorkbenchElements({
         </div>
       </ElementSection>
 
-      <ElementSection title="Model Stack Split and Selection Controls">
-        <small>Radio: one of several; max-one ancestors share that choice across nested alternatives, with None only on the outer group. Checkbox: independent optional picks, including a single option or nothing. Switch: immediate Settings only. Stepper: counts. Visible glyphs 21–22 px; target 48 px (≥44 pt / 48 dp). Restart restores selection, tab, hidden entries and folds; pending edits and split drafts reset. Controls reload from the worker.</small>
+      <ElementSection title="Model Stack Separate and Selection Controls">
+        <small>Proposal for review (UX-023, DEC-046): Separate 1 replaces the Split count; Separate all appears only with Settings › Advanced › Enable Separate all. Radio: one of several; max-one ancestors share that choice across nested alternatives, with None only on the outer group. Checkbox: independent optional picks, including a single option or nothing. Switch: immediate Settings only. Stepper: counts. Visible glyphs 21–22 px; target 48 px (≥44 pt / 48 dp). Restart restores selection, tab, hidden entries and folds; pending edits and split drafts reset. Controls reload from the worker.</small>
         <div className="ux-mobile-unit-options"><ModelStackSamples /></div>
+        <small>Separate all on, and the result of Separate 1 on a stack of five (4 + 1). A single-model stack offers neither.</small>
+        <div className="ux-elements-stack"><div className="ux-mobile-unit-options"><ModelStackSamples separateAll /></div><div className="ux-mobile-unit-options"><ModelStackSamples separateAll initialStacks={[{ id: 1, count: 4, sidearm: "Pistol", scope: false }, { id: 2, count: 1, sidearm: "Pistol", scope: false }]} /></div></div>
       </ElementSection>
 
       <ElementSection title="Unit Profile Tab · Mobile 5B">
@@ -1023,7 +1026,13 @@ function WorkbenchElements({
       </ElementSection>
 
       <ElementSection title="Developer Options">
+        <small>Proposal for review (UX-052): Show hidden entries is a Developer options switch, off by default, on every platform; it is no longer an ordinary control. With it on, hidden catalogue entries and unit options are listed where they belong, tagged Hidden; with it off (and while Developer options are locked) nothing about them shows, and the inline "Show hidden (n)" links leave Add unit and the unit options. Settings search lists the row only while Developer options are unlocked.</small>
         <DeveloperOptionsPreview />
+        <small>Add unit with Show hidden entries on (hidden rows tagged, no inline link):</small>
+        <div className="ux-screen light ux-workbench" style={{ padding: 12, maxWidth: 380 }}><div className="ux-pool">
+          <div className="ux-pool-item"><button type="button" className="ux-pool-row available"><span><strong>Bastion Squad</strong><small>Veterans</small></span><span className="ux-pool-meta"><b>185 pts</b><Chip tone="valid">available</Chip></span><Plus size={16} /></button></div>
+          <div className="ux-pool-item"><button type="button" className="ux-pool-row available"><span><strong>Cache Warden</strong><small>Hidden by the game data</small></span><span className="ux-pool-meta"><b>60 pts</b><Chip tone="neutral">Hidden</Chip></span><Plus size={16} /></button></div>
+        </div></div>
       </ElementSection>
 
       <ElementSection title="Main Tab Bar">
@@ -1056,6 +1065,10 @@ function WorkbenchElements({
       </CatalogGroup>
 
       <CatalogGroup groupId="gallery-ui">
+      <ElementSection title="On-screen Keyboard Illustration">
+        <small>Gallery-only drawing (R0 gap frames library-filters-keyboard and add-unit-focus-keyboard): a neutral 290 px keyboard at the bottom of the phone screen. It takes no input and is not an app component; the frames show the app's content shrinking above it with the focused field visible.</small>
+        <div className="ux-elements-stack"><div className="ux-screen ux-workbench light" style={{ position: "relative", height: 310, width: 360, overflow: "hidden" }}><SoftKeyboard /></div></div>
+      </ElementSection>
       <ElementSection title="Design Library Navigation"><LibrarySwitch current="phone" label="Design library examples" /></ElementSection>
       <ElementSection title="Designer Rail Controls">
         <div className="rail-actions">

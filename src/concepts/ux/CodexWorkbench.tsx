@@ -11,6 +11,8 @@ import type { ConceptProps } from "../shared";
 import { AddGameDataScreen, AdvancedInstallSetting, AutoUpdateChecksSetting, ReopenRosterSetting, FocusCatalogueSearchSetting, SeparateAllSetting, AdvancedSettingsRows, CollectionScreen, InstallJobScreen, KeepVersionsSetting, MigrationReportScreen, NotificationsSetting, ReadOnlyRosterScreen, RememberSectionsSetting, SearchGitHubScreen, SourceDetailScreen, SourcesManageScreen, SourcesNavRow, UpdateAvatarButton, WifiOnlySetting } from "./SourceJobs";
 import { MobileUnitOptions } from "./MobileUnitOptions";
 import { QuotaChip, limitReason } from "../workspace/CatalogueLimit";
+import { SoftKeyboard } from "./SoftKeyboard";
+import { SettingsResults } from "./SettingsSearch";
 import { BackOrTitle, BudgetMeter, Chip, ExpandableBudget, RosterMoreMenu, RosterShareButton, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "./uxShared";
 
 /** Screens of the source-data flow designed in Battle Augur plan 2D (SourceJobs.tsx). */
@@ -34,7 +36,7 @@ export function CodexWorkbench(props: ConceptProps) {
   const screen = props.screen;
   const isUnitDetail = screen === "unit-detail";
   const isMainTab = props.workflowScreen
-    ? (["library", "library-v2", "library-filters", "subscription-main", "source", "lookup-results", "lookup-start", "lookup-no-results", "lookup-no-data", "lookup-loading", "lookup-failed", "tools", "collections"] as const).some((tab) => tab === props.workflowScreen)
+    ? (["library", "library-v2", "library-filters", "library-filters-search", "library-filters-no-match", "library-filters-keyboard", "subscription-main", "source", "lookup-results", "lookup-start", "lookup-no-results", "lookup-no-data", "lookup-loading", "lookup-failed", "tools", "collections"] as const).some((tab) => tab === props.workflowScreen)
     : screen === "library" || screen === "catalogue" || screen === "tools" || screen === "collections";
   const showTabBar = usesTabNavigation && isMainTab;
   const isWorkbenchScreen = screen !== "library" && screen !== "catalogue" && screen !== "tools" && screen !== "collections" && screen !== "app" && screen !== "settings" && screen !== "sources" && screen !== "add-source" && !SOURCE_FLOW_SCREENS.includes(screen) && screen !== "system";
@@ -136,7 +138,9 @@ export function CodexWorkbench(props: ConceptProps) {
   let modifier = "";
 
   if (screen === "unit-options-mobile") {
-    body = <MobileUnitOptions onBack={() => props.onNavigate("overview")} />;
+    body = props.workflowScreen === "unit-options-separate-all" ? <MobileUnitOptions key="sep-all" focusStacks separateAll onBack={() => props.onNavigate("overview")} />
+      : props.workflowScreen === "unit-options-separated" ? <MobileUnitOptions key="sep-done" focusStacks separateAll initialStacks={[{ id: 1, count: 4, sidearm: "Pistol", scope: false }, { id: 2, count: 1, sidearm: "Pistol", scope: false }]} onBack={() => props.onNavigate("overview")} />
+      : <MobileUnitOptions onBack={() => props.onNavigate("overview")} />;
   } else if (screen === "library") {
     body = <Library props={props} />;
   } else if (screen === "collections") {
@@ -181,7 +185,7 @@ export function CodexWorkbench(props: ConceptProps) {
     body = <SmartSearchScreen props={props} />;
   } else {
     const smartClass = navStyle === "top" && smart ? "ux-smart" : "";
-    modifier = [isUnitDetail ? "show-detail has-detail-toggle" : props.workflowScreen === "add-unit-limit" ? "show-detail" : "", screen === "overview" ? "roster-overview" : "", screen === "validation" ? "show-checks" : "", smartClass].filter(Boolean).join(" ");
+    modifier = [isUnitDetail ? "show-detail has-detail-toggle" : props.workflowScreen === "add-unit-limit" || props.workflowScreen === "add-unit-focus-keyboard" || props.workflowScreen === "add-unit-text-200" ? "show-detail" : "", screen === "overview" ? "roster-overview" : "", screen === "validation" ? "show-checks" : "", smartClass].filter(Boolean).join(" ");
     body = (
       <>
         <WorkbenchHeader
@@ -219,6 +223,8 @@ export function CodexWorkbench(props: ConceptProps) {
     );
   }
 
+  // Gallery frames with the on-screen keyboard shown (R0 gaps): Lists search with a long system name, Add unit with "focus search" on.
+  const keyboardShown = props.workflowScreen === "library-filters-keyboard" || props.workflowScreen === "add-unit-focus-keyboard";
   const showCommandBar = navStyle === "top" && smart && isWorkbenchScreen && !isUnitDetail && screen !== "smart-search";
   const subscriptionVariant = props.workflowScreen === "subscription-main" ? "main" : props.workflowScreen === "subscription-edition" ? "edition" : null;
 
@@ -230,8 +236,9 @@ export function CodexWorkbench(props: ConceptProps) {
   };
 
   return (
-    <div className={`${shell} ${modifier}`.trim()} onPointerDown={handleShellPointerDown}>
+    <div className={`${shell} ${modifier} ${keyboardShown ? "ux-has-kbd" : ""}`.trim()} onPointerDown={handleShellPointerDown}>
       {body}
+      {keyboardShown ? <SoftKeyboard /> : null}
       {subscriptionVariant ? <SubscriptionGate variant={subscriptionVariant} onClose={() => props.onNavigate(subscriptionVariant === "main" ? "library" : "overview")} /> : null}
       {smartGateOpen ? <SubscriptionGate variant="edition" onClose={() => setSmartGateOpen(false)} /> : null}
       {focusPane ? <EdgeHandle edge="top" expanded={focusChromeVisible} onReveal={() => setFocusChromeVisible(true)} /> : null}
@@ -1146,10 +1153,16 @@ function AddPane({ props }: { props: ConceptProps }) {
   const [lastAdded, setLastAdded] = useState<string | null>(null);
   const [showHidden, setShowHidden] = useState(false);
   // Gallery state add-unit-limit (DEC-054): the sheet opened on a section with a unit at its maximum, its reason shown.
-  const limitState = props.workflowScreen === "add-unit-limit";
+  const limitState = props.workflowScreen === "add-unit-limit" || props.workflowScreen === "add-unit-text-200";
+  // R0 gap frames: "Focus search when opening the catalogue" on (search focused, keyboard shown) and the sheet at 200 % text.
+  const focusState = props.workflowScreen === "add-unit-focus-keyboard";
+  const largeText = props.workflowScreen === "add-unit-text-200";
+  const sheetRef = useRef<HTMLElement>(null);
+  // The 200 % frame opens on the unit at its maximum (the longest row: name, price, quota chip and the unavailable Add).
+  useLayoutEffect(() => { if (largeText) sheetRef.current?.querySelector(".ux-pool-row.locked")?.scrollIntoView({ block: "center" }); }, [largeText]);
   const sectionId = limitState ? flattenUnits(props.roster).find((u) => u.availability === "locked")?.sectionId ?? props.selectedSectionId : props.selectedSectionId;
   const pool = flattenUnits(props.roster).filter((u) => u.sectionId === sectionId);
-  const [explained, setExplained] = useState<string | null>(() => limitState ? pool.find((u) => u.availability === "locked")?.id ?? null : null);
+  const [explained, setExplained] = useState<string | null>(() => props.workflowScreen === "add-unit-limit" ? pool.find((u) => u.availability === "locked")?.id ?? null : null);
   const explainTimer = useRef<number>(undefined);
   useEffect(() => () => window.clearTimeout(explainTimer.current), []);
   const explain = (id: string) => { window.clearTimeout(explainTimer.current); setExplained((current) => current === id ? null : id); explainTimer.current = window.setTimeout(() => setExplained(null), 4000); };
@@ -1157,7 +1170,7 @@ function AddPane({ props }: { props: ConceptProps }) {
   const section = pool[0]?.sectionName ?? props.selectedSection.name;
   const suggestions = [`legal ${section.toLowerCase()} under 120`, "fills this slot", "best value pick"];
   return (
-    <section className="ux-wb-detail">
+    <section ref={sheetRef} className={`ux-wb-detail ${largeText ? "ux-text-200" : ""}`}>
       <button type="button" className="ux-wb-back" onClick={props.onBack}>
         <ArrowLeft size={14} />
         Back to roster
@@ -1171,7 +1184,7 @@ function AddPane({ props }: { props: ConceptProps }) {
       </div>
       <div className={`ux-wb-search ${smart ? "smart" : ""}`}>
         {smart ? <Command size={15} /> : <Search size={15} />}
-        <input placeholder={smart ? `Add a legal ${section} unit or ask…` : `Search ${section}`} readOnly />
+        <input placeholder={smart ? `Add a legal ${section} unit or ask…` : `Search ${section}`} readOnly={!focusState} autoFocus={focusState} />
       </div>
       {smart ? (
         <div className="ux-suggest">
@@ -1205,11 +1218,11 @@ function AddPane({ props }: { props: ConceptProps }) {
                 onClick={() => { if (locked) { explain(unit.id); return; } setAdded((current) => ({ ...current, [unit.id]: count + 1 })); setLastAdded(unitDisplayName(unit)); }}>
                 <span>
                   <strong>{unitDisplayName(unit)}{count ? <em className="ux-pool-count"> ({count}/3)</em> : null}</strong>
-                  <small>{reason ?? unit.role}</small>
+                  {locked ? <small className="ux-pool-quota"><QuotaChip selected={1} max={1} />Limit reached</small> : <small>{reason ?? unit.role}</small>}
                 </span>
                 <span className="ux-pool-meta">
                   <b>{unit.points} pts</b>
-                  {locked ? <QuotaChip selected={1} max={1} /> : <Chip tone={unit.availability === "available" ? "valid" : "warning"}>{unit.availability}</Chip>}
+                  {locked ? null : <Chip tone={unit.availability === "available" ? "valid" : "warning"}>{unit.availability}</Chip>}
                 </span>
                 {locked ? <span className="ws-limit-add ux-pool-limit-add" aria-hidden><i><Plus size={15} /></i></span> : <Plus size={16} />}
               </button>
@@ -1263,7 +1276,9 @@ function Library({ props }: { props: ConceptProps }) {
   const isFilters = !isV2;
   const [promptOpen, setPromptOpen] = useState(true);
   const [organizerOpen, setOrganizerOpen] = useState(true);
-  const [query, setQuery] = useState("");
+  // R0 gap frames (UI plan O5 and the keyboard / long system name frame): the search open with a query, the no-match state with Clear filters, and the keyboard shown.
+  const gapState = props.workflowScreen === "library-filters-search" ? "search" : props.workflowScreen === "library-filters-no-match" ? "no-match" : props.workflowScreen === "library-filters-keyboard" ? "keyboard" : undefined;
+  const [query, setQuery] = useState(gapState === "search" ? "frontier" : gapState === "no-match" ? "lantern" : gapState === "keyboard" ? "ex" : "");
   const [activeFilter, setActiveFilter] = useState("All rosters");
   const rosters = [
     { name: props.roster.name, sub: props.roster.faction, pts: `${props.roster.pointsUsed}/${props.roster.pointsLimit}` },
@@ -1274,7 +1289,7 @@ function Library({ props }: { props: ConceptProps }) {
   return (
     <>
       <PhoneSearchHeader title="Lists" subtitle="Your rosters" query={query} onQueryChange={setQuery}
-        placeholder="Find a roster or faction…" trailing={<AppAvatarButton props={props} />} />
+        placeholder="Find a roster or faction…" trailing={<AppAvatarButton props={props} />} initialOpen={gapState !== undefined} />
       <div className={`ux-wb-home-body ux-lists-body ${isV2 ? "is-v2" : "is-v1"} ${isV2 && organizerOpen ? "organizer-open" : ""}`}>
         {isV2 && organizerOpen ? (
           <aside className="ux-roster-organizer" aria-label="Organize rosters">
@@ -1285,7 +1300,7 @@ function Library({ props }: { props: ConceptProps }) {
             <div className="ux-organizer-tags"><small>Tags</small><div><button type="button"><Tag size={12} />Competitive</button><button type="button"><Tag size={12} />Draft</button><button type="button"><Tag size={12} />Favourite</button></div></div>
           </aside>
         ) : null}
-        {isFilters ? <PhoneListsFilters query={query} onQueryChange={setQuery} onOpenRoster={() => props.onNavigate("overview")} actions={<div className="ux-lists-actions">
+        {isFilters ? <PhoneListsFilters query={query} onQueryChange={setQuery} promptDismissed={gapState !== undefined} initialSystem={gapState === "no-match" ? "Open Field" : null} longSystem={gapState === "keyboard" ? "Example System Two: Extended Campaign Rules, Second Edition" : undefined} onOpenRoster={() => props.onNavigate("overview")} actions={<div className="ux-lists-actions">
           <button type="button" className="ux-organizer-toggle" aria-label="Import a roster file"><Upload size={15} />Import</button>
           <button type="button" className="ux-new-roster ux-new-roster-compact" onClick={() => props.onNavigate("system")}><Plus size={18} /><span><strong>New roster</strong></span></button>
         </div>} /> : <main className="ux-lists-main">
@@ -1797,11 +1812,11 @@ function LookupScreen({ props }: { props: ConceptProps }) {
 /** Lookup 1.0 (design session 2026-10-31): each workflow screen opens PhoneLookup in one state. */
 function PhoneLookupScreen({ props }: { props: ConceptProps }) {
   const s = props.workflowScreen;
-  const stack = s === "lookup-unit" ? ["u-line-fc"] : s === "lookup-force" ? ["f-line-of-battle"] : s === "lookup-detachment" ? ["d-line-formation"] : s === "lookup-upgrade" ? ["up-line-rifle"] : s === "lookup-rule" ? ["r-hold-line"] : s === "lookup-large-text" ? ["u-veteran-reinforced"] : [];
+  const stack = s === "lookup-unit" || s === "lookup-unit-text-150" ? ["u-line-fc"] : s === "lookup-force" ? ["f-line-of-battle"] : s === "lookup-detachment" ? ["d-line-formation"] : s === "lookup-upgrade" ? ["up-line-rifle"] : s === "lookup-rule" ? ["r-hold-line"] : s === "lookup-large-text" ? ["u-veteran-reinforced"] : [];
   const query = s === "lookup-start" || s === "source" ? "" : s === "lookup-no-results" ? "lantern" : s === "lookup-large-text" ? "reinforced" : "line";
   // R0-03 (DEC-054) lifecycle states: loading, failure / retry, a saved reference whose source is gone, large text.
   const phase = s === "lookup-loading" ? "loading" : s === "lookup-failed" ? "failed" : "ready";
-  return <PhoneLookup key={s} initialQuery={query} initialStack={stack} noData={s === "lookup-no-data"} phase={phase} unavailable={s === "lookup-unavailable"} largeText={s === "lookup-large-text"} trailing={<AppAvatarButton props={props} />} onAddData={() => props.onNavigate("add-source")} />;
+  return <PhoneLookup key={s} initialQuery={query} initialStack={stack} noData={s === "lookup-no-data"} phase={phase} unavailable={s === "lookup-unavailable"} largeText={s === "lookup-large-text"} text150={s === "lookup-results-text-150" || s === "lookup-unit-text-150"} trailing={<AppAvatarButton props={props} />} onAddData={() => props.onNavigate("add-source")} />;
 }
 
 function LookupGroup({ title, icon, children }: { title: string; icon: ReactNode; children: ReactNode }) {
@@ -2227,18 +2242,15 @@ function SettingsScreen({ props }: { props: ConceptProps }) {
   const [autoChecks, setAutoChecks] = useState(true);
   const [focusSearch, setFocusSearch] = useState(false);
   const [separateAll, setSeparateAll] = useState(false);
+  // UX-053 (proposal): Settings search in the top bar (the shared phone search pattern); gallery states settings-search*, the last one with Developer options unlocked.
+  const searchState = props.workflowScreen === "settings-search" ? "found" : props.workflowScreen === "settings-search-no-results" ? "none" : props.workflowScreen === "settings-search-developer" ? "developer" : undefined;
+  const [settingsQuery, setSettingsQuery] = useState(searchState === "found" ? "search" : searchState === "none" ? "lantern" : searchState === "developer" ? "hidden" : "");
   return (
     <>
-      <header className="ux-wb-top ux-wb-home-top reversed">
-        <button type="button" className="ux-icon-btn" aria-label="Back" onClick={props.onBack}>
-          <ArrowLeft size={18} />
-        </button>
-        <div className="ux-wb-title">
-          <strong>Settings</strong>
-          <small>Tune your builder</small>
-        </div>
-      </header>
+      <PhoneSearchHeader title="Settings" subtitle="Tune your builder" query={settingsQuery} onQueryChange={setSettingsQuery} placeholder="Search settings" initialOpen={searchState !== undefined}
+        leading={<button type="button" className="ux-icon-btn" aria-label="Back" onClick={props.onBack}><ArrowLeft size={18} /></button>} />
       <div className="ux-wb-home-body">
+        {settingsQuery.trim() ? <SettingsResults platform="phone" query={settingsQuery} developerUnlocked={searchState === "developer"} onClear={() => setSettingsQuery("")} /> : <>
         <AppearancePreferences props={props} states />
         <div className="ux-result-label">Search & assistance</div>
         <button type="button" className={`ux-setting-row ${smart ? "on" : ""}`} onClick={props.onToggleSmartSearch}>
@@ -2271,6 +2283,7 @@ function SettingsScreen({ props }: { props: ConceptProps }) {
           <FocusCatalogueSearchSetting on={focusSearch} onToggle={() => setFocusSearch((value) => !value)} />
           <SeparateAllSetting on={separateAll} onToggle={() => setSeparateAll((value) => !value)} />
         </AdvancedSettingsRows>
+        </>}
       </div>
     </>
   );

@@ -7,7 +7,8 @@ import { colourSchemes } from '../desktop/desktopData';
 import { Facts, ListDetail, Row, WorkspaceScope, type SessionProps } from './TabletPieces';
 import { editorShortcuts, generalShortcuts, keyLabel } from './tabletKeys';
 import { useTabletExperience } from './tabletExperience';
-import { PageTitle } from './TabletToolbar';
+import { PageTitle, TabletToolbar } from './TabletToolbar';
+import { SettingsResults, SettingsSearchField } from '../ux/SettingsSearch';
 
 // Settings (T2b): sections as a list, each one a real page in the detail pane. Key bindings are a read-only list here: the
 // shortcuts work with a hardware keyboard and appear in the system overlay; the editor stays on the desktop.
@@ -26,14 +27,19 @@ const sections = [
 
 const Group = ({ title, children }: { title?: string; children: ReactNode }) => <section className="tb-section">{title && <span className="ux-result-label">{title}</span>}{children}</section>;
 
-export function TabletSettings({ env, notify, session, themePref, scheme, onTheme, onScheme, focusSearch, onFocusSearch }: SessionProps & { themePref: ThemePref; scheme: ColorScheme; onTheme: (t: ThemePref) => void; onScheme: (s: ColorScheme) => void; focusSearch: boolean; onFocusSearch: (on: boolean) => void }) {
+export function TabletSettings({ env, notify, session, themePref, scheme, onTheme, onScheme, focusSearch, onFocusSearch, separateAll: separateAllProp, onSeparateAll: onSeparateAllProp, searchable = false }: SessionProps & { themePref: ThemePref; scheme: ColorScheme; onTheme: (t: ThemePref) => void; onScheme: (s: ColorScheme) => void; focusSearch: boolean; onFocusSearch: (on: boolean) => void; separateAll?: boolean; onSeparateAll?: (on: boolean) => void; /** UX-053 proposal: the page's top row with the Settings search (tablet library only; the foldable shell is unchanged). */ searchable?: boolean }) {
+  // Controlled by the tablet workbench so the editor's unit pane follows it; the foldable shell keeps it local.
+  const [separateAllLocal, setSeparateAllLocal] = useState(false);
+  const separateAll = separateAllProp ?? separateAllLocal;
+  const onSeparateAll = onSeparateAllProp ?? setSeparateAllLocal;
   const { experience, choose } = useTabletExperience();
   const { light, advancedInstall, setAdvancedInstall, settingsSection, setSettingsSection, language, setLanguage, setAppearanceImport } = session;
   const [open, setOpen] = useState(settingsSection !== undefined);
+  // UX-053 (proposal): search in the page's top row; results replace the section list and stay operable. Gallery states tablet-settings-search*.
+  const [query, setQuery] = useState(session.state === 'search' ? 'search' : session.state === 'search-no-results' ? 'lantern' : session.state === 'search-developer' ? 'hidden' : '');
   const [limit, setLimit] = useState(1000);
   const [toggles, setToggles] = useState({ rememberSections: true, reopenLast: false, autoChecks: true });
   const [keep, setKeep] = useState(1);
-  const [separateAll, setSeparateAll] = useState(false);
   const flip = (key: keyof typeof toggles) => (v: boolean) => setToggles(t => ({ ...t, [key]: v }));
   const current = sections.find(s => s.id === (settingsSection ?? 'appearance')) ?? sections[0];
   const page = (() => {
@@ -72,7 +78,7 @@ export function TabletSettings({ env, notify, session, themePref, scheme, onThem
       case 'advanced': return <WorkspaceScope light={light}>
         <div className="tb-plain-rows" role="group" aria-label="Advanced">
           <Switch label="Focus search when opening the catalogue" detail={`Off: Add unit opens the catalogue for browsing. ${keyLabel('Mod+F', env.device.system)} on a keyboard always focuses the search.`} checked={focusSearch} onChange={onFocusSearch} />
-          <Switch label="Enable Separate all" detail="Units with several models also offer Separate all, which splits them into single-model units in one step. Off: only Separate 1." checked={separateAll} onChange={setSeparateAll} />
+          <Switch label="Enable Separate all" detail="Units with several models also offer Separate all, which splits them into single-model units in one step. Off: only Separate 1." checked={separateAll} onChange={onSeparateAll} />
         </div>
       </WorkspaceScope>;
       default: return <>
@@ -84,9 +90,10 @@ export function TabletSettings({ env, notify, session, themePref, scheme, onThem
   })();
   // DEC-050: no title row; the rail shows the page. Section pages keep their own heading (and Back when they open over the list).
   return <div className="tb-page">
-    <PageTitle>Settings</PageTitle>
+    {searchable ? <TabletToolbar title="Settings" input={env.input} search={<SettingsSearchField query={query} onQuery={q => { setQuery(q); if (q.trim()) setOpen(false); }} />} /> : <PageTitle>Settings</PageTitle>}
     <ListDetail env={env} label="Settings" open={open} onClose={() => setOpen(false)}
-      list={<div className="tb-list scroll">{sections.map(s => <Row key={s.id} selected={s.id === current.id} mark={<s.icon size={20} />} title={s.label} sub={s.sub} end={<ChevronRight size={17} />} onClick={() => { setSettingsSection(s.id); setOpen(true); }} />)}</div>}
+      list={searchable && query.trim() ? <div className="tb-list scroll"><SettingsResults platform="tablet" query={query} developerUnlocked={session.state === 'search-developer'} onClear={() => setQuery('')} /></div>
+        : <div className="tb-list scroll">{sections.map(s => <Row key={s.id} selected={s.id === current.id} mark={<s.icon size={20} />} title={s.label} sub={s.sub} end={<ChevronRight size={17} />} onClick={() => { setSettingsSection(s.id); setOpen(true); }} />)}</div>}
       detail={<><div className="tb-detail-title"><span><h2>{current.label}</h2><small>{current.sub}</small></span></div>{page}</>} />
   </div>;
 }

@@ -18,10 +18,10 @@ import "./phone-lookup.css";
  */
 const recentIds = ["r-hold-line", "u-line-fc", "d-line-formation"];
 
-export function PhoneLookup({ initialQuery = "line", initialStack = [], noData = false, trailing, onAddData, phase: initialPhase = "ready", unavailable = false, largeText = false }: {
+export function PhoneLookup({ initialQuery = "line", initialStack = [], noData = false, trailing, onAddData, phase: initialPhase = "ready", unavailable = false, largeText = false, text150 = false }: {
   initialQuery?: string; initialStack?: string[]; noData?: boolean; trailing?: ReactNode; onAddData?: () => void;
   /** R0-03 (DEC-054) gallery states: the search in progress or failed; a saved reference whose source is gone; the page at 200 % text. */
-  phase?: LookupPhase; unavailable?: boolean; largeText?: boolean;
+  phase?: LookupPhase; unavailable?: boolean; largeText?: boolean; /** R0 gap frames: the results and the reference page at 150 % text. */ text150?: boolean;
 }) {
   const lk = useLookup(initialQuery);
   const { query, systems, results, allResults, ordered, openIds, typed, withSystem } = lk;
@@ -44,8 +44,8 @@ export function PhoneLookup({ initialQuery = "line", initialStack = [], noData =
   return (
     <>
       <PhoneSearchHeader title="Lookup" subtitle={noData ? "No game data yet" : `${plural(lookupSystems.length, "game system")} installed`}
-        query={query} onQueryChange={lk.setQuery} placeholder="Search units, rules, upgrades…" trailing={trailing} initialOpen={!!initialQuery} searchable={!noData} />
-      <div className="ux-wb-home-body ux-lk-body">
+        query={query} onQueryChange={lk.setQuery} placeholder="Search units, rules, upgrades…" trailing={trailing} initialOpen={!!initialQuery && !noData} searchable={!noData} />
+      <div className={`ux-wb-home-body ux-lk-body ${text150 ? "ux-lk-text-150" : ""}`}>
         {noData ? (
           <div className="ux-search-empty ux-lk-empty"><BookOpen size={22} /><strong>Nothing to look up yet</strong><small>Lookup searches the units, detachments, upgrades and rules of your installed game data.</small><button type="button" className="ux-job-btn" onClick={onAddData}><Database size={15} />Add game data</button></div>
         ) : <>
@@ -72,7 +72,7 @@ export function PhoneLookup({ initialQuery = "line", initialStack = [], noData =
         <header className="ux-5a-header ux-lk-phone-top"><button type="button" onClick={() => setMissing(false)} aria-label="Back to Lookup" title="Back to Lookup"><ChevronLeft size={24} aria-hidden /></button><h2>Saved reference</h2></header>
         <LookupUnavailable saved={unavailableSample} onBack={() => setMissing(false)} />
       </section></div>
-        : top ? <div className={`ux-lk-page ${largeText ? "ux-lk-text-200" : ""}`}><LookupEntryPage key={top.id} entity={top} fullNameOpen={largeText} back={stack.length > 1 ? lookupById(stack[stack.length - 2])?.name ?? "Lookup" : "Lookup"} onBack={() => setStack((s) => s.slice(0, -1))} onOpen={push} /></div> : null}
+        : top ? <div className={`ux-lk-page ${largeText ? "ux-lk-text-200" : text150 ? "ux-lk-text-150" : ""}`}><LookupEntryPage key={top.id} entity={top} fullNameOpen={largeText} back={stack.length > 1 ? lookupById(stack[stack.length - 2])?.name ?? "Lookup" : "Lookup"} onBack={() => setStack((s) => s.slice(0, -1))} onOpen={push} /></div> : null}
     </>
   );
 }
