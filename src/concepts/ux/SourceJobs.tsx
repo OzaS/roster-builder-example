@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { Archive, ArrowLeft, Bell, Check, ChevronDown, ChevronRight, Circle, CircleArrowUp, CircleCheck, Clock, Copy, Database, Download, Ellipsis, FileArchive, FileInput, FileText, FolderGit2, FolderOpen, Globe, Hand, History, Info, Library, ListChecks, LoaderCircle, Lock, Minus, OctagonAlert, Plus, RefreshCw, Search, Star, Trash2, TextCursorInput, TriangleAlert, Upload, Wifi, X } from "lucide-react";
+import { Archive, ArrowLeft, Bell, Check, ChevronDown, ChevronRight, Circle, CircleArrowUp, CircleCheck, Clock, Copy, Database, Download, Ellipsis, FileArchive, FileInput, FileText, FolderGit2, FolderOpen, Globe, Hand, History, Info, Library, ListChecks, LoaderCircle, Lock, Minus, OctagonAlert, Plus, RefreshCw, Search, Star, Trash2, TextCursorInput, TriangleAlert, Ungroup, Upload, Wifi, X } from "lucide-react";
 import type { ConceptProps } from "../shared";
 import { Chip } from "./uxShared";
 
@@ -269,6 +269,25 @@ export function FocusCatalogueSearchSetting({ on, onToggle, keys }: { on: boolea
       <span className="ux-switch" aria-hidden />
     </button>
   );
+}
+
+/**
+ * Settings → Advanced → Enable Separate all (DEC-054, R0-02; a user preference, off by default). Off: a unit with several models
+ * offers Separate 1 only; on: it also offers Separate all, splitting it into single-model units in one step.
+ */
+export function SeparateAllSetting({ on, onToggle }: { on: boolean; onToggle?: () => void }) {
+  return (
+    <button type="button" className={`ux-setting-row ${on ? "on" : ""}`} role="switch" aria-checked={on} onClick={onToggle}>
+      <span className="ux-setting-icon"><Ungroup size={17} /></span>
+      <span className="ux-setting-text"><strong>Enable Separate all</strong><small>Units with several models also offer Separate all, which splits them into single-model units in one step. Off: only Separate 1.</small></span>
+      <span className="ux-switch" aria-hidden />
+    </button>
+  );
+}
+
+/** Settings › Advanced (DEC-054): its rows sit plain in the section, with no enclosing card and no card per row. */
+export function AdvancedSettingsRows({ children }: { children: ReactNode }) {
+  return <div className="ux-setting-plain" role="group" aria-label="Advanced">{children}</div>;
 }
 
 /** Settings → Game data → Advanced installation (a user preference, off by default). */

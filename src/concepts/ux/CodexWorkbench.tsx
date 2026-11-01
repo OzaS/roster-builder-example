@@ -8,7 +8,7 @@ import { mockCatalogues, mockDetachments, mockSystemUnits } from "../../data/moc
 import { referenceById, resolveRosterReference } from "../../data/mockRosterReferences";
 import type { RosterReferenceDefinition, RosterUnit } from "../../types";
 import type { ConceptProps } from "../shared";
-import { AddGameDataScreen, AdvancedInstallSetting, AutoUpdateChecksSetting, FocusCatalogueSearchSetting, CollectionScreen, InstallJobScreen, KeepVersionsSetting, MigrationReportScreen, NotificationsSetting, ReadOnlyRosterScreen, RememberSectionsSetting, SearchGitHubScreen, SourceDetailScreen, SourcesManageScreen, SourcesNavRow, UpdateAvatarButton, WifiOnlySetting } from "./SourceJobs";
+import { AddGameDataScreen, AdvancedInstallSetting, AutoUpdateChecksSetting, FocusCatalogueSearchSetting, SeparateAllSetting, AdvancedSettingsRows, CollectionScreen, InstallJobScreen, KeepVersionsSetting, MigrationReportScreen, NotificationsSetting, ReadOnlyRosterScreen, RememberSectionsSetting, SearchGitHubScreen, SourceDetailScreen, SourcesManageScreen, SourcesNavRow, UpdateAvatarButton, WifiOnlySetting } from "./SourceJobs";
 import { MobileUnitOptions } from "./MobileUnitOptions";
 import { BackOrTitle, BudgetMeter, Chip, ExpandableBudget, RosterMoreMenu, RosterShareButton, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "./uxShared";
 
@@ -2208,6 +2208,7 @@ function SettingsScreen({ props }: { props: ConceptProps }) {
   const [wifiOnly, setWifiOnly] = useState(false);
   const [autoChecks, setAutoChecks] = useState(true);
   const [focusSearch, setFocusSearch] = useState(false);
+  const [separateAll, setSeparateAll] = useState(false);
   return (
     <>
       <header className="ux-wb-top ux-wb-home-top reversed">
@@ -2244,9 +2245,12 @@ function SettingsScreen({ props }: { props: ConceptProps }) {
         <AutoUpdateChecksSetting on={autoChecks} onToggle={() => setAutoChecks((value) => !value)} />
         <KeepVersionsSetting />
         <NotificationsSetting />
-        {/* DEC-050 (UX-059): Advanced, last; opt-in behaviour, off by default. The phone has no keyboard shortcut to name. */}
+        {/* DEC-050 (UX-059), DEC-054: Advanced, last; two opt-in preferences, off by default, as plain rows. The phone has no keyboard shortcut to name. */}
         <div className="ux-result-label">Advanced</div>
-        <FocusCatalogueSearchSetting on={focusSearch} onToggle={() => setFocusSearch((value) => !value)} />
+        <AdvancedSettingsRows>
+          <FocusCatalogueSearchSetting on={focusSearch} onToggle={() => setFocusSearch((value) => !value)} />
+          <SeparateAllSetting on={separateAll} onToggle={() => setSeparateAll((value) => !value)} />
+        </AdvancedSettingsRows>
       </div>
     </>
   );

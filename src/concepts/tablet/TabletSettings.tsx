@@ -19,7 +19,7 @@ const sections = [
   { id: 'data', label: 'Game data', sub: 'Updates and installation', icon: Database },
   { id: 'storage', label: 'Storage', sub: '67.1 MB used', icon: HardDrive },
   { id: 'keys', label: 'Keyboard shortcuts', sub: 'With a hardware keyboard', icon: Keyboard },
-  { id: 'advanced', label: 'Advanced', sub: 'Catalogue behaviour', icon: SlidersHorizontal },
+  { id: 'advanced', label: 'Advanced', sub: 'Catalogue search, Separate all', icon: SlidersHorizontal },
   { id: 'about', label: 'About', sub: 'Version and licences', icon: Info },
 ] as const;
 
@@ -32,6 +32,7 @@ export function TabletSettings({ env, notify, session, themePref, scheme, onThem
   const [limit, setLimit] = useState(1000);
   const [toggles, setToggles] = useState({ rememberSections: true, reopenLast: true, autoChecks: true });
   const [keep, setKeep] = useState(1);
+  const [separateAll, setSeparateAll] = useState(false);
   const flip = (key: keyof typeof toggles) => (v: boolean) => setToggles(t => ({ ...t, [key]: v }));
   const current = sections.find(s => s.id === (settingsSection ?? 'appearance')) ?? sections[0];
   const page = (() => {
@@ -66,10 +67,12 @@ export function TabletSettings({ env, notify, session, themePref, scheme, onThem
         <p className="tb-note"><Keyboard size={15} /><span>These shortcuts work with a hardware keyboard. {env.device.system === 'ios' ? 'Hold ⌘ to see them anywhere.' : 'Press Ctrl + / to see them anywhere.'} They are fixed; the key bindings editor is part of the desktop app.</span></p>
         {[generalShortcuts, editorShortcuts].map(group => <Group key={group.title} title={group.title}><div className="ux-src-group">{group.items.map(a => <div className="ux-src-kv tb-key-row" key={a.combo}><span>{a.label}</span><kbd className="tb-kbd">{keyLabel(a.combo, env.device.system)}</kbd></div>)}</div></Group>)}
       </>;
-      // DEC-050 (UX-059): Settings › Advanced, a new section for opt-in behaviour. Off keeps the catalogue for browsing (no keyboard over the list).
+      // DEC-050 (UX-059), DEC-054: Settings › Advanced, two opt-in preferences (off by default) as plain rows: no enclosing card.
       case 'advanced': return <WorkspaceScope light={light}>
-        <div className="ux-src-group tb-switches"><Switch label="Focus search when opening the catalogue" detail={`Off: Add unit opens the catalogue for browsing. ${keyLabel('Mod+F', env.device.system)} on a keyboard always focuses the search.`} checked={focusSearch} onChange={onFocusSearch} /></div>
-        <p className="tb-note"><Info size={15} />{focusSearch ? 'Add unit opens the catalogue with the search focused, so the on-screen keyboard appears at once.' : 'Add unit opens the catalogue without the on-screen keyboard, so the whole list stays in view.'}</p>
+        <div className="tb-plain-rows" role="group" aria-label="Advanced">
+          <Switch label="Focus search when opening the catalogue" detail={`Off: Add unit opens the catalogue for browsing. ${keyLabel('Mod+F', env.device.system)} on a keyboard always focuses the search.`} checked={focusSearch} onChange={onFocusSearch} />
+          <Switch label="Enable Separate all" detail="Units with several models also offer Separate all, which splits them into single-model units in one step. Off: only Separate 1." checked={separateAll} onChange={setSeparateAll} />
+        </div>
       </WorkspaceScope>;
       default: return <>
         <Facts rows={[['Version', '1.0.0 · tablet preview'], ['Engine', '0.9.4'], ['Protocol', '12'], ['SQLite', '3.46']]} />
