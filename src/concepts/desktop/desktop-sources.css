@@ -123,3 +123,23 @@
 .dtp-source-links { display: flex; flex-wrap: wrap; gap: 4px; margin: -4px 0 0 -10px }
 .dt-app .dtp-btn.dts-link { background: none; border-color: transparent; color: var(--dt-accent) }
 .dt-app .dtp-btn.dts-link:hover { background: var(--dt-hover) }
+
+/* R0-08 (DEC-054): compact source status: one 34 px icon (button for actions), caption in the hint bubble on hover/focus. */
+.dts-source-row { position: relative; display: flex; align-items: center; gap: 6px; border-radius: 12px; padding-right: 8px }
+.dts-source-row.selected { background: var(--dt-selected); box-shadow: inset 3px 0 0 var(--dt-accent) }
+.dt-app .dts-source-row > .dtp-row { flex: 1; min-width: 0; background: none; box-shadow: none }
+.dt-app .dts-source-row:hover { background: var(--dt-hover) }
+.dt-app .dts-source-row.selected:hover { background: var(--dt-selected) }
+.dts-status-wrap { flex-shrink: 0; display: inline-grid }
+.dt-app .dts-status { --tone: var(--dt-muted); display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border-radius: 10px; color: var(--tone) }
+.dts-status.accent { --tone: var(--dt-accent) }
+.dts-status.warn { --tone: var(--dt-warn) }
+.dts-status.err { --tone: var(--ux-err) }
+.dt-app button.dts-status { border: 1px solid color-mix(in srgb, var(--tone) 40%, transparent); background: color-mix(in srgb, var(--tone) 12%, transparent) }
+.dt-app button.dts-status:hover { background: color-mix(in srgb, var(--tone) 24%, transparent) }
+.dts-ring { --p: 0%; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: conic-gradient(var(--dt-accent) var(--p), var(--dt-border) 0) }
+.dts-ring b { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--dt-pane); color: var(--dt-text); font-size: 9px; font-weight: 700; font-variant-numeric: tabular-nums }
+.dts-status-wrap .dts-status-bubble { right: 0; left: auto; top: calc(100% + 6px); transform: none; white-space: nowrap }
+.dts-status-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px 14px; padding-bottom: 40px }
+.dts-status-sample { display: flex; align-items: center; gap: 10px; min-width: 0 }
+.dts-status-sample small { color: var(--dt-muted); font-size: 12px }
