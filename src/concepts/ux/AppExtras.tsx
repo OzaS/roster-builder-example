@@ -1,4 +1,4 @@
-import { Bug, ChevronRight, CircleCheck, Clock, Cog, Database, Gauge, Search } from "lucide-react";
+import { Bug, ChevronRight, CircleCheck, Clock, Cog, Database, Eye, Gauge, Search } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Chip } from "./uxShared";
 
@@ -42,6 +42,8 @@ export function DeveloperOptionsPreview() {
       <div className="ux-result-label">Developer</div>
       <div className="ux-src-group">
         <div className="ux-setting-row on ux-dev-row"><span className="ux-setting-icon"><Gauge size={17} /></span><span className="ux-setting-text"><strong>Performance overlay</strong><small>UI frame drops and tap → view latency, per screen</small></span><span className="ux-switch" aria-hidden /></div>
+        {/* UX-052 (approved 2026-11-01): the Show hidden control lives here on every platform, off by default; the inline "Show hidden (n)" links of Add unit and unit options are removed. */}
+        <div className="ux-setting-row ux-dev-row"><span className="ux-setting-icon"><Eye size={17} /></span><span className="ux-setting-text"><strong>Show hidden entries</strong><small>List the entries and options the game data marks as hidden in Add unit and in unit options. Off by default.</small></span><span className="ux-switch" aria-hidden /></div>
         <div className="ux-src-kv"><span>Lookup tab</span><b><Chip tone="neutral">V1.x · placeholder</Chip></b></div>
         <div className="ux-src-kv"><span>Source updates</span><b><Chip tone="neutral">V1.x · placeholder</Chip></b></div>
         <div className="ux-src-kv"><span>Component gallery · Engine bench</span><b>Tools</b></div>

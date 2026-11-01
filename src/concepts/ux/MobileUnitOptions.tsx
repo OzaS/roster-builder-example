@@ -1,16 +1,15 @@
-import { AlertTriangle, ArrowLeft, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Circle, CircleDot, Square, SquareCheck, LoaderCircle, Minus, Plus } from "lucide-react";
+import { AlertTriangle, ArrowLeft, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Circle, CircleDot, Square, SquareCheck, LoaderCircle, Minus, Plus, Scissors } from "lucide-react";
 import { type ReactNode, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 /** Implemented mobile unit detail: 5A options, 5B Profile tab, bottom categories, and links (associations). Synthetic names and costs; later detail features stay in the original design.
  * UX-004: a command in flight shows only a spinner in room kept next to the cost and never dims or inserts rows; optional one-of groups always list None first. UX-003: a count pinned at min = max has no stepper. */
-export function MobileUnitOptions({ onBack, state = "ready", compact = false, initialTab = "options", initialDrilled = false, profileContent = "both", backStyle = "ios" }: { onBack?: () => void; state?: "ready" | "loading" | "error" | "gone"; compact?: boolean; initialTab?: "options" | "profile"; initialDrilled?: boolean; profileContent?: "both" | "profiles" | "rules" | "none"; backStyle?: "ios" | "android" }) {
+export function MobileUnitOptions({ onBack, state = "ready", compact = false, initialTab = "options", initialDrilled = false, profileContent = "both", backStyle = "ios", separateAll = false, initialStacks, focusStacks = false }: { separateAll?: boolean; initialStacks?: { id: number; count: number; sidearm: string; scope: boolean }[]; focusStacks?: boolean; onBack?: () => void; state?: "ready" | "loading" | "error" | "gone"; compact?: boolean; initialTab?: "options" | "profile"; initialDrilled?: boolean; profileContent?: "both" | "profiles" | "rules" | "none"; backStyle?: "ios" | "android" }) {
   const [modelCost, setModelCost] = useState(70);
   const [guns, setGuns] = useState(2);
   const [banner, setBanner] = useState(true);
   const [drills, setDrills] = useState(true);
   const [drilled, setDrilled] = useState(initialDrilled);
   const [drill, setDrill] = useState<string | undefined>("Drill A");
-  const [showHidden, setShowHidden] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(state === "error");
   const [tab, setTab] = useState(initialTab);
@@ -18,6 +17,8 @@ export function MobileUnitOptions({ onBack, state = "ready", compact = false, in
   const parentScroll = useRef(0);
   const enterDrills = () => { parentScroll.current = frame.current?.scrollTop ?? 0; setDrilled(true); };
   useLayoutEffect(() => { frame.current?.scrollTo({ top: drilled ? 0 : parentScroll.current }); }, [drilled]);
+  // Gallery states for Separate 1 / Separate all open with the Model loadouts heading at the top of the frame.
+  useLayoutEffect(() => { if (focusStacks) { const h = frame.current?.querySelector<HTMLElement>("[data-stacks]"); if (h && frame.current) frame.current.scrollTo({ top: frame.current.scrollTop + h.getBoundingClientRect().top - frame.current.getBoundingClientRect().top - 76 }); } }, [focusStacks]);
   const hasProfiles = !drilled && (profileContent === "both" || profileContent === "profiles");
   const hasRules = !drilled && (profileContent === "both" || profileContent === "rules");
   const hasProfile = hasProfiles || hasRules;
@@ -57,8 +58,8 @@ export function MobileUnitOptions({ onBack, state = "ready", compact = false, in
         </FoldSection></div>
       </div>
       <div className="ux-5a-options" hidden={drilled || shownTab !== "options"}>
-        <h4>Model loadouts</h4>
-        <ModelStackSamples onCost={setModelCost} />
+        <h4 data-stacks>Model loadouts</h4>
+        <ModelStackSamples onCost={setModelCost} separateAll={separateAll} initialStacks={initialStacks} />
         <article className="ux-5a-card">
           <div className="ux-5a-model-title"><span><strong>Lance Leader ×1</strong><small>16 Credits per model</small></span></div>
           <small>At least 1 · Up to 1 · Soft limit · can exceed</small>
@@ -70,8 +71,6 @@ export function MobileUnitOptions({ onBack, state = "ready", compact = false, in
         </FoldSection></div>
         <h4>Links</h4>
         <div className="ux-5a-card"><h4>Escorting</h4><small className={escort ? "" : "ux-5a-invalid"}>{escort ? "1/1 linked" : <><AlertTriangle size={13} />0/1 linked · Needs 1 more link</>}</small><div role="radiogroup" aria-label="Escorting">{["Squad A", "Squad B"].map(name => <button type="button" role="radio" aria-checked={escort === name} className="ux-5a-choice" key={name} onClick={() => change(() => setEscort(escort === name ? undefined : name))}>{escort === name ? <CheckCircle2 size={21} /> : <Circle size={21} />}<span><strong>{name}</strong></span></button>)}<div className="ux-5a-choice"><Circle size={21} /><span><strong>Squad C</strong><small className="ux-5b-warn">No longer eligible</small></span></div></div></div>
-        <button className="ux-5a-link" type="button" onClick={() => setShowHidden(!showHidden)}>{showHidden ? "Hide hidden options" : "Show hidden options (1)"}</button>
-        {showHidden ? <div className="ux-5a-card"><strong>Secret option</strong><small>Hidden</small><small>No added cost</small><Count name="Secret option" value={0} min={0} disabled={true} onChange={() => {}} /></div> : null}
       </div>
     </>}
     <h4>Categories</h4>
@@ -140,20 +139,36 @@ export function OptionFoldSamples() {
   </section>;
 }
 
-/** UX-007: each resulting model stack owns its editable loadout. */
-export function ModelStackSamples({ onCost }: { onCost?: (cost: number) => void }) {
-  const [stacks, setStacks] = useState([{ id: 1, count: 5, sidearm: "Pistol", scope: false }]);
-  const [split, setSplit] = useState<{ id: number; count: number }>();
+/** UX-023 (1.0, approved 2026-11-01, mirrors the desktop unit dialog): a model group's Separate 1 action, and Separate all only when Settings › Advanced › Enable Separate all is on. Absent on a group of one model. Separating never makes a unit or a roster entry; it only lets the user choose those models' options individually inside the same unit. */
+export function SeparateRow({ separateAll, onOne, onAll }: { separateAll: boolean; onOne: () => void; onAll: () => void }) {
+  return <div className="ux-5a-separate" role="group" aria-label="Separate models">
+    <button type="button" className="ux-5a-separate-btn" onClick={onOne}><Scissors size={17} />Separate 1</button>
+    {separateAll ? <button type="button" className="ux-5a-separate-btn" onClick={onAll}><Scissors size={17} />Separate all</button> : null}
+    <small>{separateAll ? "Give one model its own options, or every model. They stay in this unit and keep the loadout." : "Give one model its own options. It stays in this unit and keeps its loadout."}</small>
+  </div>;
+}
+
+/** UX-007: each model group of the unit owns its editable loadout. */
+export function ModelStackSamples({ onCost, separateAll = false, initialStacks }: { onCost?: (cost: number) => void; separateAll?: boolean; initialStacks?: { id: number; count: number; sidearm: string; scope: boolean }[] }) {
+  const [stacks, setStacks] = useState(initialStacks ?? [{ id: 1, count: 5, sidearm: "Pistol", scope: false }]);
   const [opened, setOpened] = useState<string[]>([]);
   const fold = (key: string) => ({ folded: !opened.includes(key), onFold: () => setOpened(all => all.includes(key) ? all.filter(x => x !== key) : [...all, key]) });
   const total = stacks.reduce((n, s) => n + s.count, 0);
   const cost = stacks.reduce((n, s) => n + s.count * (s.sidearm === "Pistol" ? 14 : s.sidearm === "Axe" ? 13 : 12) + (s.scope ? s.count : 0), 0);
   useEffect(() => onCost?.(cost), [onCost, cost]);
   const update = (id: number, values: Partial<(typeof stacks)[number]>) => setStacks(all => all.map(s => s.id === id ? { ...s, ...values } : s));
+  /** UX-023 / DEC-046 (approved 2026-11-01): Separate 1 splits one model off its group inside the same unit, with the same loadout, so its options can be chosen on their own (5 → 4 + 1); Separate all (Settings › Advanced, off by default) does that for every model. The unit stays one roster entry; one undoable step each; totals and cost are unchanged. */
+  const separate = (id: number, all: boolean) => setStacks(list => {
+    const s = list.find(x => x.id === id);
+    if (!s || s.count < 2) return list;
+    let next = Math.max(...list.map(x => x.id)) + 1;
+    const made = Array.from({ length: all ? s.count - 1 : 1 }, () => ({ ...s, id: next++, count: 1 }));
+    return list.flatMap(x => x.id === id ? [{ ...x, count: all ? 1 : x.count - 1 }, ...made] : [x]);
+  });
   return <><small>{total} models total · At least 3 · Up to 10 · Soft limit</small>{stacks.map(s => <article key={s.id} className="ux-5a-card">
     <strong>Lancer ×{s.count}</strong>
     <Count name="Lancer" value={s.count} min={0} disabled={false} onChange={count => update(s.id, { count })} />
-    {s.count > 1 ? split?.id === s.id ? <div><small>Move models into a separate stack with the same loadout. Total model count stays the same.</small><Count name="Models to split" value={Math.min(split.count, s.count - 1)} min={1} max={s.count - 1} disabled={false} onChange={count => setSplit({ id: s.id, count })} /><button type="button" onClick={() => { const count = Math.min(split.count, s.count - 1); setStacks(all => [...all.map(x => x.id === s.id ? { ...x, count: x.count - count } : x), { ...s, id: Math.max(...all.map(x => x.id)) + 1, count }]); setSplit(undefined); }}>Split {Math.min(split.count, s.count - 1)} model(s)</button><button type="button" onClick={() => setSplit(undefined)}>Cancel</button></div> : <button type="button" onClick={() => setSplit({ id: s.id, count: 1 })}>Split models</button> : null}
+    {s.count > 1 ? <SeparateRow separateAll={separateAll} onOne={() => separate(s.id, false)} onAll={() => separate(s.id, true)} /> : null}
     <FoldSection title="Sidearm" counter={`${s.sidearm ? s.count : 0}/${s.count} selections`} summary={summarise([[s.sidearm, s.sidearm ? s.count : 0], ["Long scope", s.scope ? s.count : 0]])} {...fold(`${s.id}/sidearm`)}><div role="radiogroup" aria-label="Sidearm">{["", "Pistol", "Axe"].map(name => <button type="button" role="radio" aria-checked={s.sidearm === name} className="ux-5a-choice" key={name} onClick={() => update(s.id, { sidearm: name })}>{s.sidearm === name ? <CircleDot size={22} /> : <Circle size={22} />}<span><strong>{name || "None"}</strong><small>{name ? `+${name === "Pistol" ? 2 : 1} Credits per model` : "No added cost"}</small></span></button>)}</div>
     <div className="ux-fold-nested"><FoldSection title="Exchange its scope" {...fold(`${s.id}/scope`)}><ToggleRow name="Long scope" cost="+1 Credits per model" value={s.scope} disabled={false} onChange={() => update(s.id, { scope: !s.scope })} /></FoldSection></div></FoldSection>
   </article>)}</>;

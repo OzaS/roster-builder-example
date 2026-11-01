@@ -3,7 +3,7 @@ import { AlertTriangle, ArrowDownToLine, BookOpen, Check, ChevronDown, ChevronLe
 import { PointsLine, RosterSummary, SummaryToggle } from '../workspace/RosterSummary';
 import type { Notify } from '../workspace/Toasts';
 import { StatusGlyph, TreeUnitMain } from '../ux/uxShared';
-import { Count, FoldSection, RadioRow, ToggleRow } from '../ux/MobileUnitOptions';
+import { Count, FoldSection, RadioRow, SeparateRow, ToggleRow } from '../ux/MobileUnitOptions';
 import { PRIMARY_FORCE_ID, ROLES, forceOf, groupLimit, rosterIssues, unitCost, useRosterHistory, type EditorUnit, type Force, type ExportRoster, type ImportResult, type ReadOnlyInfo, type RosterIssue } from '../desktop/DesktopEditorFlows';
 import { rosterLibrary } from '../desktop/desktopData';
 import type { RosterUnit } from '../../types';
@@ -27,7 +27,7 @@ import './tablet-editor.css';
 //   Medium (600-839): force tree · unit details; the catalogue is a slide-over from Add unit.
 //   Split view (< 700 wide, also any window whose logical width drops under 700 at a larger text size): the tree alone; a unit's details open over it (like ListDetail on the pages).
 
-export type EditorStart = 'editor' | 'issues' | 'add' | 'forces' | 'add-force' | 'readonly' | 'export' | 'move-unit' | 'add-roles' | 'add-focus' | 'chip-caption' | 'limit-caption' | 'unit';
+export type EditorStart = 'editor' | 'issues' | 'add' | 'forces' | 'add-force' | 'readonly' | 'export' | 'move-unit' | 'add-roles' | 'add-focus' | 'chip-caption' | 'limit-caption' | 'unit' | 'separate-all';
 /** Gallery starts that open the catalogue as Add unit does (DEC-050: many roles, opened with the search focused, a chip's caption shown). */
 const addStarts: EditorStart[] = ['add', 'add-roles', 'add-focus', 'chip-caption', 'limit-caption'];
 type Pop = 'switcher' | 'more' | 'summary' | `unit-${number}` | `force-${string}` | null;
@@ -43,6 +43,8 @@ const PANES: { catalogue: PanePresets; inspector: PanePresets; inspectorMedium: 
   inspectorMedium: { min: 320, max: 500, narrow: 340, initial: 420, wide: 480 },
 };
 const pts = (n: number) => n.toLocaleString('en-US');
+/** UX-023 (approved 2026-11-01): a unit's models form groups, each with its own options; Separate 1 / Separate all split a group inside the same unit (never a new unit or roster entry). `stacks` is absent while the unit is one group. */
+type StackUnit = EditorUnit & { stacks?: number[] };
 const memberLabel = (u: EditorUnit) => u.role === 'Command' ? 'Commander' : u.models === 1 ? 'Crew' : 'Unit members';
 
 /** Scrolls a tree row into view inside this editor and flashes it (the desktop's revealInRoster, scoped to one frame). */
@@ -55,10 +57,12 @@ function reveal(root: RefObject<HTMLElement | null>, selector: string, focus = f
   }));
 }
 
-export function TabletEditor({ env, notify, light, rosterName, from, start = 'editor', imported, focusSearch = false, onBack, onAllRosters, onNewRoster, onImport, onFindData }: {
+export function TabletEditor({ env, notify, light, rosterName, from, start = 'editor', imported, focusSearch = false, separateAll = false, onBack, onAllRosters, onNewRoster, onImport, onFindData }: {
   env: TabletEnv; notify: Notify; light: boolean; rosterName: string; from: string; start?: EditorStart; imported?: ImportResult;
   /** Settings › Advanced › Focus search when opening the catalogue (DEC-050, UX-059; off by default). */
   focusSearch?: boolean;
+  /** Settings › Advanced › Enable Separate all (DEC-046/054; off by default): the unit pane also offers Separate all on a group of several models. */
+  separateAll?: boolean;
   onBack: () => void; onAllRosters: () => void; onNewRoster: () => void; onImport: () => void; onFindData: () => void;
 }) {
   // Foldable (env.fold): two panes on the open display in every pose (the panes divide at the fold when it is partially
@@ -134,9 +138,9 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
   function undo() { if (!readOnly) afterStep(history.undo(), true); }
   function redo() { if (!readOnly) afterStep(history.redo(), false); }
   const withUndo = (step: number) => ({ action: { label: 'Undo', run: () => { history.undoStep(step); settle(); } } });
-  const update = (change: Partial<EditorUnit>) => {
+  const update = (change: Partial<StackUnit>) => {
     if (readOnly || !selected) return;
-    const what = change.notes !== undefined ? 'notes' : change.models !== undefined ? 'unit size' : change.weapon !== undefined ? change.weapon : change.upgrade !== undefined ? `Field standard ${change.upgrade ? 'on' : 'off'}` : 'options';
+    const what = change.stacks !== undefined ? 'model groups' : change.notes !== undefined ? 'notes' : change.models !== undefined ? 'unit size' : change.weapon !== undefined ? change.weapon : change.upgrade !== undefined ? `Field standard ${change.upgrade ? 'on' : 'off'}` : 'options';
     history.edit(`${selected.name}: ${what}`, d => ({ ...d, units: d.units.map(u => u.id === selected.id ? { ...u, ...change } : u) }), { focus: selected.id, merge: change.notes !== undefined ? `notes-${selected.id}` : undefined });
   };
   const addUnit = (entry: CatalogueEntry) => {
@@ -371,14 +375,14 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
 
         {mode !== 'single' && showInspector && <aside className="tbe-pane tbe-inspector" aria-label="Unit details">
           <header className="tbe-pane-head"><span><strong>Unit details</strong></span><HintButton hint="Hide unit details (More → Show unit details brings them back)" input={env.input} side="bottom" wrapClassName="end" aria-label="Hide unit details" className="tbe-icon small" onClick={() => setShowInspector(false)}><PanelRightClose size={18} /></HintButton></header>
-          {selected ? <UnitDetail key={selected.id} unit={selected} env={env} force={forceById(forceOf(selected))} faction={roster.faction} total={total} issue={unitIssue(selected.id)} readOnly={!!readOnly} onUpdate={update} onDuplicate={() => duplicateUnit(selected)} onRemove={() => removeUnit(selected)} />
+          {selected ? <UnitDetail key={selected.id} unit={selected} env={env} force={forceById(forceOf(selected))} faction={roster.faction} total={total} issue={unitIssue(selected.id)} readOnly={!!readOnly} separateAll={separateAll} onUpdate={update} onDuplicate={() => duplicateUnit(selected)} onRemove={() => removeUnit(selected)} />
             : <EmptyDetail onAdd={readOnly ? undefined : () => openCatalogue()} />}
         </aside>}
       </div>
 
       {mode === 'single' && detailOpen && selected && <aside className="tbe-over" aria-label="Unit details">
         {!vertical && <header className="tbe-pane-head"><HintButton hint="Back to the roster tree" input={env.input} side="bottom" wrapClassName="start" className="tbe-back inline" onClick={() => setDetailOpen(false)}><ChevronLeft size={22} /><span>Roster</span></HintButton></header>}
-        <UnitDetail key={selected.id} unit={selected} env={env} force={forceById(forceOf(selected))} faction={roster.faction} total={total} issue={unitIssue(selected.id)} readOnly={!!readOnly} onUpdate={update} onDuplicate={() => duplicateUnit(selected)} onRemove={() => removeUnit(selected)} />
+        <UnitDetail key={selected.id} unit={selected} env={env} force={forceById(forceOf(selected))} faction={roster.faction} total={total} issue={unitIssue(selected.id)} readOnly={!!readOnly} separateAll={separateAll} onUpdate={update} onDuplicate={() => duplicateUnit(selected)} onRemove={() => removeUnit(selected)} />
       </aside>}
 
       {slideOver && mode !== 'three' && <div className="tbe-scrim" onClick={() => setSlideOver(false)}>
@@ -544,9 +548,9 @@ function UnitRow({ unit, env, active, issue, menuOpen, readOnly, onSelect, onMen
 
 /* ---------------------------------------------------------------- unit details (the mobile unit detail in a pane) */
 
-function UnitDetail({ unit, env, force, faction, total, issue, readOnly, onUpdate, onDuplicate, onRemove }: {
-  unit: EditorUnit; env: TabletEnv; force: Force; faction: string; total: number; issue?: RosterIssue; readOnly: boolean;
-  onUpdate: (change: Partial<EditorUnit>) => void; onDuplicate: () => void; onRemove: () => void;
+function UnitDetail({ unit, env, force, faction, total, issue, readOnly, separateAll, onUpdate, onDuplicate, onRemove }: {
+  unit: EditorUnit; env: TabletEnv; force: Force; faction: string; total: number; issue?: RosterIssue; readOnly: boolean; separateAll: boolean;
+  onUpdate: (change: Partial<StackUnit>) => void; onDuplicate: () => void; onRemove: () => void;
 }) {
   const [tab, setTab] = useState<'options' | 'profile'>('options');
   // Open sections are presentation only; the tablet opens the two option sections at first (there is room for them).
@@ -558,6 +562,9 @@ function UnitDetail({ unit, env, force, faction, total, issue, readOnly, onUpdat
   const pinned = unit.role === 'Command';
   const standardIssue = issue?.id.endsWith('-standard');
   const sizeIssue = issue?.id.endsWith('-size');
+  const stacks = (unit as StackUnit).stacks ?? [unit.models];
+  // The unit's model count is the sum of its groups; every model beyond the first of the unit costs the same (+12 pts).
+  const setStacks = (next: number[]) => { const models = next.reduce((n, c) => n + c, 0); onUpdate({ stacks: next.length > 1 ? next : undefined, models, points: unit.points + (models - unit.models) * 12 }); };
   const [move, defence, resolve, health] = unitProfile(unit);
   return <section className="ux-mobile-unit-options tbe-detail">
     <div className="tbe-unit-title">
@@ -574,11 +581,12 @@ function UnitDetail({ unit, env, force, faction, total, issue, readOnly, onUpdat
     <div className="ux-5b-tabs" role="tablist" aria-label="Unit view">{(['options', 'profile'] as const).map(id => <button type="button" role="tab" key={id} aria-selected={tab === id} onClick={() => setTab(id)}>{id === 'options' ? 'Options' : 'Profile'}</button>)}</div>
     {tab === 'options' ? <div className="tbe-options">
       <h4>Unit size</h4>
-      <article className="ux-5a-card">
-        <div className="ux-5a-model-title"><span><strong>{memberLabel(unit)} ×{unit.models}</strong><small>{pinned ? 'Always 1 model' : '+12 pts per extra model'}</small></span></div>
-        {pinned ? null : <><small className={sizeIssue ? 'ux-5a-invalid' : ''}>{sizeIssue && <AlertTriangle size={13} />}{unit.role === 'Support' ? 'At least 1' : 'At least 3'} · Up to 20 · {sizeIssue ? 'Needs more models' : 'Soft limit'}</small>
-          <Count name="Models" value={unit.models} min={1} max={20} over={sizeIssue} disabled={readOnly} onChange={models => onUpdate({ models, points: unit.points + (models - unit.models) * 12 })} /></>}
-      </article>
+      {stacks.map((count, i) => <article className="ux-5a-card" key={i}>
+        <div className="ux-5a-model-title"><span><strong>{memberLabel(unit)} ×{count}</strong><small>{pinned ? 'Always 1 model' : '+12 pts per extra model'}</small></span></div>
+        {pinned ? null : <>{i === 0 && <small className={sizeIssue ? 'ux-5a-invalid' : ''}>{sizeIssue && <AlertTriangle size={13} />}{unit.role === 'Support' ? 'At least 1' : 'At least 3'} · Up to 20 · {sizeIssue ? 'Needs more models' : 'Soft limit'}</small>}
+          <Count name={stacks.length > 1 ? `Models in group ${i + 1}` : 'Models'} value={count} min={1} max={20} over={sizeIssue} disabled={readOnly} onChange={n => setStacks(stacks.map((c, k) => k === i ? n : c))} />
+          {count > 1 && !readOnly ? <SeparateRow separateAll={separateAll} onOne={() => setStacks(stacks.flatMap((c, k) => k === i ? [c - 1, 1] : [c]))} onAll={() => setStacks(stacks.flatMap((c, k) => k === i ? Array<number>(c).fill(1) : [c]))} /> : null}</>}
+      </article>)}
       <div className="ux-5a-card"><FoldSection title="Primary weapon" counter="1/1 selections" summary={unit.weapon} {...fold('weapon')}>
         <div role="radiogroup" aria-label="Primary weapon">{weaponChoices(unit).map(w => <RadioRow key={w} name={w} cost="Included in unit cost" selected={unit.weapon === w} onChange={() => onUpdate({ weapon: w })} />)}</div>
       </FoldSection></div>

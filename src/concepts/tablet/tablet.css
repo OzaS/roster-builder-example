@@ -56,7 +56,6 @@
 .tb-panes { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(290px, 2fr) minmax(0, 3fr); gap: 14px }
 .tb-panes.single { grid-template-columns: minmax(0, 1fr); position: relative }
 .tb-pane { min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: 10px; container-type: inline-size }
-@container (max-width: 400px) { .tb-row-end b { display: none } }
 .tb-medium .tb-panes:not(.single) { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) }
 .tb-split-note { display: flex; align-items: center; gap: 8px; margin: 0; padding: 10px 12px; border-radius: var(--ux-r-md); background: var(--ux-surface-2); color: var(--ux-muted); font-size: 12.5px }
 .tb-list { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: 8px; min-width: 0 }
@@ -236,6 +235,13 @@
   .tb-app button.tb-row:has(> .tb-row-end > :not(svg)) { flex-wrap: wrap; row-gap: 6px }
   .tb-app button.tb-row > .tb-row-end:has(> :not(svg)) { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; flex-basis: 100%; justify-content: flex-start }
   .tb-app button.tb-row:has(> .tb-mark) > .tb-row-end:has(> :not(svg)) { padding-left: 52px }
+}
+/* R0 observation O3 (approved 2026-11-01): in a pane of 400 px or less a row keeps its bold points figure, on its own line under the title with the
+   status chip (left-aligned with the title, as rows already do at 300 px or less). Nothing a user needs is hidden; wide panes are unchanged. */
+@container (max-width: 400px) {
+  .tb-app button.tb-row:has(> .tb-row-end > b) { flex-wrap: wrap; row-gap: 6px }
+  .tb-app button.tb-row > .tb-row-end:has(> b) { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; flex-basis: 100%; justify-content: flex-start }
+  .tb-app button.tb-row:has(> .tb-mark) > .tb-row-end:has(> b) { padding-left: 52px }
 }
 .tb-toolbar { flex-wrap: wrap }
 .tb-toolbar .tb-search { flex: 1 1 260px }

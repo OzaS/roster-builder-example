@@ -1,6 +1,6 @@
 import { useEffect, useRef, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { BookOpen, Check, ChevronLeft, ChevronRight, Copy, Lock, Megaphone, Minus, Plus, Scissors, Trash2, UserRound, Users, X } from 'lucide-react';
-import { HistoryButtons, unitCost, type EditorUnit } from './DesktopEditorFlows';
+import { HistoryButtons, unitCost, type EditorUnit, type ModelGroup } from './DesktopEditorFlows';
 import './desktop-unit-dialog.css';
 
 /**
@@ -22,7 +22,7 @@ export function UnitDialog({ unit, forceName, source = 'Open Field · Catalogue 
   unit: EditorUnit; forceName: string; source?: string; path: UnitDialogLevel[]; tab: string; readOnlyReason?: string; separateAll: boolean;
   undo: { undoLabel?: string; redoLabel?: string; undoKey?: string; redoKey?: string; onUndo: () => void; onRedo: () => void };
   onPath: (path: UnitDialogLevel[]) => void; onTab: (tab: string) => void; onClose: () => void; onUpdate: (change: Partial<EditorUnit>) => void;
-  onDuplicate: () => void; onRemove: () => void; onSeparate: (all: boolean) => void;
+  onDuplicate: () => void; onRemove: () => void; onSeparate: (group: number, all: boolean) => void;
 }) {
   const ref = useRef<HTMLElement>(null);
   const opener = useRef<UnitDialogLevel | null>(null);
@@ -47,6 +47,12 @@ export function UnitDialog({ unit, forceName, source = 'Open Field · Catalogue 
   };
   const ro = !!readOnlyReason;
   const leaderWeapon = unit.leaderWeapon ?? LEADER_WEAPONS[0];
+  // UX-023: a unit's models form groups; Separate 1 / Separate all split a group inside the same unit (never a new unit), so each group gets its own options.
+  const groups: ModelGroup[] = unit.groups ?? [{ models: unit.models, weapon: unit.weapon }];
+  const setGroups = (next: ModelGroup[]) => { const models = next.reduce((n, g) => n + g.models, 0); onUpdate({ groups: next.length > 1 ? next : undefined, models, points: unit.points + (models - unit.models) * 12, weapon: next[0].weapon }); };
+  const weaponOptions = (current: string) => Array.from(new Set([current, 'Service rifle', 'Scout carbine', 'Heavy carbine']));
+  const SEPARATE_ONE = 'Give one model its own options. It stays in this unit and keeps its loadout.';
+  const separateButtons = (g: ModelGroup, i: number) => g.models > 1 && !ro && <div className="dtu-separate"><button type="button" className="dtp-btn small" disabled={ro} title={SEPARATE_ONE} onClick={() => onSeparate(i, false)}><Scissors size={13} />Separate 1</button>{separateAll && <button type="button" className="dtp-btn small" disabled={ro} title="Give every model its own options." onClick={() => onSeparate(i, true)}><Scissors size={13} />Separate all</button>}</div>;
   const signalLine = unit.signalKit ? `Taken · ${unit.signal ?? SIGNALS[0]}` : 'Not taken';
   const crumbs: Array<{ label: string; to: UnitDialogLevel[] }> = [{ label: unit.name, to: [] }, ...path.map((p, i) => ({ label: levelTitle[p], to: path.slice(0, i + 1) }))];
   const eyebrow = level === 'leader' ? <>Member <span> / </span> 1 model</> : level === 'signal' ? <>Upgrade <span> / </span> Squad leader</> : <>{unit.role} <span> / </span> {unit.models} {unit.models === 1 ? 'model' : 'models'}</>;
@@ -82,15 +88,23 @@ export function UnitDialog({ unit, forceName, source = 'Open Field · Catalogue 
             <div className="dt-option-heading"><h3>Signal</h3><span>{unit.signalKit ? 'Choose one' : 'Take the kit first'}</span></div>
             <div className="dtu-radios" role="radiogroup" aria-label="Signal">{SIGNALS.map(s => { const on = (unit.signal ?? SIGNALS[0]) === s; return <label key={s} className={`dt-checkbox-row ${on && unit.signalKit ? 'checked' : ''}`}><input type="radio" name={`signal-${unit.id}`} checked={on} disabled={ro || !unit.signalKit} onChange={() => onUpdate({ signal: s })} /><span><strong>{s}</strong></span>{on && unit.signalKit ? <Check size={14} /> : null}</label>; })}</div>
           </> : tab === 'Options' ? <>
-            <div className="dt-option-heading"><h3>Unit size</h3><span>{unit.models === 1 ? '1 model' : '1–20 models'}</span></div>
-            <div className="dt-model-count"><div><Users size={16} /><span>{unit.models === 1 ? 'Commander' : 'Unit members'}</span></div><div className="dt-stepper"><button aria-label="Remove model" disabled={ro || unit.models <= 1} onClick={() => onUpdate({ models: unit.models - 1, points: unit.points - 12 })}><Minus size={12} /></button><b>{unit.models}</b><button aria-label="Add model" disabled={ro || unit.role === 'Command' || unit.models >= 20} onClick={() => onUpdate({ models: unit.models + 1, points: unit.points + 12 })}><Plus size={12} /></button></div></div>
-            {/* DEC-054: Separate 1 always; Separate all only with Settings › Advanced › Enable Separate all. */}
-            {unit.models > 1 && !ro && <div className="dtu-separate"><button type="button" className="dtp-btn small" disabled={ro} title="Make one model a unit of its own" onClick={() => onSeparate(false)}><Scissors size={13} />Separate 1</button>{separateAll && <button type="button" className="dtp-btn small" disabled={ro} title={`Split into ${unit.models} single-model units`} onClick={() => onSeparate(true)}><Scissors size={13} />Separate all</button>}</div>}
+            <div className="dt-option-heading"><h3>Unit size</h3><span>{groups.length > 1 ? `${unit.models} models in ${groups.length} groups` : unit.models === 1 ? '1 model' : '1–20 models'}</span></div>
+            {/* DEC-054: Separate 1 always; Separate all only with Settings › Advanced › Enable Separate all. Separating keeps the models in this unit. */}
+            {groups.length === 1 ? <>
+              <div className="dt-model-count"><div><Users size={16} /><span>{unit.models === 1 ? 'Commander' : 'Unit members'}</span></div><div className="dt-stepper"><button aria-label="Remove model" disabled={ro || unit.models <= 1} onClick={() => onUpdate({ models: unit.models - 1, points: unit.points - 12 })}><Minus size={12} /></button><b>{unit.models}</b><button aria-label="Add model" disabled={ro || unit.role === 'Command' || unit.models >= 20} onClick={() => onUpdate({ models: unit.models + 1, points: unit.points + 12 })}><Plus size={12} /></button></div></div>
+              {separateButtons(groups[0], 0)}
+            </> : groups.map((g, i) => <div className="dtu-group" key={i} role="group" aria-label={`Models in group ${i + 1}`}>
+              <div className="dt-model-count"><div><Users size={16} /><span>Unit members ×{g.models}</span></div><div className="dt-stepper"><button aria-label={`Remove model from group ${i + 1}`} disabled={ro || g.models <= 1} onClick={() => setGroups(groups.map((x, k) => k === i ? { ...x, models: x.models - 1 } : x))}><Minus size={12} /></button><b>{g.models}</b><button aria-label={`Add model to group ${i + 1}`} disabled={ro || unit.models >= 20} onClick={() => setGroups(groups.map((x, k) => k === i ? { ...x, models: x.models + 1 } : x))}><Plus size={12} /></button></div></div>
+              {separateButtons(g, i)}
+              <label className="dt-field-label">Primary weapon<select disabled={ro} value={g.weapon} onChange={e => setGroups(groups.map((x, k) => k === i ? { ...x, weapon: e.target.value } : x))}>{weaponOptions(g.weapon).map(w => <option key={w}>{w}</option>)}</select></label>
+            </div>)}
             {hasLeader(unit) && <><div className="dt-option-heading"><h3>Members</h3><span>Have their own options</span></div>
               <button type="button" className="dtu-drill" data-drill="leader" onClick={() => push('leader')}><UserRound size={16} /><span><strong>Squad leader</strong><small>1 of {unit.models} models · {leaderWeapon}{unit.signalKit ? ' · Signal kit' : ''}</small></span><b>{unit.signalKit ? '+5' : ''}</b><ChevronRight size={15} /></button></>}
-            <div className="dt-option-heading"><h3>Equipment</h3><span>Choose one</span></div>
-            <label className="dt-field-label">Primary weapon<select disabled={ro} value={unit.weapon} onChange={e => onUpdate({ weapon: e.target.value })}>{Array.from(new Set([unit.weapon, 'Service rifle', 'Scout carbine', 'Heavy carbine'])).map(w => <option key={w}>{w}</option>)}</select></label>
-            <p className="dt-option-note">Included in unit cost</p>
+            {groups.length === 1 && <>
+              <div className="dt-option-heading"><h3>Equipment</h3><span>Choose one</span></div>
+              <label className="dt-field-label">Primary weapon<select disabled={ro} value={unit.weapon} onChange={e => onUpdate({ weapon: e.target.value })}>{Array.from(new Set([unit.weapon, 'Service rifle', 'Scout carbine', 'Heavy carbine'])).map(w => <option key={w}>{w}</option>)}</select></label>
+              <p className="dt-option-note">Included in unit cost</p>
+            </>}
             <div className="dt-option-heading"><h3>Upgrades</h3><span>Optional</span></div>
             <label className={`dt-checkbox-row ${unit.upgrade ? 'checked' : ''}`}><input type="checkbox" disabled={ro} checked={unit.upgrade} onChange={e => onUpdate({ upgrade: e.target.checked })} /><span><strong>Field standard</strong><small>Carry the detachment's colours.</small></span><b>+10</b></label>
             <div className="dt-option-heading"><h3>Unit notes</h3><span>Private</span></div>

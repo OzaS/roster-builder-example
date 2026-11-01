@@ -3,16 +3,16 @@ import { Eraser, Search, X } from 'lucide-react';
 import './phone-lists.css';
 
 /** Phone list-page search replaces the title and avatar without moving the filters or losing the query. */
-export function PhoneSearchHeader({ title, subtitle, query, onQueryChange, placeholder, trailing, initialOpen = false, searchable = true }: {
+export function PhoneSearchHeader({ title, subtitle, query, onQueryChange, placeholder, trailing, leading, initialOpen = false, searchable = true }: {
   title: string; subtitle?: string; query: string; onQueryChange: (query: string) => void;
-  placeholder: string; trailing?: ReactNode; initialOpen?: boolean; searchable?: boolean;
+  placeholder: string; trailing?: ReactNode; /** A Back button before the title (Settings, pushed pages); hidden while the search is open. */ leading?: ReactNode; initialOpen?: boolean; searchable?: boolean;
 }) {
   const [open, setOpen] = useState(initialOpen);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const id = useId();
   const close = () => { setOpen(false); requestAnimationFrame(() => toggleRef.current?.focus()); };
-  return <header className={`ux-wb-top ux-wb-home-top ux-phone-search-header ${open ? 'search-open' : ''}`}>
+  return <header className={`ux-wb-top ux-wb-home-top ux-phone-search-header ${open ? 'search-open' : ''} ${leading && !open ? 'reversed' : ''}`}>
     {open ? <div className="ux-phone-search-field" id={id} role="search">
       <Search size={19} aria-hidden />
       <input ref={inputRef} type="search" autoFocus value={query} aria-label={placeholder} placeholder={placeholder}
@@ -22,6 +22,7 @@ export function PhoneSearchHeader({ title, subtitle, query, onQueryChange, place
       <button type="button" className="ux-phone-search-close" aria-label="Close search" title="Close search" onClick={close}><X size={20} aria-hidden /></button>
       </span>
     </div> : <>
+      {leading}
       <div className="ux-wb-title"><strong>{title}</strong>{subtitle && <small>{subtitle}</small>}</div>
       {searchable && <button ref={toggleRef} type="button" className={`ux-icon-btn ux-phone-search-toggle ${query ? 'active' : ''}`}
         aria-label={`Search ${title.toLowerCase()}${query ? `, current search: ${query}` : ''}`} aria-expanded={false} aria-controls={id}

@@ -290,13 +290,13 @@ export function FocusCatalogueSearchSetting({ on, onToggle, keys }: { on: boolea
 
 /**
  * Settings → Advanced → Enable Separate all (DEC-054, R0-02; a user preference, off by default). Off: a unit with several models
- * offers Separate 1 only; on: it also offers Separate all, splitting it into single-model units in one step.
+ * offers Separate 1 only; on: it also offers Separate all, giving every model its own options in one step (the models stay in the same unit).
  */
 export function SeparateAllSetting({ on, onToggle }: { on: boolean; onToggle?: () => void }) {
   return (
     <button type="button" className={`ux-setting-row ${on ? "on" : ""}`} role="switch" aria-checked={on} onClick={onToggle}>
       <span className="ux-setting-icon"><Ungroup size={17} /></span>
-      <span className="ux-setting-text"><strong>Enable Separate all</strong><small>Units with several models also offer Separate all, which splits them into single-model units in one step. Off: only Separate 1.</small></span>
+      <span className="ux-setting-text"><strong>Enable Separate all</strong><small>Units with several models also offer Separate all, which gives every model its own options in one step. Off: only Separate 1.</small></span>
       <span className="ux-switch" aria-hidden />
     </button>
   );
@@ -1543,7 +1543,7 @@ function LiveEditorRows({ editable }: { editable: boolean }) {
 /** The export sheet of a stored roster (built in battle-augur plan 2G part 1): the Battle Augur file always; text and New Recruit JSON from the saved snapshot. */
 export function ReadOnlyExportSheet({ snapshot = true, inline = false }: { snapshot?: boolean; inline?: boolean }) {
   const formats = [
-    { id: "file", title: "Battle Augur roster file", body: "The roster as stored. It opens fully once the data is back.", ok: true },
+    { id: "file", title: "Battle Augur roster file", body: "A copy of the roster as stored. It cannot be imported back yet; New Recruit JSON can.", ok: true },
     { id: "text", title: "Text", body: snapshot ? "As last saved yesterday" : "Needs the game data", ok: snapshot },
     { id: "json", title: "New Recruit JSON", body: snapshot ? "As last saved yesterday" : "Needs the game data", ok: snapshot },
   ];
