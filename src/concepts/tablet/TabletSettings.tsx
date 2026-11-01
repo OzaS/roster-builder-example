@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { Check, ChevronRight, Database, FolderOpen, HardDrive, Info, Keyboard, Languages, Layers3, Palette, SlidersHorizontal, Upload } from 'lucide-react';
 import type { ColorScheme } from '../../types';
 import { Segmented, Switch } from '../workspace/Primitives';
+import { REOPEN_ROSTER_DETAIL, REOPEN_ROSTER_TITLE } from '../ux/SourceJobs';
 import { colourSchemes } from '../desktop/desktopData';
 import { Facts, ListDetail, Row, WorkspaceScope, type SessionProps } from './TabletPieces';
 import { editorShortcuts, generalShortcuts, keyLabel } from './tabletKeys';
@@ -30,7 +31,7 @@ export function TabletSettings({ env, notify, session, themePref, scheme, onThem
   const { light, advancedInstall, setAdvancedInstall, settingsSection, setSettingsSection, language, setLanguage, setAppearanceImport } = session;
   const [open, setOpen] = useState(settingsSection !== undefined);
   const [limit, setLimit] = useState(1000);
-  const [toggles, setToggles] = useState({ rememberSections: true, reopenLast: true, autoChecks: true });
+  const [toggles, setToggles] = useState({ rememberSections: true, reopenLast: false, autoChecks: true });
   const [keep, setKeep] = useState(1);
   const [separateAll, setSeparateAll] = useState(false);
   const flip = (key: keyof typeof toggles) => (v: boolean) => setToggles(t => ({ ...t, [key]: v }));
@@ -50,7 +51,7 @@ export function TabletSettings({ env, notify, session, themePref, scheme, onThem
       </>;
       case 'rosters': return <WorkspaceScope light={light}>
         <div className="tb-setting stacked"><span><strong>Points limit for new rosters</strong><small>The guided creation starts with this limit.</small></span><Segmented<number> label="Points limit" value={limit} onChange={setLimit} options={[500, 750, 1000, 1500, 2000].map(v => ({ value: v, label: v.toLocaleString('en-US') }))} /></div>
-        <div className="ux-src-group tb-switches"><Switch label="Remember option sections" detail="Folded option sections stay folded the next time you open a unit." checked={toggles.rememberSections} onChange={flip('rememberSections')} /><Switch label="Reopen the last roster on launch" detail="The roster you were editing opens again when the app starts." checked={toggles.reopenLast} onChange={flip('reopenLast')} /></div>
+        <div className="ux-src-group tb-switches"><Switch label={REOPEN_ROSTER_TITLE} detail={REOPEN_ROSTER_DETAIL} checked={toggles.reopenLast} onChange={flip('reopenLast')} /><Switch label="Remember option sections" detail="Folded option sections stay folded the next time you open a unit." checked={toggles.rememberSections} onChange={flip('rememberSections')} /></div>
       </WorkspaceScope>;
       case 'data': return <WorkspaceScope light={light}>
         <div className="ux-src-group tb-switches"><Switch label="Check for updates automatically" detail="When the app is open and online." checked={toggles.autoChecks} onChange={flip('autoChecks')} /><Switch label="Advanced installation" detail="Choose which factions to install when you add game data. Off: everything is installed." checked={advancedInstall} onChange={setAdvancedInstall} /></div>

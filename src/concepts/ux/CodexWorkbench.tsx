@@ -8,7 +8,7 @@ import { mockCatalogues, mockDetachments, mockSystemUnits } from "../../data/moc
 import { referenceById, resolveRosterReference } from "../../data/mockRosterReferences";
 import type { RosterReferenceDefinition, RosterUnit } from "../../types";
 import type { ConceptProps } from "../shared";
-import { AddGameDataScreen, AdvancedInstallSetting, AutoUpdateChecksSetting, FocusCatalogueSearchSetting, SeparateAllSetting, AdvancedSettingsRows, CollectionScreen, InstallJobScreen, KeepVersionsSetting, MigrationReportScreen, NotificationsSetting, ReadOnlyRosterScreen, RememberSectionsSetting, SearchGitHubScreen, SourceDetailScreen, SourcesManageScreen, SourcesNavRow, UpdateAvatarButton, WifiOnlySetting } from "./SourceJobs";
+import { AddGameDataScreen, AdvancedInstallSetting, AutoUpdateChecksSetting, ReopenRosterSetting, FocusCatalogueSearchSetting, SeparateAllSetting, AdvancedSettingsRows, CollectionScreen, InstallJobScreen, KeepVersionsSetting, MigrationReportScreen, NotificationsSetting, ReadOnlyRosterScreen, RememberSectionsSetting, SearchGitHubScreen, SourceDetailScreen, SourcesManageScreen, SourcesNavRow, UpdateAvatarButton, WifiOnlySetting } from "./SourceJobs";
 import { MobileUnitOptions } from "./MobileUnitOptions";
 import { QuotaChip, limitReason } from "../workspace/CatalogueLimit";
 import { BackOrTitle, BudgetMeter, Chip, ExpandableBudget, RosterMoreMenu, RosterShareButton, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "./uxShared";
@@ -2220,6 +2220,7 @@ function AppScreen({ props }: { props: ConceptProps }) {
 /** Settings screen housing preferences and the smart-search toggle. */
 function SettingsScreen({ props }: { props: ConceptProps }) {
   const smart = props.smartSearch ?? false;
+  const [reopenRoster, setReopenRoster] = useState(false);
   const [rememberSections, setRememberSections] = useState(true);
   const [advancedInstall, setAdvancedInstall] = useState(false);
   const [wifiOnly, setWifiOnly] = useState(false);
@@ -2255,6 +2256,8 @@ function SettingsScreen({ props }: { props: ConceptProps }) {
           When on, the add-unit menu offers quick suggestions for the current slot. With the top-bar layout it also shows a floating command bar.
         </p>
         <div className="ux-result-label">Rosters</div>
+        {/* DEC-056: Reopen roster on launch, directly above Remember option sections; off by default. */}
+        <ReopenRosterSetting on={reopenRoster} onToggle={() => setReopenRoster((value) => !value)} />
         <RememberSectionsSetting on={rememberSections} onToggle={() => setRememberSections((value) => !value)} />
         <div className="ux-result-label">Game data</div>
         <AdvancedInstallSetting on={advancedInstall} onToggle={() => setAdvancedInstall((value) => !value)} />

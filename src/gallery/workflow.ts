@@ -46,6 +46,7 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "tablet-sources-collection", label: "Tablet · Sources · Collection" },
   { id: "tablet-sources-github", label: "Tablet · Sources · Search GitHub" },
   { id: "tablet-sources-add-collection", label: "Tablet · Sources · Add a collection" },
+  { id: "tablet-settings-rosters", label: "Tablet · Settings · Rosters" },
   { id: "tablet-settings-game-data", label: "Tablet · Settings · Game data" },
   { id: "tablet-settings-shortcuts", label: "Tablet · Settings · Keyboard shortcuts" },
   { id: "tablet-create", label: "Tablet · New roster (guided creation)" },
