@@ -33,7 +33,7 @@ export type DesignComment = {
   updatedAt?: string;
 };
 
-export type DesignElementStatus = "specified" | "ready-for-rn" | "implemented" | "needs-review";
+export type DesignElementStatus = "specified" | "ready-for-rn" | "implemented" | "needs-review" | "replaced";
 export type DesignElementLevel = "foundation" | "primitive" | "composite" | "navigation" | "overlay" | "screen-composition" | "gallery-tooling";
 export type DesignElementPlatform = "phone" | "tablet" | "foldable" | "desktop" | "gallery";
 

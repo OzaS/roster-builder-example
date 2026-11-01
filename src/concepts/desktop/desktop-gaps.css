@@ -1,0 +1,50 @@
+/* R0 gap drawings (proposals, needs-review): centred Settings with search, UI scale and Developer options (UX-051..054),
+   Lookup no-data / Recently viewed / narrow, and the page-zoom previews. Additive to desktop-pages.css. */
+
+/* UX-051: the section list and the cards are centred in the content area; the pair stays 210 + 760 px wide at most. */
+.dtp-settings { grid-template-columns: 210px minmax(0, 760px); grid-template-rows: auto minmax(0, 1fr); justify-content: center; column-gap: 18px; row-gap: 12px }
+.dtp-settings-nav { align-self: start }
+/* UX-053: Find a setting spans the pair; the count sits to its right. */
+.dtp-settings-find { grid-column: 1 / -1; display: flex; align-items: center; gap: 14px; min-width: 0 }
+.dtp-settings-find .dtp-search { flex: 1 1 auto; max-width: none; min-width: 0 }
+.dtp-settings-find > span { flex: none; min-width: 130px; text-align: right; font-size: 12px }
+.dt-app .dtp-settings-nav button .dtp-count { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--dt-muted) }
+.dtp-settings-body > .dtp-empty { padding: 56px 20px }
+.dtp-dev-note { margin: -2px 0 6px; font-size: 12px }
+.dt-app .dtp-version { padding: 0; height: auto; background: none; border: 0; font: inherit; color: inherit; cursor: default; text-align: left }
+/* A narrow window: the section list narrows (UX-051: readable at the minimum window size). */
+.dtp-page:has(> .dtp-settings) { container-type: inline-size }
+@container (max-width: 860px) { .dtp-settings { grid-template-columns: 168px minmax(0, 1fr) } .dt-app .dtp-settings-nav button { padding: 9px 10px; font-size: 13px } }
+
+/* UX-054: UI scale control: smaller, the current value, larger, Reset. */
+.dtp-scale { display: inline-flex; align-items: center; gap: 6px; flex: none }
+.dtp-scale output { min-width: 52px; text-align: center; font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums }
+.dt-app .dtp-scale .dtp-icon { border: 1px solid var(--dt-border); background: var(--dt-pane) }
+.dt-app .dtp-scale .dtp-icon:disabled, .dt-app .dtp-scale .dtp-btn:disabled { opacity: .45; cursor: default }
+.dtp-scale .dtp-btn { margin-left: 4px }
+
+/* Page-zoom preview: the app laid out at 1 / zoom of the window and drawn zoom times as large (generalises .dtl-zoom-200). */
+.dtz { position: relative; --dtz-h: 820px }
+.dt-standalone .dtz { --dtz-h: calc(100vh - 36px) }
+.dtz > .dt-app, .dt-standalone .dtz > .dt-app { zoom: var(--dtz); width: 100%; min-width: 0; height: calc(var(--dtz-h) / var(--dtz)); min-height: 0 }
+.dtz-label { position: absolute; z-index: 9; right: 18px; bottom: 12px; padding: 4px 9px; border-radius: 999px; background: #0b0c10cc; color: #c9cfdd; font: 600 12px/1.3 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif }
+
+/* Lookup (R0 gaps): no game data, Recently viewed, narrow window. */
+.dtl-nodata { flex: 1; min-height: 0; display: grid; place-items: center }
+.dtl-nodata .dtp-empty { max-width: 460px; gap: 8px }
+.dtl-nodata .dtp-empty p { font-size: 13px; line-height: 1.45 }
+.dtl-nodata .dtl-unavailable-icon { margin-bottom: 4px }
+.dtp-lookup10 .dtp-search input:disabled { cursor: default; opacity: .7 }
+.dtl-start { display: grid; gap: 4px; align-content: start }
+.dtl-start .ux-lk-hint { margin: 6px 18px 10px }
+.dt-app .dtl-recent-head { display: flex; align-items: center; gap: 8px; margin: 6px 0 4px; padding: 0 18px; color: var(--dt-muted); font-size: 12px; font-weight: 600; letter-spacing: .3px; text-transform: none }
+/* Narrow window (page under 700 px wide, about a window of 800 px): the results and the entry take turns, like the tablet's narrow detail over the list.
+   The page at 200 % zoom (desktop-lookup-1-0-text-200, approved) keeps its two panes: .dtl-keep-split. */
+.dtp-page.dtp-lookup10 { container-type: inline-size }
+.dtl-narrow-back { display: none !important }
+@container (max-width: 700px) {
+  .dtp-lookup10:not(.dtl-keep-split) .dtp-split.lookup { grid-template-columns: minmax(0, 1fr) }
+  .dtp-lookup10:not(.dtl-keep-split) .dtp-split.lookup[data-pane="list"] .lookup-detail,
+  .dtp-lookup10:not(.dtl-keep-split) .dtp-split.lookup[data-pane="entry"] .dtp-list { display: none }
+  .dtp-lookup10:not(.dtl-keep-split) .dtl-narrow-back { display: inline-flex !important }
+}

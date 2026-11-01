@@ -1184,6 +1184,10 @@
           "label": "Roster editor · Unit dialog, read-only roster"
         },
         {
+          "id": "desktop-editor-unit-dialog-zoom-200",
+          "label": "Unit dialog · Page zoom 200 % (proposal)"
+        },
+        {
           "id": "desktop-editor-catalogue-limit",
           "label": "Roster editor · Catalogue limit reached"
         },
@@ -1220,6 +1224,38 @@
           "label": "Lookup 1.0 · Page zoom 200 %"
         },
         {
+          "id": "desktop-lookup-1-0-text-150",
+          "label": "Lookup 1.0 · Page zoom 150 % (proposal)"
+        },
+        {
+          "id": "desktop-lookup-1-0-no-data",
+          "label": "Lookup 1.0 · No game data, Add game data (proposal)"
+        },
+        {
+          "id": "desktop-lookup-1-0-start",
+          "label": "Lookup 1.0 · Recently viewed (proposal)"
+        },
+        {
+          "id": "desktop-lookup-1-0-upgrade",
+          "label": "Lookup 1.0 · Upgrade reference (proposal)"
+        },
+        {
+          "id": "desktop-lookup-1-0-rule",
+          "label": "Lookup 1.0 · Rule reference (proposal)"
+        },
+        {
+          "id": "desktop-lookup-1-0-detachment",
+          "label": "Lookup 1.0 · Detachment reference (proposal)"
+        },
+        {
+          "id": "desktop-lookup-1-0-narrow",
+          "label": "Lookup 1.0 · Narrow window, results (proposal)"
+        },
+        {
+          "id": "desktop-lookup-1-0-narrow-entry",
+          "label": "Lookup 1.0 · Narrow window, entry (proposal)"
+        },
+        {
           "id": "desktop-tools",
           "label": "Tools · Coming soon"
         },
@@ -1238,6 +1274,26 @@
         {
           "id": "desktop-settings-advanced",
           "label": "Settings · Advanced (plain rows)"
+        },
+        {
+          "id": "desktop-settings-wide",
+          "label": "Settings · Wide window, centred (UX-051, proposal)"
+        },
+        {
+          "id": "desktop-settings-search",
+          "label": "Settings · Search results (UX-053, proposal)"
+        },
+        {
+          "id": "desktop-settings-search-empty",
+          "label": "Settings · Search, no match (UX-053, proposal)"
+        },
+        {
+          "id": "desktop-settings-scale",
+          "label": "Settings · UI scale at 150 % (UX-054, proposal)"
+        },
+        {
+          "id": "desktop-settings-developer",
+          "label": "Settings · Developer options, Show hidden (UX-052, proposal)"
         },
         {
           "id": "desktop-first-run",
@@ -1263,6 +1319,7 @@
             "desktop-editor-unit-dialog-nested",
             "desktop-editor-unit-dialog-narrow",
             "desktop-editor-unit-dialog-readonly",
+            "desktop-editor-unit-dialog-zoom-200",
             "desktop-editor-catalogue-limit",
             "desktop-rosters",
             "desktop-lookup",
@@ -1272,11 +1329,24 @@
             "desktop-lookup-1-0-failed",
             "desktop-lookup-1-0-unavailable",
             "desktop-lookup-1-0-text-200",
+            "desktop-lookup-1-0-text-150",
+            "desktop-lookup-1-0-no-data",
+            "desktop-lookup-1-0-start",
+            "desktop-lookup-1-0-upgrade",
+            "desktop-lookup-1-0-rule",
+            "desktop-lookup-1-0-detachment",
+            "desktop-lookup-1-0-narrow",
+            "desktop-lookup-1-0-narrow-entry",
             "desktop-tools",
             "desktop-library",
             "desktop-sources",
             "desktop-settings",
             "desktop-settings-advanced",
+            "desktop-settings-wide",
+            "desktop-settings-search",
+            "desktop-settings-search-empty",
+            "desktop-settings-scale",
+            "desktop-settings-developer",
             "desktop-first-run",
             "desktop-menus"
           ]
@@ -1519,6 +1589,7 @@
                   "opens from a unit row (click, Enter on the focused row) or Edit › Edit unit… (↩); closes with × (Close {unit}), Escape on the top level or a click on the dimmed roster; focus returns to the unit row (after Remove: the neighbouring row)",
                   "normal window: centred, at most 680 px wide and the window minus 32 px high; header and tabs stay, the body scrolls, footer fixed",
                   "narrow window (dialog area under 760 × 560): fills the window minus 8 px margins (desktop-editor-unit-dialog-narrow, 720 × 520)",
+                  "R0 gap, proposal for approval: page zoom 200 % (desktop-editor-unit-dialog-zoom-200): a 1,500 × 900 window at 200 % is laid out at 750 × 432, so the dialog takes the narrow and the short rules (fills the window minus 8 px); the fixed header, tabs and footer take most of the height and the body scrolls (about one and a half rows show at once); nothing is clipped or hidden, Close stays reachable and keeps its focus ring; no sizing change is proposed (open question: compact the header in short windows)",
                   "header: eyebrow role / N models, name, points, force; Duplicate and Remove; Undo / Redo with the step names; Close",
                   "Options / Profile / Rules tabs (pill style); Options: unit size stepper, Separate 1 (and Separate all when enabled in Settings › Advanced), Members, equipment, upgrades, notes",
                   "live session: each change autosaves and is an Undo step (⌘Z / ⇧⌘Z work inside, text fields keep their own undo); no Save / Cancel draft; footer: Changes save as you edit · source and version",
@@ -1531,18 +1602,20 @@
                   "desktop-editor-unit-dialog",
                   "desktop-editor-unit-dialog-nested",
                   "desktop-editor-unit-dialog-narrow",
-                  "desktop-editor-unit-dialog-readonly"
+                  "desktop-editor-unit-dialog-readonly",
+                  "desktop-editor-unit-dialog-zoom-200"
                 ]
               },
               {
                 "id": "desktop.inspector",
                 "title": "Unit Inspector · replaced by the unit dialog",
                 "level": "composite",
-                "status": "specified",
+                "status": "replaced",
                 "platforms": [
                   "desktop"
                 ],
                 "states": [
+                  "Replaced (status): superseded by the unit editor dialog, desktop.unit-dialog (DEC-055). Kept for history, not deleted: the pane is gone from desktop-editor (the screen stays listed for that history). Do not build from this Element",
                   "DEC-055: the right-hand inspector pane is replaced by the unit editor dialog (desktop.unit-dialog); its content (header, Options / Profile / Rules, options, notes, source footer) moves into the dialog. The App DPxx / DDxx notes below describe the pane as built before R6-02",
                   "options",
                   "profile",
@@ -1715,6 +1788,35 @@
                 ]
               },
               {
+                "id": "desktop.lookup-1-0.gaps",
+                "title": "Lookup 1.0 · Gap States (R0 proposals)",
+                "level": "screen-composition",
+                "status": "needs-review",
+                "platforms": [
+                  "desktop"
+                ],
+                "states": [
+                  "R0 gaps, proposals for approval (LK-09, LK-10); composed from the approved Lookup 1.0 patterns, no approved screen changed (the approved screens render pixel-identical)",
+                  "no game data (desktop-lookup-1-0-no-data): the search field is disabled and the chip row is absent; one card says Nothing to look up yet · Lookup searches the units, forces, upgrades and rules of your installed game data. Install a game system and it is here, offline. · Add game data (opens Sources › Add game data); same wording as the phone and tablet",
+                  "Recently viewed (desktop-lookup-1-0-start): before a search is typed the results card shows the hint and a Recently viewed list (clock icon, up to 5 references, newest first, each row with name, summary · source and cost or Conditional tag); choosing one opens it in the entry card and moves it to the top; the entry card says Choose a result to read its reference. The phone has the same list (lookup-start); the tablet does not draw it yet",
+                  "static references for the kinds that had none: Upgrade (desktop-lookup-1-0-upgrade: profile table, Taken by with cost and limit), Rule (desktop-lookup-1-0-rule: rule text, Used by) and Detachment (desktop-lookup-1-0-detachment: slot categories, rules); each opens its group in the list; the reference body is the shared LookupEntryBody, the same as the phone",
+                  "narrow window (desktop-lookup-1-0-narrow, -narrow-entry; a 720 × 520 window): when the page is under 700 px wide (a window of about 800 px or less) the results and the entry take turns, as the tablet's narrow detail over the list: the results fill the width; choosing one shows the entry with a Results back button above it (Back to results; focus returns to the results), and the earlier-reference Back below it when links were followed",
+                  "the approved page zoom 200 % screen (desktop-lookup-1-0-text-200) has the same effective width as the narrow window but keeps its two panes unchanged (its entry pane is about 170 px wide); whether it should use the narrow layout too is an open question",
+                  "page zoom 150 % (desktop-lookup-1-0-text-150): the page at 150 % keeps its two panes; titles stop at two lines with the Full name disclosure, as at 200 %; the two-line cap applies to titles only",
+                  "LK-09 refresh with earlier results: not drawn, on purpose. Recommendation: show the drawn Loading state during a refresh (query and chips kept, Searching installed data…, skeleton rows). Earlier results may name entries the refresh removes (the Reference unavailable state exists for exactly that), and a marker would add a third result state to build, test and explain; the desktop already shows an empty entry card while loading, so the tablet should do the same (observation O1)"
+                ],
+                "screens": [
+                  "desktop-lookup-1-0-no-data",
+                  "desktop-lookup-1-0-start",
+                  "desktop-lookup-1-0-upgrade",
+                  "desktop-lookup-1-0-rule",
+                  "desktop-lookup-1-0-detachment",
+                  "desktop-lookup-1-0-narrow",
+                  "desktop-lookup-1-0-narrow-entry",
+                  "desktop-lookup-1-0-text-150"
+                ]
+              },
+              {
                 "id": "desktop.sources",
                 "title": "Sources & Source Detail",
                 "level": "screen-composition",
@@ -1809,15 +1911,74 @@
                 ]
               },
               {
+                "id": "desktop.settings.search",
+                "title": "Settings › Find a Setting (UX-053, proposal)",
+                "level": "composite",
+                "status": "needs-review",
+                "platforms": [
+                  "desktop"
+                ],
+                "states": [
+                  "R0 gap, proposal for approval (UX-053): a Find a setting field above the section list, as wide as the list and cards (the same search field as the hub pages' top row); the right end says how many settings match, in how many sections",
+                  "while a query is typed: the section list keeps only sections with a match and shows the match count on each; the cards keep their section headings (the section context) and show only the matching rows, each still operable (switches, segmented controls, buttons work in the results); a section whose name matches shows all its rows",
+                  "matches the setting name, its description and the words of its choices (for example Light, Crimson, Off); not case sensitive",
+                  "no match (desktop-settings-search-empty): the empty card “No settings match …” with Check the spelling, or try a shorter word, and Clear search",
+                  "Developer options are searched only while they are unlocked (UX-052, DEC-022): the empty-state screen searches “hidden” with Developer options locked, and finds nothing; search never reveals them",
+                  "Clear: the × in the field, or Escape while the field has focus; the count is a polite live region; results are real controls in tab order after the field and the section list",
+                  "no shortcut is drawn: ⌘F is Go to Lookup in the default bindings (open question)"
+                ],
+                "screens": [
+                  "desktop-settings-search",
+                  "desktop-settings-search-empty"
+                ]
+              },
+              {
+                "id": "desktop.settings.scale",
+                "title": "Settings › UI Scale (UX-054, proposal)",
+                "level": "primitive",
+                "status": "needs-review",
+                "platforms": [
+                  "desktop"
+                ],
+                "states": [
+                  "R0 gap, proposal for approval (UX-054): a UI scale row in Appearance under Theme: the name, a one-line explanation naming the View menu actions and their keys (⌘ +, ⌘ −, ⌘ 0), and at the right Zoom out, the current value (100 %), Zoom in and Reset",
+                  "Reset returns to 100 % (Actual size) and is disabled at 100 %; Zoom out and Zoom in are disabled at the ends of the range (50 % to 300 %); steps are the View menu's: 50, 67, 75, 80, 90, 100, 110, 125, 150, 175, 200, 250, 300 %",
+                  "one value: the row and View › Actual size / Zoom in / Zoom out change the same page zoom, so each shows the other's result at once; the value is polite live text",
+                  "the window's minimum size follows the zoom (UX-047): at a high scale the page keeps its layout at the smaller effective window width (see the zoom 150 % screen: the section list narrows below 860 px of effective width)",
+                  "desktop-settings-scale draws the page at page zoom 150 %, the row showing 150 % with Reset enabled; in the gallery the buttons change the number and show a toast, the zoom itself is not applied"
+                ],
+                "screens": [
+                  "desktop-settings-scale"
+                ]
+              },
+              {
+                "id": "desktop.settings.developer",
+                "title": "Settings › Developer Options · Show Hidden (UX-052, proposal)",
+                "level": "composite",
+                "status": "needs-review",
+                "platforms": [
+                  "desktop"
+                ],
+                "states": [
+                  "R0 gap, proposal for approval (UX-052): Show hidden is the first row of a Developer options card, after About; it no longer sits among ordinary settings (in the app it moves out of the ordinary list; nothing in the gallery's ordinary sections held it)",
+                  "Developer options exist only after the unlock gesture (DEC-022): seven clicks on Version in About; the gallery does it too (a toast says “Developer options are on”); until then the card and its entry in the section list are absent, and search does not find them",
+                  "row: Show hidden / “Shows entries the game data marks as hidden, in the catalogue and in option lists. They are labelled Hidden.”, the standard switch, off by default; the behaviour is the one the setting has today",
+                  "the card's note says these are for checking game data, not needed to build rosters; further developer rows (feature flags, measurements) keep the app's own design and are not redrawn"
+                ],
+                "screens": [
+                  "desktop-settings-developer"
+                ]
+              },
+              {
                 "id": "desktop.settings",
                 "title": "Settings Sections",
                 "level": "screen-composition",
                 "status": "needs-review",
                 "platforms": ["desktop"],
-                "states": ["DEC-054: Advanced is a plain section without a card: Focus search when opening the catalogue and Enable Separate all, both off by default (desktop.settings.advanced)", "theme", "colour scheme", "import scheme", "language", "switches", "Advanced installation switch (off by default)", "keep versions", "storage", "key bindings", "recording", "needs a modifier", "conflict replace", "reset", "about", "scroll-tracked section list", "App DP05a: Check for updates automatically switch and Keep previous versions (Off, 1–3) applying to the next update; DP05b: switching/deleting kept versions in source detail", "App DP10: section list (scroll-tracked) and cards for Appearance (theme segmented; colour schemes with swatches, imported schemes and Import scheme behind the colour-scheme flag, as mobile), Language (English and imported packs, Import language pack behind its flag, applied at start), Rosters (Remember option sections), Game data (automatic checks behind the updates flag, Advanced installation, Keep previous versions with the size), About (version, build, engine, data note and folder; seven clicks on the version unlock Developer) and Developer (feature flags by area with reset, engine worker restart, imports at once, install measurements). Not built: storage breakdown, key bindings and reopen tabs (desktop-only, after parity); Wi-Fi only and notifications are phone-only", "App DD13: matches the cards (scheme grid with the dashed Import tile, boxed language rows, section nav, card type and spacing). Differences: no Storage or Key bindings sections yet (DD-20, DD-15; the nav leaves them out rather than drawing cards that do nothing), so the data folder path stays in About; About shows Version, Build and one Engine fact (API \u00b7 protocol \u00b7 SQLite) and a longer data note instead of Version / Engine / Protocol / SQLite; the swatch is mobile's (background, accent, info of the scheme); app wording \u201cImport colour scheme\u201d, \u201cLoad a language pack\u201d and longer switch details; the app adds a Developer section (unlocked by seven clicks on the version or in a debug build) with boxed flag lists by area; below 1040 px the nav narrows and the schemes show two tiles a row. Colour schemes and language packs are on by default on every platform (2026-10-25)", "App DD15 (key bindings, PR pending): the app's shortcuts follow editable bindings with the gallery's actions and defaults (desktopKeys.ts); Welcome's Create a roster ⌘N and the summary's New roster key show, and the rail's Rosters, Lookup and Settings, the tab row's + , the points button and the panel toggles name their keys too. Differences: no binding acts in a text field (the gallery lets the General keys fire there); Undo / Redo keys don't act under a modal dialog; a binding can't take Esc, Tab, ⌘W / Ctrl+W or ⌘Q / Ctrl+Q; on a Mac ⌃ is a modifier of its own (the gallery reads ⌃ as ⌘); labels keep the app's notation (⇧⌘Z, ⌥⌘B; elsewhere Ctrl+Shift+Z) in the UI font, not the spaced monospace “⌘ ⇧ Z”; ⌘K does nothing until the command palette (DD-17); until the application menu (DD-18) Electron's default menu also holds ⇧⌘R (Force Reload) and ⌘Z / ⇧⌘Z", "App DD15 Settings → Key bindings: built after KeyBindingsEditor between Game data and About (Storage comes with DD-20). Matches: heading with Reset all while anything differs, the hint, General / Roster editor boxed rows, key buttons (“Press keys…” while recording, “Not set”), a per-row reset, the needs-a-modifier problem under the row, the warn conflict notice with Replace / Cancel. Differences: the app's smaller card heading; Replace / Cancel at the notice's right end; the command palette row notes its key waits for the palette (DD-17); fixed keys (Esc, Tab, ⌘W, ⌘Q) are refused with their own message; a row reset whose default another action holds asks first (the gallery sets it, leaving two actions on one key); additions: alerts, a live recording status, hints on every control, focus back on the row after Replace / Cancel / reset, Tab or leaving the button stops recording, Esc in the notice cancels"
+                "states": ["R0 gap, proposal for approval (UX-051): the section list and the cards are centred in the content area as one block (list 210 px + cards 760 px at most) with the same space on both sides in a wide window (desktop-settings-wide, a 2,440 px window drawn at 60 %); below 860 px of effective width the list narrows to 168 px and the cards take the rest, so Settings stays readable at the minimum window size and at a high UI scale", "UX-053 / UX-054 / UX-052 (proposals): Find a setting above the list (desktop.settings.search), a UI scale row under Theme (desktop.settings.scale), Developer options after the unlock (desktop.settings.developer)", "DEC-054: Advanced is a plain section without a card: Focus search when opening the catalogue and Enable Separate all, both off by default (desktop.settings.advanced)", "theme", "colour scheme", "import scheme", "language", "switches", "Advanced installation switch (off by default)", "keep versions", "storage", "key bindings", "recording", "needs a modifier", "conflict replace", "reset", "about", "scroll-tracked section list", "App DP05a: Check for updates automatically switch and Keep previous versions (Off, 1–3) applying to the next update; DP05b: switching/deleting kept versions in source detail", "App DP10: section list (scroll-tracked) and cards for Appearance (theme segmented; colour schemes with swatches, imported schemes and Import scheme behind the colour-scheme flag, as mobile), Language (English and imported packs, Import language pack behind its flag, applied at start), Rosters (Remember option sections), Game data (automatic checks behind the updates flag, Advanced installation, Keep previous versions with the size), About (version, build, engine, data note and folder; seven clicks on the version unlock Developer) and Developer (feature flags by area with reset, engine worker restart, imports at once, install measurements). Not built: storage breakdown, key bindings and reopen tabs (desktop-only, after parity); Wi-Fi only and notifications are phone-only", "App DD13: matches the cards (scheme grid with the dashed Import tile, boxed language rows, section nav, card type and spacing). Differences: no Storage or Key bindings sections yet (DD-20, DD-15; the nav leaves them out rather than drawing cards that do nothing), so the data folder path stays in About; About shows Version, Build and one Engine fact (API \u00b7 protocol \u00b7 SQLite) and a longer data note instead of Version / Engine / Protocol / SQLite; the swatch is mobile's (background, accent, info of the scheme); app wording \u201cImport colour scheme\u201d, \u201cLoad a language pack\u201d and longer switch details; the app adds a Developer section (unlocked by seven clicks on the version or in a debug build) with boxed flag lists by area; below 1040 px the nav narrows and the schemes show two tiles a row. Colour schemes and language packs are on by default on every platform (2026-10-25)", "App DD15 (key bindings, PR pending): the app's shortcuts follow editable bindings with the gallery's actions and defaults (desktopKeys.ts); Welcome's Create a roster ⌘N and the summary's New roster key show, and the rail's Rosters, Lookup and Settings, the tab row's + , the points button and the panel toggles name their keys too. Differences: no binding acts in a text field (the gallery lets the General keys fire there); Undo / Redo keys don't act under a modal dialog; a binding can't take Esc, Tab, ⌘W / Ctrl+W or ⌘Q / Ctrl+Q; on a Mac ⌃ is a modifier of its own (the gallery reads ⌃ as ⌘); labels keep the app's notation (⇧⌘Z, ⌥⌘B; elsewhere Ctrl+Shift+Z) in the UI font, not the spaced monospace “⌘ ⇧ Z”; ⌘K does nothing until the command palette (DD-17); until the application menu (DD-18) Electron's default menu also holds ⇧⌘R (Force Reload) and ⌘Z / ⇧⌘Z", "App DD15 Settings → Key bindings: built after KeyBindingsEditor between Game data and About (Storage comes with DD-20). Matches: heading with Reset all while anything differs, the hint, General / Roster editor boxed rows, key buttons (“Press keys…” while recording, “Not set”), a per-row reset, the needs-a-modifier problem under the row, the warn conflict notice with Replace / Cancel. Differences: the app's smaller card heading; Replace / Cancel at the notice's right end; the command palette row notes its key waits for the palette (DD-17); fixed keys (Esc, Tab, ⌘W, ⌘Q) are refused with their own message; a row reset whose default another action holds asks first (the gallery sets it, leaving two actions on one key); additions: alerts, a live recording status, hints on every control, focus back on the row after Replace / Cancel / reset, Tab or leaving the button stops recording, Esc in the notice cancels"
                 , "App DD20 Settings → Storage between Game data and Key bindings: the data folder's full path (moved from About) with Show in Finder (Show in Explorer / Show in file manager elsewhere; opens the folder itself), the usage bar as the split of the folder's own use (always fills; no total or disk capacity), Game data / Kept versions / Rosters (the app database, which also holds the store registry) measured by the main process, a 0 B part only in the legend; Measuring and recorded-size states the gallery doesn't draw.",
                 "DEC-050 (UX-059): Advanced section (new, between Key bindings and About, in the section list): Focus search when opening the catalogue, a switch, off by default; detail \"Off: Add unit opens the catalogue for browsing. Find in catalogue (⌘ ⇧ F) always focuses the search.\" (the menu's Find in catalogue key; Ctrl + Shift + F elsewhere); standalone link &section=advanced opens it; at the end of the scroll a chosen short section stays chosen in the list"],
-                "screens": ["desktop-settings"]
+                "screens": ["desktop-settings", "desktop-settings-wide"]
               }
             ]
           }

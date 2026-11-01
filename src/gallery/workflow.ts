@@ -86,12 +86,26 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "desktop-editor-unit-dialog-narrow", label: "Desktop · Roster editor · Unit dialog, narrow window" },
   { id: "desktop-editor-unit-dialog-nested", label: "Desktop · Roster editor · Unit dialog, nested element" },
   { id: "desktop-editor-unit-dialog-readonly", label: "Desktop · Roster editor · Unit dialog, read-only" },
+  { id: "desktop-editor-unit-dialog-zoom-200", label: "Desktop · Roster editor · Unit dialog, page zoom 200%" },
   { id: "desktop-editor-catalogue-limit", label: "Desktop · Roster editor · Catalogue limit reached" },
   { id: "desktop-settings-advanced", label: "Desktop · Settings · Advanced" },
   { id: "desktop-lookup-1-0-loading", label: "Desktop · Lookup 1.0 · Loading" },
   { id: "desktop-lookup-1-0-failed", label: "Desktop · Lookup 1.0 · Search failed" },
   { id: "desktop-lookup-1-0-unavailable", label: "Desktop · Lookup 1.0 · Reference unavailable" },
   { id: "desktop-lookup-1-0-text-200", label: "Desktop · Lookup 1.0 · Text 200%" },
+  { id: "desktop-settings-wide", label: "Desktop · Settings · Wide window (centred)" },
+  { id: "desktop-settings-search", label: "Desktop · Settings · Search results" },
+  { id: "desktop-settings-search-empty", label: "Desktop · Settings · Search, no match" },
+  { id: "desktop-settings-scale", label: "Desktop · Settings · UI scale 150%" },
+  { id: "desktop-settings-developer", label: "Desktop · Settings · Developer options" },
+  { id: "desktop-lookup-1-0-no-data", label: "Desktop · Lookup 1.0 · No game data" },
+  { id: "desktop-lookup-1-0-start", label: "Desktop · Lookup 1.0 · Recently viewed" },
+  { id: "desktop-lookup-1-0-upgrade", label: "Desktop · Lookup 1.0 · Upgrade" },
+  { id: "desktop-lookup-1-0-rule", label: "Desktop · Lookup 1.0 · Rule" },
+  { id: "desktop-lookup-1-0-detachment", label: "Desktop · Lookup 1.0 · Detachment" },
+  { id: "desktop-lookup-1-0-narrow", label: "Desktop · Lookup 1.0 · Narrow window, results" },
+  { id: "desktop-lookup-1-0-narrow-entry", label: "Desktop · Lookup 1.0 · Narrow window, entry" },
+  { id: "desktop-lookup-1-0-text-150", label: "Desktop · Lookup 1.0 · Text 150%" },
   { id: "library", label: "Lists" },
   { id: "library-v2", label: "Lists · V2" },
   { id: "library-filters", label: "Lists · Search, filters and grouping" },
@@ -183,7 +197,7 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen === "desktop-rosters") return "library";
   if (screen === "desktop-lookup-legacy" || screen === "desktop-lookup" || screen.startsWith("desktop-lookup-1-0")) return "catalogue";
   if (screen === "desktop-sources") return "sources";
-  if (screen === "desktop-settings" || screen === "desktop-settings-advanced") return "settings";
+  if (screen === "desktop-settings" || screen.startsWith("desktop-settings-")) return "settings";
   if (screen === "desktop-first-run") return "library";
   if (screen === "desktop-menus") return "overview";
   if (screen === "library-v2" || screen.startsWith("library-filters")) return "library";
