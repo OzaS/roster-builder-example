@@ -66,6 +66,7 @@ const workflowScreenIds = [
   "tablet-sources-collection",
   "tablet-sources-github",
   "tablet-sources-add-collection",
+  "tablet-settings-rosters",
   "tablet-settings-game-data",
   "tablet-settings-shortcuts",
   "tablet-create",
