@@ -1478,11 +1478,12 @@
                 "id": "desktop.inspector",
                 "title": "Unit Inspector · replaced by the unit dialog",
                 "level": "composite",
-                "status": "specified",
+                "status": "replaced",
                 "platforms": [
                   "desktop"
                 ],
                 "states": [
+                  "Replaced (status): superseded by the unit editor dialog, desktop.unit-dialog (DEC-055). Kept for history, not deleted: the pane is gone from desktop-editor (the screen stays listed for that history). Do not build from this Element",
                   "DEC-055: the right-hand inspector pane is replaced by the unit editor dialog (desktop.unit-dialog); its content (header, Options / Profile / Rules, options, notes, source footer) moves into the dialog. The App DPxx / DDxx notes below describe the pane as built before R6-02",
                   "options",
                   "profile",
