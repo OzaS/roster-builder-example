@@ -230,11 +230,11 @@
 .tb-rail button.tb-rail-item > .tb-rail-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap }
 .tb-compact .tb-main { padding: 12px 12px 20px }
 /* DEC-054 (R0-08): row status stays visible at every pane width (the rule that hid .tb-row-end below 300 px is gone). In a pane of
-   300 px or less a row's trailing text (points, text chips) moves to its own line under the title, so the name keeps its width. */
+   300 px or less a row's trailing text (points, text chips; not a lone chevron) moves to its own line under the title, so the name keeps its width. */
 @container (max-width: 300px) {
-  .tb-app button.tb-row:has(> .tb-row-end) { flex-wrap: wrap; row-gap: 6px }
-  .tb-app button.tb-row > .tb-row-end { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; flex-basis: 100%; justify-content: flex-start }
-  .tb-app button.tb-row:has(> .tb-mark) > .tb-row-end { padding-left: 52px }
+  .tb-app button.tb-row:has(> .tb-row-end > :not(svg)) { flex-wrap: wrap; row-gap: 6px }
+  .tb-app button.tb-row > .tb-row-end:has(> :not(svg)) { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; flex-basis: 100%; justify-content: flex-start }
+  .tb-app button.tb-row:has(> .tb-mark) > .tb-row-end:has(> :not(svg)) { padding-left: 52px }
 }
 .tb-toolbar { flex-wrap: wrap }
 .tb-toolbar .tb-search { flex: 1 1 260px }
