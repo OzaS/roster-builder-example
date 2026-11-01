@@ -6018,6 +6018,13 @@ button.ux-reference-tag:focus-visible {
   opacity: 0.55;
   cursor: not-allowed;
 }
+/* DEC-054: a unit at its maximum stays fully readable (no dimming): quota chip, unavailable Add, the reason on press. */
+.ux-pool-item { position: relative; display: grid; }
+.ux-pool-row.locked { grid-template-columns: minmax(0, 1fr) auto 28px; cursor: help; }
+.ux-pool-row.locked:hover { transform: none; border-color: var(--ux-line-2); }
+.ux-pool-limit-add { display: grid; place-items: center; color: var(--ux-muted); }
+.ux-pool-limit-add i { width: 28px; height: 28px; }
+.tb-hint-bubble.ux-pool-bubble { left: auto; right: 6px; top: calc(100% + 6px); transform: none; }
 
 .ux-pool-count {
   font-style: normal;

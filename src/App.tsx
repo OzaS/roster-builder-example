@@ -40,6 +40,7 @@ const workflowScreenIds = [
   "tablet-editor-add-roles",
   "tablet-editor-add-focus",
   "tablet-editor-chip-caption",
+  "tablet-editor-limit-caption",
   "tablet-editor-chips-text-150",
   "tablet-settings-advanced",
   "tablet-rosters-text-200",
@@ -88,6 +89,10 @@ const workflowScreenIds = [
   "library-filters",
   "tablet-lookup-1-0",
   "tablet-lookup-1-0-force",
+  "tablet-lookup-1-0-loading",
+  "tablet-lookup-1-0-failed",
+  "tablet-lookup-1-0-unavailable",
+  "tablet-lookup-1-0-long-text-200",
   "desktop-lookup-1-0",
   "desktop-lookup-1-0-force",
   "lookup-results",
@@ -99,6 +104,10 @@ const workflowScreenIds = [
   "lookup-detachment",
   "lookup-upgrade",
   "lookup-rule",
+  "lookup-loading",
+  "lookup-failed",
+  "lookup-unavailable",
+  "lookup-large-text",
   "collections",
   "app",
   "sources",
@@ -124,6 +133,7 @@ const workflowScreenIds = [
   "smart-search",
   "add-detachment",
   "add-unit",
+  "add-unit-limit",
   "unit-detail",
   "unit-options-mobile",
   "option-drilldown",
@@ -914,6 +924,24 @@ function insertAfter(units: RosterUnit[], sourceId: string, unit: RosterUnit) {
 
 function readPersistedGalleryState(): PersistedGalleryState {
   if (typeof window === "undefined") return {};
+  return { ...readStoredGalleryState(), ...readUrlGalleryState() };
+}
+
+/** `?screen=<workflow screen>&theme=light|dark&view=single|all-screens|elements`: open one screen directly (review links, headless captures); wins over the saved state. */
+function readUrlGalleryState(): PersistedGalleryState {
+  const params = new URLSearchParams(location.search);
+  const screen = params.get("screen");
+  const theme = params.get("theme");
+  const view = params.get("view");
+  const known = screen !== null && bundledDesignData.designs.some((design) => design.screens.some((item) => item.id === screen));
+  return {
+    ...(known ? { workflowScreen: screen as WorkflowScreen, screen: workflowToPrototypeScreen(screen as WorkflowScreen), navigatorView: "single" as NavigatorView } : {}),
+    ...(isOneOf(theme, themeModes) ? { themeMode: theme, themePreference: theme } : {}),
+    ...(isOneOf(view, navigatorViews) ? { navigatorView: view } : {}),
+  };
+}
+
+function readStoredGalleryState(): PersistedGalleryState {
   try {
     const stored = window.localStorage.getItem(GALLERY_STATE_KEY);
     if (!stored) return {};

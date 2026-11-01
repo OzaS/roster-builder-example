@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { AlertTriangle, ArrowUpCircle, Check, CheckSquare, ChevronRight, ExternalLink, FolderOpen, Github, Layers3, Link2, Plus, RefreshCcw, Search, Trash2, X } from 'lucide-react';
 import { Chip as MobileChip } from '../ux/uxShared'; // the mobile chip; the workspace Chip (dtp-chip) is not used here, see MOBILE-PIECES.md
 import { jobPercent } from '../workspace/Jobs';
+import { SourceStatusAction } from '../ux/SourceJobs';
 import type { SourceInfo } from '../desktop/desktopData';
 import { AddDataCollections, CollectionView, GitHubSearchView, LastUpdateCard, LastUpdateStates, UpdateReportView, flowSourceId, isAddFlow, useRosterChecks } from '../desktop/DesktopSourceFlows';
 import '../desktop/desktop-pages.css';
@@ -39,6 +40,11 @@ export function TabletSources({ env, notify, session, onPage, onOpenRoster }: Se
   const flow = { jobs, notify, go, onOpenJobs: openJobs };
   const openRoster = onOpenRoster;
   const chip = (s: SourceInfo) => progress[s.id] !== undefined ? <MobileChip tone="cool">Updating {progress[s.id]}%</MobileChip> : sourceStatus(s);
+  // DEC-054 (R0-08): rows carry the compact status action instead of the text chip; the detail header keeps the chip.
+  const status = (s: SourceInfo) => progress[s.id] !== undefined ? <SourceStatusAction status="updating" name={s.name} percent={progress[s.id]} onPress={openJobs} />
+    : s.next ? <SourceStatusAction status="update" name={s.name} next={s.next} onPress={() => update([s.id])} />
+      : s.status === 'review' ? <SourceStatusAction status="review" name={s.name} onPress={() => go(s.id)} />
+        : selecting ? <SourceStatusAction status="ready" name={s.name} showReady /> : null;
   const q = query.trim().toLowerCase();
   const shown = sources.filter(s => (s.name + s.repo + s.factions.join(' ')).toLowerCase().includes(q));
   const shownInstalls = installing.filter(j => j.name.toLowerCase().includes(q));
@@ -61,13 +67,13 @@ export function TabletSources({ env, notify, session, onPage, onOpenRoster }: Se
     {query && <button type="button" className="tb-search-clear" aria-label="Clear search" title="Clear search (Esc)" onClick={() => setQuery('')}><X size={16} aria-hidden="true" /></button>}
   </label>;
 
-  // DEC-050 / C-07: the shared pane row. Second line: repository · version · size; the status chip trails; no third line
-  // (progress shows in the chip and in the detail).
+  // DEC-050 / C-07: the shared pane row. Second line: repository · version · size (→ the new version when one is available);
+  // the compact status action trails (DEC-054), visible at every pane width; no third line (progress shows in the ring and the detail).
   const sourceRow = (s: SourceInfo) => {
     const on = picked.includes(s.id);
     return <Row key={s.id} selected={!selecting && flowSourceId(detail) === s.id} pressed={selecting ? on : undefined}
       mark={selecting ? <span className={`tb-pick ${on ? 'on' : ''}`}>{on ? <Check size={20} strokeWidth={2.6} /> : null}</span> : mark(s.name)}
-      title={s.name} sub={`${s.fromFile ? 'From a file' : s.repo} · ${s.version === 'local' ? 'local' : s.version} · ${s.size}`} end={chip(s)}
+      title={s.name} sub={`${s.fromFile ? 'From a file' : s.repo} · ${s.version === 'local' ? 'local' : s.next && progress[s.id] === undefined ? `${s.version} → ${s.next}` : s.version} · ${s.size}`} action={status(s)}
       onClick={() => selecting ? pick(s.id) : go(s.id)} />;
   };
   const foot = selecting
@@ -82,7 +88,7 @@ export function TabletSources({ env, notify, session, onPage, onOpenRoster }: Se
     <div className="tb-list scroll">
       {updates.length > 0 && !q && !selecting && <div className="tb-banner" role="status"><ArrowUpCircle size={20} /><span><strong>{plural(updates.length, 'update')} available</strong><small>New data for {updates.map(s => s.name).join(', ')}.</small></span><button type="button" className="ux-job-btn primary" onClick={() => update(updates.map(s => s.id))}>Update all</button></div>}
       {shown.map(sourceRow)}
-      {!selecting && shownInstalls.map(j => <Row key={j.id} selected={false} mark={mark(j.name)} title={j.name} sub={j.status === 'needs-you' ? 'Waiting for you to choose factions' : `${plural(j.factions.length, 'faction')} available`} end={j.status === 'needs-you' ? <MobileChip tone="warning"><AlertTriangle size={11} />Needs you</MobileChip> : <MobileChip tone="cool">Installing {jobPercent(j)}%</MobileChip>} onClick={openJobs} />)}
+      {!selecting && shownInstalls.map(j => <Row key={j.id} selected={false} mark={mark(j.name)} title={j.name} sub={j.status === 'needs-you' ? 'Waiting for you to choose factions' : `${plural(j.factions.length, 'faction')} available`} action={<SourceStatusAction status={j.status === 'needs-you' ? 'needs-you' : 'installing'} name={j.name} percent={jobPercent(j)} onPress={openJobs} />} onClick={openJobs} />)}
       {!sources.length && !installing.length && <p className="tb-empty">No game data installed yet.</p>}
       {q && !shown.length && !shownInstalls.length && sources.length > 0 && <EmptyState icon={Search} title={`No game data matches “${query.trim()}”`} text="Try another name, repository or faction."><button type="button" className="ux-job-btn" onClick={() => setQuery('')}>Clear search</button></EmptyState>}
       {!q && !selecting && <Row selected={isAddFlow(detail)} mark={<Plus size={20} />} title="Add game data" sub="Collections, a repository link, or GitHub search" end={<ChevronRight size={17} />} onClick={() => go('add')} />}

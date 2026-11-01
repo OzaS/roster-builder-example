@@ -76,6 +76,14 @@ export const lookupEntities: LookupEntity[] = [
     categories: ["Core", "Infantry", "Line"],
   },
   {
+    // R0-03 (DEC-054): a long synthetic name for the large-text state (two-line title cap, Full name disclosure).
+    id: "u-veteran-reinforced", group: "unit", name: "Veteran Infantry with Reinforced Field Equipment and Additional Support Options", system: "Open Field", factions: ["Frontier Coalition"], summary: "Elite · 5–10 models",
+    cost: "120 pts", costNote: "+18 pts per extra model",
+    layout: { models: "5–10 models", rows: [{ name: "Veteran", count: "4–9", cost: "18 pts each" }, { name: "Veteran Sergeant", count: "1", cost: "Included" }], limits: ["Up to 1 per roster"] },
+    profiles: [{ title: "Unit", columns: unitStats, rows: [{ name: "Veteran", values: ['6"', "3+", "8", "1"] }, { name: "Veteran Sergeant", values: ['6"', "3+", "9", "2"] }] }],
+    rules: ["r-hold-line"], categories: ["Elite", "Infantry"],
+  },
+  {
     id: "u-line-gl", group: "unit", name: "Line Infantry", system: "Example System Two", factions: ["Glass Legion"], summary: "Troops · 5–10 models",
     cost: "65 pts", costNote: "+11 pts per extra model",
     layout: { models: "5–10 models", rows: [{ name: "Legionary", count: "4–9", cost: "11 pts each" }, { name: "Decurion", count: "1", cost: "Included" }] },

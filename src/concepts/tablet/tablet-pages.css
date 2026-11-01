@@ -261,7 +261,7 @@
 .tb-el-fill { width: 100%; min-width: 0 }
 
 /* TFB-010 design review: preview and enter targets are separate; name, total and validation share the header. */
-.tb-roster-nav-row { display: grid; grid-template-columns: minmax(0, 1fr) 48px; border: 1px solid var(--ux-line); border-radius: var(--ux-r-md); background: var(--ux-surface); overflow: hidden }
+.tb-roster-nav-row { display: grid; grid-template-columns: minmax(0, 1fr) 48px; border: 1px solid var(--ux-line); border-radius: var(--ux-r-md); background: var(--ux-surface); overflow: clip } /* clip, not hidden: a scroll container would let the list grid squeeze the row */
 .tb-roster-nav-row.selected { border-color: var(--ux-accent); background: color-mix(in srgb, var(--ux-accent) 12%, var(--ux-surface)) }
 .tb-app .tb-roster-nav-row button.tb-row, .tb-app .tb-roster-nav-row button.tb-row.selected { min-width: 0; border: 0; border-radius: 0; background: transparent }
 .tb-app button.tb-roster-enter { display: grid; place-items: center; padding: 0; border: 0; border-left: 1px solid var(--ux-line); background: transparent; color: var(--ux-accent-2); cursor: pointer }
@@ -303,3 +303,6 @@
 /* Sources' Select mode: the row tile becomes a check box. */
 .tb-pick { display: grid; place-items: center; width: 24px; height: 24px; border: 2px solid var(--ux-line-2); border-radius: 7px; color: var(--ux-accent-ink) }
 .tb-pick.on { border-color: var(--ux-accent); background: var(--ux-accent) }
+/* R0-03 (DEC-054): Lookup result titles wrap to two lines at most, with an ellipsis; the row keeps the whole name as its text. */
+.tb-lookup10 .tb-row-main strong { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; white-space: normal; overflow-wrap: anywhere }
+.tb-lookup10 .ux-lk-results .ux-lk-state, .tb-lookup10 .ux-lk-results .ux-lk-failure { margin-top: 4px }

@@ -1,5 +1,5 @@
-import { useState, type ReactNode } from "react";
-import { Archive, ArrowLeft, Bell, Check, ChevronDown, ChevronRight, Circle, CircleArrowUp, CircleCheck, Clock, Copy, Database, Download, Ellipsis, FileArchive, FileInput, FileText, FolderGit2, FolderOpen, Globe, Hand, History, Info, Library, ListChecks, LoaderCircle, Lock, Minus, OctagonAlert, Plus, RefreshCw, Search, Star, Trash2, TextCursorInput, TriangleAlert, Upload, Wifi, X } from "lucide-react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { Archive, ArrowDownToLine, ArrowLeft, Bell, Check, ChevronDown, ChevronRight, Circle, CircleArrowUp, CircleCheck, Clock, Copy, Database, Download, Ellipsis, FileArchive, FileInput, FileText, FolderGit2, FolderOpen, Globe, Hand, History, Info, Library, ListChecks, LoaderCircle, Lock, Minus, OctagonAlert, Plus, RefreshCw, Search, Star, Trash2, TextCursorInput, TriangleAlert, Ungroup, Upload, Wifi, X } from "lucide-react";
 import type { ConceptProps } from "../shared";
 import { Chip } from "./uxShared";
 
@@ -271,6 +271,25 @@ export function FocusCatalogueSearchSetting({ on, onToggle, keys }: { on: boolea
   );
 }
 
+/**
+ * Settings → Advanced → Enable Separate all (DEC-054, R0-02; a user preference, off by default). Off: a unit with several models
+ * offers Separate 1 only; on: it also offers Separate all, splitting it into single-model units in one step.
+ */
+export function SeparateAllSetting({ on, onToggle }: { on: boolean; onToggle?: () => void }) {
+  return (
+    <button type="button" className={`ux-setting-row ${on ? "on" : ""}`} role="switch" aria-checked={on} onClick={onToggle}>
+      <span className="ux-setting-icon"><Ungroup size={17} /></span>
+      <span className="ux-setting-text"><strong>Enable Separate all</strong><small>Units with several models also offer Separate all, which splits them into single-model units in one step. Off: only Separate 1.</small></span>
+      <span className="ux-switch" aria-hidden />
+    </button>
+  );
+}
+
+/** Settings › Advanced (DEC-054): its rows sit plain in the section, with no enclosing card and no card per row. */
+export function AdvancedSettingsRows({ children }: { children: ReactNode }) {
+  return <div className="ux-setting-plain" role="group" aria-label="Advanced">{children}</div>;
+}
+
 /** Settings → Game data → Advanced installation (a user preference, off by default). */
 export function AdvancedInstallSetting({ on, onToggle }: { on: boolean; onToggle?: () => void }) {
   return (
@@ -505,15 +524,16 @@ export function SourceScreenHeader({ props, title, subtitle, right }: { props: C
 // ---------------------------------------------------------------- sources list with update states
 
 type SourceStatus = "ready" | "update" | "review" | "broken" | "updating";
-type ExampleSource = { name: string; factions: number; names: string; meta: string; status: SourceStatus };
+type ExampleSource = { name: string; factions: number; names: string; meta: string; status: SourceStatus; next?: string };
 
 export const EXAMPLE_SOURCES: ExampleSource[] = [
-  { name: EXAMPLE_SYSTEM.name, factions: 23, names: "Northern Realms, Ember Covenant, Glass Legion…", meta: "Version a1b2c3d · changed upstream 2026-09-30 · 41 MB", status: "update" },
-  { name: "Example System Two", factions: 14, names: "Tidewardens, Ashen Court, Verdant Host…", meta: "Version e4f5a6b · changed upstream 2026-10-02 · 29 MB", status: "update" },
+  { name: EXAMPLE_SYSTEM.name, factions: 23, names: "Northern Realms, Ember Covenant, Glass Legion…", meta: "Version a1b2c3d · changed upstream 2026-09-30 · 41 MB", status: "update", next: "b7c8d9e" },
+  { name: "Example System Two", factions: 14, names: "Tidewardens, Ashen Court, Verdant Host…", meta: "Version e4f5a6b · changed upstream 2026-10-02 · 29 MB", status: "update", next: "c3d4e5f" },
   { name: "Example System Three", factions: 6, names: "Iron Choir, Salt Kings, Lantern Guild…", meta: "Version 9c8d7e6 · changed upstream 2026-10-11 · 12 MB", status: "ready" },
   { name: "Example System Four", factions: 9, names: "Hollow Crown, Glass Legion, Ember Covenant…", meta: "Version 0f1e2d3 · changed upstream 2026-08-21 · 18 MB", status: "review" },
 ];
 
+/** The earlier wide text chip. Rows use SourceStatusAction (DEC-054); the chip stays for detail headers and the Elements view. */
 export function SourceStatusChip({ status, percent = 46 }: { status: SourceStatus; percent?: number }) {
   if (status === "updating") return <Chip tone="cool"><LoaderCircle size={11} className="ux-spin" /> Updating {percent}%</Chip>;
   if (status === "update") return <Chip tone="cool"><CircleArrowUp size={11} /> Update available</Chip>;
@@ -522,13 +542,73 @@ export function SourceStatusChip({ status, percent = 46 }: { status: SourceStatu
   return <Chip tone="valid"><CircleCheck size={11} /> Ready</Chip>;
 }
 
-export function SourceRow({ source, selecting = false, selected = false, onClick }: { source: ExampleSource; selecting?: boolean; selected?: boolean; onClick?: () => void }) {
+/** States of the compact source status action: the phone's SourceStatus plus the tablet's install states. */
+export type SourceActionStatus = SourceStatus | "installing" | "needs-you" | "failed";
+const STATUS_CAPTION: Record<SourceActionStatus, string> = { ready: "Up to date", update: "Update available", updating: "Updating", installing: "Installing", "needs-you": "Choose factions to continue", review: "Needs review", broken: "Unreadable · open for details", failed: "Update failed · open to try again" };
+const HOLD = 500;
+const SHOW = 2400;
+
+/**
+ * DEC-054 (R0-08): the compact source status, a 44 px icon action at the row's end instead of the wide text chip, so the source
+ * name keeps its width. Update: a download arrow; pressing it is the Update action. Updating / installing: a progress ring. Needs
+ * review: warning triangle; failed or unreadable: octagon; choose factions: a hand. Up to date: nothing (a quiet check only where
+ * `showReady`, e.g. Select mode). Each state has its own shape, never colour alone. Hover, keyboard focus or press and hold
+ * shows the caption in the hint bubble; the accessible name says the whole state and what pressing does.
+ */
+export function SourceStatusAction({ status, name, next, percent = 46, caption, captionShown = false, showReady = false, onPress }: {
+  status: SourceActionStatus; name: string; next?: string; percent?: number; caption?: string; captionShown?: boolean; showReady?: boolean; onPress?: () => void;
+}) {
+  const [open, setOpen] = useState(captionShown);
+  const hold = useRef<number>(undefined);
+  const hide = useRef<number>(undefined);
+  const held = useRef(false);
+  const id = useId();
+  useEffect(() => () => { window.clearTimeout(hold.current); window.clearTimeout(hide.current); }, []);
+  useEffect(() => { setOpen(captionShown); }, [captionShown]);
+  const progress = status === "updating" || status === "installing";
+  const text = caption ?? (status === "update" && next ? `Update available · ${next}` : progress ? `${STATUS_CAPTION[status]} · ${percent}%` : STATUS_CAPTION[status]);
+  if (status === "ready") return showReady ? <span className="ux-src-status ready" role="img" aria-label={`${name} is up to date`}><CircleCheck size={18} aria-hidden /></span> : null;
+  const label = status === "update" ? `Update ${name}${next ? ` to ${next}` : ""}`
+    : progress ? `${STATUS_CAPTION[status]} ${name}, ${percent}%. Show progress`
+      : status === "needs-you" ? `${name}: choose factions to continue the install`
+        : status === "review" ? `${name} needs review. Show details`
+          : `${name}: ${text}`;
+  const tone = status === "update" ? "accent" : progress || status === "needs-you" ? "cool" : status === "review" ? "warn" : "err";
+  const Icon = status === "update" ? ArrowDownToLine : status === "needs-you" ? Hand : status === "review" ? TriangleAlert : OctagonAlert;
+  const show = () => { window.clearTimeout(hide.current); setOpen(true); };
+  const later = () => { window.clearTimeout(hide.current); hide.current = window.setTimeout(() => { if (!captionShown) setOpen(false); held.current = false; }, SHOW); };
+  return (
+    <span className="ux-src-status-wrap">
+      <button type="button" className={`ux-src-status ${tone} ${open ? "open" : ""}`} aria-label={label} aria-describedby={open ? id : undefined}
+        onPointerEnter={(e) => { if (e.pointerType === "mouse") show(); }} onPointerLeave={(e) => { window.clearTimeout(hold.current); if (e.pointerType === "mouse" && !captionShown) setOpen(false); }}
+        onPointerDown={(e) => { if (e.pointerType === "mouse") return; held.current = false; hold.current = window.setTimeout(() => { held.current = true; show(); }, HOLD); }}
+        onPointerUp={() => { window.clearTimeout(hold.current); if (held.current) later(); }} onPointerCancel={() => window.clearTimeout(hold.current)}
+        onContextMenu={(e) => e.preventDefault()}
+        onFocus={(e) => { if (e.currentTarget.matches(":focus-visible")) show(); }} onBlur={() => { if (!captionShown) setOpen(false); }}
+        onKeyDown={(e) => { if (e.key === "Escape" && open) { e.stopPropagation(); setOpen(false); } }}
+        onClick={(e) => { e.stopPropagation(); if (held.current) { held.current = false; return; } onPress?.(); }}>
+        {progress ? (
+          <i className="ux-src-ring" aria-hidden style={{ ["--p" as string]: `${percent}` }}><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" /><circle cx="16" cy="16" r="13" pathLength="100" strokeDasharray={`${percent} 100`} /></svg><b>{percent}</b></i>
+        ) : <i aria-hidden><Icon size={18} strokeWidth={2.3} /></i>}
+      </button>
+      {open ? <span id={id} role="tooltip" className="tb-hint-bubble ux-src-status-bubble">{text}</span> : null}
+    </span>
+  );
+}
+
+/** The sub-line names the new version when an update is available (DEC-054: the version detail stays readable in the row). */
+const sourceMeta = (source: ExampleSource) => source.status === "update" && source.next ? source.meta.replace(/ · changed upstream [^·]*?(?= ·)/, ` · ${source.next} available`) : source.meta;
+
+export function SourceRow({ source, selecting = false, selected = false, onClick, onUpdate, captionShown = false }: { source: ExampleSource; selecting?: boolean; selected?: boolean; onClick?: () => void; onUpdate?: () => void; captionShown?: boolean }) {
   const selectable = source.status === "update";
   return (
-    <article className={`ux-source-row ux-src-row ${selecting ? "selecting" : ""} ${selecting && !selectable ? "dimmed" : ""} ${selected ? "selected" : ""}`} onClick={onClick} role={selecting ? "checkbox" : "button"} aria-checked={selecting ? selected : undefined}>
+    <article className={`ux-source-row ux-src-row ${selecting ? "selecting" : ""} ${selecting && !selectable ? "dimmed" : ""} ${selected ? "selected" : ""}`}>
       {selecting ? <span className="ux-src-check" aria-hidden>{selected ? <Check size={14} /> : null}</span> : null}
-      <span><strong>{source.name}</strong><small>{source.factions} factions · {source.names}</small><small>{source.meta}</small></span>
-      {selecting && !selectable ? <Chip tone="neutral">Up to date</Chip> : <SourceStatusChip status={source.status} />}
+      {/* The row's own target covers the row (::after); the status action sits above it. */}
+      <button type="button" className="ux-src-row-open" onClick={onClick} role={selecting ? "checkbox" : undefined} aria-checked={selecting ? selected : undefined}>
+        <span><strong>{source.name}</strong><small>{source.factions} factions · {source.names}</small><small>{sourceMeta(source)}</small></span>
+      </button>
+      {selecting ? <SourceStatusAction status={selectable ? "update" : "ready"} name={source.name} next={source.next} showReady onPress={onClick} /> : <SourceStatusAction status={source.status} name={source.name} next={source.next} captionShown={captionShown} onPress={source.status === "update" ? onUpdate : onClick} />}
     </article>
   );
 }
@@ -602,7 +682,7 @@ export function SourcesManageScreen({ props }: { props: ConceptProps }) {
               </div>
             ) : null}
             <div className="ux-source-list ux-managed-source-list ux-src-list">
-              {sources.map((s) => <SourceRow key={s.name} source={s} selecting={selecting} selected={selected.includes(s.name)} onClick={selecting ? () => { if (s.status === "update") toggle(s.name); } : () => props.onNavigate("source-detail")} />)}
+              {sources.map((s) => <SourceRow key={s.name} source={s} selecting={selecting} selected={selected.includes(s.name)} onClick={selecting ? () => { if (s.status === "update") toggle(s.name); } : () => props.onNavigate("source-detail")} onUpdate={() => setPreview("updating")} />)}
             </div>
             <small className="ux-src-footer">{preview === "installed" ? "Checked 2 min ago · pull to check again" : "Checked just now"}</small>
           </>

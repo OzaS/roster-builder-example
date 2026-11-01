@@ -5,6 +5,12 @@ export { catalogueState, type CatalogueState } from '../desktop/DesktopEditorFlo
 import { primaryForce, specialRoster, type EditorUnit, type Force, type ImportResult, type ReadOnlyInfo } from '../desktop/DesktopEditorFlows';
 import { lookupEntries, rosterLibrary } from '../desktop/desktopData';
 
+/** DEC-054: a catalogue entry whose maximum is reached (the sample's Command entries allow one each), or null. */
+export function catalogueLimit(entry: { name: string; role: string }, own: readonly { name: string; role: string }[]): { selected: number; max: number } | null {
+  const selected = own.filter(u => u.name === entry.name).length;
+  return entry.role === 'Command' && selected > 0 ? { selected, max: Math.max(1, selected) } : null;
+}
+
 export type CatalogueEntry = { name: string; role: string; models: number; points: number; weapon: string };
 export const editorCatalogue: CatalogueEntry[] = [
   { name: 'Force Commander', role: 'Command', models: 1, points: 90, weapon: 'Command blade' },
