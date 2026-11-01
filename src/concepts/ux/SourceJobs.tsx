@@ -1543,7 +1543,7 @@ function LiveEditorRows({ editable }: { editable: boolean }) {
 /** The export sheet of a stored roster (built in battle-augur plan 2G part 1): the Battle Augur file always; text and New Recruit JSON from the saved snapshot. */
 export function ReadOnlyExportSheet({ snapshot = true, inline = false }: { snapshot?: boolean; inline?: boolean }) {
   const formats = [
-    { id: "file", title: "Battle Augur roster file", body: "The roster as stored. It opens fully once the data is back.", ok: true },
+    { id: "file", title: "Battle Augur roster file", body: "A copy of the roster as stored. It cannot be imported back yet; New Recruit JSON can.", ok: true },
     { id: "text", title: "Text", body: snapshot ? "As last saved yesterday" : "Needs the game data", ok: snapshot },
     { id: "json", title: "New Recruit JSON", body: snapshot ? "As last saved yesterday" : "Needs the game data", ok: snapshot },
   ];
