@@ -140,3 +140,6 @@
 .dts-ring { --p: 0%; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: conic-gradient(var(--dt-accent) var(--p), var(--dt-border) 0) }
 .dts-ring b { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--dt-pane); color: var(--dt-text); font-size: 9px; font-weight: 700; font-variant-numeric: tabular-nums }
 .dts-status-wrap .dts-status-bubble { right: 0; left: auto; top: calc(100% + 6px); transform: none; white-space: nowrap }
+.dts-status-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px 14px; padding-bottom: 40px }
+.dts-status-sample { display: flex; align-items: center; gap: 10px; min-width: 0 }
+.dts-status-sample small { color: var(--dt-muted); font-size: 12px }

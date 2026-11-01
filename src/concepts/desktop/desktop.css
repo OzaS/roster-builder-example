@@ -156,3 +156,8 @@
 /* DEC-050: Welcome has no top row; its readiness note moves into the footer. */
 .dt-view-welcome .dt-welcome { padding-top: 58px }
 .dt-welcome-status { display: flex; align-items: center; gap: 9px; letter-spacing: 0; color: var(--dt-muted) }
+.dtc-elements .dt-catalogue { width: 300px; border: 0; background: none; overflow: visible }
+.dtc-elements .dt-catalogue-list { overflow: visible; padding-bottom: 70px }
+.dt-element-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px }
+/* R0-08: the warn-tinted reason line reaches 4.5:1 on the light catalogue too. */
+.dt-app.light .dt-catalogue-unit.warn .dt-catalogue-reason { color: color-mix(in srgb, var(--dt-warn) 55%, var(--dt-text)) }

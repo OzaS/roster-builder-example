@@ -784,9 +784,9 @@
       "eyebrow": "Desktop · Three-panel workspace",
       "icon": "PanelsTopLeft",
       "component": "DesktopWorkbench",
-      "bestFor": "Focused desktop roster building with a searchable catalogue, persistent force outline and live unit inspector.",
+      "bestFor": "Focused desktop roster building with a searchable catalogue, persistent force outline and a unit editor dialog over the roster (DEC-055).",
       "direction": "Borderless workspace on the shared themes and colour schemes, floating panel controls, curved tabs at the top, rounded card panels, and a roster summary popover with a points line under the tabs. Hub pages (Rosters, Lookup, Sources, Settings) use an activity rail; the editor does not.",
-      "interaction": "Browse Welcome and Editor in the design gallery. Open a recent roster or create one; edit with the catalogue, force tree and inspector. Floating controls toggle panels; Command K opens actions.",
+      "interaction": "Browse Welcome and Editor in the design gallery. Open a recent roster or create one; add from the catalogue and open a unit from the force tree to edit it in its dialog (Escape closes and returns to the row). Floating controls toggle panels; Command K opens actions.",
       "tradeoff": "Desktop-first exploration. Sample data and prototype-session edits; not connected to the Battle Augur engine or persistence. App foundation (2026-10-22): Electron rail, live roster/source lists and persistent appearance settings are implemented. Desktop install slice (2026-10-22): runtime collection browsing and repository-link installs, shared job progress/cancel/retry/results and Advanced installation choice are implemented. Add game data uses the full page sheet; Jobs stays available when empty; View Sources returns to the installed list. Desktop discovery slice (2026-10-22): GitHub search, saved collections/libraries, default hide/show and refresh/copy/confirmed remove are implemented. Collection actions use visible grouped buttons instead of an ellipsis menu; Add collection uses a centred modal with focus containment and Escape restoration; copy feedback includes a selectable link on failure. Live GitHub/native clipboard acceptance remains open. Desktop lifecycle slice (2026-10-23): installed source list/detail, provenance/facts, faction tags, folded report/documents, pinned install-more and guarded removal are implemented; removal uses a danger-zone confirmation with live impact and busy/error feedback. Desktop local import slice (2026-10-23): Sources file/folder choice, native picker handoff, refusal/pending/interrupted notices and shared local job/replacement feedback are implemented using existing dialogs/notices. Desktop updates slice (2026-10-23): update checks (manual and automatic), Update one/all/selected, detail changes and removal warnings, update jobs with Check rosters / Later, the Last update card, a dedicated update report page and the update preferences are implemented; the compare link is selectable URL text. Desktop kept versions and recovery slice (2026-10-23): kept-version switch/delete and interrupted recovery are implemented. Desktop roster organizer and creation slice (2026-10-23): the Rosters list/detail organizer with rename/duplicate/delete and guided creation from Rosters and Welcome are implemented. Roster opening, editor panes and full Settings remain targets; unavailable actions are marked planned. Desktop roster editor slice (2026-10-23): Open from Rosters or a source's detail starts the three-panel editor on the engine worker: catalogue pane (Add to force, role filter, search, show hidden, budget line), roster tree with header totals/limits and Saved status, Add force dialog, duplicate/delete with toast Undo, Undo/Redo buttons and ⌘Z / ⇧⌘Z, and the unit inspector (folded remembered option sections, nested drill chain with Back, model loadouts with split, Options/Profile tabs with rules, links). Command K, editable bindings, floating panel toggles, notes and the separate Rules tab are not built; diagnostics navigation and the read-only banner follow. Desktop diagnostics and read-only slice (2026-10-23): the validation strip with Show and read-only rosters (stored roster, banner choices, kept versions, tab lock) are implemented; roster export/import (DP-09) and full Settings remain targets. Desktop roster exchange slice (2026-10-23): roster export (Text / New Recruit JSON, Copy text, Save file…, stored export) and New Recruit JSON import are implemented; full Settings remains a target.",
       "screens": [
         {
@@ -795,7 +795,27 @@
         },
         {
           "id": "desktop-editor",
-          "label": "Roster editor · Three panels"
+          "label": "Roster editor · Catalogue and roster"
+        },
+        {
+          "id": "desktop-editor-unit-dialog",
+          "label": "Roster editor · Unit dialog"
+        },
+        {
+          "id": "desktop-editor-unit-dialog-nested",
+          "label": "Roster editor · Unit dialog, nested element"
+        },
+        {
+          "id": "desktop-editor-unit-dialog-narrow",
+          "label": "Roster editor · Unit dialog, narrow window"
+        },
+        {
+          "id": "desktop-editor-unit-dialog-readonly",
+          "label": "Roster editor · Unit dialog, read-only roster"
+        },
+        {
+          "id": "desktop-editor-catalogue-limit",
+          "label": "Roster editor · Catalogue limit reached"
         },
         {
           "id": "desktop-rosters",
@@ -814,6 +834,22 @@
           "label": "Lookup 1.0 · Force"
         },
         {
+          "id": "desktop-lookup-1-0-loading",
+          "label": "Lookup 1.0 · Loading"
+        },
+        {
+          "id": "desktop-lookup-1-0-failed",
+          "label": "Lookup 1.0 · Search failed, Retry"
+        },
+        {
+          "id": "desktop-lookup-1-0-unavailable",
+          "label": "Lookup 1.0 · Reference unavailable"
+        },
+        {
+          "id": "desktop-lookup-1-0-text-200",
+          "label": "Lookup 1.0 · Page zoom 200 %"
+        },
+        {
           "id": "desktop-tools",
           "label": "Tools · Coming soon"
         },
@@ -828,6 +864,10 @@
         {
           "id": "desktop-settings",
           "label": "Settings · Sections"
+        },
+        {
+          "id": "desktop-settings-advanced",
+          "label": "Settings · Advanced (plain rows)"
         },
         {
           "id": "desktop-first-run",
@@ -849,14 +889,24 @@
           "screens": [
             "desktop-welcome",
             "desktop-editor",
+            "desktop-editor-unit-dialog",
+            "desktop-editor-unit-dialog-nested",
+            "desktop-editor-unit-dialog-narrow",
+            "desktop-editor-unit-dialog-readonly",
+            "desktop-editor-catalogue-limit",
             "desktop-rosters",
             "desktop-lookup",
             "desktop-lookup-1-0",
             "desktop-lookup-1-0-force",
+            "desktop-lookup-1-0-loading",
+            "desktop-lookup-1-0-failed",
+            "desktop-lookup-1-0-unavailable",
+            "desktop-lookup-1-0-text-200",
             "desktop-tools",
             "desktop-library",
             "desktop-sources",
             "desktop-settings",
+            "desktop-settings-advanced",
             "desktop-first-run",
             "desktop-menus"
           ]
@@ -915,6 +965,7 @@
                   "desktop"
                 ],
                 "states": [
+                  "R0-02 (DEC-055): no inspector pane, so the editor's floating controls keep Toggle catalogue only; Toggle inspector, View › Show inspector and its key binding (Mod+Alt+B) are retired; the unit dialog's tabs use the curved pill style",
                   "welcome",
                   "editor without activity rail",
                   "floating panel controls",
@@ -981,6 +1032,7 @@
                   "desktop"
                 ],
                 "states": [
+                  "R0-08 (DEC-054): unavailable rows keep full-contrast name and price (no 50 % dimming); a reached limit shows the quota chip 1 / 1 and an unavailable Add (see desktop.catalogue.limit); other reasons keep the icon-only state chip",
                   "default",
                   "search",
                   "role filter",
@@ -1004,6 +1056,7 @@
                   "desktop"
                 ],
                 "states": [
+                  "R0-02 (DEC-055): a unit row (click, or Enter on the focused row) opens the unit editor dialog (aria-haspopup=dialog); the row keeps the selected highlight; Close / Escape returns focus to it; the roster is inert and dimmed while the dialog is open",
                   "selected",
                   "collapsed",
                   "empty",
@@ -1015,6 +1068,26 @@
                 , "App DP07: header (name, faction · system, errors, budget with over-limit and other limits, Saved); force sections with slot chips/counts/points, unit rows (×models, cost, status edge), collapse, duplicate and delete per row; empty state with Add force", "App DD10: tree after dt-roster: heading Your force(s) with units · forces, Undo / Redo and the check icon toggling the issues; force cards (flag icon, the force's own name, Faction · N units, points; collapse chevron kept); a slot's rows share one group card (name in data case, used / max, state chip, points; Add {group} unit row in every addable group); unit rows (icon by kind, name with other costs as tag chips, N models · loadout for every unit, points over the cost name, chevron; markers replace the points, no status edges; Duplicate / Delete float in on hover or focus); dashed Add force (neutral word, not Add detachment); no ALPHA-style tag (not in the data); at 470 px and less icons and loadout step back"
                 , "App DD19: inline force rename from a pencil in the force card's hover tools: the name becomes a selected field, Enter or leaving it saves (one undo step), Esc cancels, the focus returns to the pencil. Differences: an empty name restores the force entry's name, which a renamed card's line then shows first; no rename toast; the pencil is hidden while read only, like Delete (the gallery disables it); the field takes up to 120 characters; Add force still has no Name field (adding and naming would be two undo steps).", "App DX01: unit rows [icon, name, Duplicate / Delete on hover or focus, issue icon button, points, chevron]; the select button covers the row; a unit with issues keeps its points; force cards keep their hover tools in place (no overlap). Difference: at 720 px the overlay inspector covers the rows' trailing part (UX-048)"],
                 "screens": [
+                  "desktop-editor"
+                ]
+              },
+              {
+                "id": "desktop.catalogue.limit",
+                "title": "Catalogue Quota Chip & Unavailable Add",
+                "level": "control",
+                "status": "needs-review",
+                "platforms": [
+                  "desktop"
+                ],
+                "states": [
+                  "R0-08 (DEC-054): name and price stay at full contrast in every state (text at least 4.5:1 in light and dark); nothing is dimmed",
+                  "limit reached: quota chip 1 / 1 on the meta line (accessible: 1 selected, maximum 1), so the name keeps the row's width",
+                  "unavailable Add: dashed + beside the price; the row's Add button stays focusable (aria-disabled) and is named Add {unit}: unavailable, with the limit",
+                  "hover, focus or press shows the reason in the hint bubble: Limit reached: 1 of 1 selected. Remove the existing unit before adding another.",
+                  "other unavailable reasons (Not allowed in a Patrol) and Adds over limit keep the DEC-050 icon-only state chip with its caption, also without dimming"
+                ],
+                "screens": [
+                  "desktop-editor-catalogue-limit",
                   "desktop-editor"
                 ]
               },
@@ -1064,14 +1137,43 @@
                 "screens": ["desktop-editor"]
               },
               {
+                "id": "desktop.unit-dialog",
+                "title": "Unit Editor Dialog",
+                "level": "overlay",
+                "status": "needs-review",
+                "platforms": [
+                  "desktop"
+                ],
+                "states": [
+                  "R0-02 / UX-056 (DEC-055): modal in-app dialog over the roster (role=dialog, aria-modal, labelled by the unit name); the catalogue, roster and tab row behind it are dimmed and inert",
+                  "opens from a unit row (click, Enter on the focused row) or Edit › Edit unit… (↩); closes with × (Close {unit}), Escape on the top level or a click on the dimmed roster; focus returns to the unit row (after Remove: the neighbouring row)",
+                  "normal window: centred, at most 680 px wide and the window minus 32 px high; header and tabs stay, the body scrolls, footer fixed",
+                  "narrow window (dialog area under 760 × 560): fills the window minus 8 px margins (desktop-editor-unit-dialog-narrow, 720 × 520)",
+                  "header: eyebrow role / N models, name, points, force; Duplicate and Remove; Undo / Redo with the step names; Close",
+                  "Options / Profile / Rules tabs (pill style); Options: unit size stepper, Separate 1 (and Separate all when enabled in Settings › Advanced), Members, equipment, upgrades, notes",
+                  "live session: each change autosaves and is an Undo step (⌘Z / ⇧⌘Z work inside, text fields keep their own undo); no Save / Cancel draft; footer: Changes save as you edit · source and version",
+                  "nested navigation: a row with a chevron (Squad leader, its Signal kit) pushes a level inside the dialog; Back and a breadcrumb (earlier steps are buttons) in the header; Escape goes back one level, then closes; focus moves to Back, and back to the row that opened the level",
+                  "keyboard: focus starts on Close; Tab and Shift+Tab wrap inside the dialog",
+                  "read-only roster: opens with the read-only reason above the content, controls disabled, Not editable in the footer; nested levels stay viewable",
+                  "Duplicate keeps the dialog on the current unit (toast with Undo); Remove closes it (toast with Undo); an Undo that removes the unit closes it"
+                ],
+                "screens": [
+                  "desktop-editor-unit-dialog",
+                  "desktop-editor-unit-dialog-nested",
+                  "desktop-editor-unit-dialog-narrow",
+                  "desktop-editor-unit-dialog-readonly"
+                ]
+              },
+              {
                 "id": "desktop.inspector",
-                "title": "Unit Inspector",
+                "title": "Unit Inspector · replaced by the unit dialog",
                 "level": "composite",
                 "status": "specified",
                 "platforms": [
                   "desktop"
                 ],
                 "states": [
+                  "DEC-055: the right-hand inspector pane is replaced by the unit editor dialog (desktop.unit-dialog); its content (header, Options / Profile / Rules, options, notes, source footer) moves into the dialog. The App DPxx / DDxx notes below describe the pane as built before R6-02",
                   "options",
                   "profile",
                   "rules",
@@ -1094,6 +1196,7 @@
                   "desktop"
                 ],
                 "states": [
+                  "R0-02 (DEC-055): Show selects and reveals the unit in the tree (no pane to open); Enter or a click on the row opens its dialog",
                   "valid",
                   "missing required units",
                   "over budget",
@@ -1131,7 +1234,7 @@
                 "level": "navigation",
                 "status": "needs-review",
                 "platforms": ["desktop"],
-                "states": ["menus", "shortcuts from key bindings", "submenu", "disabled with reason", "Escape closes", "App DD18 (PR #86): native application menus route existing commands with binding-aware shortcuts and disabled reasons; Open recent can be cleared without deleting rosters. Close tab keeps the window; Duplicate, Remove and Find are editable. Native text Edit roles remain. The primary cost limit submenu and summary support presets/current/custom and Unlimited or named data fallback, with autosave and undo. Limits remain freely editable; configuration constraints remain rule errors. Above the configuration allowance only, the points button, summary and points line warn and name that allowance. Custom focuses/selects the input. Read-only/busy states disable edits. Differences: native macOS menu; non-Command keys show in labels there; Undo/Redo have no step description; Help/Report lack destinations and Install from file stays in Sources; the summary retains autosave instead of the gallery data row. Windows/Linux styling and native verification await their platform passes."],
+                "states": ["DEC-055: View has no Show inspector; Edit › Edit unit… (↩) opens the selected unit's dialog", "menus", "shortcuts from key bindings", "submenu", "disabled with reason", "Escape closes", "App DD18 (PR #86): native application menus route existing commands with binding-aware shortcuts and disabled reasons; Open recent can be cleared without deleting rosters. Close tab keeps the window; Duplicate, Remove and Find are editable. Native text Edit roles remain. The primary cost limit submenu and summary support presets/current/custom and Unlimited or named data fallback, with autosave and undo. Limits remain freely editable; configuration constraints remain rule errors. Above the configuration allowance only, the points button, summary and points line warn and name that allowance. Custom focuses/selects the input. Read-only/busy states disable edits. Differences: native macOS menu; non-Command keys show in labels there; Undo/Redo have no step description; Help/Report lack destinations and Install from file stays in Sources; the summary retains autosave instead of the gallery data row. Windows/Linux styling and native verification await their platform passes."],
                 "screens": ["desktop-menus"]
               },
               {
@@ -1201,6 +1304,7 @@
                   "desktop"
                 ],
                 "states": [
+                  "R0-03 (DEC-054): lifecycle states loading, failure / Retry, reference unavailable and page zoom 200 % (desktop.lookup-1-0.states)",
                   "Main Lookup destination from navigation and the canonical screen ID; earlier composition remains in Archive",
                   "DEC-050: no visible page title (visually hidden h1); the search fills the top row (desktop.top-row), as on Rosters and Sources",
                   "the earlier page: large search, chip row with the result count, results card and entry card",
@@ -1219,15 +1323,57 @@
                 ]
               },
               {
+                "id": "desktop.lookup-1-0.states",
+                "title": "Lookup 1.0 · Lifecycle States",
+                "level": "screen-composition",
+                "status": "needs-review",
+                "platforms": [
+                  "desktop"
+                ],
+                "states": [
+                  "R0-03 (DEC-054) loading: query and system chips kept, Searching… in the count line, status line with a spinner and skeleton rows; never a false Nothing found",
+                  "failure: Search could not finish · Your installed data is still on this device. · Retry (runs the search again through Loading); not presented as zero results",
+                  "reference unavailable: an opened or saved reference whose source is no longer installed: Reference unavailable · The source for this saved reference is no longer installed. · the saved identity · Back to results (focuses the results); never opens a same-name entry from another source or version",
+                  "page zoom 200 %: titles (result names and the entry heading) stop at two lines with an ellipsis; the full name is in the tooltip, the accessible name and a Full name disclosure; the cap applies to titles only, not reference content or explanations",
+                  "results stack from the top of the results card"
+                ],
+                "screens": [
+                  "desktop-lookup-1-0-loading",
+                  "desktop-lookup-1-0-failed",
+                  "desktop-lookup-1-0-unavailable",
+                  "desktop-lookup-1-0-text-200"
+                ]
+              },
+              {
                 "id": "desktop.sources",
                 "title": "Sources & Source Detail",
                 "level": "screen-composition",
                 "status": "needs-review",
                 "platforms": ["desktop"],
-                "states": ["update available", "update all", "updating", "up to date", "review", "from a file", "App DP04: enabled Install from a file; Choose files / Choose a folder / Cancel dialog, native picker handoff, refused pick Dismiss and pending/interrupted notices; originals preserved", "App DP05a: check/refresh footer with last checked, update available / up to date / check failed, Update all and checkbox selection with guarded actions; detail update card with loading/error/Retry, expandable changes, removed-faction roster warning, truncated-list notice and Update; the GitHub compare link is selectable URL text (no external-open capability yet)", "kept versions", "App DP05b: detail lists in-use and kept versions with Switch and Delete (destructive confirmation, Cancel/Escape/focus return), older-in-use row switches back; detail follows the store in use; actions disabled during jobs or a switch/delete", "add game data", "remove confirm", "App DP03: split installed list/detail, source-key changes, facts/provenance/faction tags, dependent roster names (opening planned), folded bounded diagnostics with severity words/counts and document list", "App DP03: pinned install-more, worker/loading/error/busy feedback, danger zone; refreshed removal impact, Cancel/Escape/focus return, busy dialog dismissal disabled, cleanup result feedback", "App DD05 list: tab-row actions Install from a file and Add game data; update banner (n updates available, New data for {names}. Last checked {when}.) with Select updates and Update all; list card with the INSTALLED head and count, rows (name, factions, shared meta Version {commit} · changed upstream {date} · {size} or From a file · {label} · imported {when} · {size}, status chip with icon, progress bar while a job runs, accent bar when selected), new installs as rows that open their job, dashed Add game data card, footer Checked for updates {when} · Check now (Refresh without sources or with updates off); loading skeleton, load failure with Retry and no game data inside the list; up to 920 px the detail goes under the list. Differences: shared chip wording (Update available, Needs review, Unreadable, Waiting for you, Waiting); the meta line uses the commit, not repo@version; Select updates kept; footer states Not checked for updates yet / Checking / check failed; a source with a running job opens its detail; nothing selected at first; the Add game data card opens the full Add game data page until DD-06.", "App DD05 detail: eyebrow, title and chip, update card, facts row, Versions, faction chips with Install more, Rosters using it and the danger zone as designed. Differences: the update card counts files added, changed and removed (the tree comparison names documents, not units, costs or rules; a library counts as a file), and the names stay under the counts; no View on GitHub (no safe external open yet), so the compare link is selectable text under Update; versions are short commits, not tags; Last checked carries the source's own Check now, and a failed check reads under the facts; Up to date shows only after a check confirmed it; the Import report and Documents sections stay (no 3 import warnings notice); labels Installed factions, Install more factions and Switch to this version, faction chips show their revision; Delete version and Remove use the confirmation dialog (DEC-024), not two clicks; a running job shows a progress card with View job; rosters open in the editor; the Last update card is restyled in DD-06; with nothing selected the pane shows a centred Select installed game data card.", "App DD06: Add game data, collection pages, GitHub search and the update report are sub-views of the detail pane beside the list, with Back links, kept in the page's selection. The Add game data card is selected while the add flow is open. Add game data: eyebrow, Choose a game system, the default collection's head (its name, Default chip, Refresh, Show all) and compact rows with the repository line, the entries it lists and Your collections as link rows, the inline repository form with Install, and the Search GitHub / Add a collection rows. No Back link except when opened from the editor (Back to the roster, at its repository)."
+                "states": ["R0-08 (DEC-054): installed rows show their status as one compact icon instead of a text chip (desktop.sources.status); the detail keeps its update card and title chip", "update available", "update all", "updating", "up to date", "review", "from a file", "App DP04: enabled Install from a file; Choose files / Choose a folder / Cancel dialog, native picker handoff, refused pick Dismiss and pending/interrupted notices; originals preserved", "App DP05a: check/refresh footer with last checked, update available / up to date / check failed, Update all and checkbox selection with guarded actions; detail update card with loading/error/Retry, expandable changes, removed-faction roster warning, truncated-list notice and Update; the GitHub compare link is selectable URL text (no external-open capability yet)", "kept versions", "App DP05b: detail lists in-use and kept versions with Switch and Delete (destructive confirmation, Cancel/Escape/focus return), older-in-use row switches back; detail follows the store in use; actions disabled during jobs or a switch/delete", "add game data", "remove confirm", "App DP03: split installed list/detail, source-key changes, facts/provenance/faction tags, dependent roster names (opening planned), folded bounded diagnostics with severity words/counts and document list", "App DP03: pinned install-more, worker/loading/error/busy feedback, danger zone; refreshed removal impact, Cancel/Escape/focus return, busy dialog dismissal disabled, cleanup result feedback", "App DD05 list: tab-row actions Install from a file and Add game data; update banner (n updates available, New data for {names}. Last checked {when}.) with Select updates and Update all; list card with the INSTALLED head and count, rows (name, factions, shared meta Version {commit} · changed upstream {date} · {size} or From a file · {label} · imported {when} · {size}, status chip with icon, progress bar while a job runs, accent bar when selected), new installs as rows that open their job, dashed Add game data card, footer Checked for updates {when} · Check now (Refresh without sources or with updates off); loading skeleton, load failure with Retry and no game data inside the list; up to 920 px the detail goes under the list. Differences: shared chip wording (Update available, Needs review, Unreadable, Waiting for you, Waiting); the meta line uses the commit, not repo@version; Select updates kept; footer states Not checked for updates yet / Checking / check failed; a source with a running job opens its detail; nothing selected at first; the Add game data card opens the full Add game data page until DD-06.", "App DD05 detail: eyebrow, title and chip, update card, facts row, Versions, faction chips with Install more, Rosters using it and the danger zone as designed. Differences: the update card counts files added, changed and removed (the tree comparison names documents, not units, costs or rules; a library counts as a file), and the names stay under the counts; no View on GitHub (no safe external open yet), so the compare link is selectable text under Update; versions are short commits, not tags; Last checked carries the source's own Check now, and a failed check reads under the facts; Up to date shows only after a check confirmed it; the Import report and Documents sections stay (no 3 import warnings notice); labels Installed factions, Install more factions and Switch to this version, faction chips show their revision; Delete version and Remove use the confirmation dialog (DEC-024), not two clicks; a running job shows a progress card with View job; rosters open in the editor; the Last update card is restyled in DD-06; with nothing selected the pane shows a centred Select installed game data card.", "App DD06: Add game data, collection pages, GitHub search and the update report are sub-views of the detail pane beside the list, with Back links, kept in the page's selection. The Add game data card is selected while the add flow is open. Add game data: eyebrow, Choose a game system, the default collection's head (its name, Default chip, Refresh, Show all) and compact rows with the repository line, the entries it lists and Your collections as link rows, the inline repository form with Install, and the Search GitHub / Add a collection rows. No Back link except when opened from the editor (Back to the roster, at its repository)."
                 , "App DD20: View on GitHub and Report a data issue under the summary (sources with a repository; local file sources have none); the update card's View changes on GitHub opens the compare page (the repository when the commits are not real commit IDs). Links open only https://github.com/… in the browser, checked by the main process; a failure to open shows a line under the button. Replaces DD05's selectable compare URL.",
                 "DEC-050: no title row; a search over the installed game data (name, repository, factions; \"n of m\" in the Installed count, a no-match line) fills the top row with Install from a file and Add game data at its end; the update banner follows; visually hidden h1 Sources"],
                 "screens": ["desktop-sources"]
+              },
+              {
+                "id": "desktop.sources.status",
+                "title": "Compact Source Status",
+                "level": "control",
+                "status": "needs-review",
+                "platforms": [
+                  "desktop"
+                ],
+                "states": [
+                  "R0-08 (DEC-054): one 34 px icon at the end of an installed source row replaces the text chip, so the name and meta keep the width",
+                  "update available: download-arrow icon button, accessible name Update {source} to {version}; pressing it starts the update",
+                  "updating / installing: progress ring with the percentage (button: show installs and updates)",
+                  "needs you (choose factions) and failed (retry): icon buttons in warn / error tone",
+                  "review (import warnings), up to date (check), installed from a file (file): icons",
+                  "never colour alone: every status has its own shape; hover or focus shows the caption (Update available · v1.5) in the hint bubble; the caption is part of the row's accessible name"
+                ],
+                "screens": [
+                  "desktop-sources"
+                ]
               },
               {
                 "id": "desktop.sources.last-update",
@@ -1275,12 +1421,30 @@
                 "screens": ["desktop-sources"]
               },
               {
+                "id": "desktop.settings.advanced",
+                "title": "Settings › Advanced Plain Rows",
+                "level": "composite",
+                "status": "needs-review",
+                "platforms": [
+                  "desktop"
+                ],
+                "states": [
+                  "DEC-054: Advanced heading and two switch rows with dividers, no enclosing card (unlike the other sections)",
+                  "Focus search when opening the catalogue (off by default; Find in catalogue always focuses the search)",
+                  "Enable Separate all (off by default): a unit with several models also offers Separate all, splitting it into single-model units in one step; off: only Separate 1",
+                  "same switch control as the other settings"
+                ],
+                "screens": [
+                  "desktop-settings-advanced"
+                ]
+              },
+              {
                 "id": "desktop.settings",
                 "title": "Settings Sections",
                 "level": "screen-composition",
                 "status": "needs-review",
                 "platforms": ["desktop"],
-                "states": ["theme", "colour scheme", "import scheme", "language", "switches", "Advanced installation switch (off by default)", "keep versions", "storage", "key bindings", "recording", "needs a modifier", "conflict replace", "reset", "about", "scroll-tracked section list", "App DP05a: Check for updates automatically switch and Keep previous versions (Off, 1–3) applying to the next update; DP05b: switching/deleting kept versions in source detail", "App DP10: section list (scroll-tracked) and cards for Appearance (theme segmented; colour schemes with swatches, imported schemes and Import scheme behind the colour-scheme flag, as mobile), Language (English and imported packs, Import language pack behind its flag, applied at start), Rosters (Remember option sections), Game data (automatic checks behind the updates flag, Advanced installation, Keep previous versions with the size), About (version, build, engine, data note and folder; seven clicks on the version unlock Developer) and Developer (feature flags by area with reset, engine worker restart, imports at once, install measurements). Not built: storage breakdown, key bindings and reopen tabs (desktop-only, after parity); Wi-Fi only and notifications are phone-only", "App DD13: matches the cards (scheme grid with the dashed Import tile, boxed language rows, section nav, card type and spacing). Differences: no Storage or Key bindings sections yet (DD-20, DD-15; the nav leaves them out rather than drawing cards that do nothing), so the data folder path stays in About; About shows Version, Build and one Engine fact (API \u00b7 protocol \u00b7 SQLite) and a longer data note instead of Version / Engine / Protocol / SQLite; the swatch is mobile's (background, accent, info of the scheme); app wording \u201cImport colour scheme\u201d, \u201cLoad a language pack\u201d and longer switch details; the app adds a Developer section (unlocked by seven clicks on the version or in a debug build) with boxed flag lists by area; below 1040 px the nav narrows and the schemes show two tiles a row. Colour schemes and language packs are on by default on every platform (2026-10-25)", "App DD15 (key bindings, PR pending): the app's shortcuts follow editable bindings with the gallery's actions and defaults (desktopKeys.ts); Welcome's Create a roster ⌘N and the summary's New roster key show, and the rail's Rosters, Lookup and Settings, the tab row's + , the points button and the panel toggles name their keys too. Differences: no binding acts in a text field (the gallery lets the General keys fire there); Undo / Redo keys don't act under a modal dialog; a binding can't take Esc, Tab, ⌘W / Ctrl+W or ⌘Q / Ctrl+Q; on a Mac ⌃ is a modifier of its own (the gallery reads ⌃ as ⌘); labels keep the app's notation (⇧⌘Z, ⌥⌘B; elsewhere Ctrl+Shift+Z) in the UI font, not the spaced monospace “⌘ ⇧ Z”; ⌘K does nothing until the command palette (DD-17); until the application menu (DD-18) Electron's default menu also holds ⇧⌘R (Force Reload) and ⌘Z / ⇧⌘Z", "App DD15 Settings → Key bindings: built after KeyBindingsEditor between Game data and About (Storage comes with DD-20). Matches: heading with Reset all while anything differs, the hint, General / Roster editor boxed rows, key buttons (“Press keys…” while recording, “Not set”), a per-row reset, the needs-a-modifier problem under the row, the warn conflict notice with Replace / Cancel. Differences: the app's smaller card heading; Replace / Cancel at the notice's right end; the command palette row notes its key waits for the palette (DD-17); fixed keys (Esc, Tab, ⌘W, ⌘Q) are refused with their own message; a row reset whose default another action holds asks first (the gallery sets it, leaving two actions on one key); additions: alerts, a live recording status, hints on every control, focus back on the row after Replace / Cancel / reset, Tab or leaving the button stops recording, Esc in the notice cancels"
+                "states": ["DEC-054: Advanced is a plain section without a card: Focus search when opening the catalogue and Enable Separate all, both off by default (desktop.settings.advanced)", "theme", "colour scheme", "import scheme", "language", "switches", "Advanced installation switch (off by default)", "keep versions", "storage", "key bindings", "recording", "needs a modifier", "conflict replace", "reset", "about", "scroll-tracked section list", "App DP05a: Check for updates automatically switch and Keep previous versions (Off, 1–3) applying to the next update; DP05b: switching/deleting kept versions in source detail", "App DP10: section list (scroll-tracked) and cards for Appearance (theme segmented; colour schemes with swatches, imported schemes and Import scheme behind the colour-scheme flag, as mobile), Language (English and imported packs, Import language pack behind its flag, applied at start), Rosters (Remember option sections), Game data (automatic checks behind the updates flag, Advanced installation, Keep previous versions with the size), About (version, build, engine, data note and folder; seven clicks on the version unlock Developer) and Developer (feature flags by area with reset, engine worker restart, imports at once, install measurements). Not built: storage breakdown, key bindings and reopen tabs (desktop-only, after parity); Wi-Fi only and notifications are phone-only", "App DD13: matches the cards (scheme grid with the dashed Import tile, boxed language rows, section nav, card type and spacing). Differences: no Storage or Key bindings sections yet (DD-20, DD-15; the nav leaves them out rather than drawing cards that do nothing), so the data folder path stays in About; About shows Version, Build and one Engine fact (API \u00b7 protocol \u00b7 SQLite) and a longer data note instead of Version / Engine / Protocol / SQLite; the swatch is mobile's (background, accent, info of the scheme); app wording \u201cImport colour scheme\u201d, \u201cLoad a language pack\u201d and longer switch details; the app adds a Developer section (unlocked by seven clicks on the version or in a debug build) with boxed flag lists by area; below 1040 px the nav narrows and the schemes show two tiles a row. Colour schemes and language packs are on by default on every platform (2026-10-25)", "App DD15 (key bindings, PR pending): the app's shortcuts follow editable bindings with the gallery's actions and defaults (desktopKeys.ts); Welcome's Create a roster ⌘N and the summary's New roster key show, and the rail's Rosters, Lookup and Settings, the tab row's + , the points button and the panel toggles name their keys too. Differences: no binding acts in a text field (the gallery lets the General keys fire there); Undo / Redo keys don't act under a modal dialog; a binding can't take Esc, Tab, ⌘W / Ctrl+W or ⌘Q / Ctrl+Q; on a Mac ⌃ is a modifier of its own (the gallery reads ⌃ as ⌘); labels keep the app's notation (⇧⌘Z, ⌥⌘B; elsewhere Ctrl+Shift+Z) in the UI font, not the spaced monospace “⌘ ⇧ Z”; ⌘K does nothing until the command palette (DD-17); until the application menu (DD-18) Electron's default menu also holds ⇧⌘R (Force Reload) and ⌘Z / ⇧⌘Z", "App DD15 Settings → Key bindings: built after KeyBindingsEditor between Game data and About (Storage comes with DD-20). Matches: heading with Reset all while anything differs, the hint, General / Roster editor boxed rows, key buttons (“Press keys…” while recording, “Not set”), a per-row reset, the needs-a-modifier problem under the row, the warn conflict notice with Replace / Cancel. Differences: the app's smaller card heading; Replace / Cancel at the notice's right end; the command palette row notes its key waits for the palette (DD-17); fixed keys (Esc, Tab, ⌘W, ⌘Q) are refused with their own message; a row reset whose default another action holds asks first (the gallery sets it, leaving two actions on one key); additions: alerts, a live recording status, hints on every control, focus back on the row after Replace / Cancel / reset, Tab or leaving the button stops recording, Esc in the notice cancels"
                 , "App DD20 Settings → Storage between Game data and Key bindings: the data folder's full path (moved from About) with Show in Finder (Show in Explorer / Show in file manager elsewhere; opens the folder itself), the usage bar as the split of the folder's own use (always fills; no total or disk capacity), Game data / Kept versions / Rosters (the app database, which also holds the store registry) measured by the main process, a 0 B part only in the legend; Measuring and recorded-size states the gallery doesn't draw.",
                 "DEC-050 (UX-059): Advanced section (new, between Key bindings and About, in the section list): Focus search when opening the catalogue, a switch, off by default; detail \"Off: Add unit opens the catalogue for browsing. Find in catalogue (⌘ ⇧ F) always focuses the search.\" (the menu's Find in catalogue key; Ctrl + Shift + F elsewhere); standalone link &section=advanced opens it; at the end of the scroll a chosen short section stays chosen in the list"],
                 "screens": ["desktop-settings"]
