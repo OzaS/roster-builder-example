@@ -3,9 +3,10 @@ import { ArrowRight, BookOpen, ChevronRight, Copy, Database, FileUp, FolderOpen,
 import { Chip as MobileChip } from '../ux/uxShared'; // the mobile chip; the workspace Chip (dtp-chip) is not used here, see MOBILE-PIECES.md
 import { ComingSoonCard } from '../ux/AppExtras';
 import { collectionSources, lookupEntries, type LookupEntry, type RosterSummary } from '../desktop/desktopData';
+import { FIRST_RUN_NO_PRESET, FirstRunPreviewStates, useFlowStore } from '../desktop/DesktopSourceFlows';
 import { HintButton } from './TabletHint';
 import type { TabletInput } from './tabletDevices';
-import { EmptyState, Facts, InstallRow, ListDetail, Meter, Progress, Row, SearchField, pts, rosterStatus, sourceStatus, plural, type PageProps, type SessionProps } from './TabletPieces';
+import { EmptyState, Facts, InstallRow, WorkspaceScope, ListDetail, Meter, Progress, Row, SearchField, pts, rosterStatus, sourceStatus, plural, type PageProps, type SessionProps } from './TabletPieces';
 import { RosterToolbar } from './RosterToolbar';
 import { PageTitle, TabletToolbar, type ToolbarAction } from './TabletToolbar';
 
@@ -27,6 +28,8 @@ export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRo
   const addData = () => { setSourceDetail('add'); onPage('sources'); };
   const startInstall = (c: typeof collectionSources[number]) => { jobs.startInstall(c); };
   const attention = rosters.filter(r => r.status !== 'ready').length;
+  // DEC-059 (R0-09): a build with no default collection fetches nothing on first run; the note points to adding a link.
+  const { noPreset } = useFlowStore();
 
   // Every shown source keeps its own version, update and progress control. TFB-001: the four most used game systems (most
   // rosters, then the latest roster activity, then name; never install order); More opens Sources with the rest.
@@ -65,10 +68,11 @@ export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRo
         <section className="tb-card tb-fill" aria-label="Start with game data">
           <span className="ux-result-label">Get started</span>
           <div className="tb-card-head"><h2 className="tb-card-title">Start with game data</h2><p className="tb-body tb-muted">Rosters are built from a game system's data. Install one; it stays available offline.</p></div>
-          <div className="tb-list">{collectionSources.map(c => <InstallRow key={c.id} title={c.name} sub={`${c.detail} · ${c.size}`} live={jobs.jobs.find(j => j.sourceId === c.id && (j.status === 'running' || j.status === 'needs-you'))} installed={jobs.sources.some(s => s.id === c.id)} onInstall={() => startInstall(c)} onJobs={() => setJobsOpen(true)} />)}</div>
+          {noPreset ? <p className="tb-note"><Info size={15} />{FIRST_RUN_NO_PRESET}</p> : <div className="tb-list">{collectionSources.map(c => <InstallRow key={c.id} title={c.name} sub={`${c.detail} · ${c.size}`} live={jobs.jobs.find(j => j.sourceId === c.id && (j.status === 'running' || j.status === 'needs-you'))} installed={jobs.sources.some(s => s.id === c.id)} onInstall={() => startInstall(c)} onJobs={() => setJobsOpen(true)} />)}</div>}
           {history}
           <Row selected={false} mark={<FolderOpen size={20} />} title="Install from a file or a link" sub="An archive, data files, a repository link or GitHub search" end={<ChevronRight size={17} />} onClick={addData} />
           <p className="tb-note"><Info size={15} />Battle Augur includes no game data. Sources come from community repositories you choose.</p>
+          <WorkspaceScope light={session.light}><FirstRunPreviewStates /></WorkspaceScope>
         </section>
       </div>
       <aside className="tb-home-side" aria-label="How it works">

@@ -4,7 +4,7 @@ import { Chip as MobileChip } from '../ux/uxShared'; // the mobile chip; the wor
 import { jobPercent } from '../workspace/Jobs';
 import { SourceStatusAction } from '../ux/SourceJobs';
 import type { SourceInfo } from '../desktop/desktopData';
-import { AddDataCollections, CollectionView, GitHubSearchView, LastUpdateCard, LastUpdateStates, UpdateReportView, flowSourceId, isAddFlow, useRosterChecks } from '../desktop/DesktopSourceFlows';
+import { AddDataCollections, AddDataPreviewStates, CollectionView, GitHubSearchView, LastUpdateCard, LastUpdateStates, UpdateReportView, flowSourceId, isAddFlow, useRosterChecks } from '../desktop/DesktopSourceFlows';
 import '../desktop/desktop-pages.css';
 import { HintButton } from './TabletHint';
 import { EmptyState, Facts, ListDetail, Row, WorkspaceScope, plural, sourceStatus, Progress, type SessionProps } from './TabletPieces';
@@ -109,6 +109,7 @@ export function TabletSources({ env, notify, session, onPage, onOpenRoster }: Se
       <Row selected={false} mark={<Plus size={20} />} title="Add a collection or library" sub="Lists of sources kept by the community" end={<ChevronRight size={17} />} onClick={() => session.setAddCollectionOpen(true)} />
       <Row selected={false} mark={<FolderOpen size={20} />} title="Install from a file" sub="An archive, data files or a folder" end={<ChevronRight size={17} />} onClick={() => notify('Choose an archive, data files or a folder (prototype)')} />
     </div>
+    <WorkspaceScope light={light}><AddDataPreviewStates jobs={jobs} onOpenJobs={openJobs} /></WorkspaceScope>
   </>;
 
   const sourcePane = (s: SourceInfo) => {

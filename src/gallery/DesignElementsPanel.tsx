@@ -827,6 +827,8 @@ function WorkbenchElements({
 
       <ElementSection title="Reinstall A Kept Version">
         <small className="ux-elements-note">DEC-060 (approved 2026-11-02): the GitHub version picked is already on the device as a kept version with every faction installed. With Advanced installation on or off, the job sheet shows this offer instead of an empty "Choose factions 0 of 0" picker. Cancel cancels the job. Reinstall this version asks first; confirmed, that kept version becomes the game data in use and the version in use now stays as a kept version.</small>
+        <JobPill needsYou label="Reinstall this version?" />
+        <p className="ux-elements-note">Waiting for you: reinstall this version</p>
         <ReinstallSheet inline />
         <ReinstallConfirmDialog inline />
         <JobOutcomeNotice outcome="done" title={REINSTALL_DONE} />

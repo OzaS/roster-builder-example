@@ -143,3 +143,13 @@
 .dts-status-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px 14px; padding-bottom: 40px }
 .dts-status-sample { display: flex; align-items: center; gap: 10px; min-width: 0 }
 .dts-status-sample small { color: var(--dt-muted); font-size: 12px }
+
+/* DEC-059 (R0-09, approved 2026-11-02): no default collection in the build; the empty Your collections group's note. */
+.dt-app .dts-none { margin: 0; padding: 12px 14px; border: 1px solid var(--dt-border); border-radius: 14px; font-size: 12px; line-height: 1.5; color: var(--dt-muted) }
+/* Elements view samples of DEC-059 / DEC-060 */
+.dt-app.ux-screen.dt-data-elements { height: auto; min-height: 0; overflow: visible; padding: 20px; border-radius: 18px; display: grid; gap: 20px }
+.dt-data-elements-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 20px; align-items: start }
+.dt-data-elements .dtp-detail { padding: 20px }
+.dt-data-elements .dt-recents { padding-top: 0 }
+.dt-data-elements-jobs .dt-jobs { position: static; max-height: none }
+.dt-app .dt-data-elements-dialog { width: 100%; max-width: 520px }

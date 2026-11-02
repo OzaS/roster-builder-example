@@ -191,3 +191,10 @@ button.ws-limit-add { display: grid; place-items: center; width: 44px; height: 4
 .ws-limit-add:focus-visible i { outline: 2px solid var(--ux-accent-2, var(--dt-accent)); outline-offset: 2px }
 .tb-hint-bubble.ws-limit-bubble { width: max-content; max-width: 240px; white-space: normal }
 .tb-hint-bubble.ws-limit-bubble.below { left: auto; right: -2px; top: calc(100% + 6px); bottom: auto; transform: none }
+
+/* DEC-060 (approved 2026-11-02): reinstall a kept version, in the jobs panel and its confirm dialog. */
+.dt-reinstall { margin-top: 10px }
+.dt-reinstall .dtp-notice { margin: 0; background: var(--dt-pane) }
+.dt-reinstall .dtp-notice > svg { color: var(--dt-accent) }
+.dt-job .dtp-notice.err { margin: 10px 0 0 }
+.dt-app .dt-reinstall-body { padding: 16px 20px 18px; font-size: 13px; line-height: 1.55; color: var(--dt-muted) }

@@ -24,7 +24,7 @@ function BackButton({ label, onClick }: { label: string; onClick: () => void }) 
 }
 
 /** Gallery-only control for states that normal clicks cannot reach (offline, errors). */
-function PreviewStates({ items, note }: { items: Array<{ label: string; active?: boolean; run: () => void }>; note?: string }) {
+export function PreviewStates({ items, note }: { items: Array<{ label: string; active?: boolean; run: () => void }>; note?: string }) {
   return <details className="dts-preview"><summary>Preview states</summary>
     <div className="dts-preview-row">{items.map(item => <button key={item.label} className={item.active ? 'active' : ''} aria-pressed={item.active} onClick={item.run}>{item.label}</button>)}</div>
     {note && <p>{note}</p>}
@@ -33,14 +33,16 @@ function PreviewStates({ items, note }: { items: Array<{ label: string; active?:
 
 /* ---------------------------- Session store ---------------------------- */
 // Saved collections, the hidden default collection and "Show archived" outlive the Sources page, like app preferences.
+// `noPreset` is the gallery's stand-in for a build with no default collection (DEC-059, R0-09): a build-time setting,
+// shared by Add game data and the first-run cards.
 
 type Saved = { id: string; name: string; kind: 'collection' | 'library'; link: string };
-type FlowStore = { hidden: boolean; showArchived: boolean; saved: Saved[] };
-export let flowStore: FlowStore = { hidden: false, showArchived: false, saved: [] };
+type FlowStore = { hidden: boolean; showArchived: boolean; saved: Saved[]; noPreset: boolean };
+export let flowStore: FlowStore = { hidden: false, showArchived: false, saved: [], noPreset: false };
 const listeners = new Set<() => void>();
 export const setFlowStore = (patch: Partial<FlowStore>) => { flowStore = { ...flowStore, ...patch }; listeners.forEach(l => l()); };
 const subscribe = (listener: () => void) => { listeners.add(listener); return () => { listeners.delete(listener); }; };
-const useFlowStore = () => useSyncExternalStore(subscribe, () => flowStore);
+export const useFlowStore = () => useSyncExternalStore(subscribe, () => flowStore);
 
 const pageOf = (id: string, store: FlowStore): CollectionPage | undefined => {
   if (sourceCollections[id]) return sourceCollections[id];
@@ -53,7 +55,7 @@ const pageKind = (page: CollectionPage) => page.kind === 'library' ? `${plural(p
 
 /* ----------------------------- Listing rows ----------------------------- */
 
-const liveJob = (jobs: WorkspaceJobs, id: string) => jobs.jobs.find(j => j.sourceId === id && (j.status === 'running' || j.status === 'needs-you'));
+const liveJob = (jobs: WorkspaceJobs, id: string) => jobs.jobs.find(j => j.sourceId === id && !j.reinstall && (j.status === 'running' || j.status === 'needs-you'));
 
 function ListingAction({ listing, jobs, go, onOpenJobs }: { listing: Listing; jobs: WorkspaceJobs; go: Go; onOpenJobs: () => void }) {
   const installed = jobs.sources.find(s => s.id === listing.id);
@@ -280,11 +282,24 @@ export function UpdateReportView({ sourceId, jobs, notify, go, onOpenRoster }: {
 
 /* ---------------------- Add game data: collections ---------------------- */
 
-/** The collections part of Add game data: the default collection's supported sources and saved collections. */
+/** The note of a build with no default collection (DEC-059, R0-09, approved 2026-11-02) while the user has no collections. */
+export const NO_COLLECTIONS = 'No collections yet. Add a collection link or a GitHub organisation to list its sources here.';
+/** First run in a build with no default collection (DEC-059): replaces the hidden-collection note. */
+export const FIRST_RUN_NO_PRESET = 'Add game data from a GitHub repository or a collection link.';
+
+/** Your collections in a build with no default collection while the user has none of their own (DEC-059). */
+export function NoPresetCollections() {
+  return <><h3>Your collections</h3><p className="dts-none">{NO_COLLECTIONS}</p></>;
+}
+
+/** The collections part of Add game data: the default collection's supported sources and saved collections. With no default
+ *  collection in the build (DEC-059): no default section and no Show the default collection row; Your collections is always
+ *  there and starts with a note while it is empty. */
 export function AddDataCollections({ jobs, go, onOpenJobs }: { jobs: WorkspaceJobs; go: Go; onOpenJobs: () => void }) {
   const store = useFlowStore();
   const def = sourceCollections.default;
   const saved = store.saved.map(s => pageOf(s.id, store)).filter((p): p is CollectionPage => !!p);
+  if (store.noPreset) return saved.length ? <><h3>Your collections</h3>{saved.map(p => <EntryRow key={p.id} page={p} onOpen={() => go(`collection:${p.id}`)} />)}</> : <NoPresetCollections />;
   return <>
     {!store.hidden && <>
       <div className="dts-section-head"><h3>Default collection</h3><button className="dts-text-btn" onClick={() => go('collection:default')}>Show all {def.listings.filter(l => !l.archived).length}<ChevronRight size={13} /></button></div>
@@ -293,6 +308,29 @@ export function AddDataCollections({ jobs, go, onOpenJobs }: { jobs: WorkspaceJo
     {saved.length > 0 && <><h3>Your collections</h3>{saved.map(p => <EntryRow key={p.id} page={p} onOpen={() => go(`collection:${p.id}`)} />)}</>}
     {store.hidden && <button className="dtp-link-row" onClick={() => setFlowStore({ hidden: false })}><Layers3 size={16} /><span><strong>Show the default collection</strong><small>You hid it. It lists sources tested with this app.</small></span><ChevronRight size={15} /></button>}
   </>;
+}
+
+/** Gallery-only states of Add game data: the build's default collection (DEC-059) and a link to a kept version (DEC-060). */
+export function AddDataPreviewStates({ jobs, onOpenJobs }: { jobs: WorkspaceJobs; onOpenJobs: () => void }) {
+  const store = useFlowStore();
+  const reinstall = (fails: boolean) => { jobs.startReinstall(fails); onOpenJobs(); };
+  return <PreviewStates note="Default collection: a build-time setting, empty by default (DEC-059). Kept version: the repository link resolves to a version already kept on this device with every faction installed (DEC-060)."
+    items={[
+      { label: 'Default collection', active: !store.noPreset && !store.hidden, run: () => setFlowStore({ noPreset: false, hidden: false }) },
+      { label: 'Default hidden', active: !store.noPreset && store.hidden, run: () => setFlowStore({ noPreset: false, hidden: true }) },
+      { label: 'No default collection (build)', active: store.noPreset, run: () => setFlowStore({ noPreset: true }) },
+      { label: 'Link to a kept version', run: () => reinstall(false) },
+      { label: 'Kept version · reinstall fails', run: () => reinstall(true) },
+    ]} />;
+}
+
+/** The first-run cards' gallery control: the build with or without a default collection (DEC-059). */
+export function FirstRunPreviewStates() {
+  const store = useFlowStore();
+  return <PreviewStates items={[
+    { label: 'Default collection', active: !store.noPreset, run: () => setFlowStore({ noPreset: false }) },
+    { label: 'No default collection (build)', active: store.noPreset, run: () => setFlowStore({ noPreset: true }) },
+  ]} />;
 }
 
 type PageState = 'live' | 'loading' | 'cached' | 'failed' | 'empty';
