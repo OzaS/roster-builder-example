@@ -112,6 +112,8 @@ const workflowScreenIds = [
   "desktop-settings",
   "desktop-first-run",
   "desktop-menus",
+  "desktop-welcome-windows",
+  "desktop-editor-windows",
   "library",
   "library-v2",
   "library-filters",

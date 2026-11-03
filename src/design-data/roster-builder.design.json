@@ -1312,7 +1312,15 @@
         },
         {
           "id": "desktop-menus",
-          "label": "Menu bar · Application menus"
+          "label": "Menu bar · Application menus (macOS only)"
+        },
+        {
+          "id": "desktop-welcome-windows",
+          "label": "Windows · Welcome · Title bar row, no menu bar (RK-03)"
+        },
+        {
+          "id": "desktop-editor-windows",
+          "label": "Windows · Roster editor · Title bar row (RK-03)"
         },
         {
           "id": "desktop-lookup-legacy",
@@ -1360,7 +1368,9 @@
             "desktop-settings-scale",
             "desktop-settings-developer",
             "desktop-first-run",
-            "desktop-menus"
+            "desktop-menus",
+            "desktop-welcome-windows",
+            "desktop-editor-windows"
           ]
         },
         {
@@ -1417,6 +1427,7 @@
                   "desktop"
                 ],
                 "states": [
+                  "RK-03 (approved 2026-11-03): on Windows the row has no traffic lights (tabs start 12 px from the edge) and ends with the Windows caption buttons; see desktop.windows-titlebar",
                   "R0-02 (DEC-055): no inspector pane, so the editor's floating controls keep Toggle catalogue only; Toggle inspector, View › Show inspector and its key binding (Mod+Alt+B) are retired; the unit dialog's tabs use the curved pill style",
                   "welcome",
                   "editor without activity rail",
@@ -1452,7 +1463,9 @@
                   "desktop-tools",
                   "desktop-library",
                   "desktop-sources",
-                  "desktop-settings"
+                  "desktop-settings",
+                  "desktop-welcome-windows",
+                  "desktop-editor-windows"
                 ]
               },
               {"id": "desktop.top-row", "title": "Page Top Row (no page titles)", "level": "screen-composition", "status": "needs-review", "platforms": ["desktop"], "states": ["DEC-050: no page title rows; the rail and the hub tab show where you are; every page keeps a visually hidden h1 (Rosters, Lookup, Sources, Settings, Tools, Library; Welcome keeps its hero heading)", "DEC-050: list pages put their search in the top row, filling it, with the page's desktop buttons at its trailing end: Rosters (Import, New roster), Sources (Install from a file, Add game data); Lookup's search fills its row alone", "DEC-050: pages without search or actions have no top row: Welcome, Settings, Tools, Library", "DEC-050: desktop keeps its own buttons (outlined and filled, text beside the icon); tablet actions use platform icon buttons", "DEC-050: the roster editor's content header (force, points, validation) stays; the window chrome (menu bar, tab row, Jobs, points button, panel toggles) is unchanged"], "screens": ["desktop-welcome", "desktop-rosters", "desktop-lookup", "desktop-sources", "desktop-settings", "desktop-tools", "desktop-library", "desktop-first-run"]},
@@ -1690,9 +1703,11 @@
                 "level": "navigation",
                 "status": "ready-for-rn",
                 "platforms": ["desktop"],
-                "states": ["DEC-055: View has no Show inspector; Edit › Edit unit… (↩) opens the selected unit's dialog", "menus", "shortcuts from key bindings", "submenu", "disabled with reason", "Escape closes", "App DD18 (PR #86): native application menus route existing commands with binding-aware shortcuts and disabled reasons; Open recent can be cleared without deleting rosters. Close tab keeps the window; Duplicate, Remove and Find are editable. Native text Edit roles remain. The primary cost limit submenu and summary support presets/current/custom and Unlimited or named data fallback, with autosave and undo. Limits remain freely editable; configuration constraints remain rule errors. Above the configuration allowance only, the points button, summary and points line warn and name that allowance. Custom focuses/selects the input. Read-only/busy states disable edits. Differences: native macOS menu; non-Command keys show in labels there; Undo/Redo have no step description; Help/Report lack destinations and Install from file stays in Sources; the summary retains autosave instead of the gallery data row. Windows/Linux styling and native verification await their platform passes."],
-                "screens": ["desktop-menus"]
+                "states": [
+                  "RK-03 (approved 2026-11-03): the menu bar is macOS only. Windows has no menu bar, neither native nor in the window: every shortcut (Ctrl+N, Ctrl+K, Ctrl+Z …) keeps working and the command palette (Ctrl+K) reaches the menu actions. See desktop.windows-titlebar and the desktop-welcome-windows screen.","DEC-055: View has no Show inspector; Edit › Edit unit… (↩) opens the selected unit's dialog", "menus", "shortcuts from key bindings", "submenu", "disabled with reason", "Escape closes", "App DD18 (PR #86): native application menus route existing commands with binding-aware shortcuts and disabled reasons; Open recent can be cleared without deleting rosters. Close tab keeps the window; Duplicate, Remove and Find are editable. Native text Edit roles remain. The primary cost limit submenu and summary support presets/current/custom and Unlimited or named data fallback, with autosave and undo. Limits remain freely editable; configuration constraints remain rule errors. Above the configuration allowance only, the points button, summary and points line warn and name that allowance. Custom focuses/selects the input. Read-only/busy states disable edits. Differences: native macOS menu; non-Command keys show in labels there; Undo/Redo have no step description; Help/Report lack destinations and Install from file stays in Sources; the summary retains autosave instead of the gallery data row. Windows/Linux styling and native verification await their platform passes."],
+                "screens": ["desktop-menus", "desktop-welcome-windows"]
               },
+              {"id": "desktop.windows-titlebar", "title": "Windows Title Bar Row (no menu bar)", "level": "navigation", "status": "ready-for-rn", "platforms": ["desktop"], "states": ["RK-03 (approved 2026-11-03): one row, as on macOS: the app's tab row is the title bar; dragging its empty space moves the window, double-clicking it maximises or restores", "no menu bar on Windows (neither the native bar nor one in the window); shortcuts keep working and Ctrl+K opens the command palette, which reaches the actions", "tabs start about 12 px from the left edge: no macOS traffic-light gap", "Windows' own minimise / maximise / close sit at the far right of the row, after Jobs (and, in the editor, after the points button and Toggle catalogue): 46 px wide, the full height of the row, glyphs in the chrome text colour", "the caption buttons follow light and dark: transparent on the chrome, hover in the chrome hover tone; Close hovers in the Windows red with a white glyph", "key labels read Ctrl+N, Ctrl+K … on Windows (⌘ N, ⌘ K on macOS)", "macOS unchanged: traffic lights at the left, native application menu bar (desktop.menus)"], "screens": ["desktop-welcome-windows", "desktop-editor-windows"], "reactNative": {"component": "Electron BrowserWindow (Windows: titleBarStyle hidden + titleBarOverlay in the theme colours, no application menu) + the workspace tab row as the drag region", "behavior": "The tab row is -webkit-app-region: drag with its tabs, buttons and inputs as no-drag; titleBarOverlay colour and symbolColor follow the resolved theme and are updated when it changes; the row reserves the overlay width at its end; Menu.setApplicationMenu(null) on Windows while accelerators stay handled by the app's key bindings.", "accessibility": "The caption buttons are system controls (not in the app's tree); the tab row keeps its navigation landmark and every menu action stays reachable through the command palette and its shortcut."}},
               {
                 "id": "desktop.jobs",
                 "title": "Installs & Updates (Jobs)",

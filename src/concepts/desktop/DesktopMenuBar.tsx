@@ -4,7 +4,7 @@ import { defaultBindings, formatCombo } from './desktopKeys';
 import './desktop-menus.css';
 
 // macOS menu bar for the desktop app (Electron application menu). Shortcuts follow the default key
-// bindings; in the app they follow the user's bindings. Windows/Linux show the same menus in the window.
+// bindings; in the app they follow the user's bindings. RK-03: macOS only; Windows has no menu bar (shortcuts and Ctrl+K reach the actions).
 // DEC-055: View has no Show inspector (units edit in a dialog); Edit › Edit unit… (↩) opens the selected unit's dialog.
 
 type Item = { label: string; keys?: string; disabled?: string; submenu?: Item[] } | 'separator';
