@@ -80,3 +80,6 @@
 .tbd-swatch b { margin-left: 12px; color: var(--ux-ink); font-size: 14px }
 
 .tb-app button.tbc-add-system { align-self: flex-start; margin-top: 4px }
+
+/* DEC-060 (approved 2026-11-02): the reinstall offer's info block, toned like the phone's info notice. */
+.tbd-reinstall > svg { color: var(--ux-cool) }

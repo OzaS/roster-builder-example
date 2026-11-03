@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { AlertTriangle, ArrowDownToLine, Check, CheckCircle2, Github, Layers3, LibraryBig, LoaderCircle, Lock, Search, Trash2, Upload } from 'lucide-react';
+import { AlertTriangle, ArrowDownToLine, Check, CheckCircle2, Github, Info, Layers3, LibraryBig, LoaderCircle, Lock, Search, Trash2, Upload } from 'lucide-react';
+import { AppDialog } from '../ux/SourceJobs';
 import { FORCE_TYPES, type EditorUnit, type Force } from '../desktop/DesktopEditorFlows';
 import { flowStore, readLink, setFlowStore, titleCase, type AddPhase } from '../desktop/DesktopSourceFlows';
 import { githubRepositories, sourceCollections } from '../desktop/desktopData';
-import type { Job, WorkspaceJobs } from '../workspace/Jobs';
+import { reinstallTitle, type Job, type WorkspaceJobs } from '../workspace/Jobs';
 import type { Notify } from '../workspace/Toasts';
 import { TabletSheet } from './TabletSheet';
 import type { AppearanceImport, AppearanceOutcome, TabletSession } from './tabletSession';
@@ -49,6 +50,25 @@ function FactionPickerSheet({ job, onChoose, onLater, onCancelInstall }: { job: 
     <p className="tbs-note"><Layers3 size={16} /><span>Advanced installation is on. Turn it off in Settings to install every faction without asking.</span></p>
     <div className="tbs-actions"><button type="button" className="tbs-action tbd-danger" onClick={onCancelInstall}>Cancel install</button></div>
   </TabletSheet>;
+}
+
+/* ---------------------------------------------------------------- Reinstall a kept version */
+
+/** DEC-060 (approved 2026-11-02): the GitHub version picked is a kept version with every faction installed. In place of an
+ *  empty faction picker the install waits on this offer, with Advanced installation on or off. Cancel cancels the install;
+ *  Reinstall this version asks first (AppDialog). */
+function ReinstallSheet({ job, onReinstall, onCancel }: { job: Job; onReinstall: () => void; onCancel: () => void }) {
+  return <TabletSheet title={reinstallTitle(job)} cancelLabel="Cancel" onClose={onCancel} action={{ label: 'Reinstall this version', onClick: onReinstall }}>
+    <div className="tbs-note tbd-reinstall" role="status"><Info size={18} /><span><strong>This version is already on this device</strong><small>It's a kept version, so there is nothing new to install. You can reinstall it to make it the game data in use.</small></span></div>
+  </TabletSheet>;
+}
+
+/** The confirm before the reinstall: the app's own dialog (AppDialog), above the sheet. */
+function ReinstallConfirm({ job, onConfirm, onClose }: { job: Job; onConfirm: () => void; onClose: () => void }) {
+  const r = job.reinstall;
+  if (!r) return null;
+  return <AppDialog front title={`Reinstall ${job.name} ${r.version}?`} message={`${r.version} becomes the game data in use. The version in use now (${r.current}) stays on this device as a kept version. Your rosters don't change.`}
+    actions={[{ label: 'Cancel', run: onClose }, { label: 'Reinstall', tone: 'primary', run: onConfirm }]} />;
 }
 
 /* ---------------------------------------------------------------- Add a collection */
@@ -165,11 +185,14 @@ export function MoveUnitSheet({ unit, forces, units, from, onMove, onAddForce, o
 
 /** The session's window-covering sheets, shown by the shell above the rail and the page. */
 export function TabletSessionSheets({ session, notify }: { session: TabletSession; notify: Notify }) {
-  const { jobs, pickerJob, setPickerJob, setAddCollectionOpen, setSourceDetail, setJobsOpen, appearanceImport, setAppearanceImport, setLanguage, deleting, setDeleting, rosters, setRosters } = session;
+  const { jobs, pickerJob, setPickerJob, reinstalling, setReinstalling, setAddCollectionOpen, setSourceDetail, setJobsOpen, appearanceImport, setAppearanceImport, setLanguage, deleting, setDeleting, rosters, setRosters } = session;
   const picking = jobs.jobs.find(j => j.id === pickerJob && j.status === 'needs-you');
+  const confirming = jobs.jobs.find(j => j.id === reinstalling && j.status === 'needs-you');
   const doomed = deleting ? rosters.find(r => r.name === deleting) : undefined;
   return <>
-    {picking && <FactionPickerSheet job={picking} onLater={() => setPickerJob(null)} onCancelInstall={() => { setPickerJob(null); jobs.cancel(picking.id); }} onChoose={chosen => { setPickerJob(null); jobs.chooseFactions(picking.id, chosen); }} />}
+    {picking?.reinstall && <ReinstallSheet job={picking} onCancel={() => { setPickerJob(null); jobs.cancel(picking.id); }} onReinstall={() => setReinstalling(picking.id)} />}
+    {confirming && <ReinstallConfirm job={confirming} onClose={() => setReinstalling(null)} onConfirm={() => { setReinstalling(null); setPickerJob(null); jobs.reinstall(confirming.id); setJobsOpen(true); }} />}
+    {picking && !picking.reinstall && <FactionPickerSheet job={picking} onLater={() => setPickerJob(null)} onCancelInstall={() => { setPickerJob(null); jobs.cancel(picking.id); }} onChoose={chosen => { setPickerJob(null); jobs.chooseFactions(picking.id, chosen); }} />}
     {session.addCollectionOpen && <AddCollectionSheet jobs={jobs} notify={notify} go={setSourceDetail} onOpenJobs={() => setJobsOpen(true)} onClose={() => setAddCollectionOpen(false)} />}
     {appearanceImport && <AppearanceImportSheet value={appearanceImport} onChange={setAppearanceImport} onClose={() => setAppearanceImport(null)}
       onImported={kind => { if (kind === 'language') setLanguage('fr'); notify(kind === 'language' ? 'Language pack imported: Français' : 'Colour scheme imported: Slate'); }} />}

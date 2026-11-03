@@ -52,12 +52,12 @@ export function JobSteps({ steps }: { steps: JobStep[] }) {
   );
 }
 
-export function JobOutcomeNotice({ outcome, title, body }: { outcome: JobOutcome; title: string; body: string }) {
+export function JobOutcomeNotice({ outcome, title, body }: { outcome: JobOutcome; title: string; body?: string }) {
   const tone = outcome === "failed" ? "error" : outcome === "cancelled" ? "info" : "ok";
   return (
     <div className={`ux-job-notice ${tone}`} role="status">
       {outcome === "failed" ? <OctagonAlert size={18} /> : outcome === "cancelled" ? <Circle size={18} /> : <CircleCheck size={18} />}
-      <span><strong>{title}</strong><small>{body}</small></span>
+      <span><strong>{title}</strong>{body ? <small>{body}</small> : null}</span>
     </div>
   );
 }
@@ -157,7 +157,7 @@ export function JobModal({
     <section className={`ux-job-sheet ${inline ? "inline" : ""}`} role="dialog" aria-label={several ? `${others.length + 1} jobs` : title}>
       <span className="ux-sheet-grip" aria-hidden />
       <header className="ux-job-head">
-        {several ? <span><strong>{others.length + 1} jobs</strong><small>{overall}% overall</small></span> : <span><strong>{title}</strong><small>{subtitle}</small></span>}
+        {several ? <span><strong>{others.length + 1} jobs</strong><small>{overall}% overall</small></span> : <span><strong>{title}</strong>{subtitle ? <small>{subtitle}</small> : null}</span>}
         {outcome ? <button type="button" className="ux-icon-btn" aria-label="Close"><X size={17} /></button> : <button type="button" className="ux-job-hide" aria-label="Hide. The work continues."><ChevronDown size={16} />Hide</button>}
       </header>
       {several ? (
@@ -356,9 +356,58 @@ export function FactionPicker({ initial = ["Northern Realms", "Tidewardens"] }: 
   );
 }
 
+// ---------------------------------------------------------------- reinstall a kept version (DEC-060)
+
+/**
+ * DEC-060 (approved 2026-11-02): the GitHub version picked is already on the device as a kept version with every faction
+ * installed. With Advanced installation on or off, the job pauses on this offer instead of an empty "Choose factions 0 of 0"
+ * picker or a silent "nothing new". Cancel cancels the job; Reinstall this version asks first (AppDialog), then switches to
+ * that kept version. The version in use now stays as a kept version; rosters don't change. Names are placeholders (DEC-001).
+ */
+export const REINSTALL = { name: "Example System Three", repo: "example-org/example-system-three", version: "v1.4", current: "v1.6" };
+
+/** The info block of the offer, in the job sheet where the faction picker would be. */
+export function ReinstallNotice() {
+  return (
+    <div className="ux-job-notice info" role="status">
+      <Info size={18} />
+      <span><strong>This version is already on this device</strong><small>It's a kept version, so there is nothing new to install. You can reinstall it to make it the game data in use.</small></span>
+    </div>
+  );
+}
+
+/** The offer's footer: Cancel (cancels the job) and the primary Reinstall this version. */
+export function ReinstallActions({ onCancel, onReinstall }: { onCancel?: () => void; onReinstall?: () => void }) {
+  return (
+    <>
+      <button type="button" className="ux-job-btn secondary" onClick={onCancel}>Cancel</button>
+      <button type="button" className="ux-job-btn primary" onClick={onReinstall}>Reinstall this version</button>
+    </>
+  );
+}
+
+/** The job sheet paused on the offer: header "{name} · {version}", the info block and the two actions. */
+export function ReinstallSheet({ inline = false, onReinstall }: { inline?: boolean; onReinstall?: () => void }) {
+  return <JobModal inline={inline} title={`${REINSTALL.name} · ${REINSTALL.version}`} subtitle="" steps={[]} notice={<ReinstallNotice />} footer={<ReinstallActions onReinstall={onReinstall} />}>{false}</JobModal>;
+}
+
+/** Confirmation before the reinstall, in the app's own dialog (AppDialog). */
+export function ReinstallConfirmDialog({ inline = false, onCancel, onReinstall }: { inline?: boolean; onCancel?: () => void; onReinstall?: () => void }) {
+  return (
+    <AppDialog inline={inline} front={!inline} title={`Reinstall ${REINSTALL.name} ${REINSTALL.version}?`}
+      message={`${REINSTALL.version} becomes the game data in use. The version in use now (${REINSTALL.current}) stays on this device as a kept version. Your rosters don't change.`}
+      actions={[{ label: "Cancel", run: onCancel }, { label: "Reinstall", tone: "primary", run: onReinstall }]} />
+  );
+}
+
+/** After the confirmed reinstall: the existing done state. */
+export const REINSTALL_DONE = `${REINSTALL.name} ${REINSTALL.version} is in use.`;
+/** A failed reinstall: the existing failed state with the error; the previous version stays in use. Sample error text. */
+export const REINSTALL_FAILED = { title: `Could not reinstall ${REINSTALL.name} ${REINSTALL.version}`, body: `The kept version could not be read: a data file is missing. ${REINSTALL.current} stays in use.` };
+
 // ---------------------------------------------------------------- gallery screen: install job
 
-type InstallPreview = "running" | "hidden" | "several" | "several-hidden" | "mobile-data" | "wifi" | "background" | "choose" | "choose-hidden" | "done" | "updated" | "failed" | "cancelled" | "toasts" | "local" | "local-done" | "local-failed";
+type InstallPreview = "running" | "hidden" | "several" | "several-hidden" | "mobile-data" | "wifi" | "background" | "choose" | "choose-hidden" | "done" | "updated" | "failed" | "cancelled" | "toasts" | "local" | "local-done" | "local-failed" | "reinstall" | "reinstall-confirm" | "reinstall-done" | "reinstall-failed";
 
 const INSTALL_PREVIEWS: Array<[InstallPreview, string]> = [
   ["running", "Running"],
@@ -378,6 +427,10 @@ const INSTALL_PREVIEWS: Array<[InstallPreview, string]> = [
   ["local", "From a file"],
   ["local-done", "From a file · done"],
   ["local-failed", "From a file · errors"],
+  ["reinstall", "Kept version"],
+  ["reinstall-confirm", "Kept version · confirm"],
+  ["reinstall-done", "Kept version · done"],
+  ["reinstall-failed", "Kept version · failed"],
 ];
 
 export function PreviewState<T extends string>({ label = "Preview state", value, options, onChange }: { label?: string; value: T; options: Array<[T, string]>; onChange: (value: T) => void }) {
@@ -471,7 +524,26 @@ export function InstallJobScreen({ props }: { props: ConceptProps }) {
   // Download; Cancel discards everything. Ended, it offers no Try again (the picked files are gone).
   const localTitle = `Installing ${LOCAL_FILE.label}`;
   const localSubtitle = `From a file · ${LOCAL_FILE.files} files · ${LOCAL_FILE.size}`;
-  if (preview === "local") {
+  // DEC-060: the GitHub version picked is a kept version with every faction installed (Advanced installation on or off).
+  const reinstallTitle = `${REINSTALL.name} · ${REINSTALL.version}`;
+  if (preview === "reinstall" || preview === "reinstall-confirm") {
+    modal = (
+      <>
+        <ReinstallSheet onReinstall={() => setPreview("reinstall-confirm")} />
+        {preview === "reinstall-confirm" ? <ReinstallConfirmDialog onCancel={() => setPreview("reinstall")} onReinstall={() => setPreview("reinstall-done")} /> : null}
+      </>
+    );
+  } else if (preview === "reinstall-done") {
+    modal = (
+      <JobModal title={reinstallTitle} subtitle="" steps={[]} outcome="done" notice={<JobOutcomeNotice outcome="done" title={REINSTALL_DONE} />}
+        footer={<><button type="button" className="ux-job-btn secondary">View</button><button type="button" className="ux-job-btn primary">Done</button></>}>{false}</JobModal>
+    );
+  } else if (preview === "reinstall-failed") {
+    modal = (
+      <JobModal title={reinstallTitle} subtitle="" steps={[]} outcome="failed" notice={<JobOutcomeNotice outcome="failed" title={REINSTALL_FAILED.title} body={REINSTALL_FAILED.body} />}
+        footer={<><button type="button" className="ux-job-btn secondary">Close</button><button type="button" className="ux-job-btn primary">Try again</button></>}>{false}</JobModal>
+    );
+  } else if (preview === "local") {
     modal = <JobModal title={localTitle} subtitle={localSubtitle} percent={8} stepLabel="Step 1 of 4" steps={localSteps("files")} notify />;
   } else if (preview === "local-done") {
     modal = (
@@ -898,17 +970,17 @@ export function OlderVersionRow({ commit = VERSION_NEWEST.commit }: { commit?: s
  * Confirm: Cancel (secondary) beside the action, which is red when it destroys something. Menu: a vertical list of actions and a Cancel row.
  * Built in battle-augur apps/mobile/src/ds/dialog.
  */
-export function AppDialog({ title, message, actions, layout = "row", inline = false }: { title: string; message?: string; actions: Array<{ label: string; tone?: "primary" | "destructive" | "secondary"; icon?: ReactNode }>; layout?: "row" | "column"; inline?: boolean }) {
+export function AppDialog({ title, message, actions, layout = "row", inline = false, front = false }: { title: string; message?: string; actions: Array<{ label: string; tone?: "primary" | "destructive" | "secondary"; icon?: ReactNode; run?: () => void }>; layout?: "row" | "column"; inline?: boolean; /** Above the gallery preview control (its actions lead on to the next state). */ front?: boolean }) {
   const dialog = (
     <div className="ux-dialog" role="alertdialog" aria-modal="true" aria-label={title}>
       <strong>{title}</strong>
       {message ? <small>{message}</small> : null}
       <div className={`ux-dialog-actions ${layout}`}>
-        {actions.map((a) => <button key={a.label} type="button" className={`ux-dialog-btn ${a.tone ?? "secondary"}`}>{a.icon}{a.label}</button>)}
+        {actions.map((a) => <button key={a.label} type="button" className={`ux-dialog-btn ${a.tone ?? "secondary"}`} onClick={a.run}>{a.icon}{a.label}</button>)}
       </div>
     </div>
   );
-  return inline ? <div className="ux-dialog-inline">{dialog}</div> : <div className="ux-job-scrim ux-alert-scrim">{dialog}</div>;
+  return inline ? <div className="ux-dialog-inline">{dialog}</div> : <div className={`ux-job-scrim ux-alert-scrim ${front ? "front" : ""}`}>{dialog}</div>;
 }
 
 /** Confirmation before deleting a kept version: the space it frees, and that it cannot be undone. */
@@ -1105,15 +1177,45 @@ export function DefaultListingRows({ onOpen }: { onOpen?: () => void }) {
   );
 }
 
-export function UserCollectionRows({ onOpen, onAdd, defaultHidden = false, onShowDefault }: { onOpen?: () => void; onAdd?: () => void; defaultHidden?: boolean; onShowDefault?: () => void }) {
+/**
+ * `saved={false}`: the user has no collections or libraries of their own. In a build with no default collection
+ * (DEC-059, R0-09, approved 2026-11-02) the group then starts with a note; there is no Show the default collection row.
+ */
+export function UserCollectionRows({ onOpen, onAdd, defaultHidden = false, onShowDefault, saved = true }: { onOpen?: () => void; onAdd?: () => void; defaultHidden?: boolean; onShowDefault?: () => void; saved?: boolean }) {
   return (
     <div className="ux-src-group">
-      <button type="button" className="ux-col-nav" onClick={onOpen}><FolderGit2 size={17} /><span><strong>Club picks</strong><small>6 sources · collection</small></span><ChevronRight size={16} /></button>
-      {/* No repository count on a library row: it would cost a GitHub API request per row (plan 2C). */}
-      <button type="button" className="ux-col-nav" onClick={onOpen}><Globe size={17} /><span><strong>community-data</strong><small>GitHub organisation or user</small></span><ChevronRight size={16} /></button>
+      {saved ? (
+        <>
+          <button type="button" className="ux-col-nav" onClick={onOpen}><FolderGit2 size={17} /><span><strong>Club picks</strong><small>6 sources · collection</small></span><ChevronRight size={16} /></button>
+          {/* No repository count on a library row: it would cost a GitHub API request per row (plan 2C). */}
+          <button type="button" className="ux-col-nav" onClick={onOpen}><Globe size={17} /><span><strong>community-data</strong><small>GitHub organisation or user</small></span><ChevronRight size={16} /></button>
+        </>
+      ) : <NoCollectionsNote />}
       {defaultHidden ? <ShowDefaultCollectionRow onShow={onShowDefault} /> : null}
       <button type="button" className="ux-col-nav add" onClick={onAdd}><Plus size={17} /><span><strong>Add a collection or library</strong><small>A collection file or a GitHub organisation</small></span><ChevronRight size={16} /></button>
     </div>
+  );
+}
+
+/** DEC-059 (R0-09): no default collection in this build and no collections of the user's own. */
+export function NoCollectionsNote() {
+  return <p className="ux-col-none">No collections yet. Add a collection link or a GitHub organisation to list its sources here.</p>;
+}
+
+/**
+ * First run in a build with no default collection (DEC-059, R0-09): the Home data card has nothing to fetch, so it points
+ * to adding a link. Buttons as before: Add game data and Open a file.
+ */
+export function FirstRunDataCard({ onAdd }: { onAdd?: () => void }) {
+  return (
+    <section className="ux-src-card ux-first-run-card" aria-label="Get game data">
+      <header><Database size={18} /><span><strong>Get game data</strong></span></header>
+      <small className="ux-col-desc">Add game data from a GitHub repository or a collection link.</small>
+      <div className="ux-first-run-actions">
+        <button type="button" className="ux-job-btn primary" onClick={onAdd}><Plus size={15} />Add game data</button>
+        <button type="button" className="ux-job-btn secondary"><FolderOpen size={15} />Open a file</button>
+      </div>
+    </section>
   );
 }
 
@@ -1158,22 +1260,24 @@ export function AddCollectionSheet({ state, inline = false }: { state: AddSheetS
   return inline ? sheet : <div className="ux-job-scrim">{sheet}</div>;
 }
 
-type AddPreview = "collections" | "hidden" | "add" | "library" | "invalid" | "duplicate" | "repository";
+type AddPreview = "collections" | "hidden" | "no-preset" | "add" | "library" | "invalid" | "duplicate" | "repository";
 
 export function AddGameDataScreen({ props }: { props: ConceptProps }) {
   const [preview, setPreview] = useState<AddPreview>("collections");
   const install = () => props.onNavigate("install-job");
   const hidden = preview === "hidden";
-  const sheet: AddSheetState | undefined = preview === "add" ? "found" : preview === "collections" || preview === "hidden" ? undefined : preview;
+  // DEC-059 (R0-09): a build with no default collection and no collections of the user's own yet.
+  const noPreset = preview === "no-preset";
+  const sheet: AddSheetState | undefined = preview === "add" ? "found" : preview === "collections" || preview === "hidden" || noPreset ? undefined : preview;
   return (
     <>
       <SourceScreenHeader props={props} title="Add game data" subtitle="Collections, a link, or GitHub search" />
       <div className="ux-wb-home-body ux-add-source-body ux-src-body">
-        <PreviewState value={preview} options={[["collections", "Collections"], ["hidden", "Default hidden"], ["add", "Add collection"], ["library", "Add library"], ["invalid", "Invalid link"], ["duplicate", "Already added"], ["repository", "Repository link"]]} onChange={setPreview} />
+        <PreviewState value={preview} options={[["collections", "Collections"], ["hidden", "Default hidden"], ["no-preset", "No default collection"], ["add", "Add collection"], ["library", "Add library"], ["invalid", "Invalid link"], ["duplicate", "Already added"], ["repository", "Repository link"]]} onChange={setPreview} />
         <div className="ux-result-label">Collections</div>
-        {hidden ? null : <DefaultCollectionCard onInstall={install} onShowAll={() => props.onNavigate("collection")} />}
-        {hidden ? null : <DefaultListingRows onOpen={() => props.onNavigate("collection")} />}
-        <UserCollectionRows onOpen={() => props.onNavigate("collection")} onAdd={() => setPreview("add")} defaultHidden={hidden} onShowDefault={() => setPreview("collections")} />
+        {hidden || noPreset ? null : <DefaultCollectionCard onInstall={install} onShowAll={() => props.onNavigate("collection")} />}
+        {hidden || noPreset ? null : <DefaultListingRows onOpen={() => props.onNavigate("collection")} />}
+        <UserCollectionRows onOpen={() => props.onNavigate("collection")} onAdd={() => setPreview("add")} defaultHidden={hidden} onShowDefault={() => setPreview("collections")} saved={!noPreset} />
         <div className="ux-result-label">Repository</div>
         <section className="ux-source-method">
           <div className="ux-source-method-heading"><span className="ux-setting-icon"><FileInput size={18} /></span><span><strong>Have a link?</strong><small>Any GitHub repository with roster data files (.gst and .cat, or their JSON form).</small></span></div>

@@ -46,6 +46,7 @@ const stateRoutes: Record<string, TabletRoute> = {
   'tablet-sources-collection': { page: 'sources', state: 'collection' },
   'tablet-sources-github': { page: 'sources', state: 'github' },
   'tablet-sources-add-collection': { page: 'sources', state: 'add-collection' },
+  'tablet-sources-reinstall': { page: 'sources', state: 'reinstall' },
   'tablet-settings-rosters': { page: 'settings', state: 'rosters' },
   'tablet-settings-game-data': { page: 'settings', state: 'game-data' },
   'tablet-settings-shortcuts': { page: 'settings', state: 'keys' },
@@ -67,7 +68,7 @@ export function tabletRoute(screen: string | undefined): TabletRoute | undefined
   return isTabletPage(page) ? { page, state: '' } : undefined;
 }
 
-const sourceDetailOf: Record<string, string> = { add: 'add', installing: 'add', 'choose-factions': 'add', 'update-report': 'report:system-two', collection: 'collection:default', github: 'github', 'add-collection': 'add' };
+const sourceDetailOf: Record<string, string> = { add: 'add', installing: 'add', 'choose-factions': 'add', 'update-report': 'report:system-two', collection: 'collection:default', github: 'github', 'add-collection': 'add', reinstall: 'add' };
 const settingsSectionOf: Record<string, string> = { rosters: 'rosters', 'game-data': 'data', keys: 'keys', 'appearance-import': 'appearance', advanced: 'advanced' };
 /** The first install of the 'installing' and 'choose-factions' states: a source with six factions. */
 const demoInstall = collectionSources[2];
@@ -82,6 +83,11 @@ export function useTabletSession({ route, notify, light, onViewSource }: { route
   const [settingsSection, setSettingsSection] = useState<string | undefined>(route.page === 'settings' ? settingsSectionOf[state] : undefined);
   const viewSource = useCallback((id: string) => { setSourceDetail(id); setJobsOpen(false); onViewSource(); }, [onViewSource]);
   const jobs = useWorkspaceJobs(state === 'first-run' ? [] : state === 'many-systems' ? manySources : installedSources, notify, viewSource, advancedInstall);
+  // DEC-060: a repository link that resolves to a kept version with every faction installed waits on the reinstall offer.
+  useEffect(() => {
+    if (state === 'reinstall') jobs.startReinstall();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once, when the state screen opens
+  }, []);
   useEffect(() => {
     if (state !== 'installing' && state !== 'choose-factions') return;
     jobs.startInstall(demoInstall);
@@ -97,22 +103,24 @@ export function useTabletSession({ route, notify, light, onViewSource }: { route
   const waiting = jobs.jobs.find(j => j.status === 'needs-you')?.id;
   useEffect(() => { if (waiting && !asked.current.has(waiting)) { asked.current.add(waiting); setPickerJob(waiting); } }, [waiting]);
   const [addCollectionOpen, setAddCollectionOpen] = useState(state === 'add-collection');
+  /** DEC-060: the job whose Reinstall this version waits for the confirm dialog. */
+  const [reinstalling, setReinstalling] = useState<string | null>(null);
   const [appearanceImport, setAppearanceImport] = useState<AppearanceImport | null>(state === 'appearance-import' ? { kind: 'scheme', outcome: 'scheme' } : null);
   const [language, setLanguage] = useState('en');
   const [deleting, setDeleting] = useState<string | null>(state === 'confirm-delete' ? rosters[0]?.name ?? null : null);
   return { state, light, rosters, setRosters, advancedInstall, setAdvancedInstall, jobs, jobsOpen, setJobsOpen, sourceDetail, setSourceDetail, settingsSection, setSettingsSection, viewSource, hasData,
-    pickerJob, setPickerJob, addCollectionOpen, setAddCollectionOpen, appearanceImport, setAppearanceImport, language, setLanguage, deleting, setDeleting };
+    pickerJob, setPickerJob, reinstalling, setReinstalling, addCollectionOpen, setAddCollectionOpen, appearanceImport, setAppearanceImport, language, setLanguage, deleting, setDeleting };
 }
 export type TabletSession = ReturnType<typeof useTabletSession>;
 export type SetState<T> = Dispatch<SetStateAction<T>>;
 
 /** Job details requested from Home or Sources in-page controls. Faction picking appears only with Advanced installation on. */
 export function TabletJobsPanel({ session }: { session: TabletSession }) {
-  const { jobs, jobsOpen, setJobsOpen, viewSource, setPickerJob, light } = session;
+  const { jobs, jobsOpen, setJobsOpen, viewSource, setPickerJob, setReinstalling, light } = session;
   if (!jobsOpen || !jobs.jobs.length) return null;
   const live = (status: string) => status === 'running' || status === 'needs-you';
   return <div className={`dt-app tb-shim tb-jobs ${light ? 'light' : ''}`}>
-    <JobsPanel jobs={jobs.jobs} onChoose={jobs.chooseFactions} onPick={setPickerJob} onCancel={jobs.cancel} onHide={() => setJobsOpen(false)} onViewSource={viewSource}
+    <JobsPanel jobs={jobs.jobs} onChoose={jobs.chooseFactions} onPick={setPickerJob} onCancel={jobs.cancel} onReinstall={setReinstalling} onHide={() => setJobsOpen(false)} onViewSource={viewSource}
       onClear={() => { jobs.clearEnded(); if (!jobs.jobs.some(j => live(j.status))) setJobsOpen(false); }} />
   </div>;
 }

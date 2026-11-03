@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { BookMarked, Check, CheckSquare, FileUp, FolderOpen, Hammer, Layers3, Plus, Search } from 'lucide-react';
+import { BookMarked, Check, CheckSquare, ChevronRight, FileUp, FolderOpen, Hammer, Info, Layers3, Plus, Search } from 'lucide-react';
+import { FIRST_RUN_NO_PRESET, NoPresetCollections } from '../desktop/DesktopSourceFlows';
 import { LibrarySwitch } from '../../gallery/LibrarySwitch';
 import { ComingSoonCard } from '../ux/AppExtras';
 import { TabletControls } from './TabletControls';
@@ -9,7 +10,7 @@ import { TabletExperienceControls } from './tabletExperience';
 import { TabletDeviceFrame } from './TabletDeviceFrame';
 import { TabletRail } from './TabletRail';
 import { TabletResizer, type PanePresets } from './TabletResizer';
-import { EmptyState, InstallRow, Row } from './TabletPieces';
+import { EmptyState, InstallRow, Row, WorkspaceScope } from './TabletPieces';
 import { Chip as MobileChip } from '../ux/uxShared';
 import { FactsGrid, GroupHeader, GroupToggle, RosterFilterBar, StatusTile } from './TabletPages';
 import type { Job } from '../workspace/Jobs';
@@ -24,6 +25,21 @@ import './tablet.css';
 
 const demoJob = (status: Job['status'], progress: number): Job => ({ id: 'demo', kind: 'install', sourceId: 'demo', name: 'Example System Three', size: '22.4 MB', factions: [], chosen: [], status, steps: [{ label: 'Download', state: status === 'needs-you' ? 'needs-you' : 'active', progress }] });
 const noop = () => {};
+
+/** DEC-059 (R0-09, approved 2026-11-02): a build with no default collection. Home's first-run card and the collections part
+ *  of Add game data, as static samples; live: the Preview states of Home (first run) and Sources › Add game data. */
+function NoPresetDemo() {
+  return <div className="tb-el-frames">
+    <div className="tb-app ux-screen dark tb-el-card"><section className="tb-card" aria-label="Start with game data, no default collection">
+      <span className="ux-result-label">Get started</span>
+      <div className="tb-card-head"><h2 className="tb-card-title">Start with game data</h2><p className="tb-body tb-muted">Rosters are built from a game system's data. Install one; it stays available offline.</p></div>
+      <p className="tb-note"><Info size={15} />{FIRST_RUN_NO_PRESET}</p>
+      <Row selected={false} mark={<FolderOpen size={20} />} title="Install from a file or a link" sub="An archive, data files, a repository link or GitHub search" end={<ChevronRight size={17} />} onClick={noop} />
+    </section></div>
+    <div className="tb-app ux-screen dark tb-el-card"><div className="tb-detail-title"><span><h2>Add game data</h2><small>Install from a collection, a repository link, or GitHub search</small></span></div>
+      <WorkspaceScope light={false}><div className="tb-flow"><NoPresetCollections /></div></WorkspaceScope></div>
+  </div>;
+}
 const demoPane: PanePresets = { min: 240, max: 420, narrow: 248, initial: 300, wide: 400 };
 
 /** The pane resizer between two sample panes; the touch one shows its press-and-hold menu. */
@@ -224,6 +240,11 @@ export function TabletElements() {
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-create" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-portrait"><TabletWorkbench workflowScreen="tablet-create-review" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="split"><TabletWorkbench workflowScreen="tablet-create" /></TabletDeviceFrame></div>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-sources-choose-factions" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-portrait"><TabletWorkbench workflowScreen="tablet-sources-add-collection" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="split"><TabletWorkbench workflowScreen="tablet-sources-add-collection" /></TabletDeviceFrame></div>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-portrait"><TabletWorkbench workflowScreen="tablet-settings-appearance-import" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-editor-move-unit" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="split"><TabletWorkbench workflowScreen="tablet-confirm-delete" /></TabletDeviceFrame></div>
+      <h2>No default collection (DEC-059 · R0-09) · reinstall a kept version (DEC-060) · approved 2026-11-02</h2>
+      <p>A build with no default collection fetches nothing. Home's first-run card replaces the hidden-collection note with “{FIRST_RUN_NO_PRESET}” (its way forward doesn't change). Add game data has no default collection and no Show the default collection row; Your collections is always there and, while the user has none, starts with the note. The repository link and Search GitHub don't change. Live: Preview states on Home (first run) and Sources › Add game data.</p>
+      <NoPresetDemo />
+      <p>A GitHub version already kept on this device with every faction installed pauses the install on the reinstall offer (Advanced installation on or off) instead of an empty faction picker: a form sheet with Cancel (cancels the install), “{'{name}'} · {'{version}'}” and Reinstall this version. It asks first in the app dialog; confirmed, that version is in use and the one in use before stays kept (the jobs popover shows the done state); a failure shows the error and the previous version stays in use. Screen: Sources · Reinstall a kept version; Sources › Add game data › Preview states › Kept version · reinstall fails.</p>
+      <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-sources-reinstall" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="split"><TabletWorkbench workflowScreen="tablet-sources-reinstall" /></TabletDeviceFrame></div>
       <h2>Framed compositions · the selected device and input mode</h2>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width"><TabletWorkbench workflowScreen="tablet-rosters" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="split"><TabletWorkbench workflowScreen="tablet-lookup" /></TabletDeviceFrame><TabletDeviceFrame fit="width"><TabletWorkbench workflowScreen="tablet-sources-choose-factions" /></TabletDeviceFrame></div>
     </div>

@@ -400,3 +400,13 @@ span.ux-src-status { cursor: default; }
 .ux-src-status-demo > span { display: grid; justify-items: center; gap: 2px; width: 84px; text-align: center; }
 .ux-src-status-demo small { color: var(--ux-muted); font-size: 11px; line-height: 1.25; }
 .ux-src-caption-demo { padding-top: 4px; }
+
+/* DEC-059 (R0-09, approved 2026-11-02): a build with no default collection. The user's group starts with a note while
+   they have no collections of their own; the first-run data card points to adding a link. */
+.ux-col-none { margin: 0; padding: 12px 13px; color: var(--ux-muted); font-size: 12.5px; line-height: 1.45; }
+.ux-col-none + .ux-col-nav { border-top: 1px solid var(--ux-line); }
+.ux-first-run-card > header > svg:first-child { color: var(--ux-accent-2); }
+.ux-first-run-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.ux-first-run-actions .ux-job-btn { min-height: 38px; }
+/* A confirm whose actions lead to the next preview state sits above the gallery preview control. */
+.ux-alert-scrim.front { z-index: 31; }

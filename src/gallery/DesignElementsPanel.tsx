@@ -19,7 +19,7 @@ import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, T
 import { BudgetMeter, Chip, ExpandableBudget, RosterMoreMenu, RosterShareButton, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
 import { ComingSoonCard, DeveloperOptionsPreview } from "../concepts/ux/AppExtras";
-import { ActionMenuDialog, ReopenRosterSetting, AddCollectionSheet, LOCAL_ERRORS, LOCAL_FILE, LOCAL_SOURCE, LocalImportChoiceDialog, LocalImportError, LocalImportRow, LocalInterruptedNotice, LocalRefusedNotice, LocalSourceNote, LocalSourceRows, localSteps, AdvancedInstallSetting, AppDialog, AutoUpdateChecksSetting, FocusCatalogueSearchSetting, SeparateAllSetting, AdvancedSettingsRows, ImportReportGroups, CollectionMenuDialog, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RememberSectionsSetting, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceStatusAction, SourceUpdateCard, SourceVersions, SourcesNavRow, TaggedRosterRows, UpdateAvatarButton, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
+import { ActionMenuDialog, ReopenRosterSetting, AddCollectionSheet, LOCAL_ERRORS, LOCAL_FILE, LOCAL_SOURCE, LocalImportChoiceDialog, LocalImportError, LocalImportRow, LocalInterruptedNotice, LocalRefusedNotice, LocalSourceNote, LocalSourceRows, localSteps, AdvancedInstallSetting, AppDialog, AutoUpdateChecksSetting, FocusCatalogueSearchSetting, SeparateAllSetting, AdvancedSettingsRows, ImportReportGroups, CollectionMenuDialog, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, FirstRunDataCard, ReinstallSheet, ReinstallConfirmDialog, REINSTALL_DONE, REINSTALL_FAILED, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RememberSectionsSetting, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceStatusAction, SourceUpdateCard, SourceVersions, SourcesNavRow, TaggedRosterRows, UpdateAvatarButton, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
 
 type Props = {
   concept: GalleryConcept;
@@ -715,6 +715,14 @@ function WorkbenchElements({
         </section>
       </ElementSection>
 
+      <ElementSection title="No Default Collection">
+        <small className="ux-elements-note">DEC-059 (R0-09, approved 2026-11-02): a build with no default collection. Add game data has no default card, no default listings and no Show the default collection row. While the user has no collections of their own, the Collections group starts with this note, then Add a collection or library; the repository link field and Search GitHub don't change. Nothing is fetched.</small>
+        <div className="ux-result-label">Collections</div>
+        <UserCollectionRows saved={false} />
+        <small className="ux-elements-note">First run (Home data card on phone and tablet): the note replaces "The default collection is hidden. Find other sources in Add game data."; the buttons don't change.</small>
+        <FirstRunDataCard />
+      </ElementSection>
+
       <ElementSection title="Collection Page">
         <div className="ux-source-list ux-managed-source-list ux-src-list">
           {DEFAULT_COLLECTION.map((entry) => <CollectionSourceRow key={entry.repo} entry={entry} />)}
@@ -815,6 +823,17 @@ function WorkbenchElements({
 
       <ElementSection title="Faction Picker">
         <FactionPicker />
+      </ElementSection>
+
+      <ElementSection title="Reinstall A Kept Version">
+        <small className="ux-elements-note">DEC-060 (approved 2026-11-02): the GitHub version picked is already on the device as a kept version with every faction installed. With Advanced installation on or off, the job sheet shows this offer instead of an empty "Choose factions 0 of 0" picker. Cancel cancels the job. Reinstall this version asks first; confirmed, that kept version becomes the game data in use and the version in use now stays as a kept version.</small>
+        <JobPill needsYou label="Reinstall this version?" />
+        <p className="ux-elements-note">Waiting for you: reinstall this version</p>
+        <ReinstallSheet inline />
+        <ReinstallConfirmDialog inline />
+        <JobOutcomeNotice outcome="done" title={REINSTALL_DONE} />
+        <JobOutcomeNotice outcome="failed" title={REINSTALL_FAILED.title} body={REINSTALL_FAILED.body} />
+        <small className="ux-elements-note">After the reinstall: the job's done state. If it fails: the job's failed state with the error, and the previous version stays in use. Rosters don't change either way.</small>
       </ElementSection>
 
       <ElementSection title="Background Job Modal">

@@ -12,7 +12,7 @@ import type { Notify } from '../workspace/Toasts';
 import './desktop-pages.css';
 import './desktop-gaps.css';
 import { ExportDialog, primaryForce, specialRoster, type ExportRoster } from './DesktopEditorFlows';
-import { AddCollectionDialog, AddDataCollections, CollectionView, GitHubSearchView, LastUpdateCard, LastUpdateStates, SourceStatus, UpdateReportView, flowSourceId, isAddFlow, sourceStatusText, useRosterChecks, type SourceStatusKind } from './DesktopSourceFlows';
+import { AddCollectionDialog, AddDataCollections, AddDataPreviewStates, CollectionView, FIRST_RUN_NO_PRESET, FirstRunPreviewStates, useFlowStore, GitHubSearchView, LastUpdateCard, LastUpdateStates, SourceStatus, UpdateReportView, flowSourceId, isAddFlow, sourceStatusText, useRosterChecks, type SourceStatusKind } from './DesktopSourceFlows';
 
 
 const statusChip = (r: RosterSummary) => r.status === 'issues' ? <Chip tone="warn"><AlertTriangle size={11} />{r.issues} {r.issues === 1 ? 'issue' : 'issues'}</Chip>
@@ -191,6 +191,7 @@ export function DesktopSources({ notify, jobs, selectedId, onSelect, onOpenJobs,
         <form className="dtp-inline-form" onSubmit={e => { e.preventDefault(); notify(link ? 'Looking up the repository…' : 'Paste a repository link first'); }}><label className="dtp-search"><Link2 size={15} /><input placeholder="https://github.com/owner/repository" aria-label="Repository link" value={link} onChange={e => setLink(e.target.value)} /></label><button className="dtp-btn" type="submit">Continue</button></form>
         <button className="dtp-link-row" onClick={() => setSelectedId('github')}><Github size={16} /><span><strong>Search GitHub</strong><small>Find data repositories by name</small></span><ChevronRight size={15} /></button>
         <button className="dtp-link-row" onClick={() => setAddingCollection(true)}><Plus size={16} /><span><strong>Add a collection or library</strong><small>Lists of sources kept by the community</small></span><ChevronRight size={15} /></button>
+        <AddDataPreviewStates jobs={jobs} onOpenJobs={onOpenJobs} />
       </section> : selectedId === 'github' ? <GitHubSearchView {...flow} />
         : selectedId.startsWith('collection:') ? <CollectionView key={selectedId} pageId={selectedId.slice(11)} {...flow} />
           : selectedId.startsWith('report:') ? <UpdateReportView key={selectedId} sourceId={flowSourceId(selectedId)} onOpenRoster={onOpenRoster} {...flow} />
@@ -371,17 +372,20 @@ function KeyBindingsEditor({ bindings, onBindings }: { bindings: KeyBindings; on
 
 /** Right side of Welcome while there is no game data, or data but no rosters yet. */
 export function WelcomeStart({ jobs, onCreate, onImport, onAddData, onOpenJobs }: { jobs: WorkspaceJobs; onCreate: () => void; onImport: () => void; onAddData: () => void; onOpenJobs: () => void }) {
+  // DEC-059 (R0-09): a build with no default collection fetches nothing on first run; the note points to adding a link.
+  const { noPreset } = useFlowStore();
   if (jobs.sources.length) return <section className="dt-recents dt-start">
     <header><h2>Ready when you are</h2><span>{jobs.sources.map(s => s.name).join(' · ')} installed</span></header>
     <div className="dtp-empty left"><Layers3 size={22} /><strong>No rosters yet</strong><p>Your first roster takes a minute: choose a faction, a force and a points limit.</p><span className="dtp-row-actions"><button className="dtp-btn primary" onClick={onCreate}><Plus size={15} />Create your first roster</button><button className="dtp-btn" onClick={onImport}><FileUp size={15} />Import a roster</button></span></div>
   </section>;
   return <section className="dt-recents dt-start">
     <header><h2>Start with game data</h2><span>Rosters are built from a game system's data. Install one; it stays available offline.</span></header>
-    <div className="dtp-rows">{collectionSources.map(c => { const live = jobs.jobs.find(j => j.sourceId === c.id && (j.status === 'running' || j.status === 'needs-you')); return <div className="dtp-collection-row" key={c.id}>
+    {noPreset ? <p className="dts-none">{FIRST_RUN_NO_PRESET}</p> : <div className="dtp-rows">{collectionSources.map(c => { const live = jobs.jobs.find(j => j.sourceId === c.id && (j.status === 'running' || j.status === 'needs-you')); return <div className="dtp-collection-row" key={c.id}>
       <span><strong>{c.name}</strong><small>{c.detail} · {c.size}</small>{live && <i className="dtp-progress"><em style={{ width: `${jobPercent(live)}%` }} /></i>}</span>
       {live ? <button className={`dtp-btn small ${live.status === 'needs-you' ? 'primary' : ''}`} onClick={onOpenJobs}>{live.status === 'needs-you' ? 'Choose factions' : `Installing ${jobPercent(live)}%`}</button> : <button className="dtp-btn small" onClick={() => { jobs.startInstall(c); onOpenJobs(); }}>Install</button>}
-    </div>; })}</div>
+    </div>; })}</div>}
     <button className="dtp-link-row" onClick={onAddData}><FolderOpen size={16} /><span><strong>Install from a file or a link</strong><small>An archive, data files, a repository link or GitHub search</small></span><ChevronRight size={15} /></button>
     <p className="dt-start-note">Battle Augur includes no game data. Sources come from community repositories you choose.</p>
+    <FirstRunPreviewStates />
   </section>;
 }
