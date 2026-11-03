@@ -16,5 +16,5 @@
 .dtm-item[aria-disabled=true] { opacity: .38 }
 .dtm-sub .dtm-menu { top: -5px; left: calc(100% + 2px) }
 .dtm-preview { display: flex; flex-direction: column; gap: 14px }
-.dtm-preview-note { font: 12px/1.5 -apple-system, sans-serif; color: var(--muted, #888) }
+.dtm-preview-note { margin: 0; padding: 0 4px; font: 12px/1.5 -apple-system, sans-serif; color: var(--muted, #888) }
 .dt-standalone .dtm-preview .dt-app { height: calc(100vh - 62px) }
