@@ -161,3 +161,16 @@
 .dt-element-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px }
 /* R0-08: the warn-tinted reason line reaches 4.5:1 on the light catalogue too. */
 .dt-app.light .dt-catalogue-unit.warn .dt-catalogue-reason { color: color-mix(in srgb, var(--dt-warn) 55%, var(--dt-text)) }
+
+/* RK-03 (approved 2026-11-03) · Windows window chrome. One row, as on macOS: the tab row is the title bar (drag to move,
+   double-click maximises); no menu bar; tabs start 12 px from the left edge (no traffic-light gap); Windows' own caption
+   buttons (Electron titleBarOverlay, height = the tab row) sit at the far right after Jobs, in the theme's chrome colours. */
+.dt-app.dt-os-windows{border-radius:8px}
+.dt-os-windows .dt-floating-chrome{padding:0 0 0 12px;gap:12px}
+.dt-win-caption{display:flex;align-self:stretch;margin-left:6px;color:var(--dt-text)}
+.dt-win-caption>span{width:46px;display:grid;place-items:center;cursor:default}
+.dt-win-caption>span:hover{background:var(--dt-hover)}
+.dt-win-caption svg{width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:1}
+.dt-win-caption .dt-win-min svg,.dt-win-caption .dt-win-max svg{shape-rendering:crispEdges}
+.dt-win-caption .dt-win-close{border-top-right-radius:8px}
+.dt-win-caption .dt-win-close:hover{background:#c42b1c;color:#fff}

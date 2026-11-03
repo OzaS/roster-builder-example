@@ -82,7 +82,9 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "desktop-sources", label: "Desktop · Sources" },
   { id: "desktop-settings", label: "Desktop · Settings" },
   { id: "desktop-first-run", label: "Desktop · First run" },
-  { id: "desktop-menus", label: "Desktop · Menu bar" },
+  { id: "desktop-menus", label: "Desktop · Menu bar (macOS only)" },
+  { id: "desktop-welcome-windows", label: "Desktop · Windows · Welcome (title bar row, no menu bar)" },
+  { id: "desktop-editor-windows", label: "Desktop · Windows · Roster editor (title bar row)" },
   { id: "desktop-editor-unit-dialog", label: "Desktop · Roster editor · Unit dialog" },
   { id: "desktop-editor-unit-dialog-narrow", label: "Desktop · Roster editor · Unit dialog, narrow window" },
   { id: "desktop-editor-unit-dialog-nested", label: "Desktop · Roster editor · Unit dialog, nested element" },
@@ -194,7 +196,7 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen.startsWith("duo-")) return "library"; // Foldable screens: a pose, a page and a state (DuoWorkbench)
   if (screen === "tablet-home" || screen === "tablet-rosters" || screen === "tablet-lookup" || screen === "tablet-tools" || screen === "tablet-library" || screen === "tablet-sources" || screen === "tablet-settings") return "library";
   if (screen === "desktop-tools" || screen === "desktop-library") return "library";
-  if (screen === "desktop-welcome") return "library";
+  if (screen === "desktop-welcome" || screen === "desktop-welcome-windows") return "library";
   if (screen === "desktop-editor" || screen.startsWith("desktop-editor-")) return "overview";
   if (screen === "desktop-rosters") return "library";
   if (screen === "desktop-lookup-legacy" || screen === "desktop-lookup" || screen.startsWith("desktop-lookup-1-0")) return "catalogue";

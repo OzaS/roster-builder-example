@@ -34,6 +34,10 @@ export function comboFromEvent(e: KeyboardEvent): string | null {
 
 export const hasCommandModifier = (combo: string) => combo.startsWith('Mod+') || combo.startsWith('Alt+');
 
-export function formatCombo(combo: string) {
+/** The window chrome and key labels of one desktop platform (RK-03: Windows has no menu bar and shows Ctrl labels). */
+export type DesktopOs = 'mac' | 'windows';
+
+export function formatCombo(combo: string, os: DesktopOs = 'mac') {
+  if (os === 'windows') return combo.split('+').map(part => ({ Mod: 'Ctrl', Alt: 'Alt', Shift: 'Shift' } as Record<string, string>)[part] ?? part).join('+');
   return combo.split('+').map(part => ({ Mod: '⌘', Alt: '⌥', Shift: '⇧' } as Record<string, string>)[part] ?? part).join(' ');
 }
