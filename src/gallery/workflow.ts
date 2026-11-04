@@ -105,6 +105,7 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "desktop-settings-search-empty", label: "Desktop · Settings · Search, no match" },
   { id: "desktop-settings-scale", label: "Desktop · Settings · UI scale 150%" },
   { id: "desktop-settings-developer", label: "Desktop · Settings · Developer options" },
+  { id: "desktop-settings-debug", label: "Desktop · Settings · Debug (debug builds)" },
   { id: "desktop-lookup-1-0-no-data", label: "Desktop · Lookup 1.0 · No game data" },
   { id: "desktop-lookup-1-0-start", label: "Desktop · Lookup 1.0 · Recently viewed" },
   { id: "desktop-lookup-1-0-upgrade", label: "Desktop · Lookup 1.0 · Upgrade" },

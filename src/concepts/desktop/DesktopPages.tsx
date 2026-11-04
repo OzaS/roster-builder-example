@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { AlertTriangle, ArrowDownToLine, ArrowRight, ArrowUpCircle, BookOpen, Check, ChevronRight, CircleAlert, Copy, Database, ExternalLink, FileUp, FolderOpen, Github, HardDrive, Info, Keyboard, Languages, Layers3, Link2, ListFilter, Minus, Palette, Pencil, Plus, RefreshCcw, Search, Shield, SlidersHorizontal, Trash2, Upload, Users, Wrench, X } from 'lucide-react';
+import { AlertTriangle, ArrowDownToLine, ArrowRight, ArrowUpCircle, BookOpen, Check, ChevronRight, CircleAlert, Copy, Database, ExternalLink, FileUp, FolderOpen, Github, HardDrive, Info, Keyboard, Languages, Layers3, Link2, ListFilter, Minus, Palette, Pencil, Plus, RefreshCcw, Search, Shield, SlidersHorizontal, Trash2, Upload, Users, Wrench, X, SquareTerminal, Cpu, RotateCcw } from 'lucide-react';
 import type { ColorScheme } from '../../types';
 import { collectionSources, colourSchemes, installedSources, lookupEntries, rosterLibrary, type LookupKind, type RosterSummary, type SourceInfo } from './desktopData';
 import { comboFromEvent, defaultBindings, formatCombo, hasCommandModifier, keyActions, type KeyAction, type KeyBindings } from './desktopKeys';
@@ -229,7 +229,14 @@ const settingsSections = [
   { id: 'advanced', label: 'Advanced', icon: SlidersHorizontal },
   { id: 'about', label: 'About', icon: Info },
   { id: 'developer', label: 'Developer options', icon: Wrench },
+  { id: 'debug', label: 'Debug', icon: SquareTerminal },
 ] as const;
+/** F1b (DEC-063): Debug's feature flags, by area; the gallery's names are synthetic. */
+const debugFlags = [
+  { area: 'Tabs', items: [{ id: 'lookup', name: 'Lookup tab', tier: '1.0 · built', on: true }, { id: 'library', name: 'Library tab', tier: '1.x · placeholder', on: false }] },
+  { area: 'Editor', items: [{ id: 'compare', name: 'Roster comparison', tier: '1.x · placeholder', on: false }] },
+];
+const flagDefaults = () => Object.fromEntries(debugFlags.flatMap(a => a.items).map(f => [f.id, f.on]));
 
 /** UX-053: what Settings search matches, per row: the name, its description and the words of its choices. */
 const settingsIndex: Record<string, Record<string, string>> = {
@@ -241,12 +248,14 @@ const settingsIndex: Record<string, Record<string, string>> = {
   keys: { all: `Key bindings Select a binding and press the new keys. ${keyActions.map(a => a.label).join(' ')}` },
   advanced: { focus: 'Focus search when opening the catalogue Find in catalogue', separate: 'Enable Separate all A unit with several models also offers Separate all' },
   about: { facts: 'About Version Engine Protocol SQLite Game data and rosters stay on this device.' },
-  developer: { hidden: 'Show hidden Shows entries the game data marks as hidden, in the catalogue and in option lists. Developer options' },
+  developer: { hidden: 'Show hidden entries Shows entries the game data marks as hidden, in the catalogue, Add force and option lists. They are labelled Hidden. Developer options' },
+  // F1b (DEC-063): Debug rows are tools, not settings: never searched.
+  debug: {},
 };
 /** The zoom steps behind View › Zoom in / Zoom out; Actual size and Reset are 100 %. */
 const SCALE_STEPS = [50, 67, 75, 80, 90, 100, 110, 125, 150, 175, 200, 250, 300];
 
-export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, bindings, onBindings, advancedInstall, onAdvancedInstall, focusSearch, onFocusSearch, separateAll, onSeparateAll, initialSection, initialQuery = '', initialDeveloper = false, initialScale = 100, notify }: { themePref: 'system' | 'light' | 'dark'; onThemePref: (v: 'system' | 'light' | 'dark') => void; scheme: ColorScheme; onScheme: (v: ColorScheme) => void; bindings: KeyBindings; onBindings: (next: KeyBindings) => void; advancedInstall: boolean; onAdvancedInstall: (v: boolean) => void; focusSearch: boolean; onFocusSearch: (v: boolean) => void; separateAll: boolean; onSeparateAll: (v: boolean) => void; initialSection?: string; initialQuery?: string; initialDeveloper?: boolean; initialScale?: number; notify: Notify }) {
+export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, bindings, onBindings, advancedInstall, onAdvancedInstall, focusSearch, onFocusSearch, separateAll, onSeparateAll, initialSection, initialQuery = '', initialDeveloper = false, initialDebug = false, initialScale = 100, notify }: { themePref: 'system' | 'light' | 'dark'; onThemePref: (v: 'system' | 'light' | 'dark') => void; scheme: ColorScheme; onScheme: (v: ColorScheme) => void; bindings: KeyBindings; onBindings: (next: KeyBindings) => void; advancedInstall: boolean; onAdvancedInstall: (v: boolean) => void; focusSearch: boolean; onFocusSearch: (v: boolean) => void; separateAll: boolean; onSeparateAll: (v: boolean) => void; initialSection?: string; initialQuery?: string; initialDeveloper?: boolean; initialDebug?: boolean; initialScale?: number; notify: Notify }) {
   const [active, setActive] = useState<string>(initialSection ?? 'appearance');
   const [language, setLanguage] = useState('en');
   const [toggles, setToggles] = useState({ rememberSections: true, restoreTabs: true, autoChecks: true });
@@ -256,6 +265,10 @@ export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, bind
   const [developer, setDeveloper] = useState(initialDeveloper);
   const [showHidden, setShowHidden] = useState(false);
   const versionClicks = useRef(0);
+  // F1b (DEC-063): Debug exists only in debug builds (dev builds, or a release build made with the debug build switch), whatever the unlock.
+  const debugBuild = initialDebug;
+  const [flags, setFlags] = useState<Record<string, boolean>>(flagDefaults);
+  const [imports, setImports] = useState(2);
   // UX-054: the UI scale is the window's page zoom, the same value View › Zoom in / Zoom out / Actual size change.
   const [scale, setScale] = useState(initialScale);
   const stepScale = (dir: 1 | -1) => { const at = Math.max(0, SCALE_STEPS.findIndex(s => s >= scale)); const next = SCALE_STEPS[Math.min(SCALE_STEPS.length - 1, Math.max(0, at + dir))]; setScale(next); notify(`UI scale ${next} %. The whole window follows.`); };
@@ -264,7 +277,7 @@ export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, bind
   // Search: a row shows when its name, description or choices contain the query; a matching section title shows the whole section.
   // Developer options are searched only while they are unlocked, so search never reveals them.
   const q = query.trim().toLowerCase();
-  const sectionsOn = settingsSections.filter(s => s.id !== 'developer' || developer);
+  const sectionsOn = settingsSections.filter(s => (s.id !== 'developer' || developer) && (s.id !== 'debug' || debugBuild));
   const rowOn = (sec: string, row: string) => !q || (sec === 'developer' ? 'developer options' : settingsSections.find(s => s.id === sec)?.label ?? '').toLowerCase().includes(q) || settingsIndex[sec][row].toLowerCase().includes(q);
   const countIn = (sec: string) => Object.keys(settingsIndex[sec]).filter(row => rowOn(sec, row)).length;
   const hits = sectionsOn.filter(s => countIn(s.id) > 0);
@@ -319,10 +332,24 @@ export function DesktopSettings({ themePref, onThemePref, scheme, onScheme, bind
           <dl className="dtp-facts four"><div><dt>Version</dt><dd><button type="button" className="dtp-version" aria-label="Version 1.0.0 · desktop preview" onClick={() => { if (developer) return; versionClicks.current += 1; if (versionClicks.current >= 7) { setDeveloper(true); notify('Developer options are on'); } }}>1.0.0 · desktop preview</button></dd></div><div><dt>Engine</dt><dd>0.9.4</dd></div><div><dt>Protocol</dt><dd>12</dd></div><div><dt>SQLite</dt><dd>3.46</dd></div></dl>
           <p className="dtp-muted">Game data and rosters stay on this device.</p>
         </section>}
-        {/* UX-052: Developer options appear after the unlock (DEC-022); Show hidden is the first row there, not an ordinary setting. */}
+        {/* UX-052: Developer options appear after the unlock (DEC-022); F1b (DEC-063): they hold Show hidden entries and Hide developer options only. */}
         {developer && show('developer') && <section id="dtp-set-developer" className="dtp-card dtp-settings-card"><h2>Developer options</h2>
           <p className="dtp-muted dtp-dev-note">For checking game data. You do not need these to build rosters.</p>
-          {rowOn('developer', 'hidden') && <Switch label="Show hidden" detail="Shows entries the game data marks as hidden, in the catalogue and in option lists. They are labelled Hidden." checked={showHidden} onChange={setShowHidden} />}
+          {rowOn('developer', 'hidden') && <Switch label="Show hidden entries" detail="Shows entries the game data marks as hidden, in the catalogue, Add force and option lists. They are labelled Hidden." checked={showHidden} onChange={setShowHidden} />}
+          {!q && <div className="dtp-setting-line"><span><strong>Hide developer options</strong><small>Show them again with seven clicks on Version in About.</small></span><button className="dtp-btn" onClick={() => { setDeveloper(false); versionClicks.current = 0; setActive('about'); notify('Developer options are hidden'); }}>Hide</button></div>}
+        </section>}
+        {/* F1b (DEC-063): Debug, debug builds only; the internal tools desktop has (no performance overlay, component gallery or engine bench). Not searchable. */}
+        {debugBuild && !q && <section id="dtp-set-debug" className="dtp-card dtp-settings-card"><h2>Debug</h2>
+          <div className="dtp-setting-block"><strong>Feature flags</strong>
+            {debugFlags.map(area => <div key={area.area} className="dtp-debug-area"><span className="dtp-debug-area-name">{area.area}</span>{area.items.map(f => <Switch key={f.id} label={f.name} detail={f.tier} checked={flags[f.id]} onChange={v => setFlags(c => ({ ...c, [f.id]: v }))} />)}</div>)}
+            <div className="dtp-setting-foot"><button className="dtp-btn small" onClick={() => { setFlags(flagDefaults()); notify('Feature flags reset to defaults'); }}><RotateCcw size={13} />Reset to defaults</button></div>
+          </div>
+          <div className="dtp-setting-block"><strong>Engine worker</strong>
+            <dl className="dtp-facts four"><div><dt>Cache</dt><dd>12 documents · 8.4 MB</dd></div><div><dt>Sessions</dt><dd>1 open</dd></div><div><dt>Heap</dt><dd>142 MB</dd></div></dl>
+            <div className="dtp-setting-foot"><button className="dtp-btn small" onClick={() => notify('Engine worker restarted')}><Cpu size={13} />Restart</button></div>
+          </div>
+          <div className="dtp-setting-line"><span><strong>Imports at once</strong><small>For measuring installs that run together.</small></span><Segmented label="Imports at once" value={imports} onChange={setImports} options={[1, 2].map(v => ({ value: v, label: String(v) }))} /></div>
+          <div className="dtp-setting-line"><span><strong>Install measurements</strong><small className="dtp-mono">Last of 10: 3 sources · 2 at once · 14.2 s</small></span><span className="dtp-debug-actions"><button className="dtp-btn small" onClick={() => notify('Measurements copied')}><Copy size={13} />Copy</button><button className="dtp-btn small" onClick={() => notify('Measurements cleared')}><Trash2 size={13} />Clear</button></span></div>
         </section>}
       </div>
     </div>

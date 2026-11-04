@@ -162,6 +162,7 @@ export type WorkflowScreen =
   | "desktop-settings-search-empty"
   | "desktop-settings-scale"
   | "desktop-settings-developer"
+  | "desktop-settings-debug"
   | "desktop-lookup-1-0-no-data"
   | "desktop-lookup-1-0-start"
   | "desktop-lookup-1-0-upgrade"
