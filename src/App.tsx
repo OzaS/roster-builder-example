@@ -48,6 +48,9 @@ const workflowScreenIds = [
   "tablet-settings-search",
   "tablet-settings-search-no-results",
   "tablet-settings-search-developer",
+  "tablet-settings-about-developer",
+  "tablet-settings-developer",
+  "tablet-settings-debug",
   "tablet-rosters-text-200",
   "tablet-sources-text-200",
   "tablet-settings-text-200",
@@ -153,6 +156,7 @@ const workflowScreenIds = [
   "desktop-settings-search-empty",
   "desktop-settings-scale",
   "desktop-settings-developer",
+  "desktop-settings-debug",
   "desktop-lookup-1-0-no-data",
   "desktop-lookup-1-0-start",
   "desktop-lookup-1-0-upgrade",
@@ -214,6 +218,9 @@ const workflowScreenIds = [
   "settings-search",
   "settings-search-no-results",
   "settings-search-developer",
+  "app-developer-debug",
+  "developer-options",
+  "debug",
   "export",
 ] satisfies WorkflowScreen[];
 const prototypeScreenIds = [
@@ -243,6 +250,8 @@ const prototypeScreenIds = [
   "unit-options-mobile",
   "validation",
   "settings",
+  "developer-options",
+  "debug",
   "export",
 ] satisfies PrototypeScreen[];
 

@@ -235,6 +235,16 @@
 .ux-cs-note { margin-top: 8px; padding: 12px; border-radius: var(--ux-r-md); background: var(--ux-surface-2); color: var(--ux-muted); font-size: 12px; line-height: 1.4; }
 .ux-dev-preview { display: grid; gap: 10px; }
 .ux-dev-row { border: 0; border-radius: 0; }
+/* F1b (DEC-063): Developer options and Debug pages; rows inside one group are divided by lines, actions sit at the group's foot. */
+.ux-dev-body > * { flex: none; }
+.ux-src-group:has(> .ux-dev-row) { overflow: hidden; }
+.ux-src-group > .ux-dev-row + *, .ux-src-group > * + .ux-dev-row { border-top: 1px solid var(--ux-line); }
+.ux-src-group > .ux-dev-row.on { border-color: var(--ux-line); }
+.ux-dev-kv { padding-left: 64px; font-size: 12.5px; }
+.ux-dev-kv > span { color: var(--ux-muted); }
+.ux-dev-kv.flush { padding-left: 13px; }
+.ux-dev-actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 13px; border-top: 1px solid var(--ux-line); }
+.ux-dev-actions .ux-job-btn { display: inline-flex; align-items: center; gap: 6px; }
 
 /* ---- design review 2026-10-15 (DEC-024): several jobs, OS progress, versions, read-only rosters ---- */
 .ux-job-card { display: grid; gap: 10px; padding: 12px; border: 1px solid var(--ux-accent); border-radius: var(--ux-r-md); background: color-mix(in srgb, var(--ux-accent) 6%, var(--ux-surface)); }

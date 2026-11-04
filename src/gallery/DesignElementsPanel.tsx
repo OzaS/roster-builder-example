@@ -19,6 +19,7 @@ import type { ColorScheme, PlatformPreview, Roster, RosterSection, RosterUnit, T
 import { BudgetMeter, Chip, ExpandableBudget, RosterMoreMenu, RosterShareButton, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "../concepts/ux/uxShared";
 import type { GalleryConcept } from "./galleryTypes";
 import { ComingSoonCard, DeveloperOptionsPreview } from "../concepts/ux/AppExtras";
+import { DebugNavRow, DebugRows } from "../concepts/ux/DeveloperPages";
 import { ActionMenuDialog, ReopenRosterSetting, AddCollectionSheet, LOCAL_ERRORS, LOCAL_FILE, LOCAL_SOURCE, LocalImportChoiceDialog, LocalImportError, LocalImportRow, LocalInterruptedNotice, LocalRefusedNotice, LocalSourceNote, LocalSourceRows, localSteps, AdvancedInstallSetting, AppDialog, AutoUpdateChecksSetting, FocusCatalogueSearchSetting, SeparateAllSetting, AdvancedSettingsRows, ImportReportGroups, CollectionMenuDialog, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, FirstRunDataCard, ReinstallSheet, ReinstallConfirmDialog, REINSTALL_DONE, REINSTALL_FAILED, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RememberSectionsSetting, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceStatusAction, SourceUpdateCard, SourceVersions, SourcesNavRow, TaggedRosterRows, UpdateAvatarButton, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
 
 type Props = {
@@ -1045,12 +1046,27 @@ function WorkbenchElements({
 
       <ElementSection title="Developer Options">
         <small>Approved 2026-11-01 (UX-052): Show hidden entries is a Developer options switch, off by default, on every platform; it is no longer an ordinary control. With it on, hidden catalogue entries and unit options are listed where they belong, tagged Hidden; with it off (and while Developer options are locked) nothing about them shows, and the inline "Show hidden (n)" / "Show hidden options" links are removed from Add unit, Add force and the unit options (and the catalogue checkbox from desktop and tablet): this switch is the only way to see hidden entries. Settings search lists the row only while Developer options are unlocked.</small>
+        <small>Approved 2026-11-04 (F1b, DEC-063): Developer options hold only Show hidden entries and Hide developer options; the internal tools moved to Debug (below). Show hidden entries also covers Add force: no inline Show hidden (n) there either.</small>
         <DeveloperOptionsPreview />
         <small>Add unit with Show hidden entries on (hidden rows tagged, no inline link):</small>
         <div className="ux-screen light ux-workbench" style={{ padding: 12, maxWidth: 380 }}><div className="ux-pool">
           <div className="ux-pool-item"><button type="button" className="ux-pool-row available"><span><strong>Bastion Squad</strong><small>Veterans</small></span><span className="ux-pool-meta"><b>185 pts</b><Chip tone="valid">available</Chip></span><Plus size={16} /></button></div>
           <div className="ux-pool-item"><button type="button" className="ux-pool-row available"><span><strong>Cache Warden</strong><small>Hidden by the game data</small></span><span className="ux-pool-meta"><b>60 pts</b><Chip tone="neutral">Hidden</Chip></span><Plus size={16} /></button></div>
         </div></div>
+        <small>Add force with Show hidden entries on (hidden forces tagged Hidden; off, they are not listed and nothing hints at them):</small>
+        <div className="ux-screen light ux-workbench" style={{ padding: 12, maxWidth: 380 }}><div className="ux-force-choice-list" aria-label="Top-level forces">
+          <button type="button"><span><strong>Patrol detachment (1)</strong></span><Plus size={15} /></button>
+          <button type="button"><span><strong>Vanguard detachment (0)</strong><small>Fits beside the patrol</small></span><Plus size={15} /></button>
+          <button type="button"><span><strong>Reserve detachment (0)</strong><small><Chip tone="neutral">Hidden</Chip></small></span><Plus size={15} /></button>
+        </div></div>
+      </ElementSection>
+
+      <ElementSection title="Debug">
+        <small>Approved 2026-11-04 (F1b, DEC-063): the internal tools of the former Developer page, unchanged, on their own page. Debug builds only (dev builds, or release builds made with the debug build switch), whatever the 7-tap unlock; phone: App › Debug below Developer options; tablet: About › Debug. Settings search never lists these rows.</small>
+        <div className="ux-dev-preview">
+          <DebugNavRow />
+          <DebugRows />
+        </div>
       </ElementSection>
 
       <ElementSection title="Main Tab Bar">

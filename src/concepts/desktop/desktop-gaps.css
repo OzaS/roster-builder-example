@@ -48,3 +48,9 @@
   .dtp-lookup10:not(.dtl-keep-split) .dtp-split.lookup[data-pane="entry"] .dtp-list { display: none }
   .dtp-lookup10:not(.dtl-keep-split) .dtl-narrow-back { display: inline-flex !important }
 }
+/* F1b (DEC-063): Settings › Debug (debug builds only): feature flags by area, the engine worker, imports and measurements. */
+.dtp-debug-area { display: flex; flex-direction: column; margin-top: 6px }
+.dtp-debug-area-name { margin-top: 6px; font-size: 11px; letter-spacing: .8px; text-transform: uppercase; color: var(--dt-faint) }
+.dtp-debug-actions { display: inline-flex; gap: 8px; flex: none }
+.dtp-settings-card .dtp-setting-block + .dtp-setting-block, .dtp-settings-card .dtp-setting-block + .dtp-setting-line { border-top: 1px solid var(--dt-border) }
+.dtp-settings-card .dtp-setting-block .dtp-facts { margin: 8px 0 0 }

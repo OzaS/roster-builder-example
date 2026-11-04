@@ -22,6 +22,9 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "tablet-settings-search", label: "Tablet · Settings · Search, results" },
   { id: "tablet-settings-search-no-results", label: "Tablet · Settings · Search, no results" },
   { id: "tablet-settings-search-developer", label: "Tablet · Settings · Search, Developer options unlocked" },
+  { id: "tablet-settings-about-developer", label: "Tablet · Settings · About, Developer options unlocked, debug build" },
+  { id: "tablet-settings-developer", label: "Tablet · Settings · About › Developer options" },
+  { id: "tablet-settings-debug", label: "Tablet · Settings · About › Debug (debug builds)" },
   { id: "tablet-rosters-text-200", label: "Tablet · Rosters · Text 200%" },
   { id: "tablet-sources-text-200", label: "Tablet · Sources · Text 200%" },
   { id: "tablet-settings-text-200", label: "Tablet · Settings · Text 200%" },
@@ -102,6 +105,7 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "desktop-settings-search-empty", label: "Desktop · Settings · Search, no match" },
   { id: "desktop-settings-scale", label: "Desktop · Settings · UI scale 150%" },
   { id: "desktop-settings-developer", label: "Desktop · Settings · Developer options" },
+  { id: "desktop-settings-debug", label: "Desktop · Settings · Debug (debug builds)" },
   { id: "desktop-lookup-1-0-no-data", label: "Desktop · Lookup 1.0 · No game data" },
   { id: "desktop-lookup-1-0-start", label: "Desktop · Lookup 1.0 · Recently viewed" },
   { id: "desktop-lookup-1-0-upgrade", label: "Desktop · Lookup 1.0 · Upgrade" },
@@ -169,6 +173,9 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "settings-search", label: "Settings · Search, results" },
   { id: "settings-search-no-results", label: "Settings · Search, no results" },
   { id: "settings-search-developer", label: "Settings · Search, Developer options unlocked" },
+  { id: "app-developer-debug", label: "App · Developer options unlocked, debug build" },
+  { id: "developer-options", label: "App · Developer options" },
+  { id: "debug", label: "App · Debug (debug builds)" },
   { id: "export", label: "Export" },
 ];
 
@@ -211,6 +218,7 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen === "drafts") return "library";
   if (screen === "source-legacy" || screen === "source" || screen.startsWith("lookup-")) return "catalogue";
   if (screen.startsWith("settings-search")) return "settings";
+  if (screen === "app-developer-debug") return "app";
   if (screen === "add-detachment") return "detachment";
   if (screen === "add-unit-limit" || screen === "add-unit-focus-keyboard" || screen === "add-unit-text-200") return "add-unit";
   if (screen === "unit-options-separate-all" || screen === "unit-options-separated") return "unit-options-mobile";
