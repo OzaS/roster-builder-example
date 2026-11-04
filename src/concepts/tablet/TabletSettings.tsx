@@ -9,7 +9,6 @@ import { editorShortcuts, generalShortcuts, keyLabel } from './tabletKeys';
 import { useTabletExperience } from './tabletExperience';
 import { PageTitle, TabletToolbar } from './TabletToolbar';
 import { SettingsResults, SettingsSearchField } from '../ux/SettingsSearch';
-import { Chip as MobileChip } from '../ux/uxShared';
 import { DEBUG_SUBTITLE, DEVELOPER_NOTE, HIDE_DEVELOPER_DETAIL, SHOW_HIDDEN_DETAIL, SHOW_HIDDEN_TITLE } from '../ux/DeveloperPages';
 
 // Settings (T2b): sections as a list, each one a real page in the detail pane. Key bindings are a read-only list here: the
@@ -32,7 +31,7 @@ const sections = [
  *  tablet-settings-about-developer (About with both rows), tablet-settings-developer, tablet-settings-debug. */
 const subPages = {
   developer: { label: 'Developer options', sub: 'For checking game data' },
-  debug: { label: 'Debug', sub: 'Internal tools · debug build' },
+  debug: { label: 'Debug', sub: 'Internal tools' },
 } as const;
 const UNLOCKED_STATES = ['about-developer', 'developer', 'debug'];
 const FLAGS = [{ id: 'lookup', name: 'Lookup tab', tier: '1.0 · built', on: true }, { id: 'library', name: 'Library tab', tier: '1.x · placeholder', on: false }, { id: 'tools', name: 'Tools tab', tier: '1.x · placeholder', on: false }];
@@ -88,7 +87,6 @@ export function TabletSettings({ env, notify, session, themePref, scheme, onThem
       <Facts rows={[['Cache', '12 documents · 8.4 MB'], ['Sessions', '1 open'], ['Heap', '142 MB']]} />
       <div className="tb-actions"><button type="button" className="ux-job-btn" onClick={() => notify('Engine worker restarted')}><Cpu size={16} />Restart</button></div>
     </Group>
-    <p className="tb-note"><Info size={15} />Only in debug builds. Settings search does not list these tools.</p>
   </> : null;
   const page = (() => {
     switch (current.id) {
@@ -133,7 +131,7 @@ export function TabletSettings({ env, notify, session, themePref, scheme, onThem
         <Facts rows={[['Version', '1.0.0 · tablet preview'], ['Engine', '0.9.4'], ['Protocol', '12'], ['SQLite', '3.46']]} />
         <Row selected={false} title="Open source licences" sub="Libraries this app is built with" end={<ChevronRight size={17} />} onClick={() => notify('Licences (prototype)')} />
         {unlocked && <Row selected={false} mark={<Bug size={20} />} title="Developer options" sub="For checking game data" end={<ChevronRight size={17} />} onClick={() => setSettingsSection('developer')} />}
-        {unlocked && <Row selected={false} mark={<SquareTerminal size={20} />} title="Debug" sub={DEBUG_SUBTITLE} label={`Debug, ${DEBUG_SUBTITLE}, debug build`} end={<span className="tb-row-end-inline"><MobileChip tone="neutral">Debug build</MobileChip><ChevronRight size={17} /></span>} onClick={() => setSettingsSection('debug')} />}
+        {unlocked && <Row selected={false} mark={<SquareTerminal size={20} />} title="Debug" sub={DEBUG_SUBTITLE} end={<ChevronRight size={17} />} onClick={() => setSettingsSection('debug')} />}
         <p className="tb-note"><Info size={15} />Game data and rosters stay on this device.</p>
       </>;
     }

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { ArrowLeft, Bug, ChevronRight, Copy, Cpu, Eye, EyeOff, Flag, Gauge, Info, Layers, LayoutGrid, RotateCcw, SquareTerminal, Timer, Trash2 } from "lucide-react";
 import type { ConceptProps } from "../shared";
-import { Chip } from "./uxShared";
 
 /*
  * F1b (DEC-063, approved 2026-11-04): Developer options and Debug are two pages.
@@ -34,10 +33,10 @@ export function DeveloperOptionsNavRow({ onClick }: { onClick?: () => void }) {
 /** App → Debug (debug builds only, whatever the unlock). */
 export function DebugNavRow({ onClick }: { onClick?: () => void }) {
   return (
-    <button type="button" className="ux-app-nav-row" onClick={onClick} aria-label={`Debug, ${DEBUG_SUBTITLE}, debug build`}>
+    <button type="button" className="ux-app-nav-row" onClick={onClick}>
       <span className="ux-setting-icon"><SquareTerminal size={17} /></span>
       <span><strong>Debug</strong><small>{DEBUG_SUBTITLE}</small></span>
-      <span className="ux-nav-trail"><Chip tone="neutral">Debug build</Chip><ChevronRight size={17} /></span>
+      <ChevronRight size={17} />
     </button>
   );
 }
@@ -156,10 +155,9 @@ export function DeveloperOptionsScreen({ props }: { props: ConceptProps }) {
 export function DebugScreen({ props }: { props: ConceptProps }) {
   return (
     <>
-      <PageHeader title="Debug" subtitle="Internal tools · debug build" onBack={props.onBack} />
+      <PageHeader title="Debug" subtitle="Internal tools" onBack={props.onBack} />
       <div className="ux-wb-home-body ux-app-body ux-dev-body">
         <DebugRows />
-        <small className="ux-src-footer">Only in debug builds. Settings search does not list these tools.</small>
       </div>
     </>
   );
