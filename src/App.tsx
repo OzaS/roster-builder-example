@@ -214,6 +214,9 @@ const workflowScreenIds = [
   "settings-search",
   "settings-search-no-results",
   "settings-search-developer",
+  "app-developer-debug",
+  "developer-options",
+  "debug",
   "export",
 ] satisfies WorkflowScreen[];
 const prototypeScreenIds = [
@@ -243,6 +246,8 @@ const prototypeScreenIds = [
   "unit-options-mobile",
   "validation",
   "settings",
+  "developer-options",
+  "debug",
   "export",
 ] satisfies PrototypeScreen[];
 

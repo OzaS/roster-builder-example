@@ -220,6 +220,9 @@ export type WorkflowScreen =
   | "settings-search"
   | "settings-search-no-results"
   | "settings-search-developer"
+  | "app-developer-debug"
+  | "developer-options"
+  | "debug"
   | "export";
 
 export type RosterOption = {
@@ -398,6 +401,8 @@ export type PrototypeScreen =
   | "unit-options-mobile"
   | "validation"
   | "settings"
+  | "developer-options"
+  | "debug"
   | "export";
 
 export type PrototypeAction =

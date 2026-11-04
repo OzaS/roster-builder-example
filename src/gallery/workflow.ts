@@ -169,6 +169,9 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "settings-search", label: "Settings · Search, results" },
   { id: "settings-search-no-results", label: "Settings · Search, no results" },
   { id: "settings-search-developer", label: "Settings · Search, Developer options unlocked" },
+  { id: "app-developer-debug", label: "App · Developer options unlocked, debug build" },
+  { id: "developer-options", label: "App · Developer options" },
+  { id: "debug", label: "App · Debug (debug builds)" },
   { id: "export", label: "Export" },
 ];
 
@@ -211,6 +214,7 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen === "drafts") return "library";
   if (screen === "source-legacy" || screen === "source" || screen.startsWith("lookup-")) return "catalogue";
   if (screen.startsWith("settings-search")) return "settings";
+  if (screen === "app-developer-debug") return "app";
   if (screen === "add-detachment") return "detachment";
   if (screen === "add-unit-limit" || screen === "add-unit-focus-keyboard" || screen === "add-unit-text-200") return "add-unit";
   if (screen === "unit-options-separate-all" || screen === "unit-options-separated") return "unit-options-mobile";

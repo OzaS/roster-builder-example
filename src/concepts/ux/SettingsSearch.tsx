@@ -1,12 +1,14 @@
 import { Fragment, useState, type ReactNode } from "react";
-import { Bell, Bug, ChevronDown, ChevronRight, Eye, Gauge, History, Info, Keyboard, Languages, ListChecks, Palette, RefreshCw, Search, Sparkles, TextCursorInput, Ungroup, Wifi, X } from "lucide-react";
+import { Bell, ChevronDown, ChevronRight, Eye, History, Info, Keyboard, Languages, ListChecks, Palette, RefreshCw, Search, Sparkles, TextCursorInput, Ungroup, Wifi, X } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { SHOW_HIDDEN_DETAIL, SHOW_HIDDEN_TITLE } from "./DeveloperPages";
 
 /**
  * UX-053 (approved 2026-11-01): search in Settings, phone and tablet. The query matches a setting's name and its description; results keep
  * the section name as a group heading so a row can be placed, switches stay operable in place, and the match is highlighted. No
- * results says so and offers Clear search. Developer rows (UX-052: Show hidden entries, Performance overlay) are in the index only
- * while Developer options are unlocked (DEC-022): a locked app neither lists them nor hints that they exist. Synthetic names only.
+ * results says so and offers Clear search. Developer options rows (UX-052, F1b DEC-063: only Show hidden entries) are in the index only
+ * while Developer options are unlocked (DEC-022): a locked app neither lists them nor hints that they exist. Debug rows (performance
+ * overlay, feature flags, tools) are tools, not settings: never in the index. Synthetic names only.
  */
 export type SettingEntry = { id: string; section: string; title: string; detail: string; icon: LucideIcon; kind: "switch" | "choice" | "link"; on?: boolean; developer?: boolean; platform?: "phone" | "tablet" };
 
@@ -30,8 +32,7 @@ export const settingsIndex = (platform: "phone" | "tablet"): SettingEntry[] => (
   { id: "focus", section: "Advanced", title: "Focus search when opening the catalogue", detail: FIND(platform), icon: TextCursorInput, kind: "switch" },
   { id: "separate", section: "Advanced", title: "Enable Separate all", detail: "Units with several models also offer Separate all, which gives every model its own options in one step. Off: only Separate 1.", icon: Ungroup, kind: "switch" },
   { id: "about", section: "About", title: "Version and licences", detail: "Version 1.0.0 · open source licences.", icon: Info, kind: "link" },
-  { id: "perf", section: "Developer", title: "Performance overlay", detail: "UI frame drops and tap → view latency, per screen.", icon: Gauge, kind: "switch", developer: true },
-  { id: "hidden", section: "Developer", title: "Show hidden entries", detail: "List the entries and options the game data marks as hidden in Add unit and in unit options. Off by default.", icon: Bug, kind: "switch", developer: true },
+  { id: "hidden", section: "Developer options", title: SHOW_HIDDEN_TITLE, detail: SHOW_HIDDEN_DETAIL, icon: Eye, kind: "switch", developer: true },
 ] as SettingEntry[]).filter((entry) => !entry.platform || entry.platform === platform);
 
 /** Entries matching the query in the name or the description, in index order; developer rows only while Developer options are unlocked. */
@@ -58,7 +59,7 @@ export function SettingsResults({ platform, query, developerUnlocked = false, on
   return <div className={`ux-settings-results ${platform}`}>
     <small className="ux-settings-count" role="status">{found.length} {found.length === 1 ? "setting" : "settings"}</small>
     {sections.map((section) => <Fragment key={section}>
-      <div className="ux-result-label">{section}{section === "Developer" ? <span className="ux-settings-dev-tag">Developer options</span> : null}</div>
+      <div className="ux-result-label">{section}</div>
       <div className={platform === "phone" ? "ux-settings-group" : "ux-src-group tb-switches"}>
         {found.filter((entry) => entry.section === section).map((entry) => {
           const Icon = entry.icon;

@@ -13,6 +13,7 @@ import { MobileUnitOptions } from "./MobileUnitOptions";
 import { QuotaChip, limitReason } from "../workspace/CatalogueLimit";
 import { SoftKeyboard } from "./SoftKeyboard";
 import { SettingsResults } from "./SettingsSearch";
+import { APP_DEVELOPER_SCREENS, DebugNavRow, DebugScreen, DeveloperOptionsNavRow, DeveloperOptionsScreen } from "./DeveloperPages";
 import { BackOrTitle, BudgetMeter, Chip, ExpandableBudget, RosterMoreMenu, RosterShareButton, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "./uxShared";
 
 /** Screens of the source-data flow designed in Battle Augur plan 2D (SourceJobs.tsx). */
@@ -39,7 +40,7 @@ export function CodexWorkbench(props: ConceptProps) {
     ? (["library", "library-v2", "library-filters", "library-filters-search", "library-filters-no-match", "library-filters-keyboard", "subscription-main", "source", "lookup-results", "lookup-start", "lookup-no-results", "lookup-no-data", "lookup-loading", "lookup-failed", "tools", "collections"] as const).some((tab) => tab === props.workflowScreen)
     : screen === "library" || screen === "catalogue" || screen === "tools" || screen === "collections";
   const showTabBar = usesTabNavigation && isMainTab;
-  const isWorkbenchScreen = screen !== "library" && screen !== "catalogue" && screen !== "tools" && screen !== "collections" && screen !== "app" && screen !== "settings" && screen !== "sources" && screen !== "add-source" && !SOURCE_FLOW_SCREENS.includes(screen) && screen !== "system";
+  const isWorkbenchScreen = screen !== "library" && screen !== "catalogue" && screen !== "tools" && screen !== "collections" && screen !== "app" && screen !== "developer-options" && screen !== "debug" && screen !== "settings" && screen !== "sources" && screen !== "add-source" && !SOURCE_FLOW_SCREENS.includes(screen) && screen !== "system";
   const [activeLoadoutSlot, setActiveLoadoutSlot] = useState<{ groupId: string; slotId: string } | null>(null);
   const [forceCreationOpen, setForceCreationOpen] = useState(false);
   const [rosterSearchOpen, setRosterSearchOpen] = useState(false);
@@ -161,6 +162,10 @@ export function CodexWorkbench(props: ConceptProps) {
     body = <DiceSimulatorScreen props={props} />;
   } else if (screen === "app") {
     body = <AppScreen props={props} />;
+  } else if (screen === "developer-options") {
+    body = <DeveloperOptionsScreen props={props} />;
+  } else if (screen === "debug") {
+    body = <DebugScreen props={props} />;
   } else if (screen === "settings") {
     body = <SettingsScreen props={props} />;
   } else if (screen === "sources") {
@@ -2189,8 +2194,11 @@ function FavoriteCreationSection({ title, children }: { title: string; children:
   return <section className="ux-favorite-creation"><div className="ux-result-label"><Heart size={13} />{title}</div><div>{children}</div></section>;
 }
 
-/** Account and application-level navigation. */
+/** Account and application-level navigation. F1b (DEC-063): Developer options appear after the 7-tap unlock on About › Version;
+ *  Debug appears in debug builds only, whatever the unlock. Gallery: `app` is a release build, locked; `app-developer-debug` (and the
+ *  two pages it opens) a debug build with Developer options unlocked. */
 function AppScreen({ props }: { props: ConceptProps }) {
+  const developer = APP_DEVELOPER_SCREENS.includes(props.workflowScreen ?? "");
   return (
     <>
       <header className="ux-wb-top ux-wb-home-top reversed">
@@ -2219,6 +2227,8 @@ function AppScreen({ props }: { props: ConceptProps }) {
           <ChevronRight size={17} />
         </button>
         <SourcesNavRow updates={EXAMPLE_UPDATES} onClick={() => props.onNavigate("sources")} />
+        {developer ? <DeveloperOptionsNavRow onClick={() => props.onNavigate("developer-options")} /> : null}
+        {developer ? <DebugNavRow onClick={() => props.onNavigate("debug")} /> : null}
         <footer className="ux-app-footer">
           <strong>Roster Builder</strong>
           <small>Version 1.0.0</small>
