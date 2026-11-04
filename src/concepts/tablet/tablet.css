@@ -105,6 +105,9 @@
 .tb-pointer .tb-actions .ux-job-btn { min-height: 44px }
 .tb-actions .tb-primary { min-height: 48px; flex: 0 1 auto }
 .tb-back { align-self: flex-start; min-height: 44px }
+/* F1b (DEC-063): Back to About inside the detail pane keeps its own width; a nav row end with a chip before the chevron. */
+.tb-detail > .tb-back { justify-self: start }
+.tb-row-end-inline { display: inline-flex; align-items: center; gap: 8px }
 .tb-section { display: grid; gap: 10px }
 .tb-section-head { display: flex; align-items: center; justify-content: space-between }
 .tb-section-head .ux-job-btn { min-height: 44px }

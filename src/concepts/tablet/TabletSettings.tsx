@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { Check, ChevronRight, Database, FolderOpen, HardDrive, Info, Keyboard, Languages, Layers3, Palette, SlidersHorizontal, Upload } from 'lucide-react';
+import { ArrowLeft, Bug, Check, ChevronRight, Copy, Cpu, Database, EyeOff, FolderOpen, HardDrive, Info, Keyboard, Languages, Layers3, LayoutGrid, Palette, RotateCcw, SlidersHorizontal, SquareTerminal, Timer, Trash2, Upload } from 'lucide-react';
 import type { ColorScheme } from '../../types';
 import { Segmented, Switch } from '../workspace/Primitives';
 import { REOPEN_ROSTER_DETAIL, REOPEN_ROSTER_TITLE } from '../ux/SourceJobs';
@@ -9,6 +9,8 @@ import { editorShortcuts, generalShortcuts, keyLabel } from './tabletKeys';
 import { useTabletExperience } from './tabletExperience';
 import { PageTitle, TabletToolbar } from './TabletToolbar';
 import { SettingsResults, SettingsSearchField } from '../ux/SettingsSearch';
+import { Chip as MobileChip } from '../ux/uxShared';
+import { DEBUG_SUBTITLE, DEVELOPER_NOTE, HIDE_DEVELOPER_DETAIL, SHOW_HIDDEN_DETAIL, SHOW_HIDDEN_TITLE } from '../ux/DeveloperPages';
 
 // Settings (T2b): sections as a list, each one a real page in the detail pane. Key bindings are a read-only list here: the
 // shortcuts work with a hardware keyboard and appear in the system overlay; the editor stays on the desktop.
@@ -24,6 +26,16 @@ const sections = [
   { id: 'advanced', label: 'Advanced', sub: 'Catalogue search, Separate all', icon: SlidersHorizontal },
   { id: 'about', label: 'About', sub: 'Version and licences', icon: Info },
 ] as const;
+
+/** F1b (DEC-063, approved 2026-11-04): two About sub-pages, each opening in the detail pane with Back to About. Developer options
+ *  appear after the 7-tap unlock on About › Version; Debug only in debug builds, whatever the unlock. Gallery states:
+ *  tablet-settings-about-developer (About with both rows), tablet-settings-developer, tablet-settings-debug. */
+const subPages = {
+  developer: { label: 'Developer options', sub: 'For checking game data' },
+  debug: { label: 'Debug', sub: 'Internal tools · debug build' },
+} as const;
+const UNLOCKED_STATES = ['about-developer', 'developer', 'debug'];
+const FLAGS = [{ id: 'lookup', name: 'Lookup tab', tier: '1.0 · built', on: true }, { id: 'library', name: 'Library tab', tier: '1.x · placeholder', on: false }, { id: 'tools', name: 'Tools tab', tier: '1.x · placeholder', on: false }];
 
 const Group = ({ title, children }: { title?: string; children: ReactNode }) => <section className="tb-section">{title && <span className="ux-result-label">{title}</span>}{children}</section>;
 
@@ -41,7 +53,43 @@ export function TabletSettings({ env, notify, session, themePref, scheme, onThem
   const [toggles, setToggles] = useState({ rememberSections: true, reopenLast: false, autoChecks: true });
   const [keep, setKeep] = useState(1);
   const flip = (key: keyof typeof toggles) => (v: boolean) => setToggles(t => ({ ...t, [key]: v }));
-  const current = sections.find(s => s.id === (settingsSection ?? 'appearance')) ?? sections[0];
+  const unlocked = UNLOCKED_STATES.includes(session.state);
+  const [showHidden, setShowHidden] = useState(false);
+  const [overlay, setOverlay] = useState(true);
+  const [flags, setFlags] = useState<Record<string, boolean>>(() => Object.fromEntries(FLAGS.map(f => [f.id, f.on])));
+  const [imports, setImports] = useState(2);
+  const subPage = settingsSection === 'developer' || settingsSection === 'debug' ? subPages[settingsSection] : undefined;
+  const current = sections.find(s => s.id === (subPage ? 'about' : settingsSection ?? 'appearance')) ?? sections[0];
+  const backToAbout = <button type="button" className="ux-job-btn tb-back" onClick={() => setSettingsSection('about')}><ArrowLeft size={16} />Back to About</button>;
+  const subPageBody = settingsSection === 'developer' ? <>
+    <p className="tb-note"><Info size={15} />{DEVELOPER_NOTE}</p>
+    <WorkspaceScope light={light}><div className="ux-src-group tb-switches"><Switch label={SHOW_HIDDEN_TITLE} detail={SHOW_HIDDEN_DETAIL} checked={showHidden} onChange={setShowHidden} /></div></WorkspaceScope>
+    <Row selected={false} mark={<EyeOff size={20} />} title="Hide developer options" sub={HIDE_DEVELOPER_DETAIL} onClick={() => { setSettingsSection('about'); notify('Developer options are hidden'); }} />
+  </> : settingsSection === 'debug' ? <>
+    <Group title="Performance">
+      <WorkspaceScope light={light}><div className="ux-src-group tb-switches"><Switch label="Performance overlay" detail="UI frame drops and tap → view latency, per screen" checked={overlay} onChange={setOverlay} /></div></WorkspaceScope>
+      <Facts rows={[['Lists', '0 drops · 38 ms'], ['Roster editor', '2 drops · 64 ms'], ['Add unit', '1 drop · 51 ms']]} />
+      <div className="tb-actions"><button type="button" className="ux-job-btn" onClick={() => notify('Report saved (prototype)')}><Copy size={16} />Save report</button><button type="button" className="ux-job-btn ux-src-ghost"><RotateCcw size={16} />Reset</button></div>
+    </Group>
+    <Group title="Feature flags">
+      <WorkspaceScope light={light}><div className="ux-src-group tb-switches">{FLAGS.map(f => <Switch key={f.id} label={f.name} detail={f.tier} checked={flags[f.id]} onChange={v => setFlags(c => ({ ...c, [f.id]: v }))} />)}</div></WorkspaceScope>
+      <div className="tb-actions"><button type="button" className="ux-job-btn ux-src-ghost" onClick={() => setFlags(Object.fromEntries(FLAGS.map(f => [f.id, f.on])))}><RotateCcw size={16} />Reset to defaults</button></div>
+    </Group>
+    <Group title="Installs">
+      <WorkspaceScope light={light}><div className="tb-setting stacked"><span><strong>Imports at once</strong><small>For measuring installs that run together.</small></span><Segmented<number> label="Imports at once" value={imports} onChange={setImports} options={[1, 2].map(v => ({ value: v, label: String(v) }))} /></div></WorkspaceScope>
+      <Facts rows={[['Install measurements', 'Last 10'], ['3 sources · 2 at once', '14.2 s'], ['3 sources · 1 at once', '19.8 s'], ['1 source · update', '4.1 s']]} />
+      <div className="tb-actions"><button type="button" className="ux-job-btn"><Copy size={16} />Copy</button><button type="button" className="ux-job-btn ux-src-ghost"><Trash2 size={16} />Clear</button></div>
+    </Group>
+    <Group title="Tools">
+      <Row selected={false} mark={<LayoutGrid size={20} />} title="Component gallery" sub="Every design-system component and state" end={<ChevronRight size={17} />} onClick={() => notify('Component gallery (prototype)')} />
+      <Row selected={false} mark={<Timer size={20} />} title="Engine bench" sub="Time engine operations on installed data" end={<ChevronRight size={17} />} onClick={() => notify('Engine bench (prototype)')} />
+    </Group>
+    <Group title="Engine worker">
+      <Facts rows={[['Cache', '12 documents · 8.4 MB'], ['Sessions', '1 open'], ['Heap', '142 MB']]} />
+      <div className="tb-actions"><button type="button" className="ux-job-btn" onClick={() => notify('Engine worker restarted')}><Cpu size={16} />Restart</button></div>
+    </Group>
+    <p className="tb-note"><Info size={15} />Only in debug builds. Settings search does not list these tools.</p>
+  </> : null;
   const page = (() => {
     switch (current.id) {
       case 'appearance': return <>
@@ -84,6 +132,8 @@ export function TabletSettings({ env, notify, session, themePref, scheme, onThem
       default: return <>
         <Facts rows={[['Version', '1.0.0 · tablet preview'], ['Engine', '0.9.4'], ['Protocol', '12'], ['SQLite', '3.46']]} />
         <Row selected={false} title="Open source licences" sub="Libraries this app is built with" end={<ChevronRight size={17} />} onClick={() => notify('Licences (prototype)')} />
+        {unlocked && <Row selected={false} mark={<Bug size={20} />} title="Developer options" sub="For checking game data" end={<ChevronRight size={17} />} onClick={() => setSettingsSection('developer')} />}
+        {unlocked && <Row selected={false} mark={<SquareTerminal size={20} />} title="Debug" sub={DEBUG_SUBTITLE} label={`Debug, ${DEBUG_SUBTITLE}, debug build`} end={<span className="tb-row-end-inline"><MobileChip tone="neutral">Debug build</MobileChip><ChevronRight size={17} /></span>} onClick={() => setSettingsSection('debug')} />}
         <p className="tb-note"><Info size={15} />Game data and rosters stay on this device.</p>
       </>;
     }
@@ -94,6 +144,7 @@ export function TabletSettings({ env, notify, session, themePref, scheme, onThem
     <ListDetail env={env} label="Settings" open={open} onClose={() => setOpen(false)}
       list={searchable && query.trim() ? <div className="tb-list scroll"><SettingsResults platform="tablet" query={query} developerUnlocked={session.state === 'search-developer'} onClear={() => setQuery('')} /></div>
         : <div className="tb-list scroll">{sections.map(s => <Row key={s.id} selected={s.id === current.id} mark={<s.icon size={20} />} title={s.label} sub={s.sub} end={<ChevronRight size={17} />} onClick={() => { setSettingsSection(s.id); setOpen(true); }} />)}</div>}
-      detail={<><div className="tb-detail-title"><span><h2>{current.label}</h2><small>{current.sub}</small></span></div>{page}</>} />
+      detail={subPage ? <>{backToAbout}<div className="tb-detail-title"><span><h2>{subPage.label}</h2><small>{subPage.sub}</small></span></div>{subPageBody}</>
+        : <><div className="tb-detail-title"><span><h2>{current.label}</h2><small>{current.sub}</small></span></div>{page}</>} />
   </div>;
 }
