@@ -4,7 +4,7 @@ import { PointsLine, RosterSummary, SummaryToggle } from '../workspace/RosterSum
 import type { Notify } from '../workspace/Toasts';
 import { StatusGlyph, TreeUnitMain } from '../ux/uxShared';
 import { Count, FoldSection, RadioRow, SeparateRow, ToggleRow } from '../ux/MobileUnitOptions';
-import { PRIMARY_FORCE_ID, ROLES, forceOf, groupLimit, rosterIssues, unitCost, useRosterHistory, type EditorUnit, type Force, type ExportRoster, type ImportResult, type ReadOnlyInfo, type RosterIssue } from '../desktop/DesktopEditorFlows';
+import { galleryExportFormat, PRIMARY_FORCE_ID, ROLES, forceOf, groupLimit, rosterIssues, unitCost, useRosterHistory, type EditorUnit, type Force, type ExportRoster, type ImportResult, type ReadOnlyInfo, type RosterIssue } from '../desktop/DesktopEditorFlows';
 import { rosterLibrary } from '../desktop/desktopData';
 import type { RosterUnit } from '../../types';
 import type { TabletEnv } from './tabletEnv';
@@ -27,13 +27,13 @@ import './tablet-editor.css';
 //   Medium (600-839): force tree · unit details; the catalogue is a slide-over from Add unit.
 //   Split view (< 700 wide, also any window whose logical width drops under 700 at a larger text size): the tree alone; a unit's details open over it (like ListDetail on the pages).
 
-export type EditorStart = 'editor' | 'issues' | 'add' | 'forces' | 'add-force' | 'readonly' | 'export' | 'move-unit' | 'add-roles' | 'add-focus' | 'chip-caption' | 'limit-caption' | 'unit' | 'separate-all';
+export type EditorStart = 'editor' | 'issues' | 'add' | 'forces' | 'add-force' | 'readonly' | 'export' | 'export-pdf' | 'export-json' | 'export-readonly' | 'move-unit' | 'add-roles' | 'add-focus' | 'chip-caption' | 'limit-caption' | 'unit' | 'separate-all';
 /** Gallery starts that open the catalogue as Add unit does (DEC-050: many roles, opened with the search focused, a chip's caption shown). */
 const addStarts: EditorStart[] = ['add', 'add-roles', 'add-focus', 'chip-caption', 'limit-caption'];
 type Pop = 'switcher' | 'more' | 'summary' | `unit-${number}` | `force-${string}` | null;
 type Sheet = { kind: 'add-force' } | { kind: 'rename' } | { kind: 'rename-force'; id: string } | { kind: 'export' } | { kind: 'move'; id: number } | null;
 /** The sample roster each gallery start opens: two forces, a roster whose faction was removed, or the default. */
-const startRoster = (start: EditorStart, name: string) => start === 'issues' ? 'Operation First Light' : start === 'forces' || start === 'add-force' || start === 'export' || start === 'move-unit' ? 'Harbour defence' : start === 'readonly' ? 'Ember patrol' : name;
+const startRoster = (start: EditorStart, name: string) => start === 'issues' ? 'Operation First Light' : start === 'forces' || start === 'add-force' || start === 'export' || start === 'export-pdf' || start === 'export-json' || start === 'move-unit' ? 'Harbour defence' : start === 'readonly' || start === 'export-readonly' ? 'Ember patrol' : name;
 type Mode = 'three' | 'two' | 'single';
 
 // Side panes: limits and the three preset widths the touch grab handle cycles through and snaps to (T4).
@@ -90,7 +90,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
   const [slideOver, setSlideOver] = useState(addStarts.includes(start) && mode !== 'three');
   // `unit`: the Foldable library's closed display with the selected unit's details open over the roster.
   const [detailOpen, setDetailOpen] = useState(start === 'unit' && mode === 'single');
-  const [sheet, setSheet] = useState<Sheet>(start === 'add-force' ? { kind: 'add-force' } : start === 'export' ? { kind: 'export' } : start === 'move-unit' ? { kind: 'move', id: 1 } : null);
+  const [sheet, setSheet] = useState<Sheet>(start === 'add-force' ? { kind: 'add-force' } : start.startsWith('export') ? { kind: 'export' } : start === 'move-unit' ? { kind: 'move', id: 1 } : null);
   const [query, setQuery] = useState('');
   const [role, setRole] = useState(start === 'add' || start === 'add-focus' ? 'Core' : 'All');
   const rootRef = useRef<HTMLDivElement>(null);
@@ -390,7 +390,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
       </div>}
     </div>
 
-    {sheet?.kind === 'export' && <ExportSheet roster={exportable} readOnly={!!readOnly} notify={notify} onClose={() => setSheet(null)} />}
+    {sheet?.kind === 'export' && <ExportSheet roster={exportable} readOnly={!!readOnly} light={light} initialFormat={start === 'export-pdf' ? 'pdf' : start === 'export-json' ? 'json' : galleryExportFormat() ?? 'text'} notify={notify} onClose={() => setSheet(null)} />}
     {sheet?.kind === 'add-force' && <AddForceSheet forces={forces} limit={limit} faction={roster.faction} onAdd={addForce} onClose={() => setSheet(null)} />}
     {sheet?.kind === 'move' && units.some(u => u.id === sheet.id) && <MoveUnitSheet unit={units.find(u => u.id === sheet.id)!} forces={forces} units={units} from={forceOf(units.find(u => u.id === sheet.id)!)} onMove={id => moveUnit(units.find(u => u.id === sheet.id)!, id)} onAddForce={() => setSheet({ kind: 'add-force' })} onClose={() => setSheet(null)} />}
     {sheet?.kind === 'rename' && <RenameSheet title="Rename roster" label="Roster name" value={roster.name} onSave={renameRoster} onClose={() => setSheet(null)} />}

@@ -1,7 +1,9 @@
 import { useMemo, useState, type ReactNode } from 'react';
-import { AlertTriangle, Check, CheckCircle2, ClipboardCopy, FileJson, FileText, Lock } from 'lucide-react';
-import { FORCE_TYPES, forceTypeBlocked, rosterText, unitCost, type ExportRoster, type Force, type ImportResult } from '../desktop/DesktopEditorFlows';
+import { AlertTriangle, ArrowDownToLine, Check, CheckCircle2, ClipboardCopy, FileJson, FileText, FileType, Lock, Printer } from 'lucide-react';
+import { FORCE_TYPES, JSON_FILE_LINE, NEEDS_GAME_DATA, PAPERS, PaperPreview, forceTypeBlocked, needsGameData, pdfPages, rosterText, sizeLabel, unitCost, type ExportFormat, type ExportRoster, type Force, type ImportResult, type Paper } from '../desktop/DesktopEditorFlows';
 import { TabletSheet } from './TabletSheet';
+import { WorkspaceScope } from './TabletPieces';
+import { Segmented } from '../workspace/Primitives';
 
 // The editor's form sheets (T1c): the desktop dialogs with the mobile controls inside. Synthetic data only (DEC-001).
 
@@ -43,40 +45,69 @@ export function RenameSheet({ title, label, value, maxLength = 60, hint, onSave,
 
 /* ---------------------------------------------------------------- Export */
 
-type Format = 'json' | 'text';
-const FORMATS: Array<{ id: Format; label: string; detail: string; ext: string; icon: ReactNode }> = [
+/** F3 (approved 2026-11-06): four formats; Print view and PDF share the print document. */
+const FORMATS: Array<{ id: ExportFormat; label: string; detail: string; ext: string; icon: ReactNode }> = [
   { id: 'text', label: 'Text for sharing', detail: 'Plain text to paste into a message, forum or notes.', ext: 'txt', icon: <FileText size={22} /> },
-  { id: 'json', label: 'Roster file', detail: 'The whole roster as a .json file. Opens in Battle Augur on any device.', ext: 'json', icon: <FileJson size={22} /> },
+  { id: 'json', label: 'Roster file', detail: 'The whole roster as a .json file.', ext: 'json', icon: <FileJson size={22} /> },
+  { id: 'html', label: 'Print view', detail: 'A formatted page to print or save as PDF (.html).', ext: 'html', icon: <Printer size={22} /> },
+  { id: 'pdf', label: 'PDF', detail: 'A document to print or send (.pdf).', ext: 'pdf', icon: <FileType size={22} /> },
 ];
 
-/** Export: pick the format, check the preview, then Share (header) or Copy. The app's export has no Include switches and
- *  no Save file… (TB-09); Copy closes the sheet with a toast. */
-export function ExportSheet({ roster, readOnly, onClose, notify }: { roster: ExportRoster; readOnly: boolean; onClose: () => void; notify: (text: string) => void }) {
-  const [format, setFormat] = useState<Format>('text');
+/** Export: pick the format (Include for Print view and PDF, Paper for PDF), check the preview (the file panel for the roster file),
+ *  then Share (header) or Save file… under the preview, with Copy text / Copy JSON beside it for Text and the roster file. Copy closes
+ *  the sheet with a toast; Save file… opens the system save picker (iOS Save to Files, Android "save as"). A read-only roster has no
+ *  game data, so Print view and PDF are disabled with "Needs the game data". */
+export function ExportSheet({ roster, readOnly, light = false, initialFormat = 'text', onClose, notify }: { roster: ExportRoster; readOnly: boolean; light?: boolean; initialFormat?: ExportFormat; onClose: () => void; notify: (text: string) => void }) {
+  const [format, setFormat] = useState<ExportFormat>(readOnly && needsGameData(initialFormat) ? 'text' : initialFormat);
+  const [rules, setRules] = useState(true);
+  const [profiles, setProfiles] = useState(true);
+  const [paper, setPaper] = useState<Paper>('A4');
   const meta = FORMATS.find(f => f.id === format)!;
   const fileName = `${roster.name}.${meta.ext}`;
-  const output = useMemo(() => format === 'json' ? JSON.stringify(roster.file, null, 2) : rosterText(roster, false, true), [format, roster]);
-  const size = new Blob([output]).size;
+  const printable = needsGameData(format);
+  const output = useMemo(() => format === 'json' ? JSON.stringify(roster.file, null, 2) : rosterText(roster, false, false), [format, roster]);
+  // The print document is about 18 KB plus 1.5 KB a unit in the gallery (the real one embeds its styles).
+  const size = printable ? 18000 + roster.forces.reduce((n, f) => n + f.units.length, 0) * 1500 + (rules ? 2000 : 0) : new Blob([output]).size;
   const done = (text: string) => { notify(text); onClose(); };
   const copy = async () => { try { await navigator.clipboard.writeText(output); done(format === 'json' ? 'Roster file copied as text' : 'Roster text copied'); } catch { notify('Could not copy. Select the preview and copy it instead.'); } };
-  // The share sheet of the system opens here; the prototype falls back to a toast.
-  const share = async () => { try { if (navigator.share) { await navigator.share({ title: roster.name, text: output }); done(`Shared “${roster.name}”`); return; } } catch { return; } done(`Share sheet opens here (${meta.label.toLowerCase()})`); };
+  // The share sheet and the save picker of the system open here; the prototype falls back to a toast.
+  const share = async () => { try { if (navigator.share && !printable) { await navigator.share({ title: roster.name, text: output }); done(`Shared “${roster.name}”`); return; } } catch { return; } done(`Share sheet opens here (${meta.label.toLowerCase()})`); };
+  const save = () => notify(`The system save picker opens here for “${fileName}”`);
   return <TabletSheet title="Export roster" wide onClose={onClose} sub={<>{roster.name} · {roster.forces.length} {roster.forces.length === 1 ? 'force' : 'forces'} · {roster.total.toLocaleString()} pts</>}
     action={{ label: 'Share', onClick: share }}>
     {readOnly && <div className="tbs-note"><Lock size={16} />Read-only roster: it is exported as it was saved.</div>}
     <div className="tbs-export">
       <div className="tbs-export-side">
         <h3 className="tbs-label" id="tbs-format">Format</h3>
-        <div className="tbs-choices" role="radiogroup" aria-labelledby="tbs-format">{FORMATS.map(f => <button type="button" role="radio" key={f.id} aria-checked={format === f.id} className={`tbs-choice ${format === f.id ? 'active' : ''}`} data-autofocus={format === f.id ? true : undefined} onClick={() => setFormat(f.id)}>
-          <span className="tbs-choice-icon">{f.icon}</span><span><strong>{f.label}</strong><small>{f.detail}</small></span>{format === f.id && <Check size={20} />}</button>)}</div>
+        <div className="tbs-choices" role="radiogroup" aria-labelledby="tbs-format">{FORMATS.map(f => {
+          const blocked = readOnly && needsGameData(f.id);
+          return <button type="button" role="radio" key={f.id} aria-checked={format === f.id} aria-disabled={blocked || undefined} className={`tbs-choice ${format === f.id ? 'active' : ''}`} data-autofocus={format === f.id ? true : undefined} onClick={() => { if (!blocked) setFormat(f.id); }}>
+            <span className="tbs-choice-icon">{f.icon}</span><span><strong>{f.label}</strong><small>{f.detail}</small>{blocked && <small className="reason"><Lock size={13} />{NEEDS_GAME_DATA}</small>}</span>{format === f.id && <Check size={20} />}</button>;
+        })}</div>
+        {printable && <>
+          <h3 className="tbs-label">Include</h3>
+          <div className="tbs-choices">
+            <button type="button" role="switch" aria-checked={rules} className="tbs-switch" onClick={() => setRules(!rules)}><span><strong>Rules</strong><small>Rule names on units, their text at the end</small></span><i aria-hidden /></button>
+            <button type="button" role="switch" aria-checked={profiles} className="tbs-switch" onClick={() => setProfiles(!profiles)}><span><strong>Profiles</strong><small>Each unit's characteristics</small></span><i aria-hidden /></button>
+          </div>
+        </>}
+        {format === 'pdf' && <div className="tbs-paper"><h3 className="tbs-label" id="tbs-paper">Paper</h3>
+          <WorkspaceScope light={light}><Segmented<Paper> label="Paper" value={paper} onChange={setPaper} options={PAPERS.map(p => ({ value: p, label: p }))} /></WorkspaceScope></div>}
       </div>
       <div className="tbs-export-preview">
-        <div className="tbs-preview-head"><h3 className="tbs-label">Preview</h3><span>{fileName} · {size < 1024 ? `${size} B` : `${(size / 1024).toFixed(1)} KB`}</span></div>
-        <pre className="tbs-pre" tabIndex={0} aria-label={`${meta.label} preview`}>{output}</pre>
+        {format === 'json' ? <>
+          <div className="tbs-preview-head"><h3 className="tbs-label">File</h3></div>
+          <div className="tbs-file"><FileJson size={24} /><span><strong>{fileName} · {sizeLabel(size)}</strong><small>{JSON_FILE_LINE}</small></span></div>
+        </> : <>
+          <div className="tbs-preview-head"><h3 className="tbs-label">Preview</h3><span>{format === 'pdf' ? `${fileName} · ${pdfPages(roster, rules, paper)} pages` : `${fileName} · ${sizeLabel(size)}`}</span></div>
+          {printable ? <PaperPreview roster={roster} rules={rules} profiles={profiles} label={format === 'pdf' ? 'PDF preview' : 'Print view preview'} className="tbs-paper-preview" />
+            : <pre className="tbs-pre" tabIndex={0} aria-label={`${meta.label} preview`}>{output}</pre>}
+        </>}
         <div className="tbs-actions">
-          <button type="button" className="tbs-action" onClick={copy}><ClipboardCopy size={18} />{format === 'json' ? 'Copy JSON' : 'Copy text'}</button>
+          <button type="button" className="tbs-action" onClick={save}><ArrowDownToLine size={18} />Save file…</button>
+          {!printable && <button type="button" className="tbs-action" onClick={copy}><ClipboardCopy size={18} />{format === 'json' ? 'Copy JSON' : 'Copy text'}</button>}
         </div>
-        <p className="tbs-hint">{format === 'json' ? 'Import this file on another device to keep editing.' : 'Copy and paste it where you share rosters.'}</p>
+        <p className="tbs-hint">{format === 'html' ? 'Open the saved page in a browser to print it.' : format === 'pdf' ? 'Opens in any PDF reader and prints as shown.' : format === 'json' ? 'Import this file on another device to keep editing.' : 'Copy and paste it where you share rosters.'}</p>
       </div>
     </div>
   </TabletSheet>;

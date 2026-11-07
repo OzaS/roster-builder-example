@@ -599,6 +599,18 @@
           "label": "Roster editor · Export"
         },
         {
+          "id": "tablet-editor-export-pdf",
+          "label": "Roster editor · Export, PDF"
+        },
+        {
+          "id": "tablet-editor-export-json",
+          "label": "Roster editor · Export, roster file"
+        },
+        {
+          "id": "tablet-editor-export-readonly",
+          "label": "Roster editor · Export, read-only roster"
+        },
+        {
           "id": "tablet-editor-shortcuts",
           "label": "Roster editor · Keyboard shortcuts (hold ⌘, Ctrl + /)"
         },
@@ -894,6 +906,9 @@
             "tablet-editor-add-force",
             "tablet-editor-readonly",
             "tablet-editor-export",
+            "tablet-editor-export-pdf",
+            "tablet-editor-export-json",
+            "tablet-editor-export-readonly",
             "tablet-editor-import-result",
             "tablet-editor-shortcuts",
             "tablet-editor-text-200",
