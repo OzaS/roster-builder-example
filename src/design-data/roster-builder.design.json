@@ -110,6 +110,30 @@
           "label": "Lookup 1.0 · Detachment"
         },
         {
+          "id": "lookup-detachment-large",
+          "label": "Lookup 1.0 · Detachment, large (key folded)"
+        },
+        {
+          "id": "lookup-detachment-key-open",
+          "label": "Lookup 1.0 · Detachment, key open"
+        },
+        {
+          "id": "lookup-detachment-base-zero",
+          "label": "Lookup 1.0 · Detachment, Base limit 0 open"
+        },
+        {
+          "id": "lookup-detachment-tap",
+          "label": "Lookup 1.0 · Detachment, tap detail"
+        },
+        {
+          "id": "lookup-detachment-text-150",
+          "label": "Lookup 1.0 · Detachment, text 150 %"
+        },
+        {
+          "id": "lookup-detachment-text-200",
+          "label": "Lookup 1.0 · Detachment, text 200 %"
+        },
+        {
           "id": "lookup-upgrade",
           "label": "Lookup 1.0 · Upgrade"
         },
@@ -366,6 +390,12 @@
             "lookup-unit",
             "lookup-force",
             "lookup-detachment",
+            "lookup-detachment-large",
+            "lookup-detachment-key-open",
+            "lookup-detachment-base-zero",
+            "lookup-detachment-tap",
+            "lookup-detachment-text-150",
+            "lookup-detachment-text-200",
             "lookup-upgrade",
             "lookup-rule",
             "lookup-loading",
@@ -728,6 +758,22 @@
           "label": "Tablet · Lookup 1.0 · Detachment reference"
         },
         {
+          "id": "tablet-lookup-1-0-detachment-large",
+          "label": "Lookup 1.0 · Detachment, large (key folded)"
+        },
+        {
+          "id": "tablet-lookup-1-0-detachment-key-open",
+          "label": "Lookup 1.0 · Detachment, key open (two columns)"
+        },
+        {
+          "id": "tablet-lookup-1-0-detachment-base-zero",
+          "label": "Lookup 1.0 · Detachment, Base limit 0 open"
+        },
+        {
+          "id": "tablet-lookup-1-0-detachment-tap",
+          "label": "Lookup 1.0 · Detachment, tap detail"
+        },
+        {
           "id": "tablet-lookup-1-0-loading-empty",
           "label": "Tablet · Lookup 1.0 · Loading, empty detail"
         },
@@ -892,6 +938,10 @@
             "tablet-lookup-1-0-upgrade",
             "tablet-lookup-1-0-rule",
             "tablet-lookup-1-0-detachment",
+            "tablet-lookup-1-0-detachment-large",
+            "tablet-lookup-1-0-detachment-key-open",
+            "tablet-lookup-1-0-detachment-base-zero",
+            "tablet-lookup-1-0-detachment-tap",
             "tablet-lookup-1-0-loading-empty",
             "tablet-lookup-1-0-failed-empty",
             "tablet-lookup-1-0-text-150",
@@ -1342,6 +1392,22 @@
           "label": "Lookup 1.0 · Detachment reference"
         },
         {
+          "id": "desktop-lookup-1-0-detachment-large",
+          "label": "Lookup 1.0 · Detachment, large (key folded)"
+        },
+        {
+          "id": "desktop-lookup-1-0-detachment-key-open",
+          "label": "Lookup 1.0 · Detachment, key open (two columns)"
+        },
+        {
+          "id": "desktop-lookup-1-0-detachment-base-zero",
+          "label": "Lookup 1.0 · Detachment, Base limit 0 open"
+        },
+        {
+          "id": "desktop-lookup-1-0-detachment-hover",
+          "label": "Lookup 1.0 · Detachment, hover detail"
+        },
+        {
           "id": "desktop-lookup-1-0-narrow",
           "label": "Lookup 1.0 · Narrow window, results"
         },
@@ -1445,6 +1511,10 @@
             "desktop-lookup-1-0-upgrade",
             "desktop-lookup-1-0-rule",
             "desktop-lookup-1-0-detachment",
+            "desktop-lookup-1-0-detachment-large",
+            "desktop-lookup-1-0-detachment-key-open",
+            "desktop-lookup-1-0-detachment-base-zero",
+            "desktop-lookup-1-0-detachment-hover",
             "desktop-lookup-1-0-narrow",
             "desktop-lookup-1-0-narrow-entry",
             "desktop-tools",

@@ -1,5 +1,6 @@
 import { PhoneSearchHeader } from "./PhoneSearchHeader";
 import { PhoneListsFilters } from "./PhoneListsFilters";
+import { ForceLayoutContext } from "./ForceLayout";
 import { PhoneLookup } from "./PhoneLookup";
 import { AppearancePreferences } from "./AppearanceSettings";
 import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject } from "react";
@@ -1815,11 +1816,14 @@ function LookupScreen({ props }: { props: ConceptProps }) {
 /** Lookup 1.0 (design session 2026-10-31): each workflow screen opens PhoneLookup in one state. */
 function PhoneLookupScreen({ props }: { props: ConceptProps }) {
   const s = props.workflowScreen;
-  const stack = s === "lookup-unit" || s === "lookup-unit-text-150" ? ["u-line-fc"] : s === "lookup-force" ? ["f-line-of-battle"] : s === "lookup-detachment" ? ["d-line-formation"] : s === "lookup-upgrade" ? ["up-line-rifle"] : s === "lookup-rule" ? ["r-hold-line"] : s === "lookup-large-text" ? ["u-veteran-reinforced"] : [];
-  const query = s === "lookup-start" || s === "source" ? "" : s === "lookup-no-results" ? "lantern" : s === "lookup-large-text" ? "reinforced" : "line";
+  // F2 sections 2–3 (approved 2026-11-07): the large detachment in its Layout states (key folded by default).
+  const muster = !!s?.startsWith("lookup-detachment-");
+  const stack = muster ? ["d-grand-muster"] : s === "lookup-unit" || s === "lookup-unit-text-150" ? ["u-line-fc"] : s === "lookup-force" ? ["f-line-of-battle"] : s === "lookup-detachment" ? ["d-line-formation"] : s === "lookup-upgrade" ? ["up-line-rifle"] : s === "lookup-rule" ? ["r-hold-line"] : s === "lookup-large-text" ? ["u-veteran-reinforced"] : [];
+  const query = s === "lookup-start" || s === "source" ? "" : s === "lookup-no-results" ? "lantern" : s === "lookup-large-text" ? "reinforced" : muster ? "muster" : "line";
   // R0-03 (DEC-054) lifecycle states: loading, failure / retry, a saved reference whose source is gone, large text.
   const phase = s === "lookup-loading" ? "loading" : s === "lookup-failed" ? "failed" : "ready";
-  return <PhoneLookup key={s} initialQuery={query} initialStack={stack} noData={s === "lookup-no-data"} phase={phase} unavailable={s === "lookup-unavailable"} largeText={s === "lookup-large-text"} text150={s === "lookup-results-text-150" || s === "lookup-unit-text-150"} trailing={<AppAvatarButton props={props} />} onAddData={() => props.onNavigate("add-source")} />;
+  const layout = { keyOpen: s === "lookup-detachment-key-open" || s === "lookup-detachment-text-150" || s === "lookup-detachment-text-200", zeroOpen: s === "lookup-detachment-base-zero", tip: s === "lookup-detachment-tap" ? "Command - Veterans Only" : undefined };
+  return <ForceLayoutContext.Provider value={layout}><PhoneLookup key={s} initialQuery={query} initialStack={stack} noData={s === "lookup-no-data"} phase={phase} unavailable={s === "lookup-unavailable"} largeText={s === "lookup-large-text" || s === "lookup-detachment-text-200"} text150={s === "lookup-results-text-150" || s === "lookup-unit-text-150" || s === "lookup-detachment-text-150"} trailing={<AppAvatarButton props={props} />} onAddData={() => props.onNavigate("add-source")} /></ForceLayoutContext.Provider>;
 }
 
 function LookupGroup({ title, icon, children }: { title: string; icon: ReactNode; children: ReactNode }) {

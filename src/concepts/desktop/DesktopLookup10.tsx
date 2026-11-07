@@ -3,6 +3,7 @@ import { BookOpen, ChevronLeft, CircleAlert, Clock3, Database, RotateCw, Search,
 import { lookupById, lookupSystems, sourceLine, type LookupEntity } from '../../data/lookupData';
 import { LookupEntryBody, LookupSection } from '../ux/PhoneLookup';
 import { plural, useLookup } from '../ux/useLookup';
+import { ForceLayoutContext, type ForceLayoutState } from '../ux/ForceLayout';
 import { PageTitle } from './DesktopPages';
 import './desktop-lookup-states.css';
 
@@ -26,8 +27,8 @@ const MISSING_REF = { name: 'Line Infantry', source: 'Example System Three v2.1'
  * with Back to results; at 200 % text, titles (result names and the entry heading) stop at two lines with the full name in
  * the tooltip, the accessible name and a Full name disclosure. The cap applies to titles only.
  */
-export function DesktopLookup10({ initial = 'u-line-fc', state: initialState, openGroup = false, narrowEntry = false, onAddData }: { initial?: string; state?: LookupState; openGroup?: boolean; narrowEntry?: boolean; onAddData?: () => void }) {
-  const lk = useLookup(initialState === 'start' || initialState === 'no-data' ? '' : 'line');
+export function DesktopLookup10({ initial = 'u-line-fc', state: initialState, openGroup = false, narrowEntry = false, layout = { hover: true }, onAddData }: { initial?: string; state?: LookupState; openGroup?: boolean; narrowEntry?: boolean; /** Force Layout gallery state (F2); the desktop shows a group's detail on hover. */ layout?: ForceLayoutState; onAddData?: () => void }) {
+  const lk = useLookup(initialState === 'start' || initialState === 'no-data' ? '' : initial === 'd-grand-muster' ? 'muster' : 'line');
   // Recently viewed (LK-09): the last references opened, newest first, shown before a search is typed.
   const [recent, setRecent] = useState(RECENT_IDS);
   const noData = initialState === 'no-data';
@@ -49,7 +50,7 @@ export function DesktopLookup10({ initial = 'u-line-fc', state: initialState, op
   // Retry runs the same search again: it shows Loading, then the results (the prototype always succeeds the second time).
   const retry = () => { setState('loading'); window.clearTimeout(retryTimer.current); retryTimer.current = window.setTimeout(() => setState(undefined), 1400); };
   const backToResults = () => { setStack([]); requestAnimationFrame(() => listRef.current?.querySelector<HTMLElement>('.dtp-result')?.focus()); };
-  return <main className={`dtp-page dtp-lookup10 ${large ? 'dtl-large' : ''} ${initialState === 'text-200' ? 'dtl-keep-split' : ''}`}>
+  return <ForceLayoutContext.Provider value={layout}><main className={`dtp-page dtp-lookup10 ${large ? 'dtl-large' : ''} ${initialState === 'text-200' ? 'dtl-keep-split' : ''}`}>
     {/* DEC-050: no visible page title; the search fills the top row, as on Rosters and Sources. */}
     <PageTitle>Lookup</PageTitle>
     <div className="dtp-toolbar dtp-top-row">
@@ -95,5 +96,5 @@ export function DesktopLookup10({ initial = 'u-line-fc', state: initialState, op
         </div> : <div className="dtl-detail-empty"><BookOpen size={22} /><p>{busy ? 'The entry opens when you choose a result.' : 'Choose a result to read its reference.'}</p></div>}
       </article>
     </div>}
-  </main>;
+  </main></ForceLayoutContext.Provider>;
 }
