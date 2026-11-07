@@ -102,8 +102,20 @@
 .tbs-pre { height: 260px; margin: 0; padding: 12px 14px; overflow: auto; border: 1px solid var(--ux-line-2); border-radius: 14px; background: var(--ux-surface); color: var(--ux-ink); font: 12.5px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; user-select: text }
 .tbs-pre:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 1px }
 .tbs-actions { display: flex; flex-wrap: wrap; gap: 10px }
+/* F3: Paper for PDF, the paper preview (the desktop's, at the tablet's sizes) and the roster file panel. */
+.tbs-paper { display: flex; align-items: center; justify-content: space-between; gap: 12px }
+.tbs-paper .tbs-label { margin: 0 }
+.tb-app .dte-paper.tbs-paper-preview { flex: none; height: 260px; margin: 0; border-color: var(--ux-line-2); border-radius: 14px; padding: 18px 20px }
+.tb-app .tbs-paper-preview h4 { margin: 0; font-size: 19px; font-weight: 600 }
+.tb-app .tbs-paper-preview h5 { margin: 12px 0 6px; padding-bottom: 4px; border-bottom: 1px solid var(--ux-line-2); font-size: 14px; display: flex; justify-content: space-between; gap: 10px }
+.tb-app .tbs-paper-preview p { font-size: 13px; margin: 4px 0 }
+.tb-app .tbs-paper-preview .dte-paper-unit, .tb-app .tbs-paper-preview .dte-paper-unit :is(small, em) { font-size: 13px }
+.tbs-file { display: flex; align-items: flex-start; gap: 12px; padding: 16px; border: 1px solid var(--ux-line-2); border-radius: 14px; background: var(--ux-surface); color: var(--ux-muted); font-size: 13.5px; line-height: 1.4 }
+.tbs-file > svg { flex-shrink: 0; color: var(--ux-accent-2) }
+.tbs-file strong { display: block; margin-bottom: 3px; color: var(--ux-ink); font-size: 15px }
 .tbs-actions .tbs-action { flex: 1 1 160px }
 @container tbs (min-width: 760px) {
   .tbs-export { grid-template-columns: 330px minmax(0, 1fr); gap: 24px }
   .tbs-pre { height: 340px }
+  .tb-app .dte-paper.tbs-paper-preview { height: 340px }
 }

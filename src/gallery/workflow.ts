@@ -10,6 +10,9 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "tablet-editor-add-force", label: "Tablet · Roster editor · Add force" },
   { id: "tablet-editor-readonly", label: "Tablet · Roster editor · Read-only roster" },
   { id: "tablet-editor-export", label: "Tablet · Roster editor · Export" },
+  { id: "tablet-editor-export-pdf", label: "Tablet · Roster editor · Export, PDF" },
+  { id: "tablet-editor-export-json", label: "Tablet · Roster editor · Export, roster file" },
+  { id: "tablet-editor-export-readonly", label: "Tablet · Roster editor · Export, read-only roster" },
   { id: "tablet-editor-shortcuts", label: "Tablet · Roster editor · Keyboard shortcuts" },
   { id: "tablet-editor-text-200", label: "Tablet · Roster editor · Text 200%" },
   { id: "tablet-editor-add-roles", label: "Tablet · Roster editor · Many unit roles" },
@@ -92,6 +95,9 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "desktop-editor-unit-dialog-narrow", label: "Desktop · Roster editor · Unit dialog, narrow window" },
   { id: "desktop-editor-unit-dialog-nested", label: "Desktop · Roster editor · Unit dialog, nested element" },
   { id: "desktop-editor-unit-dialog-readonly", label: "Desktop · Roster editor · Unit dialog, read-only" },
+  { id: "desktop-editor-export-pdf", label: "Desktop · Roster editor · Export, PDF" },
+  { id: "desktop-editor-export-json", label: "Desktop · Roster editor · Export, roster file" },
+  { id: "desktop-editor-export-readonly", label: "Desktop · Roster editor · Export, read-only roster" },
   { id: "desktop-editor-unit-dialog-zoom-200", label: "Desktop · Roster editor · Unit dialog, page zoom 200%" },
   { id: "desktop-editor-unit-dialog-separated", label: "Desktop · Roster editor · Unit dialog, after Separate 1 (4 + 1)" },
   { id: "desktop-editor-catalogue-limit", label: "Desktop · Roster editor · Catalogue limit reached" },
@@ -176,7 +182,11 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "app-developer-debug", label: "App · Developer options unlocked, debug build" },
   { id: "developer-options", label: "App · Developer options" },
   { id: "debug", label: "App · Debug (debug builds)" },
-  { id: "export", label: "Export" },
+  { id: "export", label: "Export · Text" },
+  { id: "export-json", label: "Export · New Recruit JSON" },
+  { id: "export-pdf", label: "Export · PDF" },
+  { id: "export-preview", label: "Export · Preview (PDF)" },
+  { id: "export-stored", label: "Export · Stored roster (read only)" },
 ];
 
 const workflowLabels: Record<WorkflowScreen, string> = workflowScreens.reduce(
@@ -224,6 +234,8 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen === "unit-options-separate-all" || screen === "unit-options-separated") return "unit-options-mobile";
   if (screen === "option-drilldown") return "unit-detail";
   if (screen === "diagnostics") return "validation";
+  if (screen === "export-stored") return "roster-read-only";
+  if (screen === "export" || screen === "export-json" || screen === "export-pdf" || screen === "export-preview") return "overview"; // the export sheet over the roster
   return screen as PrototypeScreen; // the tablet screens returned above are not narrowed away by startsWith
 }
 

@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { Archive, ArrowDownToLine, ArrowLeft, Bell, Check, ChevronDown, ChevronRight, Circle, CircleArrowUp, CircleCheck, Clock, Copy, Database, Download, Ellipsis, FileArchive, FileInput, FileText, FolderGit2, FolderOpen, Globe, Hand, History, Info, Library, ListChecks, LoaderCircle, Lock, Minus, OctagonAlert, Plus, RefreshCw, Search, Star, Trash2, TextCursorInput, TriangleAlert, Ungroup, Upload, Wifi, X } from "lucide-react";
 import type { ConceptProps } from "../shared";
 import { Chip } from "./uxShared";
+import { ExportActions, STORED_PRINT_ROWS } from "./PhoneExport";
 
 /*
  * Source data and background jobs (Battle Augur plan 2D, DEC-022/023).
@@ -1644,16 +1645,19 @@ function LiveEditorRows({ editable }: { editable: boolean }) {
   );
 }
 
-/** The export sheet of a stored roster (built in battle-augur plan 2G part 1): the Battle Augur file always; text and New Recruit JSON from the saved snapshot. */
+/** The export sheet of a stored roster (built in battle-augur plan 2G part 1): the Battle Augur file always; text and New Recruit JSON from the saved snapshot.
+ *  F3 (approved 2026-11-06): Print view and PDF are listed but need the game data; the roster file shows its name and size, not its
+ *  content; the actions are Copy, Save file… and Share. */
 export function ReadOnlyExportSheet({ snapshot = true, inline = false }: { snapshot?: boolean; inline?: boolean }) {
   const formats = [
     { id: "file", title: "Battle Augur roster file", body: "A copy of the roster as stored. It cannot be imported back yet; New Recruit JSON can.", ok: true },
     { id: "text", title: "Text", body: snapshot ? "As last saved yesterday" : "Needs the game data", ok: snapshot },
     { id: "json", title: "New Recruit JSON", body: snapshot ? "As last saved yesterday" : "Needs the game data", ok: snapshot },
+    ...STORED_PRINT_ROWS,
   ];
   const name = snapshot ? "Spring league list" : "Harbour raid";
   const sheet = (
-    <section className={`ux-job-sheet ${inline ? "inline" : ""}`} role="dialog" aria-label="Export roster">
+    <section className={`ux-job-sheet ux-xp-sheet ${inline ? "inline" : ""}`} role="dialog" aria-label="Export roster">
       <span className="ux-sheet-grip" aria-hidden />
       <header className="ux-job-head"><span><strong>Export roster</strong><small>{name} · read only</small></span><button type="button" className="ux-icon-btn" aria-label="Close"><X size={17} /></button></header>
       <div className="ux-fp-list ux-ro-formats" role="radiogroup" aria-label="Format">
@@ -1664,8 +1668,8 @@ export function ReadOnlyExportSheet({ snapshot = true, inline = false }: { snaps
           </button>
         ))}
       </div>
-      <pre className="ux-ro-preview">{`{\n  "format": "battle-augur-roster",\n  "name": "${name}",\n  "forces": [ … ]\n}\n\n… 2,140 more characters`}</pre>
-      <footer className="ux-job-footer"><button type="button" className="ux-job-btn"><Copy size={15} />Copy</button><button type="button" className="ux-job-btn primary"><Upload size={15} />Share</button></footer>
+      <div className="ux-xp-file"><strong>{name}.json</strong><span>2.2 KB</span></div>
+      <ExportActions copy />
     </section>
   );
   return inline ? sheet : <div className="ux-job-scrim">{sheet}</div>;
@@ -1697,7 +1701,7 @@ export function TaggedRosterRows() {
 type ReadOnlyPreview = ReadOnlyKind | "kept" | "export" | "export-none";
 
 export function ReadOnlyRosterScreen({ props }: { props: ConceptProps }) {
-  const [preview, setPreview] = useState<ReadOnlyPreview>("source");
+  const [preview, setPreview] = useState<ReadOnlyPreview>(props.workflowScreen === "export-stored" ? "export" : "source");
   const kind: ReadOnlyKind = preview === "export" ? "source" : preview === "export-none" ? "faction" : preview === "kept" ? "changed" : preview;
   const stored = kind === "source" || kind === "faction" ? kind : undefined;
   const live = stored === undefined;

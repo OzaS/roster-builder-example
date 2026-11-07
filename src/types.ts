@@ -38,6 +38,9 @@ export type WorkflowScreen =
   | "tablet-editor-add-force"
   | "tablet-editor-readonly"
   | "tablet-editor-export"
+  | "tablet-editor-export-pdf"
+  | "tablet-editor-export-json"
+  | "tablet-editor-export-readonly"
   | "tablet-editor-shortcuts"
   | "tablet-editor-text-200"
   | "tablet-editor-add-roles"
@@ -149,6 +152,9 @@ export type WorkflowScreen =
   | "desktop-editor-unit-dialog-narrow"
   | "desktop-editor-unit-dialog-nested"
   | "desktop-editor-unit-dialog-readonly"
+  | "desktop-editor-export-pdf"
+  | "desktop-editor-export-json"
+  | "desktop-editor-export-readonly"
   | "desktop-editor-unit-dialog-zoom-200"
   | "desktop-editor-unit-dialog-separated"
   | "desktop-editor-catalogue-limit"
@@ -227,7 +233,11 @@ export type WorkflowScreen =
   | "app-developer-debug"
   | "developer-options"
   | "debug"
-  | "export";
+  | "export"
+  | "export-json"
+  | "export-pdf"
+  | "export-preview"
+  | "export-stored";
 
 export type RosterOption = {
   id: string;

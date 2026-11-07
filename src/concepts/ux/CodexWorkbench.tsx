@@ -12,6 +12,7 @@ import { AddGameDataScreen, AdvancedInstallSetting, AutoUpdateChecksSetting, Reo
 import { MobileUnitOptions } from "./MobileUnitOptions";
 import { QuotaChip, limitReason } from "../workspace/CatalogueLimit";
 import { SoftKeyboard } from "./SoftKeyboard";
+import { PhoneExportFlow, phoneExportRoster } from "./PhoneExport";
 import { SettingsResults } from "./SettingsSearch";
 import { APP_DEVELOPER_SCREENS, DebugNavRow, DebugScreen, DeveloperOptionsNavRow, DeveloperOptionsScreen } from "./DeveloperPages";
 import { BackOrTitle, BudgetMeter, Chip, ExpandableBudget, RosterMoreMenu, RosterShareButton, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "./uxShared";
@@ -244,6 +245,7 @@ export function CodexWorkbench(props: ConceptProps) {
     <div className={`${shell} ${modifier} ${keyboardShown ? "ux-has-kbd" : ""}`.trim()} onPointerDown={handleShellPointerDown}>
       {body}
       {keyboardShown ? <SoftKeyboard /> : null}
+      {props.workflowScreen === "export" || props.workflowScreen === "export-json" || props.workflowScreen === "export-pdf" || props.workflowScreen === "export-preview" ? <PhoneExportFlow key={props.workflowScreen} roster={phoneExportRoster(props.roster)} initialFormat={props.workflowScreen === "export-json" ? "json" : props.workflowScreen === "export-pdf" || props.workflowScreen === "export-preview" ? "pdf" : "text"} previewOpen={props.workflowScreen === "export-preview"} onClose={() => props.onNavigate("overview")} /> : null}
       {subscriptionVariant ? <SubscriptionGate variant={subscriptionVariant} onClose={() => props.onNavigate(subscriptionVariant === "main" ? "library" : "overview")} /> : null}
       {smartGateOpen ? <SubscriptionGate variant="edition" onClose={() => setSmartGateOpen(false)} /> : null}
       {focusPane ? <EdgeHandle edge="top" expanded={focusChromeVisible} onReveal={() => setFocusChromeVisible(true)} /> : null}

@@ -234,6 +234,26 @@
           "label": "Read-only roster"
         },
         {
+          "id": "export",
+          "label": "Export · Text"
+        },
+        {
+          "id": "export-json",
+          "label": "Export · New Recruit JSON"
+        },
+        {
+          "id": "export-pdf",
+          "label": "Export · PDF"
+        },
+        {
+          "id": "export-preview",
+          "label": "Export · Preview (PDF)"
+        },
+        {
+          "id": "export-stored",
+          "label": "Export · Stored roster (read only)"
+        },
+        {
           "id": "unit-options-mobile",
           "label": "Unit detail · Mobile 5A + 5B + links"
         },
@@ -319,7 +339,12 @@
             "unit-options-separate-all",
             "unit-options-separated",
             "diagnostics",
-            "roster-read-only"
+            "roster-read-only",
+            "export",
+            "export-json",
+            "export-pdf",
+            "export-preview",
+            "export-stored"
           ]
         },
         {
@@ -443,7 +468,7 @@
               {"id": "lookup.states", "title": "Lookup Lifecycle States", "level": "composite", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["DEC-054 (R0-03) loading: a search in progress over installed data; query and filters kept (system chips without counts until it finishes); \"Searching installed data…\" with a spinner and skeleton rows; never a false \"no results\"; the tablet detail pane keeps the reference already open", "failure / retry: \"Search could not finish\" · \"Your installed data is still on this device.\" · Retry; query and filters kept; not shown as zero results", "source unavailable: an opened or saved reference whose source is no longer installed: \"Reference unavailable\" · \"The source for this saved reference is no longer installed.\" · names what was saved · Back to results; never silently opens a same-name entry from another source or version (phone: a pushed page titled Saved reference; tablet: the detail pane, no result selected)", "large text 200 %: result and reference titles capped at two lines with an ellipsis; the heading keeps the complete name for screen readers; Full name disclosure (or a tap on the title) shows it; the cap applies to titles only, not reference content or error text; on the phone page the cost moves under the title", "shared pieces LookupLoading, LookupFailure, LookupUnavailable and the title cap in concepts/ux/PhoneLookup, reused by the tablet (and desktop) Lookup", "APPROVED 2026-11-01 (R0 gaps, UI plan O4): lookup-no-data keeps the search closed: the header reads \"Lookup · No game data yet\" with no search button, no query and no open field above \"Nothing to look up yet\" and Add game data"], "screens": ["lookup-loading", "lookup-failed", "lookup-unavailable", "lookup-large-text", "tablet-lookup-1-0-loading", "tablet-lookup-1-0-failed", "tablet-lookup-1-0-unavailable", "tablet-lookup-1-0-long-text-200"], "reactNative": {"component": "LookupStatus (loading, error, unavailable) + capped Text (numberOfLines 2) with a Full name disclosure", "behavior": "The search runs in the engine runtime; the UI keeps the query and filters while it runs and on failure. Saved references are resolved by source and version; a missing source shows the unavailable state instead of a name match.", "accessibility": "Loading is a polite live region with busy state; failure is an alert with Retry; titles keep the full name in their accessibility label even when capped."}},
               { "id": "tools.workflow", "title": "Tools Workflow", "level": "screen-composition", "status": "specified", "platforms": ["phone", "tablet"], "states": ["default", "empty", "active"], "screens": ["tools", "roster-analytics", "comparison", "game-tracker", "dice-simulator"], "reactNative": { "component": "ToolsNavigator", "behavior": "Use nested navigation with restorable tool state.", "accessibility": "Provide text alternatives for charts and dice results." } },
               { "id": "lists.roster-import", "title": "Roster Import", "level": "composite", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["idle", "importing", "imported", "imported-with-gaps", "data-missing", "not-a-roster"], "screens": ["library", "library-v2"], "reactNative": { "component": "ListsImportAction", "behavior": "Lists header action: pick a New Recruit JSON file, import it in the engine worker, then open the roster; report unmatched parts without blocking, and send missing data to Sources. .ros/.rosz import comes later.", "accessibility": "Name the action, mark it busy while importing, and announce the result notice." } },
-              { "id": "roster.export-sheet", "title": "Export Sheet", "level": "composite", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["loading", "preview", "has-errors", "copied", "failed", "stored", "stored-no-snapshot"], "screens": ["export"], "reactNative": { "component": "ExportRosterSheet", "behavior": "Sheet from the roster header: pick New Recruit JSON or text, preview the export (truncated for long texts), then Share (JSON as a file) or Copy. A roster with errors can still be exported; a banner says so. .ros/.rosz and more layouts come later. Stored mode (built in battle-augur plan 2G part 1; Export on a roster without its data, Export as it was on a changed one): title Export roster with \"{name} · read only\" below, three radio rows: Battle Augur roster file (\"A copy of the roster as stored. It cannot be imported back yet; New Recruit JSON can.\", always), Text and New Recruit JSON (\"As last saved {relative date}\" from the saved snapshot, else disabled with \"Needs the game data\"), then the preview, Copy and Share.", "accessibility": "Label the format control, keep the preview selectable, and announce the copied toast." } },
+              {"id": "roster.export-sheet", "title": "Export Sheet", "level": "composite", "status": "specified", "platforms": ["phone", "tablet"], "states": ["F3 changed (approved 2026-11-06, to build)", "text", "new-recruit-json", "print-view", "pdf", "include-rules-profiles", "paper-a4-letter", "file-name-and-size", "preview-page", "save-file", "has-errors", "copied", "saved", "failed", "stored", "stored-no-snapshot", "stored-needs-game-data"], "screens": ["export", "export-json", "export-pdf", "export-preview", "export-stored"], "reactNative": {"component": "ExportRosterSheet", "behavior": "F3 (approved 2026-11-06; to build; replaces the Text | New Recruit JSON segmented control and the inline preview): sheet from the roster bar's Share. Format: four radio rows (the stored mode's rows): Text (\"Plain text to paste into a message, forum or notes.\"), New Recruit JSON (\"The whole roster as a .json file.\"), Print view (\"A formatted page to print or save as PDF (.html)\") and PDF (\"A document to print or send (.pdf)\"). Print view and PDF are the same document (the approved print template, 2026-11-02). Include, only for Print view and PDF: Rules (\"Rule names on units, their text at the end\") and Profiles (\"Each unit's characteristics\"), switches, both on by default; Text and JSON have no options (Text keeps New Recruit's layout). Paper A4 | Letter, only for PDF: the default follows the device region (Letter in the US and Canada, otherwise A4) and the last choice is remembered. Under the options: the file name and its size (PDF: \"n pages · size\"); New Recruit JSON adds \"Open it in New Recruit or import it on another device.\" and has no preview. No inline preview on the phone: a full-width Preview › row (Text, Print view, PDF) pushes the Preview page: ‹ Export back, title Preview with the file name (PDF: and its pages), Share in the header, the whole document scrolling (Text in monospace). Action row: [Copy (Text and New Recruit JSON only; hidden for Print view and PDF)] Save file… (the system save picker: iOS Save to Files, Android create document via the Storage Access Framework) and Share (the file; primary). A roster with errors can still be exported; a banner says so. Stored mode (built in battle-augur plan 2G part 1; Export on a roster without its data, Export as it was on a changed one): title Export roster with \"{name} · read only\" below; rows Battle Augur roster file (\"A copy of the roster as stored. It cannot be imported back yet; New Recruit JSON can.\", always), Text and New Recruit JSON (\"As last saved {relative date}\" from the saved snapshot, else disabled with \"Needs the game data\"), and F3: Print view and PDF, always disabled with \"Needs the game data\" (the print document needs the game data). The roster file shows its name and size instead of its content; actions Copy, Save file… and Share.", "accessibility": "Format and Paper are labelled radio groups; Rules and Profiles are switches; the Preview row says where it goes; the Preview page's text stays selectable; announce the copied and saved toasts; disabled rows read their reason."}},
               { "id": "library.favorite-cards", "title": "Favorite Library Cards", "level": "composite", "status": "specified", "platforms": ["phone", "tablet"], "states": ["default", "empty", "adding", "removing"], "screens": ["collections"], "reactNative": { "component": "FavoriteLibraryCard", "behavior": "Confirm destructive removal and retain list position.", "accessibility": "Give add and remove actions distinct labels." } },
               { "id": "account.summary", "title": "App & Account", "level": "screen-composition", "status": "specified", "platforms": ["phone", "tablet"], "states": ["signed-in", "signed-out", "loading", "offline"], "screens": ["app", "settings"], "reactNative": { "component": "AccountScreen", "behavior": "Handle cached account data and sign-in transitions.", "accessibility": "Do not expose email as the sole account identifier." } },
               { "id": "navigation.main-tabs", "title": "Main Tab Bar", "level": "navigation", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["selected", "unselected", "badge", "keyboard-visible"], "screens": ["library", "source", "tools", "collections"], "reactNative": { "component": "MainTabNavigator", "behavior": "Use the native navigation library and safe-area insets.", "accessibility": "Expose tab role, selected state, and badge value." } },
@@ -597,6 +622,18 @@
         {
           "id": "tablet-editor-export",
           "label": "Roster editor · Export"
+        },
+        {
+          "id": "tablet-editor-export-pdf",
+          "label": "Roster editor · Export, PDF"
+        },
+        {
+          "id": "tablet-editor-export-json",
+          "label": "Roster editor · Export, roster file"
+        },
+        {
+          "id": "tablet-editor-export-readonly",
+          "label": "Roster editor · Export, read-only roster"
         },
         {
           "id": "tablet-editor-shortcuts",
@@ -894,6 +931,9 @@
             "tablet-editor-add-force",
             "tablet-editor-readonly",
             "tablet-editor-export",
+            "tablet-editor-export-pdf",
+            "tablet-editor-export-json",
+            "tablet-editor-export-readonly",
             "tablet-editor-import-result",
             "tablet-editor-shortcuts",
             "tablet-editor-text-200",
@@ -981,7 +1021,7 @@
               {"id": "tablet.add-force-sheet", "title": "Add Force Sheet", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["faction; no name field: a force takes its name from the data (TB-09, as in the app)", "force types as choice rows with a one-line rule summary", "a type the roster cannot take stays visible with the reason (one per roster, needs a higher points limit, needs the allied option)", "Add force in the header", "From More, from the Add force row at the end of the tree"], "screens": ["tablet-editor-add-force"]},
               {"id": "tablet.several-forces", "title": "Several Forces in the Tree", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["one card per force with type, faction, unit count and points", "Adding here chip on the force that the catalogue adds to (tap a card to switch)", "force menu: Add unit here, Rename force, Remove force (needs two forces; Undo brings it back)", "Add force row below the last force", "Undo toasts for add, rename and remove", "validation per force in the summary issues"], "screens": ["tablet-editor-forces"]},
               {"id": "tablet.read-only-roster", "title": "Read-only Roster", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["lock beside the roster name in the header", "banner says the faction was removed from the installed data and the roster is kept as saved", "actions: Make an editable copy, Find game data, Export as it was", "undo, redo, rename, add unit and add force are off; unit options show but cannot change", "Expanded: the catalogue pane says Nothing to add, with Find game data", "summary says Not checked while read-only", "Make an editable copy opens a copy; the original stays read-only"], "screens": ["tablet-editor-readonly"]},
-              {"id": "tablet.export-sheet", "title": "Export Sheet", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["wide form sheet: format and options beside the preview (stacked in split view)", "format choice rows: Text for sharing, Roster file", "no Include switches and no Save file… (TB-09: the app's export has neither)", "monospace preview, selectable, with file name and size", "Share in the header (the system share sheet, a text action without an icon), Copy text or Copy JSON (closes the sheet with a toast)", "read-only roster: note that it is exported as it was saved", "opened from More, the summary popover or the read-only banner"], "screens": ["tablet-editor-export"]},
+              {"id": "tablet.export-sheet", "title": "Export Sheet", "level": "composite", "status": "specified", "platforms": ["tablet"], "states": ["F3 changed (approved 2026-11-06, to build)", "wide form sheet: format and options beside the preview (stacked in split view)", "format rows: Text for sharing, Roster file, Print view (.html), PDF (.pdf)", "Include (Rules, Profiles switches, both on by default) only for Print view and PDF; Paper A4 | Letter only for PDF (region default: Letter in the US and Canada, else A4; last choice remembered)", "Print view and PDF: the paper preview of the document with the file name and size (PDF: name.pdf · n pages)", "Text: monospace preview, selectable, with file name and size", "Roster file: a file panel (name · size and \"Import this file on another device to keep editing, or open it in New Recruit.\"), no preview", "Save file… under the preview for every format (the system save picker: iOS Save to Files, Android create document); Copy text or Copy JSON beside it for Text and the roster file (closes the sheet with a toast); no Copy for Print view and PDF", "Share in the header (the system share sheet with the file, a text action without an icon)", "read-only roster: note that it is exported as it was saved; Print view and PDF disabled with the lock and \"Needs the game data\"", "opened from More, the summary popover or the read-only banner"], "screens": ["tablet-editor-export", "tablet-editor-export-pdf", "tablet-editor-export-json", "tablet-editor-export-readonly"]},
               {"id": "tablet.import-result-sheet", "title": "Import Result Sheet", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["file name under the title, roster mark, name, system, faction and forces", "everything matched: ok note", "parts did not match: warning note, Units / Not found / Points (used / limit), list of entries not found with where they were", "the roster is saved before the result shows (TB-09, as the desktop's DD-12): Close in the header's leading place keeps it in the rosters list, Open roster is always the action", "from the editor's switcher, Open roster replaces the open roster", "Open starts the editor on what matched; reached from the recent-rosters switcher (Import roster…) or after choosing a file on Rosters"], "screens": ["tablet-editor-import-result"]},
               {"id": "tablet.create-sheet", "title": "Guided Creation Sheet", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["wide form sheet opened by every New roster entry (Android rail button, iPad toolbar on Home, Home and Rosters actions, recent-rosters switcher, editor menu, ⌘N)", "step list on the left, on the app's pages (TB-09): Game system, Faction and game mode, Points limit, Roster name; the data's configuration steps get a Configuration page when the data has them (the sample has none); finished steps show their choice and stay editable; titles wrap to two lines", "in a narrower window the list becomes a row of step marks above the content", "choice rows for system (Add another game system is a secondary button under them), faction (search when there are more than four) and game mode on one page; points limit chips (presets, Custom with a whole-number field, Unlimited); name field with the suggested name as placeholder", "force that needs a higher limit says so and holds Continue", "the name page sums up every earlier choice with Change (no separate Review page); Create roster opens the empty roster in the editor", "Back and Skip guided setup under the content, Continue or Create roster in the header", "no game data: Install game data first, with Add game data", "split view: fills the window"], "screens": ["tablet-create", "tablet-create-review"]},
               {"id": "tablet.faction-picker-sheet", "title": "Faction Picker Sheet", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["only with Advanced installation on (DEC-022); every other install imports all factions and never asks", "opens by itself when an install reaches Choose factions; covers the whole window, rail included", "paused-install hint, search when there are more than four factions, N of M selected with Select all or none", "checkbox rows of 56 px, the first faction chosen", "Install N factions in the header; Choose later leaves the install waiting (the jobs popover offers Choose factions again); Cancel install", "split view: fills the window"], "screens": ["tablet-sources-choose-factions"]},
@@ -1222,6 +1262,18 @@
           "label": "Roster editor · Unit dialog, read-only roster"
         },
         {
+          "id": "desktop-editor-export-pdf",
+          "label": "Roster editor · Export, PDF"
+        },
+        {
+          "id": "desktop-editor-export-json",
+          "label": "Roster editor · Export, roster file"
+        },
+        {
+          "id": "desktop-editor-export-readonly",
+          "label": "Roster editor · Export, read-only roster"
+        },
+        {
           "id": "desktop-editor-unit-dialog-separated",
           "label": "Roster editor · Unit dialog, after Separate 1 (4 + 1)"
         },
@@ -1376,6 +1428,9 @@
             "desktop-editor-unit-dialog-zoom-200",
             "desktop-editor-unit-dialog-separated",
             "desktop-editor-catalogue-limit",
+            "desktop-editor-export-pdf",
+            "desktop-editor-export-json",
+            "desktop-editor-export-readonly",
             "desktop-rosters",
             "desktop-lookup",
             "desktop-lookup-1-0",
@@ -1614,10 +1669,10 @@
                 "id": "desktop.export",
                 "title": "Export Dialog",
                 "level": "overlay",
-                "status": "needs-review",
+                "status": "specified",
                 "platforms": ["desktop"],
-                "states": ["roster file (.json)", "text for sharing with preview", "print view (.html) preview", "include rules", "include profiles", "options disabled for the roster file", "Save file…", "Copy text", "result toast", "read-only export as it was", "App DP09: Export roster… in the editor toolbar and ⌘E / Ctrl+E open the dialog with mobile's formats (New Recruit text, New Recruit JSON), a capped monospace preview with file name and size, the errors warning, Copy text (closes with a Copied toast) and Save file… (native Save dialog; File saved inline, the dialog stays open); stored mode lists the Battle Augur roster file and the saved snapshot's formats, opened from the stored roster and the banners' Export / Export as it was. Print view and include rules/profiles toggles are not built (not mobile)", "App DD12: format cards with an icon tile, the app's titles (Text, New Recruit JSON; stored: Battle Augur roster file, Text, New Recruit JSON) and a line on what each is for (stored rows add as last saved, or Needs the game data with the lock); the sub line \"Name · n forces · n pts\" (stored: \"Name · read only\" with the lock); the chosen format's line in the footer (File saved takes its place); Copy JSON for New Recruit JSON; a hint on every control. Still no Print view or Include rules/profiles (the worker's exports have no options)"],
-                "screens": ["desktop-editor"]
+                "states": ["F3 changed (approved 2026-11-06, to build)", "roster file (.json)", "text for sharing with preview", "print view (.html) preview", "PDF (.pdf) paper preview with name.pdf · n pages", "paper A4 | Letter (PDF only)", "roster file: file panel instead of a preview", "include rules", "include profiles", "Save file…", "Copy text", "result toast", "read-only export as it was", "App DP09: Export roster… in the editor toolbar and ⌘E / Ctrl+E open the dialog with mobile's formats (New Recruit text, New Recruit JSON), a capped monospace preview with file name and size, the errors warning, Copy text (closes with a Copied toast) and Save file… (native Save dialog; File saved inline, the dialog stays open); stored mode lists the Battle Augur roster file and the saved snapshot's formats, opened from the stored roster and the banners' Export / Export as it was. Print view and include rules/profiles toggles are not built (not mobile)", "App DD12: format cards with an icon tile, the app's titles (Text, New Recruit JSON; stored: Battle Augur roster file, Text, New Recruit JSON) and a line on what each is for (stored rows add as last saved, or Needs the game data with the lock); the sub line \"Name · n forces · n pts\" (stored: \"Name · read only\" with the lock); the chosen format's line in the footer (File saved takes its place); Copy JSON for New Recruit JSON; a hint on every control. Still no Print view or Include rules/profiles (the worker's exports have no options)", "F3 (approved 2026-11-06, to build): format cards Roster file, Text for sharing, Print view (\"A formatted page to print or save as PDF (.html).\") and PDF (\"A document to print or send (.pdf).\"); the roster file's line is \"The whole roster as a .json file.\". Include (Rules, Profiles, both on by default) shows only for Print view and PDF (hidden for Text and the roster file; Text keeps New Recruit's layout); Paper A4 | Letter only for PDF (default by region: Letter in the US and Canada, else A4; the last choice remembered). Print view and PDF show the paper preview (PDF: \"<name>.pdf · n pages\"; footer hint \"Opens in any PDF reader and prints as shown.\"; Print view keeps \"Open the saved page in a browser to print it.\"). The roster file (and the stored Battle Augur roster file) shows a file panel, the name · size and \"Import this file on another device to keep editing, or open it in New Recruit.\", instead of a preview. Copy is disabled for Print view and PDF with the tooltip pattern (\"A print view is saved as a file\" / \"A PDF is saved as a file\"); Save file… saves every format. Read-only and stored rosters list Print view and PDF disabled with the lock and \"Needs the game data\". Gallery: Roster editor · Export, PDF / roster file / read-only roster."],
+                "screens": ["desktop-editor", "desktop-editor-export-pdf", "desktop-editor-export-json", "desktop-editor-export-readonly"]
               },
               {
                 "id": "desktop.import-result",
