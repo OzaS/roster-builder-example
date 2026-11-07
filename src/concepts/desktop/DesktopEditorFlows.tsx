@@ -1,5 +1,5 @@
 import { useMemo, useReducer, useRef, useState, type ReactNode } from 'react';
-import { AlertTriangle, ArrowDownToLine, Check, CheckCircle2, ClipboardCopy, Copy, Database, FileJson, FileText, Flag, Lock, Pencil, Printer, Redo2, Search, Trash2, Undo2, X } from 'lucide-react';
+import { AlertTriangle, ArrowDownToLine, Check, CheckCircle2, ClipboardCopy, Copy, Database, FileJson, FileText, FileType, Flag, Lock, Pencil, Printer, Redo2, Search, Trash2, Undo2, X } from 'lucide-react';
 import { formatCombo } from './desktopKeys';
 import { Dialog, DialogHeader } from '../workspace/Dialog';
 import './desktop-editor.css';
@@ -192,12 +192,27 @@ export function CatalogueTarget({ forces, active, onChange }: { forces: Force[];
 /* ---------------------------------------------------------------- Export */
 
 export type ExportRoster = { name: string; limit: number; total: number; system: string; faction: string; forces: Array<Force & { points: number; units: EditorUnit[] }>; file: unknown };
-type ExportFormat = 'json' | 'text' | 'html';
+export type ExportFormat = 'json' | 'text' | 'html' | 'pdf';
+/** F3 (approved 2026-11-06): Print view and PDF share one document (the approved print template). Include (Rules, Profiles) applies to
+ *  those two only; Paper (A4 | Letter) to PDF only. */
 const FORMATS: Array<{ id: ExportFormat; label: string; detail: string; ext: string; icon: ReactNode }> = [
-  { id: 'json', label: 'Roster file', detail: 'The whole roster as a .json file. Opens in Battle Augur on any device.', ext: 'json', icon: <FileJson size={17} /> },
+  { id: 'json', label: 'Roster file', detail: 'The whole roster as a .json file.', ext: 'json', icon: <FileJson size={17} /> },
   { id: 'text', label: 'Text for sharing', detail: 'Plain text to paste into a message, forum or notes.', ext: 'txt', icon: <FileText size={17} /> },
   { id: 'html', label: 'Print view', detail: 'A formatted page to print or save as PDF (.html).', ext: 'html', icon: <Printer size={17} /> },
+  { id: 'pdf', label: 'PDF', detail: 'A document to print or send (.pdf).', ext: 'pdf', icon: <FileType size={17} /> },
 ];
+/** Print view and PDF are made from the game data: a stored (read-only) roster cannot have them. */
+export const needsGameData = (format: ExportFormat) => format === 'html' || format === 'pdf';
+export const NEEDS_GAME_DATA = 'Needs the game data';
+export type Paper = 'A4' | 'Letter';
+export const PAPERS: Paper[] = ['A4', 'Letter'];
+/** Gallery estimate of the PDF's page count: the heading, about six units a page (five on Letter), the rules on their own page. */
+export function pdfPages(r: ExportRoster, rules: boolean, paper: Paper = 'A4') {
+  const units = r.forces.reduce((n, f) => n + f.units.length, 0);
+  return 1 + Math.ceil(units / (paper === 'Letter' ? 5 : 6)) + (rules ? 1 : 0);
+}
+export const sizeLabel = (bytes: number) => bytes < 1024 ? `${bytes} B` : `${(bytes / 1024).toFixed(bytes < 10240 ? 1 : 0)} KB`;
+export const JSON_FILE_LINE = 'Import this file on another device to keep editing, or open it in New Recruit.';
 const PROFILE = ['M 6', 'D 4+', 'R 7', 'H 1'];
 const RULES: Record<string, string> = { 'Steady advance': 'This unit may make a normal move and keep its formation bonus while within range of its commander.', 'Field standard': 'A unit carrying a field standard may re-roll one failed resolve test per round.' };
 
@@ -227,43 +242,68 @@ function rosterHtml(r: ExportRoster, rules: boolean, profiles: boolean) {
   const rulesBlock = rules ? `<h2>Rules</h2>${Object.entries(RULES).map(([n, t]) => `<p><b>${esc(n)}</b> ${esc(t)}</p>`).join('')}` : '';
   return `<!doctype html><meta charset="utf-8"><title>${esc(r.name)}</title><h1>${esc(r.name)}</h1><p>${esc(r.system)} · ${esc(r.faction)} · ${r.total} / ${r.limit || '∞'} pts</p>${body}${rulesBlock}`;
 }
+/** The paper preview of the print document (Print view and PDF): a scaled, scrollable view of the page. */
+export function PaperPreview({ roster, rules, profiles, label = 'Print view preview', className = '' }: { roster: ExportRoster; rules: boolean; profiles: boolean; label?: string; className?: string }) {
+  return <div className={`dte-paper ${className}`.trim()} aria-label={label} tabIndex={0}><h4>{roster.name}</h4><p className="dte-paper-meta">{roster.system} · {roster.faction} · {roster.total} / {roster.limit || '∞'} pts</p>{roster.forces.map(f => <section key={f.id}><h5>{f.name}<span>{f.type} · {f.points} pts</span></h5>{f.units.map(u => <div key={u.id} className="dte-paper-unit"><b>{u.name}</b><span>{unitCost(u)} pts</span><small>{u.models} {u.models === 1 ? 'model' : 'models'}, {u.weapon}{u.upgrade ? ', Field standard' : ''}</small>{profiles && <em>{PROFILE.join(' · ')}</em>}</div>)}</section>)}{rules && <section><h5>Rules</h5>{Object.entries(RULES).map(([n, t]) => <p key={n}><b>{n}</b> {t}</p>)}</section>}</div>;
+}
 export function downloadFile(name: string, text: string, type: string) {
   const url = URL.createObjectURL(new Blob([text], { type })); const a = document.createElement('a'); a.href = url; a.download = name; a.click(); URL.revokeObjectURL(url);
 }
 
 export function ExportDialog({ roster, readOnly, storedMode = false, formats, onClose, notify }: { roster: ExportRoster; readOnly: boolean; storedMode?: boolean; formats?: readonly ExportFormat[]; onClose: () => void; notify: (text: string) => void }) {
-  const [format, setFormat] = useState<ExportFormat>('text');
-  const [rules, setRules] = useState(false);
+  const [format, setFormat] = useState<ExportFormat>(() => { const f = galleryExportFormat(); return f && !((readOnly || storedMode) && needsGameData(f)) ? f : 'text'; });
+  const [rules, setRules] = useState(true);
   const [profiles, setProfiles] = useState(true);
+  const [paper, setPaper] = useState<Paper>('A4');
   const meta = FORMATS.find(f => f.id === format)!;
   const fileName = `${roster.name}.${meta.ext}`;
-  const output = useMemo(() => format === 'json' ? JSON.stringify(roster.file, null, 2) : format === 'text' ? rosterText(roster, rules, profiles) : rosterHtml(roster, rules, profiles), [format, roster, rules, profiles]);
+  const printable = needsGameData(format);
+  // A stored or read-only roster has no game data, so Print view and PDF are listed but disabled (F3).
+  const locked = readOnly || storedMode;
+  const shown = FORMATS.filter(f => formats === undefined || formats.includes(f.id) || needsGameData(f.id));
+  // The app's text keeps New Recruit's layout (no options); the JSON is the whole roster.
+  const output = useMemo(() => format === 'json' ? JSON.stringify(roster.file, null, 2) : format === 'text' ? rosterText(roster, false, false) : rosterHtml(roster, rules, profiles), [format, roster, rules, profiles]);
   const size = new Blob([output]).size;
-  const save = () => { downloadFile(fileName, output, format === 'json' ? 'application/json' : format === 'html' ? 'text/html' : 'text/plain'); notify(`Saved “${fileName}”`); onClose(); };
+  const pages = pdfPages(roster, rules, paper);
+  const save = () => { downloadFile(fileName, output, format === 'json' ? 'application/json' : format === 'html' ? 'text/html' : format === 'pdf' ? 'application/pdf' : 'text/plain'); notify(`Saved “${fileName}”`); onClose(); };
   const copy = async () => { try { await navigator.clipboard.writeText(output); notify(format === 'json' ? 'Roster file copied as text' : 'Roster text copied'); onClose(); } catch { notify('Could not copy. Select the preview and copy it instead.'); } };
-  const optionsReason = format === 'json' ? 'The roster file always contains everything.' : undefined;
+  const copyReason = format === 'html' ? 'A print view is saved as a file' : format === 'pdf' ? 'A PDF is saved as a file' : undefined;
   return <Dialog label="Export roster" wide onClose={onClose}>
     <DialogHeader title="Export roster" sub={<>{roster.name} · {roster.forces.length} {roster.forces.length === 1 ? 'force' : 'forces'} · {roster.total.toLocaleString()} pts{readOnly && <> · <Lock size={11} /> {storedMode ? 'as last saved' : 'read-only, exported as it was saved'}</>}</>} onClose={onClose} />
     <div className="dte-export">
       <div className="dte-export-side">
         <h3 className="dte-label" id="dte-format">Format</h3>
-        <div className="dt-choice-list compact" role="radiogroup" aria-labelledby="dte-format">{FORMATS.filter(f => formats === undefined || formats.includes(f.id)).map(f => <button type="button" role="radio" aria-checked={format === f.id} key={f.id} className={format === f.id ? 'active' : ''} data-autofocus={format === f.id ? true : undefined} onClick={() => setFormat(f.id)}><span className="dte-choice-icon">{f.icon}</span><span><strong>{formats ? f.id === 'json' ? 'New Recruit JSON' : 'Text' : f.label}{storedMode ? ' · as last saved' : ''}</strong><small>{storedMode ? 'Uses the stored roster without installed game data.' : f.detail}</small></span>{format === f.id && <Check size={15} />}</button>)}</div>
-        <h3 className="dte-label">Include</h3>
-        <div className="dte-options" title={optionsReason}>
-          <label className={optionsReason ? 'disabled' : ''}><input type="checkbox" checked={format === 'json' || rules} disabled={!!optionsReason} onChange={e => setRules(e.target.checked)} /><span><strong>Rules</strong><small>Rule names on units and their text at the end</small></span></label>
-          <label className={optionsReason ? 'disabled' : ''}><input type="checkbox" checked={format === 'json' || profiles} disabled={!!optionsReason} onChange={e => setProfiles(e.target.checked)} /><span><strong>Profiles</strong><small>Each unit's characteristics</small></span></label>
-          {optionsReason && <p className="dte-hint">{optionsReason}</p>}
-        </div>
+        <div className="dt-choice-list compact" role="radiogroup" aria-labelledby="dte-format">{shown.map(f => {
+          const blocked = locked && needsGameData(f.id);
+          const title = formats && !needsGameData(f.id) ? f.id === 'json' ? 'New Recruit JSON' : 'Text' : f.label;
+          return <button type="button" role="radio" aria-checked={format === f.id} aria-disabled={blocked || undefined} key={f.id} className={`${format === f.id ? 'active' : ''} ${blocked ? 'blocked' : ''}`} title={blocked ? NEEDS_GAME_DATA : undefined} data-autofocus={format === f.id ? true : undefined} onClick={() => !blocked && setFormat(f.id)}><span className="dte-choice-icon">{f.icon}</span><span><strong>{title}{storedMode && !blocked ? ' · as last saved' : ''}</strong><small>{storedMode && !blocked ? 'Uses the stored roster without installed game data.' : f.detail}</small>{blocked && <small className="dte-reason"><Lock size={11} />{NEEDS_GAME_DATA}</small>}</span>{format === f.id && <Check size={15} />}</button>;
+        })}</div>
+        {printable && <>
+          <h3 className="dte-label">Include</h3>
+          <div className="dte-options">
+            <label><input type="checkbox" checked={rules} onChange={e => setRules(e.target.checked)} /><span><strong>Rules</strong><small>Rule names on units and their text at the end</small></span></label>
+            <label><input type="checkbox" checked={profiles} onChange={e => setProfiles(e.target.checked)} /><span><strong>Profiles</strong><small>Each unit's characteristics</small></span></label>
+          </div>
+        </>}
+        {format === 'pdf' && <>
+          <div className="dte-paper-row"><h3 className="dte-label" id="dte-paper">Paper</h3>
+          <div className="dtp-segmented" role="radiogroup" aria-labelledby="dte-paper">{PAPERS.map(p => <button type="button" role="radio" aria-checked={paper === p} key={p} className={paper === p ? 'active' : ''} onClick={() => setPaper(p)}>{p}</button>)}</div></div>
+        </>}
       </div>
       <div className="dte-export-preview">
-        <div className="dte-preview-head"><span className="dte-label">Preview</span><span>{fileName} · {size < 1024 ? `${size} B` : `${(size / 1024).toFixed(1)} KB`}</span></div>
-        {format === 'html' ? <div className="dte-paper" aria-label="Print view preview" tabIndex={0}><h4>{roster.name}</h4><p className="dte-paper-meta">{roster.system} · {roster.faction} · {roster.total} / {roster.limit || '∞'} pts</p>{roster.forces.map(f => <section key={f.id}><h5>{f.name}<span>{f.type} · {f.points} pts</span></h5>{f.units.map(u => <div key={u.id} className="dte-paper-unit"><b>{u.name}</b><span>{unitCost(u)} pts</span><small>{u.models} {u.models === 1 ? 'model' : 'models'}, {u.weapon}{u.upgrade ? ', Field standard' : ''}</small>{profiles && <em>{PROFILE.join(' · ')}</em>}</div>)}</section>)}{rules && <section><h5>Rules</h5>{Object.entries(RULES).map(([n, t]) => <p key={n}><b>{n}</b> {t}</p>)}</section>}</div>
-          : <pre className="dte-pre" tabIndex={0} aria-label={`${meta.label} preview`}>{output}</pre>}
+        {format === 'json' ? <>
+          <div className="dte-preview-head"><span className="dte-label">File</span></div>
+          <div className="dte-file"><FileJson size={20} /><span><strong>{fileName} · {sizeLabel(size)}</strong><small>{JSON_FILE_LINE}</small></span></div>
+        </> : <>
+          <div className="dte-preview-head"><span className="dte-label">Preview</span><span>{format === 'pdf' ? `${fileName} · ${pages} pages` : `${fileName} · ${sizeLabel(size)}`}</span></div>
+          {printable ? <PaperPreview roster={roster} rules={rules} profiles={profiles} label={format === 'pdf' ? 'PDF preview' : 'Print view preview'} className={format === 'pdf' ? `pdf ${paper.toLowerCase()}` : ''} />
+            : <pre className="dte-pre" tabIndex={0} aria-label={`${meta.label} preview`}>{output}</pre>}
+        </>}
       </div>
     </div>
-    <footer className="dte-foot"><span className="dte-hint">{format === 'html' ? 'Open the saved page in a browser to print it.' : format === 'json' ? 'Import this file on another device to keep editing.' : 'Copy and paste it where you share rosters.'}</span>
+    <footer className="dte-foot"><span className="dte-hint">{format === 'html' ? 'Open the saved page in a browser to print it.' : format === 'pdf' ? 'Opens in any PDF reader and prints as shown.' : format === 'json' ? 'Import this file on another device to keep editing.' : 'Copy and paste it where you share rosters.'}</span>
       <button type="button" className="dtp-btn" onClick={onClose}>Cancel</button>
-      <button type="button" className="dtp-btn" disabled={format === 'html'} title={format === 'html' ? 'A print view is saved as a file' : undefined} onClick={copy}><ClipboardCopy size={14} />{format === 'json' ? 'Copy JSON' : 'Copy text'}</button>
+      <button type="button" className="dtp-btn" disabled={!!copyReason} title={copyReason} onClick={copy}><ClipboardCopy size={14} />{format === 'json' ? 'Copy JSON' : 'Copy text'}</button>
       <button type="button" className="dtp-btn primary" onClick={save}><ArrowDownToLine size={14} />Save file…</button>
     </footer>
   </Dialog>;
@@ -393,15 +433,21 @@ export function specialRoster(name: string): { units: EditorUnit[]; forces: Forc
   return null;
 }
 
-export type GalleryFlow = 'export' | 'import' | 'import-partial' | 'add-force' | 'forces' | 'read-only' | 'issues';
+export type GalleryFlow = 'export' | 'export-read-only' | 'import' | 'import-partial' | 'add-force' | 'forces' | 'read-only' | 'issues';
 /** `?desktop=editor&flow=…` opens a flow directly on the standalone link. */
 export function galleryFlow(): GalleryFlow | null {
   const params = new URLSearchParams(location.search);
   const flow = params.has('desktop') ? params.get('flow') : null;
-  return flow && ['export', 'import', 'import-partial', 'add-force', 'forces', 'read-only', 'issues'].includes(flow) ? flow as GalleryFlow : null;
+  return flow && ['export', 'export-read-only', 'import', 'import-partial', 'add-force', 'forces', 'read-only', 'issues'].includes(flow) ? flow as GalleryFlow : null;
+}
+/** `&format=json|text|html|pdf` picks the export format the dialog opens with (standalone gallery links). */
+export function galleryExportFormat(): ExportFormat | null {
+  const f = new URLSearchParams(location.search).get('format');
+  return f === 'json' || f === 'text' || f === 'html' || f === 'pdf' ? f : null;
 }
 export const GALLERY_STATES: Array<{ id: GalleryFlow; label: string }> = [
   { id: 'export', label: 'Export dialog' },
+  { id: 'export-read-only', label: 'Export dialog: read-only roster (Print view and PDF need the game data)' },
   { id: 'import', label: 'Import result: everything matched' },
   { id: 'import-partial', label: 'Import result: parts did not match' },
   { id: 'forces', label: 'Roster with two forces' },

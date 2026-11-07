@@ -270,6 +270,7 @@ function Workbench({ os: osProp, ...props }: Partial<ConceptProps> & { os?: Desk
   const openImport = (r: ImportResult) => { loadDoc(r.units as Unit[], r.forces); setLimit(r.limit); setRosterMeta({ faction: r.faction, force: r.forces[0].type }); nextId.current = Math.max(100, ...r.units.map(u => u.id)) + 1; setSelectedId(r.units[0]?.id ?? 0); setHasRosters(true); openRoster(r.name); notify(r.unmatched.length ? `Imported “${r.name}” without ${r.unmatched.length} ${r.unmatched.length === 1 ? 'entry' : 'entries'}` : `Imported “${r.name}”`); };
   const applyFlow = (f: GalleryFlow) => {
     if (f === 'read-only') return loadRecent('Ember patrol');
+    if (f === 'export-read-only') { loadRecent('Ember patrol'); setFlow({ kind: 'export' }); return; }
     if (f === 'forces') return loadRecent('Harbour defence');
     if (f === 'issues') { loadRecent('Operation First Light'); openIssues(); return; }
     if (view !== 'editor' || readOnly || !rosterOpen) loadRecent(recent[0].name);

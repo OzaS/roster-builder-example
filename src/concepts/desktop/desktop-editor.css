@@ -82,6 +82,13 @@ ul.dte-checks { padding: 6px 8px 6px 14px }
 .dte-options strong { display: block; font-size:12px; font-weight: 500 }
 .dte-options small { display: block; font-size:12px; color: var(--dt-muted) }
 .dte-options .dte-hint { padding: 2px 10px 0 }
+.dte-paper-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 8px; padding: 0 0 0 2px }
+.dte-paper-row .dte-label { margin: 0 }
+/* F3: the roster file shows the file (name · size and one line), not its content. */
+.dte-file { display: flex; align-items: flex-start; gap: 12px; margin-top: 8px; padding: 14px 16px; border: 1px solid var(--dt-border); border-radius: 12px; background: var(--dt-pane); color: var(--dt-muted); font-size: 12px }
+.dte-file > svg { flex-shrink: 0; color: var(--dt-accent) }
+.dte-file strong { display: block; margin-bottom: 2px; color: var(--dt-text); font-size: 13px; font-weight: 600 }
+.dte-file small { display: block; font-size: 12px; line-height: 1.45 }
 .dte-export-preview { display: flex; flex-direction: column; min-width: 0; min-height: 0; padding: 16px 18px; background: var(--dt-bg) }
 .dte-preview-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size:12px; color: var(--dt-muted) }
 .dte-preview-head .dte-label { margin: 0 }
