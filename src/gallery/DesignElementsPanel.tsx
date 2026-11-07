@@ -20,6 +20,7 @@ import { BudgetMeter, Chip, ExpandableBudget, RosterMoreMenu, RosterShareButton,
 import type { GalleryConcept } from "./galleryTypes";
 import { ComingSoonCard, DeveloperOptionsPreview } from "../concepts/ux/AppExtras";
 import { DebugNavRow, DebugRows } from "../concepts/ux/DeveloperPages";
+import { PhoneExportFlow, PhoneExportPreview, phoneExportRoster } from "../concepts/ux/PhoneExport";
 import { ActionMenuDialog, ReopenRosterSetting, AddCollectionSheet, LOCAL_ERRORS, LOCAL_FILE, LOCAL_SOURCE, LocalImportChoiceDialog, LocalImportError, LocalImportRow, LocalInterruptedNotice, LocalRefusedNotice, LocalSourceNote, LocalSourceRows, localSteps, AdvancedInstallSetting, AppDialog, AutoUpdateChecksSetting, FocusCatalogueSearchSetting, SeparateAllSetting, AdvancedSettingsRows, ImportReportGroups, CollectionMenuDialog, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, FirstRunDataCard, ReinstallSheet, ReinstallConfirmDialog, REINSTALL_DONE, REINSTALL_FAILED, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RememberSectionsSetting, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceStatusAction, SourceUpdateCard, SourceVersions, SourcesNavRow, TaggedRosterRows, UpdateAvatarButton, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
 
 type Props = {
@@ -990,10 +991,15 @@ function WorkbenchElements({
       </ElementSection>
 
       <ElementSection title="Export Sheet">
-        <div className="ux-prototype-state"><small>Format</small><div><button type="button">New Recruit JSON</button><button type="button" className="active">Text</button></div></div>
+        <small className="ux-elements-note">F3 (approved 2026-11-06): radio rows for Text, New Recruit JSON, Print view and PDF; Include (Rules, Profiles) for Print view and PDF, Paper A4 | Letter for PDF; the file name and size; Preview › (Text, Print view, PDF) pushes the Preview page with the whole document; actions [Copy (Text, JSON)] Save file… Share. Stored mode lists Print view and PDF disabled with “Needs the game data”.</small>
         <article className="ux-state-card offline"><span className="ux-state-dot" aria-hidden /><strong>This roster has 2 errors</strong><small>You can still export it.</small></article>
-        <pre style={{ maxHeight: 180, overflow: "auto", margin: "10px 0", padding: 10, borderRadius: 10, background: "var(--ux-surface)", border: "1px solid var(--ux-line-2)", fontSize: 11, whiteSpace: "pre-wrap" }}>{`${roster.name} [${roster.system}]\n\n## ${roster.faction}\n\nUnit one [120 pts]\n• Option A\n• Option B\n\n… 1,240 more characters`}</pre>
-        <div className="ux-lists-actions"><div><strong>{roster.name}.txt</strong><small>Share or copy the full text</small></div><button type="button" className="ux-organizer-toggle"><Copy size={15} />Copy</button><button type="button" className="ux-new-roster ux-new-roster-compact"><Upload size={18} /><span><strong>Share</strong></span></button></div>
+        <div className="ux-xp-el-row">
+          <PhoneExportFlow inline roster={phoneExportRoster(roster)} initialFormat="text" />
+          <PhoneExportFlow inline roster={phoneExportRoster(roster)} initialFormat="json" />
+          <PhoneExportFlow inline roster={phoneExportRoster(roster)} initialFormat="pdf" />
+          <div className="ux-xp-el-page"><PhoneExportPreview roster={phoneExportRoster(roster)} format="pdf" /></div>
+          <div className="ux-xp-el-page"><PhoneExportPreview roster={phoneExportRoster(roster)} format="text" /></div>
+        </div>
         <ReadOnlyExportSheet inline />
         <ReadOnlyExportSheet inline snapshot={false} />
       </ElementSection>

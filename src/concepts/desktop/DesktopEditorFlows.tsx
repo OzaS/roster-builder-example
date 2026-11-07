@@ -18,7 +18,7 @@ export type ImportResult<U extends EditorUnit = EditorUnit> = { fileName: string
 
 export const PRIMARY_FORCE_ID = 'f1';
 export const primaryForce = (type = 'Expedition force', faction = 'Frontier Coalition'): Force => ({ id: PRIMARY_FORCE_ID, name: type === 'Expedition force' ? 'Expedition detachment' : type, type, faction });
-export type EditorFlowState = { kind: 'export' } | { kind: 'add-force' } | { kind: 'import'; result: ImportResult };
+export type EditorFlowState = { kind: 'export'; format?: ExportFormat } | { kind: 'add-force' } | { kind: 'import'; result: ImportResult };
 export const forceOf = (u: EditorUnit) => u.forceId ?? PRIMARY_FORCE_ID;
 export const unitCost = (u: EditorUnit) => u.points + (u.upgrade ? 10 : 0) + (u.signalKit ? 5 : 0);
 
@@ -250,8 +250,8 @@ export function downloadFile(name: string, text: string, type: string) {
   const url = URL.createObjectURL(new Blob([text], { type })); const a = document.createElement('a'); a.href = url; a.download = name; a.click(); URL.revokeObjectURL(url);
 }
 
-export function ExportDialog({ roster, readOnly, storedMode = false, formats, onClose, notify }: { roster: ExportRoster; readOnly: boolean; storedMode?: boolean; formats?: readonly ExportFormat[]; onClose: () => void; notify: (text: string) => void }) {
-  const [format, setFormat] = useState<ExportFormat>(() => { const f = galleryExportFormat(); return f && !((readOnly || storedMode) && needsGameData(f)) ? f : 'text'; });
+export function ExportDialog({ roster, readOnly, storedMode = false, formats, initialFormat, onClose, notify }: { roster: ExportRoster; readOnly: boolean; storedMode?: boolean; formats?: readonly ExportFormat[]; initialFormat?: ExportFormat; onClose: () => void; notify: (text: string) => void }) {
+  const [format, setFormat] = useState<ExportFormat>(() => { const f = initialFormat ?? galleryExportFormat(); return f && !((readOnly || storedMode) && needsGameData(f)) ? f : 'text'; });
   const [rules, setRules] = useState(true);
   const [profiles, setProfiles] = useState(true);
   const [paper, setPaper] = useState<Paper>('A4');
