@@ -71,3 +71,19 @@
 .ux-lk-text-200 .ux-fl-tip { zoom: 2 }
 .ux-lk-text-150 .ux-fl-keyhead, .ux-lk-text-200 .ux-fl-keyhead { flex-wrap: wrap; row-gap: 2px; padding-block: 6px }
 .ux-lk-text-150 .ux-fl-zero, .ux-lk-text-200 .ux-fl-zero { flex-wrap: wrap }
+
+/* Elements view: Layout parts in their states, and the word-family table. */
+.ux-fl-samples { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 390px)); gap: 18px; align-items: start }
+.ux-fl-sample { display: grid; gap: 8px; margin: 0 }
+.ux-fl-sample.wide { grid-column: 1 / -1; max-width: 680px }
+.ux-fl-sample figcaption { display: grid; gap: 2px; color: var(--ux-ink); font-size: 13px }
+.ux-fl-sample figcaption small { color: var(--ux-muted); font-size: 12px; line-height: 1.4 }
+.ux-fl-sample > .ux-mobile-unit-options { max-height: none; flex: none; padding: 12px; border: 1px solid var(--ux-line); border-radius: 16px; background: var(--ux-bg); overflow: visible }
+.ux-fl-table-wrap { overflow-x: auto; border: 1px solid var(--ux-line); border-radius: 14px; background: var(--ux-surface) }
+.ux-fl-table { width: 100%; border-collapse: collapse; color: var(--ux-ink); font-size: 13px }
+.ux-fl-table th, .ux-fl-table td { padding: 7px 12px; border-top: 1px solid var(--ux-line); text-align: left; vertical-align: middle }
+.ux-fl-table thead th { border-top: 0; background: var(--ux-surface-2); color: var(--ux-muted); font-size: 11px; letter-spacing: .05em; text-transform: uppercase }
+.ux-fl-table tbody th { font-weight: 700; white-space: nowrap }
+.ux-fl-table tbody th small { display: inline; color: var(--ux-muted); font-weight: 500 }
+.ux-fl-table code { color: var(--ux-accent-2); font-size: 12px }
+.ux-fl-table tr.fb td, .ux-fl-table tr.fb th { background: color-mix(in srgb, var(--ux-warn) 10%, transparent) }

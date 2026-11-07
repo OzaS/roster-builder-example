@@ -40,7 +40,7 @@ export const symbolFamilies: SymbolFamily[] = [
   { id: "operative", label: "Operative / agent", icon: "venetian-mask", symbol: "Mask", added: true, example: "Operative" },
   { id: "army-rules", label: "Army rules / configuration", icon: "scroll-text", symbol: "Scroll", added: true, example: "Order of Battle" },
 ];
-export const fallbackSymbol: SymbolFamily = { id: "none", label: "No match → fallback", icon: "hexagon", symbol: "Hexagon", example: "anything else; letters tell them apart" };
+export const fallbackSymbol: SymbolFamily = { id: "none", label: "No match → fallback", icon: "hexagon", symbol: "Hexagon", example: "Banner Wardens" };
 
 /** Ordered whole-word phrases (most specific first); a family can appear twice to put its general words after others. */
 export const symbolPhrases: Array<{ family: string; phrases: string[] }> = [
