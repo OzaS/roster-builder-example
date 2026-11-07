@@ -1,5 +1,6 @@
 import { PhoneSearchHeader } from "../concepts/ux/PhoneSearchHeader";
 import { PhoneListsFilters } from "../concepts/ux/PhoneListsFilters";
+import { CategorySymbolTable, ForceLayoutSamples } from "../concepts/ux/ForceLayoutElements";
 import { LookupEntryBody, LookupEntryPage, LookupFailure, LookupLoading, LookupUnavailable, PhoneLookup, unavailableSample } from "../concepts/ux/PhoneLookup";
 import { QuotaChip, limitReason } from "../concepts/workspace/CatalogueLimit";
 import { lookupById } from "../data/lookupData";
@@ -583,6 +584,16 @@ function WorkbenchElements({
         </div>
         <div className="ux-lk-element ux-lk-text-200-demo"><PhoneLookup initialQuery="reinforced" initialStack={["u-veteran-reinforced"]} largeText /></div>
         <small className="ux-elements-note">DEC-054 (R0-03): Loading keeps the query and filters (chips without counts) and shows skeleton rows with "Searching installed data…", never a false "no results". Failure says "Search could not finish · Your installed data is still on this device." with Retry; the query and filters stay and it is not shown as zero results. A saved or opened reference whose source is no longer installed shows "Reference unavailable", names what was saved and offers Back to results; it never opens a same-name entry from another source or version. Large text (200 %): result and reference titles stop at two lines with an ellipsis; the heading keeps the whole name for screen readers, and Full name (or a tap on the title) shows it. The cap is for titles only, not reference text or explanations. Screens: Lookup · Loading, Failure, Source unavailable, Large text 200 % (phone and tablet).</small>
+      </ElementSection>
+
+      <ElementSection title="Lookup Force Layout · Key, Chart and Base limit 0">
+        <small className="ux-elements-note">F2 sections 2–3 (approved 2026-11-07): the Layout of a force or detachment reference. Key row folded by default (“Key · N categories”, the symbols in use, chevron); open, one key row per category (symbol with letter, full name, base range). Chart of icon trays without names: required slots spiked rings, optional thin rings, six rings at most, then +n, and +∞ for no maximum; the letter on the first ring. Required / Optional legend. Base limit 0 disclosure (closed by default, “Roster conditions may change these limits.”) with every category whose base maximum is 0, never “Unavailable”. Tap (phone, tablet) or hover and focus (desktop) on a group shows its detail. Screens: Lookup 1.0 · Detachment, large, key open, Base limit 0 open, tap detail, text 150 % and 200 % (phone); the tablet and desktop detachment screens.</small>
+        <ForceLayoutSamples />
+      </ElementSection>
+
+      <ElementSection title="Category Symbols · Word Families">
+        <small className="ux-elements-note">17 word families (9 from the investigation, 8 added) and the hexagon fallback. Match the head of the name (the text before the first “ - ” or “:”), normalised, against ordered whole-word phrases, most specific first; the first match wins. Letters A, B, C… per view, in key order, only on a symbol that repeats among the shown categories (the hexagon included). Display hints only: never validity, limits or grouping. The table ships in app-core as a separate config (plain data), so a later version can let users or the library change icons (DEC-001 clarification, 2026-11-07).</small>
+        <CategorySymbolTable />
       </ElementSection>
 
       <ElementSection title="Lookup Compact Unit Reference">
