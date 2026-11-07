@@ -234,6 +234,26 @@
           "label": "Read-only roster"
         },
         {
+          "id": "export",
+          "label": "Export · Text"
+        },
+        {
+          "id": "export-json",
+          "label": "Export · New Recruit JSON"
+        },
+        {
+          "id": "export-pdf",
+          "label": "Export · PDF"
+        },
+        {
+          "id": "export-preview",
+          "label": "Export · Preview (PDF)"
+        },
+        {
+          "id": "export-stored",
+          "label": "Export · Stored roster (read only)"
+        },
+        {
           "id": "unit-options-mobile",
           "label": "Unit detail · Mobile 5A + 5B + links"
         },
@@ -319,7 +339,12 @@
             "unit-options-separate-all",
             "unit-options-separated",
             "diagnostics",
-            "roster-read-only"
+            "roster-read-only",
+            "export",
+            "export-json",
+            "export-pdf",
+            "export-preview",
+            "export-stored"
           ]
         },
         {

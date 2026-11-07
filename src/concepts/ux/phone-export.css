@@ -1,0 +1,33 @@
+/* F3 phone export (approved 2026-11-06): the live export sheet, Include / Paper, the file line, the Preview row and the pushed Preview page. */
+.ux-job-sheet.ux-xp-sheet { gap: 10px; max-height: 94%; }
+.ux-xp-label { display: block; margin: 2px 2px 6px; color: var(--ux-muted); font-size: 11px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+.ux-xp-card { padding: 0 12px; border: 1px solid var(--ux-line); border-radius: var(--ux-r-md); background: var(--ux-surface-2); }
+.ux-xp-card .ux-setting-row { grid-template-columns: minmax(0, 1fr) 46px; padding: 10px 0; color: var(--ux-ink); font: inherit; }
+.ux-xp-card .ux-setting-text strong { font-size: 13.5px; }
+.ux-xp-card .ux-setting-text small { font-size: 11.5px; }
+.ux-xp-paper-row { display: grid; grid-template-columns: minmax(0, 1fr) 150px; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--ux-line); font-size: 13.5px; }
+.ux-xp-file { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin: 2px 2px 0; color: var(--ux-muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.ux-xp-file strong { min-width: 0; overflow: hidden; color: var(--ux-ink); font-size: 13px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.ux-xp-file span { flex: none; }
+.ux-xp-note { margin: -4px 2px 0; color: var(--ux-muted); font-size: 12px; line-height: 1.4; }
+.ux-job-btn.ux-xp-preview-row { justify-content: space-between; width: 100%; padding: 0 14px; }
+.ux-job-footer.ux-xp-actions.three { grid-template-columns: 1fr 1fr 1fr; }
+.ux-xp-actions .ux-job-btn { padding: 0 8px; white-space: nowrap; }
+
+/* The pushed Preview page covers the sheet; the document scrolls. */
+.ux-xp-page { position: absolute; inset: 0; z-index: 26; display: flex; flex-direction: column; background: var(--ux-bg); color: var(--ux-ink);
+  --dt-border: var(--ux-line); --dt-text: var(--ux-ink); --dt-muted: var(--ux-muted); --dt-accent: var(--ux-accent-2); }
+.ux-xp-page-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--ux-line); }
+.ux-xp-page-head .ux-wb-title { min-width: 0; text-align: center; }
+.ux-xp-page-head .ux-wb-title strong, .ux-xp-page-head .ux-wb-title small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ux-xp-page-head .ux-wb-title strong { font-size: 15px; }
+.ux-xp-page-head .ux-wb-title small { color: var(--ux-muted); font-size: 11.5px; }
+.ux-xp-back { display: inline-flex; align-items: center; gap: 2px; min-height: 44px; padding: 0 4px 0 0; border: 0; background: none; color: var(--ux-accent-2); font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; }
+.ux-job-btn.ux-xp-share { min-height: 36px; padding: 0 12px; border-radius: 999px; }
+.ux-xp-page-body { flex: 1; min-height: 0; overflow: auto; padding: 14px 12px 28px; }
+.ux-xp-page .dte-paper.ux-xp-paper { height: auto; overflow: visible; margin: 0; padding: 18px 16px; border: 1px solid var(--ux-line-2); border-radius: var(--ux-r-md); background: var(--ux-surface-2); color: var(--ux-ink); }
+.ux-xp-paper h4 { margin: 0; font-size: 19px; font-weight: 600; }
+.ux-xp-paper h5 { display: flex; justify-content: space-between; gap: 10px; margin: 14px 0 6px; padding-bottom: 4px; border-bottom: 1px solid var(--ux-line-2); font-size: 14px; }
+.ux-xp-paper p { margin: 4px 0; font-size: 12.5px; }
+.ux-xp-paper .dte-paper-unit, .ux-xp-paper .dte-paper-unit :is(small, em) { font-size: 12.5px; }
+.ux-xp-text { margin: 0; padding: 12px; border: 1px solid var(--ux-line); border-radius: var(--ux-r-md); background: var(--ux-surface-2); color: var(--ux-ink); font: 12px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; user-select: text; }

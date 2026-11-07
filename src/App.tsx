@@ -225,6 +225,10 @@ const workflowScreenIds = [
   "developer-options",
   "debug",
   "export",
+  "export-json",
+  "export-pdf",
+  "export-preview",
+  "export-stored",
 ] satisfies WorkflowScreen[];
 const prototypeScreenIds = [
   "library",

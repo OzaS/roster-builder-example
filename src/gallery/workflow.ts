@@ -179,7 +179,11 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "app-developer-debug", label: "App · Developer options unlocked, debug build" },
   { id: "developer-options", label: "App · Developer options" },
   { id: "debug", label: "App · Debug (debug builds)" },
-  { id: "export", label: "Export" },
+  { id: "export", label: "Export · Text" },
+  { id: "export-json", label: "Export · New Recruit JSON" },
+  { id: "export-pdf", label: "Export · PDF" },
+  { id: "export-preview", label: "Export · Preview (PDF)" },
+  { id: "export-stored", label: "Export · Stored roster (read only)" },
 ];
 
 const workflowLabels: Record<WorkflowScreen, string> = workflowScreens.reduce(
@@ -227,6 +231,8 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen === "unit-options-separate-all" || screen === "unit-options-separated") return "unit-options-mobile";
   if (screen === "option-drilldown") return "unit-detail";
   if (screen === "diagnostics") return "validation";
+  if (screen === "export-stored") return "roster-read-only";
+  if (screen === "export" || screen === "export-json" || screen === "export-pdf" || screen === "export-preview") return "overview"; // the export sheet over the roster
   return screen as PrototypeScreen; // the tablet screens returned above are not narrowed away by startsWith
 }
 

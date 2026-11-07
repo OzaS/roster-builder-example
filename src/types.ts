@@ -230,7 +230,11 @@ export type WorkflowScreen =
   | "app-developer-debug"
   | "developer-options"
   | "debug"
-  | "export";
+  | "export"
+  | "export-json"
+  | "export-pdf"
+  | "export-preview"
+  | "export-stored";
 
 export type RosterOption = {
   id: string;
