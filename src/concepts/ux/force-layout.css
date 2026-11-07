@@ -1,0 +1,73 @@
+/* Force / detachment Layout (F2 sections 2–3, approved 2026-11-07): folded key, chart of icon groups, legend, Base limit 0. */
+.ux-fl { container: fl / inline-size; min-width: 0 }
+.ux-fl-card { gap: 12px !important }
+.ux-fl ul { margin: 0; padding: 0; list-style: none }
+.ux-fl button { font: inherit; text-align: left }
+.ux-fl button:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px }
+
+/* Key: the fold row, then the rows (symbol with letter, full name, base range). */
+.ux-mobile-unit-options .ux-fl-keyhead, .ux-fl-keyhead { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 0 2px; border-bottom: 1px solid var(--ux-line) !important; border-radius: 0; color: var(--ux-ink) }
+.ux-fl-keyhead strong { font-size: 14px; font-weight: 750 }
+.ux-fl-count { color: var(--ux-muted); font-size: 14px; font-weight: 600; white-space: nowrap }
+.ux-fl-syms { display: inline-flex; flex-wrap: wrap; gap: 5px; min-width: 0; color: var(--ux-muted) }
+.ux-fl-chev { display: inline-grid; margin-left: auto; color: var(--ux-muted) }
+.ux-fl-key, .ux-fl-zlist { display: grid; grid-template-columns: minmax(0, 1fr); column-gap: 22px; margin-top: -6px !important }
+.ux-fl-krow { display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 5px 2px; border-top: 1px solid var(--ux-line) }
+.ux-fl-krow:first-child { border-top: 0 }
+.ux-fl-name { flex: 1; min-width: 0; font-size: 14px; font-weight: 650; line-height: 1.25; overflow-wrap: break-word }
+.ux-fl-range { color: var(--ux-accent-2); font-size: 13px; font-weight: 750; font-variant-numeric: tabular-nums; white-space: nowrap }
+.ux-fl-krow.hl { margin: 0 -6px; padding-inline: 8px; border-top-color: transparent; border-radius: 10px; background: color-mix(in srgb, var(--ux-accent) 16%, transparent) }
+.ux-fl-krow.hl + .ux-fl-krow { border-top-color: transparent }
+
+/* Symbol rings: the key's small ring and the chart's ring share the letter badge. */
+.ux-fl-ring { flex: none }
+.ux-lk-ring.sym { width: 30px; height: 30px; border-width: 1.5px }
+.ux-fl-letter { position: absolute; right: -6px; bottom: -5px; min-width: 17px; height: 17px; padding: 0 3px; box-sizing: border-box; border: 1.5px solid var(--ux-line-2); border-radius: 9px; background: var(--ux-surface); color: var(--ux-ink); font-size: 10.5px; font-weight: 800; line-height: 14px; text-align: center; font-variant-numeric: tabular-nums }
+.ux-lk-ring.sym .ux-fl-letter { right: -7px; bottom: -6px; min-width: 15px; height: 15px; font-size: 9.5px; line-height: 12px }
+
+/* Chart: one soft tray per category, no names; a long group wraps. */
+.ux-fl-chart { display: flex; flex-wrap: wrap; gap: 14px; padding-top: 2px }
+.ux-fl-cell { position: relative; max-width: 100% }
+.ux-mobile-unit-options .ux-fl-group, .ux-fl-group { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; max-width: 100%; min-width: 0; min-height: 0; padding: 8px; border-radius: 26px; background: var(--ux-surface-2); color: var(--ux-muted) }
+.ux-fl-group:has(.ux-lk-more) { padding-right: 12px }
+.ux-fl-group .ux-lk-more { padding: 4px 6px; background: none }
+.ux-fl-group.tap { outline: 2px solid var(--ux-accent); outline-offset: 1px }
+@media (hover: hover) { .ux-fl-group:hover { background: var(--ux-surface-3) } }
+
+/* Tap / hover detail: the full name, symbol and letter, what it allows, and the base limit. */
+.ux-fl-tip { position: absolute; z-index: 5; top: calc(100% + 10px); left: 0; display: grid; gap: 1px; width: max-content; max-width: 250px; padding: 9px 12px; border-radius: 12px; background: var(--ux-ink); color: var(--ux-bg); font-size: 13px; line-height: 1.35; box-shadow: 0 6px 20px rgb(0 0 0 / .28); pointer-events: none }
+.ux-fl-tip::before { content: ""; position: absolute; top: -6px; left: 24px; width: 12px; height: 12px; background: inherit; transform: rotate(45deg) }
+.ux-fl-tip.end { right: 0; left: auto }
+.ux-fl-tip.end::before { right: 24px; left: auto }
+.ux-fl-tip b { font-size: 14px }
+.ux-mobile-unit-options .ux-fl-tip small, .ux-fl-tip small { color: inherit; font-size: 11.5px; line-height: 1.35; opacity: .8 }
+
+.ux-fl-legend { flex-wrap: wrap; gap: 8px 16px !important }
+
+/* Base limit 0: a disclosure, closed by default. */
+.ux-mobile-unit-options .ux-fl-zero, .ux-fl-zero { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 8px 2px 0; border-top: 1px solid var(--ux-line) !important; border-radius: 0; color: var(--ux-ink) }
+.ux-fl-legend + .ux-fl-zero { margin-top: -2px }
+.ux-fl-zero-text { display: grid; flex: 1; gap: 2px; min-width: 0 }
+.ux-fl-zero-text strong { font-size: 14px }
+.ux-mobile-unit-options .ux-fl-zero-text small, .ux-fl-zero-text small { color: var(--ux-muted); font-size: 12px; line-height: 1.35 }
+.ux-fl-badge { padding: 2px 8px; border-radius: 999px; background: var(--ux-surface-2); color: var(--ux-muted); font-size: 12px; font-weight: 750; font-variant-numeric: tabular-nums }
+.ux-fl-zlist { margin-top: -4px !important }
+.ux-fl-zlist li { display: flex; align-items: center; gap: 10px; min-height: 34px; padding: 4px 2px; border-top: 1px solid var(--ux-line); font-size: 13.5px; line-height: 1.25; overflow-wrap: anywhere }
+.ux-fl-zlist svg { flex: none; color: var(--ux-ink-tertiary) }
+
+/* Tablet and desktop: the key and the Base limit 0 list in two columns, filled column by column, from 560 pt. */
+@container fl (min-width: 560px) {
+  .ux-fl-key, .ux-fl-zlist { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: repeat(var(--fl-rows), auto); grid-auto-flow: column }
+  .ux-fl-key > .col2, .ux-fl-zlist > .col2 { border-top: 0 }
+}
+
+/* Large text (gallery 150 % and 200 % frames zoom the page): the range moves under the name; rings and trays keep their size. */
+.ux-lk-text-150 .ux-fl-krow, .ux-lk-text-200 .ux-fl-krow, .ux-fl.large .ux-fl-krow { display: grid; grid-template-columns: 30px minmax(0, 1fr); align-items: center; column-gap: 12px; row-gap: 2px }
+.ux-lk-text-150 .ux-fl-krow .ux-fl-ring, .ux-lk-text-200 .ux-fl-krow .ux-fl-ring, .ux-fl.large .ux-fl-krow .ux-fl-ring { grid-row: span 2 }
+.ux-lk-text-150 .ux-fl-range, .ux-lk-text-200 .ux-fl-range, .ux-fl.large .ux-fl-range { grid-column: 2 }
+.ux-lk-text-150 .ux-fl-chart, .ux-lk-text-150 .ux-fl-ring.sym { zoom: .6667 }
+.ux-lk-text-150 .ux-fl-tip { zoom: 1.5 }
+.ux-lk-text-200 .ux-fl-chart, .ux-lk-text-200 .ux-fl-ring.sym { zoom: .5 }
+.ux-lk-text-200 .ux-fl-tip { zoom: 2 }
+.ux-lk-text-150 .ux-fl-keyhead, .ux-lk-text-200 .ux-fl-keyhead { flex-wrap: wrap; row-gap: 2px; padding-block: 6px }
+.ux-lk-text-150 .ux-fl-zero, .ux-lk-text-200 .ux-fl-zero { flex-wrap: wrap }

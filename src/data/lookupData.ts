@@ -44,7 +44,7 @@ export type LookupEntity = {
   categories?: string[];
   /** Force entries: a root force or a detachment it can take. */
   forceKind?: "force" | "detachment";
-  /** Slot categories with their minimum and maximum (max -1 = no limit); no unit examples. */
+  /** Slot categories with their base minimum and maximum (max -1 = no limit, max 0 = base limit 0); no unit examples. */
   slots?: Array<{ category: string; min: number; max: number }>;
   /** A force's detachments, or the force a detachment belongs to. */
   detachments?: string[];
@@ -113,7 +113,7 @@ export const lookupEntities: LookupEntity[] = [
   /* --------------------- Forces & detachments --------------------- */
   {
     id: "f-line-of-battle", group: "force", forceKind: "force", name: "Line of Battle", system: "Open Field", factions: ["Frontier Coalition"], summary: "Force · 5 slot categories",
-    rules: ["r-hold-line"], detachments: ["d-line-formation", "d-recon-screen", "d-walker-battery"],
+    rules: ["r-hold-line"], detachments: ["d-line-formation", "d-recon-screen", "d-walker-battery", "d-grand-muster"],
     slots: [{ category: "Command", min: 1, max: 2 }, { category: "Core", min: 2, max: 6 }, { category: "Elite", min: 0, max: 3 }, { category: "Support", min: 0, max: 3 }, { category: "Specialist", min: 0, max: 1 }],
   },
   {
@@ -127,6 +127,28 @@ export const lookupEntities: LookupEntity[] = [
     slots: [{ category: "Command", min: 1, max: 1 }, { category: "Recon", min: 1, max: 3 }],
   },
   { id: "d-walker-battery", group: "force", forceKind: "detachment", name: "Walker Battery", system: "Open Field", factions: ["Frontier Coalition"], summary: "Detachment · 1 slot category", partOf: "f-line-of-battle", slots: [{ category: "Support", min: 1, max: 4 }] },
+  /*
+   * F2 sections 2–3 (approved 2026-11-07): a large detachment, so the folded key and the Base limit 0 disclosure matter.
+   * 15 categories with a base limit above 0 (crown ×4, robot ×3, hexagon ×3, shield ×2, mask ×2, package ×1) and 30 at base limit 0
+   * (every word family once or more). Synthetic, game-neutral names (DEC-001); the family words are generic category vocabulary.
+   */
+  {
+    id: "d-grand-muster", group: "force", forceKind: "detachment", name: "Grand Muster", system: "Open Field", factions: ["Frontier Coalition"], summary: "Detachment · 15 slot categories",
+    partOf: "f-line-of-battle", rules: ["r-formation-drill"],
+    slots: [
+      { category: "High Command", min: 1, max: 1 }, { category: "Command", min: 0, max: 3 }, { category: "Field Command", min: 0, max: 1 },
+      { category: "Troops", min: 0, max: 4 }, { category: "Line Troops", min: 0, max: 1 }, { category: "Transport", min: 0, max: 4 },
+      { category: "Banner Wardens", min: 0, max: -1 }, { category: "Automata Cohort", min: 0, max: -1 }, { category: "War engine - Field Refit", min: 0, max: -1 },
+      { category: "Drone Wing", min: 0, max: -1 }, { category: "Field Operative", min: 0, max: -1 }, { category: "Shadow Operative", min: 0, max: -1 },
+      { category: "Glass Wardens", min: 0, max: -1 }, { category: "Envoys of the Iron Choir", min: 0, max: -1 }, { category: "Command - Veterans Only", min: 0, max: 7 },
+      ...[
+        "Field High Command", "Retinue", "Field Retinue", "Elites", "Field Elites", "War engine", "Field War engine", "Support", "Field Support", "Field Transport",
+        "Heavy Assault", "Field Heavy Assault", "Heavy Transport", "Field Heavy Transport", "Armour", "Field Armour", "Recon", "Field Recon", "Fast Attack", "Field Fast Attack",
+        "Heavy Transport - Logistics Corps", "Recon - Outriders Only", "Monster", "Fortification", "Allies: Glass Legion", "Order of Battle", "Rare",
+        "Field Banner Wardens", "Wardens of the Glass Legion", "Field Command - Veterans Only",
+      ].map((category) => ({ category, min: 0, max: 0 })),
+    ],
+  },
   {
     id: "d-battle-line", group: "force", forceKind: "detachment", name: "Battle Line", system: "Example System Two", factions: ["Glass Legion"], summary: "Detachment · 3 slot categories",
     rules: ["r-unbroken"],

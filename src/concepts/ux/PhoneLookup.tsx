@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
-import { AlertTriangle, Anchor, BookOpen, ChevronDown, ChevronLeft, ChevronRight, Clock3, Compass, Crown, Database, Feather, Flag, Gem, Hexagon, Info, LoaderCircle, RotateCcw, Search, SearchX, Shield, Star, Target, X, type LucideIcon } from "lucide-react";
-import { factionLabel, kindLabel, lookupById, lookupEntities, lookupSystems, sourceLine, systemVersion, type LookupEntity } from "../../data/lookupData";
+import { AlertTriangle, BookOpen, ChevronDown, ChevronLeft, ChevronRight, Clock3, Database, Info, LoaderCircle, RotateCcw, Search, SearchX } from "lucide-react";
+import { factionLabel, kindLabel, lookupById, lookupSystems, sourceLine, systemVersion, type LookupEntity } from "../../data/lookupData";
+import { ForceLayout, slotSummary as forceSlotSummary } from "./ForceLayout";
 import { PhoneSearchHeader } from "./PhoneSearchHeader";
 import { FoldSection } from "./MobileUnitOptions";
 import { plural, useLookup } from "./useLookup";
@@ -210,51 +211,13 @@ function ForceBody({ e, onOpen }: { e: LookupEntity; onOpen: (id: string) => voi
   const detachments = (e.detachments ?? []).map((id) => lookupById(id)).filter((d): d is LookupEntity => !!d);
   return <>
     {e.rules?.length ? <><h4>Rules</h4>{e.rules.map((id) => lookupById(id)).filter((r): r is LookupEntity => !!r).map((r) => <div className="ux-5a-card ux-lk-rule-card" key={r.id}><button type="button" className="ux-5a-choice ux-lk-link-row" onClick={() => onOpen(r.id)}><span><strong>{r.name}</strong><small>{r.summary}</small></span><ChevronRight size={18} aria-hidden /></button><p>{r.text}</p></div>)}</> : null}
-    {e.slots?.length ? <><h4>Layout</h4><div className="ux-5a-card"><ForceSchema system={e.system} slots={e.slots} /></div></> : null}
+    {e.slots?.length ? <><h4>Layout</h4><ForceLayout slots={e.slots} /></> : null}
     {detachments.length ? <><h4>Detachments</h4><div className="ux-5a-card ux-lk-list">{detachments.map((d) => <button type="button" key={d.id} className="ux-5a-choice ux-lk-link-row" onClick={() => onOpen(d.id)}><span><strong>{d.name}</strong><small>{slotSummary(d)}</small></span>{d.conditional ? <span className="ux-lf-tag info">Conditional</span> : null}<ChevronRight size={18} aria-hidden /></button>)}</div></> : null}
     {parent ? <><h4>Part of</h4><div className="ux-5a-card ux-lk-list"><button type="button" className="ux-5a-choice ux-lk-link-row" onClick={() => onOpen(parent.id)}><span><strong>{parent.name}</strong><small>Force · {slotSummary(parent)}</small></span><ChevronRight size={18} aria-hidden /></button></div></> : null}
   </>;
 }
 
-const rangeLabel = (min: number, max: number) => max < 0 ? `${min}+` : min === max ? `${min}` : `${min}–${max}`;
-const slotSummary = (e: LookupEntity) => (e.slots ?? []).map((s) => `${s.category} ${rangeLabel(s.min, s.max)}`).join(" · ");
-
-/** Neutral icons for slot categories. The data has none, so each game system's slot categories, sorted by name, take
- * the icons in order: every category of a system has its own icon, the same in every force. The name is always printed,
- * so the icon is decoration only. */
-const schemaIcons: LucideIcon[] = [Crown, Shield, Star, Flag, Compass, Hexagon, Gem, Anchor, Target, Feather];
-function slotIcon(system: string, name: string) {
-  const names = [...new Set(lookupEntities.filter((e) => e.system === system).flatMap((e) => e.slots ?? []).map((s) => s.category))].sort();
-  return schemaIcons[Math.max(0, names.indexOf(name)) % schemaIcons.length];
-}
-
-/**
- * Force layout as a schema, after the printed force charts: one ring per slot, grouped by category, the category and
- * its range under each group. Required slots (the minimum) have a heavy, spiked ring; optional ones a thin ring.
- * At most 6 rings per category; the rest is a "+n" pill, and no maximum is a "+∞" pill.
- */
-export function ForceSchema({ system, slots }: { system: string; slots: Array<{ category: string; min: number; max: number }> }) {
-  return <div className="ux-lk-schema-wrap">
-    <div className="ux-lk-schema" role="list" aria-label="Slots">
-      {slots.map((s) => {
-        const Icon = slotIcon(system, s.category);
-        const optional = s.max < 0 ? 1 : s.max - s.min;
-        const req = Math.min(s.min, 6);
-        const opt = Math.min(optional, 6 - req);
-        const more = s.max < 0 ? "+∞" : s.min - req + optional - opt > 0 ? `+${s.min - req + optional - opt}` : null;
-        return <div role="listitem" key={s.category} className="ux-lk-slotgroup" aria-label={`${s.category}: ${s.min ? `${s.min} required` : "optional"}${s.max < 0 ? ", no maximum" : s.max > s.min ? `, up to ${s.max}` : ""}`}>
-          <div className="ux-lk-rings" aria-hidden>
-            {Array.from({ length: req }, (_, i) => <span key={`r${i}`} className="ux-lk-ring req"><Icon size={18} /></span>)}
-            {Array.from({ length: opt }, (_, i) => <span key={`o${i}`} className="ux-lk-ring"><Icon size={18} /></span>)}
-            {more ? <span className="ux-lk-more">{more}</span> : null}
-          </div>
-          <span className="ux-lk-slotname" aria-hidden><strong>{s.category}</strong><small>{rangeLabel(s.min, s.max)}</small></span>
-        </div>;
-      })}
-    </div>
-    <div className="ux-lk-legend" aria-hidden><span><i className="ux-lk-ring req mini" />Required</span><span><i className="ux-lk-ring mini" />Optional</span></div>
-  </div>;
-}
+const slotSummary = (e: LookupEntity) => forceSlotSummary(e.slots ?? []);
 
 function UpgradeBody({ e, onOpen }: { e: LookupEntity; onOpen: (id: string) => void }) {
   return <>
