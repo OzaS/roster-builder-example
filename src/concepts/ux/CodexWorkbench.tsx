@@ -16,6 +16,8 @@ import { SoftKeyboard } from "./SoftKeyboard";
 import { PhoneExportFlow, phoneExportRoster } from "./PhoneExport";
 import { LimitWarning, PhonePointsLimitSheet, PhoneRenameSheet, PhoneUnitMenu, configurationWarning } from "./PhoneNames";
 import { SettingsResults } from "./SettingsSearch";
+import { StarButton, StarDivider, StarRow, StarredHeadingContent, starredFirst, useStars } from "../workspace/Stars";
+import "./phone-stars.css";
 import { APP_DEVELOPER_SCREENS, DebugNavRow, DebugScreen, DeveloperOptionsNavRow, DeveloperOptionsScreen } from "./DeveloperPages";
 import { BackOrTitle, BudgetMeter, Chip, ExpandableBudget, RosterMoreMenu, RosterShareButton, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "./uxShared";
 
@@ -24,6 +26,12 @@ import { BackOrTitle, BudgetMeter, Chip, ExpandableBudget, RosterMoreMenu, Roste
 const NAMES_UNIT_SCREENS: readonly string[] = ["names-unit-menu", "names-unit-sheet"];
 const NAMES_LIMIT_SCREENS: readonly string[] = ["names-roster-menu", "names-points-limit", "names-limit-warning"];
 const NAMES_CONFIGURATION_LIMIT = 2000;
+
+/** R2-03 (F4c, approved 2026-11-08): the gallery screens of starred entries and what each starts with starred (synthetic names). */
+const STARS_UNITS = ["Champion in Bastion Plate Armour", "Forward Squad"];
+const STARS_FORCES = ["Unrestricted Collection", "Wayfarer Bands"];
+const STARS_FACTIONS_ADD_FORCE = ["Northern Realms"];
+const STARS_FACTION = "Theta Faction";
 
 /** Screens of the source-data flow designed in Battle Augur plan 2D (SourceJobs.tsx). */
 const SOURCE_FLOW_SCREENS: readonly string[] = ["install-job", "source-detail", "migration-report", "collection", "search-github", "roster-read-only"];
@@ -51,7 +59,7 @@ export function CodexWorkbench(props: ConceptProps) {
   const showTabBar = usesTabNavigation && isMainTab;
   const isWorkbenchScreen = screen !== "library" && screen !== "catalogue" && screen !== "tools" && screen !== "collections" && screen !== "app" && screen !== "developer-options" && screen !== "debug" && screen !== "settings" && screen !== "sources" && screen !== "add-source" && !SOURCE_FLOW_SCREENS.includes(screen) && screen !== "system";
   const [activeLoadoutSlot, setActiveLoadoutSlot] = useState<{ groupId: string; slotId: string } | null>(null);
-  const [forceCreationOpen, setForceCreationOpen] = useState(false);
+  const [forceCreationOpen, setForceCreationOpen] = useState(props.workflowScreen === "stars-add-force");
   const [rosterSearchOpen, setRosterSearchOpen] = useState(false);
   const [rosterSearchQuery, setRosterSearchQuery] = useState("");
   const [layoutMenuOpen, setLayoutMenuOpen] = useState(false);
@@ -72,6 +80,7 @@ export function CodexWorkbench(props: ConceptProps) {
   const [limitChoice, setLimitChoice] = useState<number | undefined>(NAMES_LIMIT_SCREENS.includes(ws) ? 2050 : undefined);
   useEffect(() => {
     setNameSheet(ws === "names-unit-sheet" ? "unit" : ws === "names-points-limit" ? "limit" : null);
+    setForceCreationOpen(ws === "stars-add-force"); // R2-03: Add force opened with starred forces and factions
     setUnitCustomName(undefined); setRosterNameOverride(undefined);
     setLimitChoice(NAMES_LIMIT_SCREENS.includes(ws) ? 2050 : undefined);
   }, [ws]);
@@ -214,12 +223,12 @@ export function CodexWorkbench(props: ConceptProps) {
   } else if (screen === "search-github") {
     body = <SearchGitHubScreen props={props} />;
   } else if (screen === "system") {
-    body = <CreateScreen props={props} />;
+    body = <CreateScreen key={ws === "stars-faction" ? ws : "create"} props={props} />;
   } else if (screen === "smart-search") {
     body = <SmartSearchScreen props={props} />;
   } else {
     const smartClass = navStyle === "top" && smart ? "ux-smart" : "";
-    modifier = [isUnitDetail ? "show-detail has-detail-toggle" : props.workflowScreen === "add-unit-limit" || props.workflowScreen === "add-unit-focus-keyboard" || props.workflowScreen === "add-unit-text-200" ? "show-detail" : "", screen === "overview" ? "roster-overview" : "", screen === "validation" ? "show-checks" : "", smartClass].filter(Boolean).join(" ");
+    modifier = [isUnitDetail ? "show-detail has-detail-toggle" : props.workflowScreen === "add-unit-limit" || props.workflowScreen === "add-unit-focus-keyboard" || props.workflowScreen === "add-unit-text-200" || props.workflowScreen === "stars-add-unit" ? "show-detail" : "", screen === "overview" ? "roster-overview" : "", screen === "validation" ? "show-checks" : "", smartClass].filter(Boolean).join(" ");
     body = (
       <>
         <WorkbenchHeader
@@ -283,7 +292,7 @@ export function CodexWorkbench(props: ConceptProps) {
       {subscriptionVariant ? <SubscriptionGate variant={subscriptionVariant} onClose={() => props.onNavigate(subscriptionVariant === "main" ? "library" : "overview")} /> : null}
       {smartGateOpen ? <SubscriptionGate variant="edition" onClose={() => setSmartGateOpen(false)} /> : null}
       {focusPane ? <EdgeHandle edge="top" expanded={focusChromeVisible} onReveal={() => setFocusChromeVisible(true)} /> : null}
-      {forceCreationOpen && props.forceCreationMode !== "inline" ? <ForceSelector props={props} onClose={() => setForceCreationOpen(false)} /> : null}
+      {forceCreationOpen && props.forceCreationMode !== "inline" ? <ForceSelector props={props} stars={ws === "stars-add-force"} onClose={() => setForceCreationOpen(false)} /> : null}
       {activeLoadoutSlot ? <LoadoutSelector props={props} target={activeLoadoutSlot} onClose={closeLoadoutSelector} /> : null}
       {referenceGlances.length ? <ReferenceGlanceStack glances={referenceGlances} onOpenReference={openNestedReferenceGlance} onCloseTop={() => referenceGlances.length === 1 ? closeAllReferenceGlances() : setReferenceGlances((current) => current.slice(0, -1))} onCloseAll={closeAllReferenceGlances} /> : null}
       {showTabBar ? <><EdgeHandle edge="bottom" expanded={dockOpen} onReveal={() => setDockOpen(true)} /><TabBar props={props} onNavigate={(next) => { setDockOpen(false); props.onNavigate(next); }} /></> : isUnitDetail ? <DetailModeBar props={props} /> : showCommandBar ? <CommandBar props={props} /> : null}
@@ -740,15 +749,25 @@ function InlineForceDraft({ props, onClose }: { props: ConceptProps; onClose: ()
   );
 }
 
+/** R2-03 (F4c): starred rows first in the data's order, a divider, then the rest; with no stars the list is unchanged (no divider). */
+function orderStarred<T>(items: readonly T[], key: (item: T) => string, stars: readonly string[], row: (item: T) => ReactNode): ReactNode[] {
+  const { starred, rest } = starredFirst(items, key, stars);
+  if (!starred.length || !rest.length) return [...starred, ...rest].map(row);
+  return [...starred.map(row), <StarDivider key="star-divider" />, ...rest.map(row)];
+}
+
 /**
  * Add force (Battle Augur plan 4C): one tap adds and closes. Detachments of the current force
  * (required "!", at-max state), then a faction chip row (allies of the same game system) and
  * that faction's top-level forces with how many the roster has.
  */
-function ForceSelector({ props, onClose }: { props: ConceptProps; onClose: () => void }) {
+function ForceSelector({ props, stars = false, onClose }: { props: ConceptProps; stars?: boolean; onClose: () => void }) {
   const [query, setQuery] = useState("");
   const [catalogueId, setCatalogueId] = useState(mockCatalogues[0]?.id ?? "");
-  const [choosingFaction, setChoosingFaction] = useState(false);
+  // R2-03 (F4c): the gallery's stars screen opens the faction list with a starred faction and two starred forces.
+  const [choosingFaction, setChoosingFaction] = useState(stars);
+  const forceStars = useStars(stars ? STARS_FORCES : []);
+  const factionStars = useStars(stars ? STARS_FACTIONS_ADD_FORCE : []);
   const match = (name: string) => name.toLowerCase().includes(query.trim().toLowerCase());
   const detachments = mockDetachments.filter((item) => match(item.name));
   const currentForce = props.roster.forces.find((force) => force.id === props.selectedForceId) ?? props.roster.forces[0];
@@ -772,14 +791,18 @@ function ForceSelector({ props, onClose }: { props: ConceptProps; onClose: () =>
           {props.detachmentFavorites.length ? <FavoriteCreationSection title="Favorite detachments">{props.detachmentFavorites.map((favorite) => <button type="button" key={favorite.id} onClick={() => { props.onReuseDetachmentFavorite(favorite.id); onClose(); }}><Heart size={14} /><span><strong>{forceDisplayName(favorite.force)}</strong><small>{favorite.force.points} pts · configured</small></span><Plus size={14} /></button>)}</FavoriteCreationSection> : null}
           {currentForce ? <div className="ux-force-detachments" aria-label="Detachments">
             <strong>Detachments in {forceDisplayName(currentForce)}</strong>
-            {detachments.map((item, index) => <button type="button" key={item.id} onClick={() => add(item.id)}><span><b>{item.name}{index === 0 ? <em className="ux-force-required" aria-label="Required"> !</em> : null}</b><small>{index === 0 ? "Required · 0/1" : index === 1 ? "At maximum · 1/1: adding breaks its limit" : item.slots}</small></span><Plus size={15} /></button>)}
+            {/* R2-03: starred forces first (data order), then a divider, then the rest; each row has its star before the name. */}
+            {orderStarred(detachments, (item) => item.name, forceStars.stars, (item) => { const index = mockDetachments.indexOf(item); const row = <button type="button" key={item.id} onClick={() => add(item.id)}><span><b>{item.name}{index === 0 ? <em className="ux-force-required" aria-label="Required"> !</em> : null}</b><small>{index === 0 ? "Required · 0/1" : index === 1 ? "At maximum · 1/1: adding breaks its limit" : item.slots}</small></span><Plus size={15} /></button>;
+              return stars ? <StarRow key={item.id} name={item.name} on={forceStars.isStarred(item.name)} onToggle={() => forceStars.toggle(item.name)}>{row}</StarRow> : row; })}
           </div> : null}
           {/* Plan 4C: the faction list is long (dozens per game system): one selector row opens it in place. */}
           <button type="button" className="ux-force-faction-select" aria-expanded={choosingFaction} onClick={() => setChoosingFaction((value) => !value)}><span><strong>Faction</strong><small>{mockCatalogues.find((item) => item.id === catalogueId)?.name}</small></span>{choosingFaction ? <ChevronDown size={16} /> : <ChevronRight size={16} />}</button>
-          {choosingFaction ? <div className="ux-force-choice-list" aria-label="Factions">{mockCatalogues.filter((item) => match(item.name)).map((item) => <button type="button" className={catalogueId === item.id ? "selected" : ""} key={item.id} onClick={() => { setCatalogueId(item.id); setChoosingFaction(false); }}><span><strong>{item.name}</strong></span>{catalogueId === item.id ? <Check size={15} /> : null}</button>)}</div> : null}
+          {choosingFaction ? <div className="ux-force-choice-list" aria-label="Factions">{orderStarred(mockCatalogues.filter((item) => match(item.name)), (item) => item.name, factionStars.stars, (item) => { const row = <button type="button" className={catalogueId === item.id ? "selected" : ""} key={item.id} onClick={() => { setCatalogueId(item.id); setChoosingFaction(false); }}><span><strong>{item.name}</strong></span>{catalogueId === item.id ? <Check size={15} /> : null}</button>;
+            return stars ? <StarRow key={item.id} name={item.name} on={factionStars.isStarred(item.name)} onToggle={() => factionStars.toggle(item.name)}>{row}</StarRow> : row; })}</div> : null}
           <strong className="ux-force-section-title">Layout</strong>
           <div className="ux-force-choice-list" aria-label="Top-level forces">
-            {detachments.length ? detachments.map((item, index) => <button type="button" key={item.id} onClick={() => add(item.id)}><span><strong>{item.name} {index === 0 ? "(1)" : "(0)"}</strong>{index === 0 ? null : <small>{item.fit}</small>}</span><Plus size={15} /></button>) : <div className="ux-loadout-selector-empty"><strong>No matching forces</strong><small>Try another name.</small></div>}
+            {detachments.length ? orderStarred(detachments, (item) => item.name, forceStars.stars, (item) => { const index = mockDetachments.indexOf(item); const row = <button type="button" key={item.id} onClick={() => add(item.id)}><span><strong>{item.name} {index === 0 ? "(1)" : "(0)"}</strong>{index === 0 ? null : <small>{item.fit}</small>}</span><Plus size={15} /></button>;
+              return stars ? <StarRow key={item.id} name={item.name} on={forceStars.isStarred(item.name)} onToggle={() => forceStars.toggle(item.name)}>{row}</StarRow> : row; }) : <div className="ux-loadout-selector-empty"><strong>No matching forces</strong><small>Try another name.</small></div>}
           </div>
         </div>
         <footer><button type="button" onClick={onClose}>Close</button></footer>
@@ -789,7 +812,7 @@ function ForceSelector({ props, onClose }: { props: ConceptProps; onClose: () =>
 }
 
 function Detail({ props, scrollRef, onOpenLoadoutSlot, onOpenReference }: { props: ConceptProps; scrollRef: RefObject<HTMLElement | null>; onOpenLoadoutSlot: (groupId: string, slotId: string) => void; onOpenReference: (reference: RosterReferenceDefinition) => void }) {
-  if (props.screen === "add-unit") return <AddPane props={props} />;
+  if (props.screen === "add-unit") return <AddPane key={props.workflowScreen === "stars-add-unit" ? "stars" : "pool"} props={props} />;
   const unit = props.selectedUnit;
   return (
     <section className="ux-wb-detail" ref={scrollRef}>
@@ -1207,14 +1230,45 @@ function AddPane({ props }: { props: ConceptProps }) {
   // The 200 % frame opens on the unit at its maximum (the longest row: name, price, quota chip and the unavailable Add).
   useLayoutEffect(() => { if (largeText) sheetRef.current?.querySelector(".ux-pool-row.locked")?.scrollIntoView({ block: "center" }); }, [largeText]);
   const sectionId = limitState ? flattenUnits(props.roster).find((u) => u.availability === "locked")?.sectionId ?? props.selectedSectionId : props.selectedSectionId;
-  const pool = flattenUnits(props.roster).filter((u) => u.sectionId === sectionId);
+  // R2-03 (F4c, approved 2026-11-08): the stars screen opens Add unit for the whole force (as the app's sheet does from the force),
+  // grouped by role with the Starred group first; from a slot's Add unit (one role) Starred holds that role's starred units.
+  const starsState = props.workflowScreen === "stars-add-unit";
+  const unitStars = useStars(starsState ? STARS_UNITS : []);
+  const starsForce = props.roster.forces[0];
+  const pool = starsState ? flattenUnits(props.roster).filter((u) => u.forceId === starsForce?.id && u.sectionName !== "Configuration") : flattenUnits(props.roster).filter((u) => u.sectionId === sectionId);
   const [explained, setExplained] = useState<string | null>(() => props.workflowScreen === "add-unit-limit" ? pool.find((u) => u.availability === "locked")?.id ?? null : null);
   const explainTimer = useRef<number>(undefined);
   useEffect(() => () => window.clearTimeout(explainTimer.current), []);
   const explain = (id: string) => { window.clearTimeout(explainTimer.current); setExplained((current) => current === id ? null : id); explainTimer.current = window.setTimeout(() => setExplained(null), 4000); };
   const smart = props.smartSearch ?? false;
-  const section = pool[0]?.sectionName ?? props.selectedSection.name;
+  const section = starsState && starsForce ? starsForce.name : pool[0]?.sectionName ?? props.selectedSection.name;
   const suggestions = [`legal ${section.toLowerCase()} under 120`, "fills this slot", "best value pick"];
+  const poolRow = (unit: ReturnType<typeof flattenUnits>[number]) => {
+    const locked = unit.availability === "locked";
+    const count = added[unit.id] ?? 0;
+    const reason = unit.availability === "limited" ? "Slot full: adding breaks its limit" : locked ? "Limit reached" : undefined;
+    // DEC-054: a unit at its maximum is not dimmed: quota chip 1 / 1 and an unavailable Add; pressing the row explains instead of adding.
+    return (
+      <div key={unit.id} className={`ux-pool-item ${starsState ? "with-star" : ""}`}>
+        {starsState ? <StarButton name={unitDisplayName(unit)} on={unitStars.isStarred(unit.name)} onToggle={() => unitStars.toggle(unit.name)} /> : null}
+        <button type="button" className={`ux-pool-row ${unit.availability}`} aria-disabled={locked || undefined}
+          aria-label={locked ? `${unitDisplayName(unit)}, ${unit.points} points. Unavailable: limit reached, 1 of 1 selected` : undefined}
+          aria-describedby={locked && explained === unit.id ? `limit-${unit.id}` : undefined}
+          onClick={() => { if (locked) { explain(unit.id); return; } setAdded((current) => ({ ...current, [unit.id]: count + 1 })); setLastAdded(unitDisplayName(unit)); }}>
+          <span>
+            <strong>{unitDisplayName(unit)}{count ? <em className="ux-pool-count"> ({count}/3)</em> : null}</strong>
+            {locked ? <small className="ux-pool-quota"><QuotaChip selected={1} max={1} />Limit reached</small> : <small>{reason ?? unit.role}</small>}
+          </span>
+          <span className="ux-pool-meta">
+            <b>{unit.points} pts</b>
+            {locked ? null : <Chip tone={unit.availability === "available" ? "valid" : "warning"}>{unit.availability}</Chip>}
+          </span>
+          {locked ? <span className="ws-limit-add ux-pool-limit-add" aria-hidden><i><Plus size={15} /></i></span> : <Plus size={16} />}
+        </button>
+        {locked && explained === unit.id ? <span id={`limit-${unit.id}`} role="tooltip" className="tb-hint-bubble ws-limit-bubble ux-pool-bubble">{limitReason(1, 1)}</span> : null}
+      </div>
+    );
+  };
   return (
     <section ref={sheetRef} className={`ux-wb-detail ${largeText ? "ux-text-200" : ""}`}>
       <button type="button" className="ux-wb-back" onClick={props.onBack}>
@@ -1250,33 +1304,19 @@ function AddPane({ props }: { props: ConceptProps }) {
       })}</FavoriteCreationSection> : null}
       {/* Battle Augur plan 4B: tapping a row adds it and the sheet stays open (multi-add); the row counts what was added. */}
       {lastAdded ? <div className="ux-pool-added" role="status"><Check size={14} />Added {lastAdded}</div> : null}
+      {starsState ? (() => {
+        const { starred, rest } = starredFirst(pool, (unit) => unit.name, unitStars.stars);
+        const roles = [...new Set(pool.map((unit) => unit.sectionName))];
+        return <>
+          {/* No stars: no Starred group and no hint; the outline stars are how the feature is found. */}
+          {starred.length ? <section className="ux-pool-group" aria-label="Starred"><h4 className="ux-pool-group-head ws-starred-head"><StarredHeadingContent count={starred.length} /></h4><div className="ux-pool">{starred.map(poolRow)}</div></section> : null}
+          {roles.map((role) => { const rows = rest.filter((unit) => unit.sectionName === role); return rows.length ? <section key={role} className="ux-pool-group" aria-label={role}><h4 className="ux-pool-group-head"><span>{role}</span><span>{rows.length}</span></h4><div className="ux-pool">{rows.map(poolRow)}</div></section> : null; })}
+        </>;
+      })() : (
       <div className="ux-pool">
-        {(pool.length ? pool : flattenUnits(props.roster)).map((unit) => {
-          const locked = unit.availability === "locked";
-          const count = added[unit.id] ?? 0;
-          const reason = unit.availability === "limited" ? "Slot full: adding breaks its limit" : locked ? "Limit reached" : undefined;
-          // DEC-054: a unit at its maximum is not dimmed: quota chip 1 / 1 and an unavailable Add; pressing the row explains instead of adding.
-          return (
-            <div key={unit.id} className="ux-pool-item">
-              <button type="button" className={`ux-pool-row ${unit.availability}`} aria-disabled={locked || undefined}
-                aria-label={locked ? `${unitDisplayName(unit)}, ${unit.points} points. Unavailable: limit reached, 1 of 1 selected` : undefined}
-                aria-describedby={locked && explained === unit.id ? `limit-${unit.id}` : undefined}
-                onClick={() => { if (locked) { explain(unit.id); return; } setAdded((current) => ({ ...current, [unit.id]: count + 1 })); setLastAdded(unitDisplayName(unit)); }}>
-                <span>
-                  <strong>{unitDisplayName(unit)}{count ? <em className="ux-pool-count"> ({count}/3)</em> : null}</strong>
-                  {locked ? <small className="ux-pool-quota"><QuotaChip selected={1} max={1} />Limit reached</small> : <small>{reason ?? unit.role}</small>}
-                </span>
-                <span className="ux-pool-meta">
-                  <b>{unit.points} pts</b>
-                  {locked ? null : <Chip tone={unit.availability === "available" ? "valid" : "warning"}>{unit.availability}</Chip>}
-                </span>
-                {locked ? <span className="ws-limit-add ux-pool-limit-add" aria-hidden><i><Plus size={15} /></i></span> : <Plus size={16} />}
-              </button>
-              {locked && explained === unit.id ? <span id={`limit-${unit.id}`} role="tooltip" className="tb-hint-bubble ws-limit-bubble ux-pool-bubble">{limitReason(1, 1)}</span> : null}
-            </div>
-          );
-        })}
+        {(pool.length ? pool : flattenUnits(props.roster)).map(poolRow)}
       </div>
+      )}
     </section>
   );
 }
@@ -1411,14 +1451,19 @@ const GUIDED_SYSTEMS: { name: string; sub: string; unit: string; limitMax?: numb
 ];
 
 function CreateScreen({ props }: { props: ConceptProps }) {
-  const [selectedSystem, setSelectedSystem] = useState<string | null>(null);
-  const [selectedFaction, setSelectedFaction] = useState<string | null>(null);
+  // R2-03 (F4c, approved 2026-11-08): the stars screen opens the faction picker of a system with more factions, one of them
+  // starred (and chosen); starred factions come first, then a divider, then the rest in the data's order.
+  const starsState = props.workflowScreen === "stars-faction";
+  const factionStars = useStars(starsState ? [STARS_FACTION] : []);
+  const [selectedSystem, setSelectedSystem] = useState<string | null>(starsState ? GUIDED_SYSTEMS[0].name : null);
+  const [selectedFaction, setSelectedFaction] = useState<string | null>(starsState ? STARS_FACTION : null);
   const [selectedMode, setSelectedMode] = useState<string | null>(null);
-  const [picker, setPicker] = useState<"faction" | "mode" | null>(null);
+  const [picker, setPicker] = useState<"faction" | "mode" | null>(starsState ? "faction" : null);
   const [answers, setAnswers] = useState<Record<string, Record<string, number>>>({});
   const [limitText, setLimitText] = useState("");
   const [rosterName, setRosterName] = useState("New roster");
-  const system = GUIDED_SYSTEMS.find((item) => item.name === selectedSystem);
+  const baseSystem = GUIDED_SYSTEMS.find((item) => item.name === selectedSystem);
+  const system = starsState && baseSystem === GUIDED_SYSTEMS[0] ? { ...baseSystem, factions: [...baseSystem.factions, ...["Iota Faction", "Kappa Faction", STARS_FACTION].map((name) => ({ name, sub: "Group C", modes: baseSystem.factions[1]!.modes }))] } : baseSystem;
   const faction = system?.factions.find((item) => item.name === selectedFaction);
   const mode = faction?.modes.find((item) => item.name === selectedMode);
   const steps = mode?.steps ?? [];
@@ -1572,7 +1617,7 @@ function CreateScreen({ props }: { props: ConceptProps }) {
         {mode ? <small className="ux-guided-note">Skip creates the roster with the data’s defaults; configure it in the editor.</small> : null}
       </div>
       {picker === "faction" && system ? (
-        <RosterChoicePicker title="Choose faction" context={system.name} searchLabel="factions" options={system.factions.map((item) => ({ name: item.name, sub: item.sub }))} selected={selectedFaction} onClose={() => setPicker(null)} onSelect={(name) => { setSelectedFaction(name); setSelectedMode(null); setAnswers({}); setLimitText(""); setPicker(null); }} />
+        <RosterChoicePicker title="Choose faction" context={system.name} searchLabel="factions" options={system.factions.map((item) => ({ name: item.name, sub: item.sub }))} selected={selectedFaction} stars={starsState ? factionStars : undefined} onClose={() => setPicker(null)} onSelect={(name) => { setSelectedFaction(name); setSelectedMode(null); setAnswers({}); setLimitText(""); setPicker(null); }} />
       ) : null}
       {picker === "mode" && faction ? (
         <RosterChoicePicker title="Choose game mode" context={faction.name} searchLabel="game modes" options={faction.modes.map((item) => ({ name: item.name, sub: item.sub }))} selected={selectedMode} onClose={() => setPicker(null)} onSelect={(name) => { setSelectedMode(name); setAnswers({}); setLimitText(""); setPicker(null); }} />
@@ -1581,7 +1626,7 @@ function CreateScreen({ props }: { props: ConceptProps }) {
   );
 }
 
-function RosterChoicePicker({ title, context, searchLabel, options, selected, onClose, onSelect }: { title: string; context: string; searchLabel: string; options: { name: string; sub: string }[]; selected: string | null; onClose: () => void; onSelect: (name: string) => void }) {
+function RosterChoicePicker({ title, context, searchLabel, options, selected, stars, onClose, onSelect }: { title: string; context: string; searchLabel: string; options: { name: string; sub: string }[]; selected: string | null; stars?: ReturnType<typeof useStars>; onClose: () => void; onSelect: (name: string) => void }) {
   const [query, setQuery] = useState("");
   const filtered = options.filter((option) => `${option.name} ${option.sub}`.toLowerCase().includes(query.trim().toLowerCase()));
 
@@ -1597,9 +1642,12 @@ function RosterChoicePicker({ title, context, searchLabel, options, selected, on
         <header><span><strong id="roster-picker-title">{title}</strong><small>{context}</small></span><button type="button" aria-label="Close picker" onClick={onClose}><X size={18} /></button></header>
         <label className="ux-loadout-selector-search"><Search size={15} /><input value={query} onChange={(event) => setQuery(event.currentTarget.value)} placeholder={`Search ${searchLabel}`} autoFocus /></label>
         <div className="ux-loadout-choice-list">
-          {filtered.map((option) => {
+          {/* R2-03: with stars (factions), each row has its star before the name: tapping the star only stars the faction,
+              tapping the rest of the row chooses it. Starred first, a divider, the rest; a search keeps starred matches first. */}
+          {orderStarred(filtered, (option) => option.name, stars?.stars ?? [], (option) => {
             const isSelected = option.name === selected;
-            return <button type="button" className={`ux-loadout-choice ${isSelected ? "selected" : ""}`} key={option.name} onClick={() => onSelect(option.name)}><span><strong>{option.name}</strong><small>{option.sub}</small></span><span className="ux-loadout-choice-check" aria-hidden>{isSelected ? <Check size={15} /> : null}</span></button>;
+            const row = <button type="button" className={`ux-loadout-choice ${isSelected ? "selected" : ""}`} key={option.name} onClick={() => onSelect(option.name)}><span><strong>{option.name}</strong><small>{option.sub}</small></span><span className="ux-loadout-choice-check" aria-hidden>{isSelected ? <Check size={15} /> : null}</span></button>;
+            return stars ? <StarRow key={option.name} name={option.name} on={stars.isStarred(option.name)} onToggle={() => stars.toggle(option.name)}>{row}</StarRow> : row;
           })}
           {!filtered.length ? <div className="ux-loadout-selector-empty"><Search size={18} /><strong>No matching choices</strong><small>Try a different search.</small></div> : null}
         </div>

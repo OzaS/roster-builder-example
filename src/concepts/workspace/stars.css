@@ -1,0 +1,26 @@
+/* R2-03 (F4c, approved 2026-11-08): the star toggle, the Starred heading and the starred/rest divider (Stars.tsx). */
+
+/* Touch (phone, tablet): always visible, 20 px icon, 44 pt target. */
+.ws-star { position: relative; z-index: 1; display: grid; place-items: center; flex: none; width: 44px; height: 44px; margin: 0; padding: 0; border: 0; border-radius: 10px; background: transparent; color: var(--ws-star-off, var(--ux-muted)); cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent }
+.ws-star.on { color: var(--ws-star-on, var(--ux-accent-2, var(--ux-accent))) }
+.ws-star:focus-visible { outline: 2px solid var(--ws-star-on, var(--ux-accent-2, var(--ux-accent))); outline-offset: -4px }
+
+/* Pointer (desktop): a 26 px button with a 16 px icon; the outline star shows on the hovered or focused row only. */
+.ws-star.pointer { width: 26px; height: 26px; border-radius: 6px }
+.ws-star.pointer:not(.on) { opacity: 0 }
+:is(.ws-star-row, .dt-catalogue-unit):hover .ws-star.pointer, :is(.ws-star-row, .dt-catalogue-unit):focus-within .ws-star.pointer, .ws-star.pointer.shown, .ws-star.pointer:focus-visible { opacity: 1 }
+.ws-star.pointer.shown:not(.on) { outline: 2px solid var(--ws-star-on, var(--dt-accent)); outline-offset: -2px }
+
+/* The Starred heading: the platform's group heading in the accent colour, with the star glyph. */
+.ws-starred-head { color: var(--ws-star-on, var(--ux-accent-2, var(--ux-accent))) !important }
+.ws-starred-label { display: inline-flex; align-items: center; gap: 6px }
+
+/* Starred factions and forces first, then this divider, then the rest. */
+.ws-star-divider { height: 1px; margin: 4px 2px; background: var(--ws-star-line, var(--ux-line)) }
+
+/* A choice row with the star over its start: the row's own button keeps its look, with room for the star. */
+.ws-star-row { position: relative; display: grid }
+.ws-star-row > .ws-star { position: absolute; top: 50%; left: 4px; transform: translateY(-50%) }
+.ws-star-row.touch > button:not(.ws-star) { padding-left: 50px !important }
+.ws-star-row.pointer > .ws-star { left: 6px }
+.ws-star-row.pointer > button:not(.ws-star) { padding-left: 38px !important }

@@ -43,6 +43,10 @@ export type WorkflowScreen =
   | "tablet-editor-export-readonly"
   | "tablet-editor-rename-unit"
   | "tablet-editor-renamed-unit"
+  | "tablet-stars-catalogue"
+  | "tablet-stars-catalogue-role"
+  | "tablet-stars-add-force"
+  | "tablet-stars-faction"
   | "tablet-editor-shortcuts"
   | "tablet-editor-text-200"
   | "tablet-editor-add-roles"
@@ -164,6 +168,10 @@ export type WorkflowScreen =
   | "desktop-editor-unit-rename"
   | "desktop-editor-unit-renamed"
   | "desktop-menus-rename-unit"
+  | "desktop-stars-catalogue"
+  | "desktop-stars-faction"
+  | "desktop-stars-add-force"
+  | "desktop-menus-star-unit"
   | "desktop-editor-unit-dialog-zoom-200"
   | "desktop-editor-unit-dialog-separated"
   | "desktop-editor-catalogue-limit"
@@ -262,7 +270,10 @@ export type WorkflowScreen =
   | "names-renamed-unit"
   | "names-roster-menu"
   | "names-points-limit"
-  | "names-limit-warning";
+  | "names-limit-warning"
+  | "stars-add-unit"
+  | "stars-faction"
+  | "stars-add-force";
 
 export type RosterOption = {
   id: string;

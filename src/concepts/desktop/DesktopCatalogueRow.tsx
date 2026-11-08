@@ -2,6 +2,7 @@ import { useEffect, useId, useState } from 'react';
 import { Plus } from 'lucide-react';
 import { StateChip } from '../workspace/StateChip';
 import type { CatalogueState } from './DesktopEditorFlows';
+import { StarButton } from '../workspace/Stars';
 
 export type CatalogueEntry = { name: string; role: string; models: number; points: number; weapon: string };
 
@@ -12,7 +13,12 @@ export type CatalogueEntry = { name: string; role: string; models: number; point
  * - Limit reached: a quota chip "1 / 1" on the meta line (the name keeps the row's width) and an unavailable Add (dashed +). The button stays focusable (aria-disabled);
  *   hover, focus or a press explains the limit. Name and price are never dimmed (text keeps >= 4.5:1).
  */
-export function CatalogueRow({ entry, state, onAdd, hintOpen = false }: { entry: CatalogueEntry; state: CatalogueState | null; onAdd: () => void; hintOpen?: boolean }) {
+/**
+ * R2-03 (F4c, approved 2026-11-08): `star` puts the star before the name, its own Tab stop before the row's Add. The outline
+ * star shows only on the hovered or keyboard-focused row (the slot stays, so names line up); a filled star always shows.
+ * `hovered`: the gallery draws this row as hovered with its star focused.
+ */
+export function CatalogueRow({ entry, state, onAdd, hintOpen = false, star, hovered = false }: { entry: CatalogueEntry; state: CatalogueState | null; onAdd: () => void; hintOpen?: boolean; star?: { on: boolean; onToggle: () => void }; hovered?: boolean }) {
   const [hint, setHint] = useState(hintOpen);
   const id = useId();
   useEffect(() => { setHint(hintOpen); }, [hintOpen]);
@@ -20,7 +26,8 @@ export function CatalogueRow({ entry, state, onAdd, hintOpen = false }: { entry:
   const limit = state?.limit;
   const models = <small>{entry.models} {entry.models === 1 ? 'model' : 'models'}<span className="dt-wide-only"> · {entry.weapon}</span></small>;
   const label = limit ? `Add ${entry.name}: unavailable. ${limit.selected} selected, maximum ${limit.max}. ${state.reason}` : `Add ${entry.name}${state ? `, ${state.caption}, ${state.reason}` : ''}`;
-  return <div className={`dt-catalogue-unit ${state?.tone ?? ''} ${unavailable ? 'unavailable' : ''} ${limit ? 'limit' : ''}`}>
+  return <div data-cat-entry={entry.name} className={`dt-catalogue-unit ${state?.tone ?? ''} ${unavailable ? 'unavailable' : ''} ${limit ? 'limit' : ''} ${star ? 'with-star' : ''} ${hovered ? 'hovered' : ''}`}>
+    {star && <StarButton pointer name={entry.name} on={star.on} onToggle={star.onToggle} forceShown={hovered} />}
     <button type="button" className="dt-catalogue-add" aria-disabled={unavailable || undefined} aria-label={label} aria-describedby={limit && hint ? id : undefined}
       onClick={() => { if (limit) setHint(v => !v); else if (!unavailable) onAdd(); }}
       onPointerEnter={() => limit && setHint(true)} onPointerLeave={() => limit && !hintOpen && setHint(false)}

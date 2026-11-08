@@ -15,6 +15,10 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "tablet-editor-export-readonly", label: "Tablet · Roster editor · Export, read-only roster" },
   { id: "tablet-editor-rename-unit", label: "Tablet · R2-02 · Rename unit sheet" },
   { id: "tablet-editor-renamed-unit", label: "Tablet · R2-02 · Renamed unit, Rename pane action" },
+  { id: "tablet-stars-catalogue", label: "Tablet · R2-03 · Catalogue with the Starred group" },
+  { id: "tablet-stars-catalogue-role", label: "Tablet · R2-03 · Catalogue, Core chosen" },
+  { id: "tablet-stars-add-force", label: "Tablet · R2-03 · Add force, starred forces" },
+  { id: "tablet-stars-faction", label: "Tablet · R2-03 · New roster, starred faction" },
   { id: "tablet-editor-shortcuts", label: "Tablet · Roster editor · Keyboard shortcuts" },
   { id: "tablet-editor-text-200", label: "Tablet · Roster editor · Text 200%" },
   { id: "tablet-editor-add-roles", label: "Tablet · Roster editor · Many unit roles" },
@@ -107,6 +111,10 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "desktop-editor-unit-rename", label: "Desktop · R2-02 · Unit dialog, inline rename" },
   { id: "desktop-editor-unit-renamed", label: "Desktop · R2-02 · Renamed unit in the tree" },
   { id: "desktop-menus-rename-unit", label: "Desktop · R2-02 · Edit menu, Rename unit…" },
+  { id: "desktop-stars-catalogue", label: "Desktop · R2-03 · Roster editor · Catalogue with Starred, hover/focus star" },
+  { id: "desktop-stars-faction", label: "Desktop · R2-03 · New roster · Faction step with a starred faction" },
+  { id: "desktop-stars-add-force", label: "Desktop · R2-03 · Add force · Starred forces" },
+  { id: "desktop-menus-star-unit", label: "Desktop · R2-03 · Menu bar · Edit › Star unit" },
   { id: "desktop-editor-unit-dialog-zoom-200", label: "Desktop · Roster editor · Unit dialog, page zoom 200%" },
   { id: "desktop-editor-unit-dialog-separated", label: "Desktop · Roster editor · Unit dialog, after Separate 1 (4 + 1)" },
   { id: "desktop-editor-catalogue-limit", label: "Desktop · Roster editor · Catalogue limit reached" },
@@ -212,6 +220,9 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "names-roster-menu", label: "R2-02 · Roster ⋯ menu · Rename roster, Points limit…" },
   { id: "names-points-limit", label: "R2-02 · Points limit sheet" },
   { id: "names-limit-warning", label: "R2-02 · Roster header · Configuration warning" },
+  { id: "stars-add-unit", label: "R2-03 · Add unit · Starred group" },
+  { id: "stars-faction", label: "R2-03 · New roster · Faction picker with a starred faction" },
+  { id: "stars-add-force", label: "R2-03 · Add force · Starred forces and faction" },
 ];
 
 const workflowLabels: Record<WorkflowScreen, string> = workflowScreens.reduce(
@@ -233,7 +244,7 @@ export function resolveWorkflow(workflow?: WorkflowScreen[]): Array<{ id: Workfl
 
 export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScreen {
   if (screen === "tablet-archive-sketch") return "overview";
-  if (screen === "tablet-editor" || screen.startsWith("tablet-editor-") || screen === "tablet-editor-issues" || screen === "tablet-editor-add" || screen === "tablet-editor-forces" || screen === "tablet-editor-add-force" || screen === "tablet-editor-readonly" || screen === "tablet-editor-export" || screen === "tablet-editor-import-result" || screen === "tablet-editor-move-unit" || screen === "tablet-editor-shortcuts" || screen === "tablet-editor-text-200" || screen === "tablet-editor-add-roles" || screen === "tablet-editor-add-focus" || screen === "tablet-editor-chip-caption" || screen === "tablet-editor-limit-caption" || screen === "tablet-editor-chips-text-150") return "overview";
+  if (screen === "tablet-editor" || screen.startsWith("tablet-editor-") || screen === "tablet-stars-catalogue" || screen === "tablet-stars-catalogue-role" || screen === "tablet-stars-add-force" || screen === "tablet-editor-issues" || screen === "tablet-editor-add" || screen === "tablet-editor-forces" || screen === "tablet-editor-add-force" || screen === "tablet-editor-readonly" || screen === "tablet-editor-export" || screen === "tablet-editor-import-result" || screen === "tablet-editor-move-unit" || screen === "tablet-editor-shortcuts" || screen === "tablet-editor-text-200" || screen === "tablet-editor-add-roles" || screen === "tablet-editor-add-focus" || screen === "tablet-editor-chip-caption" || screen === "tablet-editor-limit-caption" || screen === "tablet-editor-chips-text-150") return "overview";
   if (screen.startsWith("tablet-")) return "library"; // every other tablet screen is a page or a state of one
   if (screen.startsWith("duo-")) return "library"; // Foldable screens: a pose, a page and a state (DuoWorkbench)
   if (screen === "tablet-home" || screen === "tablet-rosters" || screen === "tablet-lookup" || screen === "tablet-tools" || screen === "tablet-library" || screen === "tablet-sources" || screen === "tablet-settings") return "library";
@@ -245,7 +256,9 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen === "desktop-sources") return "sources";
   if (screen === "desktop-settings" || screen.startsWith("desktop-settings-")) return "settings";
   if (screen === "desktop-first-run") return "library";
-  if (screen === "desktop-menus" || screen === "desktop-menus-rename-unit") return "overview";
+  if (screen === "desktop-menus" || screen === "desktop-menus-rename-unit" || screen === "desktop-menus-star-unit") return "overview";
+  if (screen === "desktop-stars-catalogue" || screen === "desktop-stars-add-force") return "overview"; // R2-03: the roster editor
+  if (screen === "desktop-stars-faction") return "library"; // R2-03: New roster over Welcome
   if (screen === "library-v2" || screen.startsWith("library-filters")) return "library";
   if (screen === "subscription-main") return "library";
   if (screen === "subscription-edition") return "overview";
@@ -261,7 +274,10 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen === "diagnostics") return "validation";
   if (screen === "export-stored") return "roster-read-only";
   if (screen === "names-unit-menu" || screen === "names-unit-sheet") return "unit-options-mobile"; // R2-02: unit details with the ⋯ menu / the Rename unit sheet
-  if (screen.startsWith("names-")) return "overview"; // R2-02: the roster with a renamed unit, its ⋯ menu, the Points limit sheet, the warning
+  if (screen.startsWith("names-")) return "overview";
+  if (screen === "stars-add-unit") return "add-unit"; // R2-03: the Add unit sheet with the Starred group
+  if (screen === "stars-faction") return "system"; // R2-03: New roster with the faction picker open
+  if (screen === "stars-add-force") return "overview"; // R2-03: the roster with Add force open // R2-02: the roster with a renamed unit, its ⋯ menu, the Points limit sheet, the warning
   if (screen === "export" || screen === "export-json" || screen === "export-pdf" || screen === "export-preview") return "overview"; // the export sheet over the roster
   return screen as PrototypeScreen; // the tablet screens returned above are not narrowed away by startsWith
 }

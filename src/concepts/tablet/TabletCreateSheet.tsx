@@ -3,6 +3,7 @@ import { AlertTriangle, Check, Database, Plus, Search } from 'lucide-react';
 import { FORCE_TYPES, primaryForce, type ImportResult } from '../desktop/DesktopEditorFlows';
 import type { RosterSummary, SourceInfo } from '../desktop/desktopData';
 import { TabletSheet } from './TabletSheet';
+import { StarDivider, StarRow, starredFirst, useStars } from '../workspace/Stars';
 import './tablet-dialogs.css';
 
 // Guided roster creation (T3) as a form sheet, on the app's pages (TB-09, 2026-10-27): game system, faction and game mode,
@@ -33,16 +34,20 @@ export function newRosterDocument(draft: NewRoster): { summary: RosterSummary; r
   };
 }
 
-export function CreateRosterSheet({ sources, defaultLimit = 1000, review = false, onCreate, onAddData, onClose }: {
+export function CreateRosterSheet({ sources, defaultLimit = 1000, review = false, stars = false, onCreate, onAddData, onClose }: {
   sources: SourceInfo[]; defaultLimit?: number;
   /** Gallery start: every choice made, on the name page with its summary. */
   review?: boolean;
+  /** R2-03 (F4c, approved 2026-11-08) gallery start: the faction step with a starred (and chosen) faction first, then a divider. */
+  stars?: boolean;
   onCreate: (roster: NewRoster) => void; onAddData: () => void; onClose: () => void;
 }) {
-  const [step, setStep] = useState<StepId>(review ? 'name' : 'system');
-  const [reached, setReached] = useState(review ? STEPS.length - 1 : 0);
+  const [step, setStep] = useState<StepId>(review ? 'name' : stars ? 'faction' : 'system');
+  const [reached, setReached] = useState(review ? STEPS.length - 1 : stars ? 1 : 0);
   const [system, setSystem] = useState(sources[0]?.id ?? '');
-  const [faction, setFaction] = useState(review ? sources[0]?.factions[0] ?? '' : '');
+  const lastFaction = sources[0]?.factions[sources[0].factions.length - 1] ?? '';
+  const factionStars = useStars(stars ? [lastFaction] : []);
+  const [faction, setFaction] = useState(review ? sources[0]?.factions[0] ?? '' : stars ? lastFaction : '');
   const [factionQuery, setFactionQuery] = useState('');
   const [forceType, setForceType] = useState(FORCES[0].name);
   const [limit, setLimit] = useState<number | 'custom' | 'unlimited'>(PRESETS.includes(defaultLimit) ? defaultLimit : 1000);
@@ -101,7 +106,10 @@ export function CreateRosterSheet({ sources, defaultLimit = 1000, review = false
           <h3 className="tbs-label" id="tbc-faction">Faction · {source?.name}</h3>
           {(source?.factions.length ?? 0) > 4 && <label className="tbs-field">Find a faction<input type="search" placeholder="Find a faction…" value={factionQuery} onChange={e => setFactionQuery(e.target.value)} /></label>}
           <div className="tbs-choices" role="radiogroup" aria-labelledby="tbc-faction">
-            {factions.map((f, i) => choice(faction === f, f, undefined, () => setFaction(f), f, faction ? faction === f : i === 0))}
+            {/* R2-03: each faction has its star before the name (the star only stars; the rest of the row chooses); starred first, a
+                divider, then the rest in the data's order. A search keeps starred matches first. */}
+            {(() => { const { starred, rest } = starredFirst(factions, f => f, factionStars.stars); const rows = (list: string[], offset: number) => list.map((f, i) => { const row = choice(faction === f, f, undefined, () => setFaction(f), f, faction ? faction === f : i + offset === 0); return stars ? <StarRow key={f} name={f} on={factionStars.isStarred(f)} onToggle={() => factionStars.toggle(f)}>{row}</StarRow> : row; });
+              return <>{rows(starred, 0)}{starred.length > 0 && rest.length > 0 && <StarDivider />}{rows(rest, starred.length)}</>; })()}
             {!factions.length && <p className="tbs-note"><Search size={16} />No faction matches “{factionQuery.trim()}”.</p>}
           </div>
           <p className="tbs-hint">Only factions installed with {source?.name} are listed.</p>

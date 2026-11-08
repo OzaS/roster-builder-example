@@ -31,7 +31,9 @@ type ThemePref = 'system' | 'light' | 'dark';
  * (from Home); `tablet-archive-sketch` (and any phone screen the sketch navigates to) shows the earlier three-pane sketch, unchanged.
  */
 const editorScreens: Record<string, EditorStart> = { 'tablet-editor': 'editor', 'tablet-editor-issues': 'issues', 'tablet-editor-add': 'add', 'tablet-editor-forces': 'forces', 'tablet-editor-add-force': 'add-force', 'tablet-editor-readonly': 'readonly', 'tablet-editor-export': 'export', 'tablet-editor-export-pdf': 'export-pdf', 'tablet-editor-export-json': 'export-json', 'tablet-editor-export-readonly': 'export-readonly', 'tablet-editor-move-unit': 'move-unit', 'tablet-editor-rename-unit': 'rename-unit', 'tablet-editor-renamed-unit': 'renamed-unit',
-  'tablet-editor-add-roles': 'add-roles', 'tablet-editor-add-focus': 'add-focus', 'tablet-editor-chip-caption': 'chip-caption', 'tablet-editor-limit-caption': 'limit-caption', 'tablet-editor-separate-all': 'separate-all' };
+  'tablet-editor-add-roles': 'add-roles', 'tablet-editor-add-focus': 'add-focus', 'tablet-editor-chip-caption': 'chip-caption', 'tablet-editor-limit-caption': 'limit-caption', 'tablet-editor-separate-all': 'separate-all',
+  // R2-03 (F4c): starred entries (`?tablet=stars-catalogue`, `stars-catalogue-role`, `stars-add-force`; `stars-faction` below).
+  'tablet-stars-catalogue': 'stars-catalogue', 'tablet-stars-catalogue-role': 'stars-role', 'tablet-stars-add-force': 'stars-add-force' };
 
 export function TabletWorkbench(props: Partial<ConceptProps>) {
   const shown: string | undefined = props.workflowScreen;
@@ -44,6 +46,7 @@ export function TabletWorkbench(props: Partial<ConceptProps>) {
   const screen = textScale ? shown?.slice(0, -'-text-200'.length) : shown;
   if (textScale) return <TextScaled scale={textScale}><TabletWorkbench key={shown} {...props} workflowScreen={screen as ConceptProps['workflowScreen']} /></TextScaled>;
   if (screen === 'tablet-editor-shortcuts') return <TabletShell key={screen} {...props} route={tabletRoute('tablet-home')!} initialEditor="editor" initialShortcuts />;
+  if (screen === 'tablet-stars-faction') return <TabletShell key={screen} {...props} route={tabletRoute('tablet-home')!} initialCreating="stars" />;
   if (screen === 'tablet-editor-import-result') return <TabletShell key={screen} {...props} route={{ page: 'rosters', state: '' }} initialImport />;
   const editorStart = screen ? editorScreens[screen] : undefined;
   const route = editorStart ? tabletRoute('tablet-home') : tabletRoute(screen); // a rail page, or a state of one (`tablet-home-first-run`, ...)
@@ -61,7 +64,7 @@ function TextScaled({ scale, device, children }: { scale: TextScale; device?: Ta
 type OpenEditor = { name: string; from: TabletPage; start: EditorStart; key: number; imported?: ImportResult };
 const editorAt = (start: EditorStart | undefined, key = 0): OpenEditor | null => start ? { name: rosterLibrary[0].name, from: 'home', start, key } : null;
 
-function TabletShell({ route, initialEditor, initialImport = false, initialShortcuts = false, ...props }: Partial<ConceptProps> & { route: TabletRoute; initialEditor?: EditorStart; initialImport?: boolean; initialShortcuts?: boolean }) {
+function TabletShell({ route, initialEditor, initialImport = false, initialShortcuts = false, initialCreating, ...props }: Partial<ConceptProps> & { route: TabletRoute; initialEditor?: EditorStart; initialImport?: boolean; initialShortcuts?: boolean; initialCreating?: 'stars' }) {
   const initialPage = route.page;
   const env = useTabletEnv();
   const { experience } = useTabletExperience();
@@ -90,7 +93,7 @@ function TabletShell({ route, initialEditor, initialImport = false, initialShort
   const chooseTheme = (pref: ThemePref) => { setThemePref(pref); setLight(pref === 'light' || (pref === 'system' && window.matchMedia('(prefers-color-scheme: light)').matches)); props.onThemePreferenceChange?.(pref); };
   const chooseScheme = (next: ColorScheme) => { setScheme(next); props.onColorSchemeChange?.(next); };
   // Guided creation (T3): every New roster entry opens the sheet over whatever is open; Create roster opens the editor on the new roster.
-  const [creating, setCreating] = useState<'start' | 'review' | null>(route.state === 'create' ? 'start' : route.state === 'create-review' ? 'review' : null);
+  const [creating, setCreating] = useState<'start' | 'review' | 'stars' | null>(initialCreating ?? (route.state === 'create' ? 'start' : route.state === 'create-review' ? 'review' : null));
   const newRoster = () => setCreating('start');
   const goSources = useCallback(() => setPage('sources'), []);
   const session = useTabletSession({ route, notify, light, onViewSource: goSources });
@@ -139,7 +142,7 @@ function TabletShell({ route, initialEditor, initialImport = false, initialShort
       const left = result.unmatched.length; notify(left ? `Opened “${result.name}” without ${left === 1 ? '1 entry' : `${left} entries`}` : `Opened “${result.name}”`);
     }} />}
     <TabletSessionSheets session={session} notify={notify} />
-    {creating && <CreateRosterSheet sources={jobs.sources} review={creating === 'review'} onClose={() => setCreating(null)} onCreate={createRoster} onAddData={() => { setCreating(null); setEditor(null); addData(); }} />}
+    {creating && <CreateRosterSheet sources={jobs.sources} review={creating === 'review'} stars={creating === 'stars'} onClose={() => setCreating(null)} onCreate={createRoster} onAddData={() => { setCreating(null); setEditor(null); addData(); }} />}
     <div className={`dt-app tb-shim ${light ? 'light' : ''}`}><ToastRegion toasts={toasts} /></div>
     <IconHints root={appRef} input={env.input} />
     {shortcuts && <ShortcutOverlay system={env.device.system} groups={shortcutGroups(!!editor)} onClose={() => setShortcuts(false)} />}

@@ -4,6 +4,7 @@ import { FORCE_TYPES, JSON_FILE_LINE, NEEDS_GAME_DATA, PAPERS, PaperPreview, for
 import { TabletSheet } from './TabletSheet';
 import { WorkspaceScope } from './TabletPieces';
 import { Segmented } from '../workspace/Primitives';
+import { StarDivider, StarRow, starredFirst, useStars } from '../workspace/Stars';
 
 // The editor's form sheets (T1c): the desktop dialogs with the mobile controls inside. Synthetic data only (DEC-001).
 
@@ -11,8 +12,13 @@ const FACTIONS = ['Frontier Coalition', 'Free Cities', 'Northern Realms'];
 
 /** Add force: faction and force type (types the roster cannot take say why). A force takes its name from the data (TB-09:
  *  the app has no force name field). */
-export function AddForceSheet({ forces, limit, faction, onAdd, onClose }: { forces: Force[]; limit: number; faction: string; onAdd: (force: Omit<Force, 'id'>) => void; onClose: () => void }) {
+export function AddForceSheet({ forces, limit, faction, stars = false, onAdd, onClose }: { forces: Force[]; limit: number; faction: string;
+  /** R2-03 (F4c, approved 2026-11-08): stars before the force names, starred forces first, then a divider (gallery: two starred). */
+  stars?: boolean;
+  onAdd: (force: Omit<Force, 'id'>) => void; onClose: () => void }) {
   const available = FORCE_TYPES.filter(t => !forceTypeBlocked(t, forces, limit));
+  const forceStars = useStars(stars ? ['Expedition force', 'Garrison'] : []);
+  const { starred, rest } = starredFirst(FORCE_TYPES, t => t.name, forceStars.stars);
   const [type, setType] = useState(available[0]?.name ?? '');
   const [chosenFaction, setFaction] = useState(faction);
   const named = `${type || 'New'} ${forces.filter(f => f.type === type).length + 1}`;
@@ -22,12 +28,15 @@ export function AddForceSheet({ forces, limit, faction, onAdd, onClose }: { forc
     <label className="tbs-field">Faction<select value={chosenFaction} onChange={e => setFaction(e.target.value)}>{FACTIONS.map(f => <option key={f}>{f}</option>)}</select></label>
     <h3 className="tbs-label" id="tbs-force-type">Force type</h3>
     <div className="tbs-choices" role="radiogroup" aria-labelledby="tbs-force-type">
-      {FORCE_TYPES.map(t => {
+      {[...starred, ...(starred.length && rest.length ? ['divider' as const] : []), ...rest].map(t => {
+        if (t === 'divider') return <StarDivider key="star-divider" />;
         const blocked = forceTypeBlocked(t, forces, limit);
-        return <button type="button" role="radio" key={t.name} aria-checked={type === t.name} aria-disabled={!!blocked || undefined} className={`tbs-choice ${type === t.name ? 'active' : ''}`} data-autofocus={type === t.name ? true : undefined}
+        const choice = <button type="button" role="radio" key={t.name} aria-checked={type === t.name} aria-disabled={!!blocked || undefined} className={`tbs-choice ${type === t.name ? 'active' : ''}`} data-autofocus={type === t.name ? true : undefined}
           onClick={() => { if (!blocked) setType(t.name); }}>
           <span><strong>{t.name}</strong><small>{t.detail}</small>{blocked && <small className="reason"><Lock size={13} />{blocked}</small>}</span>{type === t.name && <Check size={20} />}
         </button>;
+        // A starred force keeps its state (a type the roster cannot take still says why).
+        return stars ? <StarRow key={t.name} name={t.name} on={forceStars.isStarred(t.name)} onToggle={() => forceStars.toggle(t.name)}>{choice}</StarRow> : choice;
       })}
     </div>
   </TabletSheet>;

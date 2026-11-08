@@ -1,0 +1,18 @@
+/* R2-03 (F4c, approved 2026-11-08): starred entries on the phone (the shared star is in workspace/stars.css). */
+
+/* Add unit: role groups with the Starred group first; the star sits before the name inside the row's card. */
+.ux-pool-group { display: grid; gap: 8px }
+.ux-pool-group + .ux-pool-group { margin-top: 6px }
+.ux-pool-group-head { display: flex; justify-content: space-between; align-items: center; margin: 8px 2px 0; color: var(--ux-muted); font-size: 11px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase }
+.ux-pool-item.with-star > .ws-star { position: absolute; top: 50%; left: 2px; transform: translateY(-50%) }
+.ux-pool-item.with-star > .ux-pool-row { padding-left: 46px }
+
+/* Faction picker and Add force: the wrapped rows keep the list's direct-child look. */
+.ux-force-choice-list > .ws-star-row > button:not(.ws-star),
+.ux-force-detachments > .ws-star-row > button:not(.ws-star) { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 46px; padding: 7px 9px; border: 1px solid var(--ux-line); border-radius: 7px; background: var(--ux-surface-2); color: var(--ux-ink); text-align: left; cursor: pointer }
+.ux-force-choice-list > .ws-star-row > button:not(.ws-star).selected { border-color: var(--ux-accent); background: color-mix(in srgb, var(--ux-accent) 12%, var(--ux-surface-2)) }
+.ux-force-detachments .ws-star-row > button:not(.ws-star) { padding-left: 46px !important }
+.ux-force-choice-list .ws-star-row > button:not(.ws-star) { padding-left: 46px !important }
+:is(.ux-force-choice-list, .ux-force-detachments) .ws-star-divider { margin: 2px 2px }
+.ux-loadout-choice-list .ws-star-divider { margin: 4px 2px }
+.ux-stars-el-row { display: flex; gap: 12px; align-items: center }

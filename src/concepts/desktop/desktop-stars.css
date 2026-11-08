@@ -1,0 +1,16 @@
+/* R2-03 (F4c, approved 2026-11-08): stars on desktop (shared star: workspace/stars.css). Accent star, muted outline. */
+.dt-app { --ws-star-on: var(--dt-accent); --ws-star-off: var(--dt-muted); --ws-star-line: var(--dt-border) }
+.dt-catalogue-unit.with-star { padding-left: 4px; gap: 4px }
+.dt-catalogue-unit.with-star > .dt-catalogue-add { flex: 1; min-width: 0 }
+.dt-catalogue-unit.hovered { background: var(--dt-hover) }
+.dt-catalogue-list h3.ws-starred-head { align-items: center }
+.dt-app .ws-star.pointer:hover { background: var(--dt-hover) }
+/* Choice lists wrapped for the star keep the list's direct-child look. */
+.dt-app .dt-choice-list > .ws-star-row > button:not(.ws-star) { width: 100%; justify-content: space-between; text-align: left; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--dt-border) }
+.dt-app .dt-choice-list.compact > .ws-star-row > button:not(.ws-star) { padding: 9px 12px 9px 38px !important }
+.dt-app .dt-choice-list > .ws-star-row > button:not(.ws-star).active { border-color: color-mix(in srgb, var(--dt-fill) 55%, transparent); background: var(--dt-selected) }
+.dt-app .dt-choice-list > .ws-star-row > button:not(.ws-star).blocked { cursor: not-allowed; opacity: .55; border-style: dashed }
+.dt-app .dt-choice-list > .ws-star-row > button:not(.ws-star) > svg { color: var(--dt-accent) }
+.dt-app .dte-addforce .dt-choice-list > .ws-star-row > button:not(.ws-star) { justify-content: flex-start; gap: 10px; align-items: flex-start }
+.dt-app .dte-addforce .dt-choice-list > .ws-star-row > button:not(.ws-star) > span:first-child { flex: 1 }
+.dt-app .dt-choice-list .ws-star-divider { margin: 2px 4px }

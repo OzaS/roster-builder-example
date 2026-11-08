@@ -23,6 +23,8 @@ import { ComingSoonCard, DeveloperOptionsPreview } from "../concepts/ux/AppExtra
 import { DebugNavRow, DebugRows } from "../concepts/ux/DeveloperPages";
 import { PhoneExportFlow, PhoneExportPreview, phoneExportRoster } from "../concepts/ux/PhoneExport";
 import { LimitWarning, PhonePointsLimitSheet, PhoneRenameSheet, PhoneUnitMenu } from "../concepts/ux/PhoneNames";
+import { StarButton, StarDivider, StarRow, StarredHeadingContent } from "../concepts/workspace/Stars";
+import "../concepts/ux/phone-stars.css";
 import { ActionMenuDialog, ReopenRosterSetting, AddCollectionSheet, LOCAL_ERRORS, LOCAL_FILE, LOCAL_SOURCE, LocalImportChoiceDialog, LocalImportError, LocalImportRow, LocalInterruptedNotice, LocalRefusedNotice, LocalSourceNote, LocalSourceRows, localSteps, AdvancedInstallSetting, AppDialog, AutoUpdateChecksSetting, FocusCatalogueSearchSetting, SeparateAllSetting, AdvancedSettingsRows, ImportReportGroups, CollectionMenuDialog, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, FirstRunDataCard, ReinstallSheet, ReinstallConfirmDialog, REINSTALL_DONE, REINSTALL_FAILED, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RememberSectionsSetting, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceStatusAction, SourceUpdateCard, SourceVersions, SourcesNavRow, TaggedRosterRows, UpdateAvatarButton, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
 
 type Props = {
@@ -526,6 +528,31 @@ function WorkbenchElements({
         <button type="button" className="ux-pool-row"><span><strong>{flattenUnits(roster)[0]?.name}<em className="ux-pool-count"> (1/3)</em></strong><small>{flattenUnits(roster)[0]?.role}</small></span><span className="ux-pool-meta"><b>{flattenUnits(roster)[0]?.points} pts</b><Chip tone="valid">available</Chip></span><Plus size={16} /></button>
         {/* DEC-054: a unit at its maximum: not dimmed; quota chip, unavailable Add, the reason in the hint bubble on press. */}
         <div className="ux-pool-item" style={{ marginBottom: 72 }}><button type="button" className="ux-pool-row locked" aria-disabled="true" aria-label={`${flattenUnits(roster)[1]?.name}, ${flattenUnits(roster)[1]?.points} points. Unavailable: limit reached, 1 of 1 selected`}><span><strong>{flattenUnits(roster)[1]?.name}</strong><small>Limit reached</small></span><span className="ux-pool-meta"><b>{flattenUnits(roster)[1]?.points} pts</b><QuotaChip selected={1} max={1} /></span><span className="ws-limit-add ux-pool-limit-add" aria-hidden><i><Plus size={15} /></i></span></button><span role="tooltip" className="tb-hint-bubble ws-limit-bubble ux-pool-bubble">{limitReason(1, 1)}</span></div>
+      </ElementSection>
+
+      <ElementSection title="Star Button">
+        <small className="ux-elements-note">R2-03 (F4c, approved 2026-11-08): a star before the name on every row of the Add unit sheet, the New roster faction picker and Add force (force rows and its faction list). Outline (muted) = not starred; filled in the accent colour = starred, never the warning amber that means Slot full. Always visible on touch: 20 px icon, 44 pt target. Tapping the star only stars; tapping the rest of the row does what it did. Kept per faction (unit and force stars per catalogue, faction stars per game system), on the device: survives a restart, not in the roster file, not an Undo step. Labels “Star {"{name}"}” / “Unstar {"{name}"}”. Off · on · in a unit row · in a choice row.</small>
+        <div className="ux-stars-el-row">
+          <StarButton name="Line Infantry" on={false} />
+          <StarButton name="Line Infantry" on />
+        </div>
+        <div className="ux-pool" style={{ maxWidth: 360 }}>
+          <div className="ux-pool-item with-star"><StarButton name="Line Infantry" on={false} /><button type="button" className="ux-pool-row available"><span><strong>Line Infantry</strong><small>Line</small></span><span className="ux-pool-meta"><b>120 pts</b><Chip tone="valid">available</Chip></span><Plus size={16} /></button></div>
+          <div className="ux-pool-item with-star"><StarButton name="Support Battery" on /><button type="button" className="ux-pool-row limited"><span><strong>Support Battery</strong><small>Slot full: adding breaks its limit</small></span><span className="ux-pool-meta"><b>180 pts</b><Chip tone="warning">limited</Chip></span><Plus size={16} /></button></div>
+        </div>
+        <div className="ux-loadout-choice-list" style={{ maxWidth: 360, padding: 0 }}>
+          <StarRow name="Theta Faction" on><button type="button" className="ux-loadout-choice selected"><span><strong>Theta Faction</strong><small>Group C</small></span><span className="ux-loadout-choice-check" aria-hidden><Check size={15} /></span></button></StarRow>
+          <StarDivider />
+          <StarRow name="Alpha Faction" on={false}><button type="button" className="ux-loadout-choice"><span><strong>Alpha Faction</strong><small>Group A</small></span><span className="ux-loadout-choice-check" aria-hidden /></button></StarRow>
+        </div>
+      </ElementSection>
+
+      <ElementSection title="Starred Group Heading">
+        <small className="ux-elements-note">R2-03 (F4c, approved 2026-11-08): units get a Starred group at the top of Add unit: an accent heading with a filled star glyph and the count. Starred rows are not repeated in their role group and keep their state (Slot full, quota chip 1 / 1, unavailable Add). Factions and forces have no heading: starred rows first, a divider, then the rest. No stars: no group, no divider, no hint. Stale stars are ignored silently and kept; the role filter and search keep Starred first.</small>
+        <section className="ux-pool-group" style={{ maxWidth: 360 }}>
+          <h4 className="ux-pool-group-head ws-starred-head"><StarredHeadingContent count={2} /></h4>
+          <h4 className="ux-pool-group-head"><span>Command</span><span>2</span></h4>
+        </section>
       </ElementSection>
 
       <ElementSection title="Favorite Creation Sections">

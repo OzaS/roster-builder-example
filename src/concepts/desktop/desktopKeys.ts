@@ -1,7 +1,9 @@
 // Editable key bindings for the desktop prototype. "Mod" is Command on macOS and Ctrl elsewhere.
 // DEC-055: the inspector pane became the unit dialog, so its toggle (Mod+Alt+B) is retired; units open with Enter or a click.
 
-export type KeyAction = 'palette' | 'newRoster' | 'rosters' | 'lookup' | 'settings' | 'summary' | 'toggleCatalogue' | 'undo' | 'redo' | 'exportRoster';
+// R2-03 (F4c, approved 2026-11-08): Star unit toggles the star of the focused catalogue row; it has no default key (⌘D is
+// Duplicate unit), so Settings › Key bindings lists it as Not set until the user records one.
+export type KeyAction = 'palette' | 'newRoster' | 'rosters' | 'lookup' | 'settings' | 'summary' | 'toggleCatalogue' | 'undo' | 'redo' | 'exportRoster' | 'starUnit';
 export type KeyBindings = Record<KeyAction, string>;
 
 export const keyActions: Array<{ id: KeyAction; label: string; group: 'General' | 'Roster editor' }> = [
@@ -15,12 +17,13 @@ export const keyActions: Array<{ id: KeyAction; label: string; group: 'General' 
   { id: 'undo', label: 'Undo', group: 'Roster editor' },
   { id: 'redo', label: 'Redo', group: 'Roster editor' },
   { id: 'exportRoster', label: 'Export roster', group: 'Roster editor' },
+  { id: 'starUnit', label: 'Star unit', group: 'Roster editor' },
 ];
 
 export const defaultBindings: KeyBindings = {
   palette: 'Mod+K', newRoster: 'Mod+N', rosters: 'Mod+Shift+R', lookup: 'Mod+F', settings: 'Mod+,',
   summary: 'Mod+I', toggleCatalogue: 'Mod+B',
-  undo: 'Mod+Z', redo: 'Mod+Shift+Z', exportRoster: 'Mod+E',
+  undo: 'Mod+Z', redo: 'Mod+Shift+Z', exportRoster: 'Mod+E', starUnit: '',
 };
 
 const codeKey = (code: string, key: string) => code.startsWith('Key') ? code.slice(3) : code.startsWith('Digit') ? code.slice(5)

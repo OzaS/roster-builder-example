@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, Check, Database, Minus, Plus, Search, X } from 'lucide-react';
 import type { SourceInfo } from './desktopData';
 import { ModalShell } from '../workspace/Dialog';
+import { StarDivider, StarRow, starredFirst, useStars } from '../workspace/Stars';
 
 // Guided roster creation for desktop: the mobile steps (game system → points limit → faction and force →
 // configuration → name) as one dialog with a step list on the left. Earlier steps stay editable.
@@ -19,19 +20,23 @@ const FORCES = [
 const PRESETS = [500, 1000, 1500, 2000];
 const MAX_LIMIT = 10000;
 
-export function DesktopCreate({ sources, onCreate, onClose, onAddData }: { sources: SourceInfo[]; onCreate: (roster: NewRoster) => void; onClose: () => void; onAddData: () => void }) {
-  const [step, setStep] = useState<StepId>('system');
+/** R2-03 (F4c, approved 2026-11-08) `stars`: the gallery start on the faction step with a starred (and chosen) faction first,
+ *  then a divider; each faction's star shows on hover or focus (filled ones always). */
+export function DesktopCreate({ sources, onCreate, onClose, onAddData, stars = false }: { sources: SourceInfo[]; onCreate: (roster: NewRoster) => void; onClose: () => void; onAddData: () => void; stars?: boolean }) {
+  const lastFaction = sources[0]?.factions[sources[0].factions.length - 1] ?? '';
+  const factionStars = useStars(stars ? [lastFaction] : []);
+  const [step, setStep] = useState<StepId>(stars ? 'faction' : 'system');
   const [system, setSystem] = useState(sources[0]?.id ?? '');
   const [limit, setLimit] = useState<number | 'custom' | 'unlimited'>(1000);
   const [custom, setCustom] = useState('750');
-  const [faction, setFaction] = useState('');
+  const [faction, setFaction] = useState(stars ? lastFaction : '');
   const [factionQuery, setFactionQuery] = useState('');
   const [force, setForce] = useState(FORCES[0].name);
   const [size, setSize] = useState('Standard');
   const [allies, setAllies] = useState(false);
   const [commandPoints, setCommandPoints] = useState(1);
   const [name, setName] = useState('');
-  const [reached, setReached] = useState(0);
+  const [reached, setReached] = useState(stars ? 2 : 0);
   const bodyRef = useRef<HTMLDivElement>(null);
   const source = sources.find(s => s.id === system);
   const index = STEPS.findIndex(s => s.id === step);
@@ -44,7 +49,8 @@ export function DesktopCreate({ sources, onCreate, onClose, onAddData }: { sourc
     system: source?.name ?? '', limit: limit === 'unlimited' ? 'Unlimited' : points ? `${points.toLocaleString()} pts` : '',
     faction: faction ? `${faction} · ${force}` : '', config: `${size}${allies ? ' · allies' : ''} · ${commandPoints} CP`, name: name.trim() || suggested,
   };
-  useEffect(() => { setFaction(''); setFactionQuery(''); }, [system]);
+  const firstSystem = useRef(true);
+  useEffect(() => { if (firstSystem.current) { firstSystem.current = false; return; } setFaction(''); setFactionQuery(''); }, [system]);
   useEffect(() => { bodyRef.current?.querySelector<HTMLElement>('input, button[aria-checked=true], [role=radio]')?.focus(); }, [step]);
   const go = (to: number) => { const id = STEPS[to]?.id; if (!id) return; setStep(id); setReached(r => Math.max(r, to)); };
   const create = () => onCreate({ name: name.trim() || suggested, limit: points, system: source?.name ?? '', faction: faction || source?.factions[0] || '', force });
@@ -73,7 +79,8 @@ export function DesktopCreate({ sources, onCreate, onClose, onAddData }: { sourc
           </>}
           {step === 'faction' && <div className="dt-wizard-columns">
             <section><h4>Faction</h4><label className="dtp-search"><Search size={14} /><input placeholder="Find a faction…" aria-label="Find a faction" value={factionQuery} onChange={e => setFactionQuery(e.target.value)} /></label>
-              <div className="dt-choice-list compact" role="radiogroup" aria-label="Faction">{source?.factions.filter(f => f.toLowerCase().includes(factionQuery.toLowerCase())).map(f => <button type="button" role="radio" aria-checked={faction === f} key={f} className={faction === f ? 'active' : ''} onClick={() => setFaction(f)}><span><strong>{f}</strong></span>{faction === f && <Check size={15} />}</button>)}</div></section>
+              <div className="dt-choice-list compact" role="radiogroup" aria-label="Faction">{(() => { const { starred, rest } = starredFirst(source?.factions.filter(f => f.toLowerCase().includes(factionQuery.toLowerCase())) ?? [], f => f, factionStars.stars); const row = (f: string) => { const choice = <button type="button" role="radio" aria-checked={faction === f} key={f} className={faction === f ? 'active' : ''} onClick={() => setFaction(f)}><span><strong>{f}</strong></span>{faction === f && <Check size={15} />}</button>; return stars ? <StarRow key={f} pointer name={f} on={factionStars.isStarred(f)} onToggle={() => factionStars.toggle(f)} forceShown={f === rest[0]}>{choice}</StarRow> : choice; };
+                return <>{starred.map(row)}{starred.length > 0 && rest.length > 0 && <StarDivider />}{rest.map(row)}</>; })()}</div></section>
             <section><h4>Force</h4><div className="dt-choice-list compact" role="radiogroup" aria-label="Force">{FORCES.map(f => <button type="button" role="radio" aria-checked={force === f.name} key={f.name} className={force === f.name ? 'active' : ''} onClick={() => setForce(f.name)}><span><strong>{f.name}</strong><small>{f.detail}</small></span>{force === f.name && <Check size={15} />}</button>)}</div></section>
           </div>}
           {step === 'config' && <div className="dt-config">
