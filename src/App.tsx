@@ -39,6 +39,8 @@ const workflowScreenIds = [
   "tablet-editor-export-pdf",
   "tablet-editor-export-json",
   "tablet-editor-export-readonly",
+  "tablet-editor-rename-unit",
+  "tablet-editor-renamed-unit",
   "tablet-editor-shortcuts",
   "tablet-editor-text-200",
   "tablet-editor-add-roles",
@@ -153,6 +155,9 @@ const workflowScreenIds = [
   "desktop-editor-export-pdf",
   "desktop-editor-export-json",
   "desktop-editor-export-readonly",
+  "desktop-editor-unit-rename",
+  "desktop-editor-unit-renamed",
+  "desktop-menus-rename-unit",
   "desktop-editor-unit-dialog-zoom-200",
   "desktop-editor-unit-dialog-separated",
   "desktop-editor-catalogue-limit",
@@ -246,6 +251,12 @@ const workflowScreenIds = [
   "export-pdf",
   "export-preview",
   "export-stored",
+  "names-unit-menu",
+  "names-unit-sheet",
+  "names-renamed-unit",
+  "names-roster-menu",
+  "names-points-limit",
+  "names-limit-warning",
 ] satisfies WorkflowScreen[];
 const prototypeScreenIds = [
   "library",
@@ -641,16 +652,12 @@ function App() {
     setExpandedSectionIds((current) => [...current, sections[0].id]);
   }
 
+  /** R2-02 / DEC-046: renaming a unit names it in this roster only (an empty name restores the entry name); it no longer saves a Library snapshot. */
   function renameUnit(unitId: string, customName: string) {
     const location = findUnitLocation(roster, unitId);
     const trimmed = customName.trim();
-    if (!location || !trimmed) return;
-    const renamed = deepClone({ ...location.unit, customName: trimmed });
-    setRoster(replaceUnit(roster, unitId, renamed));
-    setFavorites((current) => ({
-      ...current,
-      units: [...current.units, { id: uniqueId("favorite-unit"), createdAt: new Date().toISOString(), sourceSectionName: location.section.name, unit: deepClone(renamed) }],
-    }));
+    if (!location) return;
+    setRoster(replaceUnit(roster, unitId, deepClone({ ...location.unit, customName: trimmed || undefined })));
   }
 
   function renameForce(forceId: string, customName: string) {

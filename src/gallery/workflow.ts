@@ -13,6 +13,8 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "tablet-editor-export-pdf", label: "Tablet · Roster editor · Export, PDF" },
   { id: "tablet-editor-export-json", label: "Tablet · Roster editor · Export, roster file" },
   { id: "tablet-editor-export-readonly", label: "Tablet · Roster editor · Export, read-only roster" },
+  { id: "tablet-editor-rename-unit", label: "Tablet · R2-02 · Rename unit sheet" },
+  { id: "tablet-editor-renamed-unit", label: "Tablet · R2-02 · Renamed unit, Rename pane action" },
   { id: "tablet-editor-shortcuts", label: "Tablet · Roster editor · Keyboard shortcuts" },
   { id: "tablet-editor-text-200", label: "Tablet · Roster editor · Text 200%" },
   { id: "tablet-editor-add-roles", label: "Tablet · Roster editor · Many unit roles" },
@@ -102,6 +104,9 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "desktop-editor-export-pdf", label: "Desktop · Roster editor · Export, PDF" },
   { id: "desktop-editor-export-json", label: "Desktop · Roster editor · Export, roster file" },
   { id: "desktop-editor-export-readonly", label: "Desktop · Roster editor · Export, read-only roster" },
+  { id: "desktop-editor-unit-rename", label: "Desktop · R2-02 · Unit dialog, inline rename" },
+  { id: "desktop-editor-unit-renamed", label: "Desktop · R2-02 · Renamed unit in the tree" },
+  { id: "desktop-menus-rename-unit", label: "Desktop · R2-02 · Edit menu, Rename unit…" },
   { id: "desktop-editor-unit-dialog-zoom-200", label: "Desktop · Roster editor · Unit dialog, page zoom 200%" },
   { id: "desktop-editor-unit-dialog-separated", label: "Desktop · Roster editor · Unit dialog, after Separate 1 (4 + 1)" },
   { id: "desktop-editor-catalogue-limit", label: "Desktop · Roster editor · Catalogue limit reached" },
@@ -201,6 +206,12 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "export-pdf", label: "Export · PDF" },
   { id: "export-preview", label: "Export · Preview (PDF)" },
   { id: "export-stored", label: "Export · Stored roster (read only)" },
+  { id: "names-unit-menu", label: "R2-02 · Unit details · ⋯ menu with Rename unit" },
+  { id: "names-unit-sheet", label: "R2-02 · Rename unit sheet" },
+  { id: "names-renamed-unit", label: "R2-02 · Roster tree · Renamed unit" },
+  { id: "names-roster-menu", label: "R2-02 · Roster ⋯ menu · Rename roster, Points limit…" },
+  { id: "names-points-limit", label: "R2-02 · Points limit sheet" },
+  { id: "names-limit-warning", label: "R2-02 · Roster header · Configuration warning" },
 ];
 
 const workflowLabels: Record<WorkflowScreen, string> = workflowScreens.reduce(
@@ -234,7 +245,7 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen === "desktop-sources") return "sources";
   if (screen === "desktop-settings" || screen.startsWith("desktop-settings-")) return "settings";
   if (screen === "desktop-first-run") return "library";
-  if (screen === "desktop-menus") return "overview";
+  if (screen === "desktop-menus" || screen === "desktop-menus-rename-unit") return "overview";
   if (screen === "library-v2" || screen.startsWith("library-filters")) return "library";
   if (screen === "subscription-main") return "library";
   if (screen === "subscription-edition") return "overview";
@@ -249,6 +260,8 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen === "option-drilldown") return "unit-detail";
   if (screen === "diagnostics") return "validation";
   if (screen === "export-stored") return "roster-read-only";
+  if (screen === "names-unit-menu" || screen === "names-unit-sheet") return "unit-options-mobile"; // R2-02: unit details with the ⋯ menu / the Rename unit sheet
+  if (screen.startsWith("names-")) return "overview"; // R2-02: the roster with a renamed unit, its ⋯ menu, the Points limit sheet, the warning
   if (screen === "export" || screen === "export-json" || screen === "export-pdf" || screen === "export-preview") return "overview"; // the export sheet over the roster
   return screen as PrototypeScreen; // the tablet screens returned above are not narrowed away by startsWith
 }

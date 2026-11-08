@@ -1,5 +1,5 @@
 import { type CSSProperties, type ReactNode, useState } from "react";
-import { AlertTriangle, ArrowLeft, Check, CheckCircle2, ChevronDown, Ellipsis, Heart, Info, LockKeyhole, Redo2, ShieldAlert, Sparkles, Undo2, Upload, X } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Check, CheckCircle2, ChevronDown, Ellipsis, Gauge, Heart, Info, LockKeyhole, Pencil, Redo2, ShieldAlert, Sparkles, Undo2, Upload, X } from "lucide-react";
 import type { ColorScheme, PrototypeScreen, Roster, RosterUnit, ThemeMode } from "../../types";
 import type { ConceptProps } from "../shared";
 
@@ -80,14 +80,18 @@ export function RosterShareButton({ onExport }: { onExport?: () => void }) {
  * UX-020: the phone roster bar's More button, after Share. Its menu opens anchored to the button (iOS: the native bar
  * button menu; Android: a Material menu) and lists Undo and Redo with their availability. A read-only roster has no
  * Undo or Redo, so it has no More button at all. `inline`: drawn in the flow, for the Elements view.
+ * R2-02 (F4b, approved 2026-11-07): Rename roster (the Rename roster sheet, as the tablet's More menu) and Points limit… (the
+ * phone Points limit sheet) follow Undo and Redo.
  */
-export function RosterMoreMenu({ open, onOpenChange, canUndo = false, canRedo = false, readOnly = false, inline = false }: {
+export function RosterMoreMenu({ open, onOpenChange, canUndo = false, canRedo = false, readOnly = false, inline = false, onRename, onLimit }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   canUndo?: boolean;
   canRedo?: boolean;
   readOnly?: boolean;
   inline?: boolean;
+  onRename?: () => void;
+  onLimit?: () => void;
 }) {
   if (readOnly) return null;
   return (
@@ -99,6 +103,8 @@ export function RosterMoreMenu({ open, onOpenChange, canUndo = false, canRedo = 
         <div className="ux-roster-more-menu" role="menu" aria-label="More actions">
           <button type="button" role="menuitem" disabled={!canUndo} onClick={() => onOpenChange(false)}><Undo2 size={16} />Undo</button>
           <button type="button" role="menuitem" disabled={!canRedo} onClick={() => onOpenChange(false)}><Redo2 size={16} />Redo</button>
+          <button type="button" role="menuitem" onClick={() => { onOpenChange(false); onRename?.(); }}><Pencil size={16} />Rename roster</button>
+          <button type="button" role="menuitem" onClick={() => { onOpenChange(false); onLimit?.(); }}><Gauge size={16} />Points limit…</button>
         </div>
       ) : null}
     </div>
@@ -122,14 +128,19 @@ export function ExpandableBudget({ roster }: { roster: Roster }) {
   );
 }
 
-/** A tree unit's name line: ×count only above 1, non-point cost in accent, configuration summary below. */
-export function TreeUnitMain({ unit, name }: { unit: RosterUnit; name: string }) {
+/**
+ * A tree unit's name line: ×count only above 1, non-point cost in accent, configuration summary below.
+ * R2-02 (F4b, approved 2026-11-07): a renamed unit shows its own name and, as the muted second line, the entry name first
+ * (as renamed forces do), then the summary.
+ */
+export function TreeUnitMain({ unit, name, entryName }: { unit: RosterUnit; name: string; entryName?: string }) {
+  const second = [entryName, unit.summary].filter(Boolean).join(" · ");
   return (
-    <span className={`ux-tree-unit-main ${unit.summary ? "with-summary" : ""}`}>
+    <span className={`ux-tree-unit-main ${second ? "with-summary" : ""}`}>
       <span>{name}</span>
       {unit.extraCost ? <em className="ux-tree-unit-cost">· {unit.extraCost}</em> : null}
       {unit.count > 1 ? <small>×{unit.count}</small> : null}
-      {unit.summary ? <small className="ux-tree-unit-summary">{unit.summary}</small> : null}
+      {second ? <small className={`ux-tree-unit-summary ${entryName ? "ux-tree-unit-entry" : ""}`}>{second}</small> : null}
     </span>
   );
 }

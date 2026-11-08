@@ -14,9 +14,16 @@ import { MobileUnitOptions } from "./MobileUnitOptions";
 import { QuotaChip, limitReason } from "../workspace/CatalogueLimit";
 import { SoftKeyboard } from "./SoftKeyboard";
 import { PhoneExportFlow, phoneExportRoster } from "./PhoneExport";
+import { LimitWarning, PhonePointsLimitSheet, PhoneRenameSheet, PhoneUnitMenu, configurationWarning } from "./PhoneNames";
 import { SettingsResults } from "./SettingsSearch";
 import { APP_DEVELOPER_SCREENS, DebugNavRow, DebugScreen, DeveloperOptionsNavRow, DeveloperOptionsScreen } from "./DeveloperPages";
 import { BackOrTitle, BudgetMeter, Chip, ExpandableBudget, RosterMoreMenu, RosterShareButton, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "./uxShared";
+
+/** R2-02 (F4b, approved 2026-11-07): the gallery screens of names and the points limit. The unit details ones open "Squad A";
+ *  the limit ones open a roster whose limit (2 050 pts) is above what its configuration allows (2 000 pts, also the data limit). */
+const NAMES_UNIT_SCREENS: readonly string[] = ["names-unit-menu", "names-unit-sheet"];
+const NAMES_LIMIT_SCREENS: readonly string[] = ["names-roster-menu", "names-points-limit", "names-limit-warning"];
+const NAMES_CONFIGURATION_LIMIT = 2000;
 
 /** Screens of the source-data flow designed in Battle Augur plan 2D (SourceJobs.tsx). */
 const SOURCE_FLOW_SCREENS: readonly string[] = ["install-job", "source-detail", "migration-report", "collection", "search-github", "roster-read-only"];
@@ -57,6 +64,24 @@ export function CodexWorkbench(props: ConceptProps) {
   const detailScrollRef = useRef<HTMLElement>(null);
   const loadoutScrollTopRef = useRef(0);
   const layoutRef = useRef<HTMLDivElement>(null);
+  // R2-02: the Rename unit / Rename roster / Points limit sheets and what they change in the gallery sample.
+  const ws = props.workflowScreen ?? "";
+  const [nameSheet, setNameSheet] = useState<"unit" | "roster" | "limit" | null>(ws === "names-unit-sheet" ? "unit" : ws === "names-points-limit" ? "limit" : null);
+  const [unitCustomName, setUnitCustomName] = useState<string | undefined>(undefined);
+  const [rosterNameOverride, setRosterNameOverride] = useState<string | undefined>(undefined);
+  const [limitChoice, setLimitChoice] = useState<number | undefined>(NAMES_LIMIT_SCREENS.includes(ws) ? 2050 : undefined);
+  useEffect(() => {
+    setNameSheet(ws === "names-unit-sheet" ? "unit" : ws === "names-points-limit" ? "limit" : null);
+    setUnitCustomName(undefined); setRosterNameOverride(undefined);
+    setLimitChoice(NAMES_LIMIT_SCREENS.includes(ws) ? 2050 : undefined);
+  }, [ws]);
+  const configurationLimit = NAMES_LIMIT_SCREENS.includes(ws) ? NAMES_CONFIGURATION_LIMIT : undefined;
+  const effectiveLimit = limitChoice === undefined ? props.roster.pointsLimit : limitChoice === -1 ? configurationLimit ?? props.roster.pointsLimit : limitChoice;
+  const limitWarning = configurationWarning(effectiveLimit, configurationLimit);
+  const unitEntryName = NAMES_UNIT_SCREENS.includes(ws) ? "Squad A" : "Lancers";
+  const unitShownName = unitCustomName ?? unitEntryName;
+  const viewRoster = { ...props.roster, name: rosterNameOverride ?? props.roster.name, pointsLimit: effectiveLimit, forces: ws === "names-renamed-unit" ? props.roster.forces.map((force) => ({ ...force, sections: force.sections.map((section) => ({ ...section, units: section.units.map((unit) => unit.name === "Forward Squad" ? { ...unit, customName: "Vanguard squad" } : unit) })) })) : props.roster.forces };
+  const viewProps: ConceptProps = { ...props, roster: viewRoster };
   const shell = `ux-screen ux-workbench ${shellClass(props.themeMode, props.colorScheme)} ${showTabBar ? "has-tabs" : ""} ${dockOpen ? "dock-open" : "dock-closed"} ${props.tabletPanelLayout.treeVisible ? "" : "tree-collapsed"} ${props.tabletPanelLayout.railVisible ? "" : "rail-collapsed"} ${focusPane ? `focus-mode focus-${focusPane}` : ""} ${focusChromeVisible ? "focus-chrome-open" : ""}`.trim();
   const panelStyle = {
     "--ux-tree-track": props.tabletPanelLayout.treeVisible ? `max(160px, calc((100% - 20px) * ${props.tabletPanelLayout.treeRatio}))` : "0px",
@@ -141,9 +166,11 @@ export function CodexWorkbench(props: ConceptProps) {
   let modifier = "";
 
   if (screen === "unit-options-mobile") {
-    body = props.workflowScreen === "unit-options-separate-all" ? <MobileUnitOptions key="sep-all" focusStacks separateAll onBack={() => props.onNavigate("overview")} />
-      : props.workflowScreen === "unit-options-separated" ? <MobileUnitOptions key="sep-done" focusStacks separateAll initialStacks={[{ id: 1, count: 4, sidearm: "Pistol", scope: false }, { id: 2, count: 1, sidearm: "Pistol", scope: false }]} onBack={() => props.onNavigate("overview")} />
-      : <MobileUnitOptions onBack={() => props.onNavigate("overview")} />;
+    // R2-02: the ⋯ menu at the header's end (Rename unit, Duplicate, Remove), open on the names-unit-menu screen.
+    const unitMenu = <PhoneUnitMenu key={ws} name={unitShownName} initialOpen={ws === "names-unit-menu"} onRename={() => setNameSheet("unit")} onDuplicate={() => props.onNavigate("overview")} onRemove={() => props.onNavigate("overview")} />;
+    body = props.workflowScreen === "unit-options-separate-all" ? <MobileUnitOptions key="sep-all" focusStacks separateAll headerEnd={unitMenu} onBack={() => props.onNavigate("overview")} />
+      : props.workflowScreen === "unit-options-separated" ? <MobileUnitOptions key="sep-done" focusStacks separateAll headerEnd={unitMenu} initialStacks={[{ id: 1, count: 4, sidearm: "Pistol", scope: false }, { id: 2, count: 1, sidearm: "Pistol", scope: false }]} onBack={() => props.onNavigate("overview")} />
+      : <MobileUnitOptions name={unitShownName} headerEnd={unitMenu} onBack={() => props.onNavigate("overview")} />;
   } else if (screen === "library") {
     body = <Library props={props} />;
   } else if (screen === "collections") {
@@ -196,7 +223,10 @@ export function CodexWorkbench(props: ConceptProps) {
     body = (
       <>
         <WorkbenchHeader
-          props={props}
+          props={viewProps}
+          moreInitiallyOpen={ws === "names-roster-menu"}
+          onRenameRoster={() => setNameSheet("roster")}
+          onPointsLimit={() => setNameSheet("limit")}
           searchOpen={rosterSearchOpen}
           searchQuery={rosterSearchQuery}
           layoutMenuOpen={layoutMenuOpen}
@@ -216,11 +246,11 @@ export function CodexWorkbench(props: ConceptProps) {
         />
         {!isUnitDetail ? (
           <div className={`ux-wb-budget ${screen === "overview" ? "tablet-overview-budget" : ""}`}>
-            {screen === "overview" ? <><small className="ux-phone-overview-identity">{props.roster.faction} · {props.roster.system}</small><ExpandableBudget roster={props.roster} /></> : <BudgetMeter roster={props.roster} />}
+            {screen === "overview" ? <><small className="ux-phone-overview-identity">{props.roster.faction} · {props.roster.system}</small><ExpandableBudget roster={viewRoster} />{limitWarning ? <LimitWarning text={limitWarning} /> : null}</> : <BudgetMeter roster={viewRoster} />}
           </div>
         ) : null}
         <div className="ux-wb-layout" ref={layoutRef} style={panelStyle}>
-          <Tree props={props} query={rosterSearchQuery} creationOpen={forceCreationOpen} onCreationOpenChange={setForceCreationOpen} onOpenUnitGlance={openUnitGlance} />
+          <Tree props={viewProps} query={rosterSearchQuery} creationOpen={forceCreationOpen} onCreationOpenChange={setForceCreationOpen} onOpenUnitGlance={openUnitGlance} />
           <PaneDivider side="tree" props={props} layoutRef={layoutRef} />
           <Detail props={props} scrollRef={detailScrollRef} onOpenLoadoutSlot={openLoadoutSelector} onOpenReference={openReferenceGlance} />
           <PaneDivider side="rail" props={props} layoutRef={layoutRef} />
@@ -231,7 +261,7 @@ export function CodexWorkbench(props: ConceptProps) {
   }
 
   // Gallery frames with the on-screen keyboard shown (R0 gaps): Lists search with a long system name, Add unit with "focus search" on.
-  const keyboardShown = props.workflowScreen === "library-filters-keyboard" || props.workflowScreen === "add-unit-focus-keyboard";
+  const keyboardShown = props.workflowScreen === "library-filters-keyboard" || props.workflowScreen === "add-unit-focus-keyboard" || (props.workflowScreen === "names-unit-sheet" && nameSheet === "unit");
   const showCommandBar = navStyle === "top" && smart && isWorkbenchScreen && !isUnitDetail && screen !== "smart-search";
   const subscriptionVariant = props.workflowScreen === "subscription-main" ? "main" : props.workflowScreen === "subscription-edition" ? "edition" : null;
 
@@ -245,7 +275,10 @@ export function CodexWorkbench(props: ConceptProps) {
   return (
     <div className={`${shell} ${modifier} ${keyboardShown ? "ux-has-kbd" : ""}`.trim()} onPointerDown={handleShellPointerDown}>
       {body}
-      {keyboardShown ? <SoftKeyboard /> : null}
+      {keyboardShown ? <SoftKeyboard action={props.workflowScreen === "names-unit-sheet" ? "Done" : undefined} /> : null}
+      {nameSheet === "unit" ? <PhoneRenameSheet key="unit" title="Rename unit" label="Unit name" value={unitShownName} restores={unitEntryName} onClose={() => setNameSheet(null)} onSave={(name) => { setUnitCustomName(name || undefined); setNameSheet(null); }} /> : null}
+      {nameSheet === "roster" ? <PhoneRenameSheet key="roster" title="Rename roster" label="Roster name" value={viewRoster.name} onClose={() => setNameSheet(null)} onSave={(name) => { setRosterNameOverride(name); setNameSheet(null); }} /> : null}
+      {nameSheet === "limit" ? <PhonePointsLimitSheet value={limitChoice ?? props.roster.pointsLimit} dataLimit={configurationLimit} configurationLimit={configurationLimit} onClose={() => setNameSheet(null)} onPick={setLimitChoice} /> : null}
       {props.workflowScreen === "export" || props.workflowScreen === "export-json" || props.workflowScreen === "export-pdf" || props.workflowScreen === "export-preview" ? <PhoneExportFlow key={props.workflowScreen} roster={phoneExportRoster(props.roster)} initialFormat={props.workflowScreen === "export-json" ? "json" : props.workflowScreen === "export-pdf" || props.workflowScreen === "export-preview" ? "pdf" : "text"} previewOpen={props.workflowScreen === "export-preview"} onClose={() => props.onNavigate("overview")} /> : null}
       {subscriptionVariant ? <SubscriptionGate variant={subscriptionVariant} onClose={() => props.onNavigate(subscriptionVariant === "main" ? "library" : "overview")} /> : null}
       {smartGateOpen ? <SubscriptionGate variant="edition" onClose={() => setSmartGateOpen(false)} /> : null}
@@ -266,7 +299,7 @@ function DetailModeBar({ props }: { props: ConceptProps }) {
     <div className="ux-detail-mode-layer">
       {menuOpen ? (
         <div className="ux-detail-action-menu" role="menu" aria-label="Unit actions">
-          <button type="button" role="menuitem" onClick={() => { setMenuOpen(false); setDialog("rename"); }}><Pencil size={15} />Rename & favorite</button>
+          <button type="button" role="menuitem" onClick={() => { setMenuOpen(false); setDialog("rename"); }}><Pencil size={15} />Rename unit</button>
           <button type="button" role="menuitem" onClick={() => { setMenuOpen(false); props.onDuplicateUnit(props.selectedUnit.id); }}><Copy size={15} />Duplicate</button>
           <button type="button" role="menuitem" onClick={() => { setMenuOpen(false); setDialog("move"); }}><MoveRight size={15} />Move</button>
         </div>
@@ -284,13 +317,15 @@ function DetailModeBar({ props }: { props: ConceptProps }) {
           <span>Profile</span>
         </button>
       </nav>
-      {dialog === "rename" ? <RenameDialog title="Rename unit" description="A reusable snapshot will be saved to your Library." initialValue={unitDisplayName(props.selectedUnit)} onClose={() => setDialog(null)} onSave={(name) => { props.onRenameUnit(props.selectedUnit.id, name); setDialog(null); }} /> : null}
+      {dialog === "rename" ? <RenameDialog title="Rename unit" description={`Empty restores “${props.selectedUnit.name}”.`} saveLabel="Save" allowEmpty initialValue={unitDisplayName(props.selectedUnit)} onClose={() => setDialog(null)} onSave={(name) => { props.onRenameUnit(props.selectedUnit.id, name); setDialog(null); }} /> : null}
       {dialog === "move" ? <UnitDestinationDialog props={props} title="Move unit" sourceSectionName={props.selectedSection.name} excludeSectionId={props.selectedSectionId} onClose={() => setDialog(null)} onSelect={(sectionId) => { props.onMoveUnit(props.selectedUnit.id, sectionId); setDialog(null); }} /> : null}
     </div>
   );
 }
 
-function RenameDialog({ title, description, initialValue, onClose, onSave }: { title: string; description: string; initialValue: string; onClose: () => void; onSave: (name: string) => void }) {
+/** The old concept's rename dialog. R2-02 / DEC-046: renaming a unit only names it in this roster (an empty name restores the
+ *  entry name); saving to the Library is a separate action, so the unit dialog no longer says it saves a snapshot. */
+function RenameDialog({ title, description, initialValue, saveLabel = "Save favorite", allowEmpty = false, onClose, onSave }: { title: string; description: string; initialValue: string; saveLabel?: string; allowEmpty?: boolean; onClose: () => void; onSave: (name: string) => void }) {
   const [value, setValue] = useState(initialValue);
   const trimmed = value.trim();
   useEffect(() => {
@@ -302,9 +337,9 @@ function RenameDialog({ title, description, initialValue, onClose, onSave }: { t
     <div className="ux-entry-dialog-layer" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
       <section className="ux-entry-dialog" role="dialog" aria-modal="true" aria-labelledby="rename-entry-title">
         <header><span><strong id="rename-entry-title">{title}</strong><small>{description}</small></span><button type="button" onClick={onClose} aria-label="Close"><X size={17} /></button></header>
-        <label><span>Custom name</span><input value={value} onChange={(event) => setValue(event.currentTarget.value)} autoFocus maxLength={80} onKeyDown={(event) => { if (event.key === "Enter" && trimmed) onSave(trimmed); }} /></label>
-        {!trimmed ? <small className="ux-entry-dialog-error">Enter a name to continue.</small> : null}
-        <footer><button type="button" onClick={onClose}>Cancel</button><button type="button" className="primary" disabled={!trimmed} onClick={() => onSave(trimmed)}>Save favorite</button></footer>
+        <label><span>Custom name</span><input value={value} onChange={(event) => setValue(event.currentTarget.value)} autoFocus maxLength={allowEmpty ? 60 : 80} onKeyDown={(event) => { if (event.key === "Enter" && (trimmed || allowEmpty)) onSave(trimmed); }} /></label>
+        {!trimmed && !allowEmpty ? <small className="ux-entry-dialog-error">Enter a name to continue.</small> : null}
+        <footer><button type="button" onClick={onClose}>Cancel</button><button type="button" className="primary" disabled={!trimmed && !allowEmpty} onClick={() => onSave(trimmed)}>{saveLabel}</button></footer>
       </section>
     </div>
   );
@@ -348,6 +383,9 @@ function ForceActionMenu({ props, forceId }: { props: ConceptProps; forceId: str
 
 function WorkbenchHeader({
   props,
+  moreInitiallyOpen = false,
+  onRenameRoster,
+  onPointsLimit,
   searchOpen,
   searchQuery,
   layoutMenuOpen,
@@ -359,6 +397,9 @@ function WorkbenchHeader({
   onFocusPaneChange,
 }: {
   props: ConceptProps;
+  moreInitiallyOpen?: boolean;
+  onRenameRoster?: () => void;
+  onPointsLimit?: () => void;
   searchOpen: boolean;
   searchQuery: string;
   layoutMenuOpen: boolean;
@@ -374,7 +415,7 @@ function WorkbenchHeader({
   const pointsRemaining = props.roster.pointsLimit - props.roster.pointsUsed;
   const progress = Math.min(100, Math.max(0, (props.roster.pointsUsed / props.roster.pointsLimit) * 100));
   const remainingLabel = pointsRemaining >= 0 ? `${pointsRemaining} pts left` : `${Math.abs(pointsRemaining)} pts over`;
-  const [moreOpen, setMoreOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(moreInitiallyOpen);
 
   return (
     <header className={`ux-wb-top workspace-header ${isUnitDetail ? "unit-detail" : ""} ${isOverview ? "roster-overview" : ""} ${isOverview && searchOpen ? "search-open" : ""}`}>
@@ -416,7 +457,7 @@ function WorkbenchHeader({
         </button>
       ) : null}
       {isOverview ? <RosterShareButton onExport={() => props.onNavigate("export")} /> : null}
-      {isOverview ? <RosterMoreMenu open={moreOpen} onOpenChange={setMoreOpen} canUndo /> : null}
+      {isOverview ? <RosterMoreMenu open={moreOpen} onOpenChange={setMoreOpen} canUndo onRename={onRenameRoster} onLimit={onPointsLimit} /> : null}
       {isUnitDetail || isOverview ? (
         <span className={`ux-detail-progress ${isOverview ? "ux-overview-progress" : ""}`} role="progressbar" aria-label="Roster points used" aria-valuemin={0} aria-valuemax={props.roster.pointsLimit} aria-valuenow={props.roster.pointsUsed}>
           <i style={{ width: `${progress}%` }} />
@@ -516,7 +557,7 @@ function Tree({ props, query, creationOpen, onCreationOpenChange, onOpenUnitGlan
           Add force
         </button>
       ))}
-      {renamingUnit ? <RenameDialog title="Rename unit" description="A reusable snapshot will be saved to your Library." initialValue={unitDisplayName(renamingUnit)} onClose={() => setRenamingUnitId(null)} onSave={(name) => { props.onRenameUnit(renamingUnit.id, name); setRenamingUnitId(null); }} /> : null}
+      {renamingUnit ? <RenameDialog title="Rename unit" description={`Empty restores “${renamingUnit.name}”.`} saveLabel="Save" allowEmpty initialValue={unitDisplayName(renamingUnit)} onClose={() => setRenamingUnitId(null)} onSave={(name) => { props.onRenameUnit(renamingUnit.id, name); setRenamingUnitId(null); }} /> : null}
     </nav>
   );
 }
@@ -601,7 +642,7 @@ function SwipeableUnitRow({ unit, active, onSelect, onOpenGlance, onDelete, onRe
         onClick={(event) => { if (longPressed.current || dragged.current) { event.preventDefault(); longPressed.current = false; dragged.current = false; return; } if (offset < 0) close(); else onSelect(); }}
       >
         <span className="ux-tree-rail" aria-hidden />
-        <TreeUnitMain unit={unit} name={unitDisplayName(unit)} />
+        <TreeUnitMain unit={unit} name={unitDisplayName(unit)} entryName={unit.customName?.trim() ? unit.name : undefined} />
         {unit.status && unit.status !== "valid" ? <StatusGlyph status={unit.status} size={13} /> : unit.points ? <b>{unit.points}</b> : null}
       </button>
     </div>

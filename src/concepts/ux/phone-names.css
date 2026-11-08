@@ -1,0 +1,29 @@
+/* R2-02 (F4b, approved 2026-11-07): the phone Rename sheet (roster or unit), the Points limit sheet, the unit ⋯ menu and the
+   configuration warning line. Colours come from the --ux-* tokens, so light, dark and every colour scheme apply. */
+.ux-job-sheet.ux-rn-sheet { gap: 10px; }
+.ux-rn-field { display: grid; gap: 6px; color: var(--ux-muted); font-size: 12px; font-weight: 650; }
+.ux-rn-field input { min-height: 46px; padding: 0 13px; border: 1.5px solid var(--ux-accent); border-radius: 12px; background: var(--ux-surface-2); color: var(--ux-ink); font: inherit; font-size: 16px; font-weight: 500; outline: none; }
+.ux-rn-field input::selection { background: color-mix(in srgb, var(--ux-accent) 42%, transparent); }
+.ux-rn-hint { display: flex; justify-content: space-between; gap: 10px; margin: -2px 2px 2px; color: var(--ux-muted); font-size: 12px; line-height: 1.4; }
+.ux-rn-count { flex: none; font-variant-numeric: tabular-nums; }
+
+/* With the on-screen keyboard shown, the sheet sits on top of it (the focused field never hides behind the keyboard). */
+.ux-has-kbd > .ux-rn-scrim { bottom: var(--ux-kbd-h, 290px); }
+
+/* Points limit sheet: the creation step's chips, the custom field with Apply, the warning and the note. */
+.ux-pl-chips { flex-wrap: wrap; }
+.ux-pl-custom { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.ux-pl-note { color: var(--ux-muted); font-size: 12px; }
+.ux-limit-warning { display: flex; align-items: center; gap: 6px; margin: 0; color: var(--ux-warn); font-size: 12.5px; font-weight: 700; line-height: 1.35; }
+.ux-limit-warning svg { flex: none; }
+.ux-wb-budget .ux-limit-warning { margin-top: 6px; }
+
+/* The unit details ⋯ menu: Rename unit, Duplicate, Remove (destructive). */
+.ux-unit-more { margin-left: auto; }
+.ux-unit-more .ux-roster-more-menu { z-index: 50; }
+.ux-roster-more-menu button.destructive { color: var(--ux-err); }
+
+/* Elements view: the sheets side by side. */
+.ux-rn-el-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 14px; margin: 10px 0; }
+.ux-rn-el-row > .ux-job-sheet { flex: 0 1 340px; }
+.ux-rn-el-row > .ux-roster-more { flex: 0 0 auto; }
