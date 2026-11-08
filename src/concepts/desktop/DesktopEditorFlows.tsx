@@ -9,7 +9,7 @@ import './desktop-editor.css';
 
 export type Role = 'Command' | 'Core' | 'Specialist' | 'Support';
 export const ROLES: Role[] = ['Command', 'Core', 'Specialist', 'Support'];
-export type EditorUnit = { id: number; name: string; role: string; models: number; points: number; weapon: string; upgrade: boolean; notes?: string; forceId?: string; leaderWeapon?: string; signalKit?: boolean; signal?: string; /** UX-023: model groups inside the unit, each with its own options; absent while all models share one set. The sizes always add up to `models`. */ groups?: ModelGroup[] };
+export type EditorUnit = { id: number; name: string; /** R2-02 (F4b): the unit's own name in this roster; the entry name (`name`) shows under it. Empty clears it. */ customName?: string; role: string; models: number; points: number; weapon: string; upgrade: boolean; notes?: string; forceId?: string; leaderWeapon?: string; signalKit?: boolean; signal?: string; /** UX-023: model groups inside the unit, each with its own options; absent while all models share one set. The sizes always add up to `models`. */ groups?: ModelGroup[] };
 export type ModelGroup = { models: number; weapon: string };
 export type Force = { id: string; name: string; type: string; faction: string };
 export type RosterDoc<U extends EditorUnit> = { units: U[]; forces: Force[] };
@@ -165,6 +165,9 @@ export function revealInRoster(selector: string, focus = true) {
 }
 
 /* ---------------------------------------------------------------- Forces in the roster centre */
+
+/** R2-02: the name a unit shows (its custom name when renamed). */
+export const unitName = (u: { name: string; customName?: string }) => u.customName?.trim() || u.name;
 
 export function ForceHeader({ force, points, units, active, showActive, canRemove, readOnlyReason, onSelect, onRename, onRemove }: { force: Force; points: number; units: number; active: boolean; showActive: boolean; canRemove: boolean; readOnlyReason?: string; onSelect: () => void; onRename: (name: string) => void; onRemove: () => void }) {
   const [renaming, setRenaming] = useState(false);
