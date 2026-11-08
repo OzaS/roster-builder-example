@@ -1381,6 +1381,18 @@
           "label": "Roster editor · Export, read-only roster"
         },
         {
+          "id": "desktop-editor-unit-rename",
+          "label": "R2-02 · Roster editor · Unit dialog, inline rename"
+        },
+        {
+          "id": "desktop-editor-unit-renamed",
+          "label": "R2-02 · Roster editor · Renamed unit in the tree"
+        },
+        {
+          "id": "desktop-menus-rename-unit",
+          "label": "R2-02 · Menu bar · Edit › Rename unit…"
+        },
+        {
           "id": "desktop-editor-unit-dialog-separated",
           "label": "Roster editor · Unit dialog, after Separate 1 (4 + 1)"
         },
@@ -1592,6 +1604,15 @@
           ]
         },
         {
+          "id": "names",
+          "label": "Names and limits",
+          "screens": [
+            "desktop-editor-unit-rename",
+            "desktop-editor-unit-renamed",
+            "desktop-menus-rename-unit"
+          ]
+        },
+        {
           "id": "archive",
           "label": "Archive",
           "screens": [
@@ -1749,9 +1770,11 @@
                   "several forces",
                   "read-only", "DX01: unit row actions (Duplicate, Remove) in room of their own before the issue icon and points on hover or focus; the issue icon is a button opening that unit's issues; the points and chevron stay visible", "DX01: no validation strip at the pane foot"
                 , "App DP07: header (name, faction · system, errors, budget with over-limit and other limits, Saved); force sections with slot chips/counts/points, unit rows (×models, cost, status edge), collapse, duplicate and delete per row; empty state with Add force", "App DD10: tree after dt-roster: heading Your force(s) with units · forces, Undo / Redo and the check icon toggling the issues; force cards (flag icon, the force's own name, Faction · N units, points; collapse chevron kept); a slot's rows share one group card (name in data case, used / max, state chip, points; Add {group} unit row in every addable group); unit rows (icon by kind, name with other costs as tag chips, N models · loadout for every unit, points over the cost name, chevron; markers replace the points, no status edges; Duplicate / Delete float in on hover or focus); dashed Add force (neutral word, not Add detachment); no ALPHA-style tag (not in the data); at 470 px and less icons and loadout step back"
-                , "App DD19: inline force rename from a pencil in the force card's hover tools: the name becomes a selected field, Enter or leaving it saves (one undo step), Esc cancels, the focus returns to the pencil. Differences: an empty name restores the force entry's name, which a renamed card's line then shows first; no rename toast; the pencil is hidden while read only, like Delete (the gallery disables it); the field takes up to 120 characters; Add force still has no Name field (adding and naming would be two undo steps).", "App DX01: unit rows [icon, name, Duplicate / Delete on hover or focus, issue icon button, points, chevron]; the select button covers the row; a unit with issues keeps its points; force cards keep their hover tools in place (no overlap). Difference: at 720 px the overlay inspector covers the rows' trailing part (UX-048)"],
+                , "App DD19: inline force rename from a pencil in the force card's hover tools: the name becomes a selected field, Enter or leaving it saves (one undo step), Esc cancels, the focus returns to the pencil. Differences: an empty name restores the force entry's name, which a renamed card's line then shows first; no rename toast; the pencil is hidden while read only, like Delete (the gallery disables it); the field takes up to 120 characters; Add force still has no Name field (adding and naming would be two undo steps).", "App DX01: unit rows [icon, name, Duplicate / Delete on hover or focus, issue icon button, points, chevron]; the select button covers the row; a unit with issues keeps its points; force cards keep their hover tools in place (no overlap). Difference: at 720 px the overlay inspector covers the rows' trailing part (UX-048)",
+                "R2-02 (F4b, approved 2026-11-07, DEC-051; to build): a renamed unit row shows its custom name and the entry name first on its second line (\"Line Infantry · 10 models · Service rifle\"), as a renamed force card shows its entry name; an empty name clears it. Gallery: R2-02 · Roster editor · Renamed unit in the tree"],
                 "screens": [
-                  "desktop-editor"
+                  "desktop-editor",
+                  "desktop-editor-unit-renamed"
                 ]
               },
               {
@@ -1839,7 +1862,8 @@
                   "nested navigation: a row with a chevron (Squad leader, its Signal kit) pushes a level inside the dialog; Back and a breadcrumb (earlier steps are buttons) in the header; Escape goes back one level, then closes; focus moves to Back, and back to the row that opened the level",
                   "keyboard: focus starts on Close; Tab and Shift+Tab wrap inside the dialog",
                   "read-only roster: opens with the read-only reason above the content, controls disabled, Not editable in the footer; nested levels stay viewable",
-                  "Duplicate keeps the dialog on the current unit (toast with Undo); Remove closes it (toast with Undo); an Undo that removes the unit closes it"
+                  "Duplicate keeps the dialog on the current unit (toast with Undo); Remove closes it (toast with Undo); an Undo that removes the unit closes it",
+                  "R2-02 (F4b, approved 2026-11-07, DEC-051; to build): a pencil beside the unit's name (hint Rename unit (F2); hidden while read-only, like Delete) turns the name into the inline rename field (desktop.unit-rename); a renamed unit's dialog shows its custom name as the title and the entry name first on the line under it (\"Line Infantry · Expedition detachment\")"
                 ],
                 "screens": [
                   "desktop-editor-unit-dialog",
@@ -1847,9 +1871,11 @@
                   "desktop-editor-unit-dialog-narrow",
                   "desktop-editor-unit-dialog-readonly",
                   "desktop-editor-unit-dialog-zoom-200",
-                  "desktop-editor-unit-dialog-separated"
+                  "desktop-editor-unit-dialog-separated",
+                  "desktop-editor-unit-rename"
                 ]
               },
+              {"id": "desktop.unit-rename", "title": "Unit Rename · Inline Field", "level": "primitive", "status": "specified", "platforms": ["desktop"], "states": ["R2-02 (F4b, approved 2026-11-07, DEC-051; to build)", "pencil beside the unit's name in the unit dialog (hidden while read-only)", "editing: the name becomes a selected field (up to 60 characters) with \"{entry name} · Enter saves, Esc cancels\" under it", "Enter or leaving the field saves (one Undo step); Esc cancels and keeps the dialog open; the focus returns to the pencil", "empty clears the custom name (the entry name shows again)", "Edit › Rename unit… (F2) opens the selected unit's dialog with the field", "renamed: the dialog title and the tree row show the custom name, the entry name first on the line under it"], "screens": ["desktop-editor-unit-rename", "desktop-editor-unit-renamed", "desktop-menus-rename-unit"], "reactNative": {"component": "UnitNameField in the unit dialog header (apps/desktop/src/renderer/unit-inspector.tsx until the dialog replaces the pane), the DD-19 inline force rename pattern", "behavior": "R2-02 (F4b, approved 2026-11-07, to build): a pencil beside the unit name turns it into an inline field with the name selected; the line under it reads \"{entry name} · Enter saves, Esc cancels\". Enter or blur sends one renameSelection command (a trimmed name sets customName; an empty one clears it); Esc cancels; focus returns to the pencil. Hidden while read-only. Edit › Rename unit… (app-menu { kind: 'renameUnit' }, F2) starts the same rename on the selected unit. Gallery: R2-02 · Roster editor · Unit dialog, inline rename; R2-02 · Roster editor · Renamed unit in the tree; R2-02 · Menu bar · Edit › Rename unit….", "accessibility": "The pencil is a button named Rename {unit}; the field is labelled Unit name and described by the Enter/Esc line; focus returns to the pencil after saving or cancelling."}},
               {
                 "id": "desktop.inspector",
                 "title": "Unit Inspector · replaced by the unit dialog",
@@ -1922,8 +1948,9 @@
                 "status": "ready-for-rn",
                 "platforms": ["desktop"],
                 "states": [
-                  "RK-03 (approved 2026-11-03): the menu bar is macOS only. Windows has no menu bar, neither native nor in the window: every shortcut (Ctrl+N, Ctrl+K, Ctrl+Z …) keeps working and the command palette (Ctrl+K) reaches the menu actions. See desktop.windows-titlebar and the desktop-welcome-windows screen.","DEC-055: View has no Show inspector; Edit › Edit unit… (↩) opens the selected unit's dialog", "menus", "shortcuts from key bindings", "submenu", "disabled with reason", "Escape closes", "App DD18 (PR #86): native application menus route existing commands with binding-aware shortcuts and disabled reasons; Open recent can be cleared without deleting rosters. Close tab keeps the window; Duplicate, Remove and Find are editable. Native text Edit roles remain. The primary cost limit submenu and summary support presets/current/custom and Unlimited or named data fallback, with autosave and undo. Limits remain freely editable; configuration constraints remain rule errors. Above the configuration allowance only, the points button, summary and points line warn and name that allowance. Custom focuses/selects the input. Read-only/busy states disable edits. Differences: native macOS menu; non-Command keys show in labels there; Undo/Redo have no step description; Help/Report lack destinations and Install from file stays in Sources; the summary retains autosave instead of the gallery data row. Windows/Linux styling and native verification await their platform passes."],
-                "screens": ["desktop-menus", "desktop-welcome-windows"]
+                  "RK-03 (approved 2026-11-03): the menu bar is macOS only. Windows has no menu bar, neither native nor in the window: every shortcut (Ctrl+N, Ctrl+K, Ctrl+Z …) keeps working and the command palette (Ctrl+K) reaches the menu actions. See desktop.windows-titlebar and the desktop-welcome-windows screen.","DEC-055: View has no Show inspector; Edit › Edit unit… (↩) opens the selected unit's dialog", "menus", "shortcuts from key bindings", "submenu", "disabled with reason", "Escape closes", "App DD18 (PR #86): native application menus route existing commands with binding-aware shortcuts and disabled reasons; Open recent can be cleared without deleting rosters. Close tab keeps the window; Duplicate, Remove and Find are editable. Native text Edit roles remain. The primary cost limit submenu and summary support presets/current/custom and Unlimited or named data fallback, with autosave and undo. Limits remain freely editable; configuration constraints remain rule errors. Above the configuration allowance only, the points button, summary and points line warn and name that allowance. Custom focuses/selects the input. Read-only/busy states disable edits. Differences: native macOS menu; non-Command keys show in labels there; Undo/Redo have no step description; Help/Report lack destinations and Install from file stays in Sources; the summary retains autosave instead of the gallery data row. Windows/Linux styling and native verification await their platform passes.",
+                  "R2-02 (F4b, approved 2026-11-07, DEC-051; to build): Edit › Rename unit… (F2) after Edit unit…, enabled when a unit is selected in an editable roster (disabled reasons: no roster, no unit selected, read-only roster); it opens that unit's dialog with the name as the inline rename field. Gallery: R2-02 · Menu bar · Edit › Rename unit…. Roster › Rename roster… stays as built (it switches to the Rosters page and opens the inline rename there; the desktop's way to rename from the editor)"],
+                "screens": ["desktop-menus", "desktop-welcome-windows", "desktop-menus-rename-unit"]
               },
               {"id": "desktop.windows-titlebar", "title": "Windows Title Bar Row (no menu bar)", "level": "navigation", "status": "ready-for-rn", "platforms": ["desktop"], "states": ["RK-03 (approved 2026-11-03): one row, as on macOS: the app's tab row is the title bar; dragging its empty space moves the window, double-clicking it maximises or restores", "no menu bar on Windows (neither the native bar nor one in the window); shortcuts keep working and Ctrl+K opens the command palette, which reaches the actions", "tabs start about 12 px from the left edge: no macOS traffic-light gap", "Windows' own minimise / maximise / close sit at the far right of the row, after Jobs (and, in the editor, after the points button and Toggle catalogue): 46 px wide, the full height of the row, glyphs in the chrome text colour", "the caption buttons follow light and dark: transparent on the chrome, hover in the chrome hover tone; Close hovers in the Windows red with a white glyph", "key labels read Ctrl+N, Ctrl+K … on Windows (⌘ N, ⌘ K on macOS)", "macOS unchanged: traffic lights at the left, native application menu bar (desktop.menus)"], "screens": ["desktop-welcome-windows", "desktop-editor-windows"], "reactNative": {"component": "Electron BrowserWindow (Windows: titleBarStyle hidden + titleBarOverlay in the theme colours, no application menu) + the workspace tab row as the drag region", "behavior": "The tab row is -webkit-app-region: drag with its tabs, buttons and inputs as no-drag; titleBarOverlay colour and symbolColor follow the resolved theme and are updated when it changes; the row reserves the overlay width at its end; Menu.setApplicationMenu(null) on Windows while accelerators stay handled by the app's key bindings.", "accessibility": "The caption buttons are system controls (not in the app's tree); the tab row keeps its navigation landmark and every menu action stays reachable through the command palette and its shortcut."}},
               {

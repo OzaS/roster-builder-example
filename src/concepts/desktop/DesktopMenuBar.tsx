@@ -6,6 +6,7 @@ import './desktop-menus.css';
 // macOS menu bar for the desktop app (Electron application menu). Shortcuts follow the default key
 // bindings; in the app they follow the user's bindings. RK-03: macOS only; Windows has no menu bar (shortcuts and Ctrl+K reach the actions).
 // DEC-055: View has no Show inspector (units edit in a dialog); Edit › Edit unit… (↩) opens the selected unit's dialog.
+// R2-02 (F4b, approved 2026-11-07): Edit › Rename unit… (F2) opens the selected unit's dialog with its name as the inline field.
 
 type Item = { label: string; keys?: string; disabled?: string; submenu?: Item[] } | 'separator';
 const k = (combo: string) => formatCombo(combo);
@@ -13,7 +14,7 @@ const k = (combo: string) => formatCombo(combo);
 const MENUS: Array<{ label: string; items: Item[] }> = [
   { label: 'Battle Augur', items: [{ label: 'About Battle Augur' }, 'separator', { label: 'Settings…', keys: k(defaultBindings.settings) }, { label: 'Check for game data updates' }, 'separator', { label: 'Hide Battle Augur', keys: '⌘ H' }, { label: 'Hide others', keys: '⌥ ⌘ H' }, 'separator', { label: 'Quit Battle Augur', keys: '⌘ Q' }] },
   { label: 'File', items: [{ label: 'New roster…', keys: k(defaultBindings.newRoster) }, { label: 'Open roster…', keys: k(defaultBindings.rosters) }, { label: 'Open recent', submenu: [{ label: 'The Ashen Expedition' }, { label: 'Northern Watch' }, { label: 'Operation First Light' }, 'separator', { label: 'Clear menu' }] }, 'separator', { label: 'Import roster…' }, { label: 'Export roster…', keys: k(defaultBindings.exportRoster) }, 'separator', { label: 'Install game data from a file…' }, 'separator', { label: 'Close tab', keys: '⌘ W' }] },
-  { label: 'Edit', items: [{ label: 'Undo add unit', keys: k(defaultBindings.undo) }, { label: 'Redo', keys: k(defaultBindings.redo), disabled: 'Nothing to redo' }, 'separator', { label: 'Cut', keys: '⌘ X' }, { label: 'Copy', keys: '⌘ C' }, { label: 'Paste', keys: '⌘ V' }, 'separator', { label: 'Edit unit…', keys: '↩' }, { label: 'Duplicate unit', keys: '⌘ D' }, { label: 'Remove unit', keys: '⌫' }, 'separator', { label: 'Find in catalogue', keys: '⌘ ⇧ F' }] },
+  { label: 'Edit', items: [{ label: 'Undo add unit', keys: k(defaultBindings.undo) }, { label: 'Redo', keys: k(defaultBindings.redo), disabled: 'Nothing to redo' }, 'separator', { label: 'Cut', keys: '⌘ X' }, { label: 'Copy', keys: '⌘ C' }, { label: 'Paste', keys: '⌘ V' }, 'separator', { label: 'Edit unit…', keys: '↩' }, { label: 'Rename unit…', keys: 'F2' }, { label: 'Duplicate unit', keys: '⌘ D' }, { label: 'Remove unit', keys: '⌫' }, 'separator', { label: 'Find in catalogue', keys: '⌘ ⇧ F' }] },
   { label: 'Roster', items: [{ label: 'Roster summary', keys: k(defaultBindings.summary) }, { label: 'Rename roster…' }, { label: 'Points limit', submenu: [{ label: '500 pts' }, { label: '1,000 pts' }, { label: '1,500 pts' }, { label: '2,000 pts' }, 'separator', { label: 'Custom…' }, { label: 'No limit' }] }, 'separator', { label: 'Add detachment…' }, { label: 'Validation details' }] },
   { label: 'View', items: [{ label: 'Show catalogue', keys: k(defaultBindings.toggleCatalogue) }, 'separator', { label: 'Command palette', keys: k(defaultBindings.palette) }, 'separator', { label: 'Appearance', submenu: [{ label: 'System' }, { label: 'Light' }, { label: 'Dark' }] }, { label: 'Colour scheme', submenu: [{ label: 'Default' }, { label: 'Crimson' }, { label: 'Gilded' }, { label: 'Azure' }, { label: 'Verdant' }] }, 'separator', { label: 'Actual size', keys: '⌘ 0' }, { label: 'Zoom in', keys: '⌘ +' }, { label: 'Zoom out', keys: '⌘ −' }, 'separator', { label: 'Enter full screen', keys: '⌃ ⌘ F' }] },
   { label: 'Go', items: [{ label: 'Welcome' }, { label: 'Rosters', keys: k(defaultBindings.rosters) }, { label: 'Lookup', keys: k(defaultBindings.lookup) }, { label: 'Tools' }, { label: 'Library' }, { label: 'Sources' }, { label: 'Settings', keys: k(defaultBindings.settings) }] },
@@ -33,8 +34,9 @@ function MenuList({ items, onPick }: { items: Item[]; onPick: (label: string) =>
     </div>)}</div>;
 }
 
-export function DesktopMenuBar({ onPick }: { onPick?: (label: string) => void }) {
-  const [open, setOpen] = useState<string | null>(null);
+/** `initialOpen`: a menu shown open (gallery screen R2-02 · Edit menu, Rename unit…). */
+export function DesktopMenuBar({ onPick, initialOpen = null }: { onPick?: (label: string) => void; initialOpen?: string | null }) {
+  const [open, setOpen] = useState<string | null>(initialOpen);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!open) return;

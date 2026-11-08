@@ -1,6 +1,6 @@
-import { useEffect, useRef, type KeyboardEvent as ReactKeyboardEvent } from 'react';
-import { BookOpen, Check, ChevronLeft, ChevronRight, Copy, Lock, Megaphone, Minus, Plus, Scissors, Trash2, UserRound, Users, X } from 'lucide-react';
-import { HistoryButtons, unitCost, type EditorUnit, type ModelGroup } from './DesktopEditorFlows';
+import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
+import { BookOpen, Check, ChevronLeft, ChevronRight, Copy, Lock, Megaphone, Minus, Pencil, Plus, Scissors, Trash2, UserRound, Users, X } from 'lucide-react';
+import { HistoryButtons, unitCost, unitName, type EditorUnit, type ModelGroup } from './DesktopEditorFlows';
 import './desktop-unit-dialog.css';
 
 /**
@@ -18,13 +18,26 @@ const levelTitle: Record<UnitDialogLevel, string> = { leader: 'Squad leader', si
 /** A unit with several models (not a commander) has a squad leader with options of its own. */
 export const hasLeader = (u: EditorUnit) => u.models > 1 && u.role !== 'Command';
 
-export function UnitDialog({ unit, forceName, source = 'Open Field · Catalogue v1.4', path, tab, readOnlyReason, separateAll, undo, onPath, onTab, onClose, onUpdate, onDuplicate, onRemove, onSeparate }: {
+/**
+ * R2-02 (F4b, approved 2026-11-07): a pencil beside the unit's name (hidden while read-only) turns the name into a selected field,
+ * the DD-19 inline force rename: Enter or leaving the field saves (one Undo step), Esc cancels (the dialog stays open), the focus
+ * returns to the pencil; the line under it reads "{entry name} · Enter saves, Esc cancels". An empty name clears the custom name.
+ * A renamed unit shows its own name, with the entry name first on the line under it. Edit › Rename unit… (F2) starts the same.
+ */
+export function UnitDialog({ unit, forceName, source = 'Open Field · Catalogue v1.4', path, tab, readOnlyReason, separateAll, undo, onPath, onTab, onClose, onUpdate, onDuplicate, onRemove, onSeparate, onRename, initialRename }: {
   unit: EditorUnit; forceName: string; source?: string; path: UnitDialogLevel[]; tab: string; readOnlyReason?: string; separateAll: boolean;
   undo: { undoLabel?: string; redoLabel?: string; undoKey?: string; redoKey?: string; onUndo: () => void; onRedo: () => void };
   onPath: (path: UnitDialogLevel[]) => void; onTab: (tab: string) => void; onClose: () => void; onUpdate: (change: Partial<EditorUnit>) => void;
   onDuplicate: () => void; onRemove: () => void; onSeparate: (group: number, all: boolean) => void;
+  /** R2-02: rename the unit ('' clears its custom name). `initialRename` opens the inline field with that draft (gallery screen). */
+  onRename?: (name: string) => void; initialRename?: string;
 }) {
   const ref = useRef<HTMLElement>(null);
+  const shown = unitName(unit);
+  const [renaming, setRenaming] = useState(initialRename !== undefined);
+  const [draft, setDraft] = useState(initialRename ?? shown);
+  const pencil = useRef<HTMLButtonElement>(null);
+  const finishRename = (save: boolean) => { if (!renaming) return; const name = draft.trim(); if (save && (name || unit.name) !== shown) onRename?.(name); setRenaming(false); requestAnimationFrame(() => pencil.current?.focus({ preventScroll: true })); };
   const opener = useRef<UnitDialogLevel | null>(null);
   const level = path[path.length - 1];
   const titleId = `dtu-title-${unit.id}`;
@@ -32,7 +45,7 @@ export function UnitDialog({ unit, forceName, source = 'Open Field · Catalogue 
   useEffect(() => {
     const box = ref.current; if (!box) return;
     const back = opener.current ? box.querySelector<HTMLElement>(`[data-drill="${opener.current}"]`) : null;
-    (back ?? box.querySelector<HTMLElement>(level ? '.dtu-back' : '.dtu-close'))?.focus({ preventScroll: true });
+    (back ?? box.querySelector<HTMLElement>(level ? '.dtu-back' : renaming ? '.dtu-rename-field' : '.dtu-close'))?.focus({ preventScroll: true });
     opener.current = null;
   }, [level]);
   const push = (next: UnitDialogLevel) => onPath([...path, next]);
@@ -54,7 +67,7 @@ export function UnitDialog({ unit, forceName, source = 'Open Field · Catalogue 
   const SEPARATE_ONE = 'Give one model its own options. It stays in this unit and keeps its loadout.';
   const separateButtons = (g: ModelGroup, i: number) => g.models > 1 && !ro && <div className="dtu-separate"><button type="button" className="dtp-btn small" disabled={ro} title={SEPARATE_ONE} onClick={() => onSeparate(i, false)}><Scissors size={13} />Separate 1</button>{separateAll && <button type="button" className="dtp-btn small" disabled={ro} title="Give every model its own options." onClick={() => onSeparate(i, true)}><Scissors size={13} />Separate all</button>}</div>;
   const signalLine = unit.signalKit ? `Taken · ${unit.signal ?? SIGNALS[0]}` : 'Not taken';
-  const crumbs: Array<{ label: string; to: UnitDialogLevel[] }> = [{ label: unit.name, to: [] }, ...path.map((p, i) => ({ label: levelTitle[p], to: path.slice(0, i + 1) }))];
+  const crumbs: Array<{ label: string; to: UnitDialogLevel[] }> = [{ label: shown, to: [] }, ...path.map((p, i) => ({ label: levelTitle[p], to: path.slice(0, i + 1) }))];
   const eyebrow = level === 'leader' ? <>Member <span> / </span> 1 model</> : level === 'signal' ? <>Upgrade <span> / </span> Squad leader</> : <>{unit.role} <span> / </span> {unit.models} {unit.models === 1 ? 'model' : 'models'}</>;
   const points = level === 'leader' ? (unit.signalKit ? '+5' : 'Included') : level === 'signal' ? '+5' : String(unitCost(unit));
   return <div className="dtu-scrim" onPointerDown={e => { if (e.target === e.currentTarget) onClose(); }}>
@@ -66,10 +79,13 @@ export function UnitDialog({ unit, forceName, source = 'Open Field · Catalogue 
         </nav>}
         <div className="dte-inspector-head">
           <span className="dt-eyebrow">{eyebrow}</span>
-          <span className="dtu-head-tools"><HistoryButtons {...undo} disabledReason={readOnlyReason} /><span className="dtu-rule" aria-hidden="true" /><button type="button" className="dt-icon dtu-close" aria-label={`Close ${unit.name}`} title="Close (Esc)" onClick={onClose}><X size={16} /></button></span>
+          <span className="dtu-head-tools"><HistoryButtons {...undo} disabledReason={readOnlyReason} /><span className="dtu-rule" aria-hidden="true" /><button type="button" className="dt-icon dtu-close" aria-label={`Close ${shown}`} title="Close (Esc)" onClick={onClose}><X size={16} /></button></span>
         </div>
-        <div className="dte-inspector-name"><h2 id={titleId}>{level ? levelTitle[level] : unit.name}</h2><strong>{points}{points.startsWith('+') || /^\d/.test(points) ? <small> pts</small> : null}</strong></div>
-        <p>{level ? `In ${unit.name} · ${forceName}` : forceName}</p>
+        <div className="dte-inspector-name">{!level && renaming
+          ? <input className="dte-rename dtu-rename-field" aria-label="Unit name" maxLength={60} value={draft} onFocus={e => { if (initialRename === undefined) e.currentTarget.select(); }} onChange={e => setDraft(e.target.value)} onBlur={() => finishRename(true)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); finishRename(true); } if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); finishRename(false); } }} />
+          : <span className="dtu-name"><h2 id={titleId}>{level ? levelTitle[level] : shown}</h2>{!level && !ro && onRename && <button ref={pencil} type="button" className="dt-icon dtu-rename" aria-label={`Rename ${shown}`} title="Rename unit (F2)" onClick={() => { setDraft(shown); setRenaming(true); }}><Pencil size={13} /></button>}</span>}
+          <strong>{points}{points.startsWith('+') || /^\d/.test(points) ? <small> pts</small> : null}</strong></div>
+        <p className={!level && renaming ? 'dtu-rename-help' : undefined}>{level ? `In ${shown} · ${forceName}` : renaming ? `${unit.name} · Enter saves, Esc cancels` : unit.customName ? `${unit.name} · ${forceName}` : forceName}</p>
         {!level && <div className="dt-unit-actions"><button disabled={ro} title={readOnlyReason ?? 'Duplicate this unit'} onClick={onDuplicate}><Copy size={13} /> Duplicate</button><button disabled={ro} title={readOnlyReason ?? 'Remove this unit'} onClick={onRemove}><Trash2 size={13} /> Remove</button></div>}
       </header>
       {!level && <div className="dt-inspector-tabs" role="tablist" aria-label="Unit details">{['Options', 'Profile', 'Rules'].map(t => <button role="tab" aria-selected={tab === t} className={tab === t ? 'active' : ''} key={t} onClick={() => onTab(t)}>{t}</button>)}</div>}
