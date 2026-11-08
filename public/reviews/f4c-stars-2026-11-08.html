@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>F4c starred entries</title>
+<style>
+/* Gallery copy of the approved F4c (R2-03) proposal: host variables given defaults so the page stands alone. */
+:root{--radius:12px;--border:#272b38;--muted-foreground:#979db1;--card:#161922;--foreground:#e9eaf1;--font-sans:-apple-system,system-ui,sans-serif}
+body{margin:0;padding:16px;background:#0b0c11;color:var(--foreground);font-family:var(--font-sans)}
+:root{--app-bg:#0d0f15;--app-card:#161922;--app-line:#272b38;--app-text:#e9eaf1;--app-muted:#979db1;--app-accent:#8d91f8;--app-accent-bg:#2a2d55;--app-warn:#e3b341}
+.wrap{display:flex;flex-direction:column;gap:20px}
+h2{font-size:15px;margin:4px 0 2px}
+p.note{margin:0;color:var(--muted-foreground);font-size:13px;line-height:1.45}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.frame{background:var(--app-bg);color:var(--app-text);border-radius:var(--radius);padding:16px;border:1px solid var(--border);flex:1 1 300px;min-width:0;font-family:-apple-system,system-ui,sans-serif}
+.cap{font-size:11px;letter-spacing:.08em;color:var(--app-muted);text-transform:uppercase;margin:0 0 10px;display:flex;justify-content:space-between}
+.title{font-weight:650;font-size:15px;margin-bottom:2px}
+.sub{color:var(--app-muted);font-size:12px;margin-bottom:12px}
+.search{border:1px solid var(--app-line);border-radius:10px;padding:8px 10px;color:var(--app-muted);font-size:13px;margin-bottom:10px}
+.gh{display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:.09em;color:var(--app-muted);margin:12px 2px 4px;text-transform:uppercase}
+.gh.star{color:var(--app-accent)}
+.gh .l{display:flex;gap:6px;align-items:center}
+.u{display:flex;align-items:center;gap:8px;padding:7px 2px}
+.u .n{flex:1;min-width:0}
+.u .n b{display:block;font-weight:600;font-size:14px}
+.u .n small{color:var(--app-muted);font-size:12px}
+.pts{font-size:13px;color:var(--app-text);white-space:nowrap}
+.pts i{font-style:normal;color:var(--app-muted);font-size:11px}
+.add{width:30px;height:30px;border-radius:50%;background:var(--app-accent-bg);display:grid;place-items:center;color:var(--app-accent);font-size:18px;flex:none}
+.st{width:30px;height:30px;display:grid;place-items:center;flex:none;border-radius:8px}
+.st svg{width:18px;height:18px}
+.off svg{fill:none;stroke:#6b7186;stroke-width:1.8}
+.on svg{fill:var(--app-accent);stroke:var(--app-accent);stroke-width:1.8}
+.ring{outline:2px solid var(--app-accent);outline-offset:1px}
+.opt{display:flex;align-items:center;gap:8px;border:1px solid var(--app-line);background:var(--app-card);border-radius:10px;padding:9px 10px;margin-bottom:6px;font-size:14px;font-weight:600}
+.opt.sel{border-color:var(--app-accent);background:#1d2040}
+.opt .n{flex:1}
+.opt small{display:block;font-weight:400;color:var(--app-muted);font-size:12px}
+.chk{color:var(--app-accent)}
+.div{height:1px;background:var(--app-line);margin:8px 0 10px}
+.warn{color:var(--app-warn);font-size:12px}
+.hover{background:#1b1e2a;border-radius:8px}
+.tag{font-size:11px;padding:1px 6px;border-radius:6px;border:1px solid var(--app-line);color:var(--app-muted)}
+ul.rules{margin:0;padding-left:18px;font-size:13px;line-height:1.5}
+ul.rules li{margin-bottom:4px}
+.k{font-weight:600}
+</style></head>
+<body><div class="wrap">
+<p class="note"><b>R2-03 (F4c) · Starred entries.</b> Approved by the user on 2026-11-08 (DEC-051), as drawn; stars are kept per faction (unit and force stars per catalogue, faction stars per game system). Gallery: workflow “Starred entries” on phone, tablet and desktop.</p>
+
+<svg width="0" height="0" style="position:absolute"><defs><symbol id="s" viewBox="0 0 24 24"><path stroke-linejoin="round" d="M12 2.8l2.8 5.8 6.3.9-4.6 4.4 1.1 6.3L12 17.2l-5.6 3 1.1-6.3L2.9 9.5l6.3-.9z"/></symbol></defs></svg>
+
+<div>
+<h2>Phone: Add unit sheet and New roster faction step</h2>
+<p class="note">Every row gets a star button before its name (20 px icon, 44 pt touch target). Outline = not starred; filled accent = starred. Starred units move into a <b>Starred</b> group at the top. Factions and forces have no group headings, so starred ones come first above a divider.</p>
+</div>
+<div class="row">
+ <div class="frame">
+  <div class="cap"><span>Add unit · Expedition force</span><span>×</span></div>
+  <div class="search">Find a unit…</div>
+  <div class="gh star"><span class="l"><svg width="12" height="12" class="on" style="fill:var(--app-accent);stroke:var(--app-accent)"><use href="#s"/></svg>Starred</span><span>2</span></div>
+  <div class="u"><span class="st on"><svg><use href="#s"/></svg></span><span class="n"><b>Line Infantry</b><small>10 models · Service rifle</small></span><span class="pts">120 <i>pts</i></span><span class="add">+</span></div>
+  <div class="u"><span class="st on"><svg><use href="#s"/></svg></span><span class="n"><b>Support Battery</b><small class="warn">Slot full</small></span><span class="pts">180 <i>pts</i></span><span class="add">+</span></div>
+  <div class="gh"><span>Command</span><span>2</span></div>
+  <div class="u"><span class="st off"><svg><use href="#s"/></svg></span><span class="n"><b>Force Commander</b><small>1 model · Command blade</small></span><span class="pts">90 <i>pts</i></span><span class="add">+</span></div>
+  <div class="u"><span class="st off"><svg><use href="#s"/></svg></span><span class="n"><b>Field Marshal</b><small>1 model · Service rifle</small></span><span class="pts">115 <i>pts</i></span><span class="add">+</span></div>
+  <div class="gh"><span>Core</span><span>1</span></div>
+  <div class="u"><span class="st off"><svg><use href="#s"/></svg></span><span class="n"><b>Recon Team</b><small>5 models · Scout carbine</small></span><span class="pts">85 <i>pts</i></span><span class="add">+</span></div>
+ </div>
+ <div class="frame">
+  <div class="cap"><span>New roster · Step 2 of 4</span><span>Continue</span></div>
+  <div class="title">Faction and game mode</div>
+  <div class="sub">Faction</div>
+  <div class="search">Find a faction</div>
+  <div class="opt sel"><span class="st on"><svg><use href="#s"/></svg></span><span class="n">Theta Faction</span><span class="chk">✓</span></div>
+  <div class="div"></div>
+  <div class="opt"><span class="st off"><svg><use href="#s"/></svg></span><span class="n">Alpha Faction</span></div>
+  <div class="opt"><span class="st off"><svg><use href="#s"/></svg></span><span class="n">Iota Faction</span></div>
+  <div class="opt"><span class="st off"><svg><use href="#s"/></svg></span><span class="n">Kappa Faction</span></div>
+  <p class="note" style="color:var(--app-muted);font-size:12px;margin-top:8px">Tapping the star only stars the faction; tapping the rest of the row chooses it, as now.</p>
+ </div>
+</div>
+
+<div>
+<h2>Tablet: catalogue pane and Add force sheet</h2>
+<p class="note">The same row and group as on the phone. Category chips still filter: with <b>Core</b> chosen, Starred shows only the starred Core units. A search keeps the Starred group first among its matches.</p>
+</div>
+<div class="row">
+ <div class="frame">
+  <div class="cap"><span>Add units · to this roster</span><span></span></div>
+  <div class="search">Find a unit…</div>
+  <div style="display:flex;gap:6px;margin-bottom:4px"><span class="tag" style="color:var(--app-accent);border-color:var(--app-accent)">All</span><span class="tag">Command</span><span class="tag">Core</span><span class="tag">Specialist</span></div>
+  <div class="gh star"><span class="l"><svg width="12" height="12" style="fill:var(--app-accent);stroke:var(--app-accent)"><use href="#s"/></svg>Starred</span><span>1</span></div>
+  <div class="u"><span class="st on"><svg><use href="#s"/></svg></span><span class="n"><b>Line Infantry</b><small>10 models · Service rifle</small></span><span class="pts">120 <i>pts</i></span><span class="add">+</span></div>
+  <div class="gh"><span>Command</span><span>2</span></div>
+  <div class="u"><span class="st off"><svg><use href="#s"/></svg></span><span class="n"><b>Force Commander</b><small><span class="tag" style="color:#f08a8a;border-color:#7a3a3a">1 / 1</span> Limit reached</small></span><span class="pts">90 <i>pts</i></span><span class="add" style="background:none;border:1px dashed #555">+</span></div>
+  <div class="u"><span class="st off"><svg><use href="#s"/></svg></span><span class="n"><b>Field Marshal</b><small>1 model · Service rifle</small></span><span class="pts">115 <i>pts</i></span><span class="add">+</span></div>
+ </div>
+ <div class="frame">
+  <div class="cap"><span>Add force</span><span>Add</span></div>
+  <div class="search">Find a force</div>
+  <div class="opt sel"><span class="st on"><svg><use href="#s"/></svg></span><span class="n">Expedition force<small>1 selected</small></span><span class="chk">✓</span></div>
+  <div class="opt"><span class="st on"><svg><use href="#s"/></svg></span><span class="n">Garrison force<small>0 selected</small></span></div>
+  <div class="div"></div>
+  <div class="opt"><span class="st off"><svg><use href="#s"/></svg></span><span class="n">Auxiliary detachment<small>0 / 1 · Minimum 1</small></span></div>
+  <div class="opt"><span class="st off"><svg><use href="#s"/></svg></span><span class="n">Patrol detachment<small>0 selected</small></span></div>
+  <p class="note" style="color:var(--app-muted);font-size:12px;margin-top:8px">Its faction list (other catalogues) uses the faction stars from New roster.</p>
+ </div>
+</div>
+
+<div>
+<h2>Desktop: catalogue, New roster dialog, Add force dialog</h2>
+<p class="note">With a mouse the outline star appears only on the hovered or keyboard-focused row, so the 200 px minimum catalogue does not lose width. Filled stars always show. The star is its own Tab stop before the row's Add, and Edit › <i>Star unit</i> toggles the focused catalogue row. It has no default key (⌘D is already Duplicate unit), and users can set one in Key bindings.</p>
+</div>
+<div class="row">
+ <div class="frame" style="flex-basis:280px">
+  <div class="search">Find a unit…</div>
+  <div class="gh star"><span class="l"><svg width="12" height="12" style="fill:var(--app-accent);stroke:var(--app-accent)"><use href="#s"/></svg>Starred</span><span>1</span></div>
+  <div class="u"><span class="st on"><svg><use href="#s"/></svg></span><span class="n"><b>Line Infantry</b><small>10 models</small></span><span class="pts">120</span><span style="color:var(--app-muted)">+</span></div>
+  <div class="gh"><span>Command</span><span>2</span></div>
+  <div class="u hover"><span class="st off ring"><svg><use href="#s"/></svg></span><span class="n"><b>Field Marshal</b><small>1 model</small></span><span class="pts">115</span><span style="color:var(--app-muted)">+</span></div>
+  <div class="u"><span class="st"></span><span class="n"><b>Force Commander</b><small>1 model</small></span><span class="pts">90</span><span style="color:var(--app-muted)">+</span></div>
+  <div class="u"><span class="st"></span><span class="n"><b>Recon Team</b><small>5 models</small></span><span class="pts">85</span><span style="color:var(--app-muted)">+</span></div>
+ </div>
+ <div class="frame" style="flex-basis:340px">
+  <div class="cap"><span>Step 2 of 3</span><span>×</span></div>
+  <div class="title" style="margin-bottom:10px">Faction and game mode</div>
+  <div class="search">Find a faction</div>
+  <div class="opt sel"><span class="st on"><svg><use href="#s"/></svg></span><span class="n">Theta Faction</span><span class="chk">✓</span></div>
+  <div class="div"></div>
+  <div class="opt"><span class="st off"><svg><use href="#s"/></svg></span><span class="n">Iota Faction</span></div>
+  <div class="opt"><span class="st"></span><span class="n">Kappa Faction</span></div>
+  <p class="note" style="color:var(--app-muted);font-size:12px;margin-top:8px">The Add force dialog's force list works the same way.</p>
+ </div>
+</div>
+
+<div class="frame" style="background:var(--card);color:var(--foreground);font-family:var(--font-sans)">
+<h2 style="margin-top:0">Behaviour (every platform, one shared app-core implementation)</h2>
+<ul class="rules">
+<li><span class="k">What can be starred:</span> factions (catalogues) in New roster and Add force; force entries in Add force; units in the Add unit sheet / catalogue pane / desktop catalogue. Stored on the device by game system + kind + entry id, so a unit star also applies in other rosters of the same system. It survives a restart, is not part of the roster file and is not an Undo step.</li>
+<li><span class="k">Order:</span> starred rows go first in the order the data gives them, and keep their state (Slot full, quota chip, unavailable Add, hidden). Units move into the Starred group and are not listed twice.</li>
+<li><span class="k">No stars yet:</span> the lists look as they do now, with no empty Starred group and no hint. The outline stars (touch) or the hover star (desktop) are how users find the feature.</li>
+<li><span class="k">Stale stars</span> (the entry is gone after a data update or the source was removed): left out of the lists without a message, and kept, so they come back if the entry returns.</li>
+<li><span class="k">Read-only rosters:</span> there is no catalogue, so no unit stars; faction stars in New roster work as usual.</li>
+<li><span class="k">Accessibility:</span> the button reads "Star Line Infantry" / "Unstar Line Infantry" with a selected state, and VoiceOver/TalkBack announce "Starred". The filled star uses the accent colour, not the warning amber that already means "Slot full".</li>
+</ul>
+</div>
+
+</div></body></html>
