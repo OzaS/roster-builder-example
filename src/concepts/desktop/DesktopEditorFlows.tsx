@@ -1,5 +1,6 @@
 import { useMemo, useReducer, useRef, useState, type ReactNode } from 'react';
 import { AlertTriangle, ArrowDownToLine, Check, CheckCircle2, ClipboardCopy, Copy, Database, FileJson, FileText, FileType, Flag, Lock, Pencil, Printer, Redo2, Search, Trash2, Undo2, X } from 'lucide-react';
+import { StarDivider, StarRow, starredFirst, useStars } from '../workspace/Stars';
 import { formatCombo } from './desktopKeys';
 import { Dialog, DialogHeader } from '../workspace/Dialog';
 import './desktop-editor.css';
@@ -363,7 +364,11 @@ export function ImportDialog({ result, version, onOpen, onClose }: { result: Imp
 /* ---------------------------------------------------------------- Add force */
 
 const FACTIONS = ['Frontier Coalition', 'Free Cities', 'Northern Realms'];
-export function AddForceDialog({ forces, limit, faction, onAdd, onClose }: { forces: Force[]; limit: number; faction: string; onAdd: (force: Omit<Force, 'id'>) => void; onClose: () => void }) {
+export function AddForceDialog({ forces, limit, faction, stars = false, onAdd, onClose }: { forces: Force[]; limit: number; faction: string;
+  /** R2-03 (F4c, approved 2026-11-08): stars before the force types (outline on hover or focus), starred first, then a divider. */
+  stars?: boolean;
+  onAdd: (force: Omit<Force, 'id'>) => void; onClose: () => void }) {
+  const forceStars = useStars(stars ? ['Expedition force', 'Garrison'] : []);
   const available = FORCE_TYPES.filter(t => !forceTypeBlocked(t, forces, limit));
   const [type, setType] = useState(available[0]?.name ?? '');
   const [chosenFaction, setFaction] = useState(faction);
@@ -382,9 +387,9 @@ export function AddForceDialog({ forces, limit, faction, onAdd, onClose }: { for
       </div>
       <div className="dte-type-head"><h3 className="dte-label" id="dte-force-type">Force type</h3><label className="dtp-search dte-search"><Search size={13} /><input placeholder="Filter…" aria-label="Filter force types" value={query} onChange={e => setQuery(e.target.value)} /></label></div>
       <div className="dt-choice-list compact" role="radiogroup" aria-labelledby="dte-force-type">
-        {shown.map(t => { const blocked = forceTypeBlocked(t, forces, limit); return <button type="button" role="radio" key={t.name} aria-checked={type === t.name} aria-disabled={!!blocked || undefined} className={`${type === t.name ? 'active' : ''} ${blocked ? 'blocked' : ''}`} data-autofocus={type === t.name ? true : undefined} title={blocked ?? undefined} onClick={() => !blocked && setType(t.name)}>
+        {(() => { const { starred, rest } = starredFirst(shown, t => t.name, forceStars.stars); return [...starred, ...(starred.length && rest.length ? ['divider' as const] : []), ...rest]; })().map(t => { if (t === 'divider') return <StarDivider key="star-divider" />; const blocked = forceTypeBlocked(t, forces, limit); const choice = <button type="button" role="radio" key={t.name} aria-checked={type === t.name} aria-disabled={!!blocked || undefined} className={`${type === t.name ? 'active' : ''} ${blocked ? 'blocked' : ''}`} data-autofocus={type === t.name ? true : undefined} title={blocked ?? undefined} onClick={() => !blocked && setType(t.name)}>
           <span><strong>{t.name}</strong><small>{t.detail}</small>{blocked && <small className="dte-reason"><Lock size={11} />{blocked}</small>}</span>{type === t.name && <Check size={15} />}
-        </button>; })}
+        </button>; return stars ? <StarRow key={t.name} pointer name={t.name} on={forceStars.isStarred(t.name)} onToggle={() => forceStars.toggle(t.name)}>{choice}</StarRow> : choice; })}
         {!shown.length && <p className="dte-hint">No force types match.</p>}
       </div>
       </div>

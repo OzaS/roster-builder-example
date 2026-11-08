@@ -111,6 +111,10 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "desktop-editor-unit-rename", label: "Desktop · R2-02 · Unit dialog, inline rename" },
   { id: "desktop-editor-unit-renamed", label: "Desktop · R2-02 · Renamed unit in the tree" },
   { id: "desktop-menus-rename-unit", label: "Desktop · R2-02 · Edit menu, Rename unit…" },
+  { id: "desktop-stars-catalogue", label: "Desktop · R2-03 · Roster editor · Catalogue with Starred, hover/focus star" },
+  { id: "desktop-stars-faction", label: "Desktop · R2-03 · New roster · Faction step with a starred faction" },
+  { id: "desktop-stars-add-force", label: "Desktop · R2-03 · Add force · Starred forces" },
+  { id: "desktop-menus-star-unit", label: "Desktop · R2-03 · Menu bar · Edit › Star unit" },
   { id: "desktop-editor-unit-dialog-zoom-200", label: "Desktop · Roster editor · Unit dialog, page zoom 200%" },
   { id: "desktop-editor-unit-dialog-separated", label: "Desktop · Roster editor · Unit dialog, after Separate 1 (4 + 1)" },
   { id: "desktop-editor-catalogue-limit", label: "Desktop · Roster editor · Catalogue limit reached" },
@@ -252,7 +256,9 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen === "desktop-sources") return "sources";
   if (screen === "desktop-settings" || screen.startsWith("desktop-settings-")) return "settings";
   if (screen === "desktop-first-run") return "library";
-  if (screen === "desktop-menus" || screen === "desktop-menus-rename-unit") return "overview";
+  if (screen === "desktop-menus" || screen === "desktop-menus-rename-unit" || screen === "desktop-menus-star-unit") return "overview";
+  if (screen === "desktop-stars-catalogue" || screen === "desktop-stars-add-force") return "overview"; // R2-03: the roster editor
+  if (screen === "desktop-stars-faction") return "library"; // R2-03: New roster over Welcome
   if (screen === "library-v2" || screen.startsWith("library-filters")) return "library";
   if (screen === "subscription-main") return "library";
   if (screen === "subscription-edition") return "overview";
