@@ -22,6 +22,7 @@ import type { GalleryConcept } from "./galleryTypes";
 import { ComingSoonCard, DeveloperOptionsPreview } from "../concepts/ux/AppExtras";
 import { DebugNavRow, DebugRows } from "../concepts/ux/DeveloperPages";
 import { PhoneExportFlow, PhoneExportPreview, phoneExportRoster } from "../concepts/ux/PhoneExport";
+import { LimitWarning, PhonePointsLimitSheet, PhoneRenameSheet, PhoneUnitMenu } from "../concepts/ux/PhoneNames";
 import { ActionMenuDialog, ReopenRosterSetting, AddCollectionSheet, LOCAL_ERRORS, LOCAL_FILE, LOCAL_SOURCE, LocalImportChoiceDialog, LocalImportError, LocalImportRow, LocalInterruptedNotice, LocalRefusedNotice, LocalSourceNote, LocalSourceRows, localSteps, AdvancedInstallSetting, AppDialog, AutoUpdateChecksSetting, FocusCatalogueSearchSetting, SeparateAllSetting, AdvancedSettingsRows, ImportReportGroups, CollectionMenuDialog, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, FirstRunDataCard, ReinstallSheet, ReinstallConfirmDialog, REINSTALL_DONE, REINSTALL_FAILED, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RememberSectionsSetting, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceStatusAction, SourceUpdateCard, SourceVersions, SourcesNavRow, TaggedRosterRows, UpdateAvatarButton, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
 
 type Props = {
@@ -205,7 +206,7 @@ function WorkbenchElements({
       </ElementSection>
 
       <ElementSection title="Roster More Menu">
-        <small className="ux-hint">UX-020: the roster bar has a visible Share button (Export or share) next to More. The More menu, anchored to its button, holds Undo and Redo only: before an edit (both disabled), after an edit (Undo enabled) and after an Undo (Redo enabled). A read-only roster has Share only and no More button.</small>
+        <small className="ux-hint">UX-020: the roster bar has a visible Share button (Export or share) next to More. The More menu, anchored to its button, holds Undo and Redo: before an edit (both disabled), after an edit (Undo enabled) and after an Undo (Redo enabled). R2-02 (F4b, approved 2026-11-07): Rename roster (the Rename roster sheet) and Points limit… (the Points limit sheet) follow them. A read-only roster has Share only and no More button.</small>
         <div className="ux-elements-more-menus">
           <RosterMoreMenu open inline onOpenChange={() => undefined} />
           <RosterMoreMenu open inline canUndo onOpenChange={() => undefined} />
@@ -395,7 +396,7 @@ function WorkbenchElements({
       <ElementSection title="Unit Detail Toggle">
         <div className="ux-detail-mode-layer ux-elements-static">
           <div className="ux-detail-action-menu ux-elements-static" role="menu" aria-label="Unit actions">
-            <button type="button" role="menuitem"><Pencil size={15} />Rename & favorite</button>
+            <button type="button" role="menuitem"><Pencil size={15} />Rename unit</button>
             <button type="button" role="menuitem"><Copy size={15} />Duplicate</button>
             <button type="button" role="menuitem"><MoveRight size={15} />Move</button>
           </div>
@@ -436,7 +437,31 @@ function WorkbenchElements({
       </ElementSection>
 
       <ElementSection title="Rename Dialog">
-        <section className="ux-entry-dialog" style={{ borderRadius: 12 }}><header><span><strong>Rename unit</strong><small>A reusable snapshot will be saved to your Library.</small></span><button type="button"><X size={17} /></button></header><label><span>Custom name</span><input value="Veteran Spearhead" readOnly /></label><footer><button type="button">Cancel</button><button type="button" className="primary">Save favorite</button></footer></section>
+        <small className="ux-elements-note">The old concept's dialog. R2-02 / DEC-046: renaming a unit names it in this roster only, so the dialog no longer says it saves a Library snapshot; an empty name restores the entry name. The 1.0 phone uses the Rename Unit Sheet below.</small>
+        <section className="ux-entry-dialog" style={{ borderRadius: 12 }}><header><span><strong>Rename unit</strong><small>Empty restores “Squad A”.</small></span><button type="button"><X size={17} /></button></header><label><span>Custom name</span><input value="Veteran Spearhead" readOnly /></label><footer><button type="button">Cancel</button><button type="button" className="primary">Save</button></footer></section>
+      </ElementSection>
+
+      <ElementSection title="Rename Unit Sheet">
+        <small className="ux-elements-note">R2-02 (F4b, approved 2026-11-07): the unit details ⋯ menu (and the tree row's unit menu) lists Rename unit first, then Duplicate and Remove. Rename unit opens the one-field sheet (the Rename roster sheet): the field prefilled with the current name and selected, the hint “Empty restores “entry name”.”, a count up to 60, Cancel / Save. Save stays off while the name is unchanged; Enter saves; an empty name clears the custom name. One Undo step; off while read-only. The tree row then shows the custom name with the entry name as a muted second line. Opened · typed · renamed row.</small>
+        <div className="ux-rn-el-row">
+          <PhoneUnitMenu inline name="Squad A" />
+          <PhoneRenameSheet inline title="Rename unit" label="Unit name" value="Squad A" restores="Squad A" />
+          <PhoneRenameSheet inline title="Rename unit" label="Unit name" value="Squad A" restores="Squad A" initialDraft="Vanguard squad" />
+          <PhoneRenameSheet inline title="Rename roster" label="Roster name" value="My roster" />
+        </div>
+        <div className="ux-tree-units" style={{ maxWidth: 360 }}>
+          <button type="button" className="ux-tree-unit valid"><span className="ux-tree-rail" aria-hidden /><TreeUnitMain unit={{ ...selectedUnit, count: 10, summary: undefined, extraCost: undefined }} name="Vanguard squad" entryName="Squad A" /><b>140</b></button>
+        </div>
+      </ElementSection>
+
+      <ElementSection title="Points Limit Sheet">
+        <small className="ux-elements-note">R2-02 (F4b, approved 2026-11-07): from the roster bar's ⋯ › Points limit…. The choices are app-core pointsLimit()'s (the tablet and desktop list) drawn as the creation step's chips, the current value selected; Custom opens the numeric field with Apply limit; Use data limit (N) clears the override (Unlimited when the data has no limit). A change applies at once (one Undo step); off while read-only or saving. Above the configuration's allowance the warning shows in the sheet and as a line under the roster budget (the tablet and desktop string). Current value · Custom · no data limit · the budget's warning line.</small>
+        <div className="ux-rn-el-row">
+          <PhonePointsLimitSheet inline value={2050} dataLimit={2000} configurationLimit={2000} />
+          <PhonePointsLimitSheet inline value={2050} dataLimit={2000} configurationLimit={2000} initialCustom />
+          <PhonePointsLimitSheet inline value={1000} />
+        </div>
+        <div className="ux-wb-budget" style={{ maxWidth: 360 }}><BudgetMeter roster={{ ...roster, pointsLimit: 2050 }} /><LimitWarning text="The configuration allows 2 000 pts" /></div>
       </ElementSection>
 
       <ElementSection title="Move Unit Dialog">

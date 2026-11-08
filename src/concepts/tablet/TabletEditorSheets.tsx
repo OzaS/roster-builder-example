@@ -33,12 +33,15 @@ export function AddForceSheet({ forces, limit, faction, onAdd, onClose }: { forc
   </TabletSheet>;
 }
 
-/** One text field: rename the roster or a force. Enter saves; Save stays off while the name is empty or unchanged. */
-export function RenameSheet({ title, label, value, maxLength = 60, hint, onSave, onClose }: { title: string; label: string; value: string; maxLength?: number; hint?: string; onSave: (name: string) => void; onClose: () => void }) {
+/** One text field: rename the roster, a force or a unit (R2-02). Enter saves; Save stays off while the name is unchanged, and
+ *  while it is empty, except for a unit (`restores`): an empty name gives it its entry name back ("Empty restores “…”."). */
+export function RenameSheet({ title, label, value, maxLength = 60, hint, restores, onSave, onClose }: { title: string; label: string; value: string; maxLength?: number; hint?: string; restores?: string; onSave: (name: string) => void; onClose: () => void }) {
   const [draft, setDraft] = useState(value);
   const name = draft.trim();
-  return <TabletSheet title={title} onClose={onClose} action={{ label: 'Save', disabled: !name || name === value, onClick: () => onSave(name) }}>
-    <label className="tbs-field">{label}<input data-autofocus maxLength={maxLength} value={draft} onChange={e => setDraft(e.target.value)} onFocus={e => e.currentTarget.select()} /><span className="tbs-count">{draft.length} / {maxLength}</span></label>
+  const disabled = restores === undefined ? !name || name === value : (name || restores) === value;
+  return <TabletSheet title={title} onClose={onClose} action={{ label: 'Save', disabled, onClick: () => onSave(name) }}>
+    <label className="tbs-field">{label}<input data-autofocus maxLength={maxLength} value={draft} onChange={e => setDraft(e.target.value)} onFocus={e => e.currentTarget.select()} onKeyDown={e => { if (e.key === 'Enter' && !disabled) onSave(name); }} /><span className="tbs-count">{draft.length} / {maxLength}</span></label>
+    {restores !== undefined && <p className="tbs-hint">Empty restores “{restores}”.</p>}
     {hint && <p className="tbs-hint">{hint}</p>}
   </TabletSheet>;
 }

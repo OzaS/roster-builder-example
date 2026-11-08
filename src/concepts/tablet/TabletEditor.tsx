@@ -4,7 +4,7 @@ import { PointsLine, RosterSummary, SummaryToggle } from '../workspace/RosterSum
 import type { Notify } from '../workspace/Toasts';
 import { StatusGlyph, TreeUnitMain } from '../ux/uxShared';
 import { Count, FoldSection, RadioRow, SeparateRow, ToggleRow } from '../ux/MobileUnitOptions';
-import { galleryExportFormat, PRIMARY_FORCE_ID, ROLES, forceOf, groupLimit, rosterIssues, unitCost, useRosterHistory, type EditorUnit, type Force, type ExportRoster, type ImportResult, type ReadOnlyInfo, type RosterIssue } from '../desktop/DesktopEditorFlows';
+import { galleryExportFormat, unitName, PRIMARY_FORCE_ID, ROLES, forceOf, groupLimit, rosterIssues, unitCost, useRosterHistory, type EditorUnit, type Force, type ExportRoster, type ImportResult, type ReadOnlyInfo, type RosterIssue } from '../desktop/DesktopEditorFlows';
 import { rosterLibrary } from '../desktop/desktopData';
 import type { RosterUnit } from '../../types';
 import type { TabletEnv } from './tabletEnv';
@@ -27,11 +27,11 @@ import './tablet-editor.css';
 //   Medium (600-839): force tree · unit details; the catalogue is a slide-over from Add unit.
 //   Split view (< 700 wide, also any window whose logical width drops under 700 at a larger text size): the tree alone; a unit's details open over it (like ListDetail on the pages).
 
-export type EditorStart = 'editor' | 'issues' | 'add' | 'forces' | 'add-force' | 'readonly' | 'export' | 'export-pdf' | 'export-json' | 'export-readonly' | 'move-unit' | 'add-roles' | 'add-focus' | 'chip-caption' | 'limit-caption' | 'unit' | 'separate-all';
+export type EditorStart = 'editor' | 'issues' | 'add' | 'forces' | 'add-force' | 'readonly' | 'export' | 'export-pdf' | 'export-json' | 'export-readonly' | 'move-unit' | 'rename-unit' | 'renamed-unit' | 'add-roles' | 'add-focus' | 'chip-caption' | 'limit-caption' | 'unit' | 'separate-all';
 /** Gallery starts that open the catalogue as Add unit does (DEC-050: many roles, opened with the search focused, a chip's caption shown). */
 const addStarts: EditorStart[] = ['add', 'add-roles', 'add-focus', 'chip-caption', 'limit-caption'];
 type Pop = 'switcher' | 'more' | 'summary' | `unit-${number}` | `force-${string}` | null;
-type Sheet = { kind: 'add-force' } | { kind: 'rename' } | { kind: 'rename-force'; id: string } | { kind: 'export' } | { kind: 'move'; id: number } | null;
+type Sheet = { kind: 'add-force' } | { kind: 'rename' } | { kind: 'rename-force'; id: string } | { kind: 'rename-unit'; id: number } | { kind: 'export' } | { kind: 'move'; id: number } | null;
 /** The sample roster each gallery start opens: two forces, a roster whose faction was removed, or the default. */
 const startRoster = (start: EditorStart, name: string) => start === 'issues' ? 'Operation First Light' : start === 'forces' || start === 'add-force' || start === 'export' || start === 'export-pdf' || start === 'export-json' || start === 'move-unit' ? 'Harbour defence' : start === 'readonly' || start === 'export-readonly' ? 'Ember patrol' : name;
 type Mode = 'three' | 'two' | 'single';
@@ -73,7 +73,8 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
   // Under 440 logical px (split view at a larger text size) the header keeps Back, the roster mark, the points and More;
   // undo and redo move into More (UX-025: collapse rather than clip). With vertical bars they are toolbar items instead.
   const narrowHead = !vertical && env.width < 440;
-  const first = useRef(imported ? rosterFromImport(imported) : loadRoster(startRoster(start, rosterName))).current;
+  // R2-02 (F4b): the renamed-unit and rename-unit starts open the selected unit with the custom name "Vanguard squad".
+  const first = useRef((() => { const r = imported ? rosterFromImport(imported) : loadRoster(startRoster(start, rosterName)); return start === 'rename-unit' || start === 'renamed-unit' ? { ...r, units: r.units.map(u => u.id === r.selected ? { ...u, customName: 'Vanguard squad' } : u) } : r; })()).current;
   const [roster, setRoster] = useState(first);
   const history = useRosterHistory<EditorUnit>({ units: first.units, forces: first.forces });
   const { units, forces } = history.doc;
@@ -90,7 +91,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
   const [slideOver, setSlideOver] = useState(addStarts.includes(start) && mode !== 'three');
   // `unit`: the Foldable library's closed display with the selected unit's details open over the roster.
   const [detailOpen, setDetailOpen] = useState(start === 'unit' && mode === 'single');
-  const [sheet, setSheet] = useState<Sheet>(start === 'add-force' ? { kind: 'add-force' } : start.startsWith('export') ? { kind: 'export' } : start === 'move-unit' ? { kind: 'move', id: 1 } : null);
+  const [sheet, setSheet] = useState<Sheet>(start === 'add-force' ? { kind: 'add-force' } : start.startsWith('export') ? { kind: 'export' } : start === 'move-unit' ? { kind: 'move', id: 1 } : start === 'rename-unit' ? { kind: 'rename-unit', id: first.selected } : null);
   const [query, setQuery] = useState('');
   const [role, setRole] = useState(start === 'add' || start === 'add-focus' ? 'Core' : 'All');
   const rootRef = useRef<HTMLDivElement>(null);
@@ -179,6 +180,12 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
     setSheet(null); setActiveForce(id); expand(id);
     reveal(rootRef, `[data-tb-force="${id}"]`);
     notify(`${force.name} added`, withUndo(step));
+  };
+  /** R2-02 (F4b): name a unit in this roster (one undo step); an empty name clears the custom name, so the entry name shows again. */
+  const renameUnit = (id: number, name: string) => {
+    const unit = units.find(u => u.id === id); if (readOnly || !unit) return;
+    history.edit(`Rename ${unitName(unit)}`, d => ({ ...d, units: d.units.map(u => u.id === id ? { ...u, customName: name || undefined } : u) }), { focus: id });
+    setSheet(null);
   };
   const renameForce = (id: string, name: string) => {
     const old = forceById(id).name; if (readOnly || name === old) return;
@@ -361,7 +368,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
                       </button>
                       {branchOpen && <div className="ux-tree-units">
                         {entries.map(u => <UnitRow key={u.id} unit={u} env={env} active={u.id === selectedId} issue={unitIssue(u.id)} menuOpen={pop === `unit-${u.id}`} readOnly={!!readOnly}
-                          onSelect={() => selectUnit(u)} onMenu={() => setPop(pop === `unit-${u.id}` ? null : `unit-${u.id}`)} onDuplicate={() => duplicateUnit(u)} onRemove={() => removeUnit(u)} onMove={() => { setPop(null); setSheet({ kind: 'move', id: u.id }); }} />)}
+                          onSelect={() => selectUnit(u)} onMenu={() => setPop(pop === `unit-${u.id}` ? null : `unit-${u.id}`)} onRename={() => { setPop(null); setSheet({ kind: 'rename-unit', id: u.id }); }} onDuplicate={() => duplicateUnit(u)} onRemove={() => removeUnit(u)} onMove={() => { setPop(null); setSheet({ kind: 'move', id: u.id }); }} />)}
                         {!readOnly && <button type="button" className="ux-tree-add" onClick={() => openCatalogue(group, force.id)}><Plus size={16} />Add {group.toLowerCase()} unit</button>}
                       </div>}
                     </div>;
@@ -375,14 +382,14 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
 
         {mode !== 'single' && showInspector && <aside className="tbe-pane tbe-inspector" aria-label="Unit details">
           <header className="tbe-pane-head"><span><strong>Unit details</strong></span><HintButton hint="Hide unit details (More → Show unit details brings them back)" input={env.input} side="bottom" wrapClassName="end" aria-label="Hide unit details" className="tbe-icon small" onClick={() => setShowInspector(false)}><PanelRightClose size={18} /></HintButton></header>
-          {selected ? <UnitDetail key={selected.id} unit={selected} env={env} force={forceById(forceOf(selected))} faction={roster.faction} total={total} issue={unitIssue(selected.id)} readOnly={!!readOnly} separateAll={separateAll} onUpdate={update} onDuplicate={() => duplicateUnit(selected)} onRemove={() => removeUnit(selected)} />
+          {selected ? <UnitDetail key={selected.id} unit={selected} env={env} force={forceById(forceOf(selected))} faction={roster.faction} total={total} issue={unitIssue(selected.id)} readOnly={!!readOnly} separateAll={separateAll} onUpdate={update} onRename={() => setSheet({ kind: 'rename-unit', id: selected.id })} onDuplicate={() => duplicateUnit(selected)} onRemove={() => removeUnit(selected)} />
             : <EmptyDetail onAdd={readOnly ? undefined : () => openCatalogue()} />}
         </aside>}
       </div>
 
       {mode === 'single' && detailOpen && selected && <aside className="tbe-over" aria-label="Unit details">
         {!vertical && <header className="tbe-pane-head"><HintButton hint="Back to the roster tree" input={env.input} side="bottom" wrapClassName="start" className="tbe-back inline" onClick={() => setDetailOpen(false)}><ChevronLeft size={22} /><span>Roster</span></HintButton></header>}
-        <UnitDetail key={selected.id} unit={selected} env={env} force={forceById(forceOf(selected))} faction={roster.faction} total={total} issue={unitIssue(selected.id)} readOnly={!!readOnly} separateAll={separateAll} onUpdate={update} onDuplicate={() => duplicateUnit(selected)} onRemove={() => removeUnit(selected)} />
+        <UnitDetail key={selected.id} unit={selected} env={env} force={forceById(forceOf(selected))} faction={roster.faction} total={total} issue={unitIssue(selected.id)} readOnly={!!readOnly} separateAll={separateAll} onUpdate={update} onRename={() => setSheet({ kind: 'rename-unit', id: selected.id })} onDuplicate={() => duplicateUnit(selected)} onRemove={() => removeUnit(selected)} />
       </aside>}
 
       {slideOver && mode !== 'three' && <div className="tbe-scrim" onClick={() => setSlideOver(false)}>
@@ -394,6 +401,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
     {sheet?.kind === 'add-force' && <AddForceSheet forces={forces} limit={limit} faction={roster.faction} onAdd={addForce} onClose={() => setSheet(null)} />}
     {sheet?.kind === 'move' && units.some(u => u.id === sheet.id) && <MoveUnitSheet unit={units.find(u => u.id === sheet.id)!} forces={forces} units={units} from={forceOf(units.find(u => u.id === sheet.id)!)} onMove={id => moveUnit(units.find(u => u.id === sheet.id)!, id)} onAddForce={() => setSheet({ kind: 'add-force' })} onClose={() => setSheet(null)} />}
     {sheet?.kind === 'rename' && <RenameSheet title="Rename roster" label="Roster name" value={roster.name} onSave={renameRoster} onClose={() => setSheet(null)} />}
+    {sheet?.kind === 'rename-unit' && units.some(u => u.id === sheet.id) && <RenameSheet title="Rename unit" label="Unit name" value={unitName(units.find(u => u.id === sheet.id)!)} restores={units.find(u => u.id === sheet.id)!.name} onSave={name => renameUnit(sheet.id, name)} onClose={() => setSheet(null)} />}
     {sheet?.kind === 'rename-force' && <RenameSheet title="Rename force" label="Force name" value={forceById(sheet.id).name} maxLength={40} onSave={name => renameForce(sheet.id, name)} onClose={() => setSheet(null)} />}
   </div>;
 }
@@ -513,9 +521,9 @@ function ReadOnlyCataloguePane({ env, info, onFindData, onClose }: { env: Tablet
 
 /* ---------------------------------------------------------------- force tree row */
 
-function UnitRow({ unit, env, active, issue, menuOpen, readOnly, onSelect, onMenu, onDuplicate, onRemove, onMove }: {
+function UnitRow({ unit, env, active, issue, menuOpen, readOnly, onSelect, onMenu, onRename, onDuplicate, onRemove, onMove }: {
   unit: EditorUnit; env: TabletEnv; active: boolean; issue?: RosterIssue; menuOpen: boolean; readOnly: boolean;
-  onSelect: () => void; onMenu: () => void; onDuplicate: () => void; onRemove: () => void; onMove: () => void;
+  onSelect: () => void; onMenu: () => void; onRename: () => void; onDuplicate: () => void; onRemove: () => void; onMove: () => void;
 }) {
   // Touch: press and hold opens the row menu (the phone's swipe actions are off at this size). Pointer: right-click does.
   const hold = useRef<number>(undefined);
@@ -526,19 +534,20 @@ function UnitRow({ unit, env, active, issue, menuOpen, readOnly, onSelect, onMen
   const status = issue ? 'warning' : 'valid';
   return <div className="tbe-unit" data-pop={`unit-${unit.id}`}>
     <button type="button" data-tb-unit={unit.id} className={`ux-tree-unit ${status} ${active ? 'active' : ''}`} aria-current={active ? 'true' : undefined} aria-haspopup="menu"
-      aria-label={`${unit.name}, ${unit.models} ${unit.models === 1 ? 'model' : 'models'}, ${unitCost(unit)} points${issue ? `, needs attention: ${issue.text}` : ''}`}
+      aria-label={`${unitName(unit)}${unit.customName ? ` (${unit.name})` : ''}, ${unit.models} ${unit.models === 1 ? 'model' : 'models'}, ${unitCost(unit)} points${issue ? `, needs attention: ${issue.text}` : ''}`}
       title={env.input === 'pointer' ? 'Right-click for unit actions' : undefined}
       onPointerDown={() => { if (env.input !== 'touch' || readOnly) return; held.current = false; window.clearTimeout(hold.current); hold.current = window.setTimeout(() => { held.current = true; onMenu(); }, 500); }}
       onPointerUp={() => window.clearTimeout(hold.current)} onPointerLeave={() => window.clearTimeout(hold.current)} onPointerCancel={() => window.clearTimeout(hold.current)}
       onContextMenu={e => { e.preventDefault(); if (!readOnly && env.input === 'pointer') onMenu(); }}
       onClick={e => { if (held.current) { e.preventDefault(); held.current = false; return; } onSelect(); }}>
       <span className="ux-tree-rail" aria-hidden />
-      <TreeUnitMain unit={shown} name={unit.name} />
+      <TreeUnitMain unit={shown} name={unitName(unit)} entryName={unit.customName ? unit.name : undefined} />
       {issue ? <StatusGlyph status="warning" size={16} /> : <span />}
       <b>{unitCost(unit)}</b>
     </button>
-    {menuOpen && <div className="tbe-menu tbe-unit-menu" role="menu" aria-label={`Actions for ${unit.name}`}>
+    {menuOpen && <div className="tbe-menu tbe-unit-menu" role="menu" aria-label={`Actions for ${unitName(unit)}`}>
       <button type="button" role="menuitem" onClick={() => { onMenu(); onSelect(); }}><Users size={18} />Show details</button>
+      <button type="button" role="menuitem" onClick={onRename}><Pencil size={18} />Rename unit</button>
       <button type="button" role="menuitem" onClick={onDuplicate}><Copy size={18} />Duplicate</button>
       <button type="button" role="menuitem" onClick={onMove}><MoveRight size={18} />Move to another force…</button>
       <button type="button" role="menuitem" className="danger" onClick={onRemove}><Trash2 size={18} />Remove</button>
@@ -548,9 +557,9 @@ function UnitRow({ unit, env, active, issue, menuOpen, readOnly, onSelect, onMen
 
 /* ---------------------------------------------------------------- unit details (the mobile unit detail in a pane) */
 
-function UnitDetail({ unit, env, force, faction, total, issue, readOnly, separateAll, onUpdate, onDuplicate, onRemove }: {
+function UnitDetail({ unit, env, force, faction, total, issue, readOnly, separateAll, onUpdate, onRename, onDuplicate, onRemove }: {
   unit: EditorUnit; env: TabletEnv; force: Force; faction: string; total: number; issue?: RosterIssue; readOnly: boolean; separateAll: boolean;
-  onUpdate: (change: Partial<StackUnit>) => void; onDuplicate: () => void; onRemove: () => void;
+  onUpdate: (change: Partial<StackUnit>) => void; onRename: () => void; onDuplicate: () => void; onRemove: () => void;
 }) {
   const [tab, setTab] = useState<'options' | 'profile'>('options');
   // Open sections are presentation only; the tablet opens the two option sections at first (there is room for them).
@@ -568,10 +577,11 @@ function UnitDetail({ unit, env, force, faction, total, issue, readOnly, separat
   const [move, defence, resolve, health] = unitProfile(unit);
   return <section className="ux-mobile-unit-options tbe-detail">
     <div className="tbe-unit-title">
-      <span><small>{unit.role} · {force.name}</small><h2>{unit.name}</h2></span>
+      <span><small>{unit.role} · {force.name}</small><h2>{unitName(unit)}</h2>{unit.customName && <p className="tbe-unit-entry">{unit.name}</p>}</span>
       <strong>{cost}<small> pts</small></strong>
     </div>
     <div className="tbe-unit-actions">
+      <HintButton hint={readOnly ? 'Read-only roster' : 'Give this unit a name of its own (empty restores the entry name)'} input={env.input} side="bottom" className="ux-job-btn" disabled={readOnly} onClick={onRename}><Pencil size={17} />Rename</HintButton>
       <HintButton hint={readOnly ? 'Read-only roster' : 'Add a copy of this unit to the same force'} input={env.input} side="bottom" className="ux-job-btn" disabled={readOnly} onClick={onDuplicate}><Copy size={17} />Duplicate</HintButton>
       <HintButton hint={readOnly ? 'Read-only roster' : 'Remove this unit (Undo brings it back)'} input={env.input} side="bottom" className="ux-job-btn destructive" disabled={readOnly} onClick={onRemove}><Trash2 size={17} />Remove</HintButton>
     </div>
