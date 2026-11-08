@@ -262,7 +262,10 @@ export type WorkflowScreen =
   | "names-renamed-unit"
   | "names-roster-menu"
   | "names-points-limit"
-  | "names-limit-warning";
+  | "names-limit-warning"
+  | "stars-add-unit"
+  | "stars-faction"
+  | "stars-add-force";
 
 export type RosterOption = {
   id: string;

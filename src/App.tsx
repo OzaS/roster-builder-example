@@ -257,6 +257,9 @@ const workflowScreenIds = [
   "names-roster-menu",
   "names-points-limit",
   "names-limit-warning",
+  "stars-add-unit",
+  "stars-faction",
+  "stars-add-force",
 ] satisfies WorkflowScreen[];
 const prototypeScreenIds = [
   "library",

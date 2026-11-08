@@ -212,6 +212,9 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "names-roster-menu", label: "R2-02 · Roster ⋯ menu · Rename roster, Points limit…" },
   { id: "names-points-limit", label: "R2-02 · Points limit sheet" },
   { id: "names-limit-warning", label: "R2-02 · Roster header · Configuration warning" },
+  { id: "stars-add-unit", label: "R2-03 · Add unit · Starred group" },
+  { id: "stars-faction", label: "R2-03 · New roster · Faction picker with a starred faction" },
+  { id: "stars-add-force", label: "R2-03 · Add force · Starred forces and faction" },
 ];
 
 const workflowLabels: Record<WorkflowScreen, string> = workflowScreens.reduce(
@@ -261,7 +264,10 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen === "diagnostics") return "validation";
   if (screen === "export-stored") return "roster-read-only";
   if (screen === "names-unit-menu" || screen === "names-unit-sheet") return "unit-options-mobile"; // R2-02: unit details with the ⋯ menu / the Rename unit sheet
-  if (screen.startsWith("names-")) return "overview"; // R2-02: the roster with a renamed unit, its ⋯ menu, the Points limit sheet, the warning
+  if (screen.startsWith("names-")) return "overview";
+  if (screen === "stars-add-unit") return "add-unit"; // R2-03: the Add unit sheet with the Starred group
+  if (screen === "stars-faction") return "system"; // R2-03: New roster with the faction picker open
+  if (screen === "stars-add-force") return "overview"; // R2-03: the roster with Add force open // R2-02: the roster with a renamed unit, its ⋯ menu, the Points limit sheet, the warning
   if (screen === "export" || screen === "export-json" || screen === "export-pdf" || screen === "export-preview") return "overview"; // the export sheet over the roster
   return screen as PrototypeScreen; // the tablet screens returned above are not narrowed away by startsWith
 }
