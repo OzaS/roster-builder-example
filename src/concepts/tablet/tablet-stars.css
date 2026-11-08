@@ -1,0 +1,5 @@
+/* R2-03 (F4c, approved 2026-11-08): the star before the name in the tablet catalogue (shared star: workspace/stars.css). */
+.tbe .tbe-cat-row.with-star { grid-template-columns: 44px minmax(0, 1fr) auto auto 36px; gap: 6px; padding-left: 0 }
+.tbe .tbe-cat-row.with-star > .ws-star { margin-right: -2px }
+.tbe-cat-list h4.ws-starred-head { align-items: center }
+.tb-app .tbs-choices .ws-star-divider { margin: 2px 4px }

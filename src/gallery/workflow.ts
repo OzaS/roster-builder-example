@@ -15,6 +15,10 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "tablet-editor-export-readonly", label: "Tablet · Roster editor · Export, read-only roster" },
   { id: "tablet-editor-rename-unit", label: "Tablet · R2-02 · Rename unit sheet" },
   { id: "tablet-editor-renamed-unit", label: "Tablet · R2-02 · Renamed unit, Rename pane action" },
+  { id: "tablet-stars-catalogue", label: "Tablet · R2-03 · Catalogue with the Starred group" },
+  { id: "tablet-stars-catalogue-role", label: "Tablet · R2-03 · Catalogue, Core chosen" },
+  { id: "tablet-stars-add-force", label: "Tablet · R2-03 · Add force, starred forces" },
+  { id: "tablet-stars-faction", label: "Tablet · R2-03 · New roster, starred faction" },
   { id: "tablet-editor-shortcuts", label: "Tablet · Roster editor · Keyboard shortcuts" },
   { id: "tablet-editor-text-200", label: "Tablet · Roster editor · Text 200%" },
   { id: "tablet-editor-add-roles", label: "Tablet · Roster editor · Many unit roles" },
@@ -236,7 +240,7 @@ export function resolveWorkflow(workflow?: WorkflowScreen[]): Array<{ id: Workfl
 
 export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScreen {
   if (screen === "tablet-archive-sketch") return "overview";
-  if (screen === "tablet-editor" || screen.startsWith("tablet-editor-") || screen === "tablet-editor-issues" || screen === "tablet-editor-add" || screen === "tablet-editor-forces" || screen === "tablet-editor-add-force" || screen === "tablet-editor-readonly" || screen === "tablet-editor-export" || screen === "tablet-editor-import-result" || screen === "tablet-editor-move-unit" || screen === "tablet-editor-shortcuts" || screen === "tablet-editor-text-200" || screen === "tablet-editor-add-roles" || screen === "tablet-editor-add-focus" || screen === "tablet-editor-chip-caption" || screen === "tablet-editor-limit-caption" || screen === "tablet-editor-chips-text-150") return "overview";
+  if (screen === "tablet-editor" || screen.startsWith("tablet-editor-") || screen === "tablet-stars-catalogue" || screen === "tablet-stars-catalogue-role" || screen === "tablet-stars-add-force" || screen === "tablet-editor-issues" || screen === "tablet-editor-add" || screen === "tablet-editor-forces" || screen === "tablet-editor-add-force" || screen === "tablet-editor-readonly" || screen === "tablet-editor-export" || screen === "tablet-editor-import-result" || screen === "tablet-editor-move-unit" || screen === "tablet-editor-shortcuts" || screen === "tablet-editor-text-200" || screen === "tablet-editor-add-roles" || screen === "tablet-editor-add-focus" || screen === "tablet-editor-chip-caption" || screen === "tablet-editor-limit-caption" || screen === "tablet-editor-chips-text-150") return "overview";
   if (screen.startsWith("tablet-")) return "library"; // every other tablet screen is a page or a state of one
   if (screen.startsWith("duo-")) return "library"; // Foldable screens: a pose, a page and a state (DuoWorkbench)
   if (screen === "tablet-home" || screen === "tablet-rosters" || screen === "tablet-lookup" || screen === "tablet-tools" || screen === "tablet-library" || screen === "tablet-sources" || screen === "tablet-settings") return "library";

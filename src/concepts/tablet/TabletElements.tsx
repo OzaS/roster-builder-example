@@ -17,6 +17,9 @@ import type { Job } from '../workspace/Jobs';
 import { editorShortcuts, keyLabel } from './tabletKeys';
 import { TabletWorkbench } from './TabletWorkbench';
 import { StateChip } from '../workspace/StateChip';
+import { StarButton, StarredHeadingContent } from '../workspace/Stars';
+import './tablet-editor.css';
+import './tablet-stars.css';
 import { LimitAddButton, QuotaChip } from '../workspace/CatalogueLimit';
 import { SourceStatusAction } from '../ux/SourceJobs';
 import { TabletPrefsContext, makeTabletEnv, TabletEnvContext } from './tabletEnv';
@@ -249,6 +252,18 @@ export function TabletElements() {
       <h2>Rename a unit (R2-02 · F4b · approved 2026-11-07) · Rename pane action · Rename sheet · renamed row</h2>
       <p>The unit pane's actions are Rename, Duplicate and Remove; Rename (and Rename unit in the tree row's menu) opens the one-field Rename sheet, now for a roster, force or unit name. For a unit the field is prefilled with its name and selected, the count goes to 60 and the hint says “Empty restores “entry name”.”; Save stays off while the name is unchanged and Enter saves. An empty name clears the custom name. One Undo step; off while read-only. A renamed unit shows its own name in the pane and the tree row, with the entry name as a muted line under it (as renamed forces do).</p>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-editor-renamed-unit" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-editor-rename-unit" /></TabletDeviceFrame></div>
+      <h2>Starred entries (R2-03 · F4c · approved 2026-11-08) · star button · Starred group · starred faction and forces</h2>
+      <p>A star before the name on every catalogue row (pane and slide-over), on the New roster faction step and on Add force's force types. Outline (muted) = not starred; filled in the accent colour = starred, never the warning amber that means Slot full. Always visible: a 20 px icon in a 44 pt target; the star only stars, the rest of the row adds or chooses. Units get a Starred group above the role groups (accent heading, star glyph, count); starred rows are not repeated and keep their state. A role chip filters Starred too (Core chosen: only starred Core units); search keeps Starred first. Factions and forces: starred first, a divider, then the rest. Stars are kept per faction (unit and force stars per catalogue, faction stars per game system), on the device: they survive a restart, are not in the roster file and are not an Undo step. No stars: the lists are unchanged (no empty group, no hint); stale stars are ignored silently and kept; read-only rosters have no catalogue. Labels “Star {"{name}"}” / “Unstar {"{name}"}”.</p>
+      <div className="tb-el-row"><div className="tb-app ux-screen dark tb-el-card tb-el-stack">
+        <div className="tbe tbe-catalogue" style={{ display: 'grid', gap: 4 }}><div className="tbe-cat-list">
+          <section><h4 className="ws-starred-head"><StarredHeadingContent count={2} /></h4>
+            <div className="tbe-cat-row with-star"><StarButton name="Line Infantry" on /><button type="button" className="tbe-cat-add"><span><strong>Line Infantry</strong><small>10 models · Service rifle</small></span></button><span aria-hidden="true" /><b aria-hidden="true">120<small> pts</small></b><span className="tbe-cat-plus" aria-hidden="true"><Plus size={18} /></span></div>
+            <div className="tbe-cat-row with-star"><StarButton name="Field Marshal" on={false} /><button type="button" className="tbe-cat-add"><span><strong>Field Marshal</strong><small>1 model · Service rifle</small></span></button><span aria-hidden="true" /><b aria-hidden="true">115<small> pts</small></b><span className="tbe-cat-plus" aria-hidden="true"><Plus size={18} /></span></div>
+          </section>
+        </div></div>
+      </div></div>
+      <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-stars-catalogue" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-stars-catalogue-role" /></TabletDeviceFrame></div>
+      <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-stars-add-force" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-stars-faction" /></TabletDeviceFrame></div>
       <h2>Dialogs and sheets · guided creation, faction picker, add collection, appearance import, move unit, confirm</h2>
       <p>Every dialog is a form sheet that covers the whole window, rail included. Guided creation has a step list beside the content (a row of step marks in a narrower window); the faction picker appears only with Advanced installation on and opens by itself when an install pauses; add collection, appearance imports, move unit and the confirm sheet use the same header (Cancel, title, one primary action) and the mobile controls inside. In split view every sheet fills the window, and a focused field scrolls above the keyboard.</p>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-create" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-portrait"><TabletWorkbench workflowScreen="tablet-create-review" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="split"><TabletWorkbench workflowScreen="tablet-create" /></TabletDeviceFrame></div>
