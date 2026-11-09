@@ -2417,7 +2417,7 @@
                 "level": "composite",
                 "status": "specified",
                 "platforms": ["desktop"],
-                "states": ["R2-06 (F4e, approved 2026-11-09, DEC-051; to build)", "opened by the Step-by-step guide text link (or a result's guide button): the dialog body becomes Step-by-step guide", "six numbered steps in accent circles: Choose Search for data · Search for your game system's data repository or collection · Open a result and copy its address (repository or .json file) · Paste it into the link field · Check the preview, then Add collection · Open it, choose game data, Install", "‹ Back and Paste a link: both return to the link field and focus it"],
+                "states": ["R2-06 (F4e, approved 2026-11-09, DEC-051; to build)", "opened by the Step-by-step guide text link (or a result's guide button): the dialog body becomes Step-by-step guide", "six numbered steps in accent circles: Choose Search for data · Search for your game system's data repository or collection · Open a result and copy its address (repository or .json file) · Paste it into the link field · Check the preview, then Add collection · Open it, choose game data, Install", "then WHICH LINK IS WHICH? (Repository, Collection, Organisation or user, accent terms) and the hint \"Found game data but no collection? Choose Install it when the app offers it. You don't need a collection to install.\", the same content as phone and tablet (one set of strings; the approved desktop frame was drawn with the steps only)", "‹ Back and Paste a link: both return to the link field and focus it"],
                 "screens": ["desktop-links-guide"]
               },
               {

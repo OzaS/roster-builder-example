@@ -27,3 +27,12 @@
 .dtl-steps b { font-weight: 600 }
 .dtl-steps small { display: block; color: var(--dt-muted); font-size: 12px }
 .dtl-step-n { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--dt-selected); color: var(--dt-accent); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums }
+
+/* Guide: the kinds of link and the no-collection hint, as on phone and tablet (one set of strings). */
+.dtl-kinds-title { margin: 14px 0 4px; color: var(--dt-muted); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase }
+.dtl-kinds { display: grid; margin: 0; font-size: 13px; line-height: 1.45 }
+.dtl-kinds > div { padding: 6px 0; border-top: 1px solid var(--dt-border) }
+.dtl-kinds > div:last-child { border-bottom: 1px solid var(--dt-border) }
+.dtl-kinds dt { display: inline; color: var(--dt-accent); font-weight: 650 }
+.dtl-kinds dd { display: inline; margin: 0; color: var(--dt-text) }
+.dtl-hint { margin: 10px 0 0; color: var(--dt-muted); font-size: 12px; line-height: 1.45 }

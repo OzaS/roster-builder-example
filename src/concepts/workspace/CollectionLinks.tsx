@@ -78,6 +78,8 @@ export const GUIDE_KINDS: Array<{ kind: string; text: string }> = [
   { kind: 'Organisation or user', text: "everyone's repositories under one GitHub name (github.com/name)." },
 ];
 export const GUIDE_NO_COLLECTION: ReactNode = <>Found game data but no collection? Tap <b>Install it</b> when the app offers it. You don't need a collection to install.</>;
+/** Desktop wording of the hint (Choose, like the desktop steps). */
+export const DESKTOP_GUIDE_NO_COLLECTION: ReactNode = <>Found game data but no collection? Choose <b>Install it</b> when the app offers it. You don't need a collection to install.</>;
 
 /**
  * The numbered step list of the guide (a primitive: Elements `links.guide-steps`, `tablet.links-guide`, `desktop.links-guide`).

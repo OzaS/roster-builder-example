@@ -4,7 +4,7 @@ import { dataChanges, githubRepositories, rosterChecks, sourceCollections, type 
 import { jobPercent, type WorkspaceJobs } from '../workspace/Jobs';
 import type { Notify } from '../workspace/Toasts';
 import { Chip, type ChipTone } from '../workspace/Primitives';
-import { DATA_REPO, DATA_SEARCH, DESKTOP_GUIDE_STEPS, EXAMPLE_SEARCH_SYSTEM, FINDING, FOUND_COLLECTION, GUIDE, GuideSteps, LINK_HELPER, LINK_LABEL, LINK_SAMPLES, NOTHING_FOUND, PASTE_LINK, SEARCH_DATA, SEVERAL, SEVERAL_COLLECTIONS, dataSearchQuery, foundIn, type FoundIn, type RepoCollection } from '../workspace/CollectionLinks';
+import { DATA_REPO, DATA_SEARCH, DESKTOP_GUIDE_STEPS, EXAMPLE_SEARCH_SYSTEM, FINDING, FOUND_COLLECTION, GUIDE, GUIDE_KINDS_TITLE, DESKTOP_GUIDE_NO_COLLECTION, GuideKinds, GuideSteps, LINK_HELPER, LINK_LABEL, LINK_SAMPLES, NOTHING_FOUND, PASTE_LINK, SEARCH_DATA, SEVERAL, SEVERAL_COLLECTIONS, dataSearchQuery, foundIn, type FoundIn, type RepoCollection } from '../workspace/CollectionLinks';
 import './desktop-sources.css';
 import './desktop-links.css';
 
@@ -602,6 +602,9 @@ export function AddCollectionDialog({ jobs, notify, go, onOpenJobs, onClose, sta
   </> : view === 'guide' ? <>
     <header><div><h2 id="dts-add-title">{GUIDE.title}</h2></div>{close}</header>
     <GuideSteps prefix="dtl" steps={DESKTOP_GUIDE_STEPS} />
+    <h3 className="dtl-kinds-title">{GUIDE_KINDS_TITLE}</h3>
+    <GuideKinds prefix="dtl" />
+    <p className="dtl-hint">{DESKTOP_GUIDE_NO_COLLECTION}</p>
     <footer>{back}<button className="dtp-btn primary" onClick={() => setView('add')}><ClipboardPaste size={14} />{PASTE_LINK}</button></footer>
   </> : <>
     <header><div><h2 id="dts-add-title">Add a collection or library</h2><p>Lists of repositories to install from</p></div>{close}</header>

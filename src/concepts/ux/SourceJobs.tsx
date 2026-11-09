@@ -1269,7 +1269,7 @@ export function AddCollectionSheet({ state, inline = false }: { state: AddSheetS
   const canAdd = view === "found" || view === "library" || view === "repo-found";
   const needLink = view === "idle" || view === "invalid" || view === "duplicate";
   const close = <button type="button" className="ux-icon-btn" aria-label="Close"><X size={17} /></button>;
-  const pageHead = (title: string) => <header className="ux-job-head ux-links-head"><button type="button" className="ux-links-back" onClick={() => setPage("add")}><ArrowLeft size={16} />Back</button><strong>{title}</strong>{close}</header>;
+  const pageHead = (title: string) => <header className="ux-job-head ux-links-head"><button type="button" className="ux-links-back" onClick={() => setPage("add")}><ArrowLeft size={16} />Back</button><strong>{title}</strong><span aria-hidden="true" /></header>;
   const body = page === "search" ? (
     <>
       {pageHead(DATA_SEARCH.title)}
