@@ -4,6 +4,7 @@ import { dataChanges, githubRepositories, rosterChecks, sourceCollections, type 
 import { jobPercent, type WorkspaceJobs } from '../workspace/Jobs';
 import type { Notify } from '../workspace/Toasts';
 import { Chip, type ChipTone } from '../workspace/Primitives';
+import { EXAMPLE_SEARCH_SYSTEM, FOUND_COLLECTION, LINK_SAMPLES, SEVERAL_COLLECTIONS, type FoundIn, type RepoCollection } from '../workspace/CollectionLinks';
 import './desktop-sources.css';
 
 // Sources sub-flows for the desktop prototype (revision 05), all inside the Sources page's detail pane:
@@ -435,27 +436,92 @@ export function GitHubSearchView({ jobs, go, onOpenJobs }: { jobs: WorkspaceJobs
 
 /* ------------------------- Add a collection dialog ------------------------- */
 
-export type AddPhase = { kind: 'idle' } | { kind: 'finding' } | { kind: 'found'; saved: Saved; page: CollectionPage } | { kind: 'error'; text: string } | { kind: 'repository'; repo: string };
+/**
+ * What Find shows. R2-06 (F4e, approved 2026-11-09): a repository link is looked up for its collection file: `found` with
+ * `from` (one collection, saved as the raw file link on that branch), `several` (choose one, then preview), `repository`
+ * (game data, no collection: Install it) or `nothing` (no collection or game data). `finding.repo` = the repository lookup.
+ */
+export type AddPhase = { kind: 'idle' } | { kind: 'finding'; repo?: boolean } | { kind: 'found'; saved: Saved; page: CollectionPage; from?: FoundIn; sources?: number } | { kind: 'error'; text: string }
+  | { kind: 'repository'; repo: string } | { kind: 'several'; repo: string; branch: string; options: RepoCollection[] } | { kind: 'nothing'; repo: string };
 
-/** What a pasted link is: a collection file, a GitHub organisation or user, a repository, or nothing usable. */
+const knownLink = (link: string) => link === sourceCollections.default.link || flowStore.saved.some(s => s.link === link);
+
+/** One collection file of a repository: the preview, or Already added when its file link is saved (the same collection key). */
+export function repoCollection(repo: string, c: RepoCollection, branch = 'main', description?: string): AddPhase {
+  const link = `https://raw.githubusercontent.com/${repo}/${branch}/${c.file}`;
+  if (knownLink(link)) return { kind: 'error', text: 'This collection is already in your list.' };
+  const base = sourceCollections['community-picks'];
+  return { kind: 'found', saved: { id: `saved-${c.file.replace(/\.json$/i, '').toLowerCase()}`, name: c.name, kind: 'collection', link }, page: { ...base, by: FOUND_COLLECTION.by, description: description ?? base.description }, from: { repo, file: c.file, branch }, sources: c.sources };
+}
+
+/** The gallery's repository lookup (placeholders, DEC-001): what the repository root holds. */
+function readRepository(repo: string, branch?: string): AddPhase {
+  const r = repo.toLowerCase();
+  if (r === FOUND_COLLECTION.from.repo) return repoCollection(repo, { name: FOUND_COLLECTION.name, file: FOUND_COLLECTION.from.file, sources: FOUND_COLLECTION.sources }, branch ?? FOUND_COLLECTION.from.branch, FOUND_COLLECTION.description);
+  if (`github.com/${r}` === LINK_SAMPLES.several) return { kind: 'several', repo, branch: branch ?? 'main', options: SEVERAL_COLLECTIONS };
+  if (`github.com/${r}` === LINK_SAMPLES.nothing) return { kind: 'nothing', repo };
+  return { kind: 'repository', repo };
+}
+
+/** What a pasted link is: a collection file, a GitHub organisation or user, a repository (looked up), or nothing usable. */
 export function readLink(raw: string): AddPhase {
   const path = raw.trim().replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/\/+$/, '');
-  const known = (link: string) => link === sourceCollections.default.link || flowStore.saved.some(s => s.link === link);
   if (/\.json$/i.test(path)) {
     const link = `https://${path}`;
-    if (known(link)) return { kind: 'error', text: 'This collection is already in your list.' };
+    if (knownLink(link)) return { kind: 'error', text: 'This collection is already in your list.' };
     const file = path.split('/').pop()!.replace(/\.json$/i, '');
     return { kind: 'found', saved: { id: `saved-${file.toLowerCase()}`, name: titleCase(file), kind: 'collection', link }, page: sourceCollections['community-picks'] };
   }
-  const github = path.match(/^github\.com\/([\w.-]+)(?:\/([\w.-]+))?/i);
-  if (github?.[2]) return { kind: 'repository', repo: `${github[1]}/${github[2]}` };
+  const github = path.match(/^github\.com\/([\w.-]+)(?:\/([\w.-]+))?(?:\/tree\/([\w.\/-]+))?/i);
+  if (github?.[2]) return readRepository(`${github[1]}/${github[2]}`, github[3]);
   if (github) {
     const link = `https://github.com/${github[1]}`;
-    if (known(link)) return { kind: 'error', text: 'This library is already in your list.' };
+    if (knownLink(link)) return { kind: 'error', text: 'This library is already in your list.' };
     return { kind: 'found', saved: { id: `saved-${github[1].toLowerCase()}`, name: github[1] === 'example' ? 'Example Data Org' : github[1], kind: 'library', link }, page: sourceCollections['example-org'] };
   }
-  if (/^[\w-]+\/[\w.-]+$/.test(path)) return { kind: 'repository', repo: path };
+  if (/^[\w-]+\/[\w.-]+$/.test(path)) return readRepository(path);
   return { kind: 'error', text: 'That link does not lead to a collection file or a GitHub organisation.' };
+}
+
+const isRepoLink = (raw: string) => { const path = raw.trim().replace(/^https?:\/\//i, '').replace(/^www\./i, ''); return !/\.json$/i.test(path) && (/^github\.com\/[\w.-]+\/[\w.-]+/i.test(path) || /^[\w-]+\/[\w.-]+\/?$/.test(path)); };
+
+/** R2-06: the dialog's / sheet's view (the link field, or Search for data / the guide in its place, each with Back). */
+export type LinksView = 'add' | 'search' | 'guide';
+/** R2-06 gallery screens: `<prefix>links-<start>` opens the add flow at that state. */
+export function linksStart(start?: string): { value: string; phase: AddPhase; view: LinksView; system: string } {
+  const at = (value: string) => ({ value, phase: readLink(value), view: 'add' as LinksView, system: '' });
+  if (start === 'repo-found') return at(LINK_SAMPLES.found);
+  if (start === 'repo-several') return at(LINK_SAMPLES.several);
+  if (start === 'data-repo') return at(LINK_SAMPLES.dataRepo);
+  if (start === 'nothing-found') return at(LINK_SAMPLES.nothing);
+  if (start === 'search-data') return { value: '', phase: { kind: 'idle' }, view: 'search', system: EXAMPLE_SEARCH_SYSTEM };
+  if (start === 'guide') return { value: '', phase: { kind: 'idle' }, view: 'guide', system: '' };
+  return { value: '', phase: { kind: 'idle' }, view: 'add', system: '' };
+}
+
+/** Find: parse errors show at once; a lookup (a repository, a collection or an organisation) shows finding first. */
+export function useLinkFind(start?: string) {
+  const initial = linksStart(start);
+  const [value, setValue] = useState(initial.value);
+  const [phase, setPhase] = useState<AddPhase>(initial.phase);
+  const [view, setView] = useState<LinksView>(initial.view);
+  const [system, setSystem] = useState(initial.system);
+  const [chosen, setChosen] = useState(0);
+  const timer = useRef(0);
+  useEffect(() => () => clearTimeout(timer.current), []);
+  const find = (link = value, offline = false) => {
+    clearTimeout(timer.current);
+    if (!link.trim()) return;
+    const next = readLink(link);
+    if (next.kind === 'error' && !offline) return setPhase(next);
+    setPhase({ kind: 'finding', repo: isRepoLink(link) });
+    setChosen(0);
+    timer.current = window.setTimeout(() => setPhase(offline ? { kind: 'error', text: 'GitHub did not answer. Check the connection and try again.' } : next), 650);
+  };
+  const edit = (next: string) => { setValue(next); clearTimeout(timer.current); setPhase({ kind: 'idle' }); };
+  const preview = (link: string, offline = false) => { setValue(link); find(link, offline); };
+  const previewChosen = () => { if (phase.kind === 'several') setPhase(repoCollection(phase.repo, phase.options[chosen], phase.branch)); };
+  return { value, edit, phase, find, preview, view, setView, system, setSystem, chosen, setChosen, previewChosen };
 }
 
 /** Focus moves into the dialog, Tab stays inside, Escape closes, focus returns to the opener. */

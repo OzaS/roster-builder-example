@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, type FocusEvent, type ReactNode } from 'react';
+import { ChevronLeft } from 'lucide-react';
 import './tablet-sheet.css';
 
 // The tablet form sheet (plan: "Creation and other dialogs"): the desktop dialog layout with the mobile controls inside.
@@ -10,13 +11,15 @@ import './tablet-sheet.css';
 
 export type SheetAction = { label: string; onClick: () => void; disabled?: boolean; icon?: ReactNode; destructive?: boolean };
 
-export function TabletSheet({ title, sub, action, cancelLabel = 'Cancel', wide = false, onClose, children }: {
+export function TabletSheet({ title, sub, action, cancelLabel = 'Cancel', wide = false, onBack, onClose, children }: {
   title: string; sub?: ReactNode;
   /** The primary action of the header (right). Enter in a single-line field runs it too. */
   action?: SheetAction;
   cancelLabel?: string;
   /** Roomier variant for two-column content such as the export preview. */
   wide?: boolean;
+  /** A page pushed inside the sheet (R2-06): the left button reads ‹ Back and returns; Escape and the scrim still close. */
+  onBack?: () => void;
   onClose: () => void; children: ReactNode;
 }) {
   const ref = useRef<HTMLFormElement>(null);
@@ -42,7 +45,7 @@ export function TabletSheet({ title, sub, action, cancelLabel = 'Cancel', wide =
     <form ref={ref} className={`tbs-sheet ${wide ? 'wide' : ''}`} role="dialog" aria-modal="true" aria-labelledby={titleId} onClick={e => e.stopPropagation()} onFocus={reveal}
       onSubmit={e => { e.preventDefault(); if (action && !action.disabled) action.onClick(); }}>
       <header className="tbs-head">
-        <button type="button" className="tbs-cancel" onClick={onClose}>{cancelLabel}</button>
+        {onBack ? <button type="button" className="tbs-cancel tbs-back" onClick={onBack}><ChevronLeft size={20} aria-hidden="true" />Back</button> : <button type="button" className="tbs-cancel" onClick={onClose}>{cancelLabel}</button>}
         <span className="tbs-title"><strong id={titleId}>{title}</strong>{sub && <small>{sub}</small>}</span>
         {action ? <button type="submit" className={`tbs-primary ${action.destructive ? 'destructive' : ''}`} disabled={action.disabled}>{action.icon}{action.label}</button> : <span />}
       </header>
