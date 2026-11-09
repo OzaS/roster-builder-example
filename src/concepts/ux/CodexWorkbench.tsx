@@ -209,7 +209,7 @@ export function CodexWorkbench(props: ConceptProps) {
   } else if (screen === "sources") {
     body = <SourcesManageScreen props={props} />;
   } else if (screen === "add-source") {
-    body = <AddGameDataScreen props={props} />;
+    body = <AddGameDataScreen key={props.workflowScreen ?? "add-source"} props={props} />;
   } else if (screen === "install-job") {
     body = <InstallJobScreen props={props} />;
   } else if (screen === "source-detail") {

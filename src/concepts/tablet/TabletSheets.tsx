@@ -1,14 +1,16 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { AlertTriangle, ArrowDownToLine, Check, CheckCircle2, Github, Info, Layers3, LibraryBig, LoaderCircle, Lock, Search, Trash2, Upload } from 'lucide-react';
+import { AlertTriangle, ArrowDownToLine, ArrowUpRight, Check, CheckCircle2, ChevronRight, CircleHelp, ClipboardPaste, Info, Layers3, LibraryBig, LoaderCircle, Lock, OctagonAlert, Search, Trash2, Upload } from 'lucide-react';
 import { AppDialog } from '../ux/SourceJobs';
 import { FORCE_TYPES, type EditorUnit, type Force } from '../desktop/DesktopEditorFlows';
-import { flowStore, readLink, setFlowStore, titleCase, type AddPhase } from '../desktop/DesktopSourceFlows';
+import { flowStore, setFlowStore, titleCase, useLinkFind } from '../desktop/DesktopSourceFlows';
+import { DATA_REPO, DATA_SEARCH, FINDING, GUIDE, GUIDE_KINDS_TITLE, GUIDE_NO_COLLECTION, GuideKinds, GuideSteps, LINK_HELPER, LINK_LABEL, LINK_SAMPLES, NEED_LINK, NOTHING_FOUND, PASTE_LINK, SEARCH_DATA, SEVERAL, TOUCH_GUIDE_STEPS, dataSearchQuery, foundIn } from '../workspace/CollectionLinks';
 import { githubRepositories, sourceCollections } from '../desktop/desktopData';
 import { reinstallTitle, type Job, type WorkspaceJobs } from '../workspace/Jobs';
 import type { Notify } from '../workspace/Toasts';
 import { TabletSheet } from './TabletSheet';
 import type { AppearanceImport, AppearanceOutcome, TabletSession } from './tabletSession';
 import './tablet-dialogs.css';
+import './tablet-links.css';
 
 // The tablet's other form sheets (T3). They cover the whole window (rail included) and work at both tablet widths and in
 // split view (TabletSheet): the install's faction picker, add a collection, appearance imports, move unit and a generic
@@ -73,21 +75,24 @@ function ReinstallConfirm({ job, onConfirm, onClose }: { job: Job; onConfirm: ()
 
 /* ---------------------------------------------------------------- Add a collection */
 
-/** Paste a collection file link or a GitHub organisation, check what it is, then add it. A repository link offers to install it instead. */
-function AddCollectionSheet({ jobs, notify, go, onOpenJobs, onClose }: { jobs: WorkspaceJobs; notify: Notify; go: (detail: string) => void; onOpenJobs: () => void; onClose: () => void }) {
-  const [value, setValue] = useState('');
-  const [phase, setPhase] = useState<AddPhase>({ kind: 'idle' });
-  const timer = useRef(0);
-  useEffect(() => () => clearTimeout(timer.current), []);
-  const find = (link = value, offline = false) => {
-    clearTimeout(timer.current);
-    if (!link.trim()) return;
-    const next = readLink(link);
-    if (next.kind !== 'found' && !offline) return setPhase(next);
-    setPhase({ kind: 'finding' });
-    timer.current = window.setTimeout(() => setPhase(offline ? { kind: 'error', text: 'GitHub did not answer. Check the connection and try again.' } : next), 650);
-  };
-  const preview = (link: string, offline = false) => { setValue(link); find(link, offline); };
+/**
+ * Paste a repository, a collection file link or a GitHub organisation, check what it is, then add it. R2-06 (F4e, approved
+ * 2026-11-09): a repository link is looked up for its collection file (one: preview with Found in …; several: choose one,
+ * then Preview; game data: Install it; nothing: Search for data / Guide). Need a link? pushes Search for data or the
+ * Step-by-step guide inside the sheet (‹ Back keeps the field text). `start` opens a gallery state (`links-<start>`).
+ */
+function AddCollectionSheet({ jobs, notify, go, onOpenJobs, onClose, start }: { jobs: WorkspaceJobs; notify: Notify; go: (detail: string) => void; onOpenJobs: () => void; onClose: () => void; start?: string }) {
+  const { value, edit, phase, find, preview, view, setView, system, setSystem, chosen, setChosen, previewChosen } = useLinkFind(start);
+  const [focusField, setFocusField] = useState(false);
+  const anchor = useRef<HTMLSpanElement>(null);
+  const mark = <span ref={anchor} hidden />;
+  useEffect(() => {
+    // A pushed page moves focus to its first control; Back and Paste a link return it to the link field.
+    if (view === 'add' && !focusField) return;
+    anchor.current?.closest('.tbs-sheet')?.querySelector<HTMLElement>('[data-autofocus]')?.focus({ preventScroll: true });
+    setFocusField(false);
+  }, [view]); // eslint-disable-line react-hooks/exhaustive-deps
+  const back = () => { setView('add'); setFocusField(true); };
   const add = () => {
     if (phase.kind !== 'found') return;
     setFlowStore({ saved: [...flowStore.saved, phase.saved] });
@@ -103,29 +108,72 @@ function AddCollectionSheet({ jobs, notify, go, onOpenJobs, onClose }: { jobs: W
     jobs.startInstall({ id, name, factions: known?.factions ?? ['Wardens', 'Wayfarers'], size: known?.size ?? '3.4 MB' });
     onOpenJobs();
   };
+  if (view === 'search') return <TabletSheet title={DATA_SEARCH.title} onBack={back} onClose={onClose}>
+    {mark}
+    <div className="tbs-field">
+      <label htmlFor="tbl-system">{DATA_SEARCH.system}</label>
+      <input id="tbl-system" data-autofocus type="search" autoCapitalize="words" autoComplete="off" value={system} aria-describedby="tbl-system-help" onChange={e => setSystem(e.target.value)} />
+      <small id="tbl-system-help">{DATA_SEARCH.systemHelp}</small>
+    </div>
+    <button type="button" className="tbs-action tbl-primary" onClick={() => notify('Opens Google in your browser')}>{DATA_SEARCH.open}<ArrowUpRight size={17} aria-label="(opens in your browser)" /></button>
+    <code className="tbl-query" aria-label="Search query">{dataSearchQuery(system)}</code>
+    <p className="tbs-hint">{DATA_SEARCH.note}</p>
+  </TabletSheet>;
+  if (view === 'guide') return <TabletSheet title={GUIDE.short} onBack={back} onClose={onClose}>
+    {mark}
+    <GuideSteps prefix="tbl" steps={TOUCH_GUIDE_STEPS} action={<button type="button" className="tbs-action" data-autofocus onClick={() => setView('search')}><Search size={16} />{SEARCH_DATA.title}</button>} />
+    <h3 className="tbs-label">{GUIDE_KINDS_TITLE}</h3>
+    <GuideKinds prefix="tbl" />
+    <p className="tbs-hint tbl-hint">{GUIDE_NO_COLLECTION}</p>
+    <button type="button" className="tbs-action tbl-primary" onClick={back}><ClipboardPaste size={17} />{PASTE_LINK}</button>
+  </TabletSheet>;
   const error = phase.kind === 'error' ? phase.text : '';
   const finding = phase.kind === 'finding';
+  const needLink = phase.kind === 'idle' || phase.kind === 'error';
   return <TabletSheet title="Add a collection or library" sub="Lists of repositories to install from" onClose={onClose} action={{ label: 'Add collection', disabled: phase.kind !== 'found', onClick: add }}>
+    {mark}
     <div className="tbs-field">
-      <label htmlFor="tbd-add-link">Collection or library link</label>
+      <label htmlFor="tbd-add-link">{LINK_LABEL}</label>
       <div className="tbd-find">
         <input id="tbd-add-link" data-autofocus type="url" inputMode="url" autoCapitalize="off" autoCorrect="off" spellCheck={false} autoComplete="off" placeholder="https://… or github.com/name" value={value} aria-invalid={!!error} aria-describedby="tbd-add-help"
-          onChange={e => { setValue(e.target.value); clearTimeout(timer.current); setPhase({ kind: 'idle' }); }} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); find(); } }} />
-        <button type="button" className="tbs-action" disabled={!value.trim() || finding} onClick={() => find()}>{finding ? <><LoaderCircle size={16} className="dt-spin" />Finding…</> : <><Search size={16} />Find</>}</button>
+          onChange={e => edit(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); find(); } }} />
+        <button type="button" className="tbs-action" disabled={!value.trim() || finding} aria-busy={finding || undefined} onClick={() => find()}>{finding ? <><LoaderCircle size={16} className="dt-spin" />{phase.repo ? FINDING : 'Finding…'}</> : <><Search size={16} />Find</>}</button>
       </div>
-      <small id="tbd-add-help" className={error ? 'tbc-error' : ''} role={error ? 'alert' : undefined}>{error || 'A collection file (.json) or a GitHub organisation or user (github.com/name).'}</small>
+      <small id="tbd-add-help" className={error ? 'tbc-error' : ''} role={error ? 'alert' : undefined}>{error || LINK_HELPER}</small>
     </div>
     {phase.kind === 'found' && <div className="tbs-note ok" role="status">{phase.saved.kind === 'library' ? <LibraryBig size={20} /> : <Layers3 size={20} />}
-      <span><strong>{phase.saved.name}</strong><small>{phase.saved.kind === 'library' ? `GitHub organisation · ${plural(phase.page.listings.length, 'repository', 'repositories')}` : `Collection · by ${phase.page.by} · ${plural(phase.page.listings.length, 'source')}`}</small><small>{phase.page.description}</small></span></div>}
-    {phase.kind === 'repository' && <div className="tbs-note" role="status"><Github size={20} />
-      <span><strong>That is a repository, not a collection</strong><small>{phase.repo} · Install it directly instead.</small><button type="button" className="tbs-action tbd-inline" onClick={installIt}><ArrowDownToLine size={16} />Install it</button></span></div>}
+      <span><strong>{phase.saved.name}</strong><small>{phase.saved.kind === 'library' ? `GitHub organisation · ${plural(phase.page.listings.length, 'repository', 'repositories')}` : `Collection · by ${phase.page.by} · ${plural(phase.sources ?? phase.page.listings.length, 'source')}`}</small><small>{phase.page.description}</small>
+        {phase.from && <small className="tbl-from">{foundIn(phase.from)}</small>}</span></div>}
+    {phase.kind === 'several' && <>
+      <div className="tbs-note" role="status"><Info size={20} /><span><strong>{SEVERAL.title(phase.options.length)}</strong><small>{SEVERAL.body}</small></span></div>
+      <div className="tbs-choices" role="radiogroup" aria-label="Collections in this repository">{phase.options.map((c, i) =>
+        <button type="button" role="radio" key={c.file} aria-checked={chosen === i} className={`tbs-choice ${chosen === i ? 'active' : ''}`} onClick={() => setChosen(i)}>
+          <span><strong>{c.name}</strong><small>{c.file} · {plural(c.sources, 'source')}</small></span>{chosen === i && <Check size={20} />}</button>)}</div>
+      <button type="button" className="tbs-action" onClick={previewChosen}>{SEVERAL.preview}</button>
+    </>}
+    {phase.kind === 'repository' && <>
+      <div className="tbs-note" role="status"><Info size={20} /><span><strong>{DATA_REPO.title}</strong><small>{DATA_REPO.body}</small></span></div>
+      <div className="tbl-actions"><button type="button" className="tbs-action tbl-primary" onClick={installIt}><ArrowDownToLine size={16} />{DATA_REPO.install}</button><button type="button" className="tbs-action" onClick={() => setView('guide')}><CircleHelp size={16} />{GUIDE.title}</button></div>
+    </>}
+    {phase.kind === 'nothing' && <>
+      <div className="tbs-note tbl-error" role="alert"><OctagonAlert size={20} /><span><strong>{NOTHING_FOUND.title}</strong><small>{NOTHING_FOUND.body}</small></span></div>
+      <div className="tbl-actions"><button type="button" className="tbs-action" onClick={() => setView('search')}><Search size={16} />{SEARCH_DATA.title}</button><button type="button" className="tbs-action" onClick={() => setView('guide')}><CircleHelp size={16} />{GUIDE.short}</button></div>
+    </>}
+    {needLink && <>
+      <h3 className="tbs-label tbl-need">{NEED_LINK}</h3>
+      <div className="tbs-choices">
+        <button type="button" className="tbs-choice" onClick={() => setView('search')}><Search size={20} /><span><strong>{SEARCH_DATA.title}</strong><small>{SEARCH_DATA.sub}</small></span><ChevronRight size={18} /></button>
+        <button type="button" className="tbs-choice" onClick={() => setView('guide')}><CircleHelp size={20} /><span><strong>{GUIDE.title}</strong><small>{GUIDE.sub}</small></span><ChevronRight size={18} /></button>
+      </div>
+    </>}
     <p className="tbs-hint">Collections only list repositories. Nothing is downloaded until you install.</p>
-    <details className="tbd-preview"><summary>Preview states · gallery controls</summary>
+    {!start && <details className="tbd-preview"><summary>Preview states · gallery controls</summary>
       <div className="tbd-preview-row">{([
         ['Collection link', () => preview('https://example.org/community-picks.json')], ['Library', () => preview('github.com/example')], ['Repository', () => preview('github.com/example-user/field-notes')],
         ['Already added', () => preview(sourceCollections.default.link)], ['Not a collection', () => preview('example.org/readme')], ['No connection', () => preview(value.trim() || 'github.com/example', true)],
+        ['Repository · one collection', () => preview(LINK_SAMPLES.found)], ['Repository · several', () => preview(LINK_SAMPLES.several)], ['Repository · nothing found', () => preview(LINK_SAMPLES.nothing)],
       ] as Array<[string, () => void]>).map(([label, run]) => <button type="button" key={label} className="tbs-action" onClick={run}>{label}</button>)}</div>
-    </details>
+    </details>}
   </TabletSheet>;
 }
 
@@ -193,7 +241,7 @@ export function TabletSessionSheets({ session, notify }: { session: TabletSessio
     {picking?.reinstall && <ReinstallSheet job={picking} onCancel={() => { setPickerJob(null); jobs.cancel(picking.id); }} onReinstall={() => setReinstalling(picking.id)} />}
     {confirming && <ReinstallConfirm job={confirming} onClose={() => setReinstalling(null)} onConfirm={() => { setReinstalling(null); setPickerJob(null); jobs.reinstall(confirming.id); setJobsOpen(true); }} />}
     {picking && !picking.reinstall && <FactionPickerSheet job={picking} onLater={() => setPickerJob(null)} onCancelInstall={() => { setPickerJob(null); jobs.cancel(picking.id); }} onChoose={chosen => { setPickerJob(null); jobs.chooseFactions(picking.id, chosen); }} />}
-    {session.addCollectionOpen && <AddCollectionSheet jobs={jobs} notify={notify} go={setSourceDetail} onOpenJobs={() => setJobsOpen(true)} onClose={() => setAddCollectionOpen(false)} />}
+    {session.addCollectionOpen && <AddCollectionSheet jobs={jobs} notify={notify} go={setSourceDetail} onOpenJobs={() => setJobsOpen(true)} onClose={() => setAddCollectionOpen(false)} start={session.state.startsWith('links-') ? session.state.slice(6) : undefined} />}
     {appearanceImport && <AppearanceImportSheet value={appearanceImport} onChange={setAppearanceImport} onClose={() => setAppearanceImport(null)}
       onImported={kind => { if (kind === 'language') setLanguage('fr'); notify(kind === 'language' ? 'Language pack imported: Français' : 'Colour scheme imported: Slate'); }} />}
     {doomed && <ConfirmSheet title="Delete roster?" sub={doomed.name} headline="This roster will be deleted" destructive confirmLabel="Delete roster" text="It is removed from this device. You can undo for a few seconds; after that it is gone for good. Game data is not affected."

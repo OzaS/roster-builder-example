@@ -51,6 +51,14 @@ const stateRoutes: Record<string, TabletRoute> = {
   'tablet-sources-github': { page: 'sources', state: 'github' },
   'tablet-sources-add-collection': { page: 'sources', state: 'add-collection' },
   'tablet-sources-reinstall': { page: 'sources', state: 'reinstall' },
+  // R2-06 (F4e): the Add collection sheet in a Collection links state (`?tablet=links-add-idle`, …).
+  'tablet-links-add-idle': { page: 'sources', state: 'links-add-idle' },
+  'tablet-links-repo-found': { page: 'sources', state: 'links-repo-found' },
+  'tablet-links-repo-several': { page: 'sources', state: 'links-repo-several' },
+  'tablet-links-data-repo': { page: 'sources', state: 'links-data-repo' },
+  'tablet-links-nothing-found': { page: 'sources', state: 'links-nothing-found' },
+  'tablet-links-search-data': { page: 'sources', state: 'links-search-data' },
+  'tablet-links-guide': { page: 'sources', state: 'links-guide' },
   'tablet-settings-rosters': { page: 'settings', state: 'rosters' },
   'tablet-settings-game-data': { page: 'settings', state: 'game-data' },
   'tablet-settings-shortcuts': { page: 'settings', state: 'keys' },
@@ -75,7 +83,7 @@ export function tabletRoute(screen: string | undefined): TabletRoute | undefined
   return isTabletPage(page) ? { page, state: '' } : undefined;
 }
 
-const sourceDetailOf: Record<string, string> = { add: 'add', installing: 'add', 'choose-factions': 'add', 'update-report': 'report:system-two', collection: 'collection:default', github: 'github', 'add-collection': 'add', reinstall: 'add' };
+const sourceDetailOf: Record<string, string> = { add: 'add', installing: 'add', 'choose-factions': 'add', 'update-report': 'report:system-two', collection: 'collection:default', github: 'github', 'add-collection': 'add', reinstall: 'add', ...Object.fromEntries(['add-idle', 'repo-found', 'repo-several', 'data-repo', 'nothing-found', 'search-data', 'guide'].map(x => [`links-${x}`, 'add'])) };
 const settingsSectionOf: Record<string, string> = { rosters: 'rosters', 'game-data': 'data', keys: 'keys', 'appearance-import': 'appearance', advanced: 'advanced', 'about-developer': 'about', developer: 'developer', debug: 'debug' };
 /** The first install of the 'installing' and 'choose-factions' states: a source with six factions. */
 const demoInstall = collectionSources[2];
@@ -109,7 +117,7 @@ export function useTabletSession({ route, notify, light, onViewSource }: { route
   const asked = useRef(new Set<string>());
   const waiting = jobs.jobs.find(j => j.status === 'needs-you')?.id;
   useEffect(() => { if (waiting && !asked.current.has(waiting)) { asked.current.add(waiting); setPickerJob(waiting); } }, [waiting]);
-  const [addCollectionOpen, setAddCollectionOpen] = useState(state === 'add-collection');
+  const [addCollectionOpen, setAddCollectionOpen] = useState(state === 'add-collection' || state.startsWith('links-'));
   /** DEC-060: the job whose Reinstall this version waits for the confirm dialog. */
   const [reinstalling, setReinstalling] = useState<string | null>(null);
   const [appearanceImport, setAppearanceImport] = useState<AppearanceImport | null>(state === 'appearance-import' ? { kind: 'scheme', outcome: 'scheme' } : null);

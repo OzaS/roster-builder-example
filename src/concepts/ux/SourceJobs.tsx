@@ -1,8 +1,10 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
-import { Archive, ArrowDownToLine, ArrowLeft, Bell, Check, ChevronDown, ChevronRight, Circle, CircleArrowUp, CircleCheck, Clock, Copy, Database, Download, Ellipsis, FileArchive, FileInput, FileText, FolderGit2, FolderOpen, Globe, Hand, History, Info, Library, ListChecks, LoaderCircle, Lock, Minus, OctagonAlert, Plus, RefreshCw, Search, Star, Trash2, TextCursorInput, TriangleAlert, Ungroup, Upload, Wifi, X } from "lucide-react";
+import { Archive, ArrowDownToLine, ArrowLeft, ArrowUpRight, Bell, Check, ChevronDown, ChevronRight, Circle, CircleArrowUp, CircleCheck, CircleHelp, ClipboardPaste, Clock, Copy, Database, Download, Ellipsis, FileArchive, FileInput, FileText, FolderGit2, FolderOpen, Globe, Hand, History, Info, Library, ListChecks, LoaderCircle, Lock, Minus, OctagonAlert, Plus, RefreshCw, Search, Star, Trash2, TextCursorInput, TriangleAlert, Ungroup, Upload, Wifi, X } from "lucide-react";
 import type { ConceptProps } from "../shared";
 import { Chip } from "./uxShared";
 import { ExportActions, STORED_PRINT_ROWS } from "./PhoneExport";
+import { DATA_REPO, DATA_SEARCH, EXAMPLE_SEARCH_SYSTEM, FINDING, FOUND_COLLECTION, GUIDE, GUIDE_KINDS_TITLE, GUIDE_NO_COLLECTION, GuideKinds, GuideSteps, LINK_HELPER, LINK_LABEL, LINK_SAMPLES, NEED_LINK, NOTHING_FOUND, PASTE_LINK, SEARCH_DATA, SEVERAL, SEVERAL_COLLECTIONS, TOUCH_GUIDE_STEPS, dataSearchQuery, foundIn, type RepoCollection } from "../workspace/CollectionLinks";
+import "./phone-links.css";
 
 /*
  * Source data and background jobs (Battle Augur plan 2D, DEC-022/023).
@@ -1225,56 +1227,164 @@ export function ShowDefaultCollectionRow({ onShow }: { onShow?: () => void }) {
   return <button type="button" className="ux-col-nav quiet" onClick={onShow}><Library size={17} /><span><strong>Show the default collection</strong><small>You hid it. It lists sources tested with this app.</small></span></button>;
 }
 
-type AddSheetState = "idle" | "found" | "library" | "invalid" | "duplicate" | "repository";
+/**
+ * R2-06 (F4e, approved 2026-11-09): a pasted repository link is searched for its collection file. `repo-found` (one
+ * collection, saved as the file link), `repo-several` (choose one, then Preview), `repository` (game data, no collection:
+ * Install it), `nothing` (no collection or game data) and `finding` (the lookup). `search` and `guide` are the pages pushed
+ * inside the sheet (Back returns to the link field with the text kept).
+ */
+export type AddSheetState = "idle" | "found" | "library" | "invalid" | "duplicate" | "repository" | "repo-found" | "repo-several" | "nothing" | "finding" | "search" | "guide";
+type AddSheetPage = "add" | "search" | "guide";
+
+const ADD_SHEET_VALUE: Record<AddSheetState, string> = {
+  idle: "", search: "", guide: "", invalid: "example.com/notes.txt", library: "github.com/club-org", found: "github.com/club-org/club-picks/blob/main/collection.json", duplicate: "github.com/club-org/club-picks/blob/main/collection.json",
+  repository: LINK_SAMPLES.dataRepo, "repo-found": LINK_SAMPLES.found, finding: LINK_SAMPLES.found, "repo-several": LINK_SAMPLES.several, nothing: LINK_SAMPLES.nothing,
+};
+
+/** R2-06 (F4e): the Need a link? group under Find: Search for data and Step-by-step guide, each pushing its page in the sheet. */
+export function NeedLinkRows({ onSearch, onGuide }: { onSearch?: () => void; onGuide?: () => void }) {
+  return (
+    <>
+      <div className="ux-result-label ux-links-need" role="heading" aria-level={3}>{NEED_LINK}</div>
+      <div className="ux-src-group">
+        <button type="button" className="ux-col-nav" onClick={onSearch}><Search size={17} /><span><strong>{SEARCH_DATA.title}</strong><small>{SEARCH_DATA.sub}</small></span><ChevronRight size={16} /></button>
+        <button type="button" className="ux-col-nav" onClick={onGuide}><CircleHelp size={17} /><span><strong>{GUIDE.title}</strong><small>{GUIDE.sub}</small></span><ChevronRight size={16} /></button>
+      </div>
+    </>
+  );
+}
 
 export function AddCollectionSheet({ state, inline = false }: { state: AddSheetState; inline?: boolean }) {
-  const value = state === "idle" ? "" : state === "repository" ? "github.com/example-org/example-system-six" : state === "invalid" ? "example.com/notes.txt" : state === "library" ? "github.com/club-org" : "github.com/club-org/club-picks/blob/main/collection.json";
-  const error = state === "invalid" ? "That link does not lead to a collection file or a GitHub organisation." : state === "duplicate" ? "This collection is already in your list." : undefined;
-  const sheet = (
-    <section className={`ux-job-sheet ${inline ? "inline" : ""}`} role="dialog" aria-label="Add a collection or library">
-      <span className="ux-sheet-grip" aria-hidden />
-      <header className="ux-job-head"><span><strong>Add a collection or library</strong><small>Lists of repositories to install from</small></span><button type="button" className="ux-icon-btn" aria-label="Close"><X size={17} /></button></header>
+  const [page, setPage] = useState<AddSheetPage>(state === "search" || state === "guide" ? state : "add");
+  const [view, setView] = useState<AddSheetState>(state === "search" || state === "guide" ? "idle" : state);
+  const [value, setValue] = useState(ADD_SHEET_VALUE[state]);
+  const [chosen, setChosen] = useState(0);
+  const [picked, setPicked] = useState<RepoCollection | null>(null);
+  const [system, setSystem] = useState(state === "search" ? EXAMPLE_SEARCH_SYSTEM : "");
+  const field = useRef<HTMLInputElement>(null);
+  const [focusField, setFocusField] = useState(false);
+  useEffect(() => { if (page === "add" && focusField) { field.current?.focus(); setFocusField(false); } }, [page, focusField]);
+  const error = view === "invalid" ? "That link does not lead to a collection file or a GitHub organisation." : view === "duplicate" ? "This collection is already in your list." : undefined;
+  const found = view === "repo-found" ? (picked ? { name: picked.name, sub: `Collection · by ${FOUND_COLLECTION.by} · ${picked.sources} sources`, description: undefined, from: { repo: LINK_SAMPLES.several.replace("github.com/", ""), file: picked.file, branch: "main" } } : { name: FOUND_COLLECTION.name, sub: `Collection · by ${FOUND_COLLECTION.by} · ${FOUND_COLLECTION.sources} sources`, description: FOUND_COLLECTION.description, from: FOUND_COLLECTION.from }) : null;
+  const canAdd = view === "found" || view === "library" || view === "repo-found";
+  const needLink = view === "idle" || view === "invalid" || view === "duplicate";
+  const close = <button type="button" className="ux-icon-btn" aria-label="Close"><X size={17} /></button>;
+  const pageHead = (title: string) => <header className="ux-job-head ux-links-head"><button type="button" className="ux-links-back" onClick={() => setPage("add")}><ArrowLeft size={16} />Back</button><strong>{title}</strong><span aria-hidden="true" /></header>;
+  const body = page === "search" ? (
+    <>
+      {pageHead(DATA_SEARCH.title)}
       <label className="ux-col-field">
-        <span>Collection or library link</span>
-        <div className={`ux-source-url ${error ? "invalid" : ""}`}><input aria-label="Collection or library link" placeholder="https://… or github.com/name" defaultValue={value} key={value} /></div>
-        <small className={error ? "ux-source-error" : ""}>{error ?? "A collection file (.json) or a GitHub organisation or user (github.com/name)."}</small>
+        <span>{DATA_SEARCH.system}</span>
+        <div className="ux-source-url ux-links-system"><input aria-label={DATA_SEARCH.system} value={system} onChange={(e) => setSystem(e.target.value)} autoCapitalize="words" /></div>
+        <small>{DATA_SEARCH.systemHelp}</small>
       </label>
-      {/* Find sits under the field as its own button, like Continue on Add game data (built 2C). */}
-      <button type="button" className="ux-job-btn secondary block"><Search size={15} />Find</button>
-      {state === "found" ? (
+      <button type="button" className="ux-job-btn primary block">{DATA_SEARCH.open}<ArrowUpRight size={15} aria-label="(opens in your browser)" /></button>
+      <code className="ux-links-query" aria-label="Search query">{dataSearchQuery(system)}</code>
+      <small className="ux-src-footer ux-links-note">{DATA_SEARCH.note}</small>
+    </>
+  ) : page === "guide" ? (
+    <>
+      {pageHead(GUIDE.short)}
+      <GuideSteps prefix="ux-links" steps={TOUCH_GUIDE_STEPS} action={<button type="button" className="ux-job-btn" onClick={() => setPage("search")}><Search size={14} />{SEARCH_DATA.title}</button>} />
+      <div className="ux-result-label">{GUIDE_KINDS_TITLE}</div>
+      <GuideKinds prefix="ux-links" />
+      <p className="ux-links-hint">{GUIDE_NO_COLLECTION}</p>
+      <button type="button" className="ux-job-btn primary block" onClick={() => { setPage("add"); setFocusField(true); }}><ClipboardPaste size={15} />{PASTE_LINK}</button>
+    </>
+  ) : (
+    <>
+      <header className="ux-job-head"><span><strong>Add a collection or library</strong><small>Lists of repositories to install from</small></span>{close}</header>
+      <label className="ux-col-field">
+        <span>{LINK_LABEL}</span>
+        <div className={`ux-source-url ${error ? "invalid" : ""}`}><input ref={field} aria-label={LINK_LABEL} placeholder="https://… or github.com/name" value={value} onChange={(e) => { setValue(e.target.value); setView("idle"); setPicked(null); }} /></div>
+        <small className={error ? "ux-source-error" : ""}>{error ?? LINK_HELPER}</small>
+      </label>
+      {/* Find sits under the field as its own button, like Continue on Add game data (built 2C). A repository link is looked up (F4e). */}
+      {view === "finding"
+        ? <button type="button" className="ux-job-btn secondary block" disabled aria-busy="true"><LoaderCircle size={15} className="ux-spin" />{FINDING}</button>
+        : <button type="button" className="ux-job-btn secondary block"><Search size={15} />Find</button>}
+      {view === "found" ? (
         <div className="ux-src-card">
           <header><FolderGit2 size={18} /><span><strong>Club picks</strong><small>Collection · by club-org · 6 sources</small></span></header>
           <small className="ux-col-desc">The systems our club plays, with the repositories we trust.</small>
         </div>
       ) : null}
-      {state === "library" ? (
+      {found ? (
+        <div className="ux-src-card">
+          <header><FolderGit2 size={18} /><span><strong>{found.name}</strong><small>{found.sub}</small></span></header>
+          {found.description ? <small className="ux-col-desc">{found.description}</small> : null}
+          <small className="ux-links-from">{foundIn(found.from)}</small>
+        </div>
+      ) : null}
+      {view === "library" ? (
         <div className="ux-src-card">
           <header><Globe size={18} /><span><strong>Club organisation</strong><small>48 repositories · GitHub organisation</small></span></header>
           <small className="ux-col-desc">From the organisation's GitHub profile. A user reads "GitHub user".</small>
         </div>
       ) : null}
-      {state === "repository" ? <div className="ux-job-notice info"><Info size={18} /><span><strong>That is a repository, not a collection.</strong><small>Install it directly instead.</small></span><button type="button" className="ux-job-btn primary">Install it</button></div> : null}
+      {view === "repo-several" ? (
+        <>
+          <div className="ux-job-notice info" role="status"><Info size={18} /><span><strong>{SEVERAL.title(SEVERAL_COLLECTIONS.length)}</strong><small>{SEVERAL.body}</small></span></div>
+          <div className="ux-fp-list" role="radiogroup" aria-label="Collections in this repository">
+            {SEVERAL_COLLECTIONS.map((c, index) => (
+              <button key={c.file} type="button" role="radio" aria-checked={chosen === index} className={`ux-fp-row ${chosen === index ? "selected" : ""}`} onClick={() => setChosen(index)}>
+                <span className={`ux-ro-radio ${chosen === index ? "on" : ""}`} aria-hidden>{chosen === index ? <CircleCheck size={20} /> : <Circle size={20} />}</span>
+                <span><strong>{c.name}</strong><small>{c.file} · {c.sources} sources</small></span>
+              </button>
+            ))}
+          </div>
+          <button type="button" className="ux-job-btn secondary block" onClick={() => { setPicked(SEVERAL_COLLECTIONS[chosen]); setView("repo-found"); }}>{SEVERAL.preview}</button>
+        </>
+      ) : null}
+      {view === "repository" ? (
+        <>
+          <div className="ux-job-notice info" role="status"><Info size={18} /><span><strong>{DATA_REPO.title}</strong><small>{DATA_REPO.body}</small></span></div>
+          <button type="button" className="ux-job-btn primary block"><ArrowDownToLine size={15} />{DATA_REPO.install}</button>
+          <button type="button" className="ux-job-btn block" onClick={() => setPage("guide")}><CircleHelp size={15} />{GUIDE.title}</button>
+        </>
+      ) : null}
+      {view === "nothing" ? (
+        <>
+          <div className="ux-job-notice error" role="alert"><OctagonAlert size={18} /><span><strong>{NOTHING_FOUND.title}</strong><small>{NOTHING_FOUND.body}</small></span></div>
+          <div className="ux-links-pair"><button type="button" className="ux-job-btn" onClick={() => setPage("search")}><Search size={15} />{SEARCH_DATA.title}</button><button type="button" className="ux-job-btn" onClick={() => setPage("guide")}><CircleHelp size={15} />{GUIDE.short}</button></div>
+        </>
+      ) : null}
+      {needLink ? <NeedLinkRows onSearch={() => setPage("search")} onGuide={() => setPage("guide")} /> : null}
       <small className="ux-src-footer">Collections only list repositories. Nothing is downloaded until you install.</small>
-      <footer className="ux-job-footer"><button type="button" className="ux-job-btn secondary">Cancel</button><button type="button" className="ux-job-btn primary" disabled={state !== "found" && state !== "library"}>Add collection</button></footer>
+      <footer className="ux-job-footer"><button type="button" className="ux-job-btn secondary">Cancel</button><button type="button" className="ux-job-btn primary" disabled={!canAdd}>Add collection</button></footer>
+    </>
+  );
+  const sheet = (
+    <section className={`ux-job-sheet ux-links-sheet ${inline ? "inline" : ""}`} role="dialog" aria-label={page === "search" ? DATA_SEARCH.title : page === "guide" ? GUIDE.title : "Add a collection or library"}>
+      <span className="ux-sheet-grip" aria-hidden />
+      {body}
     </section>
   );
   return inline ? sheet : <div className="ux-job-scrim">{sheet}</div>;
 }
 
-type AddPreview = "collections" | "hidden" | "no-preset" | "add" | "library" | "invalid" | "duplicate" | "repository";
+type AddPreview = "collections" | "hidden" | "no-preset" | "add" | "library" | "invalid" | "duplicate" | "repository" | "links-idle" | "repo-found" | "repo-several" | "nothing" | "finding" | "search" | "guide";
+
+/** R2-06 (F4e): the "Collection links" workflow screens open Add game data with the Add collection sheet in that state. */
+const LINKS_PREVIEW: Record<string, AddPreview> = {
+  "links-add-idle": "links-idle", "links-repo-found": "repo-found", "links-repo-several": "repo-several", "links-data-repo": "repository",
+  "links-nothing-found": "nothing", "links-finding": "finding", "links-search-data": "search", "links-guide": "guide",
+};
 
 export function AddGameDataScreen({ props }: { props: ConceptProps }) {
-  const [preview, setPreview] = useState<AddPreview>("collections");
+  const linksScreen = LINKS_PREVIEW[props.workflowScreen ?? ""];
+  const [preview, setPreview] = useState<AddPreview>(linksScreen ?? "collections");
   const install = () => props.onNavigate("install-job");
   const hidden = preview === "hidden";
   // DEC-059 (R0-09): a build with no default collection and no collections of the user's own yet.
   const noPreset = preview === "no-preset";
-  const sheet: AddSheetState | undefined = preview === "add" ? "found" : preview === "collections" || preview === "hidden" || noPreset ? undefined : preview;
+  const sheet: AddSheetState | undefined = preview === "add" ? "found" : preview === "links-idle" ? "idle" : preview === "collections" || preview === "hidden" || noPreset ? undefined : preview;
   return (
     <>
       <SourceScreenHeader props={props} title="Add game data" subtitle="Collections, a link, or GitHub search" />
       <div className="ux-wb-home-body ux-add-source-body ux-src-body">
-        <PreviewState value={preview} options={[["collections", "Collections"], ["hidden", "Default hidden"], ["no-preset", "No default collection"], ["add", "Add collection"], ["library", "Add library"], ["invalid", "Invalid link"], ["duplicate", "Already added"], ["repository", "Repository link"]]} onChange={setPreview} />
+        {/* R2-06: the Collection links screens show the sheet without the gallery's state control (their states are workflow screens). */}
+        {linksScreen ? null : <PreviewState value={preview} options={[["collections", "Collections"], ["hidden", "Default hidden"], ["no-preset", "No default collection"], ["add", "Add collection"], ["library", "Add library"], ["invalid", "Invalid link"], ["duplicate", "Already added"], ["repository", "Repository link"]]} onChange={setPreview} />}
         <div className="ux-result-label">Collections</div>
         {hidden || noPreset ? null : <DefaultCollectionCard onInstall={install} onShowAll={() => props.onNavigate("collection")} />}
         {hidden || noPreset ? null : <DefaultListingRows onOpen={() => props.onNavigate("collection")} />}
@@ -1286,7 +1396,7 @@ export function AddGameDataScreen({ props }: { props: ConceptProps }) {
         </section>
         <div className="ux-src-group"><button type="button" className="ux-col-nav" onClick={() => props.onNavigate("search-github")}><Search size={17} /><span><strong>Search GitHub</strong><small>Any GitHub repository with game data, by name</small></span><ChevronRight size={16} /></button></div>
       </div>
-      {sheet ? <AddCollectionSheet state={sheet} /> : null}
+      {sheet ? <AddCollectionSheet key={sheet} state={sheet} /> : null}
     </>
   );
 }

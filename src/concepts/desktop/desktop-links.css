@@ -1,0 +1,38 @@
+/* R2-06 (F4e, approved 2026-11-09): collection links in the desktop Add collection dialog. Desktop tokens (--dt-*), so
+   light and dark follow the theme. Pieces not already in desktop-sources.css / desktop-pages.css only. */
+
+.dtl-links { margin: 8px 0 0 -10px }
+.dt-app .dts-found .dtl-from { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--dt-border); overflow-wrap: anywhere }
+.dtl-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px }
+.dtl-dialog .dtl-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px }
+
+/* Search for data: the query the button opens. */
+.dtl-query { display: block; margin-top: 10px; padding: 8px 10px; border: 1px solid var(--dt-border); border-radius: 8px; background: var(--dt-pane); color: var(--dt-muted); font-family: ui-monospace, Menlo, monospace; font-size: 12px; line-height: 1.4; overflow-wrap: anywhere }
+.dtl-dialog.search .dtp-search { padding-left: 12px }
+
+/* Several collections: a radio list (arrow keys move the choice). */
+.dtl-radios { display: grid; gap: 6px; margin-top: 10px }
+.dt-app .dtl-radios > button { display: flex; align-items: center; justify-content: flex-start; gap: 10px; width: 100%; padding: 9px 12px; border: 1px solid var(--dt-border); border-radius: 10px; background: none; color: var(--dt-text); text-align: left; cursor: pointer }
+.dt-app .dtl-radios > button:hover { background: var(--dt-hover) }
+.dt-app .dtl-radios > button.on { border-color: color-mix(in srgb, var(--dt-fill) 45%, transparent); background: var(--dt-selected) }
+.dt-app .dtl-radios > button:focus-visible { outline: 2px solid var(--dt-accent); outline-offset: 1px }
+.dtl-radios strong { display: block; font-size: 13.5px; font-weight: 600 }
+.dtl-radios small { display: block; font-size: 12px; color: var(--dt-muted) }
+.dtl-radio { flex: none; width: 16px; height: 16px; border: 2px solid var(--dt-faint); border-radius: 50% }
+.dtl-radios > button.on .dtl-radio { border-color: var(--dt-accent); background: radial-gradient(var(--dt-accent) 0 3.5px, transparent 4px) }
+
+/* Guide: numbered steps in accent circles. */
+.dtl-steps { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none }
+.dtl-steps > li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; align-items: start; padding: 6px 0; color: var(--dt-text); font-size: 13px; line-height: 1.45 }
+.dtl-steps b { font-weight: 600 }
+.dtl-steps small { display: block; color: var(--dt-muted); font-size: 12px }
+.dtl-step-n { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--dt-selected); color: var(--dt-accent); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums }
+
+/* Guide: the kinds of link and the no-collection hint, as on phone and tablet (one set of strings). */
+.dtl-kinds-title { margin: 14px 0 4px; color: var(--dt-muted); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase }
+.dtl-kinds { display: grid; margin: 0; font-size: 13px; line-height: 1.45 }
+.dtl-kinds > div { padding: 6px 0; border-top: 1px solid var(--dt-border) }
+.dtl-kinds > div:last-child { border-bottom: 1px solid var(--dt-border) }
+.dtl-kinds dt { display: inline; color: var(--dt-accent); font-weight: 650 }
+.dtl-kinds dd { display: inline; margin: 0; color: var(--dt-text) }
+.dtl-hint { margin: 10px 0 0; color: var(--dt-muted); font-size: 12px; line-height: 1.45 }

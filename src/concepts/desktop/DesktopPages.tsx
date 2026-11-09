@@ -142,14 +142,14 @@ export function DesktopLookup({ onOpenRoster }: { onOpenRoster: (name: string) =
 
 /* ------------------------------ Sources ------------------------------ */
 
-export function DesktopSources({ notify, jobs, selectedId, onSelect, onOpenJobs, onOpenRoster }: { notify: Notify; jobs: WorkspaceJobs; selectedId: string; onSelect: (id: string) => void; onOpenJobs: () => void; onOpenRoster?: (name: string) => void }) {
+export function DesktopSources({ notify, jobs, selectedId, onSelect, onOpenJobs, onOpenRoster, initialCollection }: { notify: Notify; jobs: WorkspaceJobs; selectedId: string; onSelect: (id: string) => void; onOpenJobs: () => void; onOpenRoster?: (name: string) => void; /** R2-06 gallery screens: open Add collection at this state. */ initialCollection?: string }) {
   const { sources, setSources } = jobs;
   const setSelectedId = onSelect;
   const progress: Record<string, number> = Object.fromEntries(sources.flatMap(s => { const p = jobs.progressOf(s.id); return p ? [[s.id, p.percent]] : []; }));
   const [link, setLink] = useState('');
   const [query, setQuery] = useState('');
   const [confirmRemove, setConfirmRemove] = useState(false);
-  const [addingCollection, setAddingCollection] = useState(false);
+  const [addingCollection, setAddingCollection] = useState(initialCollection !== undefined);
   useEffect(() => { setConfirmRemove(false); }, [selectedId]);
   useRosterChecks(jobs, notify, setSelectedId);
   const update = (ids: string[]) => { jobs.startUpdate(ids); onOpenJobs(); };
@@ -213,7 +213,7 @@ export function DesktopSources({ notify, jobs, selectedId, onSelect, onOpenJobs,
         <LastUpdateStates source={selected} jobs={jobs} />
       </section> : null}
     </div>
-    {addingCollection && <AddCollectionDialog {...flow} onClose={() => setAddingCollection(false)} />}
+    {addingCollection && <AddCollectionDialog {...flow} start={initialCollection} onClose={() => setAddingCollection(false)} />}
   </main>;
 }
 

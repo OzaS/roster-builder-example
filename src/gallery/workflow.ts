@@ -19,6 +19,13 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "tablet-stars-catalogue-role", label: "Tablet · R2-03 · Catalogue, Core chosen" },
   { id: "tablet-stars-add-force", label: "Tablet · R2-03 · Add force, starred forces" },
   { id: "tablet-stars-faction", label: "Tablet · R2-03 · New roster, starred faction" },
+  { id: "tablet-links-add-idle", label: "Tablet · R2-06 · Add collection · Repository link field, Need a link?" },
+  { id: "tablet-links-repo-found", label: "Tablet · R2-06 · Add collection · Repository with one collection" },
+  { id: "tablet-links-repo-several", label: "Tablet · R2-06 · Add collection · Repository with several collections" },
+  { id: "tablet-links-data-repo", label: "Tablet · R2-06 · Add collection · Repository with game data, no collection" },
+  { id: "tablet-links-nothing-found", label: "Tablet · R2-06 · Add collection · Nothing usable found" },
+  { id: "tablet-links-search-data", label: "Tablet · R2-06 · Add collection · Search for data page" },
+  { id: "tablet-links-guide", label: "Tablet · R2-06 · Add collection · Step-by-step guide page" },
   { id: "tablet-editor-shortcuts", label: "Tablet · Roster editor · Keyboard shortcuts" },
   { id: "tablet-editor-text-200", label: "Tablet · Roster editor · Text 200%" },
   { id: "tablet-editor-add-roles", label: "Tablet · Roster editor · Many unit roles" },
@@ -115,6 +122,13 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "desktop-stars-faction", label: "Desktop · R2-03 · New roster · Faction step with a starred faction" },
   { id: "desktop-stars-add-force", label: "Desktop · R2-03 · Add force · Starred forces" },
   { id: "desktop-menus-star-unit", label: "Desktop · R2-03 · Menu bar · Edit › Star unit" },
+  { id: "desktop-links-add", label: "Desktop · R2-06 · Add collection dialog · Repository link, Search for data and guide links" },
+  { id: "desktop-links-repo-found", label: "Desktop · R2-06 · Add collection dialog · Repository with one collection" },
+  { id: "desktop-links-repo-several", label: "Desktop · R2-06 · Add collection dialog · Repository with several collections" },
+  { id: "desktop-links-data-repo", label: "Desktop · R2-06 · Add collection dialog · Repository with game data, no collection" },
+  { id: "desktop-links-nothing-found", label: "Desktop · R2-06 · Add collection dialog · Nothing usable found" },
+  { id: "desktop-links-search-data", label: "Desktop · R2-06 · Add collection dialog · Search for data view" },
+  { id: "desktop-links-guide", label: "Desktop · R2-06 · Add collection dialog · Step-by-step guide view" },
   { id: "desktop-editor-unit-dialog-zoom-200", label: "Desktop · Roster editor · Unit dialog, page zoom 200%" },
   { id: "desktop-editor-unit-dialog-separated", label: "Desktop · Roster editor · Unit dialog, after Separate 1 (4 + 1)" },
   { id: "desktop-editor-catalogue-limit", label: "Desktop · Roster editor · Catalogue limit reached" },
@@ -223,6 +237,14 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "stars-add-unit", label: "R2-03 · Add unit · Starred group" },
   { id: "stars-faction", label: "R2-03 · New roster · Faction picker with a starred faction" },
   { id: "stars-add-force", label: "R2-03 · Add force · Starred forces and faction" },
+  { id: "links-add-idle", label: "R2-06 · Add collection · Repository link field, Need a link?" },
+  { id: "links-repo-found", label: "R2-06 · Add collection · Repository with one collection" },
+  { id: "links-repo-several", label: "R2-06 · Add collection · Repository with several collections" },
+  { id: "links-data-repo", label: "R2-06 · Add collection · Repository with game data, no collection" },
+  { id: "links-nothing-found", label: "R2-06 · Add collection · Nothing usable found" },
+  { id: "links-finding", label: "R2-06 · Add collection · Looking in the repository" },
+  { id: "links-search-data", label: "R2-06 · Add collection · Search for data page" },
+  { id: "links-guide", label: "R2-06 · Add collection · Step-by-step guide page" },
 ];
 
 const workflowLabels: Record<WorkflowScreen, string> = workflowScreens.reduce(
@@ -253,7 +275,7 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen === "desktop-editor" || screen.startsWith("desktop-editor-")) return "overview";
   if (screen === "desktop-rosters") return "library";
   if (screen === "desktop-lookup-legacy" || screen === "desktop-lookup" || screen.startsWith("desktop-lookup-1-0")) return "catalogue";
-  if (screen === "desktop-sources") return "sources";
+  if (screen === "desktop-sources" || screen.startsWith("desktop-links-")) return "sources"; // R2-06: Sources with the Add collection dialog
   if (screen === "desktop-settings" || screen.startsWith("desktop-settings-")) return "settings";
   if (screen === "desktop-first-run") return "library";
   if (screen === "desktop-menus" || screen === "desktop-menus-rename-unit" || screen === "desktop-menus-star-unit") return "overview";
@@ -277,6 +299,7 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen.startsWith("names-")) return "overview";
   if (screen === "stars-add-unit") return "add-unit"; // R2-03: the Add unit sheet with the Starred group
   if (screen === "stars-faction") return "system"; // R2-03: New roster with the faction picker open
+  if (screen.startsWith("links-")) return "add-source"; // R2-06: Add game data with the Add collection sheet in a links state
   if (screen === "stars-add-force") return "overview"; // R2-03: the roster with Add force open // R2-02: the roster with a renamed unit, its ⋯ menu, the Points limit sheet, the warning
   if (screen === "export" || screen === "export-json" || screen === "export-pdf" || screen === "export-preview") return "overview"; // the export sheet over the roster
   return screen as PrototypeScreen; // the tablet screens returned above are not narrowed away by startsWith
