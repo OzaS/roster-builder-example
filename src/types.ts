@@ -273,7 +273,15 @@ export type WorkflowScreen =
   | "names-limit-warning"
   | "stars-add-unit"
   | "stars-faction"
-  | "stars-add-force";
+  | "stars-add-force"
+  | "links-add-idle"
+  | "links-repo-found"
+  | "links-repo-several"
+  | "links-data-repo"
+  | "links-nothing-found"
+  | "links-finding"
+  | "links-search-data"
+  | "links-guide";
 
 export type RosterOption = {
   id: string;

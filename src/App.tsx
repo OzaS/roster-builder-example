@@ -268,6 +268,14 @@ const workflowScreenIds = [
   "stars-add-unit",
   "stars-faction",
   "stars-add-force",
+  "links-add-idle",
+  "links-repo-found",
+  "links-repo-several",
+  "links-data-repo",
+  "links-nothing-found",
+  "links-finding",
+  "links-search-data",
+  "links-guide",
 ] satisfies WorkflowScreen[];
 const prototypeScreenIds = [
   "library",

@@ -25,7 +25,7 @@ import { PhoneExportFlow, PhoneExportPreview, phoneExportRoster } from "../conce
 import { LimitWarning, PhonePointsLimitSheet, PhoneRenameSheet, PhoneUnitMenu } from "../concepts/ux/PhoneNames";
 import { StarButton, StarDivider, StarRow, StarredHeadingContent } from "../concepts/workspace/Stars";
 import "../concepts/ux/phone-stars.css";
-import { ActionMenuDialog, ReopenRosterSetting, AddCollectionSheet, LOCAL_ERRORS, LOCAL_FILE, LOCAL_SOURCE, LocalImportChoiceDialog, LocalImportError, LocalImportRow, LocalInterruptedNotice, LocalRefusedNotice, LocalSourceNote, LocalSourceRows, localSteps, AdvancedInstallSetting, AppDialog, AutoUpdateChecksSetting, FocusCatalogueSearchSetting, SeparateAllSetting, AdvancedSettingsRows, ImportReportGroups, CollectionMenuDialog, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, FirstRunDataCard, ReinstallSheet, ReinstallConfirmDialog, REINSTALL_DONE, REINSTALL_FAILED, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RememberSectionsSetting, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceStatusAction, SourceUpdateCard, SourceVersions, SourcesNavRow, TaggedRosterRows, UpdateAvatarButton, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
+import { ActionMenuDialog, ReopenRosterSetting, AddCollectionSheet, NeedLinkRows, LOCAL_ERRORS, LOCAL_FILE, LOCAL_SOURCE, LocalImportChoiceDialog, LocalImportError, LocalImportRow, LocalInterruptedNotice, LocalRefusedNotice, LocalSourceNote, LocalSourceRows, localSteps, AdvancedInstallSetting, AppDialog, AutoUpdateChecksSetting, FocusCatalogueSearchSetting, SeparateAllSetting, AdvancedSettingsRows, ImportReportGroups, CollectionMenuDialog, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, FirstRunDataCard, ReinstallSheet, ReinstallConfirmDialog, REINSTALL_DONE, REINSTALL_FAILED, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RememberSectionsSetting, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceStatusAction, SourceUpdateCard, SourceVersions, SourcesNavRow, TaggedRosterRows, UpdateAvatarButton, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
 
 type Props = {
   concept: GalleryConcept;
@@ -811,6 +811,27 @@ function WorkbenchElements({
         <AddCollectionSheet inline state="library" />
         <AddCollectionSheet inline state="duplicate" />
         <AddCollectionSheet inline state="repository" />
+        <small className="ux-elements-note">R2-06 (F4e, approved 2026-11-09): the field reads Repository, collection or library link. A pasted repository link is looked up for its collection file: one collection (preview with Found in …), several (choose one, then Preview), game data without a collection (Install it, Step-by-step guide) or nothing usable (Search for data, Guide). Idle · finding · one · several · nothing found.</small>
+        <AddCollectionSheet inline state="idle" />
+        <AddCollectionSheet inline state="finding" />
+        <AddCollectionSheet inline state="repo-found" />
+        <AddCollectionSheet inline state="repo-several" />
+        <AddCollectionSheet inline state="nothing" />
+      </ElementSection>
+
+      <ElementSection title="Need A Link? Rows">
+        <small className="ux-elements-note">R2-06 (F4e, approved 2026-11-09): under Find while there is no result. Each row pushes its page inside the Add collection sheet; Back returns with the field text kept. No new tab, no new hub row.</small>
+        <NeedLinkRows />
+      </ElementSection>
+
+      <ElementSection title="Search For Data Page">
+        <small className="ux-elements-note">R2-06 (F4e, approved 2026-11-09): pushed inside the sheet. The user types the system; Search on Google opens the browser with the query shown (empty name: without the quoted part). Nothing searches on its own.</small>
+        <AddCollectionSheet inline state="search" />
+      </ElementSection>
+
+      <ElementSection title="Step-By-Step Guide">
+        <small className="ux-elements-note">R2-06 (F4e, approved 2026-11-09): pushed inside the sheet and scrolls. Six numbered steps (step 1 carries Search for data), Which link is which?, the no-collection hint and Paste a link (back to the field, focused).</small>
+        <AddCollectionSheet inline state="guide" />
       </ElementSection>
 
       <ElementSection title="Install From A File">

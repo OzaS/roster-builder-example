@@ -223,6 +223,14 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "stars-add-unit", label: "R2-03 · Add unit · Starred group" },
   { id: "stars-faction", label: "R2-03 · New roster · Faction picker with a starred faction" },
   { id: "stars-add-force", label: "R2-03 · Add force · Starred forces and faction" },
+  { id: "links-add-idle", label: "R2-06 · Add collection · Repository link field, Need a link?" },
+  { id: "links-repo-found", label: "R2-06 · Add collection · Repository with one collection" },
+  { id: "links-repo-several", label: "R2-06 · Add collection · Repository with several collections" },
+  { id: "links-data-repo", label: "R2-06 · Add collection · Repository with game data, no collection" },
+  { id: "links-nothing-found", label: "R2-06 · Add collection · Nothing usable found" },
+  { id: "links-finding", label: "R2-06 · Add collection · Looking in the repository" },
+  { id: "links-search-data", label: "R2-06 · Add collection · Search for data page" },
+  { id: "links-guide", label: "R2-06 · Add collection · Step-by-step guide page" },
 ];
 
 const workflowLabels: Record<WorkflowScreen, string> = workflowScreens.reduce(
@@ -277,6 +285,7 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen.startsWith("names-")) return "overview";
   if (screen === "stars-add-unit") return "add-unit"; // R2-03: the Add unit sheet with the Starred group
   if (screen === "stars-faction") return "system"; // R2-03: New roster with the faction picker open
+  if (screen.startsWith("links-")) return "add-source"; // R2-06: Add game data with the Add collection sheet in a links state
   if (screen === "stars-add-force") return "overview"; // R2-03: the roster with Add force open // R2-02: the roster with a renamed unit, its ⋯ menu, the Points limit sheet, the warning
   if (screen === "export" || screen === "export-json" || screen === "export-pdf" || screen === "export-preview") return "overview"; // the export sheet over the roster
   return screen as PrototypeScreen; // the tablet screens returned above are not narrowed away by startsWith

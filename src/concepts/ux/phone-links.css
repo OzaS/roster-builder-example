@@ -1,0 +1,33 @@
+/* R2-06 (F4e, approved 2026-11-09): collection links in the phone Add collection sheet; the tablet sheet reuses the
+   step list and kinds (tablet-links.css). Gallery tokens only, so light and dark both follow the theme. */
+
+.ux-job-head.ux-links-head { grid-template-columns: minmax(64px, auto) minmax(0, 1fr) minmax(64px, auto); }
+.ux-job-head.ux-links-head > .ux-icon-btn { justify-self: end; }
+.ux-job-head.ux-links-head > strong { font-size: 16px; text-align: center; }
+.ux-links-back { justify-self: start; display: inline-flex; align-items: center; gap: 2px; min-height: 36px; padding: 0 4px 0 0; border: 0; background: transparent; color: var(--ux-accent-2); font: inherit; font-size: 13.5px; font-weight: 750; cursor: pointer; }
+
+.ux-links-need { padding-top: 12px; border-top: 1px solid var(--ux-line); }
+.ux-links-from { display: block; padding-top: 9px; border-top: 1px solid var(--ux-line); color: var(--ux-muted); font-size: 11.5px; line-height: 1.4; overflow-wrap: anywhere; }
+.ux-links-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ux-links-system { grid-template-columns: minmax(0, 1fr); }
+.ux-links-system input:focus { border-color: var(--ux-accent); outline: none; }
+.ux-links-query { display: block; padding: 8px 10px; border: 1px solid var(--ux-line); border-radius: var(--ux-r-sm); background: var(--ux-surface-2); color: var(--ux-muted); font-family: ui-monospace, Menlo, monospace; font-size: 11.5px; line-height: 1.4; overflow-wrap: anywhere; }
+.ux-src-footer.ux-links-note { text-align: left; line-height: 1.45; }
+.ux-links-hint { margin: 0; color: var(--ux-muted); font-size: 12.5px; line-height: 1.45; }
+.ux-links-hint b { color: var(--ux-accent-2); font-weight: 750; }
+
+/* Guide steps: numbers in accent circles, a step's action under its text. */
+.ux-links-steps { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.ux-links-steps > li { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 10px; align-items: start; padding: 7px 0; color: var(--ux-ink); font-size: 13.5px; line-height: 1.4; }
+.ux-links-steps b { font-weight: 750; }
+.ux-links-steps small { display: block; margin-top: 2px; color: var(--ux-muted); font-size: 11.5px; }
+.ux-links-step-n { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: color-mix(in srgb, var(--ux-accent) 18%, var(--ux-surface)); color: var(--ux-accent-2); font-size: 12px; font-weight: 850; font-variant-numeric: tabular-nums; }
+.ux-links-step-action { display: block; margin-top: 7px; }
+.ux-links-step-action .ux-job-btn { min-height: 36px; font-size: 13px; }
+
+/* Which link is which? */
+.ux-links-kinds { display: grid; margin: 0; font-size: 12.5px; line-height: 1.45; }
+.ux-links-kinds > div { padding: 6px 0; border-top: 1px solid var(--ux-line); }
+.ux-links-kinds > div:last-child { border-bottom: 1px solid var(--ux-line); }
+.ux-links-kinds dt { display: inline; color: var(--ux-accent-2); font-weight: 750; }
+.ux-links-kinds dd { display: inline; margin: 0; color: var(--ux-ink); }
