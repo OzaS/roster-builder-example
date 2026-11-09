@@ -122,6 +122,13 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "desktop-stars-faction", label: "Desktop · R2-03 · New roster · Faction step with a starred faction" },
   { id: "desktop-stars-add-force", label: "Desktop · R2-03 · Add force · Starred forces" },
   { id: "desktop-menus-star-unit", label: "Desktop · R2-03 · Menu bar · Edit › Star unit" },
+  { id: "desktop-links-add", label: "Desktop · R2-06 · Add collection dialog · Repository link, Search for data and guide links" },
+  { id: "desktop-links-repo-found", label: "Desktop · R2-06 · Add collection dialog · Repository with one collection" },
+  { id: "desktop-links-repo-several", label: "Desktop · R2-06 · Add collection dialog · Repository with several collections" },
+  { id: "desktop-links-data-repo", label: "Desktop · R2-06 · Add collection dialog · Repository with game data, no collection" },
+  { id: "desktop-links-nothing-found", label: "Desktop · R2-06 · Add collection dialog · Nothing usable found" },
+  { id: "desktop-links-search-data", label: "Desktop · R2-06 · Add collection dialog · Search for data view" },
+  { id: "desktop-links-guide", label: "Desktop · R2-06 · Add collection dialog · Step-by-step guide view" },
   { id: "desktop-editor-unit-dialog-zoom-200", label: "Desktop · Roster editor · Unit dialog, page zoom 200%" },
   { id: "desktop-editor-unit-dialog-separated", label: "Desktop · Roster editor · Unit dialog, after Separate 1 (4 + 1)" },
   { id: "desktop-editor-catalogue-limit", label: "Desktop · Roster editor · Catalogue limit reached" },
@@ -268,7 +275,7 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen === "desktop-editor" || screen.startsWith("desktop-editor-")) return "overview";
   if (screen === "desktop-rosters") return "library";
   if (screen === "desktop-lookup-legacy" || screen === "desktop-lookup" || screen.startsWith("desktop-lookup-1-0")) return "catalogue";
-  if (screen === "desktop-sources") return "sources";
+  if (screen === "desktop-sources" || screen.startsWith("desktop-links-")) return "sources"; // R2-06: Sources with the Add collection dialog
   if (screen === "desktop-settings" || screen.startsWith("desktop-settings-")) return "settings";
   if (screen === "desktop-first-run") return "library";
   if (screen === "desktop-menus" || screen === "desktop-menus-rename-unit" || screen === "desktop-menus-star-unit") return "overview";

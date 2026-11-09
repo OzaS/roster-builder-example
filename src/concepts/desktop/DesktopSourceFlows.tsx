@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent as ReactKeyboardEvent, type ReactNode, type RefObject } from 'react';
-import { AlertTriangle, Archive, ArrowDownToLine, ArrowLeft, ArrowUpCircle, Check, ChevronRight, CloudOff, Copy, Ellipsis, EyeOff, FileText, Github, History, Inbox, Layers3, LibraryBig, Link2, ListChecks, LoaderCircle, OctagonAlert, RefreshCcw, Search, Trash2, X } from 'lucide-react';
+import { AlertTriangle, Archive, ArrowDownToLine, ArrowLeft, ArrowUpCircle, ArrowUpRight, ClipboardPaste, Info, Check, ChevronRight, CloudOff, Copy, Ellipsis, EyeOff, FileText, Github, History, Inbox, Layers3, LibraryBig, Link2, ListChecks, LoaderCircle, OctagonAlert, RefreshCcw, Search, Trash2, X } from 'lucide-react';
 import { dataChanges, githubRepositories, rosterChecks, sourceCollections, type CheckState, type CollectionPage, type DataChanges, type LastUpdate, type Listing, type RosterCheck, type SourceInfo } from './desktopData';
 import { jobPercent, type WorkspaceJobs } from '../workspace/Jobs';
 import type { Notify } from '../workspace/Toasts';
 import { Chip, type ChipTone } from '../workspace/Primitives';
-import { EXAMPLE_SEARCH_SYSTEM, FOUND_COLLECTION, LINK_SAMPLES, SEVERAL_COLLECTIONS, type FoundIn, type RepoCollection } from '../workspace/CollectionLinks';
+import { DATA_REPO, DATA_SEARCH, DESKTOP_GUIDE_STEPS, EXAMPLE_SEARCH_SYSTEM, FINDING, FOUND_COLLECTION, GUIDE, GuideSteps, LINK_HELPER, LINK_LABEL, LINK_SAMPLES, NOTHING_FOUND, PASTE_LINK, SEARCH_DATA, SEVERAL, SEVERAL_COLLECTIONS, dataSearchQuery, foundIn, type FoundIn, type RepoCollection } from '../workspace/CollectionLinks';
 import './desktop-sources.css';
+import './desktop-links.css';
 
 // Sources sub-flows for the desktop prototype (revision 05), all inside the Sources page's detail pane:
 // the last update card and update report, collection pages, GitHub search and the add-collection dialog.
@@ -544,22 +545,22 @@ function useDialogFocus(ref: RefObject<HTMLElement | null>, onClose: () => void)
   }, [ref]);
 }
 
-export function AddCollectionDialog({ jobs, notify, go, onOpenJobs, onClose }: { jobs: WorkspaceJobs; notify: Notify; go: Go; onOpenJobs: () => void; onClose: () => void }) {
-  const [value, setValue] = useState('');
-  const [phase, setPhase] = useState<AddPhase>({ kind: 'idle' });
+/**
+ * The Add collection dialog. R2-06 (F4e, approved 2026-11-09): a repository link is looked up for its collection file
+ * (one: the preview with Found in …; several: a radio list, arrow keys, then Preview; game data: Install it; nothing:
+ * Search for data / Guide). Two text links under the field switch the dialog's body to Search for data or the
+ * Step-by-step guide; each view has ‹ Back, and focus goes back to the field. `start` opens a gallery state.
+ */
+export function AddCollectionDialog({ jobs, notify, go, onOpenJobs, onClose, start }: { jobs: WorkspaceJobs; notify: Notify; go: Go; onOpenJobs: () => void; onClose: () => void; start?: string }) {
+  const { value, edit, phase, find, preview, view, setView, system, setSystem, chosen, setChosen, previewChosen } = useLinkFind(start);
   const dialog = useRef<HTMLElement>(null);
-  const timer = useRef(0);
+  const viewed = useRef(false);
   useDialogFocus(dialog, onClose);
-  useEffect(() => () => clearTimeout(timer.current), []);
-  const find = (link = value, offline = false) => {
-    clearTimeout(timer.current);
-    if (!link.trim()) return;
-    const next = readLink(link);
-    if (next.kind !== 'found' && !offline) return setPhase(next);
-    setPhase({ kind: 'finding' });
-    timer.current = window.setTimeout(() => setPhase(offline ? { kind: 'error', text: 'GitHub did not answer. Check the connection and try again.' } : next), 650);
-  };
-  const preview = (link: string, offline = false) => { setValue(link); find(link, offline); };
+  useEffect(() => {
+    // The first render is focused by useDialogFocus; later view changes move focus to the view's field (Back: the link field).
+    if (!viewed.current) { viewed.current = true; return; }
+    dialog.current?.querySelector<HTMLElement>(view === 'guide' ? 'footer .primary' : 'input')?.focus();
+  }, [view]);
   const add = () => {
     if (phase.kind !== 'found') return;
     setFlowStore({ saved: [...flowStore.saved, phase.saved] });
@@ -577,34 +578,78 @@ export function AddCollectionDialog({ jobs, notify, go, onOpenJobs, onClose }: {
     jobs.startInstall({ id, name, factions: known?.factions ?? ['Wardens', 'Wayfarers'], size: known?.size ?? '3.4 MB' });
     onOpenJobs();
   };
+  const close = <button className="dtp-icon" aria-label="Close dialog" title="Close" onClick={onClose}><X size={16} /></button>;
+  const back = <button className="dtp-btn" onClick={() => setView('add')}><ArrowLeft size={14} />Back</button>;
+  const onRadioKey = (e: ReactKeyboardEvent<HTMLDivElement>, count: number) => {
+    const step = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1 : e.key === 'ArrowUp' || e.key === 'ArrowLeft' ? -1 : 0;
+    if (!step) return;
+    e.preventDefault();
+    const next = (chosen + step + count) % count;
+    setChosen(next);
+    e.currentTarget.querySelectorAll<HTMLElement>('[role=radio]')[next]?.focus();
+  };
   const error = phase.kind === 'error' ? phase.text : '';
+  const needLink = phase.kind === 'idle' || phase.kind === 'error';
+  const body = view === 'search' ? <>
+    <header><div><h2 id="dts-add-title">{DATA_SEARCH.title}</h2><p>{DATA_SEARCH.sub}</p></div>{close}</header>
+    <form onSubmit={e => { e.preventDefault(); notify('Opens Google in your browser'); }}>
+      <label className="dts-field-label" htmlFor="dts-system">{DATA_SEARCH.system}</label>
+      <span className="dtp-search"><input id="dts-system" value={system} autoComplete="off" onChange={e => setSystem(e.target.value)} aria-describedby="dts-system-query" /></span>
+      <code id="dts-system-query" className="dtl-query" aria-label="Search query">{dataSearchQuery(system)}</code>
+      <small className="dts-help">{DATA_SEARCH.desktopNote}</small>
+      <footer className="dtl-footer">{back}<button className="dtp-btn primary" type="submit">{DATA_SEARCH.open}<ArrowUpRight size={14} aria-label="(opens in your browser)" /></button></footer>
+    </form>
+  </> : view === 'guide' ? <>
+    <header><div><h2 id="dts-add-title">{GUIDE.title}</h2></div>{close}</header>
+    <GuideSteps prefix="dtl" steps={DESKTOP_GUIDE_STEPS} />
+    <footer>{back}<button className="dtp-btn primary" onClick={() => setView('add')}><ClipboardPaste size={14} />{PASTE_LINK}</button></footer>
+  </> : <>
+    <header><div><h2 id="dts-add-title">Add a collection or library</h2><p>Lists of repositories to install from</p></div>{close}</header>
+    <form onSubmit={e => { e.preventDefault(); find(); }}>
+      <label className="dts-field-label" htmlFor="dts-add-link">{LINK_LABEL}</label>
+      <div className="dtp-inline-form">
+        <span className={`dtp-search ${error ? 'invalid' : ''}`}><Link2 size={15} /><input id="dts-add-link" placeholder="https://… or github.com/name" value={value} aria-invalid={!!error} aria-describedby="dts-add-help" autoComplete="off" spellCheck={false} onChange={e => edit(e.target.value)} /></span>
+        <button className="dtp-btn" type="submit" disabled={!value.trim() || phase.kind === 'finding'} aria-busy={phase.kind === 'finding' || undefined}>{phase.kind === 'finding' ? <><LoaderCircle size={14} className="dt-spin" />{phase.repo ? FINDING : 'Finding…'}</> : <><Search size={14} />Find</>}</button>
+      </div>
+      <small id="dts-add-help" className={error ? 'dts-error' : 'dts-help'} role={error ? 'alert' : undefined}>{error || LINK_HELPER}</small>
+    </form>
+    {needLink && <div className="dtp-source-links dtl-links"><button className="dtp-btn dts-link" onClick={() => setView('search')}>{SEARCH_DATA.title}</button><button className="dtp-btn dts-link" onClick={() => setView('guide')}>{GUIDE.title}</button></div>}
+    {phase.kind === 'found' && <div className="dts-found">
+      <span className="dts-tile">{phase.saved.kind === 'library' ? <LibraryBig size={18} /> : <Layers3 size={18} />}</span>
+      <span><strong>{phase.saved.name}</strong><small>{phase.saved.kind === 'library' ? `GitHub organisation · ${plural(phase.page.listings.length, 'repository', 'repositories')}` : `Collection · by ${phase.page.by} · ${plural(phase.sources ?? phase.page.listings.length, 'source')}`}</small><p>{phase.page.description}</p>
+        {phase.from && <small className="dtl-from">{foundIn(phase.from)}</small>}</span>
+    </div>}
+    {phase.kind === 'several' && <>
+      <div className="dtp-notice accent" role="status"><Info size={16} /><span><strong>{SEVERAL.title(phase.options.length)}</strong><small>{SEVERAL.body}</small></span></div>
+      <div className="dtl-radios" role="radiogroup" aria-label="Collections in this repository" onKeyDown={e => onRadioKey(e, phase.options.length)}>{phase.options.map((c, i) =>
+        <button key={c.file} role="radio" aria-checked={chosen === i} tabIndex={chosen === i ? 0 : -1} className={chosen === i ? 'on' : ''} onClick={() => setChosen(i)}>
+          <span className="dtl-radio" aria-hidden="true" /><span><strong>{c.name}</strong><small>{c.file} · {plural(c.sources, 'source')}</small></span></button>)}</div>
+      <div className="dtl-row"><button className="dtp-btn" onClick={previewChosen}>{SEVERAL.preview}</button></div>
+    </>}
+    {phase.kind === 'repository' && <>
+      <div className="dtp-notice accent" role="status"><Info size={16} /><span><strong>{DATA_REPO.title}</strong><small>{DATA_REPO.body}</small></span></div>
+      <div className="dtl-row"><button className="dtp-btn primary" onClick={installIt}><ArrowDownToLine size={13} />{DATA_REPO.install}</button><button className="dtp-btn" onClick={() => setView('guide')}>{GUIDE.title}</button></div>
+    </>}
+    {phase.kind === 'nothing' && <>
+      <div className="dtp-notice err" role="alert"><OctagonAlert size={16} /><span><strong>{NOTHING_FOUND.title}</strong><small>{NOTHING_FOUND.body}</small></span></div>
+      <div className="dtl-row"><button className="dtp-btn" onClick={() => setView('search')}><Search size={13} />{SEARCH_DATA.title}</button><button className="dtp-btn" onClick={() => setView('guide')}>{GUIDE.short}</button></div>
+    </>}
+    <p className="dts-note">Collections only list repositories. Nothing is downloaded until you install.</p>
+    <footer><button className="dtp-btn" onClick={onClose}>Cancel</button><button className="dtp-btn primary" disabled={phase.kind !== 'found'} onClick={add}>Add collection</button></footer>
+    {!start && <PreviewStates items={[
+      { label: 'Collection link', run: () => preview('https://example.org/community-picks.json') },
+      { label: 'Library', run: () => preview('github.com/example') },
+      { label: 'Repository', run: () => preview('github.com/example-user/field-notes') },
+      { label: 'Already added', run: () => preview(sourceCollections.default.link) },
+      { label: 'Not a collection', run: () => preview('example.org/readme') },
+      { label: 'No connection', run: () => preview(value.trim() || 'github.com/example', true) },
+      { label: 'Repository · one collection', run: () => preview(LINK_SAMPLES.found) },
+      { label: 'Repository · several', run: () => preview(LINK_SAMPLES.several) },
+      { label: 'Repository · nothing found', run: () => preview(LINK_SAMPLES.nothing) },
+    ]} />}
+  </>;
   return <div className="dt-modal-scrim" onClick={onClose}>
-    <section ref={dialog} className="dt-modal dts-dialog" role="dialog" aria-modal="true" aria-labelledby="dts-add-title" onClick={e => e.stopPropagation()}>
-      <header><div><h2 id="dts-add-title">Add a collection or library</h2><p>Lists of repositories to install from</p></div><button className="dtp-icon" aria-label="Close dialog" title="Close" onClick={onClose}><X size={16} /></button></header>
-      <form onSubmit={e => { e.preventDefault(); find(); }}>
-        <label className="dts-field-label" htmlFor="dts-add-link">Collection or library link</label>
-        <div className="dtp-inline-form">
-          <span className={`dtp-search ${error ? 'invalid' : ''}`}><Link2 size={15} /><input id="dts-add-link" placeholder="https://… or github.com/name" value={value} aria-invalid={!!error} aria-describedby="dts-add-help" autoComplete="off" spellCheck={false} onChange={e => { setValue(e.target.value); clearTimeout(timer.current); setPhase({ kind: 'idle' }); }} /></span>
-          <button className="dtp-btn" type="submit" disabled={!value.trim() || phase.kind === 'finding'}>{phase.kind === 'finding' ? <><LoaderCircle size={14} className="dt-spin" />Finding…</> : <><Search size={14} />Find</>}</button>
-        </div>
-        <small id="dts-add-help" className={error ? 'dts-error' : 'dts-help'} role={error ? 'alert' : undefined}>{error || 'A collection file (.json) or a GitHub organisation or user (github.com/name).'}</small>
-      </form>
-      {phase.kind === 'found' && <div className="dts-found">
-        <span className="dts-tile">{phase.saved.kind === 'library' ? <LibraryBig size={18} /> : <Layers3 size={18} />}</span>
-        <span><strong>{phase.saved.name}</strong><small>{phase.saved.kind === 'library' ? `GitHub organisation · ${plural(phase.page.listings.length, 'repository', 'repositories')}` : `Collection · by ${phase.page.by} · ${plural(phase.page.listings.length, 'source')}`}</small><p>{phase.page.description}</p></span>
-      </div>}
-      {phase.kind === 'repository' && <div className="dtp-notice accent"><Github size={16} /><span><strong>That is a repository, not a collection</strong><small>{phase.repo} · Install it directly instead.</small></span><button className="dtp-btn primary small" onClick={installIt}><ArrowDownToLine size={13} />Install it</button></div>}
-      <p className="dts-note">Collections only list repositories. Nothing is downloaded until you install.</p>
-      <footer><button className="dtp-btn" onClick={onClose}>Cancel</button><button className="dtp-btn primary" disabled={phase.kind !== 'found'} onClick={add}>Add collection</button></footer>
-      <PreviewStates items={[
-        { label: 'Collection link', run: () => preview('https://example.org/community-picks.json') },
-        { label: 'Library', run: () => preview('github.com/example') },
-        { label: 'Repository', run: () => preview('github.com/example-user/field-notes') },
-        { label: 'Already added', run: () => preview(sourceCollections.default.link) },
-        { label: 'Not a collection', run: () => preview('example.org/readme') },
-        { label: 'No connection', run: () => preview(value.trim() || 'github.com/example', true) },
-      ]} />
-    </section>
+    <section ref={dialog} className={`dt-modal dts-dialog dtl-dialog ${view}`} role="dialog" aria-modal="true" aria-labelledby="dts-add-title" onClick={e => e.stopPropagation()}>{body}</section>
   </div>;
 }
 

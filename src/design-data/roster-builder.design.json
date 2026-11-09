@@ -1553,6 +1553,34 @@
           "label": "R2-03 · Menu bar · Edit › Star unit"
         },
         {
+          "id": "desktop-links-add",
+          "label": "R2-06 · Add collection dialog · Repository link, Search for data and guide links"
+        },
+        {
+          "id": "desktop-links-repo-found",
+          "label": "R2-06 · Add collection dialog · Repository with one collection"
+        },
+        {
+          "id": "desktop-links-repo-several",
+          "label": "R2-06 · Add collection dialog · Repository with several collections"
+        },
+        {
+          "id": "desktop-links-data-repo",
+          "label": "R2-06 · Add collection dialog · Repository with game data, no collection"
+        },
+        {
+          "id": "desktop-links-nothing-found",
+          "label": "R2-06 · Add collection dialog · Nothing usable found"
+        },
+        {
+          "id": "desktop-links-search-data",
+          "label": "R2-06 · Add collection dialog · Search for data view"
+        },
+        {
+          "id": "desktop-links-guide",
+          "label": "R2-06 · Add collection dialog · Step-by-step guide view"
+        },
+        {
           "id": "desktop-editor-unit-dialog-separated",
           "label": "Roster editor · Unit dialog, after Separate 1 (4 + 1)"
         },
@@ -1780,6 +1808,19 @@
             "desktop-stars-faction",
             "desktop-stars-add-force",
             "desktop-menus-star-unit"
+          ]
+        },
+        {
+          "id": "links",
+          "label": "Collection links",
+          "screens": [
+            "desktop-links-add",
+            "desktop-links-repo-found",
+            "desktop-links-repo-several",
+            "desktop-links-data-repo",
+            "desktop-links-nothing-found",
+            "desktop-links-search-data",
+            "desktop-links-guide"
           ]
         },
         {
@@ -2358,8 +2399,26 @@
                 "level": "overlay",
                 "status": "needs-review",
                 "platforms": ["desktop"],
-                "states": ["link field", "find", "finding", "collection preview", "library preview", "add collection", "repository: install it", "already added", "not a collection", "no connection", "escape closes", "focus trap", "preview states", "App discovery slice: native modal initial focus, Escape/Cancel restores opener or navigation heading; duplicate preview/save safety; saved collection counts and library persistence", "App DD06: centred by the shared dialog shell (gallery: near the top), with the sub line and an icon Close. The repository notice keeps the app's wording 'That is a repository, not a collection.' and a repository icon (no GitHub mark). Errors are the app's existing texts (not a collection, already in your list, newer format, network)."],
-                "screens": ["desktop-sources"]
+                "states": ["link field", "find", "finding", "collection preview", "library preview", "add collection", "repository: install it", "already added", "not a collection", "no connection", "escape closes", "focus trap", "preview states", "App discovery slice: native modal initial focus, Escape/Cancel restores opener or navigation heading; duplicate preview/save safety; saved collection counts and library persistence", "App DD06: centred by the shared dialog shell (gallery: near the top), with the sub line and an icon Close. The repository notice keeps the app's wording 'That is a repository, not a collection.' and a repository icon (no GitHub mark). Errors are the app's existing texts (not a collection, already in your list, newer format, network).", "R2-06 (F4e, approved 2026-11-09, DEC-051; to build): the field reads Repository, collection or library link with the new helper; two text links under it, Search for data and Step-by-step guide, while there is no result", "a repository link is looked up (Find reads Looking in the repository…): one collection: the preview with Found in {repo} · {file} ({branch}), Add collection enables; several: This repository has {count} collections, a radio list (arrow keys move the choice), Preview; game data: This repository holds game data, not a collection, Install it and Step-by-step guide; nothing: No collection or game data in this repository, Search for data and Guide", "Search for data view (replaces the dialog body): Search for data · Opens Google in your browser, Game system, the query line, Battle Augur does not check the results…, ‹ Back and Search on Google ↗; Enter in the system field runs Search on Google", "Step-by-step guide view (replaces the dialog body): six numbered steps (desktop wording: Choose Search for data …), ‹ Back and Paste a link", "each view has ‹ Back and focus goes back to the link field; the sub line, icon Close, Escape and the focus trap stay as built"],
+                "screens": ["desktop-sources", "desktop-links-add", "desktop-links-repo-found", "desktop-links-repo-several", "desktop-links-data-repo", "desktop-links-nothing-found", "desktop-links-search-data", "desktop-links-guide"]
+              },
+              {
+                "id": "desktop.links-views",
+                "title": "Search For Data View",
+                "level": "composite",
+                "status": "specified",
+                "platforms": ["desktop"],
+                "states": ["R2-06 (F4e, approved 2026-11-09, DEC-051; to build)", "opened by the Search for data text link (or the nothing-found button): the dialog body becomes Search for data · Opens Google in your browser", "Game system field; the query line \"{system}\" BattleScribe data site:github.com (empty: without the quoted part)", "Battle Augur does not check the results. Copy a repository link, come back, and paste it.", "‹ Back (focus returns to the link field) and Search on Google ↗ (system browser, host link opener); Enter runs it"],
+                "screens": ["desktop-links-search-data"]
+              },
+              {
+                "id": "desktop.links-guide",
+                "title": "Step-By-Step Guide View",
+                "level": "composite",
+                "status": "specified",
+                "platforms": ["desktop"],
+                "states": ["R2-06 (F4e, approved 2026-11-09, DEC-051; to build)", "opened by the Step-by-step guide text link (or a result's guide button): the dialog body becomes Step-by-step guide", "six numbered steps in accent circles: Choose Search for data · Search for your game system's data repository or collection · Open a result and copy its address (repository or .json file) · Paste it into the link field · Check the preview, then Add collection · Open it, choose game data, Install", "‹ Back and Paste a link: both return to the link field and focus it"],
+                "screens": ["desktop-links-guide"]
               },
               {
                 "id": "desktop.settings.advanced",
