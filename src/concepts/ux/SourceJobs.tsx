@@ -1760,7 +1760,7 @@ function LiveEditorRows({ editable }: { editable: boolean }) {
  *  content; the actions are Copy, Save file… and Share. */
 export function ReadOnlyExportSheet({ snapshot = true, inline = false }: { snapshot?: boolean; inline?: boolean }) {
   const formats = [
-    { id: "file", title: "Battle Augur roster file", body: "A copy of the roster as stored. It cannot be imported back yet; New Recruit JSON can.", ok: true },
+    { id: "file", title: "Battle Augur roster file", body: "A copy of the roster as stored. Import it back at any time; it opens fully once the data is back.", ok: true },
     { id: "text", title: "Text", body: snapshot ? "As last saved yesterday" : "Needs the game data", ok: snapshot },
     { id: "json", title: "New Recruit JSON", body: snapshot ? "As last saved yesterday" : "Needs the game data", ok: snapshot },
     ...STORED_PRINT_ROWS,
