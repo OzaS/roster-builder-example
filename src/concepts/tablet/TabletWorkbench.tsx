@@ -22,6 +22,7 @@ import { ShortcutOverlay, shortcutGroups, useShortcutOverlay, useShortcuts } fro
 import './tablet.css';
 import './tablet-platform.css';
 import { useTabletExperience } from './tabletExperience';
+import { PinLook } from '../../look';
 
 type ThemePref = 'system' | 'light' | 'dark';
 
@@ -52,7 +53,8 @@ export function TabletWorkbench(props: Partial<ConceptProps>) {
   const route = editorStart ? tabletRoute('tablet-home') : tabletRoute(screen); // a rail page, or a state of one (`tablet-home-first-run`, ...)
   if (route) return <TabletShell key={screen} {...props} route={route} initialEditor={editorStart} />;
   const sketch = props as ConceptProps;
-  return <CodexWorkbench {...sketch} screen={screen === 'tablet-archive-sketch' ? 'overview' : sketch.screen} workflowScreen={screen === 'tablet-archive-sketch' ? 'overview' : sketch.workflowScreen} />;
+  // The archived sketch is a record of an earlier design: it keeps the approved markup in the proposed look too.
+  return <PinLook look="current"><CodexWorkbench {...sketch} screen={screen === 'tablet-archive-sketch' ? 'overview' : sketch.screen} workflowScreen={screen === 'tablet-archive-sketch' ? 'overview' : sketch.workflowScreen} /></PinLook>;
 }
 
 /** Overrides the text size of the gallery switch for the screens that show a fixed size. */

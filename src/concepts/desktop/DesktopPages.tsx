@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { AlertTriangle, ArrowDownToLine, ArrowRight, ArrowUpCircle, BookOpen, Check, ChevronRight, CircleAlert, Copy, Database, ExternalLink, FileUp, FolderOpen, Github, HardDrive, Info, Keyboard, Languages, Layers3, Link2, ListFilter, Minus, Palette, Pencil, Plus, RefreshCcw, Search, Shield, SlidersHorizontal, Trash2, Upload, Users, Wrench, X, SquareTerminal, Cpu, RotateCcw } from 'lucide-react';
+import { AlertTriangle, ArrowDownToLine, ArrowRight, ArrowUpCircle, BookOpen, Check, ChevronDown, ChevronRight, CircleAlert, Copy, Database, ExternalLink, FileUp, FolderOpen, Github, HardDrive, Info, Keyboard, Languages, Layers3, Link2, ListFilter, Minus, Palette, Pencil, Plus, RefreshCcw, Search, Shield, SlidersHorizontal, Trash2, Upload, Users, Wrench, X, SquareTerminal, Cpu, RotateCcw } from 'lucide-react';
 import type { ColorScheme } from '../../types';
 import { collectionSources, colourSchemes, installedSources, lookupEntries, rosterLibrary, type LookupKind, type RosterSummary, type SourceInfo } from './desktopData';
 import { comboFromEvent, defaultBindings, formatCombo, hasCommandModifier, keyActions, type KeyAction, type KeyBindings } from './desktopKeys';
@@ -11,6 +11,7 @@ export const PageTitle = ({ children }: { children: ReactNode }) => <h1 classNam
 import type { Notify } from '../workspace/Toasts';
 import './desktop-pages.css';
 import './desktop-gaps.css';
+import { useNextLook } from '../../look';
 import { ExportDialog, primaryForce, specialRoster, type ExportRoster } from './DesktopEditorFlows';
 import { AddCollectionDialog, AddDataCollections, AddDataPreviewStates, CollectionView, FIRST_RUN_NO_PRESET, FirstRunPreviewStates, useFlowStore, GitHubSearchView, LastUpdateCard, LastUpdateStates, SourceStatus, UpdateReportView, flowSourceId, isAddFlow, sourceStatusText, useRosterChecks, type SourceStatusKind } from './DesktopSourceFlows';
 
@@ -50,6 +51,66 @@ export function DesktopRosters({ initialRosters, onOpen, onCreate, onImport, not
   const attentionCount = rosters.filter(needsAttention).length;
   const duplicate = (r: RosterSummary) => { const copy = { ...r, name: `Copy of ${r.name}`, opened: 'Just now', mark: r.mark }; setRosters(list => [copy, ...list]); setSelected(copy.name); notify(`Duplicated as “${copy.name}”`); };
   const remove = (r: RosterSummary) => { const before = rosters; setRosters(list => list.filter(x => x.name !== r.name)); setSelected(rosters.find(x => x.name !== r.name)?.name ?? ''); notify(`Deleted “${r.name}”`, { action: { label: 'Undo', run: () => { setRosters(before); setSelected(r.name); } } }); };
+  const next = useNextLook();
+  // The proposed look (src/look.ts): one toolbar, the list without a card (sortable headings, the faction in its own
+  // column, status in words) and the details as an open column behind a hairline. Not approved (DEC-051).
+  if (next) {
+    const statusWords = (r: RosterSummary) => r.status === 'issues' ? <span className="nxd-status-words warn"><AlertTriangle size={13} />{r.issues} {r.issues === 1 ? 'issue' : 'issues'}</span>
+      : r.status === 'data-changed' ? <span className="nxd-status-words accent"><CircleAlert size={13} />Data changed</span>
+        : r.status === 'faction-removed' ? <span className="nxd-status-words err"><CircleAlert size={13} />Faction removed</span>
+          : <span className="nxd-status-words ok"><Check size={13} />Ready</span>;
+    const sortHead = (label: string, by: string) => <button type="button" className={sort === by ? 'active' : ''} aria-pressed={sort === by} title={`Sort by ${by.toLowerCase()}`} onClick={() => setSort(by)}>{label}{sort === by && <ChevronDown size={12} />}</button>;
+    return <main className="dtp-page nxd-rosters">
+      <PageTitle>Rosters</PageTitle>
+      <div className="nxd-rosters-main">
+        <div className="dtp-toolbar nxd-toolbar">
+          <label className="dtp-search"><Search size={14} /><input placeholder="Find a roster or faction…" aria-label="Find a roster" value={query} onChange={e => setQuery(e.target.value)} />{query && <button aria-label="Clear search" onClick={() => setQuery('')}><X size={13} /></button>}</label>
+          <div className="dtp-chips"><button className={!attention ? 'active' : ''} onClick={() => setAttention(false)}>All <b>{rosters.length}</b></button>{attentionCount > 0 && <button className={attention ? 'active' : ''} onClick={() => setAttention(true)}>Needs attention <b>{attentionCount}</b></button>}</div>
+          <label className="dtp-select"><select aria-label="Game system" value={system} onChange={e => setSystem(e.target.value)}>{['All game systems', 'Open Field', 'Example System Two'].map(s => <option key={s}>{s}</option>)}</select></label>
+          <span className="dtp-push" />
+          <button className="dtp-btn" onClick={onImport} title="Import a roster from a file"><FileUp size={14} />Import</button>
+          <button className="dtp-btn primary" onClick={onCreate} title="Create a roster"><Plus size={14} />New roster</button>
+        </div>
+        <section className="nxd-list" aria-label="Rosters">
+          <div className="nxd-list-head nxd-roster-grid">{sortHead('Roster', 'Name')}<span>Faction · game system</span>{sortHead('Points', 'Points')}<span>Status</span>{sortHead('Opened', 'Recently opened')}</div>
+          <div className="dtp-scroll">
+            {visible.map(r => <button key={r.name} className={`dtp-row nxd-roster-grid ${r.name === selected ? 'selected' : ''}`} aria-pressed={r.name === selected} onClick={() => setSelected(r.name)} onDoubleClick={() => onOpen(r.name)}>
+              <strong>{r.name}</strong>
+              <span className="dtp-muted">{r.faction} · {r.system}</span>
+              <span className={`dtp-points ${r.used > r.limit ? 'over' : ''}`}><b>{r.used.toLocaleString()}</b> / {r.limit.toLocaleString()}<i><em style={{ width: `${Math.min(r.used / r.limit * 100, 100)}%` }} /></i></span>
+              {statusWords(r)}
+              <span className="dtp-muted">{r.opened}</span>
+            </button>)}
+            {!rosters.length && <div className="dtp-empty"><Layers3 size={22} /><strong>No rosters yet</strong><p>Create a roster, or import one from a file.</p><span className="dtp-row-actions"><button className="dtp-btn primary" onClick={onCreate}><Plus size={15} />New roster</button><button className="dtp-btn" onClick={onImport}><FileUp size={15} />Import</button></span></div>}
+            {rosters.length > 0 && !visible.length && <div className="dtp-empty"><Search size={22} /><strong>No rosters match</strong><p>Try another name, or clear the filters.</p><button className="dtp-btn" onClick={() => { setQuery(''); setAttention(false); setSystem('All game systems'); }}>Clear filters</button></div>}
+          </div>
+          <footer className="dtp-list-foot"><span>{rosters.length} rosters stored on this device</span><span className="dtp-push">Double-click a roster to open it in a tab</span></footer>
+        </section>
+      </div>
+      <aside className="nxd-inspector" aria-label="Roster details">{current ? <>
+        <div className="dtp-detail-title">
+          {renaming ? <form onSubmit={e => { e.preventDefault(); const v = (new FormData(e.currentTarget).get('name') as string).trim(); if (v) { setRosters(list => list.map(r => r.name === current.name ? { ...r, name: v } : r)); setSelected(v); } setRenaming(false); }}><input name="name" autoFocus maxLength={60} defaultValue={current.name} aria-label="Roster name" /><button className="dtp-btn small" type="submit">Save</button></form>
+            : <div><h2>{current.name}</h2><p>{current.faction} · {current.system}</p></div>}
+          {!renaming && <button className="dtp-icon" aria-label="Rename roster" title="Rename" onClick={() => setRenaming(true)}><Pencil size={14} /></button>}
+        </div>
+        <div className="nxd-inspector-actions">
+          <button className="dtp-btn primary" onClick={() => onOpen(current.name)}>Open roster<ArrowRight size={14} /></button>
+          <button className="dtp-btn nxd-icon-btn" aria-label="Duplicate roster" title="Duplicate" onClick={() => duplicate(current)}><Copy size={14} /></button>
+          <button className="dtp-btn nxd-icon-btn" aria-label="Export roster" title="Export" onClick={() => setExporting(current)}><ArrowDownToLine size={14} /></button>
+          <button className={`dtp-btn danger ${confirmDelete ? 'confirm' : 'nxd-icon-btn'}`} aria-label={confirmDelete ? undefined : 'Delete roster'} title="Delete" onClick={() => confirmDelete ? remove(current) : setConfirmDelete(true)}><Trash2 size={14} />{confirmDelete && 'Delete for good?'}</button>
+        </div>
+        <dl className="nxd-facts">
+          <div className="nxd-fact-points"><dt>Points</dt><dd><span className={current.used > current.limit ? 'over' : ''}><b>{current.used.toLocaleString()}</b> / {current.limit.toLocaleString()} pts</span><small>{current.used > current.limit ? `${(current.used - current.limit).toLocaleString()} over the limit` : `${(current.limit - current.used).toLocaleString()} open`}</small><i className={`dtp-progress ${current.used > current.limit ? 'over' : ''}`}><em style={{ width: `${Math.min(current.used / current.limit * 100, 100)}%` }} /></i></dd></div>
+          <div><dt>Status</dt><dd>{statusWords(current)}<small>{current.status === 'ready' ? 'All roster requirements met.' : current.status === 'issues' ? (current.used > current.limit ? 'Over the points limit.' : 'Roster requirements not met.') : current.status === 'data-changed' ? 'Some entries changed in the last update. Open to review them.' : 'The faction is no longer in the installed data. The roster opens read-only.'}</small></dd></div>
+          <div><dt>Forces</dt><dd>{current.forces}</dd></div>
+          <div><dt>Units</dt><dd>{current.units}</dd></div>
+          <div><dt>Game data</dt><dd>{current.system} {current.system === 'Open Field' ? 'v1.4' : 'v3.0.2'}</dd></div>
+          <div><dt>Last opened</dt><dd>{current.opened}</dd></div>
+        </dl>
+      </> : <div className="dtp-empty"><Layers3 size={22} /><strong>No roster selected</strong><p>Choose a roster to see its details.</p></div>}</aside>
+      {exporting && <ExportDialog roster={exportSnapshot(exporting)} readOnly={exporting.status === 'faction-removed'} storedMode={exporting.status === 'faction-removed'} formats={['text', 'json']} onClose={() => setExporting(null)} notify={notify} />}
+    </main>;
+  }
   return <main className="dtp-page">
     <PageTitle>Rosters</PageTitle>
     {/* DEC-050: no page title row; the search fills the top row and the page's buttons end it (they left the tab row). */}

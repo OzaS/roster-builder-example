@@ -19,6 +19,8 @@ import { SettingsResults } from "./SettingsSearch";
 import { StarButton, StarDivider, StarRow, StarredHeadingContent, starredFirst, useStars } from "../workspace/Stars";
 import "./phone-stars.css";
 import { APP_DEVELOPER_SCREENS, DebugNavRow, DebugScreen, DeveloperOptionsNavRow, DeveloperOptionsScreen } from "./DeveloperPages";
+import { useNextLook } from "../../look";
+import { NextBudgetStrip } from "./NextLook";
 import { BackOrTitle, BudgetMeter, Chip, ExpandableBudget, RosterMoreMenu, RosterShareButton, TreeUnitMain, countSections, flattenUnits, priceLabel, rosterChecks, shellClass, StatusGlyph, SubscriptionGate } from "./uxShared";
 
 /** R2-02 (F4b, approved 2026-11-07): the gallery screens of names and the points limit. The unit details ones open "Squad A";
@@ -49,6 +51,7 @@ type ReferenceGlance =
  */
 export function CodexWorkbench(props: ConceptProps) {
   const navStyle = props.navStyle ?? "top";
+  const next = useNextLook();
   const usesTabNavigation = navStyle !== "top";
   const smart = props.smartSearch ?? false;
   const screen = props.screen;
@@ -255,7 +258,8 @@ export function CodexWorkbench(props: ConceptProps) {
         />
         {!isUnitDetail ? (
           <div className={`ux-wb-budget ${screen === "overview" ? "tablet-overview-budget" : ""}`}>
-            {screen === "overview" ? <><small className="ux-phone-overview-identity">{props.roster.faction} · {props.roster.system}</small><ExpandableBudget roster={viewRoster} />{limitWarning ? <LimitWarning text={limitWarning} /> : null}</> : <BudgetMeter roster={viewRoster} />}
+            {next ? <><NextBudgetStrip roster={viewRoster} onIssues={screen === "validation" ? undefined : () => props.onNavigate("validation")} />{screen === "overview" && limitWarning ? <LimitWarning text={limitWarning} /> : null}</>
+              : screen === "overview" ? <><small className="ux-phone-overview-identity">{props.roster.faction} · {props.roster.system}</small><ExpandableBudget roster={viewRoster} />{limitWarning ? <LimitWarning text={limitWarning} /> : null}</> : <BudgetMeter roster={viewRoster} />}
           </div>
         ) : null}
         <div className="ux-wb-layout" ref={layoutRef} style={panelStyle}>
@@ -491,6 +495,7 @@ function WorkbenchHeader({
 
 function Tree({ props, query, creationOpen, onCreationOpenChange, onOpenUnitGlance }: { props: ConceptProps; query: string; creationOpen: boolean; onCreationOpenChange: (open: boolean) => void; onOpenUnitGlance: (unit: RosterUnit) => void }) {
   const [renamingUnitId, setRenamingUnitId] = useState<string | null>(null);
+  const next = useNextLook();
   const renamingUnit = flattenUnits(props.roster).find((unit) => unit.id === renamingUnitId);
   const normalizedQuery = query.trim().toLowerCase();
   const visibleForces = props.roster.forces.map((force) => {
@@ -528,15 +533,27 @@ function Tree({ props, query, creationOpen, onCreationOpenChange, onOpenUnitGlan
                     const open = normalizedQuery ? true : props.expandedSectionIds.includes(section.id) || section.id === props.selectedSectionId;
                     return (
                       <div className={`ux-tree-branch ${open ? "open" : ""}`} key={section.id}>
+                        {next ? (
+                          // Proposed look: the section heading carries a round Add button, so the Add unit row below goes.
+                          <div className="ux-nx-section-head">
+                            <button type="button" className="ux-tree-section" aria-expanded={open} onClick={() => props.onSelectSection(section.id)}>
+                              <ChevronDown size={14} className="ux-tree-caret" />
+                              <strong>{section.name}</strong>
+                              <small>{section.required ?? section.units.length}</small>
+                            </button>
+                            {!normalizedQuery ? <button type="button" className="ux-nx-add" aria-label={`Add unit to ${section.name}`} title="Add unit" onClick={() => { props.onSelectForce(force.id); props.onSelectSection(section.id); props.onNavigate("add-unit"); }}><Plus size={17} aria-hidden /></button> : null}
+                          </div>
+                        ) : (
                         <button type="button" className="ux-tree-section" onClick={() => props.onSelectSection(section.id)}>
                           <ChevronDown size={14} className="ux-tree-caret" />
                           <strong>{section.name}</strong>
                           <small>{section.required ?? section.units.length}</small>
                         </button>
+                        )}
                         {open ? (
                           <div className="ux-tree-units">
                             {units.map((unit) => <SwipeableUnitRow key={unit.id} unit={unit} active={props.selectedUnit.id === unit.id} onSelect={() => props.onSelectUnit(unit.id)} onOpenGlance={() => onOpenUnitGlance(unit)} onDelete={() => props.onDeleteUnit(unit.id)} onRename={() => setRenamingUnitId(unit.id)} onDuplicate={() => props.onDuplicateUnit(unit.id)} />)}
-                            {!normalizedQuery ? <button
+                            {!normalizedQuery && !next ? <button
                               type="button"
                               className="ux-tree-add"
                               onClick={() => {
@@ -578,6 +595,7 @@ const UNIT_SWIPE_CONTENT_GAP = 10;
 const UNIT_SWIPE_REVEAL = UNIT_SWIPE_ACTIONS_WIDTH + UNIT_SWIPE_CONTENT_GAP;
 
 function SwipeableUnitRow({ unit, active, onSelect, onOpenGlance, onDelete, onRename, onDuplicate }: { unit: ConceptProps["selectedUnit"]; active: boolean; onSelect: () => void; onOpenGlance: () => void; onDelete: () => void; onRename: () => void; onDuplicate: () => void }) {
+  const next = useNextLook();
   const [offset, setOffset] = useState(0);
   const [dragging, setDragging] = useState(false);
   const startX = useRef<number | null>(null);
@@ -652,7 +670,10 @@ function SwipeableUnitRow({ unit, active, onSelect, onOpenGlance, onDelete, onRe
       >
         <span className="ux-tree-rail" aria-hidden />
         <TreeUnitMain unit={unit} name={unitDisplayName(unit)} entryName={unit.customName?.trim() ? unit.name : undefined} />
-        {unit.status && unit.status !== "valid" ? <StatusGlyph status={unit.status} size={13} /> : unit.points ? <b>{unit.points}</b> : null}
+        {next
+          // Proposed look: an issue icon sits before the points, it does not replace them.
+          ? <>{unit.status && unit.status !== "valid" ? <StatusGlyph status={unit.status} size={15} /> : null}{unit.points ? <b>{unit.points}</b> : null}</>
+          : unit.status && unit.status !== "valid" ? <StatusGlyph status={unit.status} size={13} /> : unit.points ? <b>{unit.points}</b> : null}
       </button>
     </div>
   );
@@ -1219,6 +1240,7 @@ function ReferenceDefinition({ reference, onOpenReference }: { reference: Roster
 }
 
 function AddPane({ props }: { props: ConceptProps }) {
+  const next = useNextLook();
   const [added, setAdded] = useState<Record<string, number>>({});
   const [lastAdded, setLastAdded] = useState<string | null>(null);
   // Gallery state add-unit-limit (DEC-054): the sheet opened on a section with a unit at its maximum, its reason shown.
@@ -1261,7 +1283,10 @@ function AddPane({ props }: { props: ConceptProps }) {
           </span>
           <span className="ux-pool-meta">
             <b>{unit.points} pts</b>
-            {locked ? null : <Chip tone={unit.availability === "available" ? "valid" : "warning"}>{unit.availability}</Chip>}
+            {locked ? null : next
+              // Proposed look: no pill; a limited unit says so in words with an icon, an available one shows nothing extra.
+              ? unit.availability === "limited" ? <small className="ux-nx-status warn"><AlertTriangle size={12} aria-hidden />Limited</small> : null
+              : <Chip tone={unit.availability === "available" ? "valid" : "warning"}>{unit.availability}</Chip>}
           </span>
           {locked ? <span className="ws-limit-add ux-pool-limit-add" aria-hidden><i><Plus size={15} /></i></span> : <Plus size={16} />}
         </button>
@@ -1359,6 +1384,7 @@ function Library({ props }: { props: ConceptProps }) {
   const isV2 = props.workflowScreen === "library-v2";
   // TFB-005: the phone Lists with search, the filter row and grouping (the tablet Rosters controls).
   const isFilters = !isV2;
+  const next = useNextLook();
   const [promptOpen, setPromptOpen] = useState(true);
   const [organizerOpen, setOrganizerOpen] = useState(true);
   // R0 gap frames (UI plan O5 and the keyboard / long system name frame): the search open with a query, the no-match state with Clear filters, and the keyboard shown.
@@ -1374,7 +1400,7 @@ function Library({ props }: { props: ConceptProps }) {
   return (
     <>
       <PhoneSearchHeader title="Lists" subtitle="Your rosters" query={query} onQueryChange={setQuery}
-        placeholder="Find a roster or faction…" trailing={<AppAvatarButton props={props} />} initialOpen={gapState !== undefined} />
+        placeholder="Find a roster or faction…" trailing={next && isFilters ? <><button type="button" className="ux-icon-btn ux-nx-header-action" aria-label="Import a roster file" title="Import a roster file"><FileInput size={20} aria-hidden /></button><AppAvatarButton props={props} /></> : <AppAvatarButton props={props} />} initialOpen={gapState !== undefined} />
       <div className={`ux-wb-home-body ux-lists-body ${isV2 ? "is-v2" : "is-v1"} ${isV2 && organizerOpen ? "organizer-open" : ""}`}>
         {isV2 && organizerOpen ? (
           <aside className="ux-roster-organizer" aria-label="Organize rosters">
@@ -1385,7 +1411,7 @@ function Library({ props }: { props: ConceptProps }) {
             <div className="ux-organizer-tags"><small>Tags</small><div><button type="button"><Tag size={12} />Competitive</button><button type="button"><Tag size={12} />Draft</button><button type="button"><Tag size={12} />Favourite</button></div></div>
           </aside>
         ) : null}
-        {isFilters ? <PhoneListsFilters query={query} onQueryChange={setQuery} promptDismissed={gapState !== undefined} initialSystem={gapState === "no-match" ? "Open Field" : null} longSystem={gapState === "keyboard" ? "Example System Two: Extended Campaign Rules, Second Edition" : undefined} onOpenRoster={() => props.onNavigate("overview")} actions={<div className="ux-lists-actions">
+        {isFilters ? <PhoneListsFilters query={query} onQueryChange={setQuery} promptDismissed={gapState !== undefined} initialSystem={gapState === "no-match" ? "Open Field" : null} longSystem={gapState === "keyboard" ? "Example System Two: Extended Campaign Rules, Second Edition" : undefined} onOpenRoster={() => props.onNavigate("overview")} actions={next ? undefined : <div className="ux-lists-actions">
           <button type="button" className="ux-organizer-toggle" aria-label="Import a roster file"><Upload size={15} />Import</button>
           <button type="button" className="ux-new-roster ux-new-roster-compact" onClick={() => props.onNavigate("system")}><Plus size={18} /><span><strong>New roster</strong></span></button>
         </div>} /> : <main className="ux-lists-main">

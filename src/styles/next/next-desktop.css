@@ -1,0 +1,351 @@
+/* The proposed look ("next") for the desktop library. Scope every rule to :root[data-look="next"]. See next-shared.css. */
+/*
+ * Everything sits in one nested block, so every rule starts with :root[data-look="next"] and applies only inside the
+ * desktop window (.dt-app). The tablet reuses `.dt-app.tb-shim` for shared workspace controls; :not(.tb-shim) keeps it out.
+ * Not approved (DEC-051): the approved desktop design is the look "current".
+ *
+ * Desktop reading of the language:
+ * - Two tones, no boxes: side areas (rail, catalogue) on the window canvas, the work area on the pane tone, one hairline
+ *   between them. The chrome row is 44 px and the points line is its bottom edge.
+ * - Rows are rounded shapes (hover, pressed, selected); no dividers between rows, no icon tiles, no row chevrons.
+ * - Type: 13 px body and controls on macOS (14 px on Windows), 12 px metadata, sentence-case labels, nothing under 12 px.
+ * - Corners: 6 px controls, 8 px rows, 10 px overlays on macOS; 4 / 4 / 8 px on Windows.
+ */
+:root[data-look="next"] .dt-app:not(.tb-shim) {
+  --nxd-body: 13px;
+  --nxd-meta: 12px;
+  --nxd-r-control: 6px;
+  --nxd-r-row: 8px;
+  --nxd-r-overlay: 10px;
+  --nxd-chrome: 44px;
+  --nxd-measure: 920px;
+  --nxd-gutter: 64px;
+  --nxd-hover: color-mix(in srgb, var(--dt-text) 6%, transparent);
+  --nxd-press: color-mix(in srgb, var(--dt-text) 12%, transparent);
+  --nxd-select: color-mix(in srgb, var(--ux-accent) 16%, transparent);
+
+  &.ux-screen { font-size: var(--nxd-body) }
+  &.dt-os-windows { --nxd-body: 14px; --nxd-r-control: 4px; --nxd-r-row: 4px; --nxd-r-overlay: 8px }
+
+  /* ---- Pressed state: every button answers a press. ---- */
+  .dt-icon:active:not(:disabled), .dtp-row:active, .dtp-chips button:active, .dtp-settings-nav button:active, .dtp-segmented button:active, .dt-modal > button:active { background: var(--nxd-press) }
+  .dt-primary:hover:not(:disabled), .dtp-btn.primary:hover:not(:disabled) { background: var(--dt-fill); filter: brightness(1.08) }
+  .dt-primary:active:not(:disabled), .dtp-btn.primary:active:not(:disabled) { background: var(--dt-fill); filter: brightness(.9) }
+  .dtp-btn.danger.confirm:hover, .dtp-btn.danger.confirm:active { background: var(--ux-err) }
+  .dt-icon { border-radius: var(--nxd-r-control) }
+  kbd { font-size: 12px; border-radius: 4px }
+
+  /* ---- Chrome row: 44 px, tabs as plain shapes, the points line as its bottom edge. ---- */
+  .dt-floating-chrome { height: var(--nxd-chrome); padding: 0 12px 0 16px; gap: 16px }
+  .dt-floating-chrome .dt-traffic { margin-top: 17px }
+  &.dt-os-windows .dt-floating-chrome { padding: 0 0 0 8px; gap: 10px }
+  .dt-workspace-tabs { gap: 2px }
+  .dt-workspace-tabs > button:not(.dt-icon) { height: 30px; padding: 0 12px; border-radius: var(--nxd-r-row); font-size: var(--nxd-body); gap: 8px }
+  .dt-workspace-tabs > button.active { background: var(--nxd-hover); box-shadow: none; font-weight: 600 }
+  .dt-workspace-tabs > button.active:active { background: var(--nxd-press) }
+  .dt-workspace-tabs .dt-dot { margin-left: 6px }
+  .dt-workspace-tabs .dt-icon { border-radius: var(--nxd-r-control) }
+  .dt-floating-actions { gap: 6px }
+  .dt-floating-actions .dt-icon { width: 28px; height: 28px; border-radius: var(--nxd-r-control) }
+  .dt-summary-toggle { height: 28px; border-radius: var(--nxd-r-control); border-color: transparent !important; background: var(--nxd-hover); font-size: var(--nxd-body) }
+  .dt-summary-toggle:active { background: var(--nxd-press) }
+  .dt-summary-toggle.active { background: var(--nxd-select) !important; border-color: transparent !important }
+  .dt-summary-toggle.configuration-warning { border-color: var(--dt-warn) !important }
+  .dt-jobs-toggle { height: 28px; border-radius: var(--nxd-r-control); font-size: 12px }
+  .dt-tab-progress { top: calc(var(--nxd-chrome) - 2px) }
+  &.dt-view-editor .dt-editor { padding-top: var(--nxd-chrome) }
+  &.dt-hub .dt-body { padding-top: var(--nxd-chrome) }
+  &.dt-view-welcome .dt-welcome { padding-top: 0 }
+  .dt-summary, .dt-jobs { top: calc(var(--nxd-chrome) + 4px); right: 12px; border-radius: var(--nxd-r-overlay) }
+  .dt-toast.functional { top: calc(var(--nxd-chrome) + 10px) }
+  .dt-toast { border-radius: var(--nxd-r-row) }
+  .dt-modal, .dte-dialog, .dt-wizard-modal { border-radius: var(--nxd-r-overlay) }
+  .dt-win-caption > span { width: 44px }
+
+  /* ---- Editor: panes divided by one hairline, no sheet. ---- */
+  .dt-panels { padding-top: 0 }
+  .dt-resizer { top: 0 }
+  .dt-catalogue { border-right: 1px solid var(--dt-border) }
+  .dt-roster, .dt-panels.no-left .dt-roster, .dt-panels.no-right .dt-roster { border: 0; border-radius: 0; background: var(--dt-pane) }
+  .dt-panel-heading { height: 40px; font-size: var(--nxd-body); font-weight: 600 }
+  .dt-panel-heading small { font-size: var(--nxd-meta); font-weight: 400; margin-left: 6px }
+  .dt-roster > .dt-panel-heading { padding-inline: max(20px, calc((100% - var(--nxd-measure)) / 2 + 12px)) max(12px, calc((100% - var(--nxd-measure)) / 2 + 6px)) }
+  .dte-history { border-right: 0; margin-right: 0 }
+
+  /* Catalogue: search, sentence-case group labels, one-line rows. */
+  .dt-panel-heading.dte-pane-tools { padding: 0 8px 0 10px; gap: 4px }
+  .dt-search { border-radius: var(--nxd-r-control); padding: 5px 8px; background: var(--nxd-hover) }
+  .dt-search input { font-size: var(--nxd-body) }
+  .dt-catalogue-tools { padding: 0 10px }
+  .dt-filter { padding: 2px 8px 4px; font-size: var(--nxd-meta) }
+  .dt-filter select { font-size: var(--nxd-meta); max-width: 140px }
+  .dt-filter span { color: var(--dt-muted) }
+  .dte-target { border-radius: var(--nxd-r-control); margin: 0 0 6px }
+  .dt-catalogue-list { padding: 0 8px 12px }
+  .dt-catalogue-list h3 { padding: 12px 8px 3px; font-size: var(--nxd-meta); font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--dt-muted) }
+  .dt-catalogue-list h3 span { font-weight: 400 }
+  .dt-catalogue-unit { min-height: 30px; padding: 4px 6px 4px 8px; border-radius: var(--nxd-r-row); gap: 6px }
+  .dt-catalogue-unit:not(.unavailable):hover { background: var(--nxd-hover) }
+  .dt-catalogue-unit:not(.unavailable):has(.dt-catalogue-add:active) { background: var(--nxd-press) }
+  .dt-catalogue-unit.unavailable:hover { background: none }
+  button.dt-catalogue-add, button.dt-catalogue-add:hover, button.dt-catalogue-add:active { background: none }
+  .dt-catalogue-add > span { flex-direction: row; align-items: baseline; gap: 8px; width: 100% }
+  .dt-catalogue-unit strong { flex: 0 1 auto; min-width: 48px; font-size: var(--nxd-body); font-weight: 500 }
+  .dt-catalogue-add small, .dt-catalogue-unit .dt-catalogue-reason { display: block; flex: 1 1 0; min-width: 0; font-size: var(--nxd-meta); color: var(--dt-muted) }
+  .dt-catalogue-unit.warn .dt-catalogue-reason { color: var(--dt-warn) }
+  &.light .dt-catalogue-unit.warn .dt-catalogue-reason { color: color-mix(in srgb, var(--dt-warn) 55%, var(--dt-text)) }
+  .dtc-meta { flex: 1 1 0; min-width: 0; align-items: baseline; gap: 6px }
+  .dtc-quota { line-height: 16px; padding: 0 6px; align-self: center }
+  .dt-catalogue-unit.limit .dtc-meta small { display: none }
+  .dt-catalogue-unit.err .dt-catalogue-reason { color: var(--dt-muted) }
+  @container (min-width: 330px) { .dt-catalogue-unit.limit .dtc-meta small { display: block } }
+  .dt-catalogue-price { gap: 8px; font-size: var(--nxd-body); color: var(--dt-text) }
+  .dt-catalogue-price svg { color: var(--dt-accent) }
+  .dtc-add-off { width: 18px; height: 18px; border-radius: 5px }
+  .dt-catalogue .dt-panel-foot { display: none }
+
+  /* Roster: a list of units with breathing room. No table, no bands, no boxes. */
+  /* The list keeps a readable measure in a wide window, so a name and its points stay within one glance. Points end in
+     one column; the gutter after it holds the actions of the row under the pointer: + for a section, Duplicate and Remove
+     for a unit, Rename and Remove for a force. */
+  .dt-roster-scroll > .dte-force, .dt-roster > .dte-readonly { width: 100%; max-width: var(--nxd-measure); margin-inline: auto }
+  .dt-roster-scroll { padding: 0 8px 20px }
+  .dt-roster-scroll > .dt-add-force { display: flex; margin-inline: max(6px, calc((100% - var(--nxd-measure)) / 2 + 6px)) auto !important }
+  .dte-force + .dte-force { margin-top: 22px; padding-top: 0; border-top: 0 }
+  .dt-force-heading.dte-force-heading { position: relative; margin-block: 2px 0; padding: 6px 0 4px 12px; gap: 8px; border: 0; border-radius: 0; background: none }
+  .dte-force-tools { position: absolute; right: 6px; top: 50%; transform: translateY(-50%) }
+  .dte-force-tools .dt-icon { width: 26px; height: 26px }
+  .dt-force-icon { display: none }
+  .dte-force-name { padding: 2px 6px; margin-left: -6px; border-radius: var(--nxd-r-control); gap: 1px }
+  .dte-force-name strong { font-size: 15px; font-weight: 600; letter-spacing: -.1px }
+  .dte-force-name small { font-size: var(--nxd-meta) }
+  .dte-force-points { margin-right: var(--nxd-gutter); font-size: var(--nxd-body); font-weight: 600 }
+  .dte-force-points small { font-size: var(--nxd-meta); font-weight: 400 }
+  .dte-rename { font-size: var(--nxd-body); border-radius: var(--nxd-r-control) }
+  .dt-roster-group { margin: 0; padding: 8px 0 0; border: 0; border-radius: 0; overflow: visible }
+  .nxd-group-head { display: flex; align-items: center }
+  .dt-group-heading { flex: 1; min-width: 0; padding: 5px 8px 5px 12px !important; border-radius: var(--nxd-r-row); font-size: var(--nxd-body) !important; gap: 6px !important }
+  .dt-group-heading:hover { background: var(--nxd-hover) !important }
+  .dt-group-heading:active { background: var(--nxd-press) !important }
+  .dt-group-heading > span { font-weight: 600 }
+  .dt-group-heading small { margin-left: 4px; font-size: var(--nxd-meta); color: var(--dt-muted); font-variant-numeric: tabular-nums }
+  .dt-group-heading b { font-size: var(--nxd-meta); color: var(--dt-muted); font-variant-numeric: tabular-nums }
+  .nxd-group-add { margin: 0 6px 0 22px; color: var(--dt-accent) !important }
+  .dte-unit-row { position: relative; min-height: 44px; margin: 0; padding: 0; border-radius: var(--nxd-r-row); gap: 6px }
+  .dte-unit-row + .dte-unit-row { margin-top: var(--nx-row-gap) }
+  .dte-unit-row::before { content: ''; position: absolute; left: 13px; top: 9px; bottom: 9px; width: 3px; border-radius: 2px; background: var(--dt-ok) }
+  .dte-unit-row:has(.dte-unit-issue)::before { background: var(--dt-warn) }
+  .dte-unit-row:hover { background: var(--nxd-hover) }
+  .dte-unit-row:has(.dt-roster-unit:active) { background: var(--nxd-press) }
+  .dte-unit-row.selected, .dte-unit-row.selected:hover { background: var(--nxd-select); box-shadow: none }
+  .dte-unit-row .dt-roster-unit, .dte-unit-row .dt-roster-unit:hover, .dte-unit-row .dt-roster-unit:active { padding: 4px 6px 4px 30px; background: none; border-radius: var(--nxd-r-row) }
+  .dt-unit-icon { display: none }
+  .dt-unit-info strong { margin-bottom: 0; font-size: var(--nxd-body); font-weight: 600; line-height: 1.4 }
+  .dt-unit-info small { font-size: var(--nxd-meta); line-height: 1.4 }
+  .dt-unit-tag { margin-left: 6px; padding: 0 5px; border-radius: 4px; font-size: 12px; letter-spacing: 0; line-height: 16px; display: inline-block }
+  .dte-row-actions { position: absolute; right: 6px; top: 50%; transform: translateY(-50%) }
+  .dte-row-actions .dt-icon { width: 26px; height: 26px }
+  .dte-unit-row.selected .dte-row-actions { display: inline-flex }
+  .dte-unit-issue { border-radius: var(--nxd-r-control) }
+  .dte-unit-end { min-width: 62px; margin-right: var(--nxd-gutter); justify-content: flex-end; color: var(--dt-text) }
+  .dte-unit-end > svg { display: none }
+  .dt-unit-points { flex-direction: row; align-items: baseline; gap: 3px; font-size: var(--nxd-body); font-weight: 600 }
+  .dt-unit-points small { font-size: var(--nxd-meta); font-weight: 400; color: var(--dt-muted) }
+  .dt-add-force { margin: 18px 0 0 6px !important; padding: 6px 8px !important; border: 0 !important; border-radius: var(--nxd-r-control); font-size: var(--nxd-body) !important; color: var(--dt-accent) !important }
+  .dte-readonly { margin: 0 12px 8px; border: 0; border-radius: var(--nxd-r-row) }
+  @container (max-width: 470px) { .dte-unit-row::before { left: 9px } .dte-unit-row .dt-roster-unit { padding-left: 22px } }
+
+  /* Status bar under the editor: data version, open points, key hints. */
+  .nxd-status { height: 26px; gap: 16px; padding: 0 12px; background: transparent; font-size: var(--nxd-meta) }
+  .nxd-status kbd { margin-right: 4px }
+
+  /* ---- Unit dialog: the dialog floats, so it keeps its box; inside it the option groups are open rows. ---- */
+  .dtu-dialog.dt-inspector { border-radius: var(--nxd-r-overlay) }
+  .dt-eyebrow, .dt-inspector-title .dt-eyebrow { font-size: var(--nxd-meta); font-weight: 500; letter-spacing: 0 }
+  .dt-inspector-tabs button { border-radius: var(--nxd-r-control); font-size: var(--nxd-body) }
+  .dt-unit-actions button { padding: 3px 6px; margin-left: -6px; border-radius: var(--nxd-r-control); font-size: var(--nxd-body) }
+  .dt-unit-actions { gap: 14px }
+  .dt-inspector-content h3, .dt-option-heading h3 { font-size: var(--nxd-meta); font-weight: 600; color: var(--dt-muted) }
+  .dt-option-heading { margin-top: 20px; margin-bottom: 4px }
+  .dt-option-heading > span { color: var(--dt-muted) }
+  .dt-model-count { padding: 4px 0 6px; border-bottom: 0; font-size: var(--nxd-body) }
+  .dt-stepper { border-radius: var(--nxd-r-control) }
+  .dt-checkbox-row { align-items: center; margin: 0 -10px; padding: 7px 10px; border: 0; border-radius: var(--nxd-r-row) }
+  .dt-checkbox-row:hover { background: var(--nxd-hover) }
+  .dt-checkbox-row:active { background: var(--nxd-press) }
+  .dt-checkbox-row.checked { border: 0; background: none }
+  .dt-checkbox-row.checked:hover { background: var(--nxd-hover) }
+  .dt-checkbox-row input { width: 14px; height: 14px; margin: 0 }
+  .dt-checkbox-row strong { font-size: var(--nxd-body); font-weight: 500 }
+  .dt-checkbox-row small { margin-top: 1px }
+  .dt-checkbox-row b { font-size: var(--nxd-body); font-variant-numeric: tabular-nums }
+  .dtu-radios { gap: 2px }
+  button.dtu-drill { width: calc(100% + 20px); margin: 0 -10px; padding: 7px 10px; border: 0; border-radius: var(--nxd-r-row) }
+  .dtu-drill strong { font-size: var(--nxd-body); font-weight: 500 }
+  .dtu-drill > span { gap: 1px }
+  .dtu-group { padding: 0; border: 0; border-radius: 0 }
+  .dtu-group + .dtu-group { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--dt-border) }
+  .dt-field-label select, .dt-field-label input, .dt-inspector textarea, .dtu-dialog textarea { border-radius: var(--nxd-r-control); font-size: var(--nxd-body) }
+  .dt-field-label { font-size: var(--nxd-meta) }
+  .dtu-readonly { border-radius: var(--nxd-r-row) }
+
+  /* ---- Hub pages: the page is the pane beside the rail, behind hairlines; no cards inside it. ---- */
+  &.dt-hub .dt-body > main { margin-top: 0; border: 0; border-top: 1px solid var(--dt-border); border-left: 1px solid var(--dt-border); border-radius: 0 }
+  &.dt-hub .dt-activity { padding-top: 12px }
+  .dt-activity > .dt-icon { border-radius: var(--nxd-r-row) }
+  .dtp-card, &.dt-hub .dtp-card, &.light.dt-hub .dtp-card { background: none; border: 0; border-radius: 0 }
+  .dtp-btn { height: 30px; padding: 0 12px; border-radius: var(--nxd-r-control); font-size: var(--nxd-body) }
+  .dtp-btn.small { height: 26px; padding: 0 9px; font-size: var(--nxd-meta) }
+  .dtp-btn:not(.primary):not(.confirm) { background: transparent }
+  .dtp-btn:not(.primary):not(.confirm):hover:not(:disabled) { background: var(--nxd-hover) }
+  .dtp-btn:not(.primary):not(.confirm):active:not(:disabled) { background: var(--nxd-press) }
+  .dtp-top-row > .dtp-btn { height: 30px }
+  .dtp-search { height: 30px; border-radius: var(--nxd-r-control); border-color: transparent; background: var(--nxd-hover) }
+  .dtp-search input { font-size: var(--nxd-body) }
+  .dtp-search.large { height: 40px; border-radius: var(--nxd-r-row); border-color: transparent }
+  .dtp-chips button { height: 28px; border-color: transparent; background: var(--nxd-hover); font-size: var(--nxd-body) }
+  .dtp-chips button.active { background: var(--nxd-select); border-color: transparent }
+  .dtp-select { height: 28px; padding: 0 8px; border-color: transparent; border-radius: var(--nxd-r-control); background: var(--nxd-hover) }
+  .dtp-select select { font-size: var(--nxd-body) }
+  .dtp-chip { font-size: 12px }
+  .dtp-row { padding: 7px 10px; border-radius: var(--nxd-r-row) }
+  .dtp-row.selected, .dtp-row.selected:hover { background: var(--nxd-select); box-shadow: none }
+  .dtp-row strong { font-size: var(--nxd-body); font-weight: 600 }
+  .dtp-segmented { border-radius: var(--nxd-r-row) }
+  .dtp-segmented button { border-radius: var(--nxd-r-control); font-size: var(--nxd-body) }
+  .dtp-setting-row strong, .dtp-setting-line strong, .dtp-setting-block > strong { font-size: var(--nxd-body) }
+  .dtp-table-head, .dtp-group h3, .dtp-eyebrow, .dtp-facts dt, .dte-label, .dtp-keys-group h3, .dt-wizard-columns h4, .dt-wizard-summary dt, .dte-import-stats dt, .dt-command-label { letter-spacing: 0; text-transform: none; font-size: var(--nxd-meta); font-weight: 600; color: var(--dt-muted) }
+  .dtp-notice, .dtp-banner, .dtp-update-card, .dtp-danger-zone { border-color: transparent; border-radius: var(--nxd-r-row) }
+  .dtp-danger-zone { background: color-mix(in srgb, var(--ux-err) 6%, transparent) }
+
+  /* Rosters: one toolbar, the list as the pane, the details as an open column behind a hairline. */
+  .dtp-page.nxd-rosters { flex-direction: row; gap: 0; padding: 0 }
+  .nxd-rosters-main { flex: 1; min-width: 0; display: flex; flex-direction: column }
+  .nxd-toolbar { flex-wrap: nowrap; gap: 8px; padding: 10px 14px 6px 18px }
+  .nxd-toolbar .dtp-search { flex: 0 1 260px; min-width: 150px }
+  .nxd-toolbar .dtp-chips { flex-wrap: nowrap }
+  .nxd-toolbar .dtp-chips button { white-space: nowrap }
+  .nxd-list { flex: 1; min-height: 0; display: flex; flex-direction: column }
+  .nxd-roster-grid { display: grid !important; grid-template-columns: minmax(150px, 1.25fr) minmax(130px, 1fr) 132px 132px 104px; align-items: center; gap: 16px }
+  .nxd-list-head { padding: 6px 18px 4px; font-size: var(--nxd-meta); color: var(--dt-muted) }
+  .nxd-list-head > button { justify-self: start; justify-content: flex-start; gap: 3px; margin-left: -6px; padding: 2px 6px; border-radius: var(--nxd-r-control); font-size: var(--nxd-meta); font-weight: 600; color: var(--dt-muted) }
+  .nxd-list-head > button.active { color: var(--dt-text) }
+  .nxd-list-head > span { font-weight: 600 }
+  .nxd-list .dtp-scroll { padding: 2px 8px 8px }
+  .nxd-list .dtp-row { height: 40px; padding: 0 10px }
+  .nxd-list .dtp-row + .dtp-row { margin-top: var(--nx-row-gap) }
+  .nxd-list .dtp-row strong, .nxd-list .dtp-row .dtp-muted { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+  .nxd-list .dtp-row .dtp-muted { font-size: var(--nxd-meta) }
+  .nxd-list .dtp-points { font-size: var(--nxd-meta) }
+  .nxd-list .dtp-points b { font-size: var(--nxd-body) }
+  .nxd-list .dtp-points i { height: 2px; margin-top: 3px; max-width: 120px }
+  .nxd-status-words { display: inline-flex; align-items: center; gap: 6px; font-size: var(--nxd-body); font-weight: 500; white-space: nowrap }
+  .nxd-status-words.ok { color: var(--dt-ok) }
+  .nxd-status-words.warn { color: var(--dt-warn) }
+  .nxd-status-words.err { color: var(--ux-err) }
+  .nxd-status-words.accent { color: var(--dt-accent) }
+  &.light .nxd-status-words.ok { color: color-mix(in srgb, var(--dt-ok) 70%, var(--dt-text)) }
+  &.light .nxd-status-words.warn { color: color-mix(in srgb, var(--dt-warn) 62%, var(--dt-text)) }
+  .nxd-list .dtp-list-foot { height: 26px; padding: 0 18px; border-top: 1px solid var(--dt-border); font-size: var(--nxd-meta); color: var(--dt-muted) }
+  .nxd-inspector { flex: 0 0 320px; min-width: 0; overflow: auto; padding: 16px 20px 20px; border-left: 1px solid var(--dt-border) }
+  .nxd-inspector .dtp-detail-title { align-items: flex-start; gap: 6px }
+  .nxd-inspector h2 { font-size: 17px; font-weight: 600; letter-spacing: -.2px; line-height: 1.3 }
+  .nxd-inspector .dtp-detail-title p { font-size: var(--nxd-meta); color: var(--dt-muted); margin-top: 2px }
+  .nxd-inspector .dtp-detail-title form { flex: 1; display: flex; gap: 6px }
+  .nxd-inspector .dtp-detail-title input { flex: 1; min-width: 0; height: 30px; padding: 0 8px; border: 1px solid color-mix(in srgb, var(--dt-fill) 55%, transparent); border-radius: var(--nxd-r-control); background: transparent; font-size: var(--nxd-body) }
+  .nxd-inspector .dtp-icon { width: 26px; height: 26px; margin: -2px -6px 0 0; border-radius: var(--nxd-r-control) }
+  .nxd-inspector-actions { display: flex; align-items: center; gap: 6px; margin: 14px 0 6px }
+  .nxd-inspector-actions .dtp-btn.primary { flex: 1; justify-content: space-between }
+  .dtp-btn.nxd-icon-btn { width: 30px; padding: 0; flex-shrink: 0 }
+  .nxd-facts { margin: 12px 0 0 }
+  .nxd-facts > div { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; padding: 8px 0 }
+  .nxd-facts dt { font-size: var(--nxd-meta); color: var(--dt-muted); line-height: 20px }
+  .nxd-facts dd { margin: 0; font-size: var(--nxd-body); line-height: 20px; font-variant-numeric: tabular-nums }
+  .nxd-facts dd b { font-weight: 600 }
+  .nxd-facts dd small { display: block; font-size: var(--nxd-meta); color: var(--dt-muted); line-height: 1.45 }
+  .nxd-facts dd .over { color: var(--dt-warn) }
+  .nxd-facts .dtp-progress { margin-top: 6px; height: 3px }
+  .nxd-facts .dtp-progress.over em { background: var(--dt-warn) }
+  /* ---- Sweep: Welcome (type only), Settings, Sources, Lookup. Lists lose their boxes; a hairline divides list and detail. ---- */
+  .dt-recents header > span, .dt-welcome-footer, .dt-welcome-footer span:last-child { letter-spacing: 0; color: var(--dt-muted) }
+  .dt-recents header > span { font-weight: 600 }
+  .dt-recent-info strong { font-size: var(--nxd-body); font-weight: 600 }
+  .dt-start-actions > button { font-size: var(--nxd-body); border-radius: var(--nxd-r-control) }
+  .dt-primary { border-radius: var(--nxd-r-control) }
+  .dt-monogram { border-radius: var(--nxd-r-control) }
+  .dt-tip, .dt-local, .dt-recent-footer button { font-size: var(--nxd-meta) }
+
+  .dtp-split { gap: 0 }
+  .dtp-split > .dtp-list { padding-right: 12px }
+  .dtp-split > .dtp-detail { border-left: 1px solid var(--dt-border); padding: 4px 4px 20px 24px }
+  .dtp-split > .dtp-detail.lookup-detail { padding: 8px 8px 24px 28px }
+  .dtp-scroll { padding: 4px 0 }
+  .dtp-list-foot { border-top: 0; padding: 8px 10px }
+  .dts-source-row.selected, .dts-source-row.selected:hover { background: var(--nxd-select); box-shadow: none }
+  .dtp-add-row, .dtp-link-row, .dtp-links button { border: 0 }
+  .dtp-links button, .dtp-link-row { border-radius: var(--nxd-r-row); font-size: var(--nxd-body) }
+  .dtp-links { gap: 2px; margin-inline: -10px }
+  .dtp-link-row { margin-top: 2px }
+  .dtp-rows { gap: var(--nx-row-gap); margin-inline: -12px; border: 0; border-radius: 0; overflow: visible }
+  .dtp-rows > *, .dtp-rows .dtp-setting-row, .dtp-collection-row { padding: 8px 12px; border-top: 0; border-radius: var(--nxd-r-row) }
+  .dtp-rows .dtp-setting-row:hover, .dtp-collection-row:hover { background: var(--nxd-hover) }
+  .dtp-collection-row strong { font-size: var(--nxd-body); font-weight: 600 }
+  .dtp-detail h3, .dtp-settings-card > h2 { letter-spacing: 0 }
+  .dtp-detail h3 { font-size: var(--nxd-meta); color: var(--dt-muted) }
+  .dts-last-update, .dts-changed-card { border-color: transparent; border-radius: var(--nxd-r-row) }
+  .dts-changed-card { background: color-mix(in srgb, var(--dt-warn) 7%, transparent) }
+  .dts-changed-card.err { background: color-mix(in srgb, var(--ux-err) 7%, transparent) }
+  .dts-tile { border: 0; border-radius: var(--nxd-r-row) }
+  .dts-more { border-color: transparent }
+  .dts-menu { border-radius: var(--nxd-r-overlay) }
+  .dts-back, .dts-text-btn { border-radius: var(--nxd-r-control); font-size: var(--nxd-body) }
+
+  .dtp-settings-nav button { padding: 6px 10px; border-radius: var(--nxd-r-row); font-size: var(--nxd-body) }
+  .dtp-settings-nav button.active { background: var(--nxd-select) }
+  .dtp-settings-card { padding: 14px 20px }
+  .dtp-settings-card > h2 { font-size: 15px }
+  .dtp-settings-plain .dtp-setting-row, .dtp-settings-plain .dtp-setting-row:last-child { border-top: 0; border-bottom: 0 }
+  .dtp-scheme-grid button { border-color: transparent; border-radius: var(--nxd-r-row); background: var(--nxd-hover); font-size: var(--nxd-body) }
+  .dtp-scheme-grid button:hover { background: var(--nxd-press) }
+  .dtp-scheme-grid button.active, .dtp-scheme-grid button.active:hover { border-color: transparent; background: var(--nxd-select) }
+  .dtp-scheme-grid button:last-child { border-style: solid; background: none }
+  .dtp-swatch { border-radius: 5px }
+  .dtp-key { border-color: transparent; border-radius: var(--nxd-r-control); background: var(--nxd-hover) }
+  .dtp-scale .dtp-icon { border-color: transparent; border-radius: var(--nxd-r-control); background: var(--nxd-hover) }
+  .dtp-shortcuts div { border-top: 0; padding: 6px 0; font-size: var(--nxd-body) }
+  .dtp-debug-area-name { letter-spacing: 0; text-transform: none; font-size: var(--nxd-meta); font-weight: 600; color: var(--dt-muted) }
+  .dtp-settings-card .dtp-setting-block + .dtp-setting-block, .dtp-settings-card .dtp-setting-block + .dtp-setting-line { border-top: 0 }
+
+  /* Create dialog and choice lists: choices are open rows; the selected one is filled. */
+  .dt-choice-list { gap: var(--nx-row-gap) }
+  .dt-choice-list > button { padding: 8px 12px; border-color: transparent; border-radius: var(--nxd-r-row) }
+  .dt-choice-list.compact > button { padding: 6px 12px }
+  .dt-choice-list > button.active { border-color: transparent; background: var(--nxd-select) }
+  .dt-choice-list > button.blocked { border-style: solid }
+  .dt-choice-list strong { font-size: var(--nxd-body); font-weight: 600 }
+  .dt-chip-row button { height: 30px; border-color: transparent; background: var(--nxd-hover); font-size: var(--nxd-body) }
+  .dt-chip-row button.active { border-color: transparent; background: var(--nxd-select) }
+  .dt-wizard-steps ol button { border-radius: var(--nxd-r-row) }
+  .dt-wizard-steps b { font-size: var(--nxd-body) }
+  .dt-modal > button { border-radius: var(--nxd-r-row); font-size: var(--nxd-body) }
+  .dte-choice-icon { border-radius: var(--nxd-r-control) }
+
+  /* Lookup entry (markup shared with the phone, restyled here only inside the desktop window): section labels in sentence
+     case, stat tables and option lists without a card around them, nothing under 12 px. */
+  .lookup-detail .ux-mobile-unit-options > h4 { margin-top: 18px; font-size: var(--nxd-meta); font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--dt-muted) }
+  .lookup-detail .ux-5a-card { padding-inline: 0; border: 0; border-radius: 0; background: none; box-shadow: none }
+  .lookup-detail .ux-5b-table th, .lookup-detail .ux-5a-card > strong, .lookup-detail .ux-5a-card > div > strong, .dtp-lookup10 .ux-lf-tag { font-size: 12px }
+  .lookup-detail .ux-5b-table-card > strong { padding-inline: 0; font-size: var(--nxd-body); font-weight: 600 }
+  .lookup-detail .ux-5b-table { border-radius: var(--nxd-r-row); overflow: hidden }
+  .lookup-detail .ux-5a-choice { border-top-color: transparent; border-radius: var(--nxd-r-row) }
+  .dtp-lookup10 .dtp-result { border-radius: var(--nxd-r-row) }
+  .dtp-lookup10 .dtp-result.selected, .dtp-lookup10 .dtp-result[aria-current], .dtp-lookup10 .dtp-result.active { box-shadow: none }
+
+  /* Read-only roster: validation is paused, so the status edge is neutral. */
+  .dt-roster:has(> .dte-readonly) .dte-unit-row::before { background: var(--dt-faint) }
+
+}
+
+/* Pressed state for every other desktop button, at the specificity of the approved hover rule (`.dt-app button:hover`),
+   so it answers a press without overriding selected or toned states. */
+:root[data-look="next"] :where(.dt-app:not(.tb-shim)) button:where(:active:not(:disabled)) { background: color-mix(in srgb, var(--dt-text) 12%, transparent) }

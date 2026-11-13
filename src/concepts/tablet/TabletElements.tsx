@@ -23,6 +23,8 @@ import './tablet-stars.css';
 import { LimitAddButton, QuotaChip } from '../workspace/CatalogueLimit';
 import { SourceStatusAction } from '../ux/SourceJobs';
 import { TabletPrefsContext, makeTabletEnv, TabletEnvContext } from './tabletEnv';
+import { NextChoice } from './TabletEditor';
+import { useNextLook } from '../../look';
 import { defaultDeviceId, defaultInput, defaultTextScale, tabletDevices, widthClassLabel, widthClassOf, type TabletDeviceId, type TabletInput, type TextScale } from './tabletDevices';
 import './tablet.css';
 
@@ -92,6 +94,8 @@ export function TabletElements() {
   const [input, setInput] = useState<TabletInput>(defaultInput);
   const [textScale, setTextScale] = useState<TextScale>(defaultTextScale);
   const prefs = useMemo(() => ({ deviceId, input, textScale, setDeviceId, setInput, setTextScale }), [deviceId, input, textScale]);
+  // The proposed look (src/look.ts): its new pieces show here only while it is on, so the approved Elements view stays as it was.
+  const next = useNextLook();
   const [page, setPage] = useState<'home' | 'rosters' | 'tools'>('rosters');
   const railIn = (mode: TabletInput, device: 'ipad-portrait' | 'android') => <div className={`tb-app ux-screen ux-size-regular dark ${device === 'android' ? 'tb-expanded' : 'tb-medium'}`} data-system={device === 'android' ? 'android' : 'ios'} style={{ height: 'auto', flex: 'none', background: 'var(--ux-bg)', borderRadius: 18, overflow: 'visible', width: 'max-content' }}>
     <TabletEnvContext.Provider value={makeTabletEnv(device, mode)}><div style={{ height: 620, display: 'flex' }}><TabletRail page={page} input={mode} system={device === 'android' ? 'android' : 'ios'} onPage={p => setPage(p as typeof page)} onNewRoster={() => {}} /></div></TabletEnvContext.Provider>
@@ -170,6 +174,17 @@ export function TabletElements() {
         <span className="tb-el-chip-line"><QuotaChip selected={1} max={1} /><LimitAddButton name="Force Commander" points={90} selected={1} max={1} input={theme === 'dark' ? 'touch' : 'pointer'} open={theme === 'dark'} /></span>
       </div>)}</div>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-editor-limit-caption" /></TabletDeviceFrame></div>
+      {next && <>
+        <h2>Proposed look (not approved) · open option rows, the section’s round Add, the catalogue’s reason line</h2>
+        <p>No pill or tile on a catalogue entry: a reached limit reads "1 / 1 · Limit reached" and a full slot "Slot full · adds over limit" under the name, in the warning tone, with a muted Add (a press still explains). The unit pane's options are rows without a box: the control, the name and one line under it, the cost on the right; the selected one in the accent. Each roster section heading carries a round tonal Add.</p>
+        <div className="tb-el-row">{(['dark', 'light'] as const).map(theme => <div key={theme} className={`tb-app ux-screen ${theme} tb-el-card ${theme === 'dark' ? 'tb-touch' : 'tb-pointer'}`}><div className="tbe" style={{ background: 'transparent' }}><div className="tbe-nx-detail" role="radiogroup" aria-label="Primary weapon (sample)">
+          <NextChoice role="radio" name="Service rifle" cost="Included" on onChange={noop} />
+          <NextChoice role="radio" name="Scout carbine" cost="Included" on={false} onChange={noop} />
+          <NextChoice role="checkbox" name="Field standard" sub="Carry the detachment's colours" cost="+10 pts" on onChange={noop} />
+          <div className="tbe-sec-head"><span className="ux-tree-section"><span /><strong>Core</strong><small>3 / 2+</small></span><button type="button" className="tbe-sec-add" aria-label="Add core unit (sample)"><Plus size={18} /></button></div>
+          <div className="tbe-cat-row tbe-nx-cat-row warn"><span className="tbe-cat-add"><span><strong>Support Battery</strong><small className="reason">Slot full · adds over limit</small></span></span><b>180<small> pts</small></b><span className="tbe-cat-plus muted" aria-hidden="true"><Plus size={18} /></span></div>
+        </div></div></div>)}</div>
+      </>}
       <h2>Settings › Rosters · Reopen roster on launch (DEC-056) · iPad and Android</h2>
       <p>One switch directly above Remember option sections, off by default: "Reopen roster on launch", "The roster open when you quit opens again." It replaces the earlier row that defaulted to on. A new launch never restores a deep Settings, Account or Sources page. The phone shows the same row; the desktop counterpart is Reopen tabs on launch.</p>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-settings-rosters" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="android"><TabletWorkbench workflowScreen="tablet-settings-rosters" /></TabletDeviceFrame></div>

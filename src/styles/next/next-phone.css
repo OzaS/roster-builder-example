@@ -1,0 +1,454 @@
+/* The proposed look ("next") for the phone library. Scope every rule to :root[data-look="next"]. See next-shared.css. */
+
+/*
+ * Everything is nested under the phone frame (single view, board, glance) and the phone Elements panel, so the
+ * tablet, foldable and desktop libraries, which reuse phone pieces, keep their own look.
+ * Layout grid: row shapes are inset 8 from the screen edges and padded 12, so all text starts 20 from the edge.
+ */
+:root[data-look="next"] :is(.device-frame.phone, .design-elements-panel.phone) {
+  --nxp-inset: var(--nx-row-inset, 8px);
+  --nxp-pad: 12px;
+  --nxp-text: 20px;
+  --nxp-radius: var(--nx-row-radius, 12px);
+  --nxp-label: 13px;
+
+  /* The colour tokens (--ux-*) are set on .ux-screen, so values mixed from them are declared there too. */
+  &.ux-screen, .ux-screen {
+    --nxp-hover: color-mix(in srgb, var(--ux-ink) 6%, transparent);
+    --nxp-press: color-mix(in srgb, var(--ux-ink) 11%, transparent);
+    --nxp-selected: color-mix(in srgb, var(--ux-accent) 16%, transparent);
+    --nxp-tonal: color-mix(in srgb, var(--ux-accent) 15%, transparent);
+  }
+
+  /* ---------- Page headers: one line, no boxes ---------- */
+  .ux-wb-top { display: flex; align-items: center; min-height: 48px; padding: 4px 10px 4px var(--nxp-text); border-bottom: 0; background: transparent; box-shadow: none; gap: 2px }
+  /* Every header is one flex line, so a title after Back starts at the same place on every page. */
+  .ux-wb-top > .ux-wb-title { flex: 1 1 auto; min-width: 0; margin-left: 4px }
+  .ux-wb-top > .ux-wb-title:first-child { margin-left: 0 }
+  .ux-wb-top .ux-wb-title strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+  .ux-wb-top.ux-wb-home-top.ux-phone-search-header { min-height: 48px }
+  .ux-wb-top > .ux-icon-btn:first-child, .ux-wb-top > .ux-wb-back:first-child { margin-left: -12px }
+  .ux-wb-top .ux-wb-title { margin-right: auto }
+  .ux-wb-top .ux-wb-title strong { font-size: 15px; font-weight: 700 }
+  .ux-wb-top.ux-wb-home-top:not(.reversed) .ux-wb-title strong { font-size: 20px; line-height: 26px; letter-spacing: -0.01em }
+  .ux-wb-top .ux-wb-title small { display: none }
+  .ux-wb-top.workspace-header.unit-detail .ux-wb-title small { display: block }
+  .ux-wb-top .ux-icon-btn { width: 40px; height: 40px; border: 0; background: transparent; box-shadow: none; border-radius: 12px; color: var(--ux-ink) }
+  .ux-wb-top .ux-icon-btn:hover { background: var(--nxp-hover) }
+  .ux-wb-top .ux-icon-btn:active { background: var(--nxp-press) }
+  .ux-wb-top .ux-avatar-btn { margin-inline: 4px 6px; font-weight: 700 }
+
+  /* ---------- Section labels: sentence case ---------- */
+  .ux-result-label { margin: 0; padding: 0 var(--nxp-pad); color: var(--ux-muted); font-size: var(--nxp-label); line-height: 18px; font-weight: 600; letter-spacing: 0; text-transform: none }
+
+  /* ---------- Lists ---------- */
+  .ux-lists-main.ux-lf { padding: 4px var(--nxp-inset) 28px; gap: 6px }
+  .ux-lf-row { align-items: center; gap: 6px; margin-bottom: 10px }
+  .ux-lists-main .ux-lf-row { padding-left: var(--nxp-pad); padding-right: 4px }
+  .ux-lf-always { padding-block: 0; gap: 6px; -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent) }
+  .ux-lf-chip { min-height: var(--nx-chip-height, 34px); min-width: 40px; padding: 0 13px; border-radius: 999px; background: var(--nxp-tonal); font-size: 13px; font-weight: 600 }
+  .ux-lf-always .ux-lf-chip { border-radius: 999px }
+  .ux-lf-chip.active { background: var(--ux-accent); color: var(--ux-accent-ink) }
+  .ux-lf-chip .ux-nx-count { font-style: normal; font-weight: 400; opacity: 0.72 }
+  .ux-lf-group { width: var(--nx-chip-height, 34px); height: var(--nx-chip-height, 34px); background: var(--nxp-tonal) }
+  .ux-lf-group.active { background: var(--ux-accent); color: var(--ux-accent-ink) }
+  .ux-lf-group svg { width: 17px; height: 17px }
+  .ux-lf-list, .ux-lf-group-section { gap: var(--nx-row-gap, 2px) }
+  .ux-lf-group-section + .ux-lf-group-section { margin-top: var(--nx-group-gap, 20px) }
+  .ux-lf-group-head { min-height: 0; margin: 0 0 4px; padding: 0 var(--nxp-pad); color: var(--ux-muted); font-size: var(--nxp-label); line-height: 18px; font-weight: 600 }
+
+  .ux-nx-row { display: flex; flex-shrink: 0; align-items: center; gap: 12px; width: 100%; min-height: 56px; box-sizing: border-box; padding: 8px var(--nxp-pad); border: 0; border-radius: var(--nxp-radius); background: transparent; color: var(--ux-ink); font: inherit; text-align: left; cursor: pointer }
+  .ux-nx-row:hover { background: var(--nxp-hover) }
+  .ux-nx-row:active { background: var(--nxp-press) }
+  .ux-nx-row:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: -2px }
+  .ux-nx-row-main { display: grid; gap: 2px; flex: 1; min-width: 0 }
+  .ux-nx-row-main strong { overflow: hidden; font-size: 14px; line-height: 19px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap }
+  .ux-nx-row-main small { overflow: hidden; color: var(--ux-muted); font-size: 12px; line-height: 16px; font-weight: 400; text-overflow: ellipsis; white-space: nowrap }
+  .ux-nx-row-end { display: grid; flex: none; justify-items: end; gap: 2px }
+  .ux-nx-row-end b { color: var(--ux-accent); font-size: 13px; line-height: 19px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap }
+  .ux-nx-row-end b.over { color: var(--ux-warn) }
+  .ux-nx-status { display: inline-flex; align-items: center; gap: 4px; color: var(--ux-muted); font-size: 12px; line-height: 16px; font-weight: 400; white-space: nowrap }
+  .ux-nx-status.err { color: var(--ux-err); font-weight: 600 }
+  .ux-nx-status.warn { color: var(--ux-warn); font-weight: 600 }
+  .ux-nx-status.info { color: var(--ux-accent); font-weight: 600 }
+
+  /* ---------- Roster editor ---------- */
+  /* Budget: one strip, the progress bar is its bottom edge. */
+  .ux-wb-budget { padding: 2px var(--nxp-text) 8px; border-bottom: 0; background: transparent }
+  .ux-wb-budget.tablet-overview-budget, .ux-wb-budget:has(> .ux-nx-budget) { padding: 0 }
+  .ux-nx-budget { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px; min-height: 36px; box-sizing: border-box; padding: 0 10px 3px var(--nxp-text) }
+  .ux-nx-budget-main { display: flex; flex: 1; align-items: baseline; gap: 6px; min-width: 0; min-height: 33px; padding: 0; border: 0; background: transparent; color: var(--ux-ink); font: inherit; text-align: left; align-items: center }
+  button.ux-nx-budget-main { cursor: pointer }
+  .ux-nx-budget-main strong { font-size: 16px; line-height: 20px; font-weight: 700; font-variant-numeric: tabular-nums }
+  .ux-nx-budget-main span { overflow: hidden; color: var(--ux-muted); font-size: 12.5px; line-height: 20px; font-variant-numeric: tabular-nums; text-overflow: ellipsis; white-space: nowrap }
+  .ux-nx-budget.over .ux-nx-budget-main strong { color: var(--ux-err) }
+  .ux-nx-budget-caret { flex: none; color: var(--ux-muted); transition: transform 0.16s ease }
+  .ux-nx-budget.open .ux-nx-budget-caret { transform: rotate(180deg) }
+  .ux-nx-budget-issues { display: inline-flex; flex: none; align-items: center; gap: 10px; min-height: 32px; padding: 0 10px; border: 0; border-radius: 10px; background: transparent; font: inherit; font-size: 12.5px; font-weight: 700; font-variant-numeric: tabular-nums; cursor: pointer }
+  .ux-nx-budget-issues:hover { background: var(--nxp-hover) }
+  .ux-nx-budget-issues:active { background: var(--nxp-press) }
+  .ux-nx-budget-issues span { display: inline-flex; align-items: center; gap: 4px }
+  .ux-nx-budget-issues .warn { color: var(--ux-warn) }
+  .ux-nx-budget-issues .err { color: var(--ux-err) }
+  .ux-nx-budget-ok { display: inline-flex; flex: none; align-items: center; gap: 5px; padding: 0 10px; color: var(--ux-ok); font-size: 12px; font-weight: 600 }
+  .ux-nx-budget-limits { display: flex; flex-wrap: wrap; gap: 2px 14px; width: 100%; margin: 0; padding: 0 0 8px; color: var(--ux-muted); font-size: 12px; list-style: none }
+  .ux-nx-budget-limits b { color: var(--ux-ink); font-weight: 700 }
+  .ux-nx-budget-limits li.over, .ux-nx-budget-limits li.over b { color: var(--ux-err) }
+  .ux-nx-budget-bar { position: absolute; inset: auto 0 0; height: 3px; background: color-mix(in srgb, var(--ux-ink) 9%, transparent) }
+  .ux-nx-budget-bar i { display: block; height: 100%; border-radius: 0 3px 3px 0; background: var(--ux-accent) }
+  .ux-nx-budget.over .ux-nx-budget-bar i { background: var(--ux-err) }
+
+  /* Tree: force and section headings are text, units are open rows, nothing is boxed. */
+  .ux-wb-tree { gap: 10px; padding: 8px var(--nxp-inset) 28px }
+  .ux-force-list { gap: 14px }
+  .ux-force-summary { grid-template-columns: minmax(0, 1fr) 40px; gap: 0; min-height: 48px; padding: 0 2px 0 0; border: 0; border-radius: var(--nxp-radius); background: transparent }
+  .ux-force-summary-main { min-height: 48px; padding: 4px 6px 4px var(--nxp-pad); border-radius: var(--nxp-radius) }
+  .ux-force-summary-main:hover { background: var(--nxp-hover) }
+  .ux-force-summary strong { font-size: 16px; line-height: 21px; font-weight: 700 }
+  .ux-force-summary small { margin-top: 0; font-size: 12px; line-height: 16px }
+  .ux-force-summary b { color: var(--ux-accent); font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums }
+  .ux-force-actions > button { width: 40px; height: 40px; border: 0; border-radius: 12px; background: transparent; color: var(--ux-muted) }
+  .ux-force-actions > button:hover { background: var(--nxp-hover) }
+  .ux-force-sections { gap: 2px; padding: 0 }
+  .ux-tree-branch { overflow: visible; border: 0; border-radius: 0; background: transparent }
+  .ux-nx-section-head { display: flex; align-items: center; gap: 4px; min-height: 40px; padding-right: 6px }
+  .ux-tree-section { display: flex; flex: 1; align-items: center; gap: 8px; min-width: 0; min-height: 40px; padding: 0 var(--nxp-pad); border-radius: var(--nxp-radius); color: var(--ux-ink) }
+  .ux-tree-section:hover { background: var(--nxp-hover) }
+  .ux-tree-section:active { background: var(--nxp-press) }
+  .ux-tree-section .ux-tree-caret { flex: none; width: 16px }
+  .ux-tree-section strong { overflow: hidden; font-size: 14px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap }
+  .ux-tree-section small { flex: none; color: var(--ux-muted); font-size: 12px; font-variant-numeric: tabular-nums }
+  /* The round Add is 28 pt with a light tint; the 40 pt row around it is the touch target. */
+  .ux-nx-add { display: inline-grid; flex: none; place-items: center; width: 28px; height: 28px; margin-right: 2px; padding: 0; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--ux-accent) 10%, transparent); color: var(--ux-accent); cursor: pointer }
+  .ux-nx-add svg { width: 16px; height: 16px }
+  .ux-nx-add:hover { background: color-mix(in srgb, var(--ux-accent) 18%, transparent) }
+  .ux-nx-add:active { background: color-mix(in srgb, var(--ux-accent) 26%, transparent) }
+  .ux-nx-add:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px }
+  .ux-tree-units { gap: var(--nx-row-gap, 2px); padding: 0 0 6px }
+  .ux-swipe-unit { border-radius: var(--nxp-radius) }
+  .ux-tree-unit { display: flex; gap: 10px; min-height: 42px; padding: 6px var(--nxp-pad) 6px calc(var(--nxp-pad) + 6px); border-radius: var(--nxp-radius) }
+  .ux-swipe-unit:not(.open) .ux-swipe-unit-content:not(.active), .ux-swipe-unit-content { background: transparent }
+  .ux-swipe-unit:is(.open, .dragging) .ux-swipe-unit-content:not(.active) { background: var(--ux-bg) }
+  .ux-swipe-unit:is(.open, .dragging) .ux-swipe-unit-content.active { background: color-mix(in srgb, var(--ux-accent) 16%, var(--ux-bg)) }
+  .ux-tree-unit:hover { background: var(--nxp-hover) }
+  .ux-tree-unit.active, .ux-swipe-unit:not(.open) .ux-swipe-unit-content.active { background: var(--nxp-selected) }
+  .ux-tree-unit .ux-tree-rail { flex: none; margin-right: 5px; opacity: 0.85 }
+  .ux-tree-unit .ux-tree-unit-main { flex: 1 }
+  .ux-tree-unit-main span { font-size: 14px; font-weight: 600 }
+  .ux-tree-unit-main small { font-size: 12px }
+  .ux-tree-unit b { flex: none; color: var(--ux-ink); font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums }
+  .ux-tree-unit > svg { flex: none }
+  .ux-swipe-actions button { border-radius: var(--nxp-radius); box-shadow: none; font-size: 10px; font-weight: 600 }
+  .ux-force-add { align-self: start; justify-self: start; width: auto; min-height: 36px; margin: 2px 0 0 4px; padding: 0 16px 0 12px; border: 0; border-radius: 999px; background: var(--nxp-tonal); color: var(--ux-accent); font-size: 13px; font-weight: 600 }
+
+  /* ---------- Generic pages (Settings, App, Sources, Create, Tools, Library) ---------- */
+  /* Text starts 20 from the edge; a row's shape reaches 12 further out on both sides. */
+  /* max-content rows: in the scrolling grid a row with a min-height would otherwise be held at that height and its text would spill into the next row. */
+  .ux-wb-home-body:not(.ux-lists-body) { grid-auto-rows: max-content; padding-top: 8px; padding-inline: var(--nxp-text); gap: 2px }
+  .ux-wb-home-body:not(.ux-lists-body) > .ux-result-label, .ux-wb-home-body .ux-src-section-head, .ux-start-group > h4, .ux-nx-appearance > .ux-result-label { margin: 16px 0 4px; padding: 0 }
+  .ux-wb-home-body:not(.ux-lists-body) > .ux-result-label:first-child, .ux-wb-home-body:not(.ux-lists-body) > :first-child > :is(.ux-result-label, h4):first-child, .ux-nx-appearance > .ux-result-label:first-child { margin-top: 4px }
+  .ux-wb-home-body .ux-src-section-head .ux-result-label { margin: 0; padding: 0 }
+  .ux-start-group > h4 { color: var(--ux-muted); font-size: var(--nxp-label); line-height: 18px; font-weight: 600; letter-spacing: 0; text-transform: none }
+  .ux-start-group { gap: 2px }
+
+  :is(.ux-setting-row, .ux-app-nav-row, .ux-start-row, .ux-add-source-primary, .ux-tool-tile, .ux-nx-setting, .ux-nx-choice, article.ux-source-row, button.ux-source-row) { flex-shrink: 0; width: auto; margin-inline: calc(-1 * var(--nxp-pad)); padding: 8px var(--nxp-pad); border: 0; border-radius: var(--nxp-radius); background: transparent; box-shadow: none }
+  :is(button.ux-setting-row, .ux-app-nav-row, .ux-start-row, .ux-add-source-primary, .ux-tool-tile, button.ux-nx-setting, .ux-nx-choice, button.ux-source-row):hover { background: var(--nxp-hover) }
+  :is(button.ux-setting-row, .ux-app-nav-row, .ux-start-row, .ux-add-source-primary, .ux-tool-tile, button.ux-nx-setting, .ux-nx-choice, button.ux-source-row):active { background: var(--nxp-press) }
+  .ux-source-row.selected, .ux-start-row.active, .ux-start-row.selected { background: var(--nxp-selected) }
+  .ux-source-list, .ux-setting-plain { gap: 2px }
+
+  /* Settings: label left, value or control right. */
+  .ux-setting-row { display: flex; min-height: 48px; align-items: center; gap: 12px; padding-block: 10px }
+  .ux-setting-row .ux-setting-text { flex: 1; min-width: 0 }
+  .ux-setting-row > .ux-switch, .ux-setting-row > svg { flex: none }
+  .ux-setting-plain .ux-setting-row { width: auto; padding: 10px var(--nxp-pad); border-radius: var(--nxp-radius) }
+  .ux-setting-plain .ux-setting-row + .ux-setting-row { border-top: 0 }
+  .ux-setting-row.on { background: transparent; border: 0 }
+  .ux-setting-row .ux-setting-icon { display: none }
+  .ux-setting-row .ux-setting-text strong { font-size: 14px; line-height: 19px; font-weight: 600 }
+  .ux-setting-row .ux-setting-text small { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; margin-top: 1px; color: var(--ux-muted); font-size: 12px; line-height: 16px }
+  .ux-hint { margin: 0 0 4px; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--ux-muted); font-size: 12px; line-height: 16px }
+  .ux-hint > svg { display: none }
+  /* The hint under a setting repeats the row's own description. */
+  .ux-wb-home-body > .ux-setting-row + .ux-hint { display: none }
+  .ux-nx-appearance > details { padding: 6px 0 }
+  .ux-nx-appearance > details > summary { color: var(--ux-muted); font-size: 12px; cursor: pointer }
+  .ux-setting-block { margin-inline: calc(-1 * var(--nxp-pad)); padding: 8px var(--nxp-pad); border: 0; border-radius: 0; background: transparent }
+  .ux-nx-appearance { display: grid; gap: 2px }
+  .ux-nx-setting { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; box-sizing: border-box; color: var(--ux-ink); font: inherit; text-align: left }
+  button.ux-nx-setting { cursor: pointer }
+  .ux-nx-setting-label { font-size: 14px; line-height: 19px; font-weight: 600 }
+  .ux-nx-setting-value { display: inline-flex; align-items: center; gap: 8px; color: var(--ux-muted); font-size: 14px }
+  .ux-nx-setting-value > svg { transition: transform 0.16s ease }
+  .ux-nx-setting[aria-expanded="true"] .ux-nx-setting-value > svg { transform: rotate(180deg) }
+  .ux-nx-swatch { display: inline-flex; flex: none; width: 34px; height: 20px; overflow: hidden; border-radius: 6px; box-shadow: 0 0 0 1px var(--ux-line-2) }
+  .ux-nx-swatch > span { flex: 1 }
+  .ux-nx-seg { display: inline-flex; gap: 2px; padding: 2px; border-radius: 10px; background: var(--nxp-hover) }
+  .ux-nx-seg button { min-width: 62px; min-height: 32px; padding: 0 10px; border: 0; border-radius: 8px; background: transparent; color: var(--ux-muted); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer }
+  .ux-nx-seg button[aria-checked="true"] { background: var(--ux-surface); color: var(--ux-ink); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16) }
+  .ux-nx-choices { display: grid; gap: 2px; padding: 0 0 8px 12px }
+  .ux-nx-choice { display: flex; align-items: center; gap: 12px; min-height: 44px; box-sizing: border-box; margin-inline: calc(-1 * var(--nxp-pad)); color: var(--ux-ink); font: inherit; font-size: 14px; text-align: left; cursor: pointer }
+  .ux-nx-choice > span:not(.ux-nx-swatch) { flex: 1 }
+  .ux-nx-choice > svg { color: var(--ux-accent) }
+  .ux-nx-choice[aria-checked="true"] { font-weight: 600 }
+  .ux-nx-text-action { display: inline-flex; align-items: center; gap: 8px; justify-self: start; min-height: 40px; padding: 0; border: 0; background: transparent; color: var(--ux-accent); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer }
+
+  /* App */
+  .ux-account-card { margin-inline: calc(-1 * var(--nxp-pad)); padding: 8px var(--nxp-pad) 12px; border: 0; border-radius: 0; background: transparent; box-shadow: none }
+  .ux-app-nav-row { min-height: 56px }
+  .ux-app-nav-row .ux-setting-icon, .ux-tool-tile .ux-setting-icon, .ux-collection-icon { width: 24px; height: 24px; background: transparent; color: var(--ux-accent) }
+  .ux-app-nav-row strong, .ux-tool-tile strong, .ux-start-row strong { font-size: 14px; line-height: 19px; font-weight: 600 }
+  .ux-app-nav-row small, .ux-tool-tile small, .ux-start-row small { color: var(--ux-muted); font-size: 12px; line-height: 16px }
+
+  /* Tools: a list, not tiles. */
+  .ux-tools-grid, .ux-tools-grid.ux-tools-grid-large { grid-template-columns: minmax(0, 1fr); gap: 2px }
+  .ux-tool-tile { align-items: center; min-height: 56px }
+  .ux-tool-tile strong { white-space: normal }
+
+  /* Create roster */
+  .ux-start-row { min-height: 52px }
+
+  /* Sources */
+  .ux-add-source-primary { min-height: 56px }
+  .ux-add-source-primary strong { font-size: 14px; line-height: 19px; font-weight: 600 }
+  .ux-add-source-primary small { color: var(--ux-muted); font-size: 12px; line-height: 16px }
+  .ux-source-row strong { font-size: 14px; line-height: 19px; font-weight: 600 }
+  .ux-source-row small { font-size: 12px; line-height: 16px }
+  .ux-job-notice { margin: 8px calc(-1 * var(--nxp-pad)); border: 0 }
+
+  /* Library (favourites) */
+  .ux-favorite-library-section { padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none }
+  .ux-favorite-library-section + .ux-favorite-library-section { margin-top: 16px }
+  .ux-favorite-library-section > header strong { font-size: 14px; font-weight: 700 }
+  .ux-favorite-empty { justify-items: start; padding: 4px 0 0 33px; border: 0; text-align: left }
+  .ux-favorite-empty > svg { display: none }
+  .ux-favorite-empty strong { font-size: 13px; font-weight: 600 }
+  .ux-favorite-empty small { color: var(--ux-muted); font-size: 12px; line-height: 16px }
+
+  /* ---------- Unit options ---------- */
+  .ux-mobile-unit-options:not(.compact) { gap: 4px; padding: 0 var(--nxp-text) 20px }
+  .ux-mobile-unit-options:not(.compact) > .ux-5a-header { top: 0; min-height: 48px; margin: 0 calc(-1 * var(--nxp-text)); padding: 0 6px 0 8px; font-size: 15px; gap: 4px }
+  .ux-mobile-unit-options .ux-5a-header > strong { font-size: 15px; font-weight: 700 }
+  .ux-mobile-unit-options .ux-5a-context { min-height: 28px; font-size: 13px }
+  .ux-mobile-unit-options .ux-5a-context strong { padding: 0; background: transparent; color: var(--ux-ink); font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums }
+  .ux-mobile-unit-options .ux-5a-budget { height: 3px; background: color-mix(in srgb, var(--ux-ink) 9%, transparent) }
+  .ux-mobile-unit-options .ux-5a-budget + small { margin-bottom: 6px; color: var(--ux-muted) }
+  .ux-mobile-unit-options .ux-5b-tabs { padding: 2px; gap: 2px; border: 0; border-radius: 10px; background: var(--nxp-hover) }
+  .ux-mobile-unit-options .ux-5b-tabs button { min-height: 34px; border-radius: 8px; font-size: 13px; font-weight: 600 }
+  .ux-mobile-unit-options .ux-5b-tabs button[aria-selected="true"] { background: var(--ux-surface) !important; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16) }
+  .ux-mobile-unit-options h4 { margin: 16px 0 0; color: var(--ux-muted); font-size: var(--nxp-label); line-height: 18px; font-weight: 600; letter-spacing: 0; text-transform: none }
+  .ux-mobile-unit-options .ux-5a-options:not([hidden]) { gap: 2px }
+  .ux-mobile-unit-options .ux-5a-options > small { color: var(--ux-muted) }
+  .ux-mobile-unit-options .ux-5a-card { gap: 2px; padding: 0; border: 0; border-radius: 0; background: transparent }
+  .ux-mobile-unit-options .ux-5a-card + .ux-5a-card { margin-top: 6px }
+  /* A model group: the name and its stepper share one row. */
+  .ux-mobile-unit-options article.ux-5a-card:has(> .ux-5a-count) { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center }
+  .ux-mobile-unit-options article.ux-5a-card:has(> .ux-5a-count) > * { grid-column: 1 / -1 }
+  .ux-mobile-unit-options article.ux-5a-card:has(> .ux-5a-count) > strong:first-child { grid-column: 1; min-height: 48px; display: flex; align-items: center; font-size: 15px; font-weight: 700 }
+  .ux-mobile-unit-options article.ux-5a-card:has(> .ux-5a-count) > .ux-5a-count { grid-column: 2; grid-row: 1 }
+  .ux-mobile-unit-options .ux-5a-count { gap: 0; padding: 2px; border: 0; background: var(--nxp-hover) }
+  .ux-mobile-unit-options .ux-5a-count button { min-width: 40px; min-height: 40px; width: 40px; height: 40px; background: transparent }
+  .ux-mobile-unit-options .ux-5a-count button:hover { background: var(--nxp-hover) }
+  .ux-mobile-unit-options .ux-5a-count strong { font-size: 15px; font-variant-numeric: tabular-nums }
+  .ux-mobile-unit-options .ux-5a-model-title { min-height: 48px; align-items: center }
+  .ux-mobile-unit-options .ux-5a-model-title strong { font-size: 15px; font-weight: 700 }
+  .ux-mobile-unit-options .ux-5a-separate { gap: 2px 10px; padding-top: 0; border-top: 0 }
+  .ux-mobile-unit-options .ux-5a-separate-btn { min-height: 36px; margin-left: -12px; padding: 0 12px; border: 0; border-radius: 999px; background: transparent; color: var(--ux-accent); font-size: 13px; font-weight: 600 }
+  .ux-mobile-unit-options .ux-5a-separate-btn:hover { background: var(--nxp-hover) }
+  .ux-mobile-unit-options .ux-5a-separate > small { flex: 1 1 100%; color: var(--ux-muted) }
+  .ux-mobile-unit-options .ux-fold { gap: 0 }
+  .ux-mobile-unit-options .ux-fold-head, .ux-mobile-unit-options .ux-5a-choice { align-self: stretch; justify-self: stretch; box-sizing: border-box; width: auto; margin-inline: calc(-1 * var(--nxp-pad)); padding: 6px var(--nxp-pad); border-top: 0 !important; border-radius: var(--nxp-radius) }
+  .ux-mobile-unit-options button:is(.ux-fold-head, .ux-5a-choice):hover { background: var(--nxp-hover) }
+  .ux-mobile-unit-options button:is(.ux-fold-head, .ux-5a-choice):active { background: var(--nxp-press) }
+  .ux-mobile-unit-options .ux-fold-head > span { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 12px; align-items: baseline }
+  .ux-mobile-unit-options .ux-fold-head strong { color: var(--ux-ink); font-size: 14px; font-weight: 600; letter-spacing: 0; text-transform: none }
+  .ux-mobile-unit-options .ux-fold-head small { color: var(--ux-muted); font-variant-numeric: tabular-nums }
+  .ux-mobile-unit-options .ux-fold-head .ux-fold-summary { grid-column: 1 / -1; font-size: 12px; -webkit-line-clamp: 1 }
+  .ux-mobile-unit-options .ux-5a-choice { min-height: 48px }
+  .ux-mobile-unit-options .ux-5a-choice:is([role="radio"], [role="checkbox"]) > span { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 12px; align-items: center }
+  .ux-mobile-unit-options .ux-5a-choice strong { font-size: 14px; font-weight: 400 }
+  .ux-mobile-unit-options .ux-5a-choice[aria-checked="true"] strong { font-weight: 600 }
+  .ux-mobile-unit-options .ux-5a-choice small { color: var(--ux-muted); font-variant-numeric: tabular-nums }
+  .ux-mobile-unit-options .ux-5a-choice:is([role="radio"], [role="checkbox"]) small { text-align: right }
+  .ux-mobile-unit-options .ux-5a-choice:is([role="radio"], [role="checkbox"]) small ~ small { grid-column: 1 / -1; text-align: left }
+  .ux-mobile-unit-options .ux-fold-nested { margin-left: 4px; padding-left: 14px; border-left: 2px solid var(--ux-line) }
+  .ux-mobile-unit-options .ux-5a-chips span { background: var(--nxp-hover) }
+  .ux-mobile-unit-options .ux-5a-notice { border: 0 }
+
+  /* ---------- Unit detail (the earlier options view) ---------- */
+  .ux-wb-detail { gap: 4px; padding-inline: var(--nxp-text) }
+  .ux-unit-options { gap: 4px }
+  .ux-unit-option-section { gap: 2px }
+  .ux-unit-option-section > h4, .ux-option-section-title h4, .ux-pool-group-head, .ux-pool-group-head span { color: var(--ux-muted); font-size: var(--nxp-label); line-height: 18px; font-weight: 600; letter-spacing: 0; text-transform: none }
+  .ux-unit-option-section > h4, .ux-option-section-title { margin-top: 14px }
+  .ux-loadout-group { margin-inline: calc(-1 * var(--nxp-pad)); border: 0; border-radius: 0; background: transparent }
+  .ux-loadout-group-head { padding: 0 6px; border-bottom: 0 }
+  .ux-loadout-slot { min-height: 44px; padding-inline: 12px 6px; border-bottom: 0; border-radius: var(--nxp-radius) }
+  .ux-loadout-slot:hover { background: var(--nxp-hover) }
+  .ux-loadout-slot small { color: var(--ux-muted); font-size: 12px; font-weight: 400; letter-spacing: 0; text-transform: none }
+  .ux-loadout-slot strong { font-size: 14px; font-weight: 600 }
+  .ux-loadout-group-toggle strong { font-size: 14px }
+  .ux-loadout-group-toggle small { font-size: 12px; font-weight: 400 }
+  .ux-loadout-count-controls, .ux-loadout-split { border: 0; background: var(--nxp-hover) }
+  .ux-opt-row { margin-inline: calc(-1 * var(--nxp-pad)); width: auto; min-height: 46px; padding: 6px var(--nxp-pad); border: 0; border-radius: var(--nxp-radius); background: transparent }
+  .ux-opt-row.on { border: 0; background: transparent }
+  .ux-opt-row:hover { background: var(--nxp-hover) }
+  .ux-opt-row em { color: var(--ux-muted); font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums }
+  .ux-chip { font-weight: 600 }
+
+  /* ---------- Add unit (catalogue) ---------- */
+  .ux-wb-back { align-self: start; justify-self: start; width: auto; margin-left: -10px; border: 0; background: transparent; color: var(--ux-accent); font-weight: 600 }
+  .ux-wb-search { border: 0; border-radius: 12px; background: var(--nxp-hover) }
+  .ux-suggest-chip { border: 0; background: var(--nxp-tonal); font-weight: 600 }
+  .ux-pool-group { gap: 2px }
+  .ux-pool-group-head { margin: 10px 0 2px }
+  .ux-pool { gap: 2px }
+  .ux-pool-item { margin-inline: calc(-1 * var(--nxp-pad)) }
+  .ux-pool-row { border: 0; border-radius: var(--nxp-radius); background: transparent; box-shadow: none }
+  .ux-pool-row:hover { background: var(--nxp-hover) }
+  .ux-pool-row:active { background: var(--nxp-press) }
+
+  /* ---------- Issues ---------- */
+  /* The issue list is open rows on the page background: no band behind it and no colour bar, the icon carries the severity. */
+  .ux-wb-rail { gap: 2px; padding: 8px var(--nxp-inset) 28px; border: 0; background: transparent; box-shadow: none }
+  .ux-wb-rail-head { min-height: 32px; padding: 0 var(--nxp-pad); color: var(--ux-muted); font-size: var(--nxp-label); font-weight: 600 }
+  .ux-wb-rail-head > svg { display: none }
+  .ux-wb-rail-head strong { color: var(--ux-muted); font-size: var(--nxp-label); line-height: 18px; font-weight: 600 }
+  .ux-wb-rail-count { min-width: 0; padding: 0; border: 0; background: transparent; color: var(--ux-muted); font-size: var(--nxp-label); font-weight: 600; font-variant-numeric: tabular-nums }
+  .ux-rail-item { min-height: 52px; padding: 8px var(--nxp-pad); border: 0; border-radius: var(--nxp-radius); background: transparent; box-shadow: none }
+  .ux-rail-item:hover { background: var(--nxp-hover) }
+  .ux-rail-item:active { background: var(--nxp-press) }
+  .ux-rail-item strong { font-size: 14px; line-height: 19px; font-weight: 600 }
+  .ux-rail-item small { color: var(--ux-muted); font-size: 12px; line-height: 16px }
+  .ux-wb-rail-foot { margin-top: 12px; padding: 0 var(--nxp-pad); border-top: 0; color: var(--ux-muted); font-size: 12px; font-weight: 600 }
+
+  /* ---------- Lookup ---------- */
+  .ux-lk-rows { gap: 2px }
+  .ux-lk-recent-head, .ux-lk-section-head { color: var(--ux-muted); font-size: var(--nxp-label); line-height: 18px; font-weight: 600 }
+  .ux-lk-recent-head { margin: 8px 0 2px }
+  .ux-mobile-unit-options .ux-5b-table-card > strong { padding: 0; font-size: 14px; font-weight: 700 }
+  .ux-mobile-unit-options .ux-5b-table-card { margin-top: 8px }
+  .ux-mobile-unit-options .ux-5b-table thead th { background: transparent; color: var(--ux-muted) }
+  .ux-mobile-unit-options .ux-5b-table :is(th, td) { border-top-color: var(--ux-line) }
+  .ux-mobile-unit-options .ux-5b-table :is(th, td):first-child { padding-left: 0 }
+  .ux-mobile-unit-options .ux-5b-table :is(th, td):last-child { padding-right: 0 }
+  .ux-mobile-unit-options.ux-lk-pane { padding: 0 }
+  .ux-mobile-unit-options:not(.compact) > .ux-5a-header.ux-lk-phone-top { margin-inline: calc(-1 * var(--nxp-text)); min-height: 48px; padding: 0 var(--nxp-text) 0 8px }
+  .ux-lk-phone-top h2 { font-size: 15px; font-weight: 700 }
+  .ux-lk-head-title strong { font-weight: 700 }
+  .ux-lk-head-title span, .ux-lk-model-row :is(dt, dd), .ux-lk-detail h4 > span { font-weight: 600 }
+  .ux-lf-tag { font-weight: 700 }
+  .ux-lk-row small, .ux-lk-head small { font-weight: 400 }
+  .ux-lk-phone-top .ux-lk-base-cost { font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums }
+
+  /* ---------- Small fixes ---------- */
+  .ux-wb-home-body > .ux-primary { margin-top: 14px }
+
+  /* ---------- Unit options: a link group is a heading row with its count on the right ---------- */
+  .ux-mobile-unit-options .ux-5a-card:has(> h4) { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 12px }
+  .ux-mobile-unit-options .ux-5a-card:has(> h4) > * { grid-column: 1 / -1 }
+  .ux-mobile-unit-options .ux-5a-card:has(> h4) > h4 { grid-column: 1; display: flex; align-items: center; min-height: 40px; margin: 0; color: var(--ux-ink); font-size: 14px; line-height: 19px; font-weight: 600 }
+  .ux-mobile-unit-options .ux-5a-card:has(> h4) > h4 + small { grid-column: 2; grid-row: 1; display: inline-flex; align-items: center; gap: 4px; color: var(--ux-muted); font-size: 12px; font-variant-numeric: tabular-nums; text-align: right }
+  .ux-mobile-unit-options .ux-5a-card:has(> h4) > h4 + small.ux-5a-invalid { color: var(--ux-err); font-weight: 600 }
+  .ux-mobile-unit-options h4 + .ux-5a-card:has(> h4) { margin-top: 4px }
+  .ux-mobile-unit-options .ux-5a-model-title small, .ux-mobile-unit-options .ux-5a-card > small { color: var(--ux-muted); font-size: 12px; line-height: 16px }
+  .ux-mobile-unit-options .ux-5a-chips { gap: 6px }
+  .ux-mobile-unit-options .ux-5a-chips span { border: 0; font-size: 12px; font-weight: 600 }
+
+  /* ---------- Unit detail: header numbers and costs in the three weights ---------- */
+  .ux-wb-header-points b { font-weight: 700 }
+  .ux-wb-header-points small { font-size: 11px; font-weight: 600; letter-spacing: 0 }
+  .ux-loadout-slot em { color: var(--ux-muted); font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0; text-transform: none }
+  .ux-option-section-title small { color: var(--ux-muted); font-size: 12px }
+
+  /* ---------- Settings: one rhythm for every row; Keep previous versions is a row with its control on the right ---------- */
+  .ux-wb-home-body > .ux-setting-row, .ux-setting-plain > .ux-setting-row { margin-block: 0 }
+  .ux-setting-row { min-height: 56px; padding-block: 8px }
+  .ux-setting-block { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 1px 12px; min-height: 56px; box-sizing: border-box; padding: 8px var(--nxp-pad) }
+  .ux-setting-block > * { grid-column: 1 }
+  .ux-setting-block-head { display: flex; gap: 0; margin: 0 }
+  .ux-setting-block-head > svg { display: none }
+  .ux-setting-block-head strong { font-size: 14px; line-height: 19px; font-weight: 600 }
+  .ux-setting-block > small { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; margin: 0; color: var(--ux-muted); font-size: 12px; line-height: 16px }
+  .ux-setting-block > .ux-segmented { grid-column: 2; grid-row: 1 / span 2 }
+  .ux-segmented { display: inline-flex; gap: 2px; width: auto; padding: 2px; border: 0; border-radius: 10px; background: var(--nxp-hover) }
+  .ux-segmented button { min-width: 34px; min-height: 32px; padding: 0 8px; font-size: 13px; font-weight: 600 }
+  .ux-segmented button.on { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16) }
+  .ux-setting-value .ux-setting-current { color: var(--ux-muted) }
+  /* Settings search results: the same rows and section labels as the page. */
+  .ux-settings-results { display: grid; gap: 2px }
+  .ux-settings-results > .ux-result-label { margin: 16px 0 4px; padding: 0 }
+  .ux-settings-count { color: var(--ux-muted); font-size: 12px; line-height: 16px }
+  .ux-settings-group { display: grid; gap: 2px }
+  .ux-settings-row .ux-settings-text { flex: 1; min-width: 0 }
+  .ux-settings-row .ux-settings-text strong { display: block; font-size: 14px; line-height: 19px; font-weight: 600 }
+  .ux-settings-row .ux-settings-text small { display: block; margin-top: 1px; color: var(--ux-muted); font-size: 12px; line-height: 16px }
+
+  /* ---------- Rows with a leading icon (App, Tools, Sources): a plain 24 pt glyph, text on one column ---------- */
+  :is(.ux-app-nav-row, .ux-tool-tile, .ux-add-source-primary) { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; align-items: center; column-gap: 14px }
+  :is(.ux-app-nav-row, .ux-tool-tile, .ux-add-source-primary) > :first-child:is(svg, .ux-setting-icon) { width: 24px; height: 24px; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: var(--ux-accent) }
+  .ux-add-source-primary > svg:first-child { stroke-width: 2 }
+  :is(.ux-app-nav-row, .ux-add-source-primary) > svg:last-child, .ux-nav-trail > svg { color: var(--ux-muted) }
+  /* App: the nav rows' text lines up with the account name next to its 48 pt avatar. */
+  .ux-app-nav-row { grid-template-columns: 48px minmax(0, 1fr) auto; column-gap: 12px }
+  .ux-app-nav-row > .ux-setting-icon:first-child { justify-self: center }
+  /* A row's status is words with an icon, not a pill. */
+  .ux-nav-trail .ux-chip { min-height: 0; padding: 0; border: 0; background: transparent; box-shadow: none; font-size: 12px; font-weight: 600 }
+  .ux-app-footer strong { font-size: 13px; font-weight: 600 }
+  .ux-app-footer small { font-size: 12px }
+
+  /* ---------- Sources ---------- */
+  .ux-job-notice.ux-src-updates { margin: 12px 0 4px; padding: 0; background: transparent; box-shadow: none; column-gap: 14px; grid-template-columns: 24px minmax(0, 1fr) }
+  .ux-job-notice.ux-src-updates > svg { justify-self: center }
+  .ux-job-notice.ux-src-updates strong { font-size: 14px; line-height: 19px; font-weight: 600 }
+  .ux-job-notice.ux-src-updates small { margin-top: 1px; color: var(--ux-muted); font-size: 12px; line-height: 16px }
+  .ux-job-notice.ux-src-updates .ux-job-btn { justify-self: start }
+  .ux-job-link { font-weight: 600 }
+  .ux-job-btn { font-weight: 700 }
+
+  /* ---------- Library (favourites): the group name is the section label, the empty line sits on the text column ---------- */
+  .ux-favorite-library-section > header { min-height: 18px; gap: 0 }
+  .ux-favorite-library-section > header .ux-collection-icon { display: none }
+  .ux-favorite-library-section > header strong { color: var(--ux-muted); font-size: var(--nxp-label); line-height: 18px; font-weight: 600 }
+  .ux-favorite-library-section + .ux-favorite-library-section { margin-top: var(--nx-group-gap, 20px) }
+  .ux-favorite-empty { gap: 2px; padding: 6px 0 0 }
+  .ux-favorite-empty strong { font-size: 14px; line-height: 19px; font-weight: 600 }
+
+  /* ---------- Create roster ---------- */
+  .ux-primary { font-weight: 700 }
+
+  /* ---------- Export sheet: the sheet floats; inside it, formats are open rows and Preview is a text row ---------- */
+  .ux-job-sheet .ux-job-head .ux-icon-btn { border: 0; background: transparent; box-shadow: none; border-radius: 12px }
+  .ux-job-sheet .ux-job-head .ux-icon-btn:hover { background: var(--nxp-hover) }
+  .ux-xp-sheet .ux-fp-list { gap: 2px; overflow: visible; border: 0; border-radius: 0; background: transparent; box-shadow: none }
+  .ux-xp-sheet .ux-fp-row { border: 0; border-radius: var(--nxp-radius); background: transparent; box-shadow: none }
+  .ux-xp-sheet .ux-fp-row:hover { background: var(--nxp-hover) }
+  .ux-xp-sheet .ux-fp-row.selected { background: var(--nxp-selected) }
+  .ux-xp-sheet .ux-fp-row strong { font-size: 14px; font-weight: 600 }
+  .ux-xp-sheet .ux-fp-row small { color: var(--ux-muted); font-size: 12px }
+  .ux-xp-file strong { font-weight: 600 }
+  .ux-xp-sheet .ux-xp-preview-row { justify-content: space-between; min-height: 44px; padding: 0 12px; border: 0; border-radius: var(--nxp-radius); background: transparent; box-shadow: none; color: var(--ux-ink); font-weight: 600 }
+  .ux-xp-sheet .ux-xp-preview-row:hover { background: var(--nxp-hover) }
+  .ux-xp-sheet .ux-xp-preview-row > svg { color: var(--ux-muted) }
+
+  /* ---------- Rename sheet ---------- */
+  .ux-rn-sheet label > span { font-weight: 600 }
+
+  /* ---------- Add unit (catalogue): status as words with an icon under the points, no pill ---------- */
+  .ux-wb-detail-head strong { font-weight: 700 }
+  .ux-wb-detail-head small { color: var(--ux-muted); font-size: 12px }
+  .ux-pool-row { min-height: 52px; padding-block: 8px; gap: 12px }
+  .ux-pool-row strong { font-size: 14px; line-height: 19px; font-weight: 600 }
+  .ux-pool-row small { color: var(--ux-muted); font-size: 12px; line-height: 16px }
+  .ux-pool-meta { gap: 2px }
+  .ux-pool-meta b { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums }
+  .ux-pool-meta .ux-nx-status { font-size: 12px }
+  .ux-pool-row > svg:last-child { color: var(--ux-accent) }
+  .ws-quota-chip { font-weight: 700 }
+  .ux-pool-quota { display: inline-flex; align-items: center; gap: 6px }
+  .ux-pool-group-head { min-height: 18px }
+  .ux-pool-group-head svg { color: var(--ux-muted) }
+
+  /* ---------- Lists: the no-match state (its Recent label is left out in the markup) ---------- */
+  .ux-search-empty .ux-job-btn { font-weight: 600 }
+}

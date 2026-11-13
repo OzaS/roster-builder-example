@@ -6,6 +6,7 @@ import type { ColorScheme, WorkflowScreen } from "./types";
 import { applyStoredAmbient } from "./concepts/desktop/desktopAmbient";
 import { TabletStandalone } from "./concepts/tablet/TabletStandalone";
 import { DuoStandalone } from "./concepts/foldable/DuoStandalone";
+import "./look";
 
 import "./styles/base.css";
 import "./styles/tokens.css";
@@ -13,6 +14,11 @@ import "./styles/concepts.css";
 import "./styles/ux.css";
 import "./styles/sources.css";
 import "./styles/gaps-mobile.css";
+// The proposed look comes last so it can restyle every library (see src/look.ts).
+import "./styles/next/next-shared.css";
+import "./styles/next/next-phone.css";
+import "./styles/next/next-tablet.css";
+import "./styles/next/next-desktop.css";
 
 const ambientParam = new URLSearchParams(location.search).get("ambient");
 applyStoredAmbient(ambientParam === null ? undefined : ambientParam !== "0");

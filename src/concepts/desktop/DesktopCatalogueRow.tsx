@@ -3,6 +3,7 @@ import { Plus } from 'lucide-react';
 import { StateChip } from '../workspace/StateChip';
 import type { CatalogueState } from './DesktopEditorFlows';
 import { StarButton } from '../workspace/Stars';
+import { useNextLook } from '../../look';
 
 export type CatalogueEntry = { name: string; role: string; models: number; points: number; weapon: string };
 
@@ -20,6 +21,9 @@ export type CatalogueEntry = { name: string; role: string; models: number; point
  */
 export function CatalogueRow({ entry, state, onAdd, hintOpen = false, star, hovered = false }: { entry: CatalogueEntry; state: CatalogueState | null; onAdd: () => void; hintOpen?: boolean; star?: { on: boolean; onToggle: () => void }; hovered?: boolean }) {
   const [hint, setHint] = useState(hintOpen);
+  // The proposed look (src/look.ts) draws the row on one line: the reason sits beside the name in the state's tone and carries
+  // the caption as its hint, so the separate state chip is not drawn.
+  const next = useNextLook();
   const id = useId();
   useEffect(() => { setHint(hintOpen); }, [hintOpen]);
   const unavailable = state?.tone === 'err';
@@ -33,9 +37,9 @@ export function CatalogueRow({ entry, state, onAdd, hintOpen = false, star, hove
       onPointerEnter={() => limit && setHint(true)} onPointerLeave={() => limit && !hintOpen && setHint(false)}
       onFocus={() => limit && setHint(true)} onBlur={() => limit && !hintOpen && setHint(false)}
       onKeyDown={e => { if (e.key === 'Escape' && hint && !hintOpen) { e.stopPropagation(); setHint(false); } }}>
-      <span><strong>{entry.name}</strong>{state && !limit ? <small className="dt-catalogue-reason">{state.reason}</small> : limit ? <span className="dtc-meta"><span className="dtc-quota" role="img" aria-label={`${limit.selected} selected, maximum ${limit.max}`}>{limit.selected} / {limit.max}</span>{models}</span> : models}</span>
+      <span><strong>{entry.name}</strong>{state && !limit ? next ? <small className="dt-catalogue-reason" title={state.caption}>{state.reason}</small> : <small className="dt-catalogue-reason">{state.reason}</small> : limit ? <span className="dtc-meta"><span className="dtc-quota" role="img" aria-label={`${limit.selected} selected, maximum ${limit.max}`}>{limit.selected} / {limit.max}</span>{models}</span> : models}</span>
     </button>
-    {state && !limit && <StateChip tone={state.tone} caption={state.caption} input="pointer" open={hintOpen} />}
+    {state && !limit && !next && <StateChip tone={state.tone} caption={state.caption} input="pointer" open={hintOpen} />}
     <span className="dt-catalogue-price" aria-hidden="true">{entry.points}{limit || unavailable ? <i className="dtc-add-off"><Plus size={13} /></i> : <Plus size={15} />}</span>
     {limit && hint && <span id={id} role="tooltip" className="tb-hint-bubble dtc-limit-bubble">Limit reached: {limit.selected} of {limit.max} selected.<small>Remove the existing unit before adding another.</small></span>}
   </div>;

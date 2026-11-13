@@ -8,6 +8,7 @@ import { HintButton } from './TabletHint';
 import type { TabletInput } from './tabletDevices';
 import { EmptyState, Facts, InstallRow, WorkspaceScope, ListDetail, Meter, Progress, Row, SearchField, pts, rosterStatus, sourceStatus, plural, type PageProps, type SessionProps } from './TabletPieces';
 import { RosterToolbar } from './RosterToolbar';
+import { useTabletNextLook } from './tabletEnv';
 import { PageTitle, TabletToolbar, type ToolbarAction } from './TabletToolbar';
 
 // Pages of the tablet: Home, Rosters and Lookup (T2a). Sources and Settings have their own files. Synthetic rows only.
@@ -23,13 +24,15 @@ const steps = [['Add game data', 'Install a game system from a collection or a f
 
 export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRoster }: SessionProps & { onPage: (page: 'rosters' | 'sources') => void; onNewRoster: () => void; onOpenRoster: (name: string) => void }) {
   const { rosters, jobs, hasData, setJobsOpen, setSourceDetail } = session;
-  const recent = rosters.slice(0, 4);
   const current = rosters[0];
   const addData = () => { setSourceDetail('add'); onPage('sources'); };
   const startInstall = (c: typeof collectionSources[number]) => { jobs.startInstall(c); };
   const attention = rosters.filter(r => r.status !== 'ready').length;
   // DEC-059 (R0-09): a build with no default collection fetches nothing on first run; the note points to adding a link.
   const { noPreset } = useFlowStore();
+  const next = useTabletNextLook(env);
+  // Proposed look: open rows are 60 pt instead of boxed 72 pt ones, so Recent rosters shows six.
+  const recent = rosters.slice(0, next ? 6 : 4);
 
   // Every shown source keeps its own version, update and progress control. TFB-001: the four most used game systems (most
   // rosters, then the latest roster activity, then name; never install order); More opens Sources with the rest.
@@ -60,6 +63,30 @@ export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRo
   // DEC-050: no top row; the rail shows the page and holds New roster. The heading stays for screen readers.
   const toolbar = <PageTitle>Home</PageTitle>;
 
+  // Proposed look: the modules without boxes. One row per game system (status as icon and text on its right, Update as a
+  // button on the row that needs it), Sources as a text button, On this device as label and value rows.
+  const nextSide = <aside className="tb-home-side tb-nx-side" aria-label="Data status">
+    <section className="tb-nx-module" aria-label="Game data status">
+      <div className="tb-nx-head"><h2>Game data</h2><button type="button" className="tb-nx-link" onClick={() => onPage('sources')}>Sources<ChevronRight size={16} /></button></div>
+      <div className="tb-nx-rows">{used.slice(0, HOME_DATA_LIMIT).map(source => {
+        const progress = jobs.progressOf(source.id);
+        return <div key={source.id} className="tb-nx-data-row">
+          <span className="tb-nx-main"><strong>{source.name}</strong><small>{source.version} · checked {source.checked}</small>{progress && <Progress percent={progress.percent} />}</span>
+          {progress ? <button type="button" className="tb-nx-link" onClick={() => setJobsOpen(true)}>Updating {progress.percent}%</button>
+            : source.next ? <HintButton hint={`Download ${source.next} and check your rosters`} input={env.input} side="top" wrapClassName="end" className="ux-job-btn primary tb-nx-update" aria-label={`Update ${source.name} to ${source.next}`} onClick={() => jobs.startUpdate([source.id])}><RefreshCcw size={16} />Update to {source.next}</HintButton>
+            : source.status === 'review' ? <span className="tb-nx-status warn"><TriangleAlert size={16} />Review</span>
+            : <span className="tb-nx-status ok"><Check size={16} />Up to date</span>}
+        </div>;
+      })}</div>
+      {hidden > 0 && <button type="button" className="tb-nx-link" aria-label={`${hidden} more game systems`} title="Opens Sources, which lists all installed game data" onClick={() => onPage('sources')}>{hidden} more in Sources</button>}
+      {jobs.jobs.length > 0 && <button type="button" className="tb-nx-link" onClick={() => setJobsOpen(true)}>Show progress · All jobs</button>}
+    </section>
+    <section className="tb-nx-module" aria-label="On this device">
+      <div className="tb-nx-head"><h2>On this device</h2></div>
+      <dl className="tb-nx-facts">{([['Rosters', rosters.length], ['Game systems', jobs.sources.length], ['Needs attention', attention]] as const).map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
+    </section>
+  </aside>;
+
   /* First run: no game data on the device. */
   if (!hasData) return <div className="tb-page tb-home-page">
     {toolbar}
@@ -86,7 +113,7 @@ export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRo
   /* Game data, no rosters yet. */
   if (!current) return <div className="tb-page tb-home-page">
     {toolbar}
-    <div className="tb-home">
+    <div className={next ? 'tb-home tb-nx-home' : 'tb-home'}>
       <div className="tb-home-main">
         <section className="tb-card tb-fill" aria-label="Ready when you are">
           <span className="ux-result-label">Ready when you are</span>
@@ -96,7 +123,32 @@ export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRo
           </EmptyState>
         </section>
       </div>
-      <aside className="tb-home-side" aria-label="Data status">{dataCard}{deviceCard}</aside>
+      {next ? nextSide : <aside className="tb-home-side" aria-label="Data status">{dataCard}{deviceCard}</aside>}
+    </div>
+  </div>;
+
+  /* The usual state, proposed look. */
+  if (next) return <div className="tb-page tb-home-page tb-nx-home-page">
+    {toolbar}
+    <div className="tb-home tb-nx-home">
+      <div className="tb-home-main">
+        <section className="tb-nx-module tb-nx-continue" aria-label="Continue roster">
+          <div className="tb-nx-head"><h2>Continue</h2></div>
+          <div className="tb-nx-continue-body">
+            <span className="tb-nx-main"><strong>{current.name}</strong><small>{current.faction} · {current.system} · opened {current.opened}</small></span>
+            <HintButton hint="Open the roster you were editing" input={env.input} side="top" wrapClassName="end" className="ux-primary tb-primary" onClick={() => onOpenRoster(current.name)}>Continue roster<ArrowRight size={17} /></HintButton>
+          </div>
+          <div className={`tb-nx-budget ${current.used > current.limit ? 'over' : ''}`}>
+            <span><b>{pts(current.used)}</b> / {pts(current.limit)} pts</span><span>{current.used > current.limit ? `${pts(current.used - current.limit)} over` : `${pts(current.limit - current.used)} open`}</span>
+            <i role="progressbar" aria-label="Points used" aria-valuemin={0} aria-valuemax={current.limit} aria-valuenow={current.used}><i style={{ width: `${Math.min(100, current.used / current.limit * 100)}%` }} /></i>
+          </div>
+        </section>
+        <section className="tb-nx-module tb-recent tb-fill" aria-label="Recent rosters">
+          <div className="tb-nx-head"><h2>Recent rosters</h2><button type="button" className="tb-nx-link" onClick={() => onPage('rosters')}>All rosters<ChevronRight size={16} /></button></div>
+          <div className="tb-list">{recent.map(r => <Row key={r.name} selected={false} title={r.name} sub={`${r.faction} · ${r.opened}`} end={<><b>{pts(r.used)} / {pts(r.limit)}</b>{r.status !== 'ready' ? rosterStatus(r) : null}</>} onClick={() => onOpenRoster(r.name)} />)}</div>
+        </section>
+      </div>
+      {nextSide}
     </div>
   </div>;
 
@@ -172,6 +224,12 @@ export const StatusTile = ({ tone, label, expanded, controls, onToggle }: { tone
 
 /** Separate preview selection from entering the roster, matching the user's row navigation schematic. */
 export function RosterNavigationRow({ roster, selected, onSelect, onOpen }: { roster: RosterSummary; selected: boolean; onSelect: () => void; onOpen: () => void }) {
+  // Proposed look: one open row, no monogram tile and no chevron. A press selects it; pressing the selected row again
+  // (or a double-click) opens the roster, as Open roster in the detail does.
+  const next = useTabletNextLook();
+  if (next) return <div className={`tb-roster-nav-row tb-nx-nav-row ${selected ? 'selected' : ''}`} onDoubleClick={onOpen}>
+    <Row selected={selected} title={roster.name} sub={`${roster.faction} · ${roster.system}`} end={<><b>{pts(roster.used)} / {pts(roster.limit)}</b>{roster.status === 'issues' ? <MobileChip tone="error">{roster.issues} {roster.issues === 1 ? 'error' : 'errors'}</MobileChip> : roster.status === 'ready' ? <small className="tb-nx-when">{roster.opened}</small> : rosterStatus(roster)}</>} onClick={selected ? onOpen : onSelect} />
+  </div>;
   return <div className={`tb-roster-nav-row ${selected ? 'selected' : ''}`}>
     <Row selected={selected} mark={roster.mark} title={roster.name} sub={`${roster.faction} · ${roster.system}`} end={<><b>{pts(roster.used)} pts</b>{roster.status === 'issues' ? <MobileChip tone="error">{roster.issues} {roster.issues === 1 ? 'error' : 'errors'}</MobileChip> : rosterStatus(roster)}</>} onClick={onSelect} />
     <button type="button" className="tb-roster-enter" aria-label={`Open ${roster.name}`} title="Navigate into this roster" onClick={onOpen}><ChevronRight size={22} aria-hidden="true" /></button>
@@ -227,6 +285,28 @@ export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster 
   const [noteTone, noteTitle, noteText] = current ? rosterNote(current) : ['', '', ''];
   const row = (r: RosterSummary) => <RosterNavigationRow key={r.name} roster={r} selected={r.name === current?.name} onSelect={() => choose(r.name)} onOpen={() => onOpenRoster(r.name)} />;
   const filtered = q !== '' || attention || system !== null;
+  const next = useTabletNextLook(env);
+  const NoteIcon = NOTE_ICONS[noteTone as keyof typeof NOTE_ICONS] ?? Info;
+  // Proposed look: an open panel. Name, points and status in the heading; Open roster and the other actions on one line; the facts as label and value rows.
+  const nextDetail = current ? <>
+    <div className="tb-nx-roster-head">
+      {renaming ? <form className="tb-rename" onSubmit={e => { e.preventDefault(); rename(current, (new FormData(e.currentTarget).get('name') as string).trim()); }}><input name="name" autoFocus maxLength={60} defaultValue={current.name} aria-label="Roster name" /><button type="submit" className="ux-job-btn primary">Save</button></form>
+        : <div className="tb-roster-heading"><h2>{current.name}</h2><small>{current.faction} · {current.system}</small></div>}
+      <strong className="tb-roster-total">{pts(current.used)} <small>/ {pts(current.limit)} pts</small></strong>
+    </div>
+    <p className={`tb-nx-status-line ${noteTone}`} role="status"><NoteIcon size={18} aria-hidden="true" /><span><strong>{noteTitle}</strong> {noteText}</span></p>
+    <div className="tb-nx-actions" role="toolbar" aria-label={`Actions for ${current.name}`}>
+      <HintButton hint="Open this roster in the editor" input={env.input} side="top" wrapClassName="start" className="ux-primary tb-primary" onClick={() => onOpenRoster(current.name)}>Open roster<ArrowRight size={17} /></HintButton>
+      <HintButton hint="Rename this roster" input={env.input} side="top" className="ux-job-btn" onClick={() => setRenaming(true)}><Pencil size={16} />Rename</HintButton>
+      <HintButton hint="Make an editable copy" input={env.input} side="top" className="ux-job-btn" onClick={() => duplicate(current)}><Copy size={16} />Duplicate</HintButton>
+      <HintButton hint="Export this roster as a file" input={env.input} side="top" className="ux-job-btn" onClick={() => notify(`“${current.name}” exported`)}><ArrowDownToLine size={16} />Export</HintButton>
+      <HintButton hint="Delete this roster (asks first)" input={env.input} side="top" wrapClassName="end" className="ux-job-btn destructive" onClick={() => session.setDeleting(current.name)}><Trash2 size={16} />Delete</HintButton>
+    </div>
+    <section className="tb-nx-module tb-nx-roster-facts" aria-label="Roster details">
+      <div className="tb-nx-head"><h3>Details</h3></div>
+      <dl className="tb-nx-facts wide">{([['Game system', current.system], ['Units', current.units], ['Forces', current.forces], ['Last opened', current.opened], ['Changed', 'Yesterday'], ['Created', '5 days ago']] as const).map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
+    </section>
+  </> : null;
   return <div className="tb-page">
     <RosterToolbar query={query} onQueryChange={setQuery} input={env.input} actions={actions} />
     <RosterFilterBar platform={env.device.system}
@@ -247,7 +327,7 @@ export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster 
         </div>
         <p className="tb-list-foot" aria-live="polite">{!filtered ? `${plural(rosters.length, 'roster')} stored on this device` : `${visible.length} of ${rosters.length} rosters`}{groups ? ` · ${plural(groups.length, 'game system')}` : ''}</p>
       </>}
-      detail={current ? <>
+      detail={next ? nextDetail : current ? <>
         <div className="tb-roster-detail-header" onKeyDown={e => { if (e.key === 'Escape') setStatusOpen(false); }}>
           {renaming ? <form className="tb-rename" onSubmit={e => { e.preventDefault(); rename(current, (new FormData(e.currentTarget).get('name') as string).trim()); }}><input name="name" autoFocus maxLength={60} defaultValue={current.name} aria-label="Roster name" /><button type="submit" className="ux-job-btn primary">Save</button></form>
             : <div className="tb-roster-heading"><h2>{current.name}</h2><small>{current.faction} · {current.system}</small></div>}

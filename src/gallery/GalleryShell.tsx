@@ -15,6 +15,7 @@ import { DesignElementsPanel } from "./DesignElementsPanel";
 import type { DesignData, DesignWorkflow, EditableDesign } from "../design-data/designData";
 import { screenLabel } from "../design-data/designData";
 import { ScreenGlance, type GlancePlacement } from "./ScreenGlance";
+import { setLook, useLook } from "../look";
 
 type Props = {
   selectedConcept: ConceptId;
@@ -126,6 +127,7 @@ export function GalleryShell({
   onCapture,
   onDesignDataChange,
 }: Props) {
+  const look = useLook();
   const library: LibraryId = concept.id === "desktop-workbench" ? "desktop" : concept.id === "tablet-workbench" ? "tablet" : concept.id === "duo-workbench" ? "foldable" : "phone";
   const [railWidth, setRailWidth] = useState(280);
   const [workflowSelection, setWorkflowSelection] = useState<WorkflowPickerSelection>("all");
@@ -287,6 +289,10 @@ export function GalleryShell({
           </div>
         </div>
         <LibrarySwitch current={library} />
+        <div className="gallery-look-switch" role="group" aria-label="Design look">
+          <button className={look === "current" ? "active" : ""} type="button" aria-pressed={look === "current"} onClick={() => setLook("current")}><span>Current</span><small>Approved design</small></button>
+          <button className={look === "next" ? "active" : ""} type="button" aria-pressed={look === "next"} onClick={() => setLook("next")}><span>New</span><small>Proposal, not approved</small></button>
+        </div>
         <ConceptGroup title="Designs" concepts={activeConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
         <div className="gallery-release-switch" role="group" aria-label="Design version">
           <button className={galleryRelease === "V1" ? "active" : ""} type="button" onClick={() => onGalleryReleaseChange("V1")}><span>V1</span><small>Current</small></button>

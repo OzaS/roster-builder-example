@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react';
+import { useNextLook } from '../../look';
 import { defaultDeviceId, defaultInput, defaultTextScale, deviceById, widthClassOf, type TabletDevice, type TabletDeviceId, type TabletInput, type TextScale, type WidthClass } from './tabletDevices';
 
 /** Gallery preferences: which device frame, input mode and text size the Tablet library shows. Provided by the gallery (or a standalone link). */
@@ -21,3 +22,6 @@ export const makeTabletEnv = (deviceId: TabletDeviceId, input: TabletInput, text
 };
 export const TabletEnvContext = createContext<TabletEnv>(makeTabletEnv(defaultDeviceId, defaultInput));
 export const useTabletEnv = () => useContext(TabletEnvContext);
+
+/** The proposed look (src/look.ts) on the tablet. The Foldable library reuses the tablet pieces (its device id is `duo`) and stays on the current look in this pass. */
+export const useTabletNextLook = (env?: TabletEnv) => { const own = useTabletEnv(); return useNextLook() && ((env ?? own).device.id as string) !== 'duo'; };
