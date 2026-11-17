@@ -420,3 +420,7 @@ span.ux-src-status { cursor: default; }
 .ux-first-run-actions .ux-job-btn { min-height: 38px; }
 /* A confirm whose actions lead to the next preview state sits above the gallery preview control. */
 .ux-alert-scrim.front { z-index: 31; }
+
+/* DEC-069 (2026-11-17): empty Sources offers Install from a file (primary) and Add from a link (secondary). */
+.ux-sources-empty-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.ux-sources-empty .ux-sources-empty-actions button.secondary { border: 1px solid var(--ux-line-2); background: var(--ux-surface-2); color: var(--ux-ink); }

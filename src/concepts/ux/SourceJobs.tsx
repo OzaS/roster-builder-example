@@ -1,9 +1,9 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
-import { Archive, ArrowDownToLine, ArrowLeft, ArrowUpRight, Bell, Check, ChevronDown, ChevronRight, Circle, CircleArrowUp, CircleCheck, CircleHelp, ClipboardPaste, Clock, Copy, Database, Download, Ellipsis, FileArchive, FileInput, FileText, FolderGit2, FolderOpen, Globe, Hand, History, Info, Library, ListChecks, LoaderCircle, Lock, Minus, OctagonAlert, Plus, RefreshCw, Search, Star, Trash2, TextCursorInput, TriangleAlert, Ungroup, Upload, Wifi, X } from "lucide-react";
+import { Archive, ArrowDownToLine, ArrowLeft, ArrowUpRight, Bell, Check, ChevronDown, ChevronRight, Circle, CircleArrowUp, CircleCheck, CircleHelp, ClipboardPaste, Link2, Clock, Copy, Database, Download, Ellipsis, FileArchive, FileInput, FileText, FolderGit2, FolderOpen, Globe, Hand, History, Info, Library, ListChecks, LoaderCircle, Lock, Minus, OctagonAlert, Plus, RefreshCw, Search, Star, Trash2, TextCursorInput, TriangleAlert, Ungroup, Upload, Wifi, X } from "lucide-react";
 import type { ConceptProps } from "../shared";
 import { Chip } from "./uxShared";
 import { ExportActions, STORED_PRINT_ROWS } from "./PhoneExport";
-import { DATA_REPO, DATA_SEARCH, EXAMPLE_SEARCH_SYSTEM, FINDING, FOUND_COLLECTION, GUIDE, GUIDE_KINDS_TITLE, GUIDE_NO_COLLECTION, GuideKinds, GuideSteps, LINK_HELPER, LINK_LABEL, LINK_SAMPLES, NEED_LINK, NOTHING_FOUND, PASTE_LINK, SEARCH_DATA, SEVERAL, SEVERAL_COLLECTIONS, TOUCH_GUIDE_STEPS, dataSearchQuery, foundIn, type RepoCollection } from "../workspace/CollectionLinks";
+import { ADD_DATA_SUB, ADD_FROM_LINK, DATA_REPO, DATA_SEARCH, EXAMPLE_SEARCH_SYSTEM, FINDING, FOUND_COLLECTION, GUIDE, GUIDE_KINDS_TITLE, GUIDE_NO_COLLECTION, GuideGroups, GuideKinds, INSTALL_FILE, LINK_HELPER, LINK_LABEL, LINK_SAMPLES, NEED_LINK, NO_DATA, NOTHING_FOUND, PASTE_LINK, SEVERAL, SEVERAL_COLLECTIONS, TOUCH_GUIDE_GROUPS, dataSearchQuery, foundIn, type RepoCollection } from "../workspace/CollectionLinks";
 import "./phone-links.css";
 
 /*
@@ -456,7 +456,7 @@ function SourcesBackdrop({ props, children }: { props: ConceptProps; children?: 
       <div className="ux-wb-home-body ux-sources-body ux-src-body ux-job-backdrop">
         {children}
         <button type="button" className="ux-add-source-primary" onClick={() => props.onNavigate("add-source")}>
-          <Plus size={18} /><span><strong>Add game data</strong><small>Collections, a repository link, or GitHub search</small></span><ChevronRight size={17} />
+          <Plus size={18} /><span><strong>Add game data</strong><small>{ADD_DATA_SUB}</small></span><ChevronRight size={17} />
         </button>
         <div className="ux-result-label">Installed</div>
         <div className="ux-source-list ux-managed-source-list">
@@ -736,18 +736,14 @@ export function SourcesManageScreen({ props }: { props: ConceptProps }) {
         <PreviewState value={preview} options={[["installed", "Installed"], ["updates", "Updates"], ["selecting", "Selecting"], ["updating", "Updating"], ["failed", "Install failed"], ["interrupted", "Install interrupted"], ["update-interrupted", "Update interrupted"], ["local-choice", "From a file · choose"], ["local-refused", "From a file · refused"], ["local", "From a file · installed"], ["local-interrupted", "From a file · interrupted"], ["empty", "Empty"]]} onChange={setPreview} />
         {!selecting ? (
           <button type="button" className="ux-add-source-primary" onClick={() => props.onNavigate("add-source")}>
-            <Plus size={18} /><span><strong>Add game data</strong><small>Collections, a repository link, or GitHub search</small></span><ChevronRight size={17} />
+            <Plus size={18} /><span><strong>Add game data</strong><small>{ADD_DATA_SUB}</small></span><ChevronRight size={17} />
           </button>
         ) : null}
         {!selecting ? <LocalImportRow onClick={() => setPreview("local-choice")} /> : null}
         {preview === "local-refused" ? <LocalRefusedNotice /> : null}
         {preview === "updates" ? <UpdatesNotice /> : null}
         {preview === "empty" ? (
-          <section className="ux-sources-empty">
-            <span><Database size={25} /></span><strong>No game data yet</strong>
-            <small>Add game data from a collection, a repository link or GitHub search. Everything in a source is installed unless Advanced installation is on.</small>
-            <button type="button" onClick={() => props.onNavigate("add-source")}><Plus size={16} />Add game data</button>
-          </section>
+          <NoDataSources onFile={() => setPreview("local-choice")} onLink={() => props.onNavigate("add-source")} />
         ) : (
           <>
             <div className="ux-src-section-head"><span className="ux-result-label">Installed</span>{!selecting ? <button type="button" className="ux-job-link" onClick={() => setPreview("selecting")}>Select</button> : null}</div>
@@ -801,12 +797,29 @@ export function SourcesManageScreen({ props }: { props: ConceptProps }) {
  */
 export const LOCAL_FILE = { label: "example-data.zip", files: 12, size: "12 MB" };
 
-/** The entry row under Add game data (a neutral icon tile: it is the second way in). */
+/** The file entry row (DEC-069: local data first; on Add game data it is the first, primary row). */
 export function LocalImportRow({ onClick }: { onClick?: () => void }) {
   return (
     <button type="button" className="ux-add-source-primary ux-src-local-entry" onClick={onClick}>
-      <FileArchive size={18} /><span><strong>Install from a file on this phone</strong><small>An archive, data files or a folder</small></span><ChevronRight size={17} />
+      <FileArchive size={18} /><span><strong>{INSTALL_FILE.title}</strong><small>{INSTALL_FILE.sub}</small></span><ChevronRight size={17} />
     </button>
+  );
+}
+
+/**
+ * DEC-069 (approved 2026-11-17): empty Sources. Two actions, Install from a file (primary) and Add from a link (secondary,
+ * opens Add game data).
+ */
+export function NoDataSources({ onFile, onLink }: { onFile?: () => void; onLink?: () => void }) {
+  return (
+    <section className="ux-sources-empty">
+      <span><Database size={25} /></span><strong>No game data yet</strong>
+      <small>{NO_DATA.emptySources}</small>
+      <div className="ux-sources-empty-actions">
+        <button type="button" onClick={onFile}><FileArchive size={16} />{INSTALL_FILE.short}</button>
+        <button type="button" className="secondary" onClick={onLink}><Link2 size={16} />{ADD_FROM_LINK}</button>
+      </div>
+    </section>
   );
 }
 
@@ -1206,17 +1219,17 @@ export function NoCollectionsNote() {
 }
 
 /**
- * First run in a build with no default collection (DEC-059, R0-09): the Home data card has nothing to fetch, so it points
- * to adding a link. Buttons as before: Add game data and Open a file.
+ * First run, no game data (DEC-069, approved 2026-11-17; was DEC-059's no-default-collection card): the Home data card
+ * offers Install from a file (primary) and Add from a link (secondary, opens Add game data).
  */
-export function FirstRunDataCard({ onAdd }: { onAdd?: () => void }) {
+export function FirstRunDataCard({ onAdd, onFile }: { onAdd?: () => void; onFile?: () => void }) {
   return (
     <section className="ux-src-card ux-first-run-card" aria-label="Get game data">
       <header><Database size={18} /><span><strong>Get game data</strong></span></header>
-      <small className="ux-col-desc">Add game data from a GitHub repository or a collection link.</small>
+      <small className="ux-col-desc">{NO_DATA.homeHero}</small>
       <div className="ux-first-run-actions">
-        <button type="button" className="ux-job-btn primary" onClick={onAdd}><Plus size={15} />Add game data</button>
-        <button type="button" className="ux-job-btn secondary"><FolderOpen size={15} />Open a file</button>
+        <button type="button" className="ux-job-btn primary" onClick={onFile}><FileArchive size={15} />{INSTALL_FILE.short}</button>
+        <button type="button" className="ux-job-btn secondary" onClick={onAdd}><Link2 size={15} />{ADD_FROM_LINK}</button>
       </div>
     </section>
   );
@@ -1241,13 +1254,12 @@ const ADD_SHEET_VALUE: Record<AddSheetState, string> = {
   repository: LINK_SAMPLES.dataRepo, "repo-found": LINK_SAMPLES.found, finding: LINK_SAMPLES.found, "repo-several": LINK_SAMPLES.several, nothing: LINK_SAMPLES.nothing,
 };
 
-/** R2-06 (F4e): the Need a link? group under Find: Search for data and Step-by-step guide, each pushing its page in the sheet. */
-export function NeedLinkRows({ onSearch, onGuide }: { onSearch?: () => void; onGuide?: () => void }) {
+/** R2-06 (F4e): the Need a link? group under Find. DEC-069 (2026-11-17): Search for data is gone; only the Step-by-step guide stays. */
+export function NeedLinkRows({ onGuide }: { onGuide?: () => void }) {
   return (
     <>
       <div className="ux-result-label ux-links-need" role="heading" aria-level={3}>{NEED_LINK}</div>
       <div className="ux-src-group">
-        <button type="button" className="ux-col-nav" onClick={onSearch}><Search size={17} /><span><strong>{SEARCH_DATA.title}</strong><small>{SEARCH_DATA.sub}</small></span><ChevronRight size={16} /></button>
         <button type="button" className="ux-col-nav" onClick={onGuide}><CircleHelp size={17} /><span><strong>{GUIDE.title}</strong><small>{GUIDE.sub}</small></span><ChevronRight size={16} /></button>
       </div>
     </>
@@ -1285,7 +1297,7 @@ export function AddCollectionSheet({ state, inline = false }: { state: AddSheetS
   ) : page === "guide" ? (
     <>
       {pageHead(GUIDE.short)}
-      <GuideSteps prefix="ux-links" steps={TOUCH_GUIDE_STEPS} action={<button type="button" className="ux-job-btn" onClick={() => setPage("search")}><Search size={14} />{SEARCH_DATA.title}</button>} />
+      <GuideGroups prefix="ux-links" titleClassName="ux-result-label" groups={TOUCH_GUIDE_GROUPS} action={<button type="button" className="ux-job-btn"><FileArchive size={14} />{INSTALL_FILE.title}</button>} />
       <div className="ux-result-label">{GUIDE_KINDS_TITLE}</div>
       <GuideKinds prefix="ux-links" />
       <p className="ux-links-hint">{GUIDE_NO_COLLECTION}</p>
@@ -1346,10 +1358,10 @@ export function AddCollectionSheet({ state, inline = false }: { state: AddSheetS
       {view === "nothing" ? (
         <>
           <div className="ux-job-notice error" role="alert"><OctagonAlert size={18} /><span><strong>{NOTHING_FOUND.title}</strong><small>{NOTHING_FOUND.body}</small></span></div>
-          <div className="ux-links-pair"><button type="button" className="ux-job-btn" onClick={() => setPage("search")}><Search size={15} />{SEARCH_DATA.title}</button><button type="button" className="ux-job-btn" onClick={() => setPage("guide")}><CircleHelp size={15} />{GUIDE.short}</button></div>
+          <div className="ux-links-pair"><button type="button" className="ux-job-btn"><FileArchive size={15} />{INSTALL_FILE.short}</button><button type="button" className="ux-job-btn" onClick={() => setPage("guide")}><CircleHelp size={15} />{GUIDE.short}</button></div>
         </>
       ) : null}
-      {needLink ? <NeedLinkRows onSearch={() => setPage("search")} onGuide={() => setPage("guide")} /> : null}
+      {needLink ? <NeedLinkRows onGuide={() => setPage("guide")} /> : null}
       <small className="ux-src-footer">Collections only list repositories. Nothing is downloaded until you install.</small>
       <footer className="ux-job-footer"><button type="button" className="ux-job-btn secondary">Cancel</button><button type="button" className="ux-job-btn primary" disabled={!canAdd}>Add collection</button></footer>
     </>
@@ -1379,24 +1391,29 @@ export function AddGameDataScreen({ props }: { props: ConceptProps }) {
   // DEC-059 (R0-09): a build with no default collection and no collections of the user's own yet.
   const noPreset = preview === "no-preset";
   const sheet: AddSheetState | undefined = preview === "add" ? "found" : preview === "links-idle" ? "idle" : preview === "collections" || preview === "hidden" || noPreset ? undefined : preview;
+  const [fileChoice, setFileChoice] = useState(false);
+  // DEC-069 (approved 2026-11-17), local data first: (1) Install from a file on this device, the primary row; (2) the
+  // repository link field; (3) Collections; (4) Search GitHub, a secondary row last.
   return (
     <>
-      <SourceScreenHeader props={props} title="Add game data" subtitle="Collections, a link, or GitHub search" />
+      <SourceScreenHeader props={props} title="Add game data" subtitle={ADD_DATA_SUB} />
       <div className="ux-wb-home-body ux-add-source-body ux-src-body">
         {/* R2-06: the Collection links screens show the sheet without the gallery's state control (their states are workflow screens). */}
         {linksScreen ? null : <PreviewState value={preview} options={[["collections", "Collections"], ["hidden", "Default hidden"], ["no-preset", "No default collection"], ["add", "Add collection"], ["library", "Add library"], ["invalid", "Invalid link"], ["duplicate", "Already added"], ["repository", "Repository link"]]} onChange={setPreview} />}
-        <div className="ux-result-label">Collections</div>
-        {hidden || noPreset ? null : <DefaultCollectionCard onInstall={install} onShowAll={() => props.onNavigate("collection")} />}
-        {hidden || noPreset ? null : <DefaultListingRows onOpen={() => props.onNavigate("collection")} />}
-        <UserCollectionRows onOpen={() => props.onNavigate("collection")} onAdd={() => setPreview("add")} defaultHidden={hidden} onShowDefault={() => setPreview("collections")} saved={!noPreset} />
+        <LocalImportRow onClick={() => setFileChoice(true)} />
         <div className="ux-result-label">Repository</div>
         <section className="ux-source-method">
           <div className="ux-source-method-heading"><span className="ux-setting-icon"><FileInput size={18} /></span><span><strong>Have a link?</strong><small>Any GitHub repository with roster data files (.gst and .cat, or their JSON form).</small></span></div>
           <div className="ux-source-url"><input aria-label="Repository" placeholder="owner/name or a GitHub link" /><button type="button" onClick={install}>Continue</button></div>
         </section>
+        <div className="ux-result-label">Collections</div>
+        {hidden || noPreset ? null : <DefaultCollectionCard onInstall={install} onShowAll={() => props.onNavigate("collection")} />}
+        {hidden || noPreset ? null : <DefaultListingRows onOpen={() => props.onNavigate("collection")} />}
+        <UserCollectionRows onOpen={() => props.onNavigate("collection")} onAdd={() => setPreview("add")} defaultHidden={hidden} onShowDefault={() => setPreview("collections")} saved={!noPreset} />
         <div className="ux-src-group"><button type="button" className="ux-col-nav" onClick={() => props.onNavigate("search-github")}><Search size={17} /><span><strong>Search GitHub</strong><small>Any GitHub repository with game data, by name</small></span><ChevronRight size={16} /></button></div>
       </div>
       {sheet ? <AddCollectionSheet key={sheet} state={sheet} /> : null}
+      {fileChoice ? <div onClick={() => setFileChoice(false)}><LocalImportChoiceDialog /></div> : null}
     </>
   );
 }
