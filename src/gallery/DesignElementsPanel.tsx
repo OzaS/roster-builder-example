@@ -359,6 +359,20 @@ function WorkbenchElements({
         </div>
       </ElementSection>
 
+      <ElementSection title="Rule Row Without Text">
+        <small className="ux-elements-note">DEC-068 (approved 2026-11-17): many datasets have no rules wording. A rule, ability, trait, equipment item or other text-bearing entry without wording shows only its name: no placeholder, no fold, no chevron and no link that would open an empty page or pane. A section left empty is omitted. Beside it, the normal expandable rule row (Charge) and a reference tag that opens its glance (Aerial Drop).</small>
+        <div className="ux-mobile-unit-options compact ux-lk-detail">
+          <h4>Rules</h4>
+          <div className="ux-5a-card">
+            <button type="button" className="ux-5a-choice" aria-expanded={false}><span><strong>Charge</strong></span><ChevronRight size={18} /></button>
+            <div className="ux-5a-choice ux-lk-rule-plain"><span><strong>Rule Alpha</strong></span></div>
+          </div>
+          <div className="ux-5a-card ux-5b-table-card"><strong>Abilities</strong><div className="ux-5b-table"><table><thead><tr><th /><th className="text">Description</th></tr></thead><tbody><tr><th>Escort</th><td className="text">This unit can be linked to one squad.</td></tr><tr><th colSpan={2}>Ability Gamma</th></tr></tbody></table></div></div>
+        </div>
+        <div className="ux-profile-tag-list"><button type="button" className="ux-reference-tag">Aerial Drop</button><span className="ux-reference-tag plain">Rule Alpha</span></div>
+        <small className="ux-elements-note">Result rows: a rule without text and without Used by would open an empty page, so its Lookup result row is plain text (name, kind, source) and does not open. Print view and PDF list such a rule by name only. Samples: Rule Alpha, Rule Beta and Gear Gamma on the phone Profile tab (unit-detail); Line Alpha in a Lookup unit and the results (lookup-unit, lookup-results); Line Beta on a detachment.</small>
+      </ElementSection>
+
       <ElementSection title="Unit Links (associations)">
         <div style={{ display: "grid", gap: 10, maxWidth: 360 }}>
           <small className="ux-elements-note">Built: below the options, one section per association of the shown unit, named after it, with "linked/max linked" and "Needs n more link(s)" when a minimum is unmet. Max 1: radio rows, tapping another unit moves the link in one step, tapping the linked one unlinks it. Several: check rows, still editable at the maximum ("Limit reached · can exceed"). Ineligible units are not listed; a linked unit that is no longer eligible stays, marked, so it can be unlinked. Roster rows show the first link as a one-line caption ("Linked to Squad A (Escorting)", "+N" for more).</small>

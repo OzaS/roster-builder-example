@@ -218,7 +218,8 @@ export function pdfPages(r: ExportRoster, rules: boolean, paper: Paper = 'A4') {
 export const sizeLabel = (bytes: number) => bytes < 1024 ? `${bytes} B` : `${(bytes / 1024).toFixed(bytes < 10240 ? 1 : 0)} KB`;
 export const JSON_FILE_LINE = 'Import this file on another device to keep editing, or open it in New Recruit.';
 const PROFILE = ['M 6', 'D 4+', 'R 7', 'H 1'];
-const RULES: Record<string, string> = { 'Steady advance': 'This unit may make a normal move and keep its formation bonus while within range of its commander.', 'Field standard': 'A unit carrying a field standard may re-roll one failed resolve test per round.' };
+// DEC-068 (approved 2026-11-17): Rule Alpha has no wording in the data; the document lists its name only (no colon, no placeholder).
+const RULES: Record<string, string> = { 'Steady advance': 'This unit may make a normal move and keep its formation bonus while within range of its commander.', 'Rule Alpha': '', 'Field standard': 'A unit carrying a field standard may re-roll one failed resolve test per round.' };
 
 export function rosterText(r: ExportRoster, rules: boolean, profiles: boolean) {
   const lines = [`${r.name} · ${r.total.toLocaleString()} / ${r.limit ? r.limit.toLocaleString() : '∞'} pts`, `${r.system} · ${r.faction}`, ''];
@@ -230,25 +231,25 @@ export function rosterText(r: ExportRoster, rules: boolean, profiles: boolean) {
       for (const u of own) {
         lines.push(`• ${u.name} [${unitCost(u)} pts]: ${u.models} ${u.models === 1 ? 'model' : 'models'}, ${u.weapon}${u.upgrade ? ', Field standard' : ''}`);
         if (profiles) lines.push(`    ${PROFILE.join(' · ')}`);
-        if (rules) lines.push(`    Rules: Steady advance${u.upgrade ? ', Field standard' : ''}`);
+        if (rules) lines.push(`    Rules: Steady advance, Rule Alpha${u.upgrade ? ', Field standard' : ''}`);
         if (u.notes) lines.push(`    Note: ${u.notes}`);
       }
     }
     lines.push('');
   }
-  if (rules) { lines.push('== Rules =='); for (const [name, text] of Object.entries(RULES)) lines.push(`${name}: ${text}`); lines.push(''); }
+  if (rules) { lines.push('== Rules =='); for (const [name, text] of Object.entries(RULES)) lines.push(text ? `${name}: ${text}` : name); lines.push(''); }
   lines.push('Made with Battle Augur');
   return lines.join('\n');
 }
 function rosterHtml(r: ExportRoster, rules: boolean, profiles: boolean) {
   const esc = (v: string) => v.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] ?? c));
   const body = r.forces.map(f => `<h2>${esc(f.name)} <small>${esc(f.type)} · ${f.points} pts</small></h2>` + f.units.map(u => `<p><b>${esc(u.name)}</b> ${unitCost(u)} pts<br>${u.models} models, ${esc(u.weapon)}${u.upgrade ? ', Field standard' : ''}${profiles ? `<br><small>${PROFILE.join(' · ')}</small>` : ''}</p>`).join('')).join('');
-  const rulesBlock = rules ? `<h2>Rules</h2>${Object.entries(RULES).map(([n, t]) => `<p><b>${esc(n)}</b> ${esc(t)}</p>`).join('')}` : '';
+  const rulesBlock = rules ? `<h2>Rules</h2>${Object.entries(RULES).map(([n, t]) => t ? `<p><b>${esc(n)}</b> ${esc(t)}</p>` : `<p><b>${esc(n)}</b></p>`).join('')}` : '';
   return `<!doctype html><meta charset="utf-8"><title>${esc(r.name)}</title><h1>${esc(r.name)}</h1><p>${esc(r.system)} · ${esc(r.faction)} · ${r.total} / ${r.limit || '∞'} pts</p>${body}${rulesBlock}`;
 }
 /** The paper preview of the print document (Print view and PDF): a scaled, scrollable view of the page. */
 export function PaperPreview({ roster, rules, profiles, label = 'Print view preview', className = '' }: { roster: ExportRoster; rules: boolean; profiles: boolean; label?: string; className?: string }) {
-  return <div className={`dte-paper ${className}`.trim()} aria-label={label} tabIndex={0}><h4>{roster.name}</h4><p className="dte-paper-meta">{roster.system} · {roster.faction} · {roster.total} / {roster.limit || '∞'} pts</p>{roster.forces.map(f => <section key={f.id}><h5>{f.name}<span>{f.type} · {f.points} pts</span></h5>{f.units.map(u => <div key={u.id} className="dte-paper-unit"><b>{u.name}</b><span>{unitCost(u)} pts</span><small>{u.models} {u.models === 1 ? 'model' : 'models'}, {u.weapon}{u.upgrade ? ', Field standard' : ''}</small>{profiles && <em>{PROFILE.join(' · ')}</em>}</div>)}</section>)}{rules && <section><h5>Rules</h5>{Object.entries(RULES).map(([n, t]) => <p key={n}><b>{n}</b> {t}</p>)}</section>}</div>;
+  return <div className={`dte-paper ${className}`.trim()} aria-label={label} tabIndex={0}><h4>{roster.name}</h4><p className="dte-paper-meta">{roster.system} · {roster.faction} · {roster.total} / {roster.limit || '∞'} pts</p>{roster.forces.map(f => <section key={f.id}><h5>{f.name}<span>{f.type} · {f.points} pts</span></h5>{f.units.map(u => <div key={u.id} className="dte-paper-unit"><b>{u.name}</b><span>{unitCost(u)} pts</span><small>{u.models} {u.models === 1 ? 'model' : 'models'}, {u.weapon}{u.upgrade ? ', Field standard' : ''}</small>{profiles && <em>{PROFILE.join(' · ')}</em>}</div>)}</section>)}{rules && <section><h5>Rules</h5>{Object.entries(RULES).map(([n, t]) => <p key={n}><b>{n}</b>{t ? <> {t}</> : null}</p>)}</section>}</div>;
 }
 export function downloadFile(name: string, text: string, type: string) {
   const url = URL.createObjectURL(new Blob([text], { type })); const a = document.createElement('a'); a.href = url; a.download = name; a.click(); URL.revokeObjectURL(url);

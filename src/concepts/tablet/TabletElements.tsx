@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { BookMarked, Check, CheckSquare, ChevronRight, FileArchive, FileUp, FolderOpen, Hammer, Info, Layers3, Link2, Plus, Search } from 'lucide-react';
+import { BookMarked, BookOpen, Check, CheckSquare, ChevronRight, FileArchive, FileUp, FolderOpen, Hammer, Info, Layers3, Link2, Plus, Search } from 'lucide-react';
 import { ADD_DATA_SUB, ADD_FROM_LINK, INSTALL_FILE, NO_DATA } from '../workspace/CollectionLinks';
 import { FIRST_RUN_NO_PRESET, NoPresetCollections } from '../desktop/DesktopSourceFlows';
 import { LibrarySwitch } from '../../gallery/LibrarySwitch';
@@ -216,6 +216,12 @@ export function TabletElements() {
       <h2>Lookup 1.0 · grouped results and detail pane (design session 2026-10-31)</h2>
       <p>The earlier Lookup page with the phone's grouping: system chips (All n, one per system with its count), four foldable sections with counts (Units open on top, folded sections below the open ones), and the phone's reference content in the detail pane, where links push onto the pane's own stack.</p>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width"><TabletWorkbench workflowScreen="tablet-lookup-1-0" /></TabletDeviceFrame><TabletDeviceFrame fit="width"><TabletWorkbench workflowScreen="tablet-lookup-1-0-force" /></TabletDeviceFrame></div>
+      <h2>Rule row without text (DEC-068 · approved 2026-11-17) · name only, not expandable · beside the normal expandable rule row</h2>
+      <p>Many datasets have no rules wording. A rule, ability or other text-bearing entry without wording shows only its name: no placeholder, no fold, no chevron and no link to an empty page or pane; a section left empty is omitted. In the editor's unit pane (Profile) Rule Alpha sits under the expandable Steady advance; in Lookup a rule without text (Line Alpha) is a plain row in a unit's Rules, and its result row is plain text that does not open.</p>
+      <div className="tb-el-row"><div className="tb-app ux-screen dark tb-el-card tb-touch"><section className="tbe-detail"><h4>Rules</h4><div className="ux-5a-card">
+        <div><button type="button" className="ux-5a-choice" aria-expanded={true}><BookOpen size={18} /><span><strong>Steady advance</strong></span><ChevronRight size={18} /></button><small className="tbe-rule-text">This unit may make a normal move and keep its formation bonus while within range of its commander.</small></div>
+        <div className="ux-5a-choice tbe-rule-plain"><BookOpen size={18} aria-hidden="true" /><span><strong>Rule Alpha</strong></span></div>
+      </div></section></div></div>
       <h2>Lookup 1.0 · detachment Layout (F2 sections 2–3, approved 2026-11-07) · key folded, key open in two columns, Base limit 0, tap detail</h2>
       <p>The phone's Layout in the detail pane: the key starts folded; open, it and the Base limit 0 list use two columns, filled column by column, once the pane is 560 pt or wider. Tapping a group shows its full name, symbol, letter and base limit, as on the phone.</p>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-lookup-1-0-detachment-large" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-lookup-1-0-detachment-key-open" /></TabletDeviceFrame></div>

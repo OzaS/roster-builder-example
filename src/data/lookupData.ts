@@ -65,9 +65,10 @@ export const lookupEntities: LookupEntity[] = [
     profiles: [
       { title: "Unit", columns: unitStats, rows: [{ name: "Line Trooper", values: ['6"', "4+", "7", "1"] }, { name: "Sergeant", values: ['6"', "4+", "8", "2"] }] },
       { title: "Ranged weapons", columns: weaponStats, rows: [{ name: "Line rifle", values: ['24"', "1", "3", "0"] }, { name: "Sidearm", values: ['12"', "1", "3", "0"] }] },
-      { title: "Abilities", columns: ["Description"], text: true, rows: [{ name: "Shoulder to shoulder", values: ["While this unit has 10 or more models, add 1 to its resolve."] }] },
+      // DEC-068 (2026-11-17): Ability Gamma has no wording in the data, so it shows its name only.
+      { title: "Abilities", columns: ["Description"], text: true, rows: [{ name: "Shoulder to shoulder", values: ["While this unit has 10 or more models, add 1 to its resolve."] }, { name: "Ability Gamma", values: [""] }] },
     ],
-    rules: ["r-hold-line", "r-steady"],
+    rules: ["r-hold-line", "r-steady", "r-line-alpha"],
     options: [
       { title: "Sergeant weapon", limit: "Choose 1", items: [{ name: "Sidearm", cost: "Included", id: "up-sidearm" }, { name: "Officer blade", cost: "+5 pts", id: "up-blade" }] },
       { title: "Special weapons", limit: "Up to 2 per 10 models", items: [{ name: "Arc rifle", cost: "+10 pts", id: "up-arc" }, { name: "Heavy carbine", cost: "+5 pts", id: "up-carbine" }] },
@@ -151,7 +152,7 @@ export const lookupEntities: LookupEntity[] = [
   },
   {
     id: "d-battle-line", group: "force", forceKind: "detachment", name: "Battle Line", system: "Example System Two", factions: ["Glass Legion"], summary: "Detachment · 3 slot categories",
-    rules: ["r-unbroken"],
+    rules: ["r-unbroken", "r-line-beta"],
     slots: [{ category: "Leaders", min: 1, max: 1 }, { category: "Troops", min: 2, max: -1 }, { category: "Support", min: 0, max: 2 }],
   },
 
@@ -182,10 +183,19 @@ export const lookupEntities: LookupEntity[] = [
   { id: "r-unbroken", group: "rule", name: "Unbroken Line", system: "Example System Two", factions: ["Glass Legion"], summary: "Faction rule", text: "Units with this rule ignore the first failed morale test each battle.", usedBy: ["u-line-gl", "d-battle-line"] },
   { id: "r-steady", group: "rule", name: "Steady advance", system: "Open Field", factions: [], summary: "Unit ability", text: "This unit may make a normal move and keep its formation bonus while within range of its commander.", usedBy: ["u-line-fc"] },
   { id: "r-formation-drill", group: "rule", name: "Formation drill", system: "Open Field", factions: ["Frontier Coalition"], summary: "Detachment rule", text: "Once per round, one Core unit from this detachment may move again after it has shot, up to half its move.", usedBy: ["d-line-formation"] },
+  // DEC-068 (approved 2026-11-17): rules without wording in the data. They show their name only: not expandable, no link,
+  // and a result row that would open an empty page does not open.
+  { id: "r-line-alpha", group: "rule", name: "Line Alpha", system: "Open Field", factions: [], summary: "Unit ability" },
+  { id: "r-line-beta", group: "rule", name: "Line Beta", system: "Example System Two", factions: ["Glass Legion"], summary: "Detachment rule" },
   { id: "r-rally", group: "rule", name: "Rally", system: "Open Field", factions: [], summary: "Upgrade rule", text: "Friendly units within 6\" of the bearer may re-roll failed resolve tests.", usedBy: ["up-line-standard"] },
 ];
 
 export const lookupById = (id: string) => lookupEntities.find((e) => e.id === id);
+
+/** DEC-068: whether an entry has wording of its own (rules: their text). */
+export const hasText = (e: LookupEntity) => !!e.text?.trim();
+/** DEC-068: whether opening the entry shows more than its name. A rule without text and without Used by does not open. */
+export const opensPage = (e: LookupEntity) => e.group !== "rule" || hasText(e) || !!e.usedBy?.length;
 
 /** "Unit", "Force", "Detachment", "Upgrade" or "Rule". */
 export function kindLabel(e: LookupEntity) {

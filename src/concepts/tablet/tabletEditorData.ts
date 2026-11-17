@@ -83,6 +83,8 @@ export const unitProfile = (unit: EditorUnit) => lookupEntries.find(e => e.kind 
 
 export const unitRules = (unit: EditorUnit) => [
   { name: 'Steady advance', text: 'This unit may make a normal move and keep its formation bonus while within range of its commander.' },
+  // DEC-068 (approved 2026-11-17): a rule without wording in the data; it shows its name only.
+  { name: 'Rule Alpha', text: '' },
   ...(unit.role === 'Core' && unit.name === 'Recon Team' ? [{ name: 'Forward deployment', text: 'Set up this unit anywhere more than 9" from enemy units after both sides have deployed.' }] : []),
   ...(unit.upgrade ? [{ name: 'Field standard', text: 'A unit carrying a field standard may re-roll one failed resolve test per round.' }] : []),
 ];

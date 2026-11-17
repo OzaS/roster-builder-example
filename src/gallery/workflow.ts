@@ -122,7 +122,7 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "desktop-stars-faction", label: "Desktop · R2-03 · New roster · Faction step with a starred faction" },
   { id: "desktop-stars-add-force", label: "Desktop · R2-03 · Add force · Starred forces" },
   { id: "desktop-menus-star-unit", label: "Desktop · R2-03 · Menu bar · Edit › Star unit" },
-  { id: "desktop-links-add", label: "Desktop · R2-06 · Add collection dialog · Repository link, Search for data and guide links" },
+  { id: "desktop-links-add", label: "Desktop · R2-06 · Add collection dialog · Repository link and guide link (DEC-069)" },
   { id: "desktop-links-repo-found", label: "Desktop · R2-06 · Add collection dialog · Repository with one collection" },
   { id: "desktop-links-repo-several", label: "Desktop · R2-06 · Add collection dialog · Repository with several collections" },
   { id: "desktop-links-data-repo", label: "Desktop · R2-06 · Add collection dialog · Repository with game data, no collection" },

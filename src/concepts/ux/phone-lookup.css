@@ -139,3 +139,9 @@
 .design-elements-panel.ux-screen .ux-element-section :is(.ux-lk-phone-top, .ux-lk-heading) h2 { color: var(--ux-ink); font-weight: 750; letter-spacing: 0; text-transform: none }
 .design-elements-panel.ux-screen .ux-element-section .ux-lk-phone-top h2 { font-size: 17px }
 .design-elements-panel.ux-screen .ux-element-section .ux-lk-heading h2 { font-size: 24px }
+
+/* DEC-068 (approved 2026-11-17): an entry without wording shows its name only. Not expandable, no link; a result row that
+   would open an empty page is plain text (no press state). */
+.ux-lk-rule-plain { cursor: default }
+.ux-lk-row.ux-lk-row-static { cursor: default }
+.ux-lk-row.ux-lk-row-static:hover, .ux-lk-row.ux-lk-row-static:active { background: inherit; transform: none }

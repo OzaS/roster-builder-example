@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { BookOpen, ChevronLeft, CircleAlert, Clock3, Database, RotateCw, Search, Unlink, X } from 'lucide-react';
-import { lookupById, lookupSystems, sourceLine, type LookupEntity } from '../../data/lookupData';
+import { opensPage, lookupById, lookupSystems, sourceLine, type LookupEntity } from '../../data/lookupData';
 import { LookupEntryBody, LookupSection } from '../ux/PhoneLookup';
 import { plural, useLookup } from '../ux/useLookup';
 import { ForceLayoutContext, type ForceLayoutState } from '../ux/ForceLayout';
@@ -75,7 +75,7 @@ export function DesktopLookup10({ initial = 'u-line-fc', state: initialState, op
             </section></div>
           : lk.ordered.length === 0 ? <div className="dtp-empty"><Search size={22} /><strong>Nothing found for “{lk.query.trim()}”</strong><p>Check the spelling, or try part of the name.</p>{lk.systems !== null && <button className="dtp-btn" onClick={() => lk.setSystems(null)}>Search all systems</button>}</div>
           : lk.ordered.map(g => <LookupSection key={g.id} label={g.label} count={g.rows.length} names={g.rows.map(nameOf)} folded={!lk.openIds.includes(g.id) && !(large && g.rows.some(e => e.id === LONG_ID))} onToggle={() => lk.toggle(g.id)}>
-            {g.rows.map(e => <button key={e.id} className={`dtp-row dtp-result ${stack[0] === e.id ? 'selected' : ''}`} aria-current={stack[0] === e.id ? 'true' : undefined} title={large ? nameOf(e) : undefined} onClick={() => open(e.id)}><span><strong className="dtl-title">{nameOf(e)}</strong><small>{e.summary} · {sourceLine(e, lk.withSystem)}</small></span><span className="ux-ro-list-trailing">{e.cost ? <b className="dtp-cost">{e.cost}</b> : null}{e.conditional ? <span className="ux-lf-tag info">Conditional</span> : null}</span></button>)}
+            {g.rows.map(e => !opensPage(e) ? <div key={e.id} className="dtp-row dtp-result dtl-result-plain"><span><strong className="dtl-title">{nameOf(e)}</strong><small>{e.summary} · {sourceLine(e, lk.withSystem)}</small></span></div> /* DEC-068: would open an empty page */ : <button key={e.id} className={`dtp-row dtp-result ${stack[0] === e.id ? 'selected' : ''}`} aria-current={stack[0] === e.id ? 'true' : undefined} title={large ? nameOf(e) : undefined} onClick={() => open(e.id)}><span><strong className="dtl-title">{nameOf(e)}</strong><small>{e.summary} · {sourceLine(e, lk.withSystem)}</small></span><span className="ux-ro-list-trailing">{e.cost ? <b className="dtp-cost">{e.cost}</b> : null}{e.conditional ? <span className="ux-lf-tag info">Conditional</span> : null}</span></button>)}
           </LookupSection>)}
       </div></section>
       <article className="dtp-card dtp-detail lookup-detail" aria-label="Entry details" onKeyDown={e => { if (e.altKey && e.key === 'ArrowLeft' && previous) setStack(s => s.slice(0, -1)); }}>

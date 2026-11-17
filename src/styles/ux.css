@@ -6254,3 +6254,9 @@ button.ux-guided-option { justify-content: flex-start; }
 .ux-screen.ux-scheme-verdant.light { --ux-muted: #535e4e; --ux-ink-tertiary: #576153; }
 /* Unit names a step heavier (DX-02): the phone tree as the tablet's (650) and desktop's (600). */
 .ux-tree-unit-main span { font-weight: 600; }
+/* DEC-068 (approved 2026-11-17): a rule or trait without wording is a plain label with its name: neutral ink, no link colour. */
+.ux-reference-tag.plain {
+  border-color: var(--ux-line-2);
+  color: var(--ux-ink);
+  background: transparent;
+}

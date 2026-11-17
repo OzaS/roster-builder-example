@@ -1075,7 +1075,7 @@ function UnitProfile({ unit, onOpenReference, glance = false }: { unit: RosterUn
           {detail.equipment.map((item) => (
             <article key={item.id}>
               <strong>{item.name}</strong>
-              <p>{item.description}</p>
+              {item.description.trim() ? <p>{item.description}</p> : null /* DEC-068: no wording, name only */}
             </article>
           ))}
         </div>
@@ -1133,6 +1133,8 @@ function ProfileTable({ table, unitCount, onOpenReference, fitToWidth = false }:
 
 function ReferenceTag({ label, onOpen, compact = false }: { label: string; onOpen: (reference: RosterReferenceDefinition) => void; compact?: boolean }) {
   const reference = resolveRosterReference(label);
+  // DEC-068 (approved 2026-11-17): a rule or trait without wording shows its name only; it is not a button, nothing opens.
+  if (reference && !reference.description.trim()) return <span className={compact ? "ux-reference-tag compact plain" : "ux-reference-tag plain"}>{label}</span>;
   if (!reference) return <span className={compact ? "ux-reference-tag compact inert" : "ux-reference-tag inert"}>{label}</span>;
   return <button type="button" className={compact ? "ux-reference-tag compact" : "ux-reference-tag"} onClick={() => onOpen(reference)}>{label}</button>;
 }
