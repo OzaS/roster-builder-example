@@ -131,6 +131,8 @@ export function UnitDialog({ unit, forceName, source = 'Open Field · Catalogue 
           </> : <>
             <h3>Steady advance</h3><p className="dt-rules">This unit may make a normal move and retain its formation bonus while within range of its commander.</p>
             <h3>Field standard</h3><p className="dt-rules">A unit carrying a field standard may re-roll one failed resolve test per round.</p>
+            {/* DEC-068 (approved 2026-11-17): a rule without wording in the data shows its name only. */}
+            <h3>Rule Alpha</h3>
           </>}
         </div>
       </div>

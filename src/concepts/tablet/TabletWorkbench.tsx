@@ -128,7 +128,7 @@ function TabletShell({ route, initialEditor, initialImport = false, initialShort
     <TabletRail page={page} input={env.input} system={env.device.system} onPage={setPage} onNewRoster={newRoster} />
     <main className="tb-main" aria-label={page}>
       {page === 'home' ? <TabletHome {...shared} onPage={setPage} onNewRoster={newRoster} onOpenRoster={openRoster} />
-        : page === 'rosters' ? <TabletRosters {...shared} onNewRoster={newRoster} onOpenRoster={openRoster} />
+        : page === 'rosters' ? <TabletRosters {...shared} onNewRoster={newRoster} onOpenRoster={openRoster} onAddData={addData} />
           : page === 'lookup' ? route.page !== 'lookup' || route.state !== 'legacy' ? <TabletLookup10 {...shared} onAddData={addData} initial={route.state === 'v1-force' ? 'f-line-of-battle' : undefined} state={route.state} /> : <TabletLookup {...shared} onAddData={addData} />
             : page === 'tools' ? <TabletTools />
               : page === 'library' ? <TabletLibrary />
@@ -142,7 +142,7 @@ function TabletShell({ route, initialEditor, initialImport = false, initialShort
       const left = result.unmatched.length; notify(left ? `Opened “${result.name}” without ${left === 1 ? '1 entry' : `${left} entries`}` : `Opened “${result.name}”`);
     }} />}
     <TabletSessionSheets session={session} notify={notify} />
-    {creating && <CreateRosterSheet sources={jobs.sources} review={creating === 'review'} stars={creating === 'stars'} onClose={() => setCreating(null)} onCreate={createRoster} onAddData={() => { setCreating(null); setEditor(null); addData(); }} />}
+    {creating && <CreateRosterSheet sources={jobs.sources} review={creating === 'review'} stars={creating === 'stars'} onClose={() => setCreating(null)} onCreate={createRoster} onAddData={() => { setCreating(null); setEditor(null); addData(); }} onInstallFile={() => notify('Choose an archive, data files or a folder (prototype)')} />}
     <div className={`dt-app tb-shim ${light ? 'light' : ''}`}><ToastRegion toasts={toasts} /></div>
     <IconHints root={appRef} input={env.input} />
     {shortcuts && <ShortcutOverlay system={env.device.system} groups={shortcutGroups(!!editor)} onClose={() => setShortcuts(false)} />}

@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent as ReactKeyboardEvent, type ReactNode, type RefObject } from 'react';
-import { AlertTriangle, Archive, ArrowDownToLine, ArrowLeft, ArrowUpCircle, ArrowUpRight, ClipboardPaste, Info, Check, ChevronRight, CloudOff, Copy, Ellipsis, EyeOff, FileText, Github, History, Inbox, Layers3, LibraryBig, Link2, ListChecks, LoaderCircle, OctagonAlert, RefreshCcw, Search, Trash2, X } from 'lucide-react';
+import { AlertTriangle, Archive, ArrowDownToLine, ArrowLeft, ArrowUpCircle, ArrowUpRight, ClipboardPaste, FileArchive, Info, Check, ChevronRight, CloudOff, Copy, Ellipsis, EyeOff, FileText, Github, History, Inbox, Layers3, LibraryBig, Link2, ListChecks, LoaderCircle, OctagonAlert, RefreshCcw, Search, Trash2, X } from 'lucide-react';
 import { dataChanges, githubRepositories, rosterChecks, sourceCollections, type CheckState, type CollectionPage, type DataChanges, type LastUpdate, type Listing, type RosterCheck, type SourceInfo } from './desktopData';
 import { jobPercent, type WorkspaceJobs } from '../workspace/Jobs';
 import type { Notify } from '../workspace/Toasts';
 import { Chip, type ChipTone } from '../workspace/Primitives';
-import { DATA_REPO, DATA_SEARCH, DESKTOP_GUIDE_STEPS, EXAMPLE_SEARCH_SYSTEM, FINDING, FOUND_COLLECTION, GUIDE, GUIDE_KINDS_TITLE, DESKTOP_GUIDE_NO_COLLECTION, GuideKinds, GuideSteps, LINK_HELPER, LINK_LABEL, LINK_SAMPLES, NOTHING_FOUND, PASTE_LINK, SEARCH_DATA, SEVERAL, SEVERAL_COLLECTIONS, dataSearchQuery, foundIn, type FoundIn, type RepoCollection } from '../workspace/CollectionLinks';
+import { DATA_REPO, DATA_SEARCH, DESKTOP_GUIDE_GROUPS, EXAMPLE_SEARCH_SYSTEM, FINDING, FOUND_COLLECTION, GUIDE, GUIDE_KINDS_TITLE, DESKTOP_GUIDE_NO_COLLECTION, GuideKinds, GuideGroups, INSTALL_FILE, LINK_HELPER, LINK_LABEL, LINK_SAMPLES, NOTHING_FOUND, PASTE_LINK, SEVERAL, SEVERAL_COLLECTIONS, dataSearchQuery, foundIn, type FoundIn, type RepoCollection } from '../workspace/CollectionLinks';
 import './desktop-sources.css';
 import './desktop-links.css';
 
@@ -601,7 +601,8 @@ export function AddCollectionDialog({ jobs, notify, go, onOpenJobs, onClose, sta
     </form>
   </> : view === 'guide' ? <>
     <header><div><h2 id="dts-add-title">{GUIDE.title}</h2></div>{close}</header>
-    <GuideSteps prefix="dtl" steps={DESKTOP_GUIDE_STEPS} />
+    {/* DEC-069 (approved 2026-11-17): two groups, each numbered from 1; file step 2 carries the Install from a file action. */}
+    <GuideGroups prefix="dtl" titleClassName="dtl-kinds-title" groups={DESKTOP_GUIDE_GROUPS} action={<button className="dtp-btn" onClick={() => notify('Choose an archive, data files or a folder')}><FileArchive size={14} />{INSTALL_FILE.short}</button>} />
     <h3 className="dtl-kinds-title">{GUIDE_KINDS_TITLE}</h3>
     <GuideKinds prefix="dtl" />
     <p className="dtl-hint">{DESKTOP_GUIDE_NO_COLLECTION}</p>
@@ -616,7 +617,8 @@ export function AddCollectionDialog({ jobs, notify, go, onOpenJobs, onClose, sta
       </div>
       <small id="dts-add-help" className={error ? 'dts-error' : 'dts-help'} role={error ? 'alert' : undefined}>{error || LINK_HELPER}</small>
     </form>
-    {needLink && <div className="dtp-source-links dtl-links"><button className="dtp-btn dts-link" onClick={() => setView('search')}>{SEARCH_DATA.title}</button><button className="dtp-btn dts-link" onClick={() => setView('guide')}>{GUIDE.title}</button></div>}
+    {/* DEC-069: Search for data is gone; the Step-by-step guide is the only text link. */}
+    {needLink && <div className="dtp-source-links dtl-links"><button className="dtp-btn dts-link" onClick={() => setView('guide')}>{GUIDE.title}</button></div>}
     {phase.kind === 'found' && <div className="dts-found">
       <span className="dts-tile">{phase.saved.kind === 'library' ? <LibraryBig size={18} /> : <Layers3 size={18} />}</span>
       <span><strong>{phase.saved.name}</strong><small>{phase.saved.kind === 'library' ? `GitHub organisation · ${plural(phase.page.listings.length, 'repository', 'repositories')}` : `Collection · by ${phase.page.by} · ${plural(phase.sources ?? phase.page.listings.length, 'source')}`}</small><p>{phase.page.description}</p>
@@ -635,7 +637,7 @@ export function AddCollectionDialog({ jobs, notify, go, onOpenJobs, onClose, sta
     </>}
     {phase.kind === 'nothing' && <>
       <div className="dtp-notice err" role="alert"><OctagonAlert size={16} /><span><strong>{NOTHING_FOUND.title}</strong><small>{NOTHING_FOUND.body}</small></span></div>
-      <div className="dtl-row"><button className="dtp-btn" onClick={() => setView('search')}><Search size={13} />{SEARCH_DATA.title}</button><button className="dtp-btn" onClick={() => setView('guide')}>{GUIDE.short}</button></div>
+      <div className="dtl-row"><button className="dtp-btn" onClick={() => notify('Choose an archive, data files or a folder')}><FileArchive size={13} />{INSTALL_FILE.short}</button><button className="dtp-btn" onClick={() => setView('guide')}>{GUIDE.short}</button></div>
     </>}
     <p className="dts-note">Collections only list repositories. Nothing is downloaded until you install.</p>
     <footer><button className="dtp-btn" onClick={onClose}>Cancel</button><button className="dtp-btn primary" disabled={phase.kind !== 'found'} onClick={add}>Add collection</button></footer>

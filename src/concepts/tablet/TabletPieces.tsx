@@ -52,8 +52,11 @@ export const SearchField = ({ value, onChange, label, placeholder }: { value: st
  *  with an ellipsis, one secondary line, the trailing end (chip, points, chevron); 72 px tall on touch, 64 with a pointer;
  *  selected: accent border and tint. `pressed` makes it a toggle (Sources' Select mode) instead of a navigation row.
  *  `action`: a trailing control of its own (DEC-054: Sources' compact status action), drawn over the row's end, outside the row button. */
-export const Row = ({ selected, onClick, mark, title, sub, end, foot, pressed, label, action }: { selected: boolean; onClick: () => void; mark?: ReactNode; title: string; sub: string; end?: ReactNode; foot?: ReactNode; pressed?: boolean; label?: string; action?: ReactNode }) => {
-  const row = <button type="button" className={`ux-list-card tb-row ${selected || pressed ? 'selected' : ''} ${action ? 'with-action' : ''}`} aria-current={selected && pressed === undefined ? 'true' : undefined} aria-pressed={pressed} aria-label={label} onClick={onClick}>
+export const Row = ({ selected, onClick, mark, title, sub, end, foot, pressed, label, action, primary, plain }: { selected: boolean; onClick: () => void; mark?: ReactNode; title: string; sub: string; end?: ReactNode; foot?: ReactNode; pressed?: boolean; label?: string; action?: ReactNode; primary?: boolean; plain?: boolean }) => {
+  // `plain` (DEC-068): an entry that would open an empty page (a rule without text) is drawn as text, not a button.
+  if (plain) return <div className="ux-list-card tb-row tb-row-plain">{mark && <span className="tb-mark" aria-hidden="true">{mark}</span>}<span className="tb-row-main"><strong>{title}</strong><small>{sub}</small>{foot}</span></div>;
+  // `primary` (DEC-069): the surface's primary row, Install from a file on this device on Add game data (accent tile and tint, as the phone row).
+  const row = <button type="button" className={`ux-list-card tb-row ${selected || pressed ? 'selected' : ''} ${action ? 'with-action' : ''} ${primary ? 'tb-row-primary' : ''}`} aria-current={selected && pressed === undefined ? 'true' : undefined} aria-pressed={pressed} aria-label={label} onClick={onClick}>
     {mark && <span className="tb-mark" aria-hidden="true">{mark}</span>}
     <span className="tb-row-main"><strong>{title}</strong><small>{sub}</small>{foot}</span>
     {end && <span className="tb-row-end">{end}</span>}

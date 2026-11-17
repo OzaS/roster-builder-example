@@ -560,10 +560,14 @@ export const mockRoster: Roster = {
                     description:
                       "When making Rush Attacks during Step 4 of the Advance Procedure, a unit containing at least one model with shock grenades may make a single shock grenade attack instead of a normal Ranged Attack.",
                   },
+                  // DEC-068: equipment without wording in the data, name only.
+                  { id: "gear-gamma", name: "Gear Gamma", description: "" },
                 ],
                 rules: [
                   "Broad (2)",
                   "Aerial Drop",
+                  "Rule Alpha",
+                  "Rule Beta",
                   "Outrider (2)",
                   "Sergeant Sub-Class",
                   "Infantry Class",

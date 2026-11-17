@@ -37,3 +37,4 @@
 .dtl-zoom-200 > .dt-app { zoom: 2; width: 50%; min-width: 0; height: 410px }
 .dt-standalone .dtl-zoom-200 > .dt-app { height: calc((100vh - 36px) / 2); min-height: 0 }
 .dtl-zoom-label { position: absolute; z-index: 9; right: 18px; bottom: 12px; padding: 4px 9px; border-radius: 999px; background: #0b0c10cc; color: #c9cfdd; font: 600 12px/1.3 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif }
+.dt-app .dtl-result-plain { display: flex; align-items: center; cursor: default } .dt-app .dtl-result-plain:hover { background: none }

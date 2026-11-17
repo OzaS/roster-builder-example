@@ -15,6 +15,9 @@ export const mockRosterReferences: RosterReferenceDefinition[] = [
   { id: "pistol", label: "Pistol", kind: "rule", description: "Pistol weapons are compact sidearms and use the Pistol firing restrictions when their bearer is engaged.", relatedIds: ["mobile", "ranged"] },
   { id: "tear", label: "Tear (6+)", kind: "rule", aliases: ["Tear"], description: "When resolving this attack, qualifying wound rolls at the listed value gain the benefit described by the Tear rule.", relatedIds: ["serrated"] },
   { id: "blast", label: "Blast (3\")", kind: "rule", aliases: ["Blast"], description: "Blast attacks can generate additional hits against tightly grouped targets according to the listed blast value.", relatedIds: ["ranged"] },
+  // DEC-068 (approved 2026-11-17): rules without wording in the data show their name only (not a link, nothing to open).
+  { id: "rule-alpha", label: "Rule Alpha", kind: "rule", description: "" },
+  { id: "rule-beta", label: "Rule Beta", kind: "rule", description: "" },
   { id: "shatter", label: "Shatter", kind: "rule", description: "Shatter changes how this weapon resolves its hit and damage effects against its target.", relatedIds: ["blast"] },
   { id: "line", label: "Line", kind: "category", description: "Line identifies the battlefield role used when organizing this unit in a roster.", relatedIds: ["forward-squad"] },
   { id: "forward-squad", label: "Forward Squad", kind: "category", description: "This category identifies rules and options that specifically affect Forward Squad units.", relatedIds: ["line", "infantry"] },

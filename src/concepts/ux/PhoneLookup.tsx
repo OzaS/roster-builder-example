@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { AlertTriangle, BookOpen, ChevronDown, ChevronLeft, ChevronRight, Clock3, Database, Info, LoaderCircle, RotateCcw, Search, SearchX } from "lucide-react";
-import { factionLabel, kindLabel, lookupById, lookupSystems, sourceLine, systemVersion, type LookupEntity } from "../../data/lookupData";
+import { hasText, opensPage, factionLabel, kindLabel, lookupById, lookupSystems, sourceLine, systemVersion, type LookupEntity } from "../../data/lookupData";
 import { ForceLayout, slotSummary as forceSlotSummary } from "./ForceLayout";
 import { PhoneSearchHeader } from "./PhoneSearchHeader";
 import { FoldSection } from "./MobileUnitOptions";
@@ -34,7 +34,12 @@ export function PhoneLookup({ initialQuery = "line", initialStack = [], noData =
   const counted = typed && phase === "ready";
   const [recent, setRecent] = useState(recentIds);
   const push = (id: string) => { setStack((s) => [...s, id]); setRecent((r) => [id, ...r.filter((x) => x !== id)].slice(0, 5)); };
-  const row = (e: LookupEntity, wide = withSystem) => (
+  // DEC-068: a rule without text (and without Used by) would open an empty page, so its result row is plain text.
+  const row = (e: LookupEntity, wide = withSystem) => !opensPage(e) ? (
+    <div key={e.id} className="ux-source-row ux-src-row ux-lk-row ux-lk-row-static">
+      <span><strong>{e.name}</strong><small>{e.summary}</small><small>{sourceLine(e, wide)}</small></span>
+    </div>
+  ) : (
     <button type="button" key={e.id} className="ux-source-row ux-src-row ux-lk-row" onClick={() => push(e.id)} aria-label={[e.name, e.summary, sourceLine(e, true), e.cost, e.conditional ? "Conditional" : ""].filter(Boolean).join(", ")}>
       <span><strong>{e.name}</strong><small>{e.summary}</small><small>{sourceLine(e, wide)}</small></span>
       <span className="ux-ro-list-trailing">{e.cost ? <b>{e.cost}</b> : null}{e.conditional ? <span className="ux-lf-tag info">Conditional</span> : null}</span>
@@ -210,7 +215,7 @@ function ForceBody({ e, onOpen }: { e: LookupEntity; onOpen: (id: string) => voi
   const parent = e.partOf ? lookupById(e.partOf) : undefined;
   const detachments = (e.detachments ?? []).map((id) => lookupById(id)).filter((d): d is LookupEntity => !!d);
   return <>
-    {e.rules?.length ? <><h4>Rules</h4>{e.rules.map((id) => lookupById(id)).filter((r): r is LookupEntity => !!r).map((r) => <div className="ux-5a-card ux-lk-rule-card" key={r.id}><button type="button" className="ux-5a-choice ux-lk-link-row" onClick={() => onOpen(r.id)}><span><strong>{r.name}</strong><small>{r.summary}</small></span><ChevronRight size={18} aria-hidden /></button><p>{r.text}</p></div>)}</> : null}
+    {e.rules?.length ? <><h4>Rules</h4>{e.rules.map((id) => lookupById(id)).filter((r): r is LookupEntity => !!r).map((r) => <div className="ux-5a-card ux-lk-rule-card" key={r.id}>{hasText(r) ? <><button type="button" className="ux-5a-choice ux-lk-link-row" onClick={() => onOpen(r.id)}><span><strong>{r.name}</strong><small>{r.summary}</small></span><ChevronRight size={18} aria-hidden /></button><p>{r.text}</p></> : <div className="ux-5a-choice ux-lk-rule-plain"><span><strong>{r.name}</strong></span></div>}</div>)}</> : null}
     {e.slots?.length ? <><h4>Layout</h4><ForceLayout slots={e.slots} /></> : null}
     {detachments.length ? <><h4>Detachments</h4><div className="ux-5a-card ux-lk-list">{detachments.map((d) => <button type="button" key={d.id} className="ux-5a-choice ux-lk-link-row" onClick={() => onOpen(d.id)}><span><strong>{d.name}</strong><small>{slotSummary(d)}</small></span>{d.conditional ? <span className="ux-lf-tag info">Conditional</span> : null}<ChevronRight size={18} aria-hidden /></button>)}</div></> : null}
     {parent ? <><h4>Part of</h4><div className="ux-5a-card ux-lk-list"><button type="button" className="ux-5a-choice ux-lk-link-row" onClick={() => onOpen(parent.id)}><span><strong>{parent.name}</strong><small>Force · {slotSummary(parent)}</small></span><ChevronRight size={18} aria-hidden /></button></div></> : null}
@@ -230,14 +235,14 @@ function UpgradeBody({ e, onOpen }: { e: LookupEntity; onOpen: (id: string) => v
 
 function RuleBody({ e, onOpen }: { e: LookupEntity; onOpen: (id: string) => void }) {
   return <>
-    <div className="ux-5a-card"><p className="ux-lk-text">{e.text}</p></div>
+    {hasText(e) ? <div className="ux-5a-card"><p className="ux-lk-text">{e.text}</p></div> : null}
     {e.usedBy?.length ? <><h4>Used by</h4><div className="ux-5a-card ux-lk-list">{e.usedBy.map((id) => lookupById(id)).filter((u): u is LookupEntity => !!u).map((u) => <button type="button" key={u.id} className="ux-5a-choice ux-lk-link-row" onClick={() => onOpen(u.id)}><span><strong>{u.name}</strong><small>{kindLabel(u)} · {factionLabel(u)}</small></span><ChevronRight size={18} aria-hidden /></button>)}</div></> : null}
   </>;
 }
 
 function Profiles({ e }: { e: LookupEntity }) {
   if (!e.profiles?.length) return null;
-  return <><h4>Profiles</h4>{e.profiles.map((p) => <div className="ux-5a-card ux-5b-table-card" key={p.title}><strong>{p.title}</strong><div className="ux-5b-table"><table><thead><tr><th />{p.columns.map((c) => <th key={c} className={p.text ? "text" : undefined}>{c}</th>)}</tr></thead><tbody>{p.rows.map((r) => <tr key={r.name} aria-label={[r.name, ...p.columns.map((c, i) => `${c}: ${r.values[i]}`)].join(", ")}><th>{r.name}</th>{r.values.map((v, i) => <td key={i} className={p.text ? "text" : undefined}>{v}</td>)}</tr>)}</tbody></table></div></div>)}</>;
+  return <><h4>Profiles</h4>{e.profiles.map((p) => <div className="ux-5a-card ux-5b-table-card" key={p.title}><strong>{p.title}</strong><div className="ux-5b-table"><table><thead><tr><th />{p.columns.map((c) => <th key={c} className={p.text ? "text" : undefined}>{c}</th>)}</tr></thead><tbody>{p.rows.map((r) => p.text && !r.values.some((v) => v.trim()) ? <tr key={r.name} aria-label={r.name}><th colSpan={p.columns.length + 1}>{r.name}</th></tr> /* DEC-068: an ability without wording, name only */ : <tr key={r.name} aria-label={[r.name, ...p.columns.map((c, i) => `${c}: ${r.values[i]}`)].join(", ")}><th>{r.name}</th>{r.values.map((v, i) => <td key={i} className={p.text ? "text" : undefined}>{v}</td>)}</tr>)}</tbody></table></div></div>)}</>;
 }
 
 /** Rules expand in place, as on the unit Profile tab; the page link shows where else a rule is used. */
@@ -245,7 +250,8 @@ function RuleList({ ids, onOpen }: { ids?: string[]; onOpen: (id: string) => voi
   const [open, setOpen] = useState<string | null>(null);
   const rules = (ids ?? []).map((id) => lookupById(id)).filter((r): r is LookupEntity => !!r);
   if (!rules.length) return null;
-  return <><h4>Rules</h4><div className="ux-5a-card">{rules.map((r) => <div key={r.id}>
+  // DEC-068 (approved 2026-11-17): a rule without text is a plain row with its name only: not expandable, no link.
+  return <><h4>Rules</h4><div className="ux-5a-card">{rules.map((r) => !hasText(r) ? <div key={r.id} className="ux-5a-choice ux-lk-rule-plain"><span><strong>{r.name}</strong></span></div> : <div key={r.id}>
     <button type="button" className="ux-5a-choice" aria-expanded={open === r.id} onClick={() => setOpen(open === r.id ? null : r.id)}><span><strong>{r.name}</strong><small>{r.summary}</small></span>{open === r.id ? <ChevronDown size={18} aria-hidden /> : <ChevronRight size={18} aria-hidden />}</button>
     {open === r.id ? <div className="ux-lk-rule-open"><p className="ux-lk-text">{r.text}</p><button type="button" className="ux-5a-link" onClick={() => onOpen(r.id)}>Where it’s used <ChevronRight size={15} /></button></div> : null}
   </div>)}</div></>;

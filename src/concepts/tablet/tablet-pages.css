@@ -306,3 +306,10 @@
 /* R0-03 (DEC-054): Lookup result titles wrap to two lines at most, with an ellipsis; the row keeps the whole name as its text. */
 .tb-lookup10 .tb-row-main strong { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; white-space: normal; overflow-wrap: anywhere }
 .tb-lookup10 .ux-lk-results .ux-lk-state, .tb-lookup10 .ux-lk-results .ux-lk-failure { margin-top: 4px }
+
+/* DEC-069 (2026-11-17): the primary row of Add game data (Install from a file on this device), as the phone's primary row. */
+.tb-app button.tb-row.tb-row-primary { border-color: color-mix(in srgb, var(--ux-accent) 48%, var(--ux-line)); background: color-mix(in srgb, var(--ux-accent) 10%, var(--ux-surface)) }
+.tb-app button.tb-row.tb-row-primary .tb-mark { background: var(--ux-accent); color: var(--ux-accent-ink) }
+/* DEC-068 (2026-11-17): a result that would open an empty page is plain text. */
+.tb-app .tb-row.tb-row-plain { display: flex; align-items: center; min-height: 64px; gap: 12px; padding: 12px 14px; color: var(--ux-ink); cursor: default }
+.tb-touch .tb-row.tb-row-plain { min-height: 72px }

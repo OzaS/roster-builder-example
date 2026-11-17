@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { AlertTriangle, Check, Database, Plus, Search } from 'lucide-react';
+import { AlertTriangle, Check, Database, FileArchive, Link2, Plus, Search } from 'lucide-react';
+import { ADD_FROM_LINK, INSTALL_FILE } from '../workspace/CollectionLinks';
 import { FORCE_TYPES, primaryForce, type ImportResult } from '../desktop/DesktopEditorFlows';
 import type { RosterSummary, SourceInfo } from '../desktop/desktopData';
 import { TabletSheet } from './TabletSheet';
@@ -34,13 +35,13 @@ export function newRosterDocument(draft: NewRoster): { summary: RosterSummary; r
   };
 }
 
-export function CreateRosterSheet({ sources, defaultLimit = 1000, review = false, stars = false, onCreate, onAddData, onClose }: {
+export function CreateRosterSheet({ sources, defaultLimit = 1000, review = false, stars = false, onCreate, onAddData, onInstallFile, onClose }: {
   sources: SourceInfo[]; defaultLimit?: number;
   /** Gallery start: every choice made, on the name page with its summary. */
   review?: boolean;
   /** R2-03 (F4c, approved 2026-11-08) gallery start: the faction step with a starred (and chosen) faction first, then a divider. */
   stars?: boolean;
-  onCreate: (roster: NewRoster) => void; onAddData: () => void; onClose: () => void;
+  onCreate: (roster: NewRoster) => void; onAddData: () => void; onInstallFile?: () => void; onClose: () => void;
 }) {
   const [step, setStep] = useState<StepId>(review ? 'name' : stars ? 'faction' : 'system');
   const [reached, setReached] = useState(review ? STEPS.length - 1 : stars ? 1 : 0);
@@ -71,8 +72,11 @@ export function CreateRosterSheet({ sources, defaultLimit = 1000, review = false
   const first = useRef(true);
   useEffect(() => { if (first.current) { first.current = false; return; } mainRef.current?.querySelector<HTMLElement>('[data-autofocus]')?.focus({ preventScroll: true }); }, [step]);
 
-  if (!sources.length) return <TabletSheet title="New roster" onClose={onClose} action={{ label: 'Add game data', icon: <Plus size={18} />, onClick: onAddData }}>
-    <div className="tbc-empty"><Database size={30} /><strong>Install game data first</strong><small>Rosters are built from a game system's data. Install one, then create your roster.</small></div>
+  // DEC-069 (approved 2026-11-17): no game data yet. Install from a file (primary) and Add from a link (secondary, opens Add game data).
+  if (!sources.length) return <TabletSheet title="New roster" onClose={onClose}>
+    <div className="tbc-empty"><Database size={30} /><strong>Install game data first</strong><small>Rosters are built from a game system's data. Install it from a file on this device or add a link, then create your roster.</small>
+      <div className="tbl-actions tbc-empty-actions"><button type="button" className="tbs-action tbl-primary" data-autofocus onClick={onInstallFile}><FileArchive size={17} />{INSTALL_FILE.short}</button><button type="button" className="tbs-action" onClick={onAddData}><Link2 size={17} />{ADD_FROM_LINK}</button></div>
+    </div>
   </TabletSheet>;
 
   const go = (to: number) => { const id = STEPS[to]?.id; if (!id) return; setStep(id); setReached(r => Math.max(r, to)); };

@@ -9,15 +9,31 @@ import rawDesignData from "./roster-builder.design.json";
 
 export type DesignStatus = "active" | "archived";
 
+/**
+ * A retired design (2026-11-17: DEC-069 Search for data, DEC-070 monetization). Retired screens stay in `design.screens`
+ * and their components stay in code so they can come back, but navigation, workflow lists, the board, Glance, the
+ * workflow editor and counts skip them. A direct `?screen=` link (or a saved selection) still renders the screen, under a
+ * "Retired" note. `workflow` records where the screen was; to bring it back, put it into that workflow and drop `retired`.
+ */
+export type DesignRetirement = {
+  decision: string;
+  date: string;
+  reason: string;
+  workflow?: string;
+};
+
 export type DesignScreen = {
   id: WorkflowScreen;
   label: string;
+  retired?: DesignRetirement;
 };
 
 export type DesignWorkflow = {
   id: string;
   label: string;
   screens: WorkflowScreen[];
+  /** A workflow whose screens were all retired; hidden like its screens. */
+  retired?: DesignRetirement;
 };
 
 export type DesignComment = {
@@ -33,7 +49,7 @@ export type DesignComment = {
   updatedAt?: string;
 };
 
-export type DesignElementStatus = "specified" | "ready-for-rn" | "implemented" | "needs-review" | "replaced";
+export type DesignElementStatus = "specified" | "ready-for-rn" | "implemented" | "needs-review" | "replaced" | "retired";
 export type DesignElementLevel = "foundation" | "primitive" | "composite" | "navigation" | "overlay" | "screen-composition" | "gallery-tooling";
 export type DesignElementPlatform = "phone" | "tablet" | "foldable" | "desktop" | "gallery";
 
@@ -50,6 +66,8 @@ export type DesignElementSection = {
     behavior: string;
     accessibility: string;
   };
+  /** Status `retired`: the Elements view no longer draws the section and the summary does not count it. */
+  retired?: DesignRetirement;
 };
 
 export type DesignElementGroup = {
@@ -111,11 +129,12 @@ export function normalizeDesignData(data: DesignData): DesignData {
         workflows.push({ id: "unsorted", label: "Unsorted", screens: [] });
       }
       const knownScreens = new Set(design.screens.map((screen) => screen.id));
+      const retired = new Set(design.screens.filter((screen) => screen.retired).map((screen) => screen.id));
       const assignedScreens = new Set(workflows.flatMap((workflow) => workflow.screens));
       const unsorted = workflows.find((workflow) => workflow.id === "unsorted");
       if (unsorted) {
         design.screens.forEach((screen) => {
-          if (!assignedScreens.has(screen.id) && !trash.screens.includes(screen.id)) {
+          if (!assignedScreens.has(screen.id) && !trash.screens.includes(screen.id) && !retired.has(screen.id)) {
             unsorted.screens.push(screen.id);
           }
         });
@@ -130,7 +149,7 @@ export function normalizeDesignData(data: DesignData): DesignData {
         })),
         workflows: workflows.map((workflow) => ({
           ...workflow,
-          screens: uniqueScreens(workflow.screens.filter((screen) => knownScreens.has(screen) && !trash.screens.includes(screen))),
+          screens: uniqueScreens(workflow.screens.filter((screen) => knownScreens.has(screen) && !trash.screens.includes(screen) && !retired.has(screen))),
         })),
       };
     }),
@@ -159,12 +178,25 @@ export function screenLabel(design: EditableDesign | undefined, screenId: Workfl
   return design?.screens?.find((screen) => screen.id === screenId)?.label ?? screenId;
 }
 
+/** The retirement record of a screen, if it is retired (DEC-069 / DEC-070). */
+export function screenRetirement(design: EditableDesign | undefined, screenId: WorkflowScreen) {
+  return design?.screens?.find((screen) => screen.id === screenId)?.retired;
+}
+
+export function retiredScreens(design: EditableDesign | undefined) {
+  return design?.screens.filter((screen) => screen.retired) ?? [];
+}
+
+export function visibleWorkflows(design: EditableDesign | undefined) {
+  return design?.workflows.filter((workflow) => !workflow.retired) ?? [];
+}
+
 export function firstScreenInDesign(design: EditableDesign | undefined): WorkflowScreen {
-  return design?.workflows.flatMap((workflow) => workflow.screens)[0] ?? "library";
+  return visibleWorkflows(design).flatMap((workflow) => workflow.screens)[0] ?? "library";
 }
 
 function toGalleryConcept(design: EditableDesign): GalleryConcept {
-  const visibleWorkflows = design.workflows
+  const shownWorkflows = visibleWorkflows(design)
     .map((workflow) => ({
       id: workflow.id,
       label: workflow.label,
@@ -182,8 +214,8 @@ function toGalleryConcept(design: EditableDesign): GalleryConcept {
     interaction: design.interaction,
     tradeoff: design.tradeoff,
     component: componentMap[design.component],
-    workflow: visibleWorkflows.flatMap((workflow) => workflow.screens),
-    flows: visibleWorkflows,
+    workflow: shownWorkflows.flatMap((workflow) => workflow.screens),
+    flows: shownWorkflows,
   };
 }
 

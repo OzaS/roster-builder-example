@@ -249,3 +249,10 @@
 .dt-app .dtp-settings-plain .dtp-setting-row { padding: 13px 16px; border-top: 1px solid var(--dt-border) }
 .dt-app .dtp-settings-plain .dtp-setting-row:last-child { border-bottom: 1px solid var(--dt-border) }
 .dt-app .dtp-settings-plain .dtp-setting-row:focus-visible { outline-offset: -2px; border-radius: 10px }
+
+/* DEC-069 (2026-11-17), local data first: Install from a file on this device is the primary row of Add game data;
+   no-data places offer Install from a file and Add from a link. */
+.dt-app .dtp-link-row.dts-primary-row { border-color: color-mix(in srgb, var(--dt-accent) 48%, var(--dt-border)); background: color-mix(in srgb, var(--dt-accent) 10%, transparent) }
+.dt-app .dtp-link-row.dts-primary-row > svg:first-child { box-sizing: content-box; padding: 7px; border-radius: 9px; background: var(--dt-fill); color: var(--ux-accent-ink) }
+.dt-first-run-actions { margin-top: 14px }
+.dt-wizard-empty .dtp-row-actions { justify-content: center }

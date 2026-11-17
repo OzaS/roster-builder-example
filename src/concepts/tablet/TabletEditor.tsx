@@ -627,7 +627,7 @@ function UnitDetail({ unit, env, force, faction, total, issue, readOnly, separat
       <div className="ux-5a-card ux-5b-table-card"><strong>Weapons</strong><div className="ux-5b-table"><table><thead><tr><th /><th>Range</th><th>Attacks</th><th>Strength</th></tr></thead>
         <tbody><tr><th>{unit.weapon}</th>{weaponProfile(unit.weapon).map((v, i) => <td key={i}>{v}</td>)}</tr></tbody></table></div></div>
       <h4>Rules</h4>
-      <div className="ux-5a-card">{unitRules(unit).map(r => <div key={r.name}><button type="button" className="ux-5a-choice" aria-expanded={rule === r.name} onClick={() => setRule(rule === r.name ? undefined : r.name)}><BookOpen size={18} /><span><strong>{r.name}</strong></span><ChevronDown size={18} className={rule === r.name ? 'tbe-rot' : 'tbe-rot closed'} /></button>{rule === r.name && <small className="tbe-rule-text">{r.text}</small>}</div>)}</div>
+      <div className="ux-5a-card">{unitRules(unit).map(r => !r.text.trim() ? <div key={r.name} className="ux-5a-choice tbe-rule-plain"><BookOpen size={18} aria-hidden="true" /><span><strong>{r.name}</strong></span></div> /* DEC-068: name only, not expandable */ : <div key={r.name}><button type="button" className="ux-5a-choice" aria-expanded={rule === r.name} onClick={() => setRule(rule === r.name ? undefined : r.name)}><BookOpen size={18} /><span><strong>{r.name}</strong></span><ChevronDown size={18} className={rule === r.name ? 'tbe-rot' : 'tbe-rot closed'} /></button>{rule === r.name && <small className="tbe-rule-text">{r.text}</small>}</div>)}</div>
     </>}
     <h4>Categories</h4>
     <div className="ux-5a-chips">{unitCategories(unit, faction).map(c => <span key={c}>{c}</span>)}</div>

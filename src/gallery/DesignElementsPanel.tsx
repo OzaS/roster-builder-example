@@ -25,7 +25,7 @@ import { PhoneExportFlow, PhoneExportPreview, phoneExportRoster } from "../conce
 import { LimitWarning, PhonePointsLimitSheet, PhoneRenameSheet, PhoneUnitMenu } from "../concepts/ux/PhoneNames";
 import { StarButton, StarDivider, StarRow, StarredHeadingContent } from "../concepts/workspace/Stars";
 import "../concepts/ux/phone-stars.css";
-import { ActionMenuDialog, ReopenRosterSetting, AddCollectionSheet, NeedLinkRows, LOCAL_ERRORS, LOCAL_FILE, LOCAL_SOURCE, LocalImportChoiceDialog, LocalImportError, LocalImportRow, LocalInterruptedNotice, LocalRefusedNotice, LocalSourceNote, LocalSourceRows, localSteps, AdvancedInstallSetting, AppDialog, AutoUpdateChecksSetting, FocusCatalogueSearchSetting, SeparateAllSetting, AdvancedSettingsRows, ImportReportGroups, CollectionMenuDialog, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, FirstRunDataCard, ReinstallSheet, ReinstallConfirmDialog, REINSTALL_DONE, REINSTALL_FAILED, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RememberSectionsSetting, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceStatusAction, SourceUpdateCard, SourceVersions, SourcesNavRow, TaggedRosterRows, UpdateAvatarButton, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
+import { ActionMenuDialog, ReopenRosterSetting, AddCollectionSheet, NeedLinkRows, LOCAL_ERRORS, LOCAL_FILE, LOCAL_SOURCE, LocalImportChoiceDialog, LocalImportError, LocalImportRow, NoDataSources, LocalInterruptedNotice, LocalRefusedNotice, LocalSourceNote, LocalSourceRows, localSteps, AdvancedInstallSetting, AppDialog, AutoUpdateChecksSetting, FocusCatalogueSearchSetting, SeparateAllSetting, AdvancedSettingsRows, ImportReportGroups, CollectionMenuDialog, CollectionSourceRow, DefaultListingRows, FactionPicker, DEFAULT_COLLECTION, DefaultCollectionCard, EXAMPLE_SOURCES, EXAMPLE_SYSTEM, installSteps, KeepVersionsSetting, UserCollectionRows, FirstRunDataCard, ReinstallSheet, ReinstallConfirmDialog, REINSTALL_DONE, REINSTALL_FAILED, JobModal, JobOutcomeNotice, JobPill, JobToast, LastUpdateCard, MigrationReportBody, MobileDataNotice, NotificationsSetting, OlderVersionRow, OpenedWithVersionNotice, OsJobNotifications, ReadOnlyBanner, ReadOnlyChips, ReadOnlyExportSheet, RememberSectionsSetting, RemoveSourceAlert, DeleteVersionAlert, StoredOutline, StoredTotals, RosterDataTag, SourceRow, SourceStatusChip, SourceStatusAction, SourceUpdateCard, SourceVersions, SourcesNavRow, TaggedRosterRows, UpdateAvatarButton, UpdatesNotice, WifiOnlySetting, WifiWaitNotice } from "../concepts/ux/SourceJobs";
 
 type Props = {
   concept: GalleryConcept;
@@ -357,6 +357,20 @@ function WorkbenchElements({
           <small className="ux-elements-note">Built (UX-015/017): Options | Profile tabs below type/cost and budget, only when displayable profiles or rules exist. Profiles-only and rules-only both retain Profile; Drills has neither and omits it. Profile: one card per profile type, horizontal scroll when wide, columns sized to their text; text columns (descriptions) are left-aligned and take the room left. Rules open on tap when they have a description. Plain category labels close either tab and wrap across lines. A nested header Back returns to the mounted parent, keeping its scroll and edits (UX-019).</small>
           <div className="ux-elements-stack"><MobileUnitOptions compact initialTab="profile" /><MobileUnitOptions compact initialTab="profile" profileContent="profiles" /><MobileUnitOptions compact initialTab="profile" profileContent="rules" /><MobileUnitOptions compact initialDrilled initialTab="profile" /></div>
         </div>
+      </ElementSection>
+
+      <ElementSection title="Rule Row Without Text">
+        <small className="ux-elements-note">DEC-068 (approved 2026-11-17): many datasets have no rules wording. A rule, ability, trait, equipment item or other text-bearing entry without wording shows only its name: no placeholder, no fold, no chevron and no link that would open an empty page or pane. A section left empty is omitted. Beside it, the normal expandable rule row (Charge) and a reference tag that opens its glance (Aerial Drop).</small>
+        <div className="ux-mobile-unit-options compact ux-lk-detail">
+          <h4>Rules</h4>
+          <div className="ux-5a-card">
+            <button type="button" className="ux-5a-choice" aria-expanded={false}><span><strong>Charge</strong></span><ChevronRight size={18} /></button>
+            <div className="ux-5a-choice ux-lk-rule-plain"><span><strong>Rule Alpha</strong></span></div>
+          </div>
+          <div className="ux-5a-card ux-5b-table-card"><strong>Abilities</strong><div className="ux-5b-table"><table><thead><tr><th /><th className="text">Description</th></tr></thead><tbody><tr><th>Escort</th><td className="text">This unit can be linked to one squad.</td></tr><tr><th colSpan={2}>Ability Gamma</th></tr></tbody></table></div></div>
+        </div>
+        <div className="ux-profile-tag-list"><button type="button" className="ux-reference-tag">Aerial Drop</button><span className="ux-reference-tag plain">Rule Alpha</span></div>
+        <small className="ux-elements-note">Result rows: a rule without text and without Used by would open an empty page, so its Lookup result row is plain text (name, kind, source) and does not open. Print view and PDF list such a rule by name only. Samples: Rule Alpha, Rule Beta and Gear Gamma on the phone Profile tab (unit-detail); Line Alpha in a Lookup unit and the results (lookup-unit, lookup-results); Line Beta on a detachment.</small>
       </ElementSection>
 
       <ElementSection title="Unit Links (associations)">
@@ -713,7 +727,8 @@ function WorkbenchElements({
           <SourceRow source={EXAMPLE_SOURCES[2]} selecting />
         </div>
         <div className="ux-src-chips"><SourceStatusChip status="ready" /><SourceStatusChip status="update" /><SourceStatusChip status="updating" /><SourceStatusChip status="review" /><SourceStatusChip status="broken" /></div>
-        <section className="ux-sources-empty"><span><Database size={25} /></span><strong>No game data yet</strong><small>Add game data from a collection, a repository link or GitHub search.</small><button type="button"><Plus size={16} />Add game data</button></section>
+        <small className="ux-elements-note">Empty Sources (DEC-069, approved 2026-11-17): Install from a file (primary) and Add from a link (secondary, opens Add game data).</small>
+        <NoDataSources />
       </ElementSection>
 
       <ElementSection title="Compact Source Status Action">
@@ -768,23 +783,26 @@ function WorkbenchElements({
       </ElementSection>
 
       <ElementSection title="Source Addition">
+        <small className="ux-elements-note">DEC-069 (approved 2026-11-17), local data first. Order on Add game data: (1) Install from a file on this device, the primary row; (2) the repository link field; (3) Collections; (4) Search GitHub, a secondary row last. Subtitle: A file on this device, a link, or GitHub search.</small>
+        <LocalImportRow />
+        <section className="ux-source-method">
+          <div className="ux-source-method-heading"><span className="ux-setting-icon"><FileInput size={18} /></span><span><strong>Have a link?</strong><small>Any GitHub repository with roster data files.</small></span></div>
+          <div className="ux-source-url"><input aria-label="Repository example" placeholder="owner/name or a GitHub link" /><button type="button">Continue</button></div>
+        </section>
         <div className="ux-result-label">Collections</div>
         <DefaultCollectionCard />
         <DefaultListingRows />
         <UserCollectionRows />
         <small className="ux-elements-note">Default collection hidden (DEC-028): no card or default listings; this row in the user's group shows it again.</small>
         <UserCollectionRows defaultHidden />
-        <section className="ux-source-method">
-          <div className="ux-source-method-heading"><span className="ux-setting-icon"><FileInput size={18} /></span><span><strong>Have a link?</strong><small>Any GitHub repository with roster data files.</small></span></div>
-          <div className="ux-source-url"><input aria-label="Repository example" placeholder="owner/name or a GitHub link" /><button type="button">Continue</button></div>
-        </section>
+        <div className="ux-src-group"><button type="button" className="ux-col-nav"><Search size={17} /><span><strong>Search GitHub</strong><small>Any GitHub repository with game data, by name</small></span><ChevronRight size={16} /></button></div>
       </ElementSection>
 
       <ElementSection title="No Default Collection">
         <small className="ux-elements-note">DEC-059 (R0-09, approved 2026-11-02): a build with no default collection. Add game data has no default card, no default listings and no Show the default collection row. While the user has no collections of their own, the Collections group starts with this note, then Add a collection or library; the repository link field and Search GitHub don't change. Nothing is fetched.</small>
         <div className="ux-result-label">Collections</div>
         <UserCollectionRows saved={false} />
-        <small className="ux-elements-note">First run (Home data card on phone and tablet): the note replaces "The default collection is hidden. Find other sources in Add game data."; the buttons don't change.</small>
+        <small className="ux-elements-note">First run, no game data (Home data card on phone and tablet; DEC-069, approved 2026-11-17): the Home hero body and two actions, Install from a file (primary) and Add from a link (secondary, opens Add game data).</small>
         <FirstRunDataCard />
       </ElementSection>
 
@@ -811,7 +829,7 @@ function WorkbenchElements({
         <AddCollectionSheet inline state="library" />
         <AddCollectionSheet inline state="duplicate" />
         <AddCollectionSheet inline state="repository" />
-        <small className="ux-elements-note">R2-06 (F4e, approved 2026-11-09): the field reads Repository, collection or library link. A pasted repository link is looked up for its collection file: one collection (preview with Found in …), several (choose one, then Preview), game data without a collection (Install it, Step-by-step guide) or nothing usable (Search for data, Guide). Idle · finding · one · several · nothing found.</small>
+        <small className="ux-elements-note">R2-06 (F4e, approved 2026-11-09): the field reads Repository, collection or library link. A pasted repository link is looked up for its collection file: one collection (preview with Found in …), several (choose one, then Preview), game data without a collection (Install it, Step-by-step guide) or nothing usable (Install from a file, Guide; DEC-069). Idle · finding · one · several · nothing found.</small>
         <AddCollectionSheet inline state="idle" />
         <AddCollectionSheet inline state="finding" />
         <AddCollectionSheet inline state="repo-found" />
@@ -820,7 +838,7 @@ function WorkbenchElements({
       </ElementSection>
 
       <ElementSection title="Need A Link? Rows">
-        <small className="ux-elements-note">R2-06 (F4e, approved 2026-11-09): under Find while there is no result. Each row pushes its page inside the Add collection sheet; Back returns with the field text kept. No new tab, no new hub row.</small>
+        <small className="ux-elements-note">R2-06 (F4e); DEC-069 (2026-11-17): under Find while there is no result, Need a link? now holds only the Step-by-step guide (Install from a file or a link). It pushes its page inside the Add collection sheet; Back returns with the field text kept. Search for data is retired.</small>
         <NeedLinkRows />
       </ElementSection>
 
@@ -830,7 +848,7 @@ function WorkbenchElements({
       </ElementSection>
 
       <ElementSection title="Step-By-Step Guide">
-        <small className="ux-elements-note">R2-06 (F4e, approved 2026-11-09): pushed inside the sheet and scrolls. Six numbered steps (step 1 carries Search for data), Which link is which?, the no-collection hint and Paste a link (back to the field, focused).</small>
+        <small className="ux-elements-note">DEC-069 (approved 2026-11-17): pushed inside the sheet and scrolls. Two groups, each numbered from 1: From a file on this device (step 2 carries the Install from a file on this device action) and From a link; then Which link is which?, the no-collection hint and Paste a link (back to the field, focused).</small>
         <AddCollectionSheet inline state="guide" />
       </ElementSection>
 
@@ -1546,11 +1564,13 @@ const ElementCatalogContext = createContext<DesignElements | null>(null);
 
 function CatalogSummary({ groups }: { groups: DesignElementGroup[] }) {
   const product = groups.find((group) => group.id === "product-ui");
-  const ready = product?.sections.filter((section) => section.status === "ready-for-rn").length ?? 0;
-  const coveredScreens = new Set(product?.sections.flatMap((section) => section.screens) ?? []);
+  // Retired sections (DEC-069 / DEC-070) are not drawn and not counted.
+  const sections = product?.sections.filter((section) => section.status !== "retired") ?? [];
+  const ready = sections.filter((section) => section.status === "ready-for-rn").length;
+  const coveredScreens = new Set(sections.flatMap((section) => section.screens));
   return (
     <aside className="ux-catalog-summary" aria-label="V1 React Native handoff summary">
-      <div><strong>{product?.sections.length ?? 0}</strong><small>Product specifications</small></div>
+      <div><strong>{sections.length}</strong><small>Product specifications</small></div>
       <div><strong>{ready}</strong><small>Ready for RN</small></div>
       <div><strong>{coveredScreens.size}</strong><small>Screens covered</small></div>
       <div><strong>{groups.find((group) => group.id === "gallery-ui")?.sections.length ?? 0}</strong><small>Gallery-only tools</small></div>
@@ -1582,7 +1602,7 @@ function StateMatrixElement() {
     ["Offline", "Showing saved roster data.", "offline"],
     ["Error", "Couldn’t update the roster.", "error"],
     ["Disabled", "Unavailable for this force.", "disabled"],
-    ["Subscriber", "Supporter feature", "locked"],
+    // DEC-070 (2026-11-17): the Subscriber / Supporter feature state is retired with the other monetization designs.
   ];
   return (
     <ElementSection title="Component State Matrix">
@@ -1603,6 +1623,8 @@ function StateMatrixElement() {
 function ElementSection({ title, children }: { title: string; children: React.ReactNode }) {
   const catalog = useContext(ElementCatalogContext);
   const specification = catalog?.groups.flatMap((group) => group.sections).find((section) => section.title === title);
+  // DEC-069 / DEC-070 (2026-11-17): a retired section stays in the design data and in code, but is not drawn.
+  if (specification?.status === "retired") return null;
   return (
     <article className="element-section ux-element-section" data-element-id={specification?.id}>
       <header className="ux-element-heading">

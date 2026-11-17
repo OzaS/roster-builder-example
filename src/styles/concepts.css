@@ -3946,3 +3946,26 @@
   width: 360px;
   margin-inline: auto;
 }
+
+/* Retired screens (DEC-069 / DEC-070, 2026-11-17) */
+.retired-row {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.retired-screen-note {
+  display: grid;
+  gap: 2px;
+  max-width: 560px;
+  margin: 0 auto 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--line, rgba(127, 127, 127, 0.35));
+  border-radius: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.retired-screen-note strong {
+  color: var(--ink, inherit);
+  font-size: 13px;
+}

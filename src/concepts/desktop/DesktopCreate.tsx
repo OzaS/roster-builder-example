@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, Check, Database, Minus, Plus, Search, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Database, FileArchive, Link2, Minus, Plus, Search, X } from 'lucide-react';
+import { ADD_FROM_LINK, INSTALL_FILE } from '../workspace/CollectionLinks';
 import type { SourceInfo } from './desktopData';
 import { ModalShell } from '../workspace/Dialog';
 import { StarDivider, StarRow, starredFirst, useStars } from '../workspace/Stars';
@@ -22,7 +23,7 @@ const MAX_LIMIT = 10000;
 
 /** R2-03 (F4c, approved 2026-11-08) `stars`: the gallery start on the faction step with a starred (and chosen) faction first,
  *  then a divider; each faction's star shows on hover or focus (filled ones always). */
-export function DesktopCreate({ sources, onCreate, onClose, onAddData, stars = false }: { sources: SourceInfo[]; onCreate: (roster: NewRoster) => void; onClose: () => void; onAddData: () => void; stars?: boolean }) {
+export function DesktopCreate({ sources, onCreate, onClose, onAddData, onInstallFile, stars = false }: { sources: SourceInfo[]; onCreate: (roster: NewRoster) => void; onClose: () => void; onAddData: () => void; onInstallFile?: () => void; stars?: boolean }) {
   const lastFaction = sources[0]?.factions[sources[0].factions.length - 1] ?? '';
   const factionStars = useStars(stars ? [lastFaction] : []);
   const [step, setStep] = useState<StepId>(stars ? 'faction' : 'system');
@@ -57,7 +58,7 @@ export function DesktopCreate({ sources, onCreate, onClose, onAddData, stars = f
   const next = () => { if (!valid[step]) return; if (index === STEPS.length - 1) create(); else go(index + 1); };
   const skip = () => onCreate({ name: 'Untitled roster', limit: 1000, system: source?.name ?? '', faction: source?.factions[0] ?? '', force: FORCES[0].name });
 
-  if (!sources.length) return <ModalShell onClose={onClose} label="Create roster" className="dt-wizard-modal"><div className="dt-wizard-empty"><Database size={26} /><h2>Install game data first</h2><p>Rosters are built from a game system's data. Install one, then create your roster.</p><button className="dtp-btn primary" onClick={onAddData}>Add game data<ArrowRight size={15} /></button></div></ModalShell>;
+  if (!sources.length) return <ModalShell onClose={onClose} label="Create roster" className="dt-wizard-modal"><div className="dt-wizard-empty"><Database size={26} /><h2>Install game data first</h2><p>Rosters are built from a game system's data. Install it from a file on this device or add a link, then create your roster.</p><span className="dtp-row-actions">{/* DEC-069: Install from a file (primary), Add from a link (secondary) */}<button className="dtp-btn primary" onClick={onInstallFile}><FileArchive size={15} />{INSTALL_FILE.short}</button><button className="dtp-btn" onClick={onAddData}><Link2 size={15} />{ADD_FROM_LINK}</button></span></div></ModalShell>;
 
   return <ModalShell onClose={onClose} label="Create roster" className="dt-wizard-modal">
     <form className="dt-wizard" onSubmit={e => { e.preventDefault(); next(); }}>

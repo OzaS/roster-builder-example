@@ -83,3 +83,6 @@
 
 /* DEC-060 (approved 2026-11-02): the reinstall offer's info block, toned like the phone's info notice. */
 .tbd-reinstall > svg { color: var(--ux-cool) }
+
+/* DEC-069 (2026-11-17): New roster without game data offers Install from a file and Add from a link. */
+.tbc-empty .tbc-empty-actions { justify-content: center; width: min(420px, 100%); margin-top: 8px }

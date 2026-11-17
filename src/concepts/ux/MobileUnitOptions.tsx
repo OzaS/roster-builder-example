@@ -95,10 +95,11 @@ export function RadioRow({ name, cost, selected, onChange }: { name: string; cos
 /** 5B Profile content; categories close either view in the shared screen footer (UX-015/017). */
 function MobileUnitProfile({ profiles, rules: showRules }: { profiles: boolean; rules: boolean }) {
   const [open, setOpen] = useState<string | undefined>();
-  const rules = [{ name: "Charge", text: "Each time this unit charges, add 1 to its move." }, { name: "Steady" }];
+  // DEC-068 (approved 2026-11-17): a rule without text (Steady, Rule Alpha) is a plain row with its name only: not expandable.
+  const rules = [{ name: "Charge", text: "Each time this unit charges, add 1 to its move." }, { name: "Steady" }, { name: "Rule Alpha" }];
   return <>
     {profiles ? <><div className="ux-5a-card ux-5b-table-card"><strong>Unit</strong><div className="ux-5b-table"><table><thead><tr><th /><th>Mv</th><th>Gr</th><th>Wd</th><th>Ld</th><th>Sv</th><th>Arm</th></tr></thead><tbody><tr aria-label="Lancer, Mv: 8, Gr: 3+, Wd: 2, Ld: 7, Sv: 4+, Arm: 1"><th>Lancer</th><td>8"</td><td>3+</td><td>2</td><td>7</td><td>4+</td><td>1</td></tr></tbody></table></div></div>
-    <div className="ux-5a-card ux-5b-table-card"><strong>Abilities</strong><div className="ux-5b-table"><table><thead><tr><th /><th className="text">Description</th></tr></thead><tbody><tr><th>Escort</th><td className="text">This unit can be linked to one squad. While linked, both move together and share their cover.</td></tr></tbody></table></div></div>
+    <div className="ux-5a-card ux-5b-table-card"><strong>Abilities</strong><div className="ux-5b-table"><table><thead><tr><th /><th className="text">Description</th></tr></thead><tbody><tr><th>Escort</th><td className="text">This unit can be linked to one squad. While linked, both move together and share their cover.</td></tr>{/* DEC-068: an ability without wording, name only */}<tr aria-label="Ability Gamma"><th colSpan={2}>Ability Gamma</th></tr></tbody></table></div></div>
     </> : null}
     {showRules ? <><h4>Rules</h4>
     <div className="ux-5a-card">{rules.map(rule => rule.text ? <div key={rule.name}><button type="button" className="ux-5a-choice" aria-expanded={open === rule.name} onClick={() => setOpen(open === rule.name ? undefined : rule.name)}><span><strong>{rule.name}</strong></span>{open === rule.name ? <ChevronDown size={18} /> : <ChevronRight size={18} />}</button>{open === rule.name ? <small>{rule.text}</small> : null}</div> : <div className="ux-5a-choice" key={rule.name}><span><strong>{rule.name}</strong></span></div>)}</div>

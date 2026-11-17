@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { AlertTriangle, ArrowDownToLine, ArrowRight, ArrowUpCircle, BookOpen, Check, ChevronRight, CircleAlert, Copy, Database, ExternalLink, FileUp, FolderOpen, Github, HardDrive, Info, Keyboard, Languages, Layers3, Link2, ListFilter, Minus, Palette, Pencil, Plus, RefreshCcw, Search, Shield, SlidersHorizontal, Trash2, Upload, Users, Wrench, X, SquareTerminal, Cpu, RotateCcw } from 'lucide-react';
+import { AlertTriangle, ArrowDownToLine, ArrowRight, ArrowUpCircle, BookOpen, Check, ChevronRight, CircleAlert, Copy, Database, ExternalLink, FileArchive, FileUp, FolderOpen, Github, HardDrive, Info, Keyboard, Languages, Layers3, Link2, ListFilter, Minus, Palette, Pencil, Plus, RefreshCcw, Search, Shield, SlidersHorizontal, Trash2, Upload, Users, Wrench, X, SquareTerminal, Cpu, RotateCcw } from 'lucide-react';
 import type { ColorScheme } from '../../types';
 import { collectionSources, colourSchemes, installedSources, lookupEntries, rosterLibrary, type LookupKind, type RosterSummary, type SourceInfo } from './desktopData';
 import { comboFromEvent, defaultBindings, formatCombo, hasCommandModifier, keyActions, type KeyAction, type KeyBindings } from './desktopKeys';
 import { jobPercent, type WorkspaceJobs } from '../workspace/Jobs';
+import { ADD_DATA_SUB, ADD_FROM_LINK, INSTALL_FILE, NO_DATA } from '../workspace/CollectionLinks';
 import { Chip, Segmented, Switch } from '../workspace/Primitives';
 
 /** DEC-050: desktop pages have no title row (the rail and the hub tab show where you are); screen readers keep a heading. */
@@ -22,7 +23,7 @@ const statusChip = (r: RosterSummary) => r.status === 'issues' ? <Chip tone="war
 
 /* ------------------------------ Rosters ------------------------------ */
 
-export function DesktopRosters({ initialRosters, onOpen, onCreate, onImport, notify }: { initialRosters: RosterSummary[]; onOpen: (name: string) => void; onCreate: () => void; onImport: () => void; notify: Notify }) {
+export function DesktopRosters({ initialRosters, onOpen, onCreate, onImport, notify, hasData = true, onAddData }: { initialRosters: RosterSummary[]; onOpen: (name: string) => void; onCreate: () => void; onImport: () => void; notify: Notify; hasData?: boolean; onAddData?: () => void }) {
   const [rosters, setRosters] = useState(initialRosters);
   const [exporting, setExporting] = useState<RosterSummary | null>(null);
   const exportSnapshot = (r: RosterSummary): ExportRoster => {
@@ -73,7 +74,9 @@ export function DesktopRosters({ initialRosters, onOpen, onCreate, onImport, not
             <span>{statusChip(r)}</span>
             <span className="dtp-muted">{r.opened}</span>
           </button>)}
-          {!rosters.length && <div className="dtp-empty"><Layers3 size={22} /><strong>No rosters yet</strong><p>Create a roster, or import one from a file.</p><span className="dtp-row-actions"><button className="dtp-btn primary" onClick={onCreate}><Plus size={15} />New roster</button><button className="dtp-btn" onClick={onImport}><FileUp size={15} />Import</button></span></div>}
+          {/* DEC-069 (approved 2026-11-17): without game data, Install from a file (primary) and Add from a link (secondary, opens Add game data). */}
+          {!rosters.length && !hasData && <div className="dtp-empty"><Layers3 size={22} /><strong>No rosters yet</strong><p>{NO_DATA.emptyHome}</p><span className="dtp-row-actions"><button className="dtp-btn primary" onClick={() => notify('Choose an archive, data files or a folder')} title={INSTALL_FILE.sub}><FileArchive size={15} />{INSTALL_FILE.short}</button><button className="dtp-btn" onClick={onAddData}><Link2 size={15} />{ADD_FROM_LINK}</button></span></div>}
+          {!rosters.length && hasData && <div className="dtp-empty"><Layers3 size={22} /><strong>No rosters yet</strong><p>Create a roster, or import one from a file.</p><span className="dtp-row-actions"><button className="dtp-btn primary" onClick={onCreate}><Plus size={15} />New roster</button><button className="dtp-btn" onClick={onImport}><FileUp size={15} />Import</button></span></div>}
           {rosters.length > 0 && !visible.length && <div className="dtp-empty"><Search size={22} /><strong>No rosters match</strong><p>Try another name, or clear the filters.</p><button className="dtp-btn" onClick={() => { setQuery(''); setAttention(false); setSystem('All game systems'); }}>Clear filters</button></div>}
         </div>
         <footer className="dtp-list-foot">{rosters.length} rosters stored on this device · double-click a roster to open it in a tab</footer>
@@ -169,7 +172,7 @@ export function DesktopSources({ notify, jobs, selectedId, onSelect, onOpenJobs,
     <div className="dtp-toolbar dtp-top-row">
       <label className="dtp-search"><Search size={15} /><input placeholder="Find installed game data…" aria-label="Find installed game data" value={query} onChange={e => setQuery(e.target.value)} />{query && <button aria-label="Clear search" onClick={() => setQuery('')}><X size={13} /></button>}</label>
       <button className="dtp-btn" onClick={() => notify('Choose an archive, data files or a folder')} title="Install game data from an archive, data files or a folder"><FolderOpen size={15} />Install from a file</button>
-      <button className="dtp-btn primary" onClick={() => setSelectedId('add')} title="Install from a collection, a repository link or GitHub search"><Plus size={15} />Add game data</button>
+      <button className="dtp-btn primary" onClick={() => setSelectedId('add')} title={ADD_DATA_SUB}><Plus size={15} />Add game data</button>
     </div>
     {updates.length > 0 && <div className="dtp-banner"><ArrowUpCircle size={17} /><span><strong>{updates.length} {updates.length === 1 ? 'update' : 'updates'} available</strong><small>New data for {updates.map(s => s.name).join(', ')}. Last checked 8 minutes ago.</small></span><button className="dtp-btn primary small" onClick={() => update(updates.map(s => s.id))}>Update all</button></div>}
     <div className="dtp-split sources">
@@ -180,17 +183,22 @@ export function DesktopSources({ notify, jobs, selectedId, onSelect, onOpenJobs,
             <span><strong>{s.name}</strong><small>{s.factions.length} factions · {s.factions.slice(0, 2).join(', ')}{s.factions.length > 2 ? '…' : ''}</small><small className="dtp-faint">{s.fromFile ? `From a file · imported ${s.installed}` : `${s.repo}@${s.version} · ${s.installed} · ${s.size}`}</small>{progress[s.id] !== undefined && <i className="dtp-progress"><em style={{ width: `${progress[s.id]}%` }} /></i>}<span className="dt-visually-hidden">, {sourceStatusText(kind, s, progress[s.id])}</span></span>
           </button><SourceStatus kind={kind} source={s} percent={progress[s.id]} open={statusShown === s.id} onAction={kind === 'update' ? () => update([s.id]) : kind === 'updating' ? onOpenJobs : undefined} /></div>; })}
           {q && !shown.length && <p className="dtp-muted dtp-no-match">No installed game data matches “{query}”.</p>}
+          {/* DEC-069 (approved 2026-11-17): empty Sources, Install from a file (primary) and Add from a link (secondary, opens Add game data). */}
+          {!sources.length && !installing.length && <div className="dtp-empty dts-no-data"><Database size={22} /><strong>No game data yet</strong><p>{NO_DATA.emptySources}</p><span className="dtp-row-actions"><button className="dtp-btn primary" onClick={() => notify('Choose an archive, data files or a folder')} title={INSTALL_FILE.sub}><FileArchive size={15} />{INSTALL_FILE.short}</button><button className="dtp-btn" onClick={() => setSelectedId('add')}><Link2 size={15} />{ADD_FROM_LINK}</button></span></div>}
           {installing.map(j => <div key={j.id} className="dts-source-row"><button className="dtp-row dtp-source" onClick={onOpenJobs}><span><strong>{j.name}</strong><small>{j.status === 'needs-you' ? 'Waiting for you to choose factions' : `${j.factions.length} factions available`}</small><i className="dtp-progress"><em style={{ width: `${jobPercent(j)}%` }} /></i></span></button><SourceStatus kind={j.status === 'needs-you' ? 'needs-you' : 'installing'} source={j} percent={jobPercent(j)} onAction={onOpenJobs} /></div>)}
         </div>
-        <button className={`dtp-row dtp-add-row ${isAddFlow(selectedId) ? 'selected' : ''}`} onClick={() => setSelectedId('add')}><span className="dtp-add-icon"><Plus size={16} /></span><span><strong>Add game data</strong><small>Collections, a repository link, or GitHub search</small></span><ChevronRight size={15} /></button>
+        <button className={`dtp-row dtp-add-row ${isAddFlow(selectedId) ? 'selected' : ''}`} onClick={() => setSelectedId('add')}><span className="dtp-add-icon"><Plus size={16} /></span><span><strong>Add game data</strong><small>{ADD_DATA_SUB}</small></span><ChevronRight size={15} /></button>
       </div><footer className="dtp-list-foot"><RefreshCcw size={12} />Checked for updates 8 minutes ago<button onClick={() => notify('Checked for updates. Nothing new.')}>Check now</button></footer></section>
       {selectedId === 'add' ? <section className="dtp-card dtp-detail" aria-label="Add game data">
-        <span className="dtp-eyebrow">Add game data</span><h2>Choose a game system</h2><p className="dtp-muted">Install from a collection, paste a repository link, or search GitHub.</p>
-        <AddDataCollections jobs={jobs} go={setSelectedId} onOpenJobs={onOpenJobs} />
+        {/* DEC-069 (approved 2026-11-17), local data first: (1) Install from a file on this device, the primary row; (2) the
+            repository link; (3) Collections and Add a collection or library; (4) Search GitHub, a secondary row last. */}
+        <span className="dtp-eyebrow">Add game data</span><h2>Choose a game system</h2><p className="dtp-muted">{ADD_DATA_SUB}</p>
+        <button className="dtp-link-row dts-primary-row" onClick={() => notify('Choose an archive, data files or a folder')}><FileArchive size={16} /><span><strong>{INSTALL_FILE.title}</strong><small>{INSTALL_FILE.sub}</small></span><ChevronRight size={15} /></button>
         <h3>Repository link</h3>
         <form className="dtp-inline-form" onSubmit={e => { e.preventDefault(); notify(link ? 'Looking up the repository…' : 'Paste a repository link first'); }}><label className="dtp-search"><Link2 size={15} /><input placeholder="https://github.com/owner/repository" aria-label="Repository link" value={link} onChange={e => setLink(e.target.value)} /></label><button className="dtp-btn" type="submit">Continue</button></form>
-        <button className="dtp-link-row" onClick={() => setSelectedId('github')}><Github size={16} /><span><strong>Search GitHub</strong><small>Find data repositories by name</small></span><ChevronRight size={15} /></button>
+        <AddDataCollections jobs={jobs} go={setSelectedId} onOpenJobs={onOpenJobs} />
         <button className="dtp-link-row" onClick={() => setAddingCollection(true)}><Plus size={16} /><span><strong>Add a collection or library</strong><small>Lists of sources kept by the community</small></span><ChevronRight size={15} /></button>
+        <button className="dtp-link-row" onClick={() => setSelectedId('github')}><Github size={16} /><span><strong>Search GitHub</strong><small>Find data repositories by name</small></span><ChevronRight size={15} /></button>
         <AddDataPreviewStates jobs={jobs} onOpenJobs={onOpenJobs} />
       </section> : selectedId === 'github' ? <GitHubSearchView {...flow} />
         : selectedId.startsWith('collection:') ? <CollectionView key={selectedId} pageId={selectedId.slice(11)} {...flow} />
@@ -398,7 +406,7 @@ function KeyBindingsEditor({ bindings, onBindings }: { bindings: KeyBindings; on
 /* ------------------------- Welcome: first run ------------------------- */
 
 /** Right side of Welcome while there is no game data, or data but no rosters yet. */
-export function WelcomeStart({ jobs, onCreate, onImport, onAddData, onOpenJobs }: { jobs: WorkspaceJobs; onCreate: () => void; onImport: () => void; onAddData: () => void; onOpenJobs: () => void }) {
+export function WelcomeStart({ jobs, onCreate, onImport, onAddData, onOpenJobs, onInstallFile }: { jobs: WorkspaceJobs; onCreate: () => void; onImport: () => void; onAddData: () => void; onOpenJobs: () => void; onInstallFile?: () => void }) {
   // DEC-059 (R0-09): a build with no default collection fetches nothing on first run; the note points to adding a link.
   const { noPreset } = useFlowStore();
   if (jobs.sources.length) return <section className="dt-recents dt-start">
@@ -406,13 +414,9 @@ export function WelcomeStart({ jobs, onCreate, onImport, onAddData, onOpenJobs }
     <div className="dtp-empty left"><Layers3 size={22} /><strong>No rosters yet</strong><p>Your first roster takes a minute: choose a faction, a force and a points limit.</p><span className="dtp-row-actions"><button className="dtp-btn primary" onClick={onCreate}><Plus size={15} />Create your first roster</button><button className="dtp-btn" onClick={onImport}><FileUp size={15} />Import a roster</button></span></div>
   </section>;
   return <section className="dt-recents dt-start">
-    <header><h2>Start with game data</h2><span>Rosters are built from a game system's data. Install one; it stays available offline.</span></header>
-    {noPreset ? <p className="dts-none">{FIRST_RUN_NO_PRESET}</p> : <div className="dtp-rows">{collectionSources.map(c => { const live = jobs.jobs.find(j => j.sourceId === c.id && (j.status === 'running' || j.status === 'needs-you')); return <div className="dtp-collection-row" key={c.id}>
-      <span><strong>{c.name}</strong><small>{c.detail} · {c.size}</small>{live && <i className="dtp-progress"><em style={{ width: `${jobPercent(live)}%` }} /></i>}</span>
-      {live ? <button className={`dtp-btn small ${live.status === 'needs-you' ? 'primary' : ''}`} onClick={onOpenJobs}>{live.status === 'needs-you' ? 'Choose factions' : `Installing ${jobPercent(live)}%`}</button> : <button className="dtp-btn small" onClick={() => { jobs.startInstall(c); onOpenJobs(); }}>Install</button>}
-    </div>; })}</div>}
-    <button className="dtp-link-row" onClick={onAddData}><FolderOpen size={16} /><span><strong>Install from a file or a link</strong><small>An archive, data files, a repository link or GitHub search</small></span><ChevronRight size={15} /></button>
-    <p className="dt-start-note">Battle Augur includes no game data. Sources come from community repositories you choose.</p>
-    <FirstRunPreviewStates />
+    {/* DEC-069 (approved 2026-11-17), local data first: the hero body and two actions, Install from a file (primary) and Add
+        from a link (secondary, opens Sources › Add game data). No collection rows: the app does not point to a data source. */}
+    <header><h2>Start with game data</h2><span>{NO_DATA.homeHero}</span></header>
+    <span className="dtp-row-actions dt-first-run-actions"><button className="dtp-btn primary" onClick={onInstallFile} title={INSTALL_FILE.sub}><FileArchive size={15} />{INSTALL_FILE.short}</button><button className="dtp-btn" onClick={onAddData}><Link2 size={15} />{ADD_FROM_LINK}</button></span>
   </section>;
 }

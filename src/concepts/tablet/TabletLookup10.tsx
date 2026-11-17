@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { BookOpen, ChevronLeft, Clock3, Database, Search } from 'lucide-react';
-import { lookupById, lookupSystems, sourceLine, type LookupEntity } from '../../data/lookupData';
+import { opensPage, lookupById, lookupSystems, sourceLine, type LookupEntity } from '../../data/lookupData';
 import { LookupEntryBody, LookupFailure, LookupLoading, LookupSection, LookupUnavailable, unavailableSample, type LookupPhase } from '../ux/PhoneLookup';
 import { plural, useLookup } from '../ux/useLookup';
 import { ForceLayoutContext, type ForceLayoutState } from '../ux/ForceLayout';
@@ -57,7 +57,7 @@ export function TabletLookup10({ env, session, onAddData, initial = 'u-line-fc',
           : phase === 'loading' ? <LookupLoading /> : phase === 'failed' ? <LookupFailure onRetry={retry} />
           : lk.ordered.length === 0 ? <div className="ux-search-empty ux-lk-empty"><Search size={19} /><strong>Nothing found for “{lk.query.trim()}”</strong><small>Check the spelling, or try part of the name.</small>{lk.systems !== null ? <button type="button" className="ux-job-btn" onClick={() => lk.setSystems(null)}>Search all systems</button> : null}</div>
           : lk.ordered.map(g => <LookupSection key={g.id} label={g.label} count={g.rows.length} names={g.rows.map(e => e.name)} folded={!lk.openIds.includes(g.id)} onToggle={() => lk.toggle(g.id)}>
-            {g.rows.map(e => <Row key={e.id} selected={!missing && e.id === stack[0]} title={e.name} sub={e.summary} foot={<small>{sourceLine(e, lk.withSystem)}</small>} end={end(e)} onClick={() => choose(e)} />)}
+            {g.rows.map(e => <Row key={e.id} plain={!opensPage(e)} selected={!missing && e.id === stack[0]} title={e.name} sub={e.summary} foot={<small>{sourceLine(e, lk.withSystem)}</small>} end={end(e)} onClick={() => choose(e)} />)}
           </LookupSection>)}
       </div>}
       detail={missing ? <div className="ux-mobile-unit-options ux-lk-detail ux-lk-pane"><LookupUnavailable saved={unavailableSample} onBack={() => { setMissing(false); setOpen(false); }} /></div>

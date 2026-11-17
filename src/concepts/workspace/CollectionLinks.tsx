@@ -10,18 +10,35 @@ import type { ReactNode } from 'react';
 export const LINK_LABEL = 'Repository, collection or library link';
 export const LINK_HELPER = 'Paste a GitHub repository, a collection file (.json) or an organisation or user (github.com/name).';
 export const NEED_LINK = 'Need a link?';
+/** Retired (DEC-069, 2026-11-17): no built-in data search. Kept for the retired Search for data screens only. */
 export const SEARCH_DATA = { title: 'Search for data', sub: 'Search Google in your browser' };
-export const GUIDE = { title: 'Step-by-step guide', short: 'Guide', sub: 'Find, paste, preview and install' };
+/** DEC-069: the guide covers both ways in, a file on this device first. */
+export const GUIDE = { title: 'Step-by-step guide', short: 'Guide', sub: 'Install from a file or a link' };
 export const FINDING = 'Looking in the repository…';
 export const SEVERAL = { title: (count: number) => `This repository has ${count} collections`, body: 'Choose one to preview it.', preview: 'Preview' };
 export const DATA_REPO = { title: 'This repository holds game data, not a collection.', body: 'You can install it now. Or add the collection or organisation that lists it, to see related data too.', install: 'Install it' };
-export const NOTHING_FOUND = { title: 'No collection or game data in this repository.', body: "Check the link, or search for the system's data repository." };
+export const NOTHING_FOUND = { title: 'No collection or game data in this repository.', body: 'Check the link. If you have the data as files, install them from this device instead.' };
 export const DATA_SEARCH = {
   title: 'Search for data', sub: 'Opens Google in your browser', system: 'Game system', systemHelp: "Type the game system's name. Leave it empty to search for all data.",
   open: 'Search on Google', note: 'Opens in your browser. Battle Augur does not check the results. Copy a repository link from them, come back, and paste it.',
   desktopNote: 'Battle Augur does not check the results. Copy a repository link, come back, and paste it.',
 };
 export const PASTE_LINK = 'Paste a link';
+
+/*
+ * DEC-069 (approved 2026-11-17): no built-in data search, local data first. Installing from a file on this device is the
+ * primary way to add game data, pasting a link second; nothing names or points to a data source. Shared by phone, tablet
+ * and desktop.
+ */
+export const INSTALL_FILE = { title: 'Install from a file on this device', short: 'Install from a file', sub: 'An archive, data files or a folder' };
+export const ADD_FROM_LINK = 'Add from a link';
+export const ADD_DATA_SUB = 'A file on this device, a link, or GitHub search';
+/** Bodies of the no-data places: the Home hero (first run), Home without data, empty Sources. */
+export const NO_DATA = {
+  homeHero: 'First add the game data you play with. Install it from a file on this device, or add a link to it. It stays on this device.',
+  emptyHome: 'Rosters are built from game data. Install it from a file on this device or add a link in Sources, then create a roster here.',
+  emptySources: 'Install game data from a file on this device, or add a link to a repository. Installs from a link download 10–80 MB; you can limit that to Wi-Fi in Settings.',
+};
 /** The system typed on the gallery's Search for data screens. */
 export const EXAMPLE_SEARCH_SYSTEM = 'Example System';
 
@@ -50,8 +67,42 @@ export const SEVERAL_COLLECTIONS: RepoCollection[] = [
 ];
 
 export type GuideStep = { text: ReactNode; sub?: string; action?: boolean };
+export type GuideGroup = { id: 'file' | 'link'; title: string; steps: GuideStep[] };
 
-/** Phone and tablet (touch): frame 8 of the proposal. Step 1 carries a Search for data button. */
+const FILE_KINDS = 'Save the game data on this device: an archive (.zip or .bsr), data files (.gst and .cat, also .gstz, .catz or their .json form) or a folder that holds them.';
+
+/**
+ * DEC-069 (approved 2026-11-17): the guide in two groups, each numbered from 1. Touch (phone and tablet): file step 2
+ * carries the Install from a file on this device action (where the old step 1 carried Search for data).
+ */
+export const TOUCH_GUIDE_GROUPS: GuideGroup[] = [
+  { id: 'file', title: 'From a file on this device', steps: [
+    { text: FILE_KINDS },
+    { text: <>Tap <b>Install from a file on this device</b> and pick the archive, the files or the folder.</>, action: true },
+    { text: 'Battle Augur reads them and installs the game data it finds. It stays on this device.' },
+  ] },
+  { id: 'link', title: 'From a link', steps: [
+    { text: 'Copy the address of a repository or a collection file (.json).' },
+    { text: <>Paste it into the link field, check the preview, then tap <b>Add collection</b>.</> },
+    { text: <>Open the saved collection, choose game data and tap <b>Install</b>.</> },
+  ] },
+];
+
+/** Desktop wording of the two groups (Choose, like the other desktop steps). */
+export const DESKTOP_GUIDE_GROUPS: GuideGroup[] = [
+  { id: 'file', title: 'From a file on this device', steps: [
+    { text: FILE_KINDS },
+    { text: <>Choose <b>Install from a file</b> and pick the archive, the files or the folder.</>, action: true },
+    { text: 'Battle Augur reads them and installs the game data it finds. It stays on this device.' },
+  ] },
+  { id: 'link', title: 'From a link', steps: [
+    { text: 'Copy the address of a repository or a collection file (.json).' },
+    { text: <>Paste it into the link field, check the preview, then <b>Add collection</b>.</> },
+    { text: <>Open it, choose game data, <b>Install</b>.</> },
+  ] },
+];
+
+/** Retired with Search for data (DEC-069): the R2-06 six-step guide. Phone and tablet (touch): step 1 carried a Search for data button. */
 export const TOUCH_GUIDE_STEPS: GuideStep[] = [
   { text: <>Tap <b>Search for data</b>.</>, action: true },
   { text: "Search for your game system's data repository or collection." },
@@ -61,7 +112,7 @@ export const TOUCH_GUIDE_STEPS: GuideStep[] = [
   { text: <>Open the saved collection, choose game data and tap <b>Install</b>.</> },
 ];
 
-/** Desktop: the Step-by-step guide view of the dialog, as drawn. */
+/** Retired with Search for data (DEC-069): the R2-06 desktop guide steps. */
 export const DESKTOP_GUIDE_STEPS: GuideStep[] = [
   { text: <>Choose <b>Search for data</b>.</> },
   { text: "Search for your game system's data repository or collection." },
@@ -90,6 +141,16 @@ export function GuideSteps({ steps, prefix, action }: { steps: GuideStep[]; pref
     {steps.map((step, i) => <li key={i}><span className={`${prefix}-step-n`} aria-hidden="true">{i + 1}</span>
       <span>{step.text}{step.sub && <small>{step.sub}</small>}{step.action && action ? <span className={`${prefix}-step-action`}>{action}</span> : null}</span></li>)}
   </ol>;
+}
+
+/** DEC-069: the guide's two groups (From a file on this device, From a link), each a heading and its own steps from 1. */
+export function GuideGroups({ groups, prefix, titleClassName, action }: { groups: GuideGroup[]; prefix: string; titleClassName: string; action?: ReactNode }) {
+  return <>
+    {groups.map((group) => <section key={group.id} className={`${prefix}-group guide-group`} aria-label={group.title}>
+      <h4 className={`${titleClassName} guide-group-title`}>{group.title}</h4>
+      <GuideSteps steps={group.steps} prefix={prefix} action={action} />
+    </section>)}
+  </>;
 }
 
 /** "Which link is which?": the three kinds of link, each in the accent colour, then the no-collection hint. */

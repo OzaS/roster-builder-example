@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { AlertTriangle, ArrowDownToLine, ArrowUpRight, Check, CheckCircle2, ChevronRight, CircleHelp, ClipboardPaste, Info, Layers3, LibraryBig, LoaderCircle, Lock, OctagonAlert, Search, Trash2, Upload } from 'lucide-react';
+import { AlertTriangle, ArrowDownToLine, ArrowUpRight, Check, CheckCircle2, ChevronRight, CircleHelp, ClipboardPaste, FileArchive, Info, Layers3, LibraryBig, LoaderCircle, Lock, OctagonAlert, Search, Trash2, Upload } from 'lucide-react';
 import { AppDialog } from '../ux/SourceJobs';
 import { FORCE_TYPES, type EditorUnit, type Force } from '../desktop/DesktopEditorFlows';
 import { flowStore, setFlowStore, titleCase, useLinkFind } from '../desktop/DesktopSourceFlows';
-import { DATA_REPO, DATA_SEARCH, FINDING, GUIDE, GUIDE_KINDS_TITLE, GUIDE_NO_COLLECTION, GuideKinds, GuideSteps, LINK_HELPER, LINK_LABEL, LINK_SAMPLES, NEED_LINK, NOTHING_FOUND, PASTE_LINK, SEARCH_DATA, SEVERAL, TOUCH_GUIDE_STEPS, dataSearchQuery, foundIn } from '../workspace/CollectionLinks';
+import { DATA_REPO, DATA_SEARCH, FINDING, GUIDE, GUIDE_KINDS_TITLE, GUIDE_NO_COLLECTION, GuideGroups, GuideKinds, INSTALL_FILE, LINK_HELPER, LINK_LABEL, LINK_SAMPLES, NEED_LINK, NOTHING_FOUND, PASTE_LINK, SEVERAL, TOUCH_GUIDE_GROUPS, dataSearchQuery, foundIn } from '../workspace/CollectionLinks';
 import { githubRepositories, sourceCollections } from '../desktop/desktopData';
 import { reinstallTitle, type Job, type WorkspaceJobs } from '../workspace/Jobs';
 import type { Notify } from '../workspace/Toasts';
@@ -121,7 +121,7 @@ function AddCollectionSheet({ jobs, notify, go, onOpenJobs, onClose, start }: { 
   </TabletSheet>;
   if (view === 'guide') return <TabletSheet title={GUIDE.short} onBack={back} onClose={onClose}>
     {mark}
-    <GuideSteps prefix="tbl" steps={TOUCH_GUIDE_STEPS} action={<button type="button" className="tbs-action" data-autofocus onClick={() => setView('search')}><Search size={16} />{SEARCH_DATA.title}</button>} />
+    <GuideGroups prefix="tbl" titleClassName="tbs-label" groups={TOUCH_GUIDE_GROUPS} action={<button type="button" className="tbs-action" data-autofocus onClick={() => notify('Choose an archive, data files or a folder (prototype)')}><FileArchive size={16} />{INSTALL_FILE.title}</button>} />
     <h3 className="tbs-label">{GUIDE_KINDS_TITLE}</h3>
     <GuideKinds prefix="tbl" />
     <p className="tbs-hint tbl-hint">{GUIDE_NO_COLLECTION}</p>
@@ -157,12 +157,11 @@ function AddCollectionSheet({ jobs, notify, go, onOpenJobs, onClose, start }: { 
     </>}
     {phase.kind === 'nothing' && <>
       <div className="tbs-note tbl-error" role="alert"><OctagonAlert size={20} /><span><strong>{NOTHING_FOUND.title}</strong><small>{NOTHING_FOUND.body}</small></span></div>
-      <div className="tbl-actions"><button type="button" className="tbs-action" onClick={() => setView('search')}><Search size={16} />{SEARCH_DATA.title}</button><button type="button" className="tbs-action" onClick={() => setView('guide')}><CircleHelp size={16} />{GUIDE.short}</button></div>
+      <div className="tbl-actions"><button type="button" className="tbs-action" onClick={() => notify('Choose an archive, data files or a folder (prototype)')}><FileArchive size={16} />{INSTALL_FILE.short}</button><button type="button" className="tbs-action" onClick={() => setView('guide')}><CircleHelp size={16} />{GUIDE.short}</button></div>
     </>}
     {needLink && <>
       <h3 className="tbs-label tbl-need">{NEED_LINK}</h3>
       <div className="tbs-choices">
-        <button type="button" className="tbs-choice" onClick={() => setView('search')}><Search size={20} /><span><strong>{SEARCH_DATA.title}</strong><small>{SEARCH_DATA.sub}</small></span><ChevronRight size={18} /></button>
         <button type="button" className="tbs-choice" onClick={() => setView('guide')}><CircleHelp size={20} /><span><strong>{GUIDE.title}</strong><small>{GUIDE.sub}</small></span><ChevronRight size={18} /></button>
       </div>
     </>}

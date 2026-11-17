@@ -9,6 +9,7 @@ import { mockCatalogues, mockDetachments, mockSystemUnits } from "../../data/moc
 import { referenceById, resolveRosterReference } from "../../data/mockRosterReferences";
 import type { RosterReferenceDefinition, RosterUnit } from "../../types";
 import type { ConceptProps } from "../shared";
+import { SMART_TOOLS_RETIRED, smartToolsOn } from "../shared";
 import { AddGameDataScreen, AdvancedInstallSetting, AutoUpdateChecksSetting, ReopenRosterSetting, FocusCatalogueSearchSetting, SeparateAllSetting, AdvancedSettingsRows, CollectionScreen, InstallJobScreen, KeepVersionsSetting, MigrationReportScreen, NotificationsSetting, ReadOnlyRosterScreen, RememberSectionsSetting, SearchGitHubScreen, SourceDetailScreen, SourcesManageScreen, SourcesNavRow, UpdateAvatarButton, WifiOnlySetting } from "./SourceJobs";
 import { MobileUnitOptions } from "./MobileUnitOptions";
 import { QuotaChip, limitReason } from "../workspace/CatalogueLimit";
@@ -50,7 +51,7 @@ type ReferenceGlance =
 export function CodexWorkbench(props: ConceptProps) {
   const navStyle = props.navStyle ?? "top";
   const usesTabNavigation = navStyle !== "top";
-  const smart = props.smartSearch ?? false;
+  const smart = smartToolsOn(props); // DEC-070: retired, always off
   const screen = props.screen;
   const isUnitDetail = screen === "unit-detail";
   const isMainTab = props.workflowScreen
@@ -440,9 +441,10 @@ function WorkbenchHeader({
         <div className="ux-navbar-search ux-roster-navbar-search">
           <Search size={15} />
           <input value={searchQuery} onChange={(event) => onSearchQueryChange(event.currentTarget.value)} placeholder="Search roster" autoFocus />
-          <button type="button" className="ux-navbar-search-smart" aria-label="Smart search" title="Smart search" onClick={onOpenSmartSearch}>
+          {/* DEC-070: the Smart search button opened the Subscription Gate; hidden while smart tools are retired. */}
+          {!SMART_TOOLS_RETIRED ? <button type="button" className="ux-navbar-search-smart" aria-label="Smart search" title="Smart search" onClick={onOpenSmartSearch}>
             <Wand2 size={15} />
-          </button>
+          </button> : null}
         </div>
       ) : (
         <div className="ux-wb-title">
@@ -1073,7 +1075,7 @@ function UnitProfile({ unit, onOpenReference, glance = false }: { unit: RosterUn
           {detail.equipment.map((item) => (
             <article key={item.id}>
               <strong>{item.name}</strong>
-              <p>{item.description}</p>
+              {item.description.trim() ? <p>{item.description}</p> : null /* DEC-068: no wording, name only */}
             </article>
           ))}
         </div>
@@ -1131,6 +1133,8 @@ function ProfileTable({ table, unitCount, onOpenReference, fitToWidth = false }:
 
 function ReferenceTag({ label, onOpen, compact = false }: { label: string; onOpen: (reference: RosterReferenceDefinition) => void; compact?: boolean }) {
   const reference = resolveRosterReference(label);
+  // DEC-068 (approved 2026-11-17): a rule or trait without wording shows its name only; it is not a button, nothing opens.
+  if (reference && !reference.description.trim()) return <span className={compact ? "ux-reference-tag compact plain" : "ux-reference-tag plain"}>{label}</span>;
   if (!reference) return <span className={compact ? "ux-reference-tag compact inert" : "ux-reference-tag inert"}>{label}</span>;
   return <button type="button" className={compact ? "ux-reference-tag compact" : "ux-reference-tag"} onClick={() => onOpen(reference)}>{label}</button>;
 }
@@ -1240,7 +1244,7 @@ function AddPane({ props }: { props: ConceptProps }) {
   const explainTimer = useRef<number>(undefined);
   useEffect(() => () => window.clearTimeout(explainTimer.current), []);
   const explain = (id: string) => { window.clearTimeout(explainTimer.current); setExplained((current) => current === id ? null : id); explainTimer.current = window.setTimeout(() => setExplained(null), 4000); };
-  const smart = props.smartSearch ?? false;
+  const smart = smartToolsOn(props);
   const section = starsState && starsForce ? starsForce.name : pool[0]?.sectionName ?? props.selectedSection.name;
   const suggestions = [`legal ${section.toLowerCase()} under 120`, "fills this slot", "best value pick"];
   const poolRow = (unit: ReturnType<typeof flattenUnits>[number]) => {
@@ -1853,8 +1857,8 @@ function LookupScreen({ props }: { props: ConceptProps }) {
         <AppAvatarButton props={props} />
       </header>
       <div className="ux-wb-home-body">
-        <div className={`ux-wb-search ${props.smartSearch ? "smart" : ""}`}>
-          {props.smartSearch ? <Command size={15} /> : <Search size={15} />}
+        <div className={`ux-wb-search ${smartToolsOn(props) ? "smart" : ""}`}>
+          {smartToolsOn(props) ? <Command size={15} /> : <Search size={15} />}
           <input placeholder="Search Forward Squad, Aerial Drop, arc..." readOnly />
         </div>
         <div className="ux-source-filters">
@@ -2336,6 +2340,7 @@ function AppScreen({ props }: { props: ConceptProps }) {
 /** Settings screen housing preferences and the smart-search toggle. */
 function SettingsScreen({ props }: { props: ConceptProps }) {
   const smart = props.smartSearch ?? false;
+  const showSmartSetting = !SMART_TOOLS_RETIRED; // DEC-070: the paid smart-tools setting is hidden
   const [reopenRoster, setReopenRoster] = useState(false);
   const [rememberSections, setRememberSections] = useState(true);
   const [advancedInstall, setAdvancedInstall] = useState(false);
@@ -2353,6 +2358,7 @@ function SettingsScreen({ props }: { props: ConceptProps }) {
       <div className="ux-wb-home-body">
         {settingsQuery.trim() ? <SettingsResults platform="phone" query={settingsQuery} developerUnlocked={searchState === "developer"} onClear={() => setSettingsQuery("")} /> : <>
         <AppearancePreferences props={props} states />
+        {showSmartSetting ? <>
         <div className="ux-result-label">Search & assistance</div>
         <button type="button" className={`ux-setting-row ${smart ? "on" : ""}`} onClick={props.onToggleSmartSearch}>
           <span className="ux-setting-icon">
@@ -2368,6 +2374,7 @@ function SettingsScreen({ props }: { props: ConceptProps }) {
           <Sparkles size={14} />
           When on, the add-unit menu offers quick suggestions for the current slot. With the top-bar layout it also shows a floating command bar.
         </p>
+        </> : null}
         <div className="ux-result-label">Rosters</div>
         {/* DEC-056: Reopen roster on launch, directly above Remember option sections; off by default. */}
         <ReopenRosterSetting on={reopenRoster} onToggle={() => setReopenRoster((value) => !value)} />
