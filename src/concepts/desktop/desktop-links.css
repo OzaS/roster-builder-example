@@ -36,3 +36,4 @@
 .dtl-kinds dt { display: inline; color: var(--dt-accent); font-weight: 650 }
 .dtl-kinds dd { display: inline; margin: 0; color: var(--dt-text) }
 .dtl-hint { margin: 10px 0 0; color: var(--dt-muted); font-size: 12px; line-height: 1.45 }
+.dtl-step-action { display: block; margin-top: 8px }
