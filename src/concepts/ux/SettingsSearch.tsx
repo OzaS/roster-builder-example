@@ -2,6 +2,7 @@ import { Fragment, useState, type ReactNode } from "react";
 import { Bell, ChevronDown, ChevronRight, Eye, History, Info, Keyboard, Languages, ListChecks, Palette, RefreshCw, Search, Sparkles, TextCursorInput, Ungroup, Wifi, X } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { SHOW_HIDDEN_DETAIL, SHOW_HIDDEN_TITLE } from "./DeveloperPages";
+import { SMART_TOOLS_RETIRED } from "../shared";
 
 /**
  * UX-053 (approved 2026-11-01): search in Settings, phone and tablet. The query matches a setting's name and its description; results keep
@@ -33,7 +34,7 @@ export const settingsIndex = (platform: "phone" | "tablet"): SettingEntry[] => (
   { id: "separate", section: "Advanced", title: "Enable Separate all", detail: "Units with several models also offer Separate all, which gives every model its own options in one step. Off: only Separate 1.", icon: Ungroup, kind: "switch" },
   { id: "about", section: "About", title: "Version and licences", detail: "Version 1.0.0 · open source licences.", icon: Info, kind: "link" },
   { id: "hidden", section: "Developer options", title: SHOW_HIDDEN_TITLE, detail: SHOW_HIDDEN_DETAIL, icon: Eye, kind: "switch", developer: true },
-] as SettingEntry[]).filter((entry) => !entry.platform || entry.platform === platform);
+] as SettingEntry[]).filter((entry) => (!entry.platform || entry.platform === platform) && !(entry.id === "smart" && SMART_TOOLS_RETIRED)); // DEC-070: the paid smart-tools setting is retired
 
 /** Entries matching the query in the name or the description, in index order; developer rows only while Developer options are unlocked. */
 export function matchSettings(platform: "phone" | "tablet", query: string, developerUnlocked: boolean): SettingEntry[] {

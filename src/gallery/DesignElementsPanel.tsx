@@ -1546,11 +1546,13 @@ const ElementCatalogContext = createContext<DesignElements | null>(null);
 
 function CatalogSummary({ groups }: { groups: DesignElementGroup[] }) {
   const product = groups.find((group) => group.id === "product-ui");
-  const ready = product?.sections.filter((section) => section.status === "ready-for-rn").length ?? 0;
-  const coveredScreens = new Set(product?.sections.flatMap((section) => section.screens) ?? []);
+  // Retired sections (DEC-069 / DEC-070) are not drawn and not counted.
+  const sections = product?.sections.filter((section) => section.status !== "retired") ?? [];
+  const ready = sections.filter((section) => section.status === "ready-for-rn").length;
+  const coveredScreens = new Set(sections.flatMap((section) => section.screens));
   return (
     <aside className="ux-catalog-summary" aria-label="V1 React Native handoff summary">
-      <div><strong>{product?.sections.length ?? 0}</strong><small>Product specifications</small></div>
+      <div><strong>{sections.length}</strong><small>Product specifications</small></div>
       <div><strong>{ready}</strong><small>Ready for RN</small></div>
       <div><strong>{coveredScreens.size}</strong><small>Screens covered</small></div>
       <div><strong>{groups.find((group) => group.id === "gallery-ui")?.sections.length ?? 0}</strong><small>Gallery-only tools</small></div>
@@ -1582,7 +1584,7 @@ function StateMatrixElement() {
     ["Offline", "Showing saved roster data.", "offline"],
     ["Error", "Couldn’t update the roster.", "error"],
     ["Disabled", "Unavailable for this force.", "disabled"],
-    ["Subscriber", "Supporter feature", "locked"],
+    // DEC-070 (2026-11-17): the Subscriber / Supporter feature state is retired with the other monetization designs.
   ];
   return (
     <ElementSection title="Component State Matrix">
@@ -1603,6 +1605,8 @@ function StateMatrixElement() {
 function ElementSection({ title, children }: { title: string; children: React.ReactNode }) {
   const catalog = useContext(ElementCatalogContext);
   const specification = catalog?.groups.flatMap((group) => group.sections).find((section) => section.title === title);
+  // DEC-069 / DEC-070 (2026-11-17): a retired section stays in the design data and in code, but is not drawn.
+  if (specification?.status === "retired") return null;
   return (
     <article className="element-section ux-element-section" data-element-id={specification?.id}>
       <header className="ux-element-heading">

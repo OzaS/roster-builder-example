@@ -13,7 +13,7 @@ import { WorkflowBoard } from "./WorkflowBoard";
 import { workflowToPrototypeScreen } from "./workflow";
 import { DesignElementsPanel } from "./DesignElementsPanel";
 import type { DesignData, DesignWorkflow, EditableDesign } from "../design-data/designData";
-import { screenLabel } from "../design-data/designData";
+import { retiredScreens, screenLabel, screenRetirement, visibleWorkflows } from "../design-data/designData";
 import { ScreenGlance, type GlancePlacement } from "./ScreenGlance";
 
 type Props = {
@@ -402,6 +402,7 @@ export function GalleryShell({
             />
           ) : (
             <div className="single-preview-shell" onClickCapture={handleSinglePreviewClick}>
+              <RetiredScreenNote design={selectedDesign} screen={workflowScreen} />
               <PreviewFrame concept={concept} screen={workflowScreen} platform={platform} themeMode={themeMode} colorScheme={colorScheme} statusBarUsesDesignBackground={statusBarUsesDesignBackground}>{children}</PreviewFrame>
             </div>
           )}
@@ -529,7 +530,7 @@ function WorkflowEditor({
         Add workflow
       </button>
       <div className="workflow-edit-list">
-        {design?.workflows.map((workflow) => (
+        {visibleWorkflows(design).map((workflow) => (
           <div className="workflow-edit-row" key={workflow.id}>
             <span>
               <strong>{workflow.label}</strong>
@@ -552,7 +553,7 @@ function WorkflowEditor({
               <small>{screen}</small>
             </span>
             <select value={workflowIdForScreen(design, screen)} onChange={(event) => onMoveScreen(screen, event.currentTarget.value)} disabled={!writable}>
-              {design?.workflows.map((workflow) => (
+              {visibleWorkflows(design).map((workflow) => (
                 <option value={workflow.id} key={workflow.id}>
                   {workflow.label}
                 </option>
@@ -564,6 +565,7 @@ function WorkflowEditor({
           </div>
         ))}
       </div>
+      <RetiredSection design={design} />
       <details className="trash-section">
         <summary>
           <h3>Trash</h3>
@@ -628,7 +630,42 @@ function workflowIdForScreen(design: EditableDesign | undefined, screen: Workflo
 
 function visibleDesignScreens(design: EditableDesign | undefined) {
   const trash = new Set(design?.trash?.screens ?? []);
-  return design?.screens.map((screen) => screen.id).filter((screen) => !trash.has(screen)) ?? [];
+  return design?.screens.filter((screen) => !screen.retired).map((screen) => screen.id).filter((screen) => !trash.has(screen)) ?? [];
+}
+
+/** Retired screens (DEC-069 / DEC-070, 2026-11-17): listed read-only, with no link, so the editor accounts for them. */
+function RetiredSection({ design }: { design?: EditableDesign }) {
+  const retired = retiredScreens(design);
+  if (!retired.length) return null;
+  return (
+    <details className="trash-section retired-section">
+      <summary>
+        <h3>Retired</h3>
+        <small>{retired.length}</small>
+      </summary>
+      <p className="designer-note">Hidden from navigation, the board, Glance and counts. Kept in the design data and in code so they can come back.</p>
+      {retired.map((screen) => (
+        <div className="screen-move-row retired-row" key={screen.id}>
+          <span>
+            <strong>{screen.label}</strong>
+            <small>{screen.id} · {screen.retired?.decision} · {screen.retired?.date}</small>
+          </span>
+        </div>
+      ))}
+    </details>
+  );
+}
+
+/** A direct link (`?screen=`) or a saved selection can still open a retired screen; it renders under this note. */
+function RetiredScreenNote({ design, screen }: { design?: EditableDesign; screen: WorkflowScreen }) {
+  const retired = screenRetirement(design, screen);
+  if (!retired) return null;
+  return (
+    <p className="retired-screen-note" role="note">
+      <strong>Retired · {retired.decision} · {retired.date}</strong>
+      <span>{retired.reason} Not part of the current design; kept for reference.</span>
+    </p>
+  );
 }
 
 function slugify(value: string) {

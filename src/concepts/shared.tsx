@@ -28,7 +28,7 @@ export type ConceptProps = {
   colorScheme?: ColorScheme;
   onColorSchemeChange?: (scheme: ColorScheme) => void;
   workflowScreen?: WorkflowScreen;
-  /** When true, the premium "smart search & suggestions" features are enabled. */
+  /** When true, the premium "smart search & suggestions" features are enabled. Retired (DEC-070): see `smartToolsOn`. */
   smartSearch?: boolean;
   onToggleSmartSearch?: () => void;
   /** Main navigation style for the prototype (top bar / bottom tabs / floating tabs). */
@@ -384,4 +384,15 @@ export function ValidationScreen({ roster, onNavigate }: { roster: Roster; onNav
       </div>
     </section>
   );
+}
+
+/**
+ * DEC-070 (2026-11-17): no monetization. Smart search & suggestions was the paid smart-tools tier behind the Subscription
+ * Gate, so it is retired with the other monetization designs: the phone draws no smart search, command bar, suggestion
+ * chips, smart-search setting or gate entry point. The code stays; set this to false to bring the tier back.
+ */
+export const SMART_TOOLS_RETIRED = true;
+
+export function smartToolsOn(props: { smartSearch?: boolean }) {
+  return !SMART_TOOLS_RETIRED && (props.smartSearch ?? false);
 }
