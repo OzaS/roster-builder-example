@@ -38,3 +38,11 @@ Class names keep the `dt-` / `dtp-` / `dte-` prefixes of the desktop prototype. 
   it is evaluated later than `workspace.css`, so workspace rules that set `font-size` on buttons or selects need a
   `.dt-app` prefix (the summary rows have one).
 - Overlays (`.dt-toast`, `.dt-modal-scrim`, `.dt-summary`, `.dt-jobs`) are positioned absolutely against the root.
+
+## Revisions
+
+- **DEC-068/069/070, approved 2026-11-17.** `CollectionLinks.tsx` holds the local-first strings shared by phone, tablet
+  and desktop (`INSTALL_FILE`, `ADD_FROM_LINK`, `ADD_DATA_SUB`, `NO_DATA`), the two-group guide (`TOUCH_GUIDE_GROUPS`,
+  `DESKTOP_GUIDE_GROUPS`, `GuideGroups`) and the new nothing-found body. Search for data (`SEARCH_DATA`, `DATA_SEARCH`,
+  the six-step guides) stays in code only for the retired screens (DEC-069). Absent rule text (DEC-068) and the hidden
+  monetization designs (DEC-070) do not touch this layer.
