@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { AlertTriangle, ArrowUpCircle, Check, CheckSquare, ChevronRight, ExternalLink, FolderOpen, Github, Layers3, Link2, Plus, RefreshCcw, Search, Trash2, X } from 'lucide-react';
+import { AlertTriangle, ArrowUpCircle, Check, CheckSquare, ChevronRight, Database, ExternalLink, FileArchive, FolderOpen, Github, Layers3, Link2, Plus, RefreshCcw, Search, Trash2, X } from 'lucide-react';
+import { ADD_DATA_SUB, ADD_FROM_LINK, INSTALL_FILE, NO_DATA } from '../workspace/CollectionLinks';
 import { Chip as MobileChip } from '../ux/uxShared'; // the mobile chip; the workspace Chip (dtp-chip) is not used here, see MOBILE-PIECES.md
 import { jobPercent } from '../workspace/Jobs';
 import { SourceStatusAction } from '../ux/SourceJobs';
@@ -58,7 +59,7 @@ export function TabletSources({ env, notify, session, onPage, onOpenRoster }: Se
   const actions: ToolbarAction[] = [
     { id: 'select', label: selecting ? 'Done selecting' : 'Select game data', caption: selecting ? 'Done' : 'Select', icon: CheckSquare, pressed: selecting, priority: 2, hint: selecting ? 'Leave selection' : 'Select several game systems to update or remove them together', onClick: () => selecting ? endSelect() : setSelecting(true) },
     { id: 'file', label: 'Install from a file', caption: 'From a file', icon: FolderOpen, priority: 1, hint: 'Install game data from an archive, data files or a folder', onClick: () => notify('Choose an archive, data files or a folder (prototype)') },
-    { id: 'add', label: 'Add game data', caption: 'Add game data', icon: Plus, prominent: true, hint: 'Install from a collection, a repository link or GitHub search', onClick: () => go('add') },
+    { id: 'add', label: 'Add game data', caption: 'Add game data', icon: Plus, prominent: true, hint: ADD_DATA_SUB, onClick: () => go('add') },
   ];
   const search = <label className="ux-search tb-search">
     <Search size={18} aria-hidden="true" />
@@ -89,25 +90,33 @@ export function TabletSources({ env, notify, session, onPage, onOpenRoster }: Se
       {updates.length > 0 && !q && !selecting && <div className="tb-banner" role="status"><ArrowUpCircle size={20} /><span><strong>{plural(updates.length, 'update')} available</strong><small>New data for {updates.map(s => s.name).join(', ')}.</small></span><button type="button" className="ux-job-btn primary" onClick={() => update(updates.map(s => s.id))}>Update all</button></div>}
       {shown.map(sourceRow)}
       {!selecting && shownInstalls.map(j => <Row key={j.id} selected={false} mark={mark(j.name)} title={j.name} sub={j.status === 'needs-you' ? 'Waiting for you to choose factions' : `${plural(j.factions.length, 'faction')} available`} action={<SourceStatusAction status={j.status === 'needs-you' ? 'needs-you' : 'installing'} name={j.name} percent={jobPercent(j)} onPress={openJobs} />} onClick={openJobs} />)}
-      {!sources.length && !installing.length && <p className="tb-empty">No game data installed yet.</p>}
+      {/* DEC-069 (approved 2026-11-17): empty Sources, Install from a file (primary) and Add from a link (secondary, opens Add game data). */}
+      {!sources.length && !installing.length && <EmptyState icon={Database} title="No game data yet" text={NO_DATA.emptySources}>
+        <HintButton hint={INSTALL_FILE.sub} input={env.input} side="top" className="ux-primary tb-primary" onClick={() => notify('Choose an archive, data files or a folder (prototype)')}><FileArchive size={17} />{INSTALL_FILE.short}</HintButton>
+        <HintButton hint="Open Add game data" input={env.input} side="top" className="ux-job-btn" onClick={() => go('add')}><Link2 size={16} />{ADD_FROM_LINK}</HintButton>
+      </EmptyState>}
       {q && !shown.length && !shownInstalls.length && sources.length > 0 && <EmptyState icon={Search} title={`No game data matches “${query.trim()}”`} text="Try another name, repository or faction."><button type="button" className="ux-job-btn" onClick={() => setQuery('')}>Clear search</button></EmptyState>}
-      {!q && !selecting && <Row selected={isAddFlow(detail)} mark={<Plus size={20} />} title="Add game data" sub="Collections, a repository link, or GitHub search" end={<ChevronRight size={17} />} onClick={() => go('add')} />}
+      {!q && !selecting && <Row selected={isAddFlow(detail)} mark={<Plus size={20} />} title="Add game data" sub={ADD_DATA_SUB} end={<ChevronRight size={17} />} onClick={() => go('add')} />}
     </div>
     {foot}
   </>;
 
+  // DEC-069 (approved 2026-11-17), local data first: (1) Install from a file on this device, the primary row; (2) the
+  // repository link; (3) Collections (default, saved, Add a collection or library); (4) Search GitHub, a secondary row last.
   const addPane = <>
-    <div className="tb-detail-title"><span><h2>Add game data</h2><small>Install from a collection, a repository link, or GitHub search</small></span></div>
+    <div className="tb-detail-title"><span><h2>Add game data</h2><small>{ADD_DATA_SUB}</small></span></div>
     <p className="tb-note"><Layers3 size={15} /><span>{advancedInstall ? <>Advanced installation is on. Each install pauses on <b>Choose factions</b>, so you install only the factions you play.</> : <>Each install brings every faction. To choose factions, turn on <b>Advanced installation</b> in Settings.</>}{' '}<button type="button" className="tb-text-link" onClick={() => { session.setSettingsSection('data'); onPage('settings'); }}>Open Game data settings</button></span></p>
-    <WorkspaceScope light={light}><div className="tb-flow"><AddDataCollections jobs={jobs} go={go} onOpenJobs={openJobs} /></div></WorkspaceScope>
+    <div className="tb-list">
+      <Row primary selected={false} mark={<FileArchive size={20} />} title={INSTALL_FILE.title} sub={INSTALL_FILE.sub} end={<ChevronRight size={17} />} onClick={() => notify('Choose an archive, data files or a folder (prototype)')} />
+    </div>
     <form className="tb-link-form" onSubmit={e => { e.preventDefault(); notify(link ? 'Looking up the repository…' : 'Paste a repository link first'); }}>
       <label className="ux-search tb-search"><Link2 size={16} /><input value={link} onChange={e => setLink(e.target.value)} placeholder="https://github.com/owner/repository" aria-label="Repository link" inputMode="url" autoCapitalize="off" /></label>
       <button type="submit" className="ux-job-btn">Continue</button>
     </form>
+    <WorkspaceScope light={light}><div className="tb-flow"><AddDataCollections jobs={jobs} go={go} onOpenJobs={openJobs} /></div></WorkspaceScope>
     <div className="tb-list">
-      <Row selected={false} mark={<Github size={20} />} title="Search GitHub" sub="Find data repositories by name" end={<ChevronRight size={17} />} onClick={() => go('github')} />
       <Row selected={false} mark={<Plus size={20} />} title="Add a collection or library" sub="Lists of sources kept by the community" end={<ChevronRight size={17} />} onClick={() => session.setAddCollectionOpen(true)} />
-      <Row selected={false} mark={<FolderOpen size={20} />} title="Install from a file" sub="An archive, data files or a folder" end={<ChevronRight size={17} />} onClick={() => notify('Choose an archive, data files or a folder (prototype)')} />
+      <Row selected={false} mark={<Github size={20} />} title="Search GitHub" sub="Find data repositories by name" end={<ChevronRight size={17} />} onClick={() => go('github')} />
     </div>
     <WorkspaceScope light={light}><AddDataPreviewStates jobs={jobs} onOpenJobs={openJobs} /></WorkspaceScope>
   </>;

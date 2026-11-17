@@ -1,5 +1,6 @@
 import { type ReactNode, useId, useMemo, useState } from 'react';
-import { ArrowRight, BookOpen, ChevronRight, Copy, Database, FileUp, FolderOpen, Hammer, Info, Layers3, Pencil, Plus, RefreshCcw, Search, ShieldCheck, Trash2, TriangleAlert, ArrowDownToLine, BookMarked, Check } from 'lucide-react';
+import { ADD_FROM_LINK, INSTALL_FILE, NO_DATA } from '../workspace/CollectionLinks';
+import { ArrowRight, BookOpen, ChevronRight, Copy, Database, FileArchive, FileUp, FolderOpen, Link2, Hammer, Info, Layers3, Pencil, Plus, RefreshCcw, Search, ShieldCheck, Trash2, TriangleAlert, ArrowDownToLine, BookMarked, Check } from 'lucide-react';
 import { Chip as MobileChip } from '../ux/uxShared'; // the mobile chip; the workspace Chip (dtp-chip) is not used here, see MOBILE-PIECES.md
 import { ComingSoonCard } from '../ux/AppExtras';
 import { collectionSources, lookupEntries, type LookupEntry, type RosterSummary } from '../desktop/desktopData';
@@ -19,7 +20,7 @@ export type { PageProps };
 /** Game systems Home's data card shows (TFB-001); More opens Sources with the rest. */
 const HOME_DATA_LIMIT = 4;
 
-const steps = [['Add game data', 'Install a game system from a collection or a file.'], ['Create a roster', 'Choose a faction, a force and a points limit.'], ['Build and check', 'Add units, see the points and the checks as you go.']];
+const steps = [['Add game data', 'Install it from a file on this device, or add a link to it.'], ['Create a roster', 'Choose a faction, a force and a points limit.'], ['Build and check', 'Add units, see the points and the checks as you go.']];
 
 export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRoster }: SessionProps & { onPage: (page: 'rosters' | 'sources') => void; onNewRoster: () => void; onOpenRoster: (name: string) => void }) {
   const { rosters, jobs, hasData, setJobsOpen, setSourceDetail } = session;
@@ -67,12 +68,14 @@ export function TabletHome({ env, notify, session, onPage, onNewRoster, onOpenRo
       <div className="tb-home-main">
         <section className="tb-card tb-fill" aria-label="Start with game data">
           <span className="ux-result-label">Get started</span>
-          <div className="tb-card-head"><h2 className="tb-card-title">Start with game data</h2><p className="tb-body tb-muted">Rosters are built from a game system's data. Install one; it stays available offline.</p></div>
-          {noPreset ? <p className="tb-note"><Info size={15} />{FIRST_RUN_NO_PRESET}</p> : <div className="tb-list">{collectionSources.map(c => <InstallRow key={c.id} title={c.name} sub={`${c.detail} · ${c.size}`} live={jobs.jobs.find(j => j.sourceId === c.id && (j.status === 'running' || j.status === 'needs-you'))} installed={jobs.sources.some(s => s.id === c.id)} onInstall={() => startInstall(c)} onJobs={() => setJobsOpen(true)} />)}</div>}
+          {/* DEC-069 (approved 2026-11-17), local data first: the hero body and two actions, Install from a file (primary) and
+              Add from a link (secondary, opens Add game data). No collection rows: the app does not point to a data source. */}
+          <div className="tb-card-head"><h2 className="tb-card-title">Start with game data</h2><p className="tb-body tb-muted">{NO_DATA.homeHero}</p></div>
+          <div className="tb-actions">
+            <HintButton hint={INSTALL_FILE.sub} input={env.input} side="top" className="ux-primary tb-primary" onClick={() => notify('Choose an archive, data files or a folder (prototype)')}><FileArchive size={17} />{INSTALL_FILE.short}</HintButton>
+            <HintButton hint="Open Add game data" input={env.input} side="top" className="ux-job-btn" onClick={addData}><Link2 size={16} />{ADD_FROM_LINK}</HintButton>
+          </div>
           {history}
-          <Row selected={false} mark={<FolderOpen size={20} />} title="Install from a file or a link" sub="An archive, data files, a repository link or GitHub search" end={<ChevronRight size={17} />} onClick={addData} />
-          <p className="tb-note"><Info size={15} />Battle Augur includes no game data. Sources come from community repositories you choose.</p>
-          <WorkspaceScope light={session.light}><FirstRunPreviewStates /></WorkspaceScope>
         </section>
       </div>
       <aside className="tb-home-side" aria-label="How it works">
@@ -182,7 +185,7 @@ export function RosterNavigationRow({ roster, selected, onSelect, onOpen }: { ro
 export const FactsGrid = ({ rows }: { rows: Array<[string, ReactNode]> }) =>
   <div className="tb-facts-wrap"><dl className="tb-facts-grid">{rows.map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl></div>;
 
-export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster }: SessionProps & { onNewRoster: () => void; onOpenRoster: (name: string) => void }) {
+export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster, onAddData }: SessionProps & { onNewRoster: () => void; onOpenRoster: (name: string) => void; onAddData?: () => void }) {
   const { rosters, setRosters, hasData } = session;
   const [query, setQuery] = useState(session.state === 'search' ? 'patrol' : '');
   const [attention, setAttention] = useState(false);
@@ -217,10 +220,14 @@ export function TabletRosters({ env, notify, session, onNewRoster, onOpenRoster 
   const actions: ToolbarAction[] = [{ id: 'import', label: 'Import roster', caption: 'Import', icon: FileUp, hint: 'Import a roster from a file', onClick: () => notify('Import a roster file (prototype)') }];
   if (!rosters.length) return <div className="tb-page">
     <RosterToolbar query={query} onQueryChange={setQuery} input={env.input} actions={actions} />
-    <EmptyState icon={Layers3} title="No rosters yet" text={hasData ? 'Create a roster, or import one from a file.' : 'Rosters are built from game data. Add a game system first, then create a roster.'}>
+    {/* DEC-069 (approved 2026-11-17): without game data, Install from a file (primary) and Add from a link (secondary, opens Add game data). */}
+    {hasData ? <EmptyState icon={Layers3} title="No rosters yet" text="Create a roster, or import one from a file.">
       <HintButton hint="Create a roster" input={env.input} side="top" className="ux-primary tb-primary" onClick={onNewRoster}><Plus size={17} />New roster</HintButton>
       <HintButton hint="Import a roster from a file" input={env.input} side="top" className="ux-job-btn" onClick={() => notify('Import a roster file (prototype)')}><FileUp size={16} />Import a roster</HintButton>
-    </EmptyState>
+    </EmptyState> : <EmptyState icon={Layers3} title="No rosters yet" text={NO_DATA.emptyHome}>
+      <HintButton hint={INSTALL_FILE.sub} input={env.input} side="top" className="ux-primary tb-primary" onClick={() => notify('Choose an archive, data files or a folder (prototype)')}><FileArchive size={17} />{INSTALL_FILE.short}</HintButton>
+      <HintButton hint="Open Add game data" input={env.input} side="top" className="ux-job-btn" onClick={onAddData}><Link2 size={16} />{ADD_FROM_LINK}</HintButton>
+    </EmptyState>}
   </div>;
   const duplicate = (r: RosterSummary) => { const copy = { ...r, name: `Copy of ${r.name}`, opened: 'Just now' }; setRosters(list => [copy, ...list]); choose(copy.name); notify(`Duplicated as “${copy.name}”`); };
   const rename = (r: RosterSummary, name: string) => { if (name && name !== r.name) { setRosters(list => list.map(x => x.name === r.name ? { ...x, name } : x)); setSelected(name); } setRenaming(false); };

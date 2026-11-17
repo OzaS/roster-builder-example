@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { BookMarked, Check, CheckSquare, ChevronRight, FileUp, FolderOpen, Hammer, Info, Layers3, Plus, Search } from 'lucide-react';
+import { BookMarked, Check, CheckSquare, ChevronRight, FileArchive, FileUp, FolderOpen, Hammer, Info, Layers3, Link2, Plus, Search } from 'lucide-react';
+import { ADD_DATA_SUB, ADD_FROM_LINK, INSTALL_FILE, NO_DATA } from '../workspace/CollectionLinks';
 import { FIRST_RUN_NO_PRESET, NoPresetCollections } from '../desktop/DesktopSourceFlows';
 import { LibrarySwitch } from '../../gallery/LibrarySwitch';
 import { ComingSoonCard } from '../ux/AppExtras';
@@ -35,11 +36,11 @@ function NoPresetDemo() {
   return <div className="tb-el-frames">
     <div className="tb-app ux-screen dark tb-el-card"><section className="tb-card" aria-label="Start with game data, no default collection">
       <span className="ux-result-label">Get started</span>
-      <div className="tb-card-head"><h2 className="tb-card-title">Start with game data</h2><p className="tb-body tb-muted">Rosters are built from a game system's data. Install one; it stays available offline.</p></div>
-      <p className="tb-note"><Info size={15} />{FIRST_RUN_NO_PRESET}</p>
-      <Row selected={false} mark={<FolderOpen size={20} />} title="Install from a file or a link" sub="An archive, data files, a repository link or GitHub search" end={<ChevronRight size={17} />} onClick={noop} />
+      <div className="tb-card-head"><h2 className="tb-card-title">Start with game data</h2><p className="tb-body tb-muted">{NO_DATA.homeHero}</p></div>
+      <div className="tb-actions"><button type="button" className="ux-primary tb-primary"><FileArchive size={17} />{INSTALL_FILE.short}</button><button type="button" className="ux-job-btn"><Link2 size={16} />{ADD_FROM_LINK}</button></div>
     </section></div>
-    <div className="tb-app ux-screen dark tb-el-card"><div className="tb-detail-title"><span><h2>Add game data</h2><small>Install from a collection, a repository link, or GitHub search</small></span></div>
+    <div className="tb-app ux-screen dark tb-el-card"><div className="tb-detail-title"><span><h2>Add game data</h2><small>{ADD_DATA_SUB}</small></span></div>
+      <div className="tb-list"><Row primary selected={false} mark={<FileArchive size={20} />} title={INSTALL_FILE.title} sub={INSTALL_FILE.sub} end={<ChevronRight size={17} />} onClick={noop} /></div>
       <WorkspaceScope light={false}><div className="tb-flow"><NoPresetCollections /></div></WorkspaceScope></div>
   </div>;
 }
@@ -79,7 +80,7 @@ function ToolbarActionsDemo({ width, system, input = 'touch', text }: { width: n
   const actions: ToolbarAction[] = [
     { id: 'select', label: selecting ? 'Done selecting' : 'Select game data', caption: selecting ? 'Done' : 'Select', icon: CheckSquare, pressed: selecting, priority: 2, hint: 'Select several game systems to update or remove them together', onClick: () => setSelecting(!selecting) },
     { id: 'file', label: 'Install from a file', caption: 'From a file', icon: FolderOpen, priority: 1, hint: 'Install game data from an archive, data files or a folder', onClick: noop },
-    { id: 'add', label: 'Add game data', caption: 'Add game data', icon: Plus, prominent: true, hint: 'Install from a collection, a repository link or GitHub search', onClick: noop },
+    { id: 'add', label: 'Add game data', caption: 'Add game data', icon: Plus, prominent: true, hint: ADD_DATA_SUB, onClick: noop },
   ];
   return <div className={`tb-app ux-screen dark tb-el-card tb-${input}`} data-system={system} data-text={text} style={{ width, boxSizing: 'border-box', ...(text ? { zoom: 2 } : {}) }}>
     <div style={{ width: '100%', minWidth: 0 }}><TabletToolbar title="Sources" input={input} actions={actions} search={<label className="ux-search tb-search"><Search size={18} aria-hidden="true" /><input type="search" aria-label="Find installed game data" placeholder="Find game data…" /></label>} /></div>
@@ -264,9 +265,12 @@ export function TabletElements() {
       </div></div>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-stars-catalogue" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-stars-catalogue-role" /></TabletDeviceFrame></div>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-stars-add-force" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-stars-faction" /></TabletDeviceFrame></div>
-      <h2>Collection links (R2-06 · F4e · approved 2026-11-09) · Need a link? · repository results · Search for data · Step-by-step guide</h2>
-      <p>The Add collection form sheet: a repository link is looked up for its collection file (one, several, game data, nothing found). Need a link? pushes Search for data or the guide inside the sheet; the header's Cancel becomes ‹ Back, and the field keeps its text.</p>
-      <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-links-add-idle" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-portrait"><TabletWorkbench workflowScreen="tablet-links-guide" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="split"><TabletWorkbench workflowScreen="tablet-links-search-data" /></TabletDeviceFrame></div>
+      <h2>Local data first (DEC-069 · approved 2026-11-17) · Add game data order · no game data · guide in two groups</h2>
+      <p>Installing from a file on this device is the primary way to add game data, a link second; nothing names or points to a data source. Add game data: (1) Install from a file on this device (An archive, data files or a folder), the primary row (accent tile and tint); (2) the repository link; (3) Collections and Add a collection or library; (4) Search GitHub, a secondary row last; subtitle “{ADD_DATA_SUB}”. Wherever there is no game data yet (Home first run, Rosters, Sources, New roster) the way forward is Install from a file (primary) and Add from a link (secondary, opens Add game data). Need a link? holds only the Step-by-step guide (Install from a file or a link), in two groups each numbered from 1; file step 2 carries the Install from a file on this device action. Nothing usable found offers Install from a file and Guide.</p>
+      <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-sources-add" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-home-first-run" /></TabletDeviceFrame></div>
+      <h2>Collection links (R2-06 · F4e · approved 2026-11-09; DEC-069 2026-11-17) · Need a link? · repository results · Step-by-step guide</h2>
+      <p>The Add collection form sheet: a repository link is looked up for its collection file (one, several, game data, nothing found). Need a link? pushes the guide inside the sheet; the header's Cancel becomes ‹ Back, and the field keeps its text. Search for data is retired (DEC-069).</p>
+      <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-links-add-idle" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-portrait"><TabletWorkbench workflowScreen="tablet-links-guide" /></TabletDeviceFrame></div>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-links-repo-found" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-links-repo-several" /></TabletDeviceFrame></div>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-links-data-repo" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-links-nothing-found" /></TabletDeviceFrame></div>
       <h2>Dialogs and sheets · guided creation, faction picker, add collection, appearance import, move unit, confirm</h2>
@@ -275,7 +279,7 @@ export function TabletElements() {
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-sources-choose-factions" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-portrait"><TabletWorkbench workflowScreen="tablet-sources-add-collection" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="split"><TabletWorkbench workflowScreen="tablet-sources-add-collection" /></TabletDeviceFrame></div>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-portrait"><TabletWorkbench workflowScreen="tablet-settings-appearance-import" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-editor-move-unit" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="split"><TabletWorkbench workflowScreen="tablet-confirm-delete" /></TabletDeviceFrame></div>
       <h2>No default collection (DEC-059 · R0-09) · reinstall a kept version (DEC-060) · approved 2026-11-02</h2>
-      <p>A build with no default collection fetches nothing. Home's first-run card replaces the hidden-collection note with “{FIRST_RUN_NO_PRESET}” (its way forward doesn't change). Add game data has no default collection and no Show the default collection row; Your collections is always there and, while the user has none, starts with the note. The repository link and Search GitHub don't change. Live: Preview states on Home (first run) and Sources › Add game data.</p>
+      <p>A build with no default collection fetches nothing. Home's first-run card has no collection rows since DEC-069 (Install from a file and Add from a link only), so it no longer differs in such a build. Add game data has no default collection and no Show the default collection row; Your collections is always there and, while the user has none, starts with the note. The repository link and Search GitHub don't change. Live: Preview states on Home (first run) and Sources › Add game data.</p>
       <NoPresetDemo />
       <p>A GitHub version already kept on this device with every faction installed pauses the install on the reinstall offer (Advanced installation on or off) instead of an empty faction picker: a form sheet with Cancel (cancels the install), “{'{name}'} · {'{version}'}” and Reinstall this version. It asks first in the app dialog; confirmed, that version is in use and the one in use before stays kept (the jobs popover shows the done state); a failure shows the error and the previous version stays in use. Screen: Sources · Reinstall a kept version; Sources › Add game data › Preview states › Kept version · reinstall fails.</p>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-sources-reinstall" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="split"><TabletWorkbench workflowScreen="tablet-sources-reinstall" /></TabletDeviceFrame></div>
