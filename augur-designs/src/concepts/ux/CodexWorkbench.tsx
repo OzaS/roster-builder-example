@@ -4,7 +4,7 @@ import { ForceLayoutContext } from "./ForceLayout";
 import { PhoneLookup } from "./PhoneLookup";
 import { AppearancePreferences } from "./AppearanceSettings";
 import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject } from "react";
-import { Activity, AlertTriangle, ArrowLeft, ArrowUp, BarChart3, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, Circle, CircleDot, ClipboardList, Cog, Coins, Command, Copy, Database, Dice5, Download, Ellipsis, FileInput, Filter, Folder, FolderOpen, Gamepad2, GripVertical, Hammer, Heart, ImagePlus, Languages, Layers, LibraryBig, Maximize2, Minimize2, Minus, Moon, MoveRight, Palette, PanelsTopLeft, Pencil, Plus, RotateCcw, Scale, Search, ShieldCheck, Sparkles, Split, Square, SquareCheck, Tag, Target, Timer, Trash2, Upload, UserRound, UsersRound, Wand2, X } from "lucide-react";
+import { Activity, AlertTriangle, ArrowLeft, ArrowUp, BarChart3, BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, Circle, CircleDot, ClipboardList, Cog, Coins, Command, Copy, Database, Dice5, Download, Ellipsis, FileInput, Filter, Folder, FolderOpen, Gamepad2, GripVertical, Hammer, Heart, ImagePlus, Languages, Layers, LibraryBig, Maximize2, Minimize2, Minus, Moon, MoveRight, Palette, PanelsTopLeft, Pencil, Plus, RotateCcw, Scale, Search, ShieldCheck, Sparkles, Split, Square, SquareCheck, Tag, Target, Timer, Trash2, Upload, UserRound, UsersRound, Wand2, X, Flag } from "lucide-react";
 import { mockCatalogues, mockDetachments, mockSystemUnits } from "../../data/mockRoster";
 import { referenceById, resolveRosterReference } from "../../data/mockRosterReferences";
 import type { RosterReferenceDefinition, RosterUnit } from "../../types";
@@ -521,6 +521,7 @@ function Tree({ props, query, creationOpen, onCreationOpenChange, onOpenUnitGlan
               <div className="ux-force-summary">
                 <button type="button" className="ux-force-summary-main" aria-expanded={forceOpen} onClick={() => props.onToggleForce(force.id)}>
                   <ChevronDown size={15} />
+                  {next ? <span className="ux-nx-force-glyph" aria-hidden><Flag size={15} /></span> : null}
                   <span>
                     <strong>{forceDisplayName(force)}</strong>
                     <small>{force.detachment}</small>
