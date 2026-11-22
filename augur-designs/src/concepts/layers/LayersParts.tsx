@@ -149,10 +149,11 @@ export function InstallSource({ platform, link, onFile, onLink }: { platform: La
   const [value, setValue] = useState(link ?? '');
   return <div className={`lyr lyr-${platform} lyr-install-source`}>
     <button type="button" className="lyr-add-row primary" onClick={onFile}><span className="lyr-add-icon" aria-hidden><FileArchive size={18} /></span><span className="lyr-text"><strong>Choose a file on this device</strong><small>An archive or a folder with the add-on or variant</small></span><ChevronRight size={16} aria-hidden /></button>
-    <form className="lyr-link-form" onSubmit={e => { e.preventDefault(); onLink?.(); }}>
-      <label className="lyr-field"><span>Or paste a link</span><span className="lyr-field-box"><Link2 size={16} aria-hidden /><input value={value} onChange={e => setValue(e.target.value)} placeholder="https://github.com/owner/repository" inputMode="url" autoCapitalize="off" aria-label="Link to an add-on or variant" /></span></label>
-      <button type="submit" className={btnClass(platform)} disabled={!value.trim()} title={value.trim() ? undefined : 'Paste a link first'}>Check link</button>
-    </form>
+    {/* A group, not a form: the tablet sheet is a form already. Enter in the field runs Check link. */}
+    <div className="lyr-link-form" role="group" aria-label="Add from a link">
+      <label className="lyr-field"><span>Or paste a link</span><span className="lyr-field-box"><Link2 size={16} aria-hidden /><input value={value} onChange={e => setValue(e.target.value)} placeholder="https://github.com/owner/repository" inputMode="url" autoCapitalize="off" aria-label="Link to an add-on or variant" onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); if (value.trim()) onLink?.(); } }} /></span></label>
+      <button type="button" className={btnClass(platform)} disabled={!value.trim()} title={value.trim() ? undefined : 'Paste a link first'} onClick={onLink}>Check link</button>
+    </div>
     <p className="lyr-hint">The app reads the file first and tells you whether it fits {BASE.title} {BASE.version} before anything is added.</p>
   </div>;
 }
@@ -167,7 +168,10 @@ const Facts = ({ s, fit }: { s: Sample; fit: ReactNode }) => <dl className="lyr-
 </dl>;
 
 /** The requirement check, shown before anything is added: it fits, it needs a newer base, or it is refused. */
-export function InstallCheck({ platform, state, onCancel, onAdd }: { platform: LayerPlatform; state: CheckState; onCancel?: () => void; onAdd?: () => void }) {
+/** The check's primary action, for hosts that put it in a sheet header (tablet). */
+export const checkAction = (state: CheckState) => state === 'fits' ? 'Add variant' : state === 'needs' ? `Update ${BASE.title}, then add` : undefined;
+
+export function InstallCheck({ platform, state, onCancel, onAdd, hideActions = false }: { platform: LayerPlatform; state: CheckState; onCancel?: () => void; onAdd?: () => void; hideActions?: boolean }) {
   if (state === 'fits') {
     const s = INSTALL_SAMPLE;
     return <div className={`lyr lyr-${platform} lyr-check`}>
@@ -176,7 +180,7 @@ export function InstallCheck({ platform, state, onCancel, onAdd }: { platform: L
       <h3 className="lyr-check-title">{s.title}</h3>
       <Facts s={s} fit={<span className="lyr-fit ok"><Check size={13} aria-hidden />you have {BASE.version}</span>} />
       <p className="lyr-hint">Variants change rules, so your {BASE.rosters} rosters on {BASE.title} will ask for a review the next time they open.</p>
-      <div className="lyr-actions"><button type="button" className={btnClass(platform)} onClick={onCancel}>Cancel</button><button type="button" className={btnClass(platform, 'primary')} onClick={onAdd}>Add variant</button></div>
+      {hideActions ? null : <div className="lyr-actions"><button type="button" className={btnClass(platform)} onClick={onCancel}>Cancel</button><button type="button" className={btnClass(platform, 'primary')} onClick={onAdd}>Add variant</button></div>}
     </div>;
   }
   if (state === 'needs') {
@@ -186,7 +190,7 @@ export function InstallCheck({ platform, state, onCancel, onAdd }: { platform: L
       <div className="lyr-verdict warn" role="status"><AlertTriangle size={18} aria-hidden /><span><strong>Needs {BASE.title} 1.5 or later</strong><small>You have {BASE.version}. {BASE.title} {BASE.next} is available; update it first and this variant is added after.</small></span></div>
       <h3 className="lyr-check-title">{s.title}</h3>
       <Facts s={s} fit={<span className="lyr-fit warn"><AlertTriangle size={13} aria-hidden />you have {BASE.version}</span>} />
-      <div className="lyr-actions"><button type="button" className={btnClass(platform)} onClick={onCancel}>Cancel</button><button type="button" className={btnClass(platform, 'primary')} onClick={onAdd}><ArrowUpCircle size={15} />Update {BASE.title}, then add</button></div>
+      {hideActions ? null : <div className="lyr-actions"><button type="button" className={btnClass(platform)} onClick={onCancel}>Cancel</button><button type="button" className={btnClass(platform, 'primary')} onClick={onAdd}><ArrowUpCircle size={15} />Update {BASE.title}, then add</button></div>}
     </div>;
   }
   const s = RULES_SAMPLE;
@@ -196,7 +200,7 @@ export function InstallCheck({ platform, state, onCancel, onAdd }: { platform: L
     <h3 className="lyr-check-title">{s.title}</h3>
     <Facts s={s} fit={<span className="lyr-fit ok"><Check size={13} aria-hidden />you have {BASE.version}</span>} />
     <details className="lyr-details"><summary>What it changes</summary><ul><li>Cost of Lancers: 90 → 80</li><li>Cost of Scout Riders: 60 → 55</li><li>Cost of Field Gun: 120 → 110</li></ul></details>
-    <div className="lyr-actions"><button type="button" className={btnClass(platform, 'primary')} onClick={onCancel}>Close</button></div>
+    {hideActions ? null : <div className="lyr-actions"><button type="button" className={btnClass(platform, 'primary')} onClick={onCancel}>Close</button></div>}
   </div>;
 }
 

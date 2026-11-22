@@ -251,3 +251,11 @@
 .lyr-phone .lyr-review-actions { position: sticky; bottom: -32px; z-index: 2; margin: 0 -8px -32px; padding: 12px 20px 20px; background: linear-gradient(to bottom, transparent, var(--ux-bg) 14px); }
 .lyr-phone .lyr-review-actions { flex-direction: column-reverse; align-items: stretch; gap: 8px; }
 .lyr-phone .lyr-review-actions > .lyr-btn { flex: none; justify-content: center; }
+
+/* Tablet: the layers under the base row in the list pane, and the detail pane's spacing */
+.lyr-tablet-children { margin: -4px 0 6px 34px; }
+.lyr-tablet-children .lyr-child { min-height: 44px; font-size: 15px; }
+.lyr-tablet-page .tb-detail { display: flex; flex-direction: column; gap: 16px; }
+.lyr-tablet-page .tb-detail > .lyr-update-line { margin: 0; }
+.tbs-body > .lyr { flex: none; }
+.tbs-body .lyr-review-actions { padding-bottom: 4px; }

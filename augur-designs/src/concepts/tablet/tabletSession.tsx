@@ -4,6 +4,7 @@ import type { Notify } from '../workspace/Toasts';
 import { collectionSources, installedSources, rosterLibrary, type RosterSummary } from '../desktop/desktopData';
 import { isTabletPage, type TabletPage } from './TabletRail';
 import { manyRosters, manySources } from './tabletData';
+import { tabletLayerScreens } from '../layers/layerScreens';
 
 // Prototype-session state the tablet pages share: the roster list, the install and update jobs, the Advanced installation
 // setting and where the Sources and Settings pages are pointing. State screens (`tablet-sources-add`, ...) start the
@@ -73,6 +74,8 @@ const stateRoutes: Record<string, TabletRoute> = {
   'tablet-create': { page: 'home', state: 'create' },
   'tablet-create-review': { page: 'home', state: 'create-review' },
   'tablet-confirm-delete': { page: 'rosters', state: 'confirm-delete' },
+  // A3 (Next track, Proposal): add-ons and variants on Sources; the roster open review and Roster info over Rosters.
+  ...Object.fromEntries(tabletLayerScreens.map(({ id }) => [id, { page: ['review', 'review-missing', 'roster-info'].includes(id.slice(14)) ? 'rosters' : 'sources', state: id.slice(7) } satisfies TabletRoute])),
 };
 
 /** Which page (and state) a gallery screen shows; undefined for screens that are not tablet pages. */
