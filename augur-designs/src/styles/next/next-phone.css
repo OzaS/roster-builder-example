@@ -478,3 +478,14 @@
   .ux-tree-section strong { font-weight: 600 }
   .ux-tree-unit { padding-left: calc(var(--nxp-pad) + 22px) }
 }
+
+:root[data-look="next"] .ux-nx-force-glyph { display: none }
+/* Phone force row (user, 2026-11-22, option B of two): forces appear once or twice per roster, so on phone they don't
+   indent what follows. Sections sit at the edge, units one small step in (8 px), and the force is marked by the rule,
+   its weight and a round force glyph (the Add force flag) before its name, which costs width on the force row only. */
+:root[data-look="next"] :is(.device-frame.phone, .design-elements-panel.phone) {
+  .ux-tree-section { padding-left: var(--nxp-pad) }
+  .ux-tree-unit { padding-left: calc(var(--nxp-pad) + 8px) }
+  .ux-force-summary-main { grid-template-columns: 16px 30px minmax(0, 1fr) auto; padding-left: var(--nxp-pad) }
+  .ux-nx-force-glyph { display: inline-grid; flex: none; place-items: center; width: 30px; height: 30px; margin-right: 2px; border-radius: 999px; background: var(--nxp-tonal); color: var(--ux-accent) }
+}
