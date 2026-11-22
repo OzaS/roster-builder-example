@@ -1,0 +1,26 @@
+/* Gallery chrome tokens (the design kit's track switch uses --surface, --surface-2, --ink, --muted, --radius-sm). */
+:root {
+  --bg: #f4f5f7; --surface: #ffffff; --surface-2: #eceef2; --ink: #17202a; --muted: #5b6672; --line: #dfe3e8; --accent: #5e6ad2; --radius-sm: 8px;
+  --track-switch-bg: var(--surface-2); --track-switch-shadow: none;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #111317; --surface: #1b1e24; --surface-2: #23272e; --ink: #e8eaee; --muted: #a0a8b3; --line: #2a2f37; --accent: #8f98ff; color-scheme: dark; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+.cg-gallery { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+.cg-rail { display: flex; flex-direction: column; gap: 16px; padding: 18px; border-right: 1px solid var(--line); background: var(--surface); }
+.cg-brand { display: flex; align-items: center; gap: 10px; }
+.cg-brand strong { display: block; font-size: 15px; }
+.cg-brand small { color: var(--muted); font-size: 12px; }
+.cg-mark { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 9px; background: var(--ink); color: var(--bg); font-weight: 800; font-size: 13px; }
+.cg-back { margin-top: auto; color: var(--muted); font-size: 12px; }
+.cg-stage { max-width: 720px; padding: 48px 40px; }
+.cg-stage h1 { margin: 0 0 12px; font-size: 24px; letter-spacing: -0.01em; }
+.cg-stage p { color: var(--muted); }
+@media (max-width: 720px) {
+  .cg-gallery { grid-template-columns: 1fr; }
+  .cg-rail { border-right: 0; border-bottom: 1px solid var(--line); }
+  .cg-stage { padding: 24px 16px; }
+}

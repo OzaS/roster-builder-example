@@ -1,9 +1,10 @@
 /*
  * Design track switch: Current / Next, the Next items and their status chips.
  * Uses the gallery tokens --surface, --surface-2, --ink, --muted and --radius-sm (each gallery defines them).
+ * A gallery can restyle the switch's well with --track-switch-bg and --track-switch-shadow (defaults: the Battle Augur rail).
  */
 .gallery-track { display: grid; gap: 8px; }
-.gallery-track-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 6px; border-radius: 12px; background: color-mix(in srgb, var(--surface-2) 80%, white); box-shadow: inset 4px 4px 10px rgba(122, 142, 150, 0.18), inset -4px -4px 10px rgba(255, 255, 255, 0.8); }
+.gallery-track-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 6px; border-radius: 12px; background: var(--track-switch-bg, color-mix(in srgb, var(--surface-2) 80%, white)); box-shadow: var(--track-switch-shadow, inset 4px 4px 10px rgba(122, 142, 150, 0.18), inset -4px -4px 10px rgba(255, 255, 255, 0.8)); }
 .gallery-track-switch button { display: grid; gap: 1px; min-height: 42px; place-content: center; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--muted); cursor: pointer; font: inherit; }
 .gallery-track-switch button span { display: inline-flex; align-items: center; justify-content: center; gap: 5px; font-size: 13px; font-weight: 850; }
 .gallery-track-switch button small { font-size: 9px; font-weight: 700; }
