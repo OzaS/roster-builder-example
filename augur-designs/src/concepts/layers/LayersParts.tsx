@@ -216,7 +216,7 @@ export function ReviewLines({ platform, lines, onAction }: { platform: LayerPlat
 }
 
 /** "This roster was saved with different data": what changed, what's missing, what happened to selections. */
-export function RosterReview({ platform, variant, onOpen, onKeep, notify }: { platform: LayerPlatform; variant: 'full' | 'missing'; onOpen?: () => void; onKeep?: () => void; notify?: (m: string) => void }) {
+export function RosterReview({ platform, variant, onOpen, onKeep, notify, hideActions = false }: { platform: LayerPlatform; variant: 'full' | 'missing'; onOpen?: () => void; onKeep?: () => void; notify?: (m: string) => void; /** The host puts the two actions in its dialog footer (desktop). */ hideActions?: boolean }) {
   const act = (l: ReviewLine) => notify?.(l.action === 'Show in roster' ? `Opens the roster at ${l.title.split(':')[0]}` : `${l.action} (prototype)`);
   return <div className={`lyr lyr-${platform} lyr-review`}>
     <p className="lyr-review-lede">{variant === 'full' ? <>Saved {REVIEW_ROSTER.saved} with other versions of its data. Nothing is lost: selections that no longer fit are kept and marked.</> : <>Saved with a variant that isn’t installed. Its selections are kept unresolved until you install it.</>}</p>
@@ -227,15 +227,16 @@ export function RosterReview({ platform, variant, onOpen, onKeep, notify }: { pl
       <section className="lyr-review-group" aria-label="Add-ons"><h3>Add-ons · no review needed</h3><ReviewLines platform={platform} lines={[REVIEW_ADDONS]} /></section>
     </> : <section className="lyr-review-group" aria-label="Missing"><h3>Missing</h3><ReviewLines platform={platform} lines={MISSING_ONLY} onAction={act} /><p className="lyr-hint">The roster names the variant but never carries its files. Ask whoever shared the roster for the file, or install it from where you got it.</p></section>}
     <p className="lyr-hint"><b>{REVIEW_ACTIONS.open}:</b> {variant === 'full' ? REVIEW_ACTIONS.openNote : 'Its 5 selections stay unresolved, cost 0, until the variant is back.'} <b>{REVIEW_ACTIONS.keep}:</b> {REVIEW_ACTIONS.keepNote}</p>
-    <div className="lyr-review-actions">
+    {hideActions ? null : <div className="lyr-review-actions">
       <button type="button" className={btnClass(platform)} onClick={onKeep}>{REVIEW_ACTIONS.keep}</button>
       <button type="button" className={btnClass(platform, 'primary')} onClick={onOpen}>{REVIEW_ACTIONS.open}</button>
-    </div>
+    </div>}
   </div>;
 }
 
 /** Title line of the review, for the platform's sheet or dialog header. */
 export const REVIEW_TITLE = 'This roster was saved with different data';
+export { REVIEW_ACTIONS };
 
 // ------------------------------------------------------------- base update (4) and roster info (5)
 
