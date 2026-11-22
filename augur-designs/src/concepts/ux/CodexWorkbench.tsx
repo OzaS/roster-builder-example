@@ -9,6 +9,7 @@ import { mockCatalogues, mockDetachments, mockSystemUnits } from "../../data/moc
 import { referenceById, resolveRosterReference } from "../../data/mockRosterReferences";
 import type { RosterReferenceDefinition, RosterUnit } from "../../types";
 import type { ConceptProps } from "../shared";
+import { PhoneLayersScreen } from "../layers/PhoneLayers";
 import { SMART_TOOLS_RETIRED, smartToolsOn } from "../shared";
 import { AddGameDataScreen, AdvancedInstallSetting, AutoUpdateChecksSetting, ReopenRosterSetting, FocusCatalogueSearchSetting, SeparateAllSetting, AdvancedSettingsRows, CollectionScreen, InstallJobScreen, KeepVersionsSetting, MigrationReportScreen, NotificationsSetting, ReadOnlyRosterScreen, RememberSectionsSetting, SearchGitHubScreen, SourceDetailScreen, SourcesManageScreen, SourcesNavRow, UpdateAvatarButton, WifiOnlySetting } from "./SourceJobs";
 import { MobileUnitOptions } from "./MobileUnitOptions";
@@ -178,7 +179,10 @@ export function CodexWorkbench(props: ConceptProps) {
   let body: ReactNode;
   let modifier = "";
 
-  if (screen === "unit-options-mobile") {
+  if (ws.startsWith("layers-")) {
+    // A3 (Next track, Proposal): add-ons and variants on Sources, the requirement check and the roster open review.
+    body = <PhoneLayersScreen key={ws} props={props} />;
+  } else if (screen === "unit-options-mobile") {
     // R2-02: the ⋯ menu at the header's end (Rename unit, Duplicate, Remove), open on the names-unit-menu screen.
     const unitMenu = <PhoneUnitMenu key={ws} name={unitShownName} initialOpen={ws === "names-unit-menu"} onRename={() => setNameSheet("unit")} onDuplicate={() => props.onNavigate("overview")} onRemove={() => props.onNavigate("overview")} />;
     body = props.workflowScreen === "unit-options-separate-all" ? <MobileUnitOptions key="sep-all" focusStacks separateAll headerEnd={unitMenu} onBack={() => props.onNavigate("overview")} />

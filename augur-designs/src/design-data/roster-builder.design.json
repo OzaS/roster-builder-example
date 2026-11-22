@@ -364,6 +364,62 @@
         {
           "id": "source-legacy",
           "label": "Archive · Earlier Lookup"
+        },
+        {
+          "id": "layers-sources",
+          "label": "A3 · Sources · layers listed under their base"
+        },
+        {
+          "id": "layers-base",
+          "label": "A3 · Sources · Open Field with its variants and add-ons"
+        },
+        {
+          "id": "layers-problems",
+          "label": "A3 · Sources · Problems in words, each with its fix"
+        },
+        {
+          "id": "layers-order",
+          "label": "A3 · Edit variant order"
+        },
+        {
+          "id": "layers-order-conflict",
+          "label": "A3 · Edit variant order · conflict, Done unavailable"
+        },
+        {
+          "id": "layers-install",
+          "label": "A3 · Add an add-on or variant · a file first, a link second"
+        },
+        {
+          "id": "layers-check-fits",
+          "label": "A3 · Requirement check · fits"
+        },
+        {
+          "id": "layers-check-needs",
+          "label": "A3 · Requirement check · needs a newer base"
+        },
+        {
+          "id": "layers-check-rules",
+          "label": "A3 · Requirement check · refused, an add-on that changes rules"
+        },
+        {
+          "id": "layers-review",
+          "label": "A3 · Roster open · saved with different data"
+        },
+        {
+          "id": "layers-review-missing",
+          "label": "A3 · Roster open · a missing variant"
+        },
+        {
+          "id": "layers-base-update",
+          "label": "A3 · Base update · a layer no longer fits, keys moved"
+        },
+        {
+          "id": "layers-after-update",
+          "label": "A3 · Base updated · turned off and moved, in the list"
+        },
+        {
+          "id": "layers-roster-info",
+          "label": "A3 · Roster info · the recorded layers"
         }
       ],
       "workflows": [
@@ -507,6 +563,26 @@
             "links-nothing-found",
             "links-finding",
             "links-guide"
+          ]
+        },
+        {
+          "id": "layers",
+          "label": "Layers (A3)",
+          "screens": [
+            "layers-sources",
+            "layers-base",
+            "layers-problems",
+            "layers-order",
+            "layers-order-conflict",
+            "layers-install",
+            "layers-check-fits",
+            "layers-check-needs",
+            "layers-check-rules",
+            "layers-review",
+            "layers-review-missing",
+            "layers-base-update",
+            "layers-after-update",
+            "layers-roster-info"
           ]
         },
         {
@@ -1071,6 +1147,58 @@
         {
           "id": "tablet-lookup-legacy",
           "label": "Archive · Earlier Lookup"
+        },
+        {
+          "id": "tablet-layers-base",
+          "label": "Tablet · A3 · Sources · Open Field with its variants and add-ons"
+        },
+        {
+          "id": "tablet-layers-problems",
+          "label": "Tablet · A3 · Sources · Problems in words, each with its fix"
+        },
+        {
+          "id": "tablet-layers-order",
+          "label": "Tablet · A3 · Edit variant order"
+        },
+        {
+          "id": "tablet-layers-order-conflict",
+          "label": "Tablet · A3 · Edit variant order · conflict, Done unavailable"
+        },
+        {
+          "id": "tablet-layers-install",
+          "label": "Tablet · A3 · Add an add-on or variant · a file first, a link second"
+        },
+        {
+          "id": "tablet-layers-check-fits",
+          "label": "Tablet · A3 · Requirement check · fits"
+        },
+        {
+          "id": "tablet-layers-check-needs",
+          "label": "Tablet · A3 · Requirement check · needs a newer base"
+        },
+        {
+          "id": "tablet-layers-check-rules",
+          "label": "Tablet · A3 · Requirement check · refused, an add-on that changes rules"
+        },
+        {
+          "id": "tablet-layers-review",
+          "label": "Tablet · A3 · Roster open · saved with different data"
+        },
+        {
+          "id": "tablet-layers-review-missing",
+          "label": "Tablet · A3 · Roster open · a missing variant"
+        },
+        {
+          "id": "tablet-layers-base-update",
+          "label": "Tablet · A3 · Base update · a layer no longer fits, keys moved"
+        },
+        {
+          "id": "tablet-layers-after-update",
+          "label": "Tablet · A3 · Base updated · turned off and moved, in the list"
+        },
+        {
+          "id": "tablet-layers-roster-info",
+          "label": "Tablet · A3 · Roster info · the recorded layers"
         }
       ],
       "workflows": [
@@ -1201,6 +1329,25 @@
             "tablet-links-data-repo",
             "tablet-links-nothing-found",
             "tablet-links-guide"
+          ]
+        },
+        {
+          "id": "layers",
+          "label": "Layers (A3)",
+          "screens": [
+            "tablet-layers-base",
+            "tablet-layers-problems",
+            "tablet-layers-order",
+            "tablet-layers-order-conflict",
+            "tablet-layers-install",
+            "tablet-layers-check-fits",
+            "tablet-layers-check-needs",
+            "tablet-layers-check-rules",
+            "tablet-layers-review",
+            "tablet-layers-review-missing",
+            "tablet-layers-base-update",
+            "tablet-layers-after-update",
+            "tablet-layers-roster-info"
           ]
         },
         {
@@ -1739,6 +1886,58 @@
         {
           "id": "desktop-lookup-legacy",
           "label": "Archive · Earlier Lookup"
+        },
+        {
+          "id": "desktop-layers-base",
+          "label": "Desktop · A3 · Sources · Open Field with its variants and add-ons"
+        },
+        {
+          "id": "desktop-layers-problems",
+          "label": "Desktop · A3 · Sources · Problems in words, each with its fix"
+        },
+        {
+          "id": "desktop-layers-order",
+          "label": "Desktop · A3 · Edit variant order"
+        },
+        {
+          "id": "desktop-layers-order-conflict",
+          "label": "Desktop · A3 · Edit variant order · conflict, Done unavailable"
+        },
+        {
+          "id": "desktop-layers-install",
+          "label": "Desktop · A3 · Add an add-on or variant · a file first, a link second"
+        },
+        {
+          "id": "desktop-layers-check-fits",
+          "label": "Desktop · A3 · Requirement check · fits"
+        },
+        {
+          "id": "desktop-layers-check-needs",
+          "label": "Desktop · A3 · Requirement check · needs a newer base"
+        },
+        {
+          "id": "desktop-layers-check-rules",
+          "label": "Desktop · A3 · Requirement check · refused, an add-on that changes rules"
+        },
+        {
+          "id": "desktop-layers-review",
+          "label": "Desktop · A3 · Roster open · saved with different data"
+        },
+        {
+          "id": "desktop-layers-review-missing",
+          "label": "Desktop · A3 · Roster open · a missing variant"
+        },
+        {
+          "id": "desktop-layers-base-update",
+          "label": "Desktop · A3 · Base update · a layer no longer fits, keys moved"
+        },
+        {
+          "id": "desktop-layers-after-update",
+          "label": "Desktop · A3 · Base updated · turned off and moved, in the list"
+        },
+        {
+          "id": "desktop-layers-roster-info",
+          "label": "Desktop · A3 · Roster info · the recorded layers"
         }
       ],
       "workflows": [
@@ -1824,6 +2023,25 @@
             "desktop-links-data-repo",
             "desktop-links-nothing-found",
             "desktop-links-guide"
+          ]
+        },
+        {
+          "id": "layers",
+          "label": "Layers (A3)",
+          "screens": [
+            "desktop-layers-base",
+            "desktop-layers-problems",
+            "desktop-layers-order",
+            "desktop-layers-order-conflict",
+            "desktop-layers-install",
+            "desktop-layers-check-fits",
+            "desktop-layers-check-needs",
+            "desktop-layers-check-rules",
+            "desktop-layers-review",
+            "desktop-layers-review-missing",
+            "desktop-layers-base-update",
+            "desktop-layers-after-update",
+            "desktop-layers-roster-info"
           ]
         },
         {
