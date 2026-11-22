@@ -1,3 +1,6 @@
+import { LayerCheckElement, LayerControls, LayerGroupsElement, LayerOrderElement, LayerRowStates, ReviewLinesElement } from "../concepts/layers/LayersElements";
+import { useNextLook, useTrack } from "../look";
+import { screenOnTrack } from "../nextTrack";
 import { PhoneSearchHeader } from "../concepts/ux/PhoneSearchHeader";
 import { PhoneListsFilters } from "../concepts/ux/PhoneListsFilters";
 import { CategorySymbolTable, ForceLayoutSamples } from "../concepts/ux/ForceLayoutElements";
@@ -160,6 +163,7 @@ function WorkbenchElements({
   onSelectUnit: (id: string) => void;
   onToggleOption: (id: string) => void;
 }) {
+  const nextLook = useNextLook(); // A3 (Next): the add-on and variant pieces show only on Next
   const checks = rosterChecks(roster);
   const profileUnit = flattenUnits(roster).find((unit) => unit.detail) ?? selectedUnit;
 
@@ -573,6 +577,31 @@ function WorkbenchElements({
       <ElementSection title="Favorite Creation Sections">
         <section className="ux-favorite-creation"><div className="ux-result-label"><Heart size={13} />Favorite units</div><div><button type="button"><Heart size={14} /><span><strong>Veteran Spearhead</strong><small>{selectedUnit.points} pts · configured</small></span><Plus size={14} /></button></div></section>
       </ElementSection>
+
+      {/* A3 (Next track, Proposal): add-ons and variants. Shown only on Next, so the Current Elements view stays as it was. */}
+      {nextLook ? <>
+        <ElementSection title="Layer Row">
+          <small className="ux-elements-note">A3 (Next · Proposal): one add-on or variant under its base. Kind glyph, title (Test mark), purpose · version · from a file or a link, the patch report, the enabled switch; a status edge (green on, grey off, amber needs something, red not usable, accent moved). A problem is written on the row with its fix as a button; a switch that can't be turned on says why.</small>
+          <LayerRowStates platform="phone" />
+          <LayerControls platform="phone" />
+        </ElementSection>
+        <ElementSection title="Add-ons and Variants Groups">
+          <small className="ux-elements-note">A3 (Next · Proposal): Variants then Add-ons as two open groups under the base, each with what turning one off means, its count and Edit order; Add an add-on or variant at the end.</small>
+          <LayerGroupsElement platform="phone" />
+        </ElementSection>
+        <ElementSection title="Layer Order Editor">
+          <small className="ux-elements-note">A3 (Next · Proposal): Edit order on touch: a drag handle and Move up / Move down per row, Automatic order, each move announced. An order that breaks a rule shows on the row and Done says why it is unavailable.</small>
+          <LayerOrderElement platform="phone" />
+        </ElementSection>
+        <ElementSection title="Layer Requirement Check">
+          <small className="ux-elements-note">A3 (Next · Proposal): before anything is added: fits, needs a newer base (update it, then add), or refused (an add-on that changes rules).</small>
+          <LayerCheckElement platform="phone" />
+        </ElementSection>
+        <ElementSection title="Roster Open Review">
+          <small className="ux-elements-note">A3 (Next · Proposal): the lines of “This roster was saved with different data”: a missing variant by title and source with how to get it, changed data, selections that followed, were kept for review or are no longer in the data. Open with current data or Keep for review.</small>
+          <ReviewLinesElement platform="phone" />
+        </ElementSection>
+      </> : null}
 
       <ElementSection title="Smart Search (Settings)">
         <div className="ux-wb-search smart">
@@ -1570,7 +1599,9 @@ const ElementCatalogContext = createContext<DesignElements | null>(null);
 function CatalogSummary({ groups }: { groups: DesignElementGroup[] }) {
   const product = groups.find((group) => group.id === "product-ui");
   // Retired sections (DEC-069 / DEC-070) are not drawn and not counted.
-  const sections = product?.sections.filter((section) => section.status !== "retired") ?? [];
+  // Sections that only Next screens use (DEC-074 Proposals) are counted on Next only, so the Current view stays as it was.
+  const track = useTrack();
+  const sections = product?.sections.filter((section) => section.status !== "retired" && !(section.screens.length > 0 && section.screens.every((screen) => !screenOnTrack(screen, track)))) ?? [];
   const ready = sections.filter((section) => section.status === "ready-for-rn").length;
   const coveredScreens = new Set(sections.flatMap((section) => section.screens));
   return (

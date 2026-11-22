@@ -278,3 +278,11 @@
 .lyr-switch:not(.on) { box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--ux-muted) 55%, transparent); }
 .lyr-switch:disabled { opacity: .55; }
 .tbs-body .lyr-review-actions { position: sticky; bottom: -24px; z-index: 2; margin: 0 -20px -24px; padding: 14px 20px 20px; background: linear-gradient(to bottom, transparent, var(--ux-bg) 14px); }
+
+/* Elements view */
+.lyr-el-demo { display: flex; flex-direction: column; gap: 10px; padding: 16px; }
+.lyr-el-demo > h3 { margin: 12px 0 0; color: var(--ux-muted); font-size: 13px; font-weight: 600; }
+.lyr-el-stack { max-width: 720px; }
+.lyr-el-inline { flex-direction: row; align-items: center; gap: 16px; padding: 4px 12px; }
+.lyr-el-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; align-items: start; }
+.lyr-el-grid.three { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
