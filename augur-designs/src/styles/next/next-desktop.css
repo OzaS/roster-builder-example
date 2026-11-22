@@ -190,7 +190,8 @@
   .dtu-readonly { border-radius: var(--nxd-r-row) }
 
   /* ---- Hub pages: the page is the pane beside the rail, behind hairlines; no cards inside it. ---- */
-  &.dt-hub .dt-body > main { margin-top: 0; border: 0; border-top: 1px solid var(--dt-border); border-left: 1px solid var(--dt-border); border-radius: 0 }
+  /* The page panel keeps a rounded top-left corner beside the rail (user, 2026-11-22), smaller than Current's 14 px: the overlay radius (10 px, 8 px on Windows). */
+  &.dt-hub .dt-body > main { margin-top: 0; border: 0; border-top: 1px solid var(--dt-border); border-left: 1px solid var(--dt-border); border-radius: var(--nxd-r-overlay) 0 0 0 }
   &.dt-hub .dt-activity { padding-top: 12px }
   .dt-activity > .dt-icon { border-radius: var(--nxd-r-row) }
   .dtp-card, &.dt-hub .dtp-card, &.light.dt-hub .dtp-card { background: none; border: 0; border-radius: 0 }
