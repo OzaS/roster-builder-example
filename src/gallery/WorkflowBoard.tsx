@@ -2,16 +2,18 @@ import { PreviewFrame } from "../components/PreviewFrame";
 import type { MouseEvent as ReactMouseEvent } from "react";
 import { resolveWorkflow, workflowToPrototypeScreen } from "./workflow";
 import type { GalleryConcept, WorkflowFlow } from "./galleryTypes";
-import type { ColorScheme, DetachmentFavorite, ForceCreationMode, GalleryRelease, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, UnitDetailView, UnitFavorite, WorkflowScreen } from "../types";
+import type { ColorScheme, DetachmentFavorite, ForceCreationMode, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, UnitDetailView, UnitFavorite, WorkflowScreen } from "../types";
 import type { WorkflowPickerSelection } from "../components/v2/WorkflowScreenPicker";
 import type { GlancePlacement } from "./ScreenGlance";
 import { screenLabel, type EditableDesign } from "../design-data/designData";
+import { useTrack, type DesignTrack } from "../look";
+import { nextItemForScreen, screenOnTrack, type NextItem } from "../nextTrack";
+import { TrackChip } from "./TrackSwitch";
 
 type Props = {
   concept: GalleryConcept;
   design?: EditableDesign;
   activeWorkflow: WorkflowPickerSelection;
-  galleryRelease: GalleryRelease;
   platform: PlatformPreview;
   themeMode: ThemeMode;
   colorScheme: ColorScheme;
@@ -62,7 +64,6 @@ export function WorkflowBoard({
   concept,
   design,
   activeWorkflow,
-  galleryRelease,
   platform,
   themeMode,
   colorScheme,
@@ -109,7 +110,8 @@ export function WorkflowBoard({
   onOpenGlance,
 }: Props) {
   const Concept = concept.component;
-  const groups = workflowGroups(concept, design, activeWorkflow, galleryRelease);
+  const track = useTrack();
+  const groups = workflowGroups(concept, design, activeWorkflow, track);
 
   return (
     <section className={`workflow-board ${platform}`}>
@@ -123,6 +125,7 @@ export function WorkflowBoard({
                 <article className="workflow-board-item" key={item.id}>
                   <button type="button" className="workflow-board-label" onClick={() => onOpenGlance(item.screen)}>
                     {item.label}
+                    {item.next ? <TrackChip status={item.next.status} /> : null}
                   </button>
                   <div className="workflow-screen-hitarea" onClick={(event) => handleScreenClick(event, item.screen, onOpenGlance)}>
                     <PreviewFrame concept={concept} screen={item.screen} platform={platform} themeMode={themeMode} colorScheme={colorScheme} statusBarUsesDesignBackground={statusBarUsesDesignBackground} fit="width">
@@ -201,13 +204,13 @@ function handleScreenClick(
   });
 }
 
-type WorkflowBoardItem = { id: string; label: string; screen: WorkflowScreen };
+type WorkflowBoardItem = { id: string; label: string; screen: WorkflowScreen; next?: NextItem };
 
 function workflowGroups(
   concept: GalleryConcept,
   design: EditableDesign | undefined,
   activeWorkflow: WorkflowPickerSelection,
-  galleryRelease: GalleryRelease,
+  track: DesignTrack,
 ): Array<{ id: string; label: string; items: WorkflowBoardItem[] }> {
   const flows: WorkflowFlow[] =
     concept.flows && concept.flows.length > 0
@@ -219,8 +222,11 @@ function workflowGroups(
     id: flow.id,
     label: flow.label,
     items: flow.screens
-      .filter((screen) => galleryRelease === "V2" ? screen !== "library" : screen !== "library-v2")
-      .map((screen) => ({ id: `${flow.id}-${screen}`, label: screen === "library-v2" ? "Lists" : screenLabel(design, screen), screen })),
+      .filter((screen) => screenOnTrack(screen, track))
+      .map((screen) => {
+        const next = nextItemForScreen(screen);
+        return { id: `${flow.id}-${screen}`, label: next?.replaces ? screenLabel(design, next.replaces as WorkflowScreen) : screenLabel(design, screen), screen, next };
+      }),
   }));
 }
 

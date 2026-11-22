@@ -1,0 +1,31 @@
+{
+  "about": "The Next track (DEC-074): everything designed but not yet in the app. Current is what the app ships. Each item is a Proposal until the user approves it; implementation takes only Approved items. The app PR that builds an item promotes it: its styles move into the base, a replaced screen (or the screen a variant was an alternative to, if the variant wins) goes to the archive (never deleted), and the item is removed from this list.",
+  "items": [
+    {
+      "id": "open-lists-look",
+      "title": "Open lists look",
+      "kind": "look",
+      "status": "proposal",
+      "platforms": [
+        "phone",
+        "tablet",
+        "desktop"
+      ],
+      "summary": "No boxes around content: groups separated by space and a heading, rows without dividers, selection as a tinted shape, no row menus. Phone Lists rows carry the editor's status edge (D1b). Styles in src/styles/next/; markup reads useNextLook(). Foldable not covered (stays Current).",
+      "source": "Design reviews 2026-11-11 and 2026-11-12; user feedback 2026-11-12 and 2026-11-22"
+    },
+    {
+      "id": "roster-organizer",
+      "title": "Roster Organizer",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "phone"
+      ],
+      "screen": "library-v2",
+      "summary": "An alternative Lists screen with an Organize panel: search, folders, game systems and tags over all saved rosters. Shown beside Lists on Next. Kept to refine (user 2026-11-22); dropped if refinement doesn't work. Still drawn in the Current look.",
+      "source": "Former V2 release track",
+      "variantOf": "library"
+    }
+  ]
+}

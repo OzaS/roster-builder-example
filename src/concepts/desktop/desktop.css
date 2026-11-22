@@ -27,7 +27,7 @@
 .design-library-switch{display:flex;gap:4px;border:1px solid var(--line);border-radius:10px;padding:4px}
 .design-library-switch a{flex:1;text-align:center;text-decoration:none;color:inherit;font-size:12px;border-radius:7px;padding:7px}
 .design-library-switch a[aria-current=page]{background:#7c8cff20;color:#6d76ca}
-.desktop-design-library .gallery-release-switch,.desktop-design-library .platform-toggle{display:none}
+.desktop-design-library .platform-toggle{display:none}
 
 /* Desktop 03 — shared themes (--ux-* tokens, colour schemes) and the softer card structure of the mobile design. */
 .dt-app.ux-screen{font:14px/1.5 var(--font)}
@@ -102,7 +102,6 @@
 .dt-dot.idle{background:var(--dt-faint)}
 .dt-app .dt-validation.paused{color:var(--dt-muted)!important;border-color:var(--dt-border)!important;background:var(--dt-hover)!important}
 /* Tablet library (gallery): like the desktop library it has no V1/V2 switch. */
-.tablet-design-library .gallery-release-switch{display:none}
 
 /* DX-02 approved; phone and tablet take the same values since TB-11 (styles/ux.css, end). */
 .dt-app.ux-screen.dark{--dt-muted:#a3abbc;--dt-faint:#969fae;--ux-muted:var(--dt-muted);--ux-ink-tertiary:var(--dt-faint)}

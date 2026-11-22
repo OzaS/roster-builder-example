@@ -3,7 +3,7 @@ import { Archive, Component, Moon, Navigation, Palette, PanelBottom, Pencil, Plu
 import { PreviewFrame } from "../components/PreviewFrame";
 import { ScreenshotButton } from "../components/v2/ScreenshotButton";
 import { WorkflowScreenPicker, type WorkflowPickerSelection } from "../components/v2/WorkflowScreenPicker";
-import type { ColorScheme, ConceptId, DetachmentFavorite, ForceCreationMode, GalleryRelease, NavigatorView, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, UnitDetailView, UnitFavorite, WorkflowScreen } from "../types";
+import type { ColorScheme, ConceptId, DetachmentFavorite, ForceCreationMode, NavigatorView, NavStyle, PlatformPreview, Roster, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, UnitDetailView, UnitFavorite, WorkflowScreen } from "../types";
 import { colorSchemes } from "../types";
 import { DesktopAmbientSwitch } from "../concepts/desktop/desktopAmbient";
 import { TabletControls } from "../concepts/tablet/TabletControls";
@@ -15,7 +15,7 @@ import { DesignElementsPanel } from "./DesignElementsPanel";
 import type { DesignData, DesignWorkflow, EditableDesign } from "../design-data/designData";
 import { retiredScreens, screenLabel, screenRetirement, visibleWorkflows } from "../design-data/designData";
 import { ScreenGlance, type GlancePlacement } from "./ScreenGlance";
-import { setLook, useLook } from "../look";
+import { TrackSwitch } from "./TrackSwitch";
 
 type Props = {
   selectedConcept: ConceptId;
@@ -23,7 +23,6 @@ type Props = {
   themeMode: ThemeMode;
   colorScheme: ColorScheme;
   navigatorView: NavigatorView;
-  galleryRelease: GalleryRelease;
   workflowScreen: WorkflowScreen;
   navStyle: NavStyle;
   forceCreationMode: ForceCreationMode;
@@ -80,7 +79,6 @@ type Props = {
   onThemeModeChange: (mode: ThemeMode) => void;
   onColorSchemeChange: (scheme: ColorScheme) => void;
   onNavigatorViewChange: (view: NavigatorView) => void;
-  onGalleryReleaseChange: (release: GalleryRelease) => void;
   onWorkflowScreenChange: (screen: WorkflowScreen) => void;
   onNavStyleChange: (style: NavStyle) => void;
   onForceCreationModeChange: (mode: ForceCreationMode) => void;
@@ -102,7 +100,6 @@ export function GalleryShell({
   themeMode,
   colorScheme,
   navigatorView,
-  galleryRelease,
   workflowScreen,
   navStyle,
   forceCreationMode,
@@ -119,7 +116,6 @@ export function GalleryShell({
   onThemeModeChange,
   onColorSchemeChange,
   onNavigatorViewChange,
-  onGalleryReleaseChange,
   onWorkflowScreenChange,
   onNavStyleChange,
   onForceCreationModeChange,
@@ -127,7 +123,6 @@ export function GalleryShell({
   onCapture,
   onDesignDataChange,
 }: Props) {
-  const look = useLook();
   const library: LibraryId = concept.id === "desktop-workbench" ? "desktop" : concept.id === "tablet-workbench" ? "tablet" : concept.id === "duo-workbench" ? "foldable" : "phone";
   const [railWidth, setRailWidth] = useState(280);
   const [workflowSelection, setWorkflowSelection] = useState<WorkflowPickerSelection>("all");
@@ -289,15 +284,8 @@ export function GalleryShell({
           </div>
         </div>
         <LibrarySwitch current={library} />
-        <div className="gallery-look-switch" role="group" aria-label="Design look">
-          <button className={look === "current" ? "active" : ""} type="button" aria-pressed={look === "current"} onClick={() => setLook("current")}><span>Current</span><small>Approved design</small></button>
-          <button className={look === "next" ? "active" : ""} type="button" aria-pressed={look === "next"} onClick={() => setLook("next")}><span>New</span><small>Proposal, not approved</small></button>
-        </div>
+        <TrackSwitch />
         <ConceptGroup title="Designs" concepts={activeConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
-        <div className="gallery-release-switch" role="group" aria-label="Design version">
-          <button className={galleryRelease === "V1" ? "active" : ""} type="button" onClick={() => onGalleryReleaseChange("V1")}><span>V1</span><small>Current</small></button>
-          <button className={galleryRelease === "V2" ? "active" : ""} type="button" onClick={() => onGalleryReleaseChange("V2")}><span>V2</span><small>Future</small></button>
-        </div>
         <div className="view-icon-switch" role="group" aria-label="View">
           <button className={navigatorView === "single" ? "active" : ""} type="button" onClick={() => selectNavigatorView("single")} aria-label="Single" title="Single">
             <Smartphone size={18} />
@@ -382,7 +370,6 @@ export function GalleryShell({
               concept={concept}
               design={selectedDesign}
               activeWorkflow={workflowSelection}
-              galleryRelease={galleryRelease}
               platform={platform}
               themeMode={themeMode}
               colorScheme={colorScheme}
