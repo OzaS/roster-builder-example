@@ -1,0 +1,38 @@
+/*
+ * The direction screens: a macOS window at 1440 px, drawn in its own theme (`.light` / `.dark`), independent of the
+ * gallery theme. Each direction sets the tokens below on `.fc-a`, `.fc-b` or `.fc-c`.
+ */
+.fc-window {
+  --w-bg: #f6f7f9; --w-pane: #ffffff; --w-ink: #1b1f25; --w-muted: #59616c; --w-faint: #6b727c; --w-line: #e3e6ea;
+  --w-accent: #3d63dd; --w-accent-text: #3557c7; --w-accent-ink: #ffffff;
+  --w-err: #c4352a; --w-warn: #a36307; --w-cool: #1b7aa0; --w-ok: #1f8a4f;
+  --w-hover: color-mix(in srgb, var(--w-ink) 5%, transparent);
+  --w-press: color-mix(in srgb, var(--w-ink) 10%, transparent);
+  --w-select: color-mix(in srgb, var(--w-accent) 14%, transparent);
+  --w-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  position: relative; display: flex; flex-direction: column; width: 1440px; overflow: hidden;
+  border: 1px solid var(--w-line); border-radius: 12px; background: var(--w-bg); color: var(--w-ink);
+  font: 13px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; text-align: left;
+  box-shadow: 0 24px 60px rgb(15 20 30 / .18), 0 0 0 .5px rgb(0 0 0 / .12);
+  -webkit-font-smoothing: antialiased; color-scheme: light;
+}
+.fc-window.dark {
+  --w-err: #ff7b6b; --w-warn: #f0b44a; --w-cool: #5cc6ec; --w-ok: #57d98a;
+  box-shadow: 0 24px 60px rgb(0 0 0 / .5), 0 0 0 .5px rgb(255 255 255 / .1); color-scheme: dark;
+}
+.fc-window * { box-sizing: border-box; }
+.fc-window h1, .fc-window h2, .fc-window h3, .fc-window p, .fc-window ul, .fc-window ol { margin: 0; padding: 0; }
+.fc-window ul, .fc-window ol { list-style: none; }
+.fc-window button { display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; color: inherit; font: inherit; cursor: default; padding: 0; }
+.fc-window svg { flex-shrink: 0; }
+.fc-window kbd { padding: 0 4px; border: 1px solid var(--w-line); border-radius: 4px; color: var(--w-muted); font: 11.5px/1.55 -apple-system, BlinkMacSystemFont, sans-serif; white-space: nowrap; }
+.fc-window .mono { font-family: var(--w-mono); font-size: 12px; }
+.fc-window .muted { color: var(--w-muted); }
+.fc-window .num { font-variant-numeric: tabular-nums; text-align: right; }
+.fc-window .fc-diag-icon.error { color: var(--w-err) !important; }
+.fc-window .fc-diag-icon.preservation { color: var(--w-warn) !important; }
+.fc-window .fc-diag-icon.suggestion { color: var(--w-cool) !important; }
+.fc-traffic { display: inline-flex; gap: 8px; }
+.fc-traffic i { width: 12px; height: 12px; border-radius: 50%; background: #fe5f57; box-shadow: inset 0 0 0 .5px rgb(0 0 0 / .15); }
+.fc-traffic i:nth-child(2) { background: #febc2e; }
+.fc-traffic i:nth-child(3) { background: #28c840; }
