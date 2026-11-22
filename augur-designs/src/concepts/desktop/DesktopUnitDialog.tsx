@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
-import { BookOpen, Check, ChevronLeft, ChevronRight, Copy, Lock, Megaphone, Minus, Pencil, Plus, Scissors, Trash2, UserRound, Users, X } from 'lucide-react';
+import { BookOpen, Check, ChevronLeft, ChevronRight, Copy, Lock, Megaphone, Minus, Pencil, Plus, Scissors, Trash2, UserRound, Users, X, PanelRightClose } from 'lucide-react';
 import { HistoryButtons, unitCost, unitName, type EditorUnit, type ModelGroup } from './DesktopEditorFlows';
 import './desktop-unit-dialog.css';
 
@@ -24,13 +24,15 @@ export const hasLeader = (u: EditorUnit) => u.models > 1 && u.role !== 'Command'
  * returns to the pencil; the line under it reads "{entry name} · Enter saves, Esc cancels". An empty name clears the custom name.
  * A renamed unit shows its own name, with the entry name first on the line under it. Edit › Rename unit… (F2) starts the same.
  */
-export function UnitDialog({ unit, forceName, source = 'Open Field · Catalogue v1.4', path, tab, readOnlyReason, separateAll, undo, onPath, onTab, onClose, onUpdate, onDuplicate, onRemove, onSeparate, onRename, initialRename }: {
+export function UnitDialog({ unit, forceName, source = 'Open Field · Catalogue v1.4', path, tab, readOnlyReason, separateAll, undo, onPath, onTab, onClose, onUpdate, onDuplicate, onRemove, onSeparate, onRename, initialRename, docked = false }: {
   unit: EditorUnit; forceName: string; source?: string; path: UnitDialogLevel[]; tab: string; readOnlyReason?: string; separateAll: boolean;
   undo: { undoLabel?: string; redoLabel?: string; undoKey?: string; redoKey?: string; onUndo: () => void; onRedo: () => void };
   onPath: (path: UnitDialogLevel[]) => void; onTab: (tab: string) => void; onClose: () => void; onUpdate: (change: Partial<EditorUnit>) => void;
   onDuplicate: () => void; onRemove: () => void; onSeparate: (group: number, all: boolean) => void;
   /** R2-02: rename the unit ('' clears its custom name). `initialRename` opens the inline field with that draft (gallery screen). */
   onRename?: (name: string) => void; initialRename?: string;
+  /** Next look: the same editor docked as the editor's right panel (user's choice, 2026-11-22): no scrim, not modal, no focus trap; Close hides the panel. */
+  docked?: boolean;
 }) {
   const ref = useRef<HTMLElement>(null);
   const shown = unitName(unit);
@@ -42,8 +44,10 @@ export function UnitDialog({ unit, forceName, source = 'Open Field · Catalogue 
   const level = path[path.length - 1];
   const titleId = `dtu-title-${unit.id}`;
   // Focus: Close on opening, Back after pushing a level, the row that opened a level after going back.
+  const shownOnce = useRef(false);
   useEffect(() => {
     const box = ref.current; if (!box) return;
+    if (docked && !shownOnce.current) { shownOnce.current = true; return; }
     const back = opener.current ? box.querySelector<HTMLElement>(`[data-drill="${opener.current}"]`) : null;
     (back ?? box.querySelector<HTMLElement>(level ? '.dtu-back' : renaming ? '.dtu-rename-field' : '.dtu-close'))?.focus({ preventScroll: true });
     opener.current = null;
@@ -51,8 +55,8 @@ export function UnitDialog({ unit, forceName, source = 'Open Field · Catalogue 
   const push = (next: UnitDialogLevel) => onPath([...path, next]);
   const pop = () => { opener.current = level ?? null; onPath(path.slice(0, -1)); };
   const onKeyDown = (e: ReactKeyboardEvent) => {
-    if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); if (level) pop(); else onClose(); return; }
-    if (e.key !== 'Tab') return;
+    if (e.key === 'Escape') { if (docked && !level) return; e.preventDefault(); e.stopPropagation(); if (level) pop(); else onClose(); return; }
+    if (e.key !== 'Tab' || docked) return;
     const nodes = Array.from(ref.current?.querySelectorAll<HTMLElement>('button, input, select, textarea, [tabindex]:not([tabindex="-1"])') ?? []).filter(el => !el.matches(':disabled') && el.offsetParent !== null);
     const first = nodes[0]; const last = nodes[nodes.length - 1];
     if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
@@ -70,8 +74,7 @@ export function UnitDialog({ unit, forceName, source = 'Open Field · Catalogue 
   const crumbs: Array<{ label: string; to: UnitDialogLevel[] }> = [{ label: shown, to: [] }, ...path.map((p, i) => ({ label: levelTitle[p], to: path.slice(0, i + 1) }))];
   const eyebrow = level === 'leader' ? <>Member <span> / </span> 1 model</> : level === 'signal' ? <>Upgrade <span> / </span> Squad leader</> : <>{unit.role} <span> / </span> {unit.models} {unit.models === 1 ? 'model' : 'models'}</>;
   const points = level === 'leader' ? (unit.signalKit ? '+5' : 'Included') : level === 'signal' ? '+5' : String(unitCost(unit));
-  return <div className="dtu-scrim" onPointerDown={e => { if (e.target === e.currentTarget) onClose(); }}>
-    <section ref={ref} className="dt-inspector dtu-dialog" role="dialog" aria-modal="true" aria-labelledby={titleId} aria-describedby={ro ? `${titleId}-ro` : undefined} onKeyDown={onKeyDown}>
+  const box = <section ref={ref} className={`dt-inspector dtu-dialog ${docked ? 'dtu-docked' : ''}`} role={docked ? 'complementary' : 'dialog'} aria-modal={docked ? undefined : true} aria-labelledby={titleId} aria-describedby={ro ? `${titleId}-ro` : undefined} onKeyDown={onKeyDown}>
       <header className="dt-inspector-title dtu-head">
         {level && <nav className="dtu-crumbs" aria-label="Where you are in this unit">
           <button type="button" className="dt-icon dtu-back" aria-label={`Back to ${crumbs[crumbs.length - 2].label}`} title="Back (Esc)" onClick={pop}><ChevronLeft size={16} /></button>
@@ -79,7 +82,7 @@ export function UnitDialog({ unit, forceName, source = 'Open Field · Catalogue 
         </nav>}
         <div className="dte-inspector-head">
           <span className="dt-eyebrow">{eyebrow}</span>
-          <span className="dtu-head-tools"><HistoryButtons {...undo} disabledReason={readOnlyReason} /><span className="dtu-rule" aria-hidden="true" /><button type="button" className="dt-icon dtu-close" aria-label={`Close ${shown}`} title="Close (Esc)" onClick={onClose}><X size={16} /></button></span>
+          <span className="dtu-head-tools"><HistoryButtons {...undo} disabledReason={readOnlyReason} /><span className="dtu-rule" aria-hidden="true" /><button type="button" className="dt-icon dtu-close" aria-label={docked ? 'Hide unit panel' : `Close ${shown}`} title={docked ? 'Hide unit panel' : 'Close (Esc)'} onClick={onClose}>{docked ? <PanelRightClose size={16} /> : <X size={16} />}</button></span>
         </div>
         <div className="dte-inspector-name">{!level && renaming
           ? <input className="dte-rename dtu-rename-field" aria-label="Unit name" maxLength={60} value={draft} onFocus={e => { if (initialRename === undefined) e.currentTarget.select(); }} onChange={e => setDraft(e.target.value)} onBlur={() => finishRename(true)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); finishRename(true); } if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); finishRename(false); } }} />
@@ -137,6 +140,7 @@ export function UnitDialog({ unit, forceName, source = 'Open Field · Catalogue 
         </div>
       </div>
       <footer className="dt-inspector-foot dtu-foot"><span className="dtu-saved">{ro ? <><Lock size={12} />Not editable</> : <><Check size={12} />Changes save as you edit</>}</span><span className="dtu-source"><BookOpen size={13} /> {source}</span></footer>
-    </section>
-  </div>;
+    </section>;
+  if (docked) return box;
+  return <div className="dtu-scrim" onPointerDown={e => { if (e.target === e.currentTarget) onClose(); }}>{box}</div>;
 }

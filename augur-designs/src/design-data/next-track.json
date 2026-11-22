@@ -26,6 +26,17 @@
       "summary": "An alternative Lists screen with an Organize panel: search, folders, game systems and tags over all saved rosters. Shown beside Lists on Next. Kept to refine (user 2026-11-22); dropped if refinement doesn't work. Still drawn in the Current look.",
       "source": "Former V2 release track",
       "variantOf": "library"
+    },
+    {
+      "id": "desktop-unit-panel",
+      "title": "Desktop unit panel",
+      "kind": "look",
+      "status": "proposal",
+      "platforms": [
+        "desktop"
+      ],
+      "summary": "The unit editor can be docked as the roster editor's right panel, shown or hidden with the toolbar's panel toggle and resizable like the catalogue (300–560 px, 360 px at first), as the tablet's Unit details pane is. Shown, it follows the selected row; hidden, a unit opens in the dialog (the Current design, DEC-055). Gallery screens that draw the dialog start with the panel hidden.",
+      "source": "User feedback 2026-11-22: horizontal space on desktop is cheap, keep the right panel as a user choice"
     }
   ]
 }
