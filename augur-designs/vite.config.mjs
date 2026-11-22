@@ -1,9 +1,9 @@
 import react from "@vitejs/plugin-react";
 import { readFile, writeFile } from "node:fs/promises";
-import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
 
-const designDataPath = path.resolve(process.cwd(), "src/design-data/roster-builder.design.json");
+const designDataPath = fileURLToPath(new URL("./src/design-data/roster-builder.design.json", import.meta.url));
 
 function designDataMiddleware() {
   return {

@@ -1,18 +1,25 @@
-# Roster builder design gallery
+# Design galleries
 
-The design reference for the roster builder app: phone, tablet, foldable and desktop libraries, each with workflows, single screens, a Glance view and an Elements view. Sample data is synthetic and game-neutral.
+| Folder | What |
+| --- | --- |
+| `augur-designs/` | **Battle Augur**: the roster builder app; phone, tablet, foldable and desktop libraries, each with workflows, single screens, a Glance view and an Elements view |
+| `cogitator-designs/` | **Field Cogitator**: the data editor for datasets (desktop) |
+| `design-kit/` | Shared gallery code (`@designs/kit`) |
+| `docs/` | Shared design rules: principles, done checklist, agent workflow, review rubric |
+
+Sample data is synthetic and neutral.
 
 ## How to view
 
-- **Hosted:** https://ozas.github.io/roster-builder-example/ (built from `main` on every push).
-- **Locally:** `npm install`, then `npm run dev` and open the address it prints.
+- **Hosted:** https://ozas.github.io/roster-builder-example/ lists both galleries: `/augur/` and `/cogitator/` (built from `main` on every push). Older links to the root with a query string open the Battle Augur gallery.
+- **Locally:** `npm install` at the root, then `npm run dev:augur` or `npm run dev:cogitator` and open the address it prints. `npm run build` builds both into `dist/`.
 
-The rail on the left picks the library (Phone, Tablet, Foldable, Desktop) and the **design track**:
+In each gallery the rail picks the **design track** (in Battle Augur also the library: Phone, Tablet, Foldable, Desktop):
 
 - **Current** is what the app ships.
 - **Next** is everything designed but not yet built. On Next the rail lists each item with a **Proposal** or **Approved** chip, and board labels of Next screens carry the same chip.
 
-Links:
+Battle Augur links (after `/augur/`):
 
 | Parameter | Effect |
 | --- | --- |

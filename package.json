@@ -1,20 +1,13 @@
 {
+  "name": "design-examples",
+  "private": true,
+  "description": "Design galleries: Battle Augur (augur-designs) and Field Cogitator (cogitator-designs), on a shared design kit (design-kit) and design docs (docs).",
+  "workspaces": ["design-kit", "augur-designs", "cogitator-designs"],
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
-    "build": "tsc && vite build",
-    "preview": "vite preview --host 0.0.0.0"
-  },
-  "dependencies": {
-    "@vitejs/plugin-react": "^4.3.4",
-    "html-to-image": "^1.11.13",
-    "lucide-react": "^0.468.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "typescript": "^5.7.2",
-    "vite": "^6.0.7"
-  },
-  "devDependencies": {
-    "@types/react": "^19.0.2",
-    "@types/react-dom": "^19.0.2"
+    "dev": "npm run dev -w augur-designs",
+    "dev:augur": "npm run dev -w augur-designs",
+    "dev:cogitator": "npm run dev -w cogitator-designs",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "build": "node scripts/build-pages.mjs"
   }
 }

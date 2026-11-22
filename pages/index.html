@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Design galleries</title>
+  <script>
+    // Links from before the split (2026-11-22) pointed at the root with a query (?gallery=desktop, ?screen=…, ?desktop=…):
+    // they open the Battle Augur gallery with the same query.
+    if (location.search || location.hash) location.replace("augur/" + location.search + location.hash);
+  </script>
+  <style>
+    :root { --bg: #f5f6f8; --ink: #17202a; --muted: #5b6672; --line: #dfe3e8; --accent: #4f5bd5; color-scheme: light dark; }
+    @media (prefers-color-scheme: dark) { :root { --bg: #14161a; --ink: #e8eaee; --muted: #a0a8b3; --line: #2a2f37; --accent: #8f98ff; } }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    main { max-width: 640px; margin: 0 auto; padding: 56px 16px; }
+    h1 { margin: 0 0 6px; font-size: 26px; letter-spacing: -0.01em; }
+    p { margin: 0 0 28px; color: var(--muted); }
+    a.gallery { display: block; padding: 16px 0; border-top: 1px solid var(--line); color: inherit; text-decoration: none; }
+    a.gallery:last-of-type { border-bottom: 1px solid var(--line); }
+    a.gallery strong { display: block; color: var(--accent); font-size: 17px; }
+    a.gallery span { color: var(--muted); }
+    a.gallery:hover strong, a.gallery:focus-visible strong { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Design galleries</h1>
+    <p>Each gallery has a Current / Next switch: Current is what the product ships, Next is designed but not yet built.</p>
+    <a class="gallery" href="augur/"><strong>Battle Augur</strong><span>Roster builder: phone, tablet, foldable and desktop.</span></a>
+    <a class="gallery" href="cogitator/"><strong>Field Cogitator</strong><span>Data editor for datasets: desktop.</span></a>
+  </main>
+</body>
+</html>

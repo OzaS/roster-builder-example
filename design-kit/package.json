@@ -1,0 +1,11 @@
+{
+  "name": "@designs/kit",
+  "private": true,
+  "description": "Shared design-gallery kit: the Current / Next track, the Next item registry and the track switch. Source TypeScript, consumed directly by the galleries' Vite builds.",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "peerDependencies": {
+    "react": "^19.0.0"
+  }
+}
