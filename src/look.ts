@@ -1,54 +1,71 @@
 import { createContext, createElement, useContext, useSyncExternalStore, type ReactNode } from "react";
 
 /**
- * The global design look. "current" is the approved 1.0 design (DEC-051). "next" is a proposal under review:
- * the card-free look from the design review of 2026-11-11. Nothing under "next" is approved until the user says so.
+ * The design track (DEC-074). "current" is what the app ships; "next" is everything designed but not yet built
+ * (src/design-data/next-track.json), each item a Proposal or Approved. Nothing under "next" is built until it is Approved.
  *
- * The look is one attribute on the root element (`<html data-look="next">`), so every library, the standalone
- * tablet and desktop routes, the board and the Elements view follow it. Styles for it live in `src/styles/next/`
- * and are scoped to `:root[data-look="next"]`; markup that differs reads `useLook()`.
- * `?look=next` or `?look=current` in the URL wins for that page load (review links, headless captures).
+ * The track is one attribute on the root element (`<html data-look="next">`; the attribute keeps its old name so the
+ * Next styles in `src/styles/next/`, scoped to `:root[data-look="next"]`, stay as they are), so every library, the
+ * standalone tablet and desktop routes, the board and the Elements view follow it; markup that differs reads `useLook()`.
+ * `?track=next` or `?track=current` in the URL wins for that page load (review links, headless captures); the older
+ * `?look=` is still read. Switching writes `?track=next` into the address, so a copied link opens the same track.
  */
-export type DesignLook = "current" | "next";
+export type DesignTrack = "current" | "next";
+/** @deprecated Older name of {@link DesignTrack}. */
+export type DesignLook = DesignTrack;
 
-const LOOK_KEY = "roster-builder.look.v1";
+const TRACK_KEY = "roster-builder.look.v1";
 const listeners = new Set<() => void>();
 
-function isLook(value: unknown): value is DesignLook {
+function isTrack(value: unknown): value is DesignTrack {
   return value === "current" || value === "next";
 }
 
-function initialLook(): DesignLook {
+function initialTrack(): DesignTrack {
   if (typeof window === "undefined") return "current";
-  const fromUrl = new URLSearchParams(window.location.search).get("look");
-  if (isLook(fromUrl)) return fromUrl;
+  const params = new URLSearchParams(window.location.search);
+  const fromUrl = params.get("track") ?? params.get("look");
+  if (isTrack(fromUrl)) return fromUrl;
   try {
-    const stored = window.localStorage.getItem(LOOK_KEY);
-    if (isLook(stored)) return stored;
+    const stored = window.localStorage.getItem(TRACK_KEY);
+    if (isTrack(stored)) return stored;
   } catch {
-    // Storage can be unavailable; the approved look is the fallback.
+    // Storage can be unavailable; Current is the fallback.
   }
   return "current";
 }
 
-let look: DesignLook = initialLook();
+let track: DesignTrack = initialTrack();
 
 function apply() {
-  if (typeof document !== "undefined") document.documentElement.dataset.look = look;
+  if (typeof document !== "undefined") document.documentElement.dataset.look = track;
 }
 
 apply();
 
-export function getLook(): DesignLook {
-  return look;
+function writeUrl() {
+  try {
+    const url = new URL(window.location.href);
+    url.searchParams.delete("look");
+    if (track === "next") url.searchParams.set("track", "next");
+    else url.searchParams.delete("track");
+    window.history.replaceState(window.history.state, "", url);
+  } catch {
+    // The address stays as it was; the switch still works.
+  }
 }
 
-export function setLook(next: DesignLook) {
-  if (next === look) return;
-  look = next;
+export function getTrack(): DesignTrack {
+  return track;
+}
+
+export function setTrack(next: DesignTrack) {
+  if (next === track) return;
+  track = next;
   apply();
+  writeUrl();
   try {
-    window.localStorage.setItem(LOOK_KEY, next);
+    window.localStorage.setItem(TRACK_KEY, next);
   } catch {
     // The switch still works for this page load.
   }
@@ -60,19 +77,29 @@ function subscribe(listener: () => void) {
   return () => listeners.delete(listener);
 }
 
-/** Pins the look for a subtree: archived frames keep the approved markup whatever the switch says. */
-const PinnedLook = createContext<DesignLook | null>(null);
+/** Pins the track for a subtree: frames the Next styles don't cover keep the Current markup whatever the switch says. */
+const PinnedTrack = createContext<DesignTrack | null>(null);
 
-export function PinLook({ look: pinned, children }: { look: DesignLook; children: ReactNode }) {
-  return createElement(PinnedLook.Provider, { value: pinned }, children);
+export function PinLook({ look: pinned, children }: { look: DesignTrack; children: ReactNode }) {
+  return createElement(PinnedTrack.Provider, { value: pinned }, children);
 }
 
-export function useLook(): DesignLook {
-  const global = useSyncExternalStore(subscribe, getLook, getLook);
-  return useContext(PinnedLook) ?? global;
+/** The global track, ignoring pins (gallery chrome: the switch, the board, screen routing). */
+export function useTrack(): DesignTrack {
+  return useSyncExternalStore(subscribe, getTrack, getTrack);
 }
 
-/** True when the proposed look is on. */
+/** The track for design markup, honouring {@link PinLook}. */
+export function useLook(): DesignTrack {
+  const global = useTrack();
+  return useContext(PinnedTrack) ?? global;
+}
+
+/** True when design markup should draw the Next look. */
 export function useNextLook(): boolean {
   return useLook() === "next";
 }
+
+/** @deprecated Older names. */
+export const getLook = getTrack;
+export const setLook = setTrack;

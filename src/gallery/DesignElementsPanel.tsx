@@ -8,6 +8,7 @@ import { DesktopElements } from "../concepts/desktop/DesktopWorkbench";
 import { TabletElements } from "../concepts/tablet/TabletElements";
 import { DuoElements } from "../concepts/foldable/DuoElements";
 import { LibrarySwitch } from "./LibrarySwitch";
+import { TrackSwitch } from "./TrackSwitch";
 import { AppearancePreferences } from "../concepts/ux/AppearanceSettings";
 import { SoftKeyboard } from "../concepts/ux/SoftKeyboard";
 import { MobileUnitOptions, ModelStackSamples, OptionFoldSamples } from "../concepts/ux/MobileUnitOptions";
@@ -1210,6 +1211,10 @@ function WorkbenchElements({
       <ElementSection title="On-screen Keyboard Illustration">
         <small>Gallery-only drawing (R0 gap frames library-filters-keyboard and add-unit-focus-keyboard): a neutral 290 px keyboard at the bottom of the phone screen. It takes no input and is not an app component; the frames show the app's content shrinking above it with the focused field visible.</small>
         <div className="ux-elements-stack"><div className="ux-screen ux-workbench light" style={{ position: "relative", height: 310, width: 360, overflow: "hidden" }}><SoftKeyboard /></div></div>
+      </ElementSection>
+      <ElementSection title="Design Track Switch">
+        <small>Current is what the app ships; Next is everything designed but not yet built (DEC-074, src/design-data/next-track.json). On Next the rail lists the items with a Proposal or Approved chip, and board labels of Next screens carry the same chip. `?track=next` opens a link on Next.</small>
+        <div style={{ maxWidth: 260 }}><TrackSwitch /></div>
       </ElementSection>
       <ElementSection title="Design Library Navigation"><LibrarySwitch current="phone" label="Design library examples" /></ElementSection>
       <ElementSection title="Designer Rail Controls">

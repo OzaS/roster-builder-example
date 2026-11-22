@@ -156,7 +156,7 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "desktop-lookup-1-0-narrow-entry", label: "Desktop · Lookup 1.0 · Narrow window, entry" },
   { id: "desktop-lookup-1-0-text-150", label: "Desktop · Lookup 1.0 · Text 150%" },
   { id: "library", label: "Lists" },
-  { id: "library-v2", label: "Lists · V2" },
+  { id: "library-v2", label: "Lists · Roster Organizer" },
   { id: "library-filters", label: "Lists · Search, filters and grouping" },
   { id: "library-filters-search", label: "Lists · Search open with a query" },
   { id: "library-filters-no-match", label: "Lists · No match, Clear filters" },

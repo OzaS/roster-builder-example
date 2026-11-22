@@ -5,7 +5,6 @@ export type ThemeMode = "dark" | "light";
 export type ThemePreference = "system" | ThemeMode;
 export type AppLanguage = "en" | "fr";
 export type NavigatorView = "single" | "all-screens" | "elements";
-export type GalleryRelease = "V1" | "V2";
 
 /** In-prototype main navigation style for the merged design. */
 export type NavStyle = "top" | "tabs" | "floating";

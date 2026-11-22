@@ -15,11 +15,11 @@
       "screens": [
         {
           "id": "library",
-          "label": "Lists · V1"
+          "label": "Lists"
         },
         {
           "id": "library-v2",
-          "label": "Lists · V2"
+          "label": "Lists · Roster Organizer"
         },
         {
           "id": "library-filters",
@@ -639,6 +639,7 @@
             "label": "Design Gallery UI",
             "description": "Web-only review and gallery tooling; excluded from the React Native product implementation.",
             "sections": [
+              {"id": "gallery.track-switch", "title": "Design Track Switch", "level": "gallery-tooling", "status": "implemented", "platforms": ["gallery"], "states": ["current", "next", "next with item list", "proposal chip", "approved chip", "board label chip"], "screens": ["library-v2"]},
               {"id": "gallery.library-navigation", "title": "Design Library Navigation", "level": "gallery-tooling", "status": "specified", "platforms": ["gallery"], "states": ["phone library", "tablet library", "foldable library", "desktop library", "independent preferences"], "screens": []},
               {"id": "gallery.soft-keyboard", "title": "On-screen Keyboard Illustration", "level": "gallery-tooling", "status": "ready-for-rn", "platforms": ["gallery"], "states": ["phone, 290 px, neutral keys, Search action key", "used by the R0 gap frames with a focused field: library-filters-keyboard, add-unit-focus-keyboard"], "screens": ["library-filters-keyboard", "add-unit-focus-keyboard"]},
               { "id": "gallery.designer-rail", "title": "Designer Rail Controls", "level": "gallery-tooling", "status": "implemented", "platforms": ["gallery"], "states": ["default", "expanded", "editing"], "screens": [] },
