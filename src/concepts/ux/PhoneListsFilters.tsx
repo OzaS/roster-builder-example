@@ -35,6 +35,9 @@ function NextStatus({ r }: { r: RosterSummary }) {
   return <small className="ux-nx-status">{r.opened}</small>;
 }
 
+/** The row's status edge, as on the editor's unit rows; same order as NextStatus, so the edge and the status text agree. */
+const edgeTone = (r: RosterSummary) => r.status === "data-changed" ? "info" : r.status === "faction-removed" ? "err" : r.used > r.limit ? "warn" : r.status === "issues" ? "err" : "ok";
+
 export function PhoneListsFilters({ initialGrouped = false, initialSystem = null, longSystem, promptDismissed = false, query = "", onQueryChange, actions, onOpenRoster }: { initialGrouped?: boolean; initialSystem?: string | null; promptDismissed?: boolean; /** Gallery state: shows this game system under a long name (the chip truncates it). */ longSystem?: string; query?: string; onQueryChange?: (query: string) => void; actions?: ReactNode; onOpenRoster?: () => void }) {
   const next = useNextLook();
   const [promptOpen, setPromptOpen] = useState(!promptDismissed);
@@ -49,9 +52,10 @@ export function PhoneListsFilters({ initialGrouped = false, initialSystem = null
   const visible = rosters.filter((r) => `${r.name} ${r.faction} ${r.system}`.toLowerCase().includes(q) && (!attention || needsAttention(r)) && (system === null || r.system === system));
   const groups = bySystem && grouped ? systems.map((s) => ({ name: s.name, rows: visible.filter((r) => r.system === s.name) })).filter((g) => g.rows.length > 0) : null;
   const clear = () => { onQueryChange?.(""); setSystem(null); setAttention(false); };
-  // Proposed look: one muted line under the name; points over the opened time or the status; no box, no row menu.
+  // Proposed look: a status edge, one muted line under the name; points over the opened time or the status; no box, no row menu.
   const row = (r: RosterSummary) => next ? (
     <button type="button" key={r.name} className="ux-lf-roster ux-nx-row" onClick={onOpenRoster}>
+      <span className="ux-nx-edge" aria-hidden data-tone={edgeTone(r)} />
       <span className="ux-nx-row-main"><strong>{r.name}</strong><small>{r.faction} · {r.system}</small></span>
       <span className="ux-nx-row-end"><b className={r.used > r.limit ? "over" : ""}>{r.used.toLocaleString("en-US")} / {r.limit.toLocaleString("en-US")}</b><NextStatus r={r} /></span>
     </button>
@@ -63,7 +67,7 @@ export function PhoneListsFilters({ initialGrouped = false, initialSystem = null
   );
   return (
     <main className="ux-lists-main ux-lf">
-      {promptOpen && (!next || rosters.length === 0) ? <div className="ux-cmd-hero"><button type="button" className="ux-cmd-hero-close" aria-label="Close getting started prompt" onClick={() => setPromptOpen(false)}><X size={16} /></button><Wand2 size={20} /><h2>What do you want to build?</h2><p>Start a new roster. Rosters you open stay here, most recent first.</p></div> : null}
+      {promptOpen ? <div className="ux-cmd-hero"><button type="button" className="ux-cmd-hero-close" aria-label="Close getting started prompt" onClick={() => setPromptOpen(false)}><X size={16} /></button><Wand2 size={20} /><h2>What do you want to build?</h2><p>Start a new roster. Rosters you open stay here, most recent first.</p></div> : null}
       {actions}
       <div className="ux-lf-row">
         <div className="ux-lf-filters ux-lf-scroll ux-lf-always" role="group" aria-label="Show rosters">

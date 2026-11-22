@@ -452,3 +452,16 @@
   /* ---------- Lists: the no-match state (its Recent label is left out in the markup) ---------- */
   .ux-search-empty .ux-job-btn { font-weight: 600 }
 }
+
+/* Lists rows (D1b, user 2026-11-22): a status edge as on the editor's unit rows, so each roster row is distinct
+   without a box, a fill or a divider. Same order as the status text: changed by an update accent, faction removed
+   and errors red, over the limit amber, otherwise green. */
+:root[data-look="next"] :is(.device-frame.phone, .design-elements-panel.phone) {
+  .ux-lf-list, .ux-lf-group-section { gap: 6px }
+  .ux-lf-roster.ux-nx-row { min-height: 60px; padding-left: 4px }
+  .ux-lf-roster .ux-nx-row-main strong { font-size: 15px; line-height: 20px }
+  .ux-nx-edge { display: block; flex: none; align-self: stretch; width: 4px; margin-block: 4px; border-radius: 2px; background: var(--ux-ok) }
+  .ux-nx-edge[data-tone="warn"] { background: var(--ux-warn) }
+  .ux-nx-edge[data-tone="err"] { background: var(--ux-err) }
+  .ux-nx-edge[data-tone="info"] { background: var(--ux-accent) }
+}
