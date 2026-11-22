@@ -350,3 +350,11 @@
 /* Pressed state for every other desktop button, at the specificity of the approved hover rule (`.dt-app button:hover`),
    so it answers a press without overriding selected or toned states. */
 :root[data-look="next"] :where(.dt-app:not(.tb-shim)) button:where(:active:not(:disabled)) { background: color-mix(in srgb, var(--dt-text) 12%, transparent) }
+
+/* Unit panel (user, 2026-11-22): the unit editor docked as the editor's right panel, shown or hidden with the toolbar's
+   panel toggle like the tablet's Unit details pane, and resizable like the catalogue (the column is set inline); hidden, a unit opens in the dialog. Horizontal space is cheap on desktop. */
+:root[data-look="next"] .dt-app {
+  .dtu-dialog.dtu-docked.dt-inspector { width: auto; height: auto; max-height: none; min-height: 0; border: 0; border-left: 1px solid var(--dt-border); border-radius: 0; box-shadow: none; background: var(--dt-pane) }
+  .dtu-docked .dtu-content { flex: 1; min-height: 0; overflow: auto }
+  .dtu-docked-empty { display: grid; place-items: center; padding: 24px; color: var(--dt-muted); font-size: var(--nxd-body); text-align: center }
+}
