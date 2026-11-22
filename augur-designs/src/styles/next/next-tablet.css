@@ -438,3 +438,16 @@
 :root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-roster-head { flex-wrap: wrap; row-gap: 4px }
 :root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-roster-head .tb-roster-heading { flex: 1 1 260px; min-width: 0 }
 :root[data-look="next"] .tb-app:not(.duo-app) .tbe .tbe-nx-choice:disabled { color: var(--ux-muted); cursor: default }
+
+/* Tree hierarchy (user, 2026-11-22, option B of three): force, section and unit read as three levels by weight, colour and
+   position, not size. The force starts at the edge under a rule, heavier; sections are indented, muted and lighter; units sit
+   one step further in. */
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe {
+  .ux-force-entry { padding-top: 10px; border-top: 1px solid color-mix(in srgb, var(--ux-ink) 14%, transparent) }
+  .ux-force-summary-main { padding-left: 2px }
+  .ux-force-summary strong { font-weight: 800 }
+  .ux-tree-section { padding-left: 20px }
+  .ux-tree-section, .ux-tree-section .ux-tree-caret { color: var(--ux-muted) }
+  .ux-tree-section strong { font-weight: 600 }
+  .ux-tree-unit { padding-left: 29px }
+}

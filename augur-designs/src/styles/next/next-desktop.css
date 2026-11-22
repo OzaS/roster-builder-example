@@ -358,3 +358,16 @@
   .dtu-docked .dtu-content { flex: 1; min-height: 0; overflow: auto }
   .dtu-docked-empty { display: grid; place-items: center; padding: 24px; color: var(--dt-muted); font-size: var(--nxd-body); text-align: center }
 }
+
+/* Tree hierarchy (user, 2026-11-22, option B of three): force, section and unit read as three levels by weight, colour and
+   position, not size. The force starts at the edge under a rule, heavier; sections are indented, muted and lighter; units sit
+   one step further in. */
+:root[data-look="next"] .dt-app {
+  .dte-force { padding-top: 10px; border-top: 1px solid var(--dt-border) }
+  .dt-force-heading.dte-force-heading { padding-left: 0 }
+  .dte-force-name strong { font-weight: 750 }
+  .dt-group-heading { padding-left: 24px !important }
+  .dt-group-heading, .dt-group-heading > span, .dt-group-heading svg { color: var(--dt-muted) !important }
+  .dt-group-heading > span { font-weight: 500 }
+  .dte-unit-row { margin-left: 14px }
+}
