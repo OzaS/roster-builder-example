@@ -1,0 +1,440 @@
+/* The proposed look ("next") for the tablet library. Scope every rule to :root[data-look="next"]. See next-shared.css.
+   Scope: the tablet app root (.tb-app) in the device frame, the board, the Elements view and the standalone route.
+   The Foldable library reuses the tablet pieces under .tb-app.duo-app and stays on the current look in this pass. */
+
+/* ------------------------------ values ------------------------------ */
+:root[data-look="next"] .tb-app:not(.duo-app) { --nx-accent-text: var(--ux-accent-2); --nx-tint: color-mix(in srgb, var(--ux-accent) 18%, transparent); --nx-hover: color-mix(in srgb, var(--ux-ink) 6%, transparent); --nx-press: color-mix(in srgb, var(--ux-ink) 11%, transparent); --nx-field: color-mix(in srgb, var(--ux-ink) 6%, transparent) }
+:root[data-look="next"] .tb-app:not(.duo-app).light { --nx-accent-text: var(--ux-accent); --nx-tint: color-mix(in srgb, var(--ux-accent) 13%, transparent) }
+
+/* ------------------------------ chips: 34 pt tall, 44 pt target ------------------------------ */
+:root[data-look="next"] .tb-app:not(.duo-app) button.tb-filter { position: relative; min-height: var(--nx-chip-height); padding: 0 14px; border: 0; background: var(--nx-hover); color: var(--ux-ink); font-size: 14px; font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) button.tb-filter::after { content: ''; position: absolute; inset: -5px 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) button.tb-filter.active { background: var(--ux-accent); color: var(--ux-accent-ink) }
+:root[data-look="next"] .tb-app:not(.duo-app).tb-pointer button.tb-filter:not(.active):hover { background: var(--nx-press) }
+
+/* ------------------------------ buttons ------------------------------ */
+/* The filled button is flat: the accent colour, no gradient glow under it. Weight 600 (the look keeps 400, 600 and 700). */
+:root[data-look="next"] .tb-app:not(.duo-app) .ux-primary { background: var(--ux-accent); box-shadow: none; font-weight: 600; letter-spacing: 0 }
+/* Toolbar icon actions sit on the page without a glass disc; hover and press tint them. The prominent and active ones keep their fill. */
+:root[data-look="next"] .tb-app:not(.duo-app) button.tb-tool-action:not(.prominent):not(.active) .tb-tool-ind { border-color: transparent; background: transparent; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none }
+:root[data-look="next"] .tb-app:not(.duo-app).tb-pointer button.tb-tool-action:not(.prominent):not(.active):hover .tb-tool-ind { background: var(--nx-hover) }
+:root[data-look="next"] .tb-app:not(.duo-app) button.tb-tool-action:not(.prominent):not(.active):active .tb-tool-ind { background: var(--nx-press) }
+
+/* ------------------------------ fields ------------------------------ */
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-search { border-color: transparent; background: var(--nx-field) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-search:focus-within { border-color: var(--ux-accent) }
+
+/* ============================== roster editor ============================== */
+/* One toolbar of 52 pt; the progress line is its bottom edge. */
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-header { min-height: 52px; gap: 2px; padding: 4px 10px 4px 6px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe:not(.tbe-narrow-head) .tbe-title .tb-mark { display: none }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe button.tbe-title { min-height: 44px; gap: 6px; padding: 0 8px 0 10px; border-radius: 12px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe:not(.tbe-narrow-head) .tbe-title-text { display: flex; align-items: baseline; gap: 10px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-title-text strong { flex: 0 1 auto; font-size: 17px; font-weight: 700 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-title-text small { flex: 0 99 auto; font-size: 13px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-two .tbe-title-text small, :root[data-look="next"] .tb-app:not(.duo-app) .tbe-single .tbe-title-text small { display: none }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe button.tbe-icon { border-color: transparent; background: transparent; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; border-radius: 12px }
+:root[data-look="next"] .tb-app:not(.duo-app).tb-pointer .tbe button.tbe-icon:not(:disabled):hover, :root[data-look="next"] .tb-app:not(.duo-app) .tbe button.tbe-icon[aria-expanded=true] { background: var(--nx-hover) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe button.tbe-icon:not(:disabled):active { background: var(--nx-press) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe button.tbe-pane-toggle[aria-pressed=true] { color: var(--nx-accent-text) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe button.tbe-back { min-height: 40px; margin-right: 2px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-header .dt-summary-toggle { height: 40px; margin: 0 2px 0 6px; border-radius: 20px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-header .dt-summary-toggle b { font-weight: 700 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-header .tbe-add { min-height: 40px; margin-right: 6px; border-radius: 20px; font-weight: 600 }
+
+/* Panes: one background, one hairline between them, no title bars. */
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-catalogue.pane, :root[data-look="next"] .tb-app:not(.duo-app) .tbe-inspector { background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-single .tbe-pane-head { min-height: 52px; border-bottom: 0 }
+
+/* Catalogue */
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-cat-tools { gap: 10px; padding: 12px 12px 4px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-cat-list { padding: 0 8px 24px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-cat-list h4 { margin: 18px 8px 4px; color: var(--ux-muted); font-size: var(--nx-heading-size); font-weight: var(--nx-heading-weight); line-height: 18px; letter-spacing: 0; text-transform: none }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-cat-list h4 > span { font-weight: 400 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-cat-list section:first-child h4 { margin-top: 10px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .tbe-cat-row { min-height: 52px; gap: 8px; padding: 6px 4px 6px 8px; border-radius: var(--nx-row-radius) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .tbe-cat-row + .tbe-cat-row { margin-top: var(--nx-row-gap) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-cat-row strong { font-size: 15.5px; font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-cat-add small { font-size: 13px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-cat-add small.quota { color: var(--ux-warn) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-cat-row b { font-size: 15px; font-weight: 700 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-cat-row b small { display: none }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-cat-plus { width: 32px; height: 32px; margin: 0 2px; background: var(--nx-tint); color: var(--nx-accent-text) }
+:root[data-look="next"] .tb-app:not(.duo-app).tb-pointer .tbe .tbe-cat-row:not(.unavailable):hover { background: var(--nx-hover) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .tbe-cat-row:not(.unavailable):active { background: var(--nx-press) }
+/* A unit that cannot be added (or adds over a limit): the reason under the name in the state's colour, a muted Add. No pill, no tile. */
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .tbe-nx-cat-row { grid-template-columns: minmax(0, 1fr) auto 36px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .tbe-nx-cat-row.with-star { grid-template-columns: 44px minmax(0, 1fr) auto 36px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-cat-row > span:empty { display: none }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-cat-row :is(.tbe-cat-add small.reason) { color: var(--ux-warn) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-cat-row.err:not(.limit) .tbe-cat-add small.reason { color: var(--ux-err) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-cat-plus.muted { background: var(--nx-hover); color: var(--ux-muted) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-cat-row button.ws-limit-add { color: var(--ux-muted) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-cat-row .ws-limit-add i { width: 32px; height: 32px; border: 0; background: var(--nx-hover) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-cat-row .ws-limit-add:is(.open, :hover) i { border: 0; background: var(--nx-press) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-pane-foot { border-top: 0; font-size: 12.5px }
+
+/* The roster: headings, space and rounded rows. No boxes, no bands, no dividers. */
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-tree-scroll.ux-wb-tree { gap: 0; padding: 8px 8px 40px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .ux-force-list { gap: 24px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .ux-force-summary { grid-template-columns: minmax(0, 1fr) 48px; min-height: 56px; border-left: 0; border-radius: var(--nx-row-radius); background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .ux-force-entry.selected .ux-force-summary { border-left-width: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .ux-force-summary-main { gap: 8px; min-height: 56px; padding: 6px 8px; border-radius: var(--nx-row-radius) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .ux-force-summary strong { font-size: 17px; font-weight: 700 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .ux-force-summary small { margin-top: 1px; font-size: 13px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .ux-force-summary b { color: var(--nx-accent-text); font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .ux-force-summary strong .tbe-chip { font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .ux-force-sections { gap: 14px; padding: 6px 0 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .ux-tree-branch { border: 0; border-radius: 0; background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-sec-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4px; padding-right: 6px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .ux-tree-section { grid-template-columns: 18px auto minmax(0, 1fr); gap: 8px; min-height: 44px; padding: 4px 8px; border-radius: var(--nx-row-radius) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .ux-tree-section strong { font-size: 15px; font-weight: 700 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .ux-tree-section small { font-size: 13px; text-align: left }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe button.tbe-sec-add { position: relative; display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 50%; background: var(--nx-tint); color: var(--nx-accent-text); cursor: pointer; touch-action: manipulation }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe button.tbe-sec-add::after { content: ''; position: absolute; inset: -5px }
+:root[data-look="next"] .tb-app:not(.duo-app).tb-pointer .tbe button.tbe-sec-add:hover { background: color-mix(in srgb, var(--ux-accent) 26%, transparent) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe button.tbe-sec-add:active { background: color-mix(in srgb, var(--ux-accent) 32%, transparent); transform: scale(.94) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe button.tbe-sec-add:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .ux-tree-units { gap: var(--nx-row-gap); padding: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .ux-tree-units:empty { display: none }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .ux-tree-unit { grid-template-columns: 3px minmax(0, 1fr) auto auto; gap: 16px; min-height: 56px; padding: 8px 14px 8px 15px; border-radius: var(--nx-row-radius) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .ux-tree-unit > :nth-child(3) { margin-right: -8px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .ux-tree-rail { margin: 3px 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .ux-tree-unit-main span { font-size: 16px; font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .ux-tree-unit-main small { font-size: 13px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .ux-tree-unit b { font-size: 15px; font-weight: 700 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .ux-tree-unit.active { background: var(--nx-tint) }
+:root[data-look="next"] .tb-app:not(.duo-app).tb-pointer .tbe .ux-tree-unit:not(.active):hover, :root[data-look="next"] .tb-app:not(.duo-app).tb-pointer .tbe :is(.ux-tree-section, .ux-force-summary-main):hover { background: var(--nx-hover) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .ux-tree-unit:not(.active):active, :root[data-look="next"] .tb-app:not(.duo-app) .tbe :is(.ux-tree-section, .ux-force-summary-main):active { background: var(--nx-press) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe button.tbe-add-force { width: auto; min-height: 44px; margin: 20px 0 0 4px; padding: 0 12px; border: 0; border-radius: var(--nx-row-radius); color: var(--nx-accent-text); font-size: 14.5px; font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-readonly { margin: 8px 8px 0; padding: 12px 16px; border: 0; border-radius: var(--nx-row-radius); background: color-mix(in srgb, var(--ux-warn) 10%, transparent) }
+
+/* Unit pane: name and cost, text actions, the switch, then open option rows. */
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-detail.ux-mobile-unit-options { gap: 0; padding: 14px 20px 40px; background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .tbe-unit-title { align-items: baseline }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .tbe-unit-title h2 { margin: 0; font-size: 22px; font-weight: 700; line-height: 28px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .tbe-unit-title > strong { color: var(--nx-accent-text); font-size: 22px; font-weight: 700; line-height: 28px; font-variant-numeric: tabular-nums }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .tbe-unit-title > strong small { font-weight: 400 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .tbe-unit-title .tbe-unit-entry { font-weight: 400 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-context { margin: 2px 0 0; color: var(--ux-muted); font-size: 13px; line-height: 18px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .tbe-unit-actions { gap: 0 20px; margin: 2px 0 8px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .tbe-nx-detail .tbe-unit-actions .ux-job-btn { min-width: 0; min-height: 44px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--nx-accent-text); font-size: 14.5px; font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .tbe-nx-detail .tbe-unit-actions .ux-job-btn.destructive { border: 0; color: var(--ux-err) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .tbe-nx-detail .tbe-unit-actions .ux-job-btn:disabled { color: var(--ux-muted) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .ux-5b-tabs { padding: 3px; border: 0; border-radius: 12px; background: var(--nx-field) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .ux-5b-tabs button { min-height: 38px; border-radius: 9px; font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .ux-5b-tabs button[aria-selected="true"] { background: var(--ux-surface) !important; box-shadow: 0 1px 3px rgb(0 0 0 / .16) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .ux-5a-notice { margin: 0 0 10px; border: 0; border-radius: var(--nx-row-radius); background: color-mix(in srgb, var(--ux-warn) 10%, transparent) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .tbe-options { gap: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-group { display: flex; flex-direction: column; margin-top: var(--nx-group-gap) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail h4.tbe-nx-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; min-height: 28px; margin: 0; color: var(--ux-muted); font-size: var(--nx-heading-size); font-weight: var(--nx-heading-weight); line-height: 18px; letter-spacing: 0; text-transform: none }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail h4.tbe-nx-head small { display: inline-flex; align-items: center; gap: 4px; color: var(--ux-muted); font-size: 13px; font-weight: 400; line-height: 18px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail h4.tbe-nx-head small.ux-5a-invalid { color: var(--ux-err) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .ux-fold { gap: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .ux-fold-head { min-height: 36px; padding: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .ux-fold-head > span { flex-direction: row; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 12px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .ux-fold-head strong { color: var(--ux-muted); font-size: var(--nx-heading-size); font-weight: var(--nx-heading-weight); letter-spacing: 0; text-transform: none }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .ux-fold-head small { font-size: 13px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .ux-fold-head .ux-fold-summary { flex-basis: 100%; color: var(--ux-ink); font-size: 15px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-row > span { min-width: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-row strong { display: block; font-size: 16px; font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-row small { font-size: 13px; line-height: 18px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .ux-5a-count { flex: none; padding: 2px; border: 0; background: var(--nx-field) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .ux-5a-count button { width: 44px; height: 40px; min-width: 44px; min-height: 40px; background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .ux-5a-count strong { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .ux-5a-separate { gap: 0 16px; padding-top: 0; border-top: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .ux-5a-separate-btn { min-width: 0; min-height: 40px; padding: 0; border: 0; background: transparent; color: var(--nx-accent-text); font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .ux-5a-separate > small { margin-top: -4px; font-size: 13px; line-height: 18px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .tbe-nx-choice { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; gap: 12px; width: calc(100% + 16px); min-height: 48px; margin: 0 -8px; padding: 6px 8px; border: 0; border-radius: var(--nx-row-radius); background: transparent; color: var(--ux-ink); font: inherit; text-align: left; cursor: pointer; touch-action: manipulation }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .tbe-nx-choice + .tbe-nx-choice { margin-top: var(--nx-row-gap) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-choice > svg { color: var(--ux-muted) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-choice.on > svg { color: var(--ux-accent) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-choice strong { display: block; font-size: 15.5px; font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-choice small { font-size: 13px; line-height: 18px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-choice em { color: var(--ux-muted); font-size: 14px; font-style: normal; font-variant-numeric: tabular-nums; white-space: nowrap }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-choice.on em { color: var(--nx-accent-text); font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app).tb-pointer .tbe .tbe-nx-choice:not(:disabled):hover { background: var(--nx-hover) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .tbe-nx-choice:not(:disabled):active { background: var(--nx-press) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .tbe-nx-choice:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: -2px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .tbe-notes { margin-top: 4px; border-color: transparent; background: var(--nx-field) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .tbe-notes:focus { border-color: var(--ux-accent) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .ux-5b-table thead th { background: transparent; border-top: 0; font-size: 12px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .ux-5b-table th:first-child { padding-left: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .ux-5a-choice { min-height: 48px; padding: 6px 0; border-top: 0 !important }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .ux-5a-chips { margin-top: 4px }
+
+/* ============================== pages ============================== */
+/* One page background: modules and detail panes are open, one hairline between a list and its detail. */
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-card { padding: 0; border: 0; border-radius: 0; background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-panes { gap: 12px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-detail { padding: 6px 4px 24px 24px; border: 0; border-left: 1px solid var(--ux-line); border-radius: 0; background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-detail.over { padding: 16px 20px 24px; border-left: 0; background: var(--ux-bg); box-shadow: none }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-detail-title h2 { font-size: 24px; font-weight: 700 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-detail-title small, :root[data-look="next"] .tb-app:not(.duo-app) .tb-continue-head small, :root[data-look="next"] .tb-app:not(.duo-app) .tb-data-row small { font-size: 13px }
+
+/* Section labels: sentence case, 13/18, 600, muted. */
+:root[data-look="next"] .tb-app:not(.duo-app) .ux-result-label { font-size: var(--nx-heading-size); font-weight: var(--nx-heading-weight); line-height: 18px; letter-spacing: 0; text-transform: none }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-group-head { padding: 6px 12px; font-size: var(--nx-heading-size); font-weight: var(--nx-heading-weight); letter-spacing: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-group-head > span:first-child { color: var(--ux-muted) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-list-foot { padding: 0 12px; font-size: 13px }
+
+/* Rows: no box and no divider. A rounded shape that tints on hover and press and fills with the accent tint when selected. */
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-list { gap: var(--nx-row-gap) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-list.scroll { padding: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-group { gap: var(--nx-row-gap) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-group + .tb-group { margin-top: var(--nx-group-gap) }
+:root[data-look="next"] .tb-app:not(.duo-app) button.tb-row { min-height: 60px; gap: 12px; padding: 8px 12px; border: 0; border-radius: var(--nx-row-radius); background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) button.tb-row.selected { background: var(--nx-tint) }
+:root[data-look="next"] .tb-app:not(.duo-app).tb-pointer button.tb-row:not(.selected):hover { background: var(--nx-hover) }
+:root[data-look="next"] .tb-app:not(.duo-app) button.tb-row:not(.selected):active { background: var(--nx-press) }
+:root[data-look="next"] .tb-app:not(.duo-app) button.tb-row strong { font-size: 16px; font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) button.tb-row small { font-size: 13px }
+:root[data-look="next"] .tb-app:not(.duo-app) button.tb-row b { color: var(--ux-ink); font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-row-end { gap: 2px 10px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-row-end small.tb-nx-when { color: var(--ux-muted); font-size: 13px }
+/* A list beside its detail shows the selection; the lone chevron goes. */
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-panes:not(.single) button.tb-row > .tb-row-end:has(> svg:only-child) { display: none }
+/* A monogram tile repeats the first letters of the name beside it; icon tiles stay. */
+:root[data-look="next"] .tb-app:not(.duo-app) button.tb-row > .tb-mark:not(:has(*)) { display: none }
+:root[data-look="next"] .tb-app:not(.duo-app) button.tb-row:has(> .tb-mark:not(:has(*))) > .tb-row-end { padding-left: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) button.tb-row > .tb-mark { background: var(--nx-tint); color: var(--nx-accent-text) }
+/* Status under the value: icon and text, no pill. */
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-row-end .ux-chip, :root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-data-row .ux-chip { padding: 0; border: 0; background: transparent; font-size: 13px; font-weight: 600; letter-spacing: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-roster-nav-row { grid-template-columns: minmax(0, 1fr); border: 0; border-radius: var(--nx-row-radius); background: transparent; overflow: visible }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-roster-nav-row button.tb-row { border-radius: var(--nx-row-radius) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-roster-nav-row.selected button.tb-row.selected { background: var(--nx-tint) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-install-row { min-height: 60px; padding: 8px 0; border: 0; border-radius: 0; background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-install-row .tb-row-main strong { font-size: 16px; font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-empty-card { border: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-empty-card strong { font-weight: 700 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-note.ok, :root[data-look="next"] .tb-app:not(.duo-app) .tb-note.warn, :root[data-look="next"] .tb-app:not(.duo-app) .tb-note.err { border: 0 }
+
+/* Label and value rows. */
+:root[data-look="next"] .tb-app:not(.duo-app) .ux-src-group { border: 0; border-radius: 0; background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .ux-src-kv { min-height: 40px; padding: 6px 0; font-size: 15px }
+:root[data-look="next"] .tb-app:not(.duo-app) .ux-src-kv + .ux-src-kv { border-top: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .ux-src-kv > span:first-child { color: var(--ux-muted) }
+:root[data-look="next"] .tb-app:not(.duo-app) .ux-src-kv b { color: var(--ux-ink); font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-facts-grid { gap: 4px 24px; border: 0; border-radius: 0; background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-facts-grid > div, :root[data-look="next"] .tb-app:not(.duo-app) .tb-facts-grid > div:nth-child(even), :root[data-look="next"] .tb-app:not(.duo-app) .tb-facts-grid > div:nth-child(2) { min-height: 48px; padding: 4px 0; border: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-facts-grid dt { font-size: 13px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-facts-grid dd { font-size: 15px; font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-facts { display: grid; margin: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-facts > div { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 40px; font-size: 15px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-facts dt { color: var(--ux-muted) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-facts.wide > div { justify-content: flex-start }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-facts.wide dt { flex: 0 0 160px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-facts.wide dd { text-align: left }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-detail .ux-src-kv { grid-template-columns: 160px minmax(0, 1fr) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-detail .ux-src-kv > b { justify-self: start }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-facts dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; overflow-wrap: anywhere }
+
+/* Text buttons and module headings (Home, Rosters detail). */
+:root[data-look="next"] .tb-app:not(.duo-app) button.tb-nx-link { display: inline-flex; align-items: center; gap: 2px; min-height: 44px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--nx-accent-text); font: inherit; font-size: 14.5px; font-weight: 600; white-space: nowrap; cursor: pointer }
+:root[data-look="next"] .tb-app:not(.duo-app) button.tb-nx-link:focus-visible { outline: 2px solid var(--ux-accent-2); outline-offset: 2px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-module { display: flex; flex-direction: column; min-width: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 36px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-head :is(h2, h3) { margin: 0; color: var(--ux-muted); font-size: var(--nx-heading-size); font-weight: var(--nx-heading-weight); line-height: 18px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-main { display: grid; min-width: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-main strong, :root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-main small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-main strong { font-size: 16px; font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-main small { color: var(--ux-muted); font-size: 13px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-main .ux-job-bar { margin-top: 8px; max-width: 240px }
+
+/* ------------------------------ Home: the widgets without boxes ------------------------------ */
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-home { gap: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-home .tb-home-main { gap: 28px; padding-right: 32px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-side { gap: 28px; padding-left: 32px; border-left: 1px solid var(--ux-line) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-continue-body { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-top: 2px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-continue .tb-nx-main strong { font-size: 28px; font-weight: 700; line-height: 34px; letter-spacing: -.01em }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-continue .tb-nx-main small { margin-top: 2px; font-size: 14px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-continue .tb-primary { flex: none; min-height: 48px; padding: 0 20px; border-radius: 24px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-budget { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 8px 12px; margin-top: 18px; color: var(--ux-muted); font-size: 15px; font-variant-numeric: tabular-nums }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-budget b { color: var(--ux-ink); font-size: 20px; font-weight: 700 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-budget > i { grid-column: 1 / -1; display: block; height: 6px; overflow: hidden; border-radius: 3px; background: var(--nx-press) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-budget > i > i { display: block; height: 100%; border-radius: 3px; background: var(--ux-accent) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-budget.over > i > i { background: var(--ux-err) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-budget.over > span:nth-child(2) { color: var(--ux-err) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-module .tb-list { margin: 0 -12px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-rows { display: grid }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-data-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 60px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-status { display: inline-flex; align-items: center; gap: 6px; flex: none; font-size: 14px; font-weight: 600; white-space: nowrap }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-status.ok { color: var(--ux-ok) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-status.warn { color: var(--ux-warn) }
+:root[data-look="next"] .tb-app:not(.duo-app) .ux-job-btn.tb-nx-update { flex: none; min-height: 36px; padding: 0 14px; border-radius: 18px; font-size: 14px; font-weight: 600; white-space: nowrap }
+:root[data-look="next"] .tb-app:not(.duo-app).tb-medium .tb-nx-home, :root[data-look="next"] .tb-app:not(.duo-app).tb-compact .tb-nx-home { gap: 24px }
+:root[data-look="next"] .tb-app:not(.duo-app).tb-medium .tb-nx-home .tb-home-main, :root[data-look="next"] .tb-app:not(.duo-app).tb-compact .tb-nx-home .tb-home-main { padding-right: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app).tb-medium .tb-nx-side, :root[data-look="next"] .tb-app:not(.duo-app).tb-compact .tb-nx-side { gap: 24px 40px; padding: 20px 0 0; border-left: 0; border-top: 1px solid var(--ux-line) }
+:root[data-look="next"] .tb-app:not(.duo-app).tb-compact .tb-nx-module .tb-list { overflow: visible }
+
+/* ------------------------------ Rosters ------------------------------ */
+/* The filter group keeps its joined, expressive shape at chip height. */
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-roster-filters button.tb-filter { background: color-mix(in srgb, var(--ux-accent) 14%, transparent) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-roster-filters button.tb-filter-start { border-radius: 17px 6px 6px 17px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-roster-filters button.tb-filter-end { border-radius: 6px 17px 17px 6px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-roster-filters button.tb-filter.active { border-radius: 17px; background: var(--ux-accent) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-roster-filter-row { align-items: center; min-height: 44px; margin: -5px 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) button.tb-group-toggle { position: relative; width: var(--nx-chip-height); height: var(--nx-chip-height); background: color-mix(in srgb, var(--ux-accent) 14%, transparent) }
+:root[data-look="next"] .tb-app:not(.duo-app) button.tb-group-toggle::after { content: ''; position: absolute; inset: -5px }
+:root[data-look="next"] .tb-app:not(.duo-app) button.tb-group-toggle.active { background: var(--ux-accent) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-roster-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; min-width: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-roster-head .tb-roster-heading h2 { font-size: 24px; font-weight: 700 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-roster-head .tb-roster-heading small { font-size: 14px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-roster-head .tb-roster-total { font-size: 22px; font-weight: 700 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-roster-head .tb-roster-total small { font-size: 15px; font-weight: 400 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-status-line { display: flex; align-items: flex-start; gap: 8px; margin: -6px 0 0; color: var(--ux-muted); font-size: 14.5px; line-height: 20px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-status-line > svg { flex: none; margin-top: 1px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-status-line strong { font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-status-line.ok > svg, :root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-status-line.ok strong { color: var(--ux-ok) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-status-line.warn > svg, :root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-status-line.warn strong { color: var(--ux-warn) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-status-line.err > svg, :root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-status-line.err strong { color: var(--ux-err) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 20px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-actions .tb-primary { flex: none; min-height: 44px; margin-right: 4px; padding: 0 18px; border-radius: 22px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-actions .ux-job-btn { min-height: 44px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--nx-accent-text); font-size: 14.5px; font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-actions .ux-job-btn.destructive { color: var(--ux-err) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-roster-action-strip { gap: 4px 20px; overflow: visible; border: 0; border-radius: 0; background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-roster-action-strip .ux-job-btn { padding: 0; color: var(--nx-accent-text); font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-roster-action-strip .ux-job-btn + .ux-job-btn { border-left: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-roster-detail-header { border-bottom: 0; padding-bottom: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-roster-facts { margin-top: 8px }
+
+/* ============================== sweep: Settings, Sources, Lookup, sheets ============================== */
+/* Weights: 400, 600 and 700 only. */
+:root[data-look="next"] .tb-app:not(.duo-app) :is(h2, h3) { font-weight: 700 }
+:root[data-look="next"] .tb-app:not(.duo-app) :is(.ux-job-btn, .tbs-primary, .tbs-action, .tbs-choice, .tb-text-link, .tbe-show, .ux-chip, .ws-quota-chip, .tb-kbd, .ux-lf-tag) { font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) :is(.tb-card-title, .tb-empty-card strong, .ux-cs-card > strong) { font-weight: 700 }
+
+/* Settings: section rows and the colour scheme list are open rows; the switches keep their row dividers off. */
+:root[data-look="next"] .tb-app:not(.duo-app) button.tb-scheme { min-height: 52px; padding: 6px 12px; border: 0; border-radius: var(--nx-row-radius); background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) button.tb-scheme.on { background: var(--nx-tint) }
+:root[data-look="next"] .tb-app:not(.duo-app).tb-pointer button.tb-scheme:not(.on):hover { background: var(--nx-hover) }
+:root[data-look="next"] .tb-app:not(.duo-app) button.tb-scheme:not(.on):active { background: var(--nx-press) }
+:root[data-look="next"] .tb-app:not(.duo-app) button.tb-scheme strong { font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-schemes { gap: var(--nx-row-gap); margin: 0 0 0 -12px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-switches { padding: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .dtp-setting-row + .dtp-setting-row { border-top: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .dtp-setting-row strong { font-size: 16px; font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .dtp-setting-row small { font-size: 13px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-setting strong { font-size: 16px; font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-setting small { font-size: 13px }
+:root[data-look="next"] .tb-app:not(.duo-app) .dtp-segmented { border: 0; background: var(--nx-field) }
+:root[data-look="next"] .tb-app:not(.duo-app) .dtp-segmented button { font-weight: 600 }
+
+/* Sources: the update line, version rows and the reused workspace flows without their boxes. */
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-banner { padding: 4px 12px; border: 0; border-radius: 0; background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-banner strong { font-size: 16px; font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-banner small { font-size: 13px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-update { background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-danger { padding: 8px 0; border: 0; border-radius: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-flow .dtp-rows, :root[data-look="next"] .tb-app:not(.duo-app) .tb-flow .dtp-link-row, :root[data-look="next"] .tb-app:not(.duo-app) .tb-flow .dts-change-group ul { border: 0; border-radius: 0; background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-flow .dtp-collection-row, :root[data-look="next"] .tb-app:not(.duo-app) .tb-flow .dtp-link-row { padding-left: 0; padding-right: 0; border-color: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-flow .dts-change-group li { padding-left: 0; padding-right: 0; border-color: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-flow .dts-changed-card { padding: 8px 0; border: 0; border-radius: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-flow .dts-last-update { padding: 8px 0; border: 0; border-radius: 0; background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-flow .dts-count { padding: 8px 0; border: 0; background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-flow .dtp-search { border-color: transparent; background: var(--nx-field) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-flow .dtp-detail h3, :root[data-look="next"] .tb-app:not(.duo-app) .tb-flow .dtp-eyebrow { color: var(--ux-muted); font-size: var(--nx-heading-size); font-weight: var(--nx-heading-weight); letter-spacing: 0; text-transform: none }
+
+/* Lookup: results are rows; the detail's profile tables lose their outer box and header fill (they stay tables: they are tabular data). */
+:root[data-look="next"] .tb-app:not(.duo-app).tb-app .tb-lookup10 .ux-5a-card, :root[data-look="next"] .tb-app:not(.duo-app) .tb-detail .ux-5a-card { padding: 0; border: 0; border-radius: 0; background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-detail .ux-5b-table-card > strong { padding: 0; font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-detail .ux-5b-table thead th { border-top: 0; background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-detail .ux-5b-table :is(th, td):first-child { padding-left: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-detail.ux-mobile-unit-options h4, :root[data-look="next"] .tb-app:not(.duo-app) .tb-detail .ux-mobile-unit-options h4 { color: var(--ux-muted); font-size: var(--nx-heading-size); font-weight: var(--nx-heading-weight); letter-spacing: 0; text-transform: none }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-profile { border: 0; border-radius: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-profile span + span { border-left: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-profile small { font-size: 12px; font-weight: 600; letter-spacing: 0; text-transform: none }
+
+/* Placeholders (Tools, Library). */
+:root[data-look="next"] .tb-app:not(.duo-app) .ux-cs-card { border: 0; background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .ux-cs-overline { font-size: var(--nx-heading-size); font-weight: var(--nx-heading-weight); letter-spacing: 0; text-transform: none }
+
+/* Sheets and dialogs float, so they keep their box; only their labels and weights follow the look. */
+:root[data-look="next"] .tb-app:not(.duo-app) .tbs-label { font-size: var(--nx-heading-size); font-weight: var(--nx-heading-weight); letter-spacing: 0; text-transform: none }
+
+/* ============================== sweep, second pass ============================== */
+/* Secondary actions in a detail pane are text buttons in the accent colour (the filled one stays filled). */
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-detail button.ux-job-btn:not(.primary):not(.tb-confirm) { min-height: 44px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--nx-accent-text); font-size: 14.5px; font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-detail button.ux-job-btn.destructive:not(.tb-confirm) { color: var(--ux-err) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-detail button.ux-job-btn.tb-wide:not(.primary) { width: auto; justify-content: flex-start }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-detail .tb-actions { gap: 4px 24px; align-items: center }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-detail .ux-job-btn.primary { min-height: 44px; padding: 0 18px; border: 0; border-radius: 22px }
+:root[data-look="next"] .tb-app:not(.duo-app) button.tb-icon-btn { border-color: transparent; background: transparent; color: var(--ux-muted) }
+:root[data-look="next"] .tb-app:not(.duo-app).tb-pointer button.tb-icon-btn:hover { background: var(--nx-hover) }
+:root[data-look="next"] .tb-app:not(.duo-app) button.tb-icon-btn:active { background: var(--nx-press) }
+
+/* Status in a heading or on a row: icon and text in the tone's colour, no pill. */
+:root[data-look="next"] .tb-app:not(.duo-app) :is(.tb-detail-title, .tb-install-row) .ux-chip, :root[data-look="next"] .tb-app:not(.duo-app) .tb-row-end .ux-lf-tag { padding: 0; border: 0; background: transparent; font-size: 13px; font-weight: 600; letter-spacing: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-detail-title .ux-chip { font-size: 14px }
+/* Small chips (factions): a quiet fill, no outline. "Install more" is a text button. */
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-chips .ux-chip { min-height: 30px; padding: 0 12px; border: 0; background: var(--nx-hover); color: var(--ux-ink); font-size: 13.5px; font-weight: 600; letter-spacing: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) button.tb-chip-add { min-height: 44px; padding: 0 6px; border: 0; color: var(--nx-accent-text); font-size: 14.5px; font-weight: 600 }
+/* Notes: a tinted line for a state, plain text otherwise. No outline. */
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-note:not(.ok):not(.warn):not(.err):not(.tb-validation-popover) { padding: 4px 0; background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-note.ok { background: transparent; padding: 4px 0 }
+/* The source status action on a row: a round tonal button like the editor's Add, no outline; a ready mark is a bare icon. */
+:root[data-look="next"] .tb-app:not(.duo-app) .ux-src-status > i { border: 0; background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .ux-src-status:is(.accent, .warn, .err) > i { background: color-mix(in srgb, currentColor 16%, transparent) }
+:root[data-look="next"] .tb-app:not(.duo-app) .ux-src-status.accent { color: var(--nx-accent-text) }
+:root[data-look="next"] .tb-app:not(.duo-app) .ux-src-status:is(.open, :hover) > i { background: color-mix(in srgb, currentColor 26%, transparent) }
+
+/* Lookup: no rules between model rows or before the folded groups; group headings are labels; table titles are row text. */
+:root[data-look="next"] .tb-app:not(.duo-app) .ux-lk-model-row { border-top: 0; padding: 6px 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .ux-lk-section:not(.folded) + .ux-lk-section.folded { margin-top: var(--nx-group-gap); padding-top: 0; border-top: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .ux-lk-head { padding: 4px 12px; border-radius: var(--nx-row-radius) }
+:root[data-look="next"] .tb-app:not(.duo-app).tb-pointer .ux-lk-head:hover { background: var(--nx-hover) }
+:root[data-look="next"] .tb-app:not(.duo-app) .ux-lk-head:active { background: var(--nx-press) }
+:root[data-look="next"] .tb-app:not(.duo-app) .ux-lk-section:not(.folded) .ux-lk-head-title { color: var(--ux-muted); font-size: var(--nx-heading-size); font-weight: var(--nx-heading-weight) }
+:root[data-look="next"] .tb-app:not(.duo-app) .ux-lk-section.folded .ux-lk-head-title { font-size: 15.5px; font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .ux-lk-head-title > span { font-weight: 400 }
+:root[data-look="next"] .tb-app:not(.duo-app) .ux-lk-head small { font-size: 13px; font-weight: 400 }
+:root[data-look="next"] .tb-app:not(.duo-app) .ux-lk-composition h4 span { font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .ux-lk-model-row dt { font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-detail .ux-5b-table-card > strong { font-size: 16px; font-weight: 600 }
+
+/* The roster summary popover floats (it keeps its box); inside it the budget and the issues are open rows. */
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .dt-summary-budget { margin: 4px 0; padding: 8px 12px; background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .dt-summary-budget strong, :root[data-look="next"] .tb-app:not(.duo-app) .tbe .dt-summary h2 { font-weight: 700 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-issues { gap: var(--nx-row-gap); margin: 0 0 4px; padding: 0; background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-issues li { padding: 6px 4px 6px 12px; background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-issues strong { font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe.tbe .tbe-issues button.tbe-show { min-width: 0; padding: 0 8px; border: 0; background: transparent; color: var(--nx-accent-text); font-weight: 600 }
+
+/* Sheets float and keep their box; what is inside them is open: choices are rounded rows, fields are filled, notes have no outline. */
+:root[data-look="next"] .tb-app:not(.duo-app) .tbs-choices { gap: var(--nx-row-gap) }
+:root[data-look="next"] .tb-app:not(.duo-app) button.tbs-choice { border-color: transparent; border-radius: var(--nx-row-radius); background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) button.tbs-choice.active { border-color: transparent; background: var(--nx-tint) }
+:root[data-look="next"] .tb-app:not(.duo-app).tb-pointer button.tbs-choice:not(.active):not([aria-disabled=true]):hover { background: var(--nx-hover) }
+:root[data-look="next"] .tb-app:not(.duo-app) button.tbs-choice:not(.active):not([aria-disabled=true]):active { background: var(--nx-press) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbs-choice strong { font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbs-action { border-color: transparent; background: var(--nx-hover); font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app).tb-pointer .tbs-action:not(:disabled):hover { background: var(--nx-press) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbs-field { font-weight: 600 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbs-field :is(input, select) { border-color: transparent; background: var(--nx-field); font-weight: 400 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbs-rows { gap: var(--nx-row-gap) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbs-rows li { padding: 8px 0; border: 0; border-radius: 0; background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbs-note { border: 0; background: transparent; padding: 4px 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbs-note.warn { padding: 12px 14px; border: 0; background: color-mix(in srgb, var(--ux-warn) 10%, transparent) }
+
+/* Other secondary buttons (empty states, first run, the read-only notice, the reused workspace flows): a quiet fill, no outline.
+   :where() keeps this below every specific rule above (text buttons in detail panes and the unit pane stay text buttons). */
+:root[data-look="next"] .tb-app.ux-screen:not(.duo-app) :where(button.ux-job-btn:not(.primary):not(.ux-src-ghost):not(.tb-confirm)), :root[data-look="next"] .tb-app.ux-screen:not(.duo-app) :where(.tb-flow button.dtp-btn:not(.primary)) { border-color: transparent; background: var(--nx-hover); font-weight: 600 }
+:root[data-look="next"] .tb-app.ux-screen:not(.duo-app).tb-pointer :where(button.ux-job-btn:not(.primary):not(.ux-src-ghost):not(.tb-confirm), .tb-flow button.dtp-btn:not(.primary)):not(:disabled):hover { background: var(--nx-press) }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-flow .dtp-icon { border-color: transparent; background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-flow .dts-change-group h4 { color: var(--ux-muted); font-size: var(--nx-heading-size); font-weight: var(--nx-heading-weight); letter-spacing: 0; text-transform: none }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-flow button.dtp-btn:not(.primary):disabled { background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-target select { border-color: transparent; background-color: var(--nx-field) }
+/* Rows inside a detail pane line up with its text; their rounded shape reaches into the pane's padding. */
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-detail .tb-list { margin: 0 -12px }
+:root[data-look="next"] .tb-app:not(.duo-app) .ux-cs-note { padding: 0; background: transparent; font-size: 13px }
+/* Keyboard shortcuts: the action on the left, the keys on the right as a small filled key cap. */
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-detail .ux-src-kv.tb-key-row { grid-template-columns: minmax(0, 1fr) auto; min-height: 44px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-key-row .tb-kbd { justify-self: end; min-width: 44px; border-color: transparent; background: var(--nx-hover); font-weight: 600; text-align: center }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-detail > button.tb-row { margin-inline: -12px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-flow button.dtp-btn.dts-quiet { background: transparent }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe-nx-detail .ux-5a-chips span { border-color: transparent; background: var(--nx-hover); color: var(--ux-ink); font-weight: 600 }
+/* In a narrow detail the points drop under the name instead of squeezing it. */
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-roster-head { flex-wrap: wrap; row-gap: 4px }
+:root[data-look="next"] .tb-app:not(.duo-app) .tb-nx-roster-head .tb-roster-heading { flex: 1 1 260px; min-width: 0 }
+:root[data-look="next"] .tb-app:not(.duo-app) .tbe .tbe-nx-choice:disabled { color: var(--ux-muted); cursor: default }

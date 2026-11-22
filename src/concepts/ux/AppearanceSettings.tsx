@@ -1,6 +1,7 @@
-import { AlertTriangle, Check, Languages, LoaderCircle, Palette, Upload, X } from "lucide-react";
+import { AlertTriangle, Check, ChevronDown, Languages, LoaderCircle, Palette, Upload, X } from "lucide-react";
 import { useState } from "react";
 import type { ConceptProps } from "../shared";
+import { useNextLook } from "../../look";
 
 // Battle Augur 6C: a design preview of the shipped local import flow, not a file validator.
 // State buttons make the native picker's outcomes reviewable in the web gallery.
@@ -18,6 +19,9 @@ export function AppearancePreferences({ props, states = false }: { props?: Conce
   const [language, setLanguage] = useState(props?.language ?? "en");
   const [mode, setMode] = useState(props?.themePreference ?? props?.themeMode ?? "system");
   const [outcome, setOutcome] = useState<Outcome>("idle");
+  const next = useNextLook();
+  // Proposed look: Colour scheme and Language are one row each (label left, the chosen value right) that opens its choices in place.
+  const [openRow, setOpenRow] = useState<"scheme" | "language" | null>(null);
   const busy = outcome === "importing";
   const importScheme = () => { setScheme("slate"); props?.onColorSchemeChange?.("default"); setOutcome("scheme"); };
   const importLanguage = () => { setLanguage("fr"); props?.onLanguageChange?.("fr"); setOutcome("language"); };
@@ -28,6 +32,46 @@ export function AppearancePreferences({ props, states = false }: { props?: Conce
       </div>
       {!busy && <button type="button" className="ux-icon-btn" aria-label="Dismiss import notice" onClick={() => setOutcome("idle")}><X size={16} /></button>}
     </div>;
+  const stateControls = states && <details><summary>Import states · gallery controls</summary><div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
+      <button type="button" className="ux-appearance-action" onClick={() => { setOpenRow("scheme"); setOutcome("importing"); }}>Importing</button>
+      <button type="button" className="ux-appearance-action" onClick={() => { setOpenRow("scheme"); importScheme(); }}>Saved scheme</button>
+      <button type="button" className="ux-appearance-action" onClick={() => { setOpenRow("language"); importLanguage(); }}>Language warnings</button>
+      <button type="button" className="ux-appearance-action" onClick={() => { setOpenRow("scheme"); setOutcome("error"); }}>Contrast error</button>
+      <button type="button" className="ux-appearance-action" onClick={() => setOutcome("idle")}>Cancel / unchanged</button>
+    </div><p className="ux-hint">Native app: system JSON picker; 16 KiB schemes, 128 KiB language packs, eight of each. Reimport the same ID or locale to replace. Errors preserve the current choice.</p></details>;
+  const swatch = (accent: string) => <span aria-hidden className="ux-nx-swatch">{["var(--ux-bg)", accent, "var(--ux-cool)"].map((color, i) => <span key={i} style={{ background: color }} />)}</span>;
+  const languages = [["en", "English"], ["fr", "Français · imported"]] as const;
+  if (next) return <div className="ux-appearance-preferences ux-nx-appearance">
+    <div className="ux-result-label">Appearance</div>
+    <div className="ux-nx-setting">
+      <span className="ux-nx-setting-label">Theme</span>
+      <div className="ux-nx-seg" role="radiogroup" aria-label="Theme">
+        {(["system", "light", "dark"] as const).map(value => <button key={value} type="button" role="radio" aria-checked={mode === value} onClick={() => { setMode(value); props?.onThemePreferenceChange?.(value); }}>{value[0].toUpperCase() + value.slice(1)}</button>)}
+      </div>
+    </div>
+    <button type="button" className="ux-nx-setting" aria-expanded={openRow === "scheme"} onClick={() => setOpenRow(openRow === "scheme" ? null : "scheme")}>
+      <span className="ux-nx-setting-label">Colour scheme</span>
+      <span className="ux-nx-setting-value">{swatch(schemes.find(item => item.id === scheme)?.accent ?? schemes[0].accent)}{schemes.find(item => item.id === scheme)?.name}<ChevronDown size={16} aria-hidden /></span>
+    </button>
+    {openRow === "scheme" && <div className="ux-nx-choices" role="radiogroup" aria-label="Colour scheme">
+      {schemes.map(item => <button key={item.id} type="button" role="radio" aria-checked={scheme === item.id} className="ux-nx-choice" onClick={() => { setScheme(item.id); props?.onColorSchemeChange?.(item.id === "slate" ? "default" : item.id as NonNullable<ConceptProps["colorScheme"]>); }}>
+        {swatch(item.accent)}<span>{item.name}</span>{scheme === item.id && <Check size={18} aria-hidden />}
+      </button>)}
+      <button type="button" className="ux-nx-text-action" disabled={busy} onClick={importScheme}><Upload size={16} aria-hidden />Import colour scheme</button>
+      {outcome !== "language" && feedback}
+    </div>}
+    <button type="button" className="ux-nx-setting" aria-expanded={openRow === "language"} onClick={() => setOpenRow(openRow === "language" ? null : "language")}>
+      <span className="ux-nx-setting-label">Language</span>
+      <span className="ux-nx-setting-value">{languages.find(([locale]) => locale === language)?.[1]}<ChevronDown size={16} aria-hidden /></span>
+    </button>
+    {openRow === "language" && <div className="ux-nx-choices" role="radiogroup" aria-label="Language">
+      {languages.map(([locale, name]) => <button key={locale} type="button" role="radio" aria-checked={language === locale} className="ux-nx-choice" onClick={() => { setLanguage(locale); props?.onLanguageChange?.(locale); }}><span>{name}</span>{language === locale && <Check size={18} aria-hidden />}</button>)}
+      <button type="button" className="ux-nx-text-action" disabled={busy} onClick={importLanguage}><Upload size={16} aria-hidden />Upload language pack</button>
+      {outcome === "language" && feedback}
+      <p className="ux-hint">Only the app interface is translated. Game data is shown as written.{language === "fr" && " 5 untranslated strings use English."}</p>
+    </div>}
+    {stateControls}
+  </div>;
   return <div className="ux-appearance-preferences" style={{ display: "grid", gap: 12 }}>
     <div className="ux-result-label">Appearance</div>
     <div style={{ background: "var(--ux-surface)", borderRadius: 14, padding: 14 }}>

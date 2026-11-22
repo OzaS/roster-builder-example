@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type RefObject } from 'react';
-import { AlertTriangle, ArrowDownToLine, BookOpen, Check, ChevronDown, ChevronLeft, Copy, Database, Ellipsis, FilePlus2, Flag, LibraryBig, Lock, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, Pencil, Plus, Redo2, Search, Trash2, Undo2, Upload, Users, X } from 'lucide-react';
+import { AlertTriangle, ArrowDownToLine, BookOpen, Check, ChevronDown, ChevronLeft, Circle, CircleDot, Copy, Database, Ellipsis, FilePlus2, Flag, LibraryBig, Lock, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, Pencil, Plus, Redo2, Search, Square, SquareCheck, Trash2, Undo2, Upload, Users, X } from 'lucide-react';
 import { PointsLine, RosterSummary, SummaryToggle } from '../workspace/RosterSummary';
 import type { Notify } from '../workspace/Toasts';
 import { StatusGlyph, TreeUnitMain } from '../ux/uxShared';
@@ -7,7 +7,7 @@ import { Count, FoldSection, RadioRow, SeparateRow, ToggleRow } from '../ux/Mobi
 import { galleryExportFormat, unitName, PRIMARY_FORCE_ID, ROLES, forceOf, groupLimit, rosterIssues, unitCost, useRosterHistory, type EditorUnit, type Force, type ExportRoster, type ImportResult, type ReadOnlyInfo, type RosterIssue } from '../desktop/DesktopEditorFlows';
 import { rosterLibrary } from '../desktop/desktopData';
 import type { RosterUnit } from '../../types';
-import type { TabletEnv } from './tabletEnv';
+import { useTabletNextLook, type TabletEnv } from './tabletEnv';
 import { HintButton } from './TabletHint';
 import { useBarItems, type BarItem, type BarMenuItem } from '../foldable/duoBarItems';
 import { StateChip } from '../workspace/StateChip';
@@ -74,6 +74,8 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
   // folded, HIG: avoid extreme layout changes as people fold), one on the closed display; the catalogue is a slide-over.
   const fold = env.fold;
   const vertical = env.bars === 'vertical';
+  // Proposed look: one toolbar (the pane toggles sit in it), no title bars inside the panes, the section's Add as a round button in its heading.
+  const next = useTabletNextLook(env);
   const mode: Mode = fold ? (env.width >= 700 ? 'two' : 'single') : env.widthClass === 'expanded' ? 'three' : env.width < 700 ? 'single' : 'two';
   // Under 440 logical px (split view at a larger text size) the header keeps Back, the roster mark, the points and More;
   // undo and redo move into More (UX-025: collapse rather than clip). With vertical bars they are toolbar items instead.
@@ -302,6 +304,9 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
         {pop === 'switcher' && <RosterSwitcher current={roster.name} onPick={switchRoster} onClose={() => setPop(null)} onAll={onAllRosters} onNew={onNewRoster} onImport={() => { setPop(null); onImport(); }} />}
       </div>
       <span className="tbe-header-spacer" />
+      {next && !vertical && mode === 'two' && !readOnly && <HintButton hint={`Add a unit to ${forces.length > 1 ? target.name : 'this roster'} from the catalogue`} input={env.input} side="bottom" className="ux-job-btn primary tbe-add" onClick={() => openCatalogue()}><Plus size={18} />Add unit</HintButton>}
+      {next && !vertical && mode === 'three' && <HintButton hint={showCatalogue ? 'Hide the catalogue' : 'Show the catalogue'} input={env.input} side="bottom" aria-label={showCatalogue ? 'Hide catalogue' : 'Show catalogue'} aria-pressed={showCatalogue} className="tbe-icon tbe-pane-toggle" onClick={() => setShowCatalogue(v => !v)}>{showCatalogue ? <PanelLeftClose size={20} /> : <PanelLeftOpen size={20} />}</HintButton>}
+      {next && !vertical && mode !== 'single' && <HintButton hint={showInspector ? 'Hide unit details' : 'Show unit details'} input={env.input} side="bottom" aria-label={showInspector ? 'Hide unit details' : 'Show unit details'} aria-pressed={showInspector} className="tbe-icon tbe-pane-toggle" onClick={() => setShowInspector(v => !v)}>{showInspector ? <PanelRightClose size={20} /> : <PanelRightOpen size={20} />}</HintButton>}
       {!narrowHead && !vertical && <><HintButton hint={readOnly ? 'Read-only roster: nothing to undo' : history.undoLabel ? `Undo “${history.undoLabel}”${keys('Mod+Z')}` : 'Nothing to undo'} input={env.input} side="bottom" aria-label={history.undoLabel ? `Undo ${history.undoLabel}` : 'Undo'} className="tbe-icon" disabled={!history.undoLabel || !!readOnly} onClick={undo}><Undo2 size={20} /></HintButton>
       <HintButton hint={readOnly ? 'Read-only roster: nothing to redo' : history.redoLabel ? `Redo “${history.redoLabel}”${keys('Mod+Shift+Z')}` : 'Nothing to redo'} input={env.input} side="bottom" aria-label={history.redoLabel ? `Redo ${history.redoLabel}` : 'Redo'} className="tbe-icon" disabled={!history.redoLabel || !!readOnly} onClick={redo}><Redo2 size={20} /></HintButton></>}
       <span className={`dt-app tb-shim ${light ? 'light' : ''}`} data-pop="summary"><SummaryToggle total={total} limit={limit} open={pop === 'summary'} onToggle={() => setPop(pop === 'summary' ? null : 'summary')} /></span>
@@ -335,10 +340,10 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
         {mode === 'three' && showCatalogue && (readOnly ? <ReadOnlyCataloguePane env={env} info={readOnly} onFindData={onFindData} onClose={() => setShowCatalogue(false)} /> : catalogue('pane'))}
 
         <section className="tbe-pane tbe-tree" aria-label="Roster">
-          <header className="tbe-pane-head">
+          {(!next || mode === 'single') && <header className="tbe-pane-head">
             <span><strong>{forces.length > 1 ? 'Your forces' : 'Your force'}</strong><small>{units.length} units{forces.length > 1 ? ` · ${forces.length} forces` : ''} · {pts(total)} pts</small></span>
             {!readOnly && (mode !== 'three' || !showCatalogue) && !(vertical && mode === 'single') && <HintButton hint={`Add a unit to ${forces.length > 1 ? target.name : 'this roster'} from the catalogue`} input={env.input} side="bottom" className="ux-job-btn primary tbe-add" onClick={() => openCatalogue()}><Plus size={18} />Add unit</HintButton>}
-          </header>
+          </header>}
           {readOnly && <section className="tbe-readonly" role="region" aria-label="Read-only roster" tabIndex={-1}><Lock size={20} />
             <div><strong>This roster is read-only</strong><p>{readOnly.faction} was removed from the installed {readOnly.system} data, so its units can't be checked or changed. The roster is kept as it was saved.</p>
               <div className="tbe-readonly-actions">
@@ -371,13 +376,18 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
                     const entries = own.filter(u => u.role === group);
                     const branchOpen = !collapsed.includes(key);
                     return <div key={group} className={`ux-tree-branch ${branchOpen ? 'open' : ''}`} data-tb-group={key}>
-                      <button type="button" className="ux-tree-section" aria-expanded={branchOpen} onClick={() => toggle(key)}>
+                      {next ? <div className="tbe-sec-head">
+                        <button type="button" className="ux-tree-section" aria-expanded={branchOpen} onClick={() => toggle(key)}>
+                          <ChevronDown size={16} className="ux-tree-caret" /><strong>{group}</strong><small>{entries.length} {groupLimit(force, group)}</small>
+                        </button>
+                        {!readOnly && <HintButton hint={`Add a ${group.toLowerCase()} unit to ${multi ? force.name : 'this roster'}`} input={env.input} side="bottom" wrapClassName="end" aria-label={`Add ${group.toLowerCase()} unit`} className="tbe-sec-add" onClick={() => openCatalogue(group, force.id)}><Plus size={18} /></HintButton>}
+                      </div> : <button type="button" className="ux-tree-section" aria-expanded={branchOpen} onClick={() => toggle(key)}>
                         <ChevronDown size={16} className="ux-tree-caret" /><strong>{group}</strong><small>{entries.length} {groupLimit(force, group)}</small>
-                      </button>
+                      </button>}
                       {branchOpen && <div className="ux-tree-units">
                         {entries.map(u => <UnitRow key={u.id} unit={u} env={env} active={u.id === selectedId} issue={unitIssue(u.id)} menuOpen={pop === `unit-${u.id}`} readOnly={!!readOnly}
                           onSelect={() => selectUnit(u)} onMenu={() => setPop(pop === `unit-${u.id}` ? null : `unit-${u.id}`)} onRename={() => { setPop(null); setSheet({ kind: 'rename-unit', id: u.id }); }} onDuplicate={() => duplicateUnit(u)} onRemove={() => removeUnit(u)} onMove={() => { setPop(null); setSheet({ kind: 'move', id: u.id }); }} />)}
-                        {!readOnly && <button type="button" className="ux-tree-add" onClick={() => openCatalogue(group, force.id)}><Plus size={16} />Add {group.toLowerCase()} unit</button>}
+                        {!next && !readOnly && <button type="button" className="ux-tree-add" onClick={() => openCatalogue(group, force.id)}><Plus size={16} />Add {group.toLowerCase()} unit</button>}
                       </div>}
                     </div>;
                   })}</div>}
@@ -389,7 +399,7 @@ export function TabletEditor({ env, notify, light, rosterName, from, start = 'ed
         </section>
 
         {mode !== 'single' && showInspector && <aside className="tbe-pane tbe-inspector" aria-label="Unit details">
-          <header className="tbe-pane-head"><span><strong>Unit details</strong></span><HintButton hint="Hide unit details (More → Show unit details brings them back)" input={env.input} side="bottom" wrapClassName="end" aria-label="Hide unit details" className="tbe-icon small" onClick={() => setShowInspector(false)}><PanelRightClose size={18} /></HintButton></header>
+          {!next && <header className="tbe-pane-head"><span><strong>Unit details</strong></span><HintButton hint="Hide unit details (More → Show unit details brings them back)" input={env.input} side="bottom" wrapClassName="end" aria-label="Hide unit details" className="tbe-icon small" onClick={() => setShowInspector(false)}><PanelRightClose size={18} /></HintButton></header>}
           {selected ? <UnitDetail key={selected.id} unit={selected} env={env} force={forceById(forceOf(selected))} faction={roster.faction} total={total} issue={unitIssue(selected.id)} readOnly={!!readOnly} separateAll={separateAll} onUpdate={update} onRename={() => setSheet({ kind: 'rename-unit', id: selected.id })} onDuplicate={() => duplicateUnit(selected)} onRemove={() => removeUnit(selected)} />
             : <EmptyDetail onAdd={readOnly ? undefined : () => openCatalogue()} />}
         </aside>}
@@ -449,6 +459,7 @@ function CataloguePanel({ env, variant, query, onQuery, role, onRole, forces, ta
   /** R2-03 (F4c): starred units (a Starred group first; the star before each name). Absent: the catalogue as before. */
   stars?: ReturnType<typeof useStars>;
 }) {
+  const next = useTabletNextLook(env);
   const matches = (e: CatalogueEntry) => e.name.toLowerCase().includes(query.trim().toLowerCase()) && (role === 'All' || e.role === role);
   // DEC-054: the limit explanation of one row at a time; a press shows it for a few seconds, a second press hides it.
   const [explained, setExplained] = useState<string | null>(null);
@@ -467,6 +478,18 @@ function CataloguePanel({ env, variant, query, onQuery, role, onRole, forces, ta
   }, [captionShown]);
   const starred = stars ? entries.filter(e => stars.isStarred(e.name) && matches(e)) : [];
   const row = (e: CatalogueEntry) => { const limit = catalogueLimit(e, own); const state = limit ? null : catalogueState(e, own); const unavailable = !!limit || state?.tone === 'err';
+    // Proposed look: no quota pill and no state tile. The reason is the line under the name, in the state's colour, and the Add button is muted.
+    if (next) return <div key={e.name} data-cat-entry={e.name} className={`tbe-cat-row tbe-nx-cat-row ${state ? state.tone : ''} ${limit ? 'limit' : ''} ${unavailable ? 'unavailable' : ''} ${stars ? 'with-star' : ''}`}>
+      {stars && <StarButton name={e.name} on={stars.isStarred(e.name)} onToggle={() => stars.toggle(e.name)} />}
+      <button type="button" className="tbe-cat-add" aria-disabled={unavailable || undefined} tabIndex={limit ? -1 : undefined}
+        aria-label={limit ? `${e.name}, ${e.points} points, limit reached` : `Add ${e.name}, ${e.points} points${state ? `, ${state.caption}, ${state.reason}` : ''}`} onClick={() => limit ? explain(e.name) : unavailable ? undefined : onAdd(e)}>
+        <span><strong>{e.name}</strong>{limit ? <small className="reason">{limit.selected} / {limit.max} · Limit reached</small> : state ? <small className="reason">{state.tone === 'warn' ? `${state.reason} · ${state.caption.toLowerCase()}` : state.reason}</small> : <small>{e.models} {e.models === 1 ? 'model' : 'models'} · {e.weapon}</small>}</span>
+      </button>
+      <span aria-hidden="true" />
+      <b aria-hidden="true">{e.points}<small> pts</small></b>
+      {limit ? <LimitAddButton name={e.name} points={e.points} selected={limit.selected} max={limit.max} input={env.input} open={explained === e.name || captionShown === e.name} onPress={() => explain(e.name)} />
+        : <span className={`tbe-cat-plus ${state ? 'muted' : ''}`} aria-hidden="true"><Plus size={18} /></span>}
+    </div>;
     // The row adds the unit (the whole row is its target); the state chip sits above it and only shows its caption.
     // DEC-054: no dimming. A reached limit shows the quota chip under the name (the name keeps the row's width) and the unavailable Add button; pressing the row or the button explains.
     return <div key={e.name} data-cat-entry={e.name} className={`tbe-cat-row ${state ? state.tone : ''} ${unavailable ? 'unavailable' : ''} ${stars ? 'with-star' : ''}`}>
@@ -481,10 +504,10 @@ function CataloguePanel({ env, variant, query, onQuery, role, onRole, forces, ta
         : <span className="tbe-cat-plus" aria-hidden="true"><Plus size={18} /></span>}
     </div>; };
   return <aside className={`tbe-pane tbe-catalogue ${variant}`} aria-label="Unit catalogue">
-    <header className="tbe-pane-head">
+    {!(next && variant === 'pane') && <header className="tbe-pane-head">
       <span><strong>Add units</strong><small>to {forces.length > 1 ? target.name : 'this roster'}</small></span>
       {!(variant === 'slide' && env.bars === 'vertical') && <HintButton hint={variant === 'pane' ? 'Hide the catalogue (More → Show catalogue brings it back)' : 'Close the catalogue'} input={env.input} side="bottom" wrapClassName="end" aria-label={variant === 'pane' ? 'Hide catalogue' : 'Close catalogue'} className="tbe-icon small" onClick={onClose}>{variant === 'pane' ? <PanelLeftClose size={18} /> : <X size={20} />}</HintButton>}
-    </header>
+    </header>}
     <div className="tbe-cat-tools">
       <label className="ux-search tb-search"><Search size={17} /><input ref={searchRef} value={query} onChange={e => onQuery(e.target.value)} placeholder="Find a unit…" aria-label="Find a unit" />{query && <button type="button" className="tbe-clear" aria-label="Clear search" onClick={() => onQuery('')}><X size={16} /></button>}</label>
       {/* DEC-050: the role pills stay in one row that scrolls sideways, with an edge fade where more pills are hidden. */}
@@ -527,9 +550,10 @@ function useEdgeFade(ref: RefObject<HTMLElement | null>, active: string) {
 }
 
 function ReadOnlyCataloguePane({ env, info, onFindData, onClose }: { env: TabletEnv; info: ReadOnlyInfo; onFindData: () => void; onClose: () => void }) {
+  const next = useTabletNextLook(env);
   return <aside className="tbe-pane tbe-catalogue pane" aria-label="Unit catalogue">
-    <header className="tbe-pane-head"><span><strong>Unit catalogue</strong></span>
-      <HintButton hint="Hide the catalogue (More → Show catalogue brings it back)" input={env.input} side="bottom" wrapClassName="end" aria-label="Hide catalogue" className="tbe-icon small" onClick={onClose}><PanelLeftClose size={18} /></HintButton></header>
+    {!next && <header className="tbe-pane-head"><span><strong>Unit catalogue</strong></span>
+      <HintButton hint="Hide the catalogue (More → Show catalogue brings it back)" input={env.input} side="bottom" wrapClassName="end" aria-label="Hide catalogue" className="tbe-icon small" onClick={onClose}><PanelLeftClose size={18} /></HintButton></header>}
     <div className="tbe-empty"><Lock size={30} /><strong>Nothing to add</strong><small>{info.faction} is not in the installed {info.system} data, so its units can't be added.</small><button type="button" className="ux-job-btn" onClick={onFindData}><Database size={17} />Find game data</button></div>
     <footer className="tbe-pane-foot"><Database size={15} />{info.faction}<span>removed</span></footer>
   </aside>;
@@ -591,6 +615,50 @@ function UnitDetail({ unit, env, force, faction, total, issue, readOnly, separat
   // The unit's model count is the sum of its groups; every model beyond the first of the unit costs the same (+12 pts).
   const setStacks = (next: number[]) => { const models = next.reduce((n, c) => n + c, 0); onUpdate({ stacks: next.length > 1 ? next : undefined, models, points: unit.points + (models - unit.models) * 12 }); };
   const [move, defence, resolve, health] = unitProfile(unit);
+  const next = useTabletNextLook(env);
+  // Proposed look: name and cost on one line, the actions as text buttons, option groups as open rows (no boxes), costs on the right.
+  if (next) return <section className="ux-mobile-unit-options tbe-detail tbe-nx-detail">
+    <div className="tbe-unit-title">
+      <span><h2>{unitName(unit)}</h2>{unit.customName && <p className="tbe-unit-entry">{unit.name}</p>}</span>
+      <strong>{cost}<small> pts</small></strong>
+    </div>
+    <p className="tbe-nx-context">{unit.role} · {force.name} · {share}% of roster</p>
+    <div className="tbe-unit-actions">
+      <HintButton hint={readOnly ? 'Read-only roster' : 'Give this unit a name of its own (empty restores the entry name)'} input={env.input} side="bottom" wrapClassName="start" className="ux-job-btn" disabled={readOnly} onClick={onRename}><Pencil size={17} />Rename</HintButton>
+      <HintButton hint={readOnly ? 'Read-only roster' : 'Add a copy of this unit to the same force'} input={env.input} side="bottom" className="ux-job-btn" disabled={readOnly} onClick={onDuplicate}><Copy size={17} />Duplicate</HintButton>
+      <HintButton hint={readOnly ? 'Read-only roster' : 'Remove this unit (Undo brings it back)'} input={env.input} side="bottom" className="ux-job-btn destructive" disabled={readOnly} onClick={onRemove}><Trash2 size={17} />Remove</HintButton>
+    </div>
+    {issue && <div className="ux-5a-notice tbe-unit-issue" role="status"><AlertTriangle size={18} /><span><strong>{issue.text}</strong><small>{issue.where}</small></span></div>}
+    <div className="ux-5b-tabs" role="tablist" aria-label="Unit view">{(['options', 'profile'] as const).map(id => <button type="button" role="tab" key={id} aria-selected={tab === id} onClick={() => setTab(id)}>{id === 'options' ? 'Options' : 'Profile'}</button>)}</div>
+    {tab === 'options' ? <div className="tbe-options">
+      <div className="tbe-nx-group">
+        <h4 className="tbe-nx-head"><span>Unit size</span><small className={sizeIssue ? 'ux-5a-invalid' : ''}>{sizeIssue && <AlertTriangle size={13} />}{pinned ? 'Always 1 model' : `${unit.role === 'Support' ? 1 : 3}–20 · ${sizeIssue ? 'needs more models' : 'soft limit'}`}</small></h4>
+        {stacks.map((count, i) => <div className="tbe-nx-size" key={i}>
+          <div className="tbe-nx-row"><span><strong>{memberLabel(unit)} ×{count}</strong>{!pinned && <small>+12 pts per extra model</small>}</span>
+            {!pinned && <Count name={stacks.length > 1 ? `Models in group ${i + 1}` : 'Models'} value={count} min={1} max={20} over={sizeIssue} disabled={readOnly} onChange={n => setStacks(stacks.map((c, k) => k === i ? n : c))} />}</div>
+          {!pinned && count > 1 && !readOnly ? <SeparateRow separateAll={separateAll} onOne={() => setStacks(stacks.flatMap((c, k) => k === i ? [c - 1, 1] : [c]))} onAll={() => setStacks(stacks.flatMap((c, k) => k === i ? Array<number>(c).fill(1) : [c]))} /> : null}
+        </div>)}
+      </div>
+      <div className="tbe-nx-group"><FoldSection title="Primary weapon" counter="1/1" summary={unit.weapon} {...fold('weapon')}>
+        <div role="radiogroup" aria-label="Primary weapon">{weaponChoices(unit).map(w => <NextChoice key={w} role="radio" name={w} cost="Included" on={unit.weapon === w} disabled={readOnly} onChange={() => onUpdate({ weapon: w })} />)}</div>
+      </FoldSection></div>
+      <div className="tbe-nx-group"><FoldSection title="Upgrades" counter={`${unit.upgrade ? 1 : 0}/1${standardIssue ? ' · one per force' : ''}`} invalid={standardIssue} summary={unit.upgrade ? 'Field standard' : ''} {...fold('upgrades')}>
+        <NextChoice role="checkbox" name="Field standard" sub="Carry the detachment's colours" cost="+10 pts" on={unit.upgrade} disabled={readOnly} onChange={() => onUpdate({ upgrade: !unit.upgrade })} />
+      </FoldSection></div>
+      <div className="tbe-nx-group">
+        <h4 className="tbe-nx-head"><span>Notes</span><small>Private · not exported</small></h4>
+        <textarea className="tbe-notes" aria-label="Unit notes" readOnly={readOnly} placeholder="A role, a reminder, a plan…" value={unit.notes ?? ''} onChange={e => onUpdate({ notes: e.target.value })} />
+      </div>
+    </div> : <>
+      <div className="tbe-nx-group"><h4 className="tbe-nx-head"><span>Unit</span></h4><div className="ux-5b-table"><table><thead><tr><th /><th>Move</th><th>Defence</th><th>Resolve</th><th>Health</th></tr></thead>
+        <tbody><tr><th>{unit.name}</th><td>{move}</td><td>{defence}</td><td>{resolve}</td><td>{health}</td></tr></tbody></table></div></div>
+      <div className="tbe-nx-group"><h4 className="tbe-nx-head"><span>Weapons</span></h4><div className="ux-5b-table"><table><thead><tr><th /><th>Range</th><th>Attacks</th><th>Strength</th></tr></thead>
+        <tbody><tr><th>{unit.weapon}</th>{weaponProfile(unit.weapon).map((v, i) => <td key={i}>{v}</td>)}</tr></tbody></table></div></div>
+      <div className="tbe-nx-group"><h4 className="tbe-nx-head"><span>Rules</span></h4>{unitRules(unit).map(r => <div key={r.name}><button type="button" className="ux-5a-choice" aria-expanded={rule === r.name} onClick={() => setRule(rule === r.name ? undefined : r.name)}><BookOpen size={18} /><span><strong>{r.name}</strong></span><ChevronDown size={18} className={rule === r.name ? 'tbe-rot' : 'tbe-rot closed'} /></button>{rule === r.name && <small className="tbe-rule-text">{r.text}</small>}</div>)}</div>
+    </>}
+    <div className="tbe-nx-group"><h4 className="tbe-nx-head"><span>Categories</span></h4>
+      <div className="ux-5a-chips">{unitCategories(unit, faction).map(c => <span key={c}>{c}</span>)}</div></div>
+  </section>;
   return <section className="ux-mobile-unit-options tbe-detail">
     <div className="tbe-unit-title">
       <span><small>{unit.role} · {force.name}</small><h2>{unitName(unit)}</h2>{unit.customName && <p className="tbe-unit-entry">{unit.name}</p>}</span>
@@ -632,6 +700,14 @@ function UnitDetail({ unit, env, force, faction, total, issue, readOnly, separat
     <h4>Categories</h4>
     <div className="ux-5a-chips">{unitCategories(unit, faction).map(c => <span key={c}>{c}</span>)}</div>
   </section>;
+}
+
+/** Proposed look: an option row without a box: the control, the name (and one line under it), the cost on the right. */
+export function NextChoice({ role, name, sub, cost, on, disabled, onChange }: { role: 'radio' | 'checkbox'; name: string; sub?: string; cost: string; on: boolean; disabled?: boolean; onChange: () => void }) {
+  const Icon = role === 'radio' ? (on ? CircleDot : Circle) : (on ? SquareCheck : Square);
+  return <button type="button" className={`tbe-nx-choice ${on ? 'on' : ''}`} role={role} aria-label={`${name}, ${cost}`} aria-checked={on} disabled={disabled} onClick={onChange}>
+    <Icon size={22} aria-hidden="true" /><span><strong>{name}</strong>{sub && <small>{sub}</small>}</span><em>{cost}</em>
+  </button>;
 }
 
 function EmptyDetail({ onAdd }: { onAdd?: () => void }) {
