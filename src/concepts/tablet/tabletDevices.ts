@@ -2,7 +2,7 @@
 // Sizes are the logical window sizes of the device; the width class follows the Material window size classes.
 
 /** `duo` is the Foldable library's passport foldable; it is not one of the Tablet library's frames. */
-export type TabletDeviceId = 'ipad-landscape' | 'ipad-portrait' | 'android' | 'fold' | 'split' | 'duo';
+export type TabletDeviceId = 'ipad-landscape' | 'ipad-portrait' | 'android' | 'android-portrait' | 'fold' | 'split' | 'duo';
 export type TabletInput = 'touch' | 'pointer';
 export type WidthClass = 'compact' | 'medium' | 'expanded';
 export type TabletDevice = { id: TabletDeviceId; label: string; short: string; width: number; height: number; system: 'ios' | 'android' };
@@ -11,6 +11,7 @@ export const tabletDevices: TabletDevice[] = [
   { id: 'ipad-landscape', label: 'iPad 11″ landscape', short: 'iPad landscape', width: 1194, height: 834, system: 'ios' },
   { id: 'ipad-portrait', label: 'iPad 11″ portrait', short: 'iPad portrait', width: 834, height: 1194, system: 'ios' },
   { id: 'android', label: 'Android tablet', short: 'Android', width: 1280, height: 800, system: 'android' },
+  { id: 'android-portrait', label: 'Android tablet portrait (capture harness only)', short: 'Android portrait', width: 800, height: 1280, system: 'android' },
   { id: 'fold', label: 'Foldable unfolded', short: 'Foldable', width: 884, height: 1104, system: 'android' },
   { id: 'split', label: 'Split view', short: 'Split view', width: 600, height: 834, system: 'ios' },
 ];

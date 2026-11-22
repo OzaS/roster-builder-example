@@ -1,0 +1,28 @@
+/*
+ * The proposed look ("next"), shared values. Scope every rule in this folder to :root[data-look="next"].
+ * See src/look.ts. Nothing here is approved (DEC-051); the approved design is the look "current".
+ *
+ * The language, in short ("open lists"):
+ * - One page background. No bordered or raised boxes around content. Boxes stay for things that float:
+ *   dialogs, sheets, menus, popovers, toasts, the job pill, the paper preview in Export.
+ * - Groups are separated by space and a text heading. No filled bands, no header rows, no column grid.
+ * - Rows have no dividers. A row is a rounded shape: hover and press tint it, selection fills it with the accent tint.
+ * - One value on the right of a row (points), status under it. No row menu button; actions are swipe,
+ *   long-press, hover or the selected row.
+ */
+:root[data-look="next"] {
+  --nx-row-radius: 12px;
+  --nx-row-inset: 8px;
+  --nx-row-gap: 2px;
+  --nx-group-gap: 20px;
+  --nx-heading-size: 13px;
+  --nx-heading-weight: 600;
+  --nx-chip-height: 34px;
+}
+
+/* Gallery chrome: the look switch. */
+.gallery-look-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 6px; border-radius: 12px; background: color-mix(in srgb, var(--surface-2) 80%, white); box-shadow: inset 4px 4px 10px rgba(122, 142, 150, 0.18), inset -4px -4px 10px rgba(255, 255, 255, 0.8); }
+.gallery-look-switch button { display: grid; gap: 1px; min-height: 42px; place-content: center; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--muted); cursor: pointer; font: inherit; }
+.gallery-look-switch button span { font-size: 13px; font-weight: 850; }
+.gallery-look-switch button small { font-size: 9px; font-weight: 700; }
+.gallery-look-switch button.active { color: var(--ink); background: var(--surface); box-shadow: 3px 4px 10px rgba(35, 54, 61, 0.12); }

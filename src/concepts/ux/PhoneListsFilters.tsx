@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from "react";
-import { Archive, Check, CircleArrowUp, Layers3, Search, Wand2, X } from "lucide-react";
+import { Archive, Check, CircleAlert, CircleArrowUp, Layers3, Search, TriangleAlert, Wand2, X } from "lucide-react";
 import { rosterLibrary, type RosterSummary } from "../desktop/desktopData";
 import "./phone-lists.css";
+import { useNextLook } from "../../look";
 
 /**
  * Phone Lists with search, the filter row and grouping (TFB-005): the tablet Rosters controls on the phone. All,
@@ -25,7 +26,17 @@ function Tag({ r }: { r: RosterSummary }) {
   return null;
 }
 
+/** The proposed look ("next", see src/look.ts): the status as words with an icon under the points, no pill. */
+function NextStatus({ r }: { r: RosterSummary }) {
+  if (r.status === "data-changed") return <small className="ux-nx-status info"><CircleArrowUp size={12} aria-hidden />Changed by update</small>;
+  if (r.status === "faction-removed") return <small className="ux-nx-status err"><Archive size={12} aria-hidden />Faction removed</small>;
+  if (r.used > r.limit) return <small className="ux-nx-status warn"><TriangleAlert size={12} aria-hidden />{(r.used - r.limit).toLocaleString("en-US")} over</small>;
+  if (r.status === "issues") return <small className="ux-nx-status err"><CircleAlert size={12} aria-hidden />{plural(r.issues ?? 1, "error")}</small>;
+  return <small className="ux-nx-status">{r.opened}</small>;
+}
+
 export function PhoneListsFilters({ initialGrouped = false, initialSystem = null, longSystem, promptDismissed = false, query = "", onQueryChange, actions, onOpenRoster }: { initialGrouped?: boolean; initialSystem?: string | null; promptDismissed?: boolean; /** Gallery state: shows this game system under a long name (the chip truncates it). */ longSystem?: string; query?: string; onQueryChange?: (query: string) => void; actions?: ReactNode; onOpenRoster?: () => void }) {
+  const next = useNextLook();
   const [promptOpen, setPromptOpen] = useState(!promptDismissed);
   const [system, setSystem] = useState<string | null>(initialSystem);
   const [attention, setAttention] = useState(false);
@@ -38,7 +49,13 @@ export function PhoneListsFilters({ initialGrouped = false, initialSystem = null
   const visible = rosters.filter((r) => `${r.name} ${r.faction} ${r.system}`.toLowerCase().includes(q) && (!attention || needsAttention(r)) && (system === null || r.system === system));
   const groups = bySystem && grouped ? systems.map((s) => ({ name: s.name, rows: visible.filter((r) => r.system === s.name) })).filter((g) => g.rows.length > 0) : null;
   const clear = () => { onQueryChange?.(""); setSystem(null); setAttention(false); };
-  const row = (r: RosterSummary) => (
+  // Proposed look: one muted line under the name; points over the opened time or the status; no box, no row menu.
+  const row = (r: RosterSummary) => next ? (
+    <button type="button" key={r.name} className="ux-lf-roster ux-nx-row" onClick={onOpenRoster}>
+      <span className="ux-nx-row-main"><strong>{r.name}</strong><small>{r.faction} · {r.system}</small></span>
+      <span className="ux-nx-row-end"><b className={r.used > r.limit ? "over" : ""}>{r.used.toLocaleString("en-US")} / {r.limit.toLocaleString("en-US")}</b><NextStatus r={r} /></span>
+    </button>
+  ) : (
     <button type="button" key={r.name} className="ux-source-row ux-src-row ux-lf-roster" onClick={onOpenRoster}>
       <span><strong>{r.name}</strong><small>{r.faction} · {r.system}</small><small>Opened {r.opened}</small></span>
       <span className="ux-ro-list-trailing"><b className={r.used > r.limit ? "over" : ""}>{r.used} / {r.limit} pts</b><Tag r={r} /></span>
@@ -46,17 +63,17 @@ export function PhoneListsFilters({ initialGrouped = false, initialSystem = null
   );
   return (
     <main className="ux-lists-main ux-lf">
-      {promptOpen ? <div className="ux-cmd-hero"><button type="button" className="ux-cmd-hero-close" aria-label="Close getting started prompt" onClick={() => setPromptOpen(false)}><X size={16} /></button><Wand2 size={20} /><h2>What do you want to build?</h2><p>Start a new roster. Rosters you open stay here, most recent first.</p></div> : null}
+      {promptOpen && (!next || rosters.length === 0) ? <div className="ux-cmd-hero"><button type="button" className="ux-cmd-hero-close" aria-label="Close getting started prompt" onClick={() => setPromptOpen(false)}><X size={16} /></button><Wand2 size={20} /><h2>What do you want to build?</h2><p>Start a new roster. Rosters you open stay here, most recent first.</p></div> : null}
       {actions}
       <div className="ux-lf-row">
         <div className="ux-lf-filters ux-lf-scroll ux-lf-always" role="group" aria-label="Show rosters">
-          <button type="button" className={`ux-lf-chip ${!attention && system === null ? "active" : ""}`} aria-pressed={!attention && system === null} onClick={() => { setSystem(null); setAttention(false); }}>All {rosters.length}</button>
-          {bySystem && systems.map((s) => <button type="button" key={s.name} className={`ux-lf-chip ${system === s.name ? "active" : ""}`} aria-pressed={system === s.name} aria-label={`${s.name}, ${plural(s.count, "roster")}`} onClick={() => setSystem(system === s.name ? null : s.name)}>{system === s.name ? <Check size={15} aria-hidden /> : null}<span>{s.name}</span> {s.count}</button>)}
-          {attentionCount > 0 ? <button type="button" className={`ux-lf-chip ${attention ? "active" : ""}`} aria-pressed={attention} onClick={() => setAttention(!attention)}>{attention ? <Check size={15} aria-hidden /> : null}Needs attention {attentionCount}</button> : null}
+          <button type="button" className={`ux-lf-chip ${!attention && system === null ? "active" : ""}`} aria-pressed={!attention && system === null} onClick={() => { setSystem(null); setAttention(false); }}>All {next ? <i className="ux-nx-count">{rosters.length}</i> : rosters.length}</button>
+          {bySystem && systems.map((s) => <button type="button" key={s.name} className={`ux-lf-chip ${system === s.name ? "active" : ""}`} aria-pressed={system === s.name} aria-label={`${s.name}, ${plural(s.count, "roster")}`} onClick={() => setSystem(system === s.name ? null : s.name)}>{system === s.name ? <Check size={15} aria-hidden /> : null}<span>{s.name}</span> {next ? <i className="ux-nx-count">{s.count}</i> : s.count}</button>)}
+          {attentionCount > 0 ? <button type="button" className={`ux-lf-chip ${attention ? "active" : ""}`} aria-pressed={attention} onClick={() => setAttention(!attention)}>{attention ? <Check size={15} aria-hidden /> : null}Needs attention {next ? <i className="ux-nx-count">{attentionCount}</i> : attentionCount}</button> : null}
         </div>
         {bySystem ? <button type="button" className={`ux-lf-group ${grouped ? "active" : ""}`} aria-pressed={grouped} aria-label="Group by game system" title="Group by game system" onClick={() => setGrouped(!grouped)}><Layers3 size={19} aria-hidden /></button> : null}
       </div>
-      {groups && groups.length > 0 ? null : <div className="ux-result-label">Recent</div>}
+      {(groups && groups.length > 0) || (next && visible.length === 0) ? null : <div className="ux-result-label">Recent</div>}
       {visible.length === 0
         ? <div className="ux-search-empty"><Search size={19} /><strong>No rosters match</strong><small>Try another name, or clear the filters.</small><button type="button" className="ux-job-btn" onClick={clear}>Clear filters</button></div>
         : groups

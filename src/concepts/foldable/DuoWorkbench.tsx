@@ -18,6 +18,7 @@ import { TabletEnvContext, type TabletEnv } from '../tablet/tabletEnv';
 import { widthClassOf } from '../tablet/tabletDevices';
 import { IconHints } from '../tablet/TabletHint';
 import { useTabletExperience } from '../tablet/tabletExperience';
+import { PinLook } from '../../look';
 import { BarRegistry, BarRegistryContext, type BarLayer } from './duoBarItems';
 import { DuoBottomTabs, DuoSideBar, type DuoPage } from './DuoBars';
 import { contentWidth, FOLD_GAP, poseById, STATUS_HEIGHT } from './duoPoses';
@@ -35,7 +36,7 @@ type ThemePref = 'system' | 'light' | 'dark';
  * edge and screens declare their toolbar items (useBarItems); open in portrait the bars are horizontal. Content layouts follow
  * size classes: compact on the outer display (one pane at a time, as on the phone), regular on the inner display (panes).
  */
-export function DuoWorkbench(props: Partial<ConceptProps>) {
+function DuoWorkbenchBody(props: Partial<ConceptProps>) {
   const screen = props.workflowScreen as string | undefined;
   return <DuoShell key={screen} {...props} spec={duoScreenOf(screen)} />;
 }
@@ -123,4 +124,9 @@ function DuoShell({ spec, ...props }: Partial<ConceptProps> & { spec: DuoScreen 
       <IconHints root={appRef} input="touch" />
     </div>
   </TabletEnvContext.Provider></BarRegistryContext.Provider>;
+}
+
+/** The foldable library stays on the approved look in this pass: the proposed look (src/look.ts) does not style it yet. */
+export function DuoWorkbench(props: Partial<ConceptProps>) {
+  return <PinLook look="current"><DuoWorkbenchBody {...props} /></PinLook>;
 }
