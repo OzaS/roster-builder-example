@@ -55,12 +55,14 @@ export function StartWindow({ mode, platform, initial = "recent", problem, inter
   const [job, setJob] = useState<Job | null>(initial === "opening" ? { kind: "open", title: "Demo Skirmish", path: recents[0].path[platform], files: 31, modules: 5, tick: 7, static: true } : null);
   const rowRefs = useRef(new Map<string, HTMLDivElement>());
   const gridRef = useRef<HTMLDivElement>(null);
-  const firstDialog = useRef(true);
+  const userDialog = useRef(false);
+  const showDialog = (p: OpenProblem) => { userDialog.current = true; setDialog(p); };
 
   /* A dialog opened by the user takes the focus (its primary choice), so Return and Esc reach it; the starting state doesn't steal focus. */
   useEffect(() => {
-    if (firstDialog.current) { firstDialog.current = false; return; }
-    if (dialog) gridRef.current?.querySelector<HTMLElement>(".cg-dialog .d-btn.primary")?.focus();
+    if (dialog && userDialog.current) gridRef.current?.querySelector<HTMLElement>(".cg-dialog .d-btn.primary")?.focus();
+    else if (!dialog && userDialog.current) gridRef.current?.querySelector<HTMLElement>(".cg-recent.selected")?.focus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dialog]);
 
   /* Job ticks (interactive jobs only; the `opening` state stays put for captures). */
@@ -77,7 +79,7 @@ export function StartWindow({ mode, platform, initial = "recent", problem, inter
   const startJob = (j: Omit<Job, "tick">) => { setDialog(null); setJob({ ...j, tick: 0 }); };
   const open = (r: Recent) => {
     if (r.missing) return;
-    if (r.outcome && r.outcome !== "open") { setSel(r.id); setDialog(r.outcome); return; }
+    if (r.outcome && r.outcome !== "open") { setSel(r.id); showDialog(r.outcome); return; }
     startJob({ kind: "open", title: r.title, path: r.path[platform], readOnly: r.form !== "folder", files: r.files, modules: r.modules });
   };
   const remove = (id: string) => {
@@ -93,7 +95,7 @@ export function StartWindow({ mode, platform, initial = "recent", problem, inter
     setList((current) => { const next = [...current]; next.splice(removed.index, 0, removed.r); return next; });
     setSel(removed.r.id); setRemoved(null);
   };
-  const openFolder = () => setDialog("not-dataset");
+  const openFolder = () => showDialog("not-dataset");
   const convert = () => startJob({ kind: "convert", title: "skirmish-xml", path: xmlFolder[platform], files: xmlFolder.files, modules: 5 });
   const openSample = () => startJob({ kind: "open", title: "the Demo Skirmish sample", path: "Inside Field Cogitator", readOnly: true, files: 14, modules: 3 });
   const selected = visible.find((r) => r.id === sel);
@@ -102,7 +104,7 @@ export function StartWindow({ mode, platform, initial = "recent", problem, inter
   const onKey = (event: ReactKeyboardEvent<HTMLDivElement>) => {
     const mod = platform === "mac" ? event.metaKey : event.ctrlKey;
     if (event.key === "Escape") {
-      if (dialog) { event.preventDefault(); setDialog(null); return; }
+      if (dialog) { event.preventDefault(); close(); return; }
       if (job && !jobDone(job)) { event.preventDefault(); setJob(null); return; }
     }
     if (dialog) {
@@ -135,7 +137,7 @@ export function StartWindow({ mode, platform, initial = "recent", problem, inter
     if (p === "parse-errors") return () => startJob({ kind: "open", title: r.title, path: r.path[platform], files: r.files, modules: r.modules });
     return () => startJob({ kind: "open", title: r.title, path: r.path[platform], readOnly: true, files: r.files, modules: r.modules });
   };
-  const close = () => setDialog(null);
+  const close = () => { userDialog.current = true; setDialog(null); };
   const dialogFor = (p: OpenProblem): ReactNode => {
     const r = problemDataset;
     const cancel: DlgAction = { label: "Cancel", cancel: true, onClick: close, title: "Close this and go back to the start window" };

@@ -213,7 +213,8 @@
 .fc-cg .cg-dialog-actions .d-btn { gap: 8px; }
 .fc-cg .cg-dialog-actions .d-btn.danger { color: var(--cg-status-error); }
 /* Windows (ContentDialog): the choices sit in a footer band of the surface colour, equal widths, the primary first. */
-.fc-cg[data-platform="windows"] .cg-dialog-actions { display: grid; grid-auto-columns: minmax(0, 1fr); grid-auto-flow: column; padding: 16px 20px; border-top: 1px solid var(--cg-line); background: var(--cg-surface); }
+.fc-cg[data-platform="windows"] .cg-dialog { width: 500px; }
+.fc-cg[data-platform="windows"] .cg-dialog-actions { display: grid; grid-auto-columns: minmax(max-content, 1fr); grid-auto-flow: column; padding: 16px 20px; border-top: 1px solid var(--cg-line); background: var(--cg-surface); }
 .fc-cg[data-platform="windows"] .cg-dialog-actions .d-btn { justify-content: center; }
 .fc-cg[data-platform="windows"] .cg-dialog-actions .cg-dialog-left { margin-right: 0; }
 .fc-cg[data-platform="windows"] .cg-dialog-main { padding: 22px 24px 18px; }

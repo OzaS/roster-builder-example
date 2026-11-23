@@ -70,6 +70,18 @@
       "screen": "e1-start-window",
       "summary": "What Field Cogitator shows with no dataset open: the app actions in the sidebar (Open folder…, Open file…, Convert from XML data…, the sample, Settings), recent datasets as dense rows with a status edge from the last check, a drop target; states recent, first run, opening (steps with counts and Cancel), missing on disk, 960 px and large text; macOS and Windows.",
       "source": "D4 step 3a, E1 screens (2026-11-22)"
+    },
+    {
+      "id": "cg-e1-start-errors",
+      "title": "E1 open errors",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "desktop"
+      ],
+      "screen": "e1-start-errors",
+      "summary": "Dialogs (sheets on macOS) over the start window when a dataset cannot be opened as is: not a dataset (Convert… for XML data files), newer DKLPO version (open read-only), files that do not parse (open anyway, they open as source text with their errors), folder not writable (open read-only or Save as…). One sentence, the folder, choices as verbs; Return = primary, Esc = Cancel; macOS and Windows.",
+      "source": "D4 step 3a, E1 screens (2026-11-22)"
     }
   ]
 }
