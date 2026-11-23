@@ -80,7 +80,7 @@
 .cg-caption svg { width: 10px; height: 10px; fill: none; stroke: currentColor; stroke-width: 1; }
 .cg-caption .cg-caption-min svg, .cg-caption .cg-caption-max svg { shape-rendering: crispEdges; }
 .cg-caption .cg-caption-close { border-top-right-radius: var(--cg-radius-window); }
-.cg-caption .cg-caption-close:hover, .cg-caption .cg-caption-close.is-hover { background: var(--cg-caption-close); color: #fff; }
+.cg-caption .cg-caption-close:hover, .fc-cg .cg-caption > .cg-caption-close.is-hover { background: var(--cg-caption-close); color: #fff; }
 
 /* ---------- Command palette (⌘K / Ctrl+K): a dialog, so it floats ---------- */
 .cg-palette { width: 560px; max-width: 100%; overflow: hidden; border: 1px solid var(--cg-line); border-radius: var(--cg-radius-float); background: var(--cg-float); box-shadow: var(--cg-elev-dialog); }
