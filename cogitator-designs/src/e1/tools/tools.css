@@ -17,7 +17,6 @@
 .fc-cg .cg-tl-facts dd .mono { font: var(--cg-text-mono-kw) var(--cg-mono); }
 .fc-cg .cg-tl-cmd { display: flex; align-items: center; gap: var(--cg-space-4); min-width: 0; margin: 0; padding: var(--cg-space-3) var(--cg-space-7); border-top: 1px solid var(--cg-line); background: var(--cg-surface); }
 .fc-cg .cg-tl-cmd code { flex: 1; min-width: 0; overflow: hidden; color: var(--cg-muted); font: var(--cg-text-mono-kw) var(--cg-mono); text-overflow: ellipsis; white-space: nowrap; }
-.fc-cg .cg-err { color: var(--cg-status-error); }
 .fc-cg .cg-tl-mono { font: var(--cg-text-mono-kw) var(--cg-mono); }
 
 /* Verdict mark: icon + word */
@@ -223,7 +222,7 @@
 .cg-ed .cg-tl-rt .cg-tl-contracts { margin: 0; }
 .cg-ed .cg-tl-rt .cg-tl-h { padding-left: var(--cg-space-4); }
 .cg-ed .d-top .cg-tl-verdict { margin-left: var(--cg-space-2); }
-.cg-ed .d-top .cg-seg { margin-right: var(--cg-space-4); }
+.cg-ed .d-top .cg-seg.cg-tl-routeseg { margin-right: var(--cg-space-4); }
 .fc-cg .cg-tl-route { display: grid; gap: var(--cg-space-1); margin: 0 0 var(--cg-space-6); padding: 0 var(--cg-space-4); }
 .fc-cg .cg-tl-route strong { font-weight: 600; }
 .fc-cg .cg-tl-route .mono { font: var(--cg-text-mono-kw) var(--cg-mono); }

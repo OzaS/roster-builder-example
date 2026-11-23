@@ -46,7 +46,7 @@ export const toolScreens: E1Screen[] = [
     tryIt: [
       { what: "Convert", how: "Convert (⌘↵) runs the steps, then the report; Esc cancels. Dry run does the same and writes nothing (Open is then unavailable and says why)." },
       { what: "Options", how: "switch the input kind, the text language and columns; turning the envelope off also turns Keep the original files off (it needs the envelope); the command line under the report follows." },
-      { what: "Report", how: "Convert another goes back to the options." },
+      { what: "Report", how: "Convert another (in the options footer) goes back to the options." },
     ],
     render: ({ mode, platform, state, interactive }) => <ConvertScreen key={`${state}-${platform}`} mode={mode} platform={platform} state={state} interactive={interactive} />,
   },

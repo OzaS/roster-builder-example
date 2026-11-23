@@ -174,7 +174,7 @@ export function RoundtripScreen({ mode, state = "equal", interactive }: { mode: 
             <span className="d-crumbs">Demo Skirmish<span>/</span>Roundtrip</span>
             {verdict}
             <span className="d-spacer" />
-            <span className="cg-seg" role="radiogroup" aria-label="Route">
+            <span className="cg-seg cg-tl-routeseg" role="radiogroup" aria-label="Route">
               <button type="button" role="radio" aria-checked={!reverse} className={reverse ? "" : "active"} onClick={() => { setRoute("xml"); setSel("c2"); }} title="Roundtrip the XML data this dataset was converted from (C2 and C1)">From the XML data</button>
               <button type="button" role="radio" aria-checked={reverse} className={reverse ? "active" : ""} onClick={() => { setRoute("dataset"); setSel("reconvert"); }} title="The reverse route: write this dataset as XML data and read it back">From this dataset</button>
             </span>

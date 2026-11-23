@@ -132,7 +132,9 @@ export function ConvertScreen({ mode, platform, state = "options", interactive }
       </div>
       <footer className="cg-tl-cv-actions">
         {written ? <span className="cg-tl-help cg-tl-why">Converted. To convert again, turn on Update or choose another output folder.</span> : null}
-        <button type="button" className="d-btn" onClick={() => convert(true)} disabled={busy || phase === "refused"} title="Convert and report; write nothing">Dry run</button>
+        {written || (dry && (phase === "equal" || phase === "differences"))
+          ? <button type="button" className="d-btn" onClick={() => setPhase("options")} title="Back to the options and the input's documents">Convert another</button>
+          : <button type="button" className="d-btn" onClick={() => convert(true)} disabled={busy || phase === "refused"} title="Convert and report; write nothing">Dry run</button>}
         <button type="button" className="d-btn primary" onClick={() => convert(false)} disabled={busy || phase === "refused" || written}
           title={phase === "refused" ? "The input can’t be read: choose another" : written ? "The output folder isn’t empty now: turn on Update, or choose another folder" : "Convert and write the dataset"}>Convert<kbd>{keyFor(platform, "⌘↵", "Ctrl+Enter")}</kbd></button>
       </footer>
@@ -204,7 +206,6 @@ export function ConvertScreen({ mode, platform, state = "options", interactive }
         <VerdictMark v={diff ? "different" : "equal"}>{diff ? "2 documents differ" : "Equal"}</VerdictMark>
         <span className="d-muted">3.8 s</span>
         <span className="d-spacer" />
-        <button type="button" className="d-btn" onClick={() => setPhase("options")}>Convert another</button>
         <button type="button" className="d-btn">{mac ? "Show in Finder" : "Show in Explorer"}</button>
         <button type="button" className="d-btn primary" disabled={dry} title={dry ? "A dry run wrote nothing: Convert first" : "Open the new dataset in an editor window"}><CornerDownLeft size={13} />{dry ? "Nothing to open: dry run" : "Open the converted dataset"}{dry ? null : <kbd>{keyFor(platform, "↵", "Enter")}</kbd>}</button>
       </>
