@@ -1,0 +1,123 @@
+/*
+ * Field Cogitator primitives that Direction D doesn't draw yet, plus the platform and state rules every primitive needs.
+ * Direction D's own primitives (rows, sidebar items, page blocks, helper box, panel) stay in `../directions/direction-d.css`
+ * under `.fc-d`; everything here reads `tokens.css` and is scoped to `.fc-cg` with `cg-` class names, so a D window
+ * (which has neither `data-platform` nor `data-text`, nor any `cg-`/`is-` class) is not touched.
+ */
+
+/* ---------- A specimen: a piece of a window drawn alone (the Elements and Design language pages) ---------- */
+.fc-spec {
+  color: var(--cg-ink); font: var(--cg-text)/var(--cg-leading) var(--cg-font); text-align: left;
+  -webkit-font-smoothing: antialiased;
+}
+.fc-spec.light { color-scheme: light; }
+.fc-spec.dark { color-scheme: dark; }
+.fc-spec * { box-sizing: border-box; }
+.fc-spec h1, .fc-spec h2, .fc-spec h3, .fc-spec h4, .fc-spec p, .fc-spec ul, .fc-spec ol { margin: 0; padding: 0; }
+.fc-spec ul, .fc-spec ol { list-style: none; }
+.fc-spec button { display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; color: inherit; font: inherit; cursor: default; padding: 0; }
+.fc-spec svg { flex-shrink: 0; }
+.fc-spec kbd, .fc-cg .cg-kbd { padding: 0 4px; border: 1px solid var(--cg-line); border-radius: var(--cg-radius-chip); color: var(--cg-muted); font: var(--cg-text-micro)/1.55 var(--cg-font-ui); white-space: nowrap; }
+.fc-spec .mono { font-family: var(--cg-mono); font-size: var(--cg-text-mono); }
+.fc-spec .muted { color: var(--cg-muted); }
+.fc-spec .num { font-variant-numeric: tabular-nums; text-align: right; }
+.fc-spec .fc-diag-icon.error { color: var(--cg-status-error); }
+.fc-spec .fc-diag-icon.preservation { color: var(--cg-status-preservation); }
+.fc-spec .fc-diag-icon.suggestion { color: var(--cg-status-suggestion); }
+/* Floating objects drawn in place (in the window they are positioned over the page). */
+.fc-spec .d-helper, .fc-spec .d-pill { position: relative; top: auto; right: auto; }
+.fc-spec .d-helper { max-height: none; }
+.fc-spec .d-peek.is-static { position: relative; top: auto; left: auto; }
+
+/* ---------- Static states (the gallery shows hover, pressed and focus side by side) ---------- */
+.fc-cg :is(.d-item, .d-row, .d-group, .d-ghost, .d-icon, .d-block, .d-issue, .d-tog, .d-ws, .cg-menu-item, .cg-pal-row, .cg-caption > span).is-hover { background: var(--cg-hover); }
+.fc-cg :is(.d-props dd).is-hover { background: var(--cg-hover); }
+.fc-cg .d-ptabs [role="tab"].is-hover { background: var(--cg-hover); }
+.fc-cg .d-btn.is-hover { background: var(--cg-press); }
+.fc-cg .d-mention.is-hover { background: var(--cg-mention-hover); }
+.fc-cg .d-exit.is-hover { background: var(--cg-exit-hover); }
+.fc-cg .d-pill.is-hover { border-color: color-mix(in srgb, var(--cg-accent) 45%, var(--cg-line)); }
+.fc-cg :is(.d-item, .d-row, .d-group, .d-ghost, .d-icon, .d-block, .d-issue, .d-tog, .cg-menu-item, .cg-pal-row).is-press { background: var(--cg-row-pressed); filter: var(--cg-press-filter); }
+.fc-cg .d-btn.is-press { background: var(--cg-press); filter: var(--cg-press-filter); }
+.fc-cg .d-btn.primary.is-press { background: var(--cg-accent); }
+.fc-cg[data-platform="windows"] .d-btn.primary.is-press { background: var(--cg-accent-press); }
+.fc-cg .is-focus { outline: var(--cg-focus-width) solid var(--cg-focus-color); outline-offset: var(--cg-focus-offset); }
+
+/* Windows answers a live press with a fill, not a filter. */
+.fc-cg[data-platform="windows"] :is(.d-item, .d-row, .d-group, .d-ghost, .d-icon, .d-tog, .d-btn, .cg-menu-item, .cg-pal-row):active:not(:disabled) { background: var(--cg-press); }
+.fc-cg[data-platform="windows"] .d-btn.primary:active:not(:disabled) { background: var(--cg-accent-press); }
+
+/* Disabled: muted text, no hover, the fill of a quiet button; never only lower opacity. */
+.fc-cg :is(.d-btn, .d-btn.primary):disabled, .fc-cg :is(.d-btn, .d-btn.primary):disabled:hover { background: var(--cg-hover); color: var(--cg-muted); font-weight: 500; filter: none; }
+.fc-cg :is(.d-ghost, .d-icon, .d-item, .cg-menu-item):disabled, .fc-cg :is(.d-ghost, .d-icon, .d-item, .cg-menu-item):disabled:hover { background: none; color: var(--cg-muted); filter: none; }
+.fc-cg :is(.d-ghost, .d-icon, .cg-menu-item):disabled svg { color: var(--cg-muted); opacity: .7; }
+
+/* ---------- Large text: rows grow, names wrap, costs keep their column ---------- */
+.fc-cg[data-text="large"] .d-row { height: auto; min-height: var(--cg-row); padding-block: 4px; align-items: start; white-space: normal; }
+.fc-cg[data-text="large"] .d-row > svg { margin-top: .3em; }
+.fc-cg[data-text="large"] .d-row .d-changed { margin-top: .6em; }
+.fc-cg[data-text="large"] .d-row .d-diag { margin-top: .2em; }
+.fc-cg[data-text="large"] .d-name { overflow: visible; white-space: normal; overflow-wrap: anywhere; }
+.fc-cg[data-text="large"] .d-colheads, .fc-cg[data-text="large"] .d-row { grid-template-columns: 16px minmax(0, 1fr) 30px 56px 16px; }
+.fc-cg[data-text="large"] .d-item { height: auto; min-height: var(--cg-row); padding-block: 3px; white-space: normal; }
+.fc-cg[data-text="large"] .d-props > div { grid-template-columns: 9.5em minmax(0, 1fr); align-items: start; }
+.fc-cg[data-text="large"] .d-props dt { min-height: var(--cg-prop-row); }
+
+/* ---------- Window frames (macOS traffic lights; Windows caption buttons, Augur RK-03 style) ---------- */
+.cg-win { display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--cg-line); border-radius: var(--cg-radius-window); background: var(--cg-surface); box-shadow: var(--cg-elev-window); }
+.cg-win-body { display: grid; grid-template-columns: var(--cg-win-side, 232px) minmax(0, 1fr); flex: 1; min-height: 0; }
+.cg-win-side { display: flex; flex-direction: column; gap: 1px; padding: 0 8px 10px; border-right: 1px solid var(--cg-line); background: var(--cg-surface); }
+.cg-win-side-top { display: flex; align-items: center; height: var(--cg-header); flex-shrink: 0; padding-left: 8px; }
+.cg-win-main { display: flex; flex-direction: column; min-width: 0; background: var(--cg-pane); }
+.cg-win-top { display: flex; align-items: center; gap: 8px; height: var(--cg-header); flex-shrink: 0; padding: 0 12px 0 18px; white-space: nowrap; }
+.fc-cg[data-platform="windows"] .cg-win-top { padding-right: 0; }
+.fc-cg[data-platform="windows"] .cg-win-side-top { padding-left: 4px; }
+.fc-cg[data-platform="windows"] .cg-win-side-top .d-ws { margin: 0; flex: 1; }
+/* Windows' own minimise / maximise / close (Electron titleBarOverlay): 46 px wide, the header row's height, theme chrome colours. */
+.cg-caption { display: flex; align-self: stretch; margin-left: 6px; color: var(--cg-ink); }
+.cg-caption > span { display: grid; place-items: center; width: 46px; }
+.cg-caption > span:hover { background: var(--cg-hover); }
+.cg-caption svg { width: 10px; height: 10px; fill: none; stroke: currentColor; stroke-width: 1; }
+.cg-caption .cg-caption-min svg, .cg-caption .cg-caption-max svg { shape-rendering: crispEdges; }
+.cg-caption .cg-caption-close { border-top-right-radius: var(--cg-radius-window); }
+.cg-caption .cg-caption-close:hover, .fc-cg .cg-caption > .cg-caption-close.is-hover { background: var(--cg-caption-close); color: #fff; }
+
+/* ---------- Command palette (⌘K / Ctrl+K): a dialog, so it floats ---------- */
+.cg-palette { width: 560px; max-width: 100%; overflow: hidden; border: 1px solid var(--cg-line); border-radius: var(--cg-radius-float); background: var(--cg-float); box-shadow: var(--cg-elev-dialog); }
+.cg-pal-input { display: flex; align-items: center; gap: 10px; height: calc(var(--cg-header) + 4px); padding: 0 12px 0 16px; border-bottom: 1px solid var(--cg-line); }
+.cg-pal-input > svg { color: var(--cg-muted); }
+.cg-pal-input input { flex: 1; min-width: 0; border: 0; background: none; color: var(--cg-ink); font: inherit; font-size: var(--cg-text-palette); outline: none; }
+.cg-pal-input input::placeholder { color: var(--cg-muted); }
+.cg-pal-scope { display: inline-flex; align-items: center; height: 20px; padding: 0 6px; border-radius: var(--cg-radius-chip); background: var(--cg-hover); color: var(--cg-muted); font-size: var(--cg-text-micro); font-weight: 600; }
+.cg-pal-body { padding: 4px 6px 6px; }
+.cg-pal-group { display: flex; align-items: center; gap: 6px; height: var(--cg-control-sm); margin-top: 4px; padding: 0 10px; color: var(--cg-muted); font-size: var(--cg-text-caption); font-weight: 600; }
+.cg-pal-row { display: flex; align-items: center; gap: 10px; width: 100%; height: var(--cg-row); padding: 0 10px; border-radius: var(--cg-radius-control); text-align: left; white-space: nowrap; }
+.cg-pal-row > svg { color: var(--cg-muted); }
+.cg-pal-row:hover { background: var(--cg-hover); }
+.cg-pal-row.selected { background: var(--cg-select); }
+.cg-pal-row.selected > svg { color: var(--cg-accent-text); }
+.cg-pal-row strong { font-weight: 500; overflow: hidden; text-overflow: ellipsis; }
+.cg-pal-row mark { background: none; color: inherit; font-weight: 700; }
+.cg-pal-row .mono { overflow: hidden; color: var(--cg-muted); font-size: var(--cg-text-mono-kw); text-overflow: ellipsis; }
+.cg-pal-row .cg-pal-end { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; color: var(--cg-muted); font-size: var(--cg-text-caption); font-variant-numeric: tabular-nums; }
+.cg-pal-foot { display: flex; align-items: center; gap: 4px; height: var(--cg-footer); padding: 0 14px; border-top: 1px solid var(--cg-line); color: var(--cg-muted); font-size: var(--cg-text-caption); white-space: nowrap; }
+.cg-pal-foot kbd + span { margin-right: 8px; }
+.cg-pal-empty { padding: 14px 10px 16px; color: var(--cg-muted); font-size: var(--cg-text-small); }
+
+/* ---------- Context menu (right-click, ⇧F10): floats like D's / menu ---------- */
+.cg-menu { width: 252px; padding: 5px; border: 1px solid var(--cg-line); border-radius: var(--cg-radius-popover); background: var(--cg-float); box-shadow: var(--cg-elev-menu); }
+.cg-menu-item { display: flex; align-items: center; gap: 10px; width: 100%; height: var(--cg-menu-item); padding: 0 8px; border-radius: var(--cg-radius-control); text-align: left; white-space: nowrap; }
+.cg-menu-item > svg { color: var(--cg-muted); }
+.cg-menu-item:hover { background: var(--cg-hover); }
+.cg-menu-item .cg-menu-key { margin-left: auto; color: var(--cg-muted); font-size: var(--cg-text-caption); letter-spacing: .02em; }
+.cg-menu-item.danger, .cg-menu-item.danger > svg { color: var(--cg-status-error); }
+.cg-menu-sep { height: 1px; margin: 4px 8px; background: var(--cg-line); }
+.cg-menu-label { padding: 2px 8px 4px; color: var(--cg-muted); font-size: var(--cg-text-caption); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ---------- More static states and in-place drawing of D primitives ---------- */
+.fc-cg .d-filter.is-focus-within { box-shadow: inset 0 0 0 1.5px var(--cg-accent); }
+.fc-cg .d-resize.is-hover::after { background: var(--cg-accent); }
+.fc-cg .d-seg button.is-hover:not(.active) { background: var(--cg-hover); }
+.fc-spec .d-slashmenu { position: relative; left: auto; top: auto; }
+/* A nested token scope (large text beside default, one platform inside another's cell). */
+.cg-scope { color: var(--cg-ink); font: var(--cg-text)/var(--cg-leading) var(--cg-font); }

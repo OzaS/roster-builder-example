@@ -40,6 +40,24 @@
       "screen": "entry-editor-d",
       "summary": "Entry editor mixing the three directions: B's sidebar and document page in the middle; selecting a source opens A's dense grouped list beside the sidebar; a floating helper box (issues, suggestions, actions) collapses to a pill or expands into C's resizable inspector panel; focus mode (double-click a source, ⌘. or the toolbar) hides the sidebar. Interactive mock.",
       "source": "User mix of A, B and C (2026-11-22)"
+    },
+    {
+      "id": "cg-design-language",
+      "title": "Design language (from Direction D)",
+      "kind": "look",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "summary": "Direction D written down as one token file (src/language/tokens.css: semantic colour light and dark, type, spacing, density, radii, elevation, motion, focus) with a Windows platform layer, large text, forced colours and reduced motion, plus layout numbers and the collapse order (src/language/layout.ts). Direction D reads them; its captures are byte-identical. Gallery page ?page=language.",
+      "source": "D4 step 2, design language (2026-11-22)"
+    },
+    {
+      "id": "cg-elements",
+      "title": "Elements view",
+      "kind": "look",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "summary": "Every primitive Direction D uses, live from the tokens, in light and dark and on macOS and Windows where they differ, with states side by side; new: Windows window frame (caption buttons), command palette (⌘K), context menu, the large text rule for rows. Entries listed in cogitator.design.json (elements.sections). Gallery page ?page=elements.",
+      "source": "D4 step 2, design language (2026-11-22)"
     }
   ]
 }

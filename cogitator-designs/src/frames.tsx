@@ -42,3 +42,18 @@ export function MacWindow({ children, mode, height = 900, className = "" }: { ch
 export function TrafficLights() {
   return <span className="fc-traffic" aria-hidden><i /><i /><i /></span>;
 }
+
+/**
+ * Windows' own minimise / maximise / close (Electron titleBarOverlay), as in the Battle Augur desktop app (RK-03): 46 px
+ * buttons at the far right of the header row, in the theme's chrome colours. System chrome, so hidden from the accessible tree.
+ * `hover` draws one button in its hover state (the Elements view).
+ */
+export function WinCaption({ hover }: { hover?: "min" | "max" | "close" }) {
+  return (
+    <span className="cg-caption" aria-hidden title="Windows window controls (system)">
+      <span className={`cg-caption-min${hover === "min" ? " is-hover" : ""}`}><svg viewBox="0 0 10 10"><path d="M0 5.5h10" /></svg></span>
+      <span className={`cg-caption-max${hover === "max" ? " is-hover" : ""}`}><svg viewBox="0 0 10 10"><rect x="0.5" y="0.5" width="9" height="9" rx="1" /></svg></span>
+      <span className={`cg-caption-close${hover === "close" ? " is-hover" : ""}`}><svg viewBox="0 0 10 10"><path d="M0.5 0.5l9 9M9.5 0.5l-9 9" /></svg></span>
+    </span>
+  );
+}

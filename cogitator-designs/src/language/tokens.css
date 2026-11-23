@@ -1,0 +1,243 @@
+/*
+ * Field Cogitator design language: the token file (D4 step 2, extracted from Direction D).
+ *
+ * The single source for colour, type, density, radii, elevation, motion and focus in Field Cogitator windows.
+ * Scope: an element with `.fc-cg` and `.light` or `.dark` (a window, or a specimen in the gallery). Platform layer:
+ * macOS is the base; `[data-platform="windows"]` switches font, text size, corners, density and focus.
+ * Pane widths and window breakpoints are numbers the code needs (resize, grid columns): they live in `layout.ts`.
+ *
+ * Names are semantic: surface (the quiet paper of sidebar and panel), pane (list and page), float (raised objects),
+ * ink, muted, line, accent, status-* (error, preservation, suggestion, ok), state mixes (hover, press, select).
+ */
+
+/* ---------- Colour, light (base) ---------- */
+.fc-cg {
+  --cg-surface: #f7f6f3;
+  --cg-pane: #ffffff;
+  --cg-float: #ffffff;
+  --cg-ink: #2a2926;
+  --cg-muted: #6c6862;
+  --cg-line: #e9e7e2;
+  --cg-accent: #2b78b4;
+  --cg-accent-text: #22679c;
+  --cg-accent-ink: #ffffff;
+  --cg-status-error: #c4352a;
+  --cg-status-preservation: #a36307;
+  --cg-status-suggestion: #1b7aa0;
+  --cg-status-ok: #1f8a4f;
+  /* Tag hues (categories, mention chips): a hue mixed into the background, never a fill of its own. */
+  --cg-tag-1: #c98a3c;
+  --cg-tag-2: #4f9a6c;
+  --cg-tag-3: #8a6fc4;
+  --cg-tag-mix: 20%;
+  /* Windows' own close-button red (caption buttons); system chrome, same in both themes. */
+  --cg-caption-close: #c42b1c;
+
+  /* State mixes: the one way rows, buttons and blocks answer hover, press and selection. */
+  --cg-hover: color-mix(in srgb, var(--cg-ink) 5%, transparent);
+  --cg-press: color-mix(in srgb, var(--cg-ink) 10%, transparent);
+  --cg-select: color-mix(in srgb, var(--cg-accent) 14%, transparent);
+  --cg-mention: color-mix(in srgb, var(--cg-accent) 10%, transparent);
+  --cg-mention-hover: color-mix(in srgb, var(--cg-accent) 18%, transparent);
+  --cg-exit-hover: color-mix(in srgb, var(--cg-accent) 22%, transparent);
+  --cg-badge-error: color-mix(in srgb, var(--cg-status-error) 16%, transparent);
+  --cg-flag-error: color-mix(in srgb, var(--cg-status-error) 9%, transparent);
+  --cg-flag-preservation: color-mix(in srgb, var(--cg-status-preservation) 11%, transparent);
+  --cg-flag-suggestion: color-mix(in srgb, var(--cg-status-suggestion) 9%, transparent);
+  --cg-press-filter: brightness(.94);
+  /* A pressed row keeps its hover fill on macOS (the press filter darkens it); Windows fills it with --cg-press. */
+  --cg-row-pressed: var(--cg-hover);
+  /* Primary button pressed (Windows draws it; macOS uses the press filter). */
+  --cg-accent-press: color-mix(in srgb, var(--cg-accent) 85%, var(--cg-ink));
+
+  /* ---------- Type (macOS: system font, 13 px working text) ---------- */
+  --cg-font: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --cg-font-ui: -apple-system, BlinkMacSystemFont, sans-serif;
+  --cg-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --cg-text: 13px;
+  --cg-leading: 1.45;
+  --cg-text-small: 12.5px;
+  --cg-text-caption: 12px;
+  --cg-text-micro: 11.5px;
+  --cg-text-mono: 12px;
+  --cg-text-mono-kw: 11.5px;
+  --cg-text-section: 17px;
+  --cg-weight-section: 650;
+  --cg-text-title: 30px;
+  --cg-weight-title: 700;
+  --cg-text-title-key: 26px;
+  --cg-text-palette: 15px;
+
+  /* ---------- Spacing (4 px grid with the half steps D uses) ---------- */
+  --cg-space-1: 2px;
+  --cg-space-2: 4px;
+  --cg-space-3: 6px;
+  --cg-space-4: 8px;
+  --cg-space-5: 10px;
+  --cg-space-6: 12px;
+  --cg-space-7: 14px;
+  --cg-space-8: 18px;
+  --cg-space-9: 24px;
+  --cg-space-10: 36px;
+
+  /* ---------- Density (heights) ---------- */
+  --cg-row: 28px;
+  --cg-row-group-gap: 4px;
+  --cg-control: 26px;
+  --cg-control-sm: 22px;
+  --cg-colheads: 22px;
+  --cg-prop-row: 30px;
+  --cg-menu-item: 27px;
+  --cg-pill: 30px;
+  --cg-header: 44px;
+  --cg-toolbar: 42px;
+  --cg-footer: 30px;
+  --cg-helper-header: 34px;
+  --cg-icon-button: 28px;
+  --cg-icon-button-sm: 24px;
+
+  /* ---------- Radii (macOS: 6 px controls and rows, larger only for what floats) ---------- */
+  --cg-radius-chip: 4px;
+  --cg-radius-block: 5px;
+  --cg-radius-control: 6px;
+  --cg-radius-tab: 7px;
+  --cg-radius-group: 8px;
+  --cg-radius-popover: 9px;
+  --cg-radius-float: 12px;
+  --cg-radius-window: 12px;
+  --cg-radius-pill: 999px;
+
+  /* ---------- Elevation: only floating things are raised (pill, helper box, popovers, menus, palette, dialogs) ---------- */
+  --cg-elev-thumb: 0 1px 2px rgb(0 0 0 / .12);
+  --cg-elev-pill: 0 6px 18px rgb(30 25 15 / .12);
+  --cg-elev-box: 0 10px 30px rgb(30 25 15 / .12), 0 1px 3px rgb(30 25 15 / .08);
+  --cg-elev-popover: 0 12px 32px rgb(0 0 0 / .16);
+  --cg-elev-menu: 0 14px 40px rgb(0 0 0 / .18);
+  --cg-elev-dialog: 0 24px 60px rgb(15 20 30 / .22), 0 0 0 .5px rgb(0 0 0 / .12);
+  --cg-elev-window: 0 24px 60px rgb(15 20 30 / .18), 0 0 0 .5px rgb(0 0 0 / .12);
+
+  /* ---------- Motion ---------- */
+  --cg-motion-fast: .12s;
+  --cg-motion-layout: .2s;
+  --cg-ease: ease;
+
+  /* ---------- Focus ---------- */
+  --cg-focus-width: 2px;
+  --cg-focus-color: var(--cg-accent);
+  --cg-focus-offset: -2px;
+}
+
+/* ---------- Colour, dark ---------- */
+.fc-cg.dark {
+  --cg-surface: #22211f;
+  --cg-pane: #1b1a19;
+  --cg-float: #2a2927;
+  --cg-ink: #ebe9e5;
+  --cg-muted: #a6a29b;
+  --cg-line: #34322f;
+  --cg-accent: #66aee6;
+  --cg-accent-text: #82bdea;
+  --cg-accent-ink: #0b1a26;
+  --cg-status-error: #ff7b6b;
+  --cg-status-preservation: #f0b44a;
+  --cg-status-suggestion: #5cc6ec;
+  --cg-status-ok: #57d98a;
+  --cg-elev-pill: 0 6px 18px rgb(0 0 0 / .5);
+  --cg-elev-box: 0 12px 34px rgb(0 0 0 / .5);
+  --cg-elev-popover: 0 12px 32px rgb(0 0 0 / .55);
+  --cg-elev-menu: 0 14px 40px rgb(0 0 0 / .55);
+  --cg-elev-dialog: 0 24px 60px rgb(0 0 0 / .5), 0 0 0 .5px rgb(255 255 255 / .1);
+  --cg-elev-window: 0 24px 60px rgb(0 0 0 / .5), 0 0 0 .5px rgb(255 255 255 / .1);
+}
+
+/* ---------- Platform layer: Windows (Segoe UI Variable, 14 px working text, 4 / 8 px corners, explicit pressed and focus) ---------- */
+.fc-cg[data-platform="windows"] {
+  --cg-font: "Segoe UI Variable Text", "Segoe UI Variable", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+  --cg-font-ui: var(--cg-font);
+  --cg-mono: "Cascadia Mono", Consolas, ui-monospace, monospace;
+  --cg-text: 14px;
+  --cg-leading: 1.43;
+  --cg-text-small: 13px;
+  --cg-text-caption: 12px;
+  --cg-text-micro: 12px;
+  --cg-text-mono: 13px;
+  --cg-text-mono-kw: 12px;
+  --cg-text-section: 18px;
+  --cg-weight-section: 600;
+  --cg-text-title: 28px;
+  --cg-weight-title: 600;
+  --cg-text-title-key: 24px;
+  --cg-text-palette: 16px;
+
+  --cg-row: 32px;
+  --cg-control: 32px;
+  --cg-control-sm: 24px;
+  --cg-colheads: 24px;
+  --cg-prop-row: 34px;
+  --cg-menu-item: 32px;
+  --cg-pill: 32px;
+  --cg-header: 48px;
+  --cg-toolbar: 44px;
+  --cg-footer: 32px;
+  --cg-helper-header: 36px;
+  --cg-icon-button: 32px;
+  --cg-icon-button-sm: 28px;
+
+  --cg-radius-chip: 4px;
+  --cg-radius-block: 4px;
+  --cg-radius-control: 4px;
+  --cg-radius-tab: 4px;
+  --cg-radius-group: 4px;
+  --cg-radius-popover: 8px;
+  --cg-radius-float: 8px;
+  --cg-radius-window: 8px;
+
+  /* Windows answers a press with a darker fill (not a filter) and shows focus as a ring outside the control, in ink. */
+  --cg-press: color-mix(in srgb, var(--cg-ink) 14%, transparent);
+  --cg-press-filter: none;
+  --cg-row-pressed: var(--cg-press);
+  --cg-focus-color: var(--cg-ink);
+  --cg-focus-offset: 1px;
+}
+
+/*
+ * Large text (working text at 1.25×). Heights stay minimums: rows grow, names wrap, costs keep their column
+ * (primitives.css switches rows from a fixed height to a minimum under `[data-text="large"]`).
+ */
+.fc-cg[data-text="large"] {
+  --cg-text: 16.25px;
+  --cg-text-small: 15.6px;
+  --cg-text-caption: 15px;
+  --cg-text-micro: 14.4px;
+  --cg-text-mono: 15px;
+  --cg-text-mono-kw: 14.4px;
+}
+.fc-cg[data-platform="windows"][data-text="large"] {
+  --cg-text: 17.5px;
+  --cg-text-small: 16.25px;
+  --cg-text-caption: 15px;
+  --cg-text-micro: 15px;
+  --cg-text-mono: 16.25px;
+  --cg-text-mono-kw: 15px;
+}
+
+/*
+ * Forced colours (Windows High Contrast and contrast themes): the system palette replaces every token. Status edges and
+ * the changed dot use `forced-color-adjust: none` only where shape carries the meaning anyway (the diagnostic icons differ
+ * by shape); selection becomes Highlight / HighlightText; focus is a 2 px CanvasText ring.
+ */
+@media (forced-colors: active) {
+  .fc-cg {
+    --cg-select: Highlight;
+    --cg-focus-color: CanvasText;
+    --cg-focus-offset: 1px;
+  }
+}
+
+/* Reduced motion: layout changes (columns, helper box) happen at once. */
+@media (prefers-reduced-motion: reduce) {
+  .fc-cg {
+    --cg-motion-fast: 0s;
+    --cg-motion-layout: 0s;
+  }
+}
