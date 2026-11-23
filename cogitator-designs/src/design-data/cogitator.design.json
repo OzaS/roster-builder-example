@@ -94,7 +94,143 @@
         "entries": [
           { "id": "check.large-text", "title": "Large text (1.25×)", "from": "New rule for Direction D's rows", "platforms": ["mac", "windows"], "states": ["default", "large"], "summary": "Working text at 1.25×: rows grow from a minimum height, names wrap instead of truncating, costs keep their right-aligned column, property labels wrap." }
         ]
+      },
+      {
+        "id": "e1-start",
+        "title": "Open a dataset and settings (E1)",
+        "entries": [
+          {
+            "id": "e1.recent-row",
+            "title": "Recent-dataset row",
+            "from": "New in E1 (start window)",
+            "platforms": [
+              "mac",
+              "windows"
+            ],
+            "states": [
+              "default",
+              "hover",
+              "selected with actions",
+              "error / preservation / suggestion edge",
+              "archive tag",
+              "missing on disk",
+              "large text"
+            ],
+            "summary": "Icon, title (with an Archive or Sample tag), folder, DKLPO version, layers on / total, last opened; the status edge is the last check’s worst kind. Selected, a second line shows the last check and the actions (Open, Show in Finder, Remove from the list) or, when missing, Locate… / Remove from the list."
+          },
+          {
+            "id": "e1.progress-row",
+            "title": "Progress row",
+            "from": "New in E1 (opening, converting)",
+            "platforms": [
+              "mac"
+            ],
+            "states": [
+              "done",
+              "running",
+              "waiting",
+              "failed"
+            ],
+            "summary": "A step of a longer job: status icon, label, count, and a thin accent bar while it runs."
+          },
+          {
+            "id": "e1.drop-target",
+            "title": "Drop target",
+            "from": "New in E1 (start window)",
+            "platforms": [
+              "mac"
+            ],
+            "states": [
+              "idle",
+              "dragging over"
+            ],
+            "summary": "A dashed outline that holds no content (not a card); turns into the selection tint while a folder or archive is dragged over it."
+          },
+          {
+            "id": "e1.dialog",
+            "title": "Dialog and sheet",
+            "from": "New in E1 (open errors, editor dialogs)",
+            "platforms": [
+              "mac",
+              "windows"
+            ],
+            "states": [
+              "sheet (macOS)",
+              "dialog with footer band (Windows)",
+              "primary + Esc keys",
+              "destructive choice"
+            ],
+            "summary": "What happened in one sentence, the file or folder, the choices as verbs; Return does the primary, Esc the safe choice. Floats with the dialog elevation over a scrim."
+          },
+          {
+            "id": "e1.popover-sections",
+            "title": "Popover menu with sections",
+            "from": "The context menu, extended in E1 (dataset switcher)",
+            "platforms": [
+              "mac",
+              "windows"
+            ],
+            "states": [
+              "head block",
+              "section label",
+              "two-line item",
+              "hover",
+              "tag"
+            ],
+            "summary": "The context menu, wider, with a head block for the open dataset, section labels and two-line items with a folder in mono."
+          },
+          {
+            "id": "e1.settings-row",
+            "title": "Settings row and controls",
+            "from": "New in E1 (settings)",
+            "platforms": [
+              "mac",
+              "windows"
+            ],
+            "states": [
+              "checkbox / switch on, off, unavailable",
+              "pop-up / drop-down closed and open",
+              "radios with notes",
+              "help text"
+            ],
+            "summary": "Label, control, help text. macOS: the classic preferences layout with checkboxes; Windows: label and help left, control right, switches with On / Off, radios stacked; no setting cards."
+          },
+          {
+            "id": "e1.settings-nav",
+            "title": "Settings tabs and navigation list",
+            "from": "New in E1 (settings)",
+            "platforms": [
+              "mac",
+              "windows"
+            ],
+            "states": [
+              "selected",
+              "hover"
+            ],
+            "summary": "macOS toolbar tabs (icon above label); Windows navigation list with the accent indicator bar."
+          },
+          {
+            "id": "e1.shortcut-list",
+            "title": "Shortcut list",
+            "from": "New in E1 (settings, Keyboard)",
+            "platforms": [
+              "mac",
+              "windows"
+            ],
+            "states": [
+              "grouped rows",
+              "hover"
+            ],
+            "summary": "Command and its keys as one keycap per key, grouped by task; read-only in E1."
+          }
+        ]
       }
     ]
-  }
+  },
+  "screens": [
+    {"id": "e1-start-window", "title": "Start window", "item": "cg-e1-start-window", "group": "Open a dataset", "states": ["recent", "first-run", "opening", "missing", "narrow", "large"], "platforms": ["mac", "windows"], "summary": "No dataset open: app actions in the sidebar, recent datasets (title, folder, DKLPO version, layers on / total, last opened, status edge), a drop target. The selected row opens a second line with the last check and Open / Show in Finder / Remove from the list, or for a missing dataset Locate… / Remove from the list.", "workflows": ["Open a recent dataset: select (click or ↑ ↓), Return or double-click; progress shows reading files, compiling and checking with counts; Esc cancels", "Remove a recent dataset: ⌘⌫ (Delete on Windows) or the row action; Undo in the footer (⌘Z)", "Missing dataset: Locate… points the row at its new folder, or remove it", "Open folder… / Open file… / drop a folder or archive; a problem shows the open-errors dialog", "Convert from XML data…: pick a folder of .gst / .cat files; the steps run with counts and the new dataset opens", "First run: the empty state offers the three actions and the sample dataset"]},
+    {"id": "e1-start-errors", "title": "Open errors", "item": "cg-e1-start-errors", "group": "Open a dataset", "states": ["not-dataset", "newer-format", "parse-errors", "permission"], "platforms": ["mac", "windows"], "summary": "A sheet (macOS) or dialog with a footer band (Windows) over the start window: what happened, the folder, the choices as verbs; the primary takes Return, Cancel takes Esc.", "workflows": ["Not a dataset: Convert… (XML data files found), Choose another folder…, Cancel", "Newer DKLPO version: Open read-only (what the newer version added shows as source text, nothing saved) or Cancel", "Files that do not parse: Open anyway (the files open as source text with their errors; their entries are left out) or Cancel", "Folder not writable: Open read-only, Save as… elsewhere, or Cancel"]},
+    {"id": "e1-start-editor-dialogs", "title": "Window-level dialogs over the editor", "item": "cg-e1-start-editor-dialogs", "group": "Open a dataset", "states": ["switcher", "unsaved", "changed-on-disk", "changed-on-disk-edits", "save-failed"], "platforms": ["mac"], "summary": "Dataset switcher popover and the sheets for unsaved changes, a module changed on disk and a failed save, over a static Direction D window.", "workflows": ["Switch dataset: Demo Skirmish ▾ opens the switcher; a recent dataset, Open…, Convert… or Close dataset; with unsaved changes the Save / Don’t save / Cancel sheet follows", "Changed on disk without edits: Reload (primary), Keep mine (Esc), Compare", "Changed on disk with edits: Compare (primary), Keep mine (Esc), Reload and discard my edits", "Save failed: Retry (primary), Save as…, Cancel (Esc); edits stay in the editor"]},
+    {"id": "e1-start-settings", "title": "Settings", "item": "cg-e1-start-settings", "group": "Settings", "states": ["general", "editor", "checking", "text", "appearance", "keyboard", "command-line"], "platforms": ["mac", "windows"], "summary": "Settings window, one state per section; macOS toolbar tabs, Windows navigation list; open rows of label, control and help text.", "workflows": ["General: open the last dataset at start, recent list length, clear the recent list (Undo)", "Editor: source text beside the page by default, / insert, format on save (fmt), font size", "Checking: default check level lenient / strict (a dataset’s checking: wins), run checks on save, show authoring suggestions", "Text: text pack language, how names without text show", "Appearance: theme (system / light / dark), accent (system or app)", "Keyboard: read-only shortcut list with a filter", "Command line: engine, DKLPO and augur dklpo versions; copy the same check command"]}
+  ]
 }

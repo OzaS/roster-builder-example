@@ -11,6 +11,7 @@ import { Blk, M, TableBlk, issuesFor, pageFor } from "../directions/direction-d-
 import { HelperBox } from "../directions/DirectionD";
 import { Matrix, State, type Mode, type Platform } from "../language/Specimen";
 import { diagOne, entry, type DiagKind, type Kind } from "../sample";
+import { startElementRenderers } from "../e1/start/elements";
 
 /* ---------- Small helpers ---------- */
 
@@ -476,6 +477,9 @@ const renderers: Record<string, Renderer> = {
     after: <p className="cg-lang-text">Rows switch from a fixed height to a minimum under large text, names wrap (never truncated), and the cost column stays right-aligned at the top of its row; the cost column widens a little so three-digit costs with a lowered value still fit. Property labels wrap in a column sized in em.</p>,
   },
 };
+
+/* E1 part A primitives (start window, open errors, settings) keep their renderers beside their screens. */
+Object.assign(renderers, startElementRenderers);
 
 /* ---------- Command palette ---------- */
 
