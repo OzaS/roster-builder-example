@@ -20,3 +20,8 @@
 .gallery-track-chip.approved { background: #d5f2e0; color: #145a32; }
 .workflow-board-label .gallery-track-chip { margin-left: 8px; }
 .gallery-track-empty { margin: 0; padding: 4px 8px; color: var(--muted); font-size: 11px; }
+button.gallery-track-item-title { padding: 0; border: 0; background: none; text-align: left; cursor: pointer; font: inherit; font-size: 12px; font-weight: 750; color: var(--ink) }
+button.gallery-track-item-title:hover { text-decoration: underline }
+.gallery-track-platform { padding: 0; border: 0; background: none; color: inherit; font: inherit; text-decoration: underline; text-decoration-color: color-mix(in srgb, currentColor 40%, transparent); cursor: pointer }
+.gallery-track-platform:hover { color: var(--ink) }
+.gallery-track-platform.current { color: var(--ink); font-weight: 750 }

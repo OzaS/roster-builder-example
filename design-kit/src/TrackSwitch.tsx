@@ -1,14 +1,29 @@
 import "./track.css";
-import { nextStatusLabel, type NextItem } from "./next";
+import { nextStatusLabel, type NextEntry, type NextItem } from "./next";
 import type { TrackStore } from "./track";
+
+const platformLabel = (platform: string) => platform.charAt(0).toUpperCase() + platform.slice(1);
 
 /**
  * The Current / Next switch. Current is what the product ships; Next is everything designed but not yet built.
- * On Next it lists the Next items with their status, so a review knows what is approved and what is only proposed.
+ * On Next it lists the Next entries (features, or single items) with their status. With `onOpen`, an entry opens its screen:
+ * the title opens it on the current platform when the entry has one there (else its first), the platform names open it there.
  */
-export function TrackSwitch({ store, items, showItems = true }: { store: TrackStore; items: NextItem[]; showItems?: boolean }) {
+export function TrackSwitch({ store, entries, platform, onOpen, showItems = true }: {
+  store: TrackStore;
+  entries: NextEntry[];
+  /** The library the gallery shows now (phone, tablet, desktop…). */
+  platform?: string;
+  onOpen?: (screen: string, platform: string) => void;
+  showItems?: boolean;
+}) {
   const track = store.useTrack();
-  const proposals = items.filter((item) => item.status === "proposal").length;
+  const proposals = entries.filter((entry) => entry.status === "proposal").length;
+  const open = (entry: NextEntry, on?: string) => {
+    if (!entry.open || !onOpen) return;
+    const target = on ?? (platform && entry.open[platform] ? platform : Object.keys(entry.open)[0]);
+    if (target && entry.open[target]) onOpen(entry.open[target], target);
+  };
   return (
     <div className="gallery-track">
       <div className="gallery-track-switch" role="group" aria-label="Design track">
@@ -16,19 +31,33 @@ export function TrackSwitch({ store, items, showItems = true }: { store: TrackSt
           <span>Current</span><small>What the app ships</small>
         </button>
         <button className={track === "next" ? "active" : ""} type="button" aria-pressed={track === "next"} onClick={() => store.setTrack("next")}>
-          <span>Next <i className="gallery-track-count" aria-label={`${items.length} items`}>{items.length}</i></span><small>{proposals > 0 ? `${proposals} to approve` : "Designed, not built"}</small>
+          <span>Next <i className="gallery-track-count" aria-label={`${entries.length} items`}>{entries.length}</i></span><small>{proposals > 0 ? `${proposals} to approve` : "Designed, not built"}</small>
         </button>
       </div>
       {showItems && track === "next" ? (
-        items.length > 0 ? (
+        entries.length > 0 ? (
           <ul className="gallery-track-items" aria-label="Next items">
-            {items.map((item) => (
-              <li key={item.id} title={item.summary}>
-                <span className="gallery-track-item-title">{item.title}</span>
-                <TrackChip status={item.status} />
-                <small>{item.kind === "look" ? "Look" : item.replaces ? "Replaces a screen" : item.variantOf ? "Alternative screen" : "New screen"} · {item.platforms.join(", ")}</small>
-              </li>
-            ))}
+            {entries.map((entry) => {
+              const targets = entry.open ? Object.keys(entry.open) : [];
+              const canOpen = !!onOpen && targets.length > 0;
+              return (
+                <li key={entry.id} title={entry.summary}>
+                  {canOpen
+                    ? <button type="button" className="gallery-track-item-title" onClick={() => open(entry)}>{entry.title}</button>
+                    : <span className="gallery-track-item-title">{entry.title}</span>}
+                  <TrackChip status={entry.status} />
+                  <small>
+                    {entry.label} ·{" "}
+                    {entry.platforms.map((p, index) => (
+                      <span key={p}>
+                        {index > 0 ? ", " : ""}
+                        {canOpen && entry.open?.[p] ? <button type="button" className={`gallery-track-platform ${p === platform ? "current" : ""}`} onClick={() => open(entry, p)} aria-label={`Open ${entry.title} on ${p}`}>{platformLabel(p)}</button> : platformLabel(p)}
+                      </span>
+                    ))}
+                  </small>
+                </li>
+              );
+            })}
           </ul>
         ) : <p className="gallery-track-empty">Nothing on Next yet.</p>
       ) : null}

@@ -379,10 +379,11 @@ function App() {
   const track = useTrack();
   const [workflowScreen, setWorkflowScreen] = useState<WorkflowScreen>(initialState.workflowScreen ?? "library");
   const [smartSearch, setSmartSearch] = useState(initialState.smartSearch ?? true);
-  const [navStyle, setNavStyle] = useState<NavStyle>(initialState.navStyle ?? "floating");
-  const [statusBarUsesDesignBackground, setStatusBarUsesDesignBackground] = useState(initialState.statusBarUsesDesignBackground ?? false);
+  // Navigation, force creation and the status bar background were settled long ago (user, 2026-11-22): fixed, no longer gallery switches.
+  const [navStyle, setNavStyle] = useState<NavStyle>("floating");
+  const [statusBarUsesDesignBackground, setStatusBarUsesDesignBackground] = useState(false);
   const [unitDetailView, setUnitDetailView] = useState<UnitDetailView>(initialState.unitDetailView ?? "options");
-  const [forceCreationMode, setForceCreationMode] = useState<ForceCreationMode>(initialState.forceCreationMode ?? "selector");
+  const [forceCreationMode, setForceCreationMode] = useState<ForceCreationMode>("selector");
   const [tabletPanelLayout, setTabletPanelLayout] = useState<TabletPanelLayout>(initialState.tabletPanelLayout ?? defaultTabletPanelLayout);
   const [roster, setRoster] = useState<Roster>(mockRoster);
   const [favorites, setFavorites] = useState<FavoriteLibrary>(() => readFavoriteLibrary());

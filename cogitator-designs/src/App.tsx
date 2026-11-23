@@ -29,7 +29,7 @@ export function App() {
     <div className="cg-gallery">
       <aside className="cg-rail" aria-label="Gallery">
         <div className="cg-brand"><span className="cg-mark" aria-hidden>FC</span><span><strong>Field Cogitator</strong><small>Desktop design library</small></span></div>
-        <TrackSwitch store={cogitatorTrack} items={cogitatorNext.items} showItems={false} />
+        <TrackSwitch store={cogitatorTrack} entries={cogitatorNext.entries} showItems={false} />
         <nav className="cg-nav" aria-label="Pages">
           <h2>D4 · Direction</h2>
           <NavLink page="board" current={page} icon={<LayoutGrid size={16} />} label="Mood board" meta="Patterns, borrow or avoid" />

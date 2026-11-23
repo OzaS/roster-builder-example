@@ -1,5 +1,5 @@
 import { useMemo, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent, type RefObject } from "react";
-import { Archive, Component, Moon, Navigation, Palette, PanelBottom, Pencil, Plus, Rows3, Smartphone, Sun, Trash2 } from "lucide-react";
+import { Archive, Component, Moon, Palette, Pencil, Plus, Rows3, Smartphone, Sun, Trash2 } from "lucide-react";
 import { PreviewFrame } from "../components/PreviewFrame";
 import { ScreenshotButton } from "../components/v2/ScreenshotButton";
 import { WorkflowScreenPicker, type WorkflowPickerSelection } from "../components/v2/WorkflowScreenPicker";
@@ -89,11 +89,6 @@ type Props = {
 
 const libraryName: Record<LibraryId, string> = { phone: "Phone", tablet: "Tablet", foldable: "Foldable", desktop: "Desktop" };
 
-const navStyleOptions: Array<{ id: Exclude<NavStyle, "top">; label: string; icon: typeof PanelBottom }> = [
-  { id: "tabs", label: "Bottom tabs", icon: PanelBottom },
-  { id: "floating", label: "Floating tabs", icon: Navigation },
-];
-
 export function GalleryShell({
   selectedConcept,
   platform,
@@ -124,6 +119,17 @@ export function GalleryShell({
   onDesignDataChange,
 }: Props) {
   const library: LibraryId = concept.id === "desktop-workbench" ? "desktop" : concept.id === "tablet-workbench" ? "tablet" : concept.id === "duo-workbench" ? "foldable" : "phone";
+  // A Next entry in the rail opens its screen: in this library directly, in another library through its address (DEC-074).
+  const openNextScreen = (screen: string, platform: string) => {
+    if (platform === library) { onNavigatorViewChange("single"); onWorkflowScreenChange(screen as WorkflowScreen); return; }
+    const url = new URL(window.location.href);
+    url.search = "";
+    url.searchParams.set("gallery", platform);
+    url.searchParams.set("screen", screen);
+    url.searchParams.set("track", "next");
+    url.searchParams.set("view", "single");
+    window.location.assign(url.toString());
+  };
   const [railWidth, setRailWidth] = useState(280);
   const [workflowSelection, setWorkflowSelection] = useState<WorkflowPickerSelection>("all");
   const [glance, setGlance] = useState<null | { screen: WorkflowScreen; placement?: GlancePlacement }>(null);
@@ -273,6 +279,9 @@ export function GalleryShell({
           </div>
           <div className="rail-actions">
             <ScreenshotButton onCapture={onCapture} />
+            <button className="rail-icon-button" type="button" aria-label={themeMode === "dark" ? "Switch to light theme" : "Switch to dark theme"} title={themeMode === "dark" ? "Light theme" : "Dark theme"} onClick={() => onThemeModeChange(themeMode === "dark" ? "light" : "dark")}>
+              {themeMode === "dark" ? <Sun size={17} /> : <Moon size={17} />}
+            </button>
             {archivedConcepts.length > 0 ? (
               <details className="archive-menu">
                 <summary className="rail-icon-button" aria-label="Open archive" title="Open archive">
@@ -284,7 +293,7 @@ export function GalleryShell({
           </div>
         </div>
         <LibrarySwitch current={library} />
-        <TrackSwitch />
+        <TrackSwitch platform={library} onOpen={openNextScreen} />
         <ConceptGroup title="Designs" concepts={activeConcepts} selectedConcept={selectedConcept} onConceptChange={onConceptChange} />
         <div className="view-icon-switch" role="group" aria-label="View">
           <button className={navigatorView === "single" ? "active" : ""} type="button" onClick={() => selectNavigatorView("single")} aria-label="Single" title="Single">
@@ -314,45 +323,8 @@ export function GalleryShell({
           <summary>
             <h3>Display</h3>
           </summary>
-          <ControlGroup title="Navigation">
-            {navStyleOptions.map((option) => {
-              const Icon = option.icon;
-              return (
-                <button key={option.id} className={navStyle === option.id ? "active" : ""} type="button" onClick={() => onNavStyleChange(option.id)}>
-                  <Icon size={16} />
-                  {option.label}
-                </button>
-              );
-            })}
-          </ControlGroup>
-          <ControlGroup title="Force creation">
-            <button className={forceCreationMode === "selector" ? "active" : ""} type="button" onClick={() => onForceCreationModeChange("selector")}><PanelBottom size={16} />Selector</button>
-            <button className={forceCreationMode === "inline" ? "active" : ""} type="button" onClick={() => onForceCreationModeChange("inline")}><Rows3 size={16} />Inline</button>
-          </ControlGroup>
           {library === "desktop" && <ControlGroup title="Desktop"><DesktopAmbientSwitch /></ControlGroup>}
           {library === "tablet" && <ControlGroup title="Tablet"><DesktopAmbientSwitch /></ControlGroup>}
-          <ControlGroup title="Theme">
-            <button className={themeMode === "dark" ? "active" : ""} type="button" onClick={() => onThemeModeChange("dark")}>
-              <Moon size={16} />
-              Dark
-            </button>
-            <button className={themeMode === "light" ? "active" : ""} type="button" onClick={() => onThemeModeChange("light")}>
-              <Sun size={16} />
-              Light
-            </button>
-          </ControlGroup>
-          <ControlGroup title="Status bar">
-            <button
-              className="display-switch-row"
-              type="button"
-              role="switch"
-              aria-checked={statusBarUsesDesignBackground}
-              onClick={() => onStatusBarUsesDesignBackgroundChange(!statusBarUsesDesignBackground)}
-            >
-              <span>Design background</span>
-              <span className="display-switch" aria-hidden="true" />
-            </button>
-          </ControlGroup>
           <ControlGroup title="Colour scheme">
             {colorSchemes.map((scheme) => (
               <button key={scheme.id} className={colorScheme === scheme.id ? "active" : ""} type="button" onClick={() => onColorSchemeChange(scheme.id)}>
