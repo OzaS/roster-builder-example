@@ -138,6 +138,36 @@
       "screen": "e1-editor-empty",
       "summary": "Empty states inside the editor: a source with no entries (inline New entry with its key), an entry with no statements (the / hint as the first block), a search with no result (the palette says what it searched and offers next steps).",
       "source": "D4 step 3a, E1 screens (2026-11-22)"
+    },
+    {
+      "id": "cg-e1-layers-stack",
+      "title": "E1: Layer stack and page overlay",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "e1-layers-stack",
+      "summary": "The sidebar's Layers opens the dataset's layer stack: base, add-ons and variants in order (Derived or Explicit like --layers), kind, purpose, version, requires: result, applied or refused with the reason, patch report, values changed, conflicts (later wins) and the add-on display-only check; Show on page draws the layer overlay (changed values marked with their layer, effective beside base). States: stack OK, refused, conflict, add-on changes rules, entry page with overlay.",
+      "source": "D4 step 3b, E1 screens part 2 (2026-11-23)"
+    },
+    {
+      "id": "cg-e1-layers-search",
+      "title": "E1: Dataset search and replace",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "e1-layers-search",
+      "summary": "⇧⌘F searches entries, text, references and statements across sources and layers: results grouped by source and entry with highlights, kind / source / layer filters, a preview; Replace for names and text with a per-match preview; keys lead to Rename… (F2). States: results, no results, filters, replace preview.",
+      "source": "D4 step 3b, E1 screens part 2 (2026-11-23)"
+    },
+    {
+      "id": "cg-e1-layers-runner",
+      "title": "E1: Dataset runner with hot reload",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "e1-layers-runner",
+      "summary": "User request 2026-11-23: Run (⌘R) builds a roster against the dataset in a basic developer UI, docked beside the editor or in its own window (960 px: takes the page area). What runs (dataset alone or with layers, variants, locale), Add list, roster tree, options / profile / rules, totals, engine errors; hot reload on save or while typing keeps the roster through the roster-open rules, with a change summary, the last good build on a compile error and a review of structural moves; Go to entry / Show in runner; Save as test scenario. States: empty, in progress, reloaded, compile error, kept for review, save as test, detached, 960 px.",
+      "source": "D4 step 3b, E1 screens part 2 (2026-11-23)"
     }
   ]
 }
