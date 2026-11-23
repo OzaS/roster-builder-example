@@ -37,6 +37,7 @@ const swatchGroups: { label: string; tokens: { name: string; use: string }[] }[]
     { name: "--cg-status-suggestion", use: "Suggestion (cool)" },
     { name: "--cg-status-ok", use: "Saved, fixed, diff additions" },
     { name: "--cg-badge-error", use: "Count badge fill (error 16%)" },
+    { name: "--cg-badge-error-text", use: "Count badge number (error 80% with ink in light)" },
   ] },
   { label: "Tag hues (mixed 20% into the paper)", tokens: [
     { name: "--cg-tag-1", use: "Tag tone 1" },
@@ -60,7 +61,7 @@ const pairs: Pair[] = [
   { fg: "--cg-accent-text", bg: "--cg-select", base: "--cg-pane", use: "Layer chip, Exit focus", need: 4.5 },
   { fg: "--cg-accent-ink", bg: "--cg-accent", use: "Primary button", need: 4.5 },
   { fg: "--cg-status-error", bg: "--cg-pane", use: "Broken reference, error text", need: 4.5 },
-  { fg: "--cg-status-error", bg: "--cg-badge-error", base: "--cg-surface", use: "Updates count badge (11.5 px bold)", need: 4.5 },
+  { fg: "--cg-badge-error-text", bg: "--cg-badge-error", base: "--cg-surface", use: "Updates count badge (11.5 px bold)", need: 4.5 },
   { fg: "--cg-status-preservation", bg: "--cg-pane", use: "Preservation text and icon", need: 4.5 },
   { fg: "--cg-status-suggestion", bg: "--cg-pane", use: "Suggestion text, “No en text” tag", need: 4.5 },
   { fg: "--cg-status-ok", bg: "--cg-pane", use: "Diff additions (11.5 px mono)", need: 4.5 },
@@ -339,7 +340,7 @@ export function LanguagePage() {
         <h3>Contrast</h3>
         <p>Computed from the rendered tokens (translucent fills composited over the paper they sit on). Everything here is text of 11.5 to 13 px, so each pair needs 4.5:1 (WCAG AA). Icons, edges and the changed dot are graphics and need 3:1; every status colour clears that on every paper.</p>
         <ContrastTable colors={colors} />
-        <p className="cg-lang-text">Two pairs inherited from Direction D miss AA in light: the error count badge and the green of diff additions. Fixing them changes D's look, so they are listed as an open question rather than changed here (a darker <code>status-ok</code>, #1b7f48, gives 5.0:1; the badge count in red mixed 80% with ink gives 4.9:1). Dark passes everywhere.</p>
+        <p className="cg-lang-text">Two light pairs inherited from Direction D missed AA (the error count badge at 3.94:1, the diff green at 4.37:1). The user chose the fix (2026-11-22): <code>status-ok</code> is #1b7f48 and the badge number uses <code>badge-error-text</code>, red mixed 80% with ink. Dark is unchanged.</p>
       </section>
 
       <section id="type" className="cg-lang-section">

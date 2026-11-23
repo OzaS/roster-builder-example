@@ -52,7 +52,7 @@
 .fc-d .d-item.current > svg { color: var(--cg-accent-text); }
 .fc-d .d-item.i1 { padding-left: 24px; }
 .fc-d .d-item kbd, .fc-d .d-item > .d-muted, .fc-d .d-count { margin-left: auto; }
-.fc-d .d-count { min-width: 20px; padding: 0 6px; border-radius: var(--cg-radius-pill); background: var(--cg-badge-error); color: var(--cg-status-error); font-size: var(--cg-text-micro); font-weight: 700; text-align: center; line-height: 18px; }
+.fc-d .d-count { min-width: 20px; padding: 0 6px; border-radius: var(--cg-radius-pill); background: var(--cg-badge-error); color: var(--cg-badge-error-text); font-size: var(--cg-text-micro); font-weight: 700; text-align: center; line-height: 18px; }
 .fc-d .d-src-item { padding: 0 0 0 4px; gap: 0; }
 .fc-d .d-src-item .d-tog { width: 18px; height: 24px; }
 .fc-d .d-src-btn { flex: 1; height: var(--cg-row); padding: 0 4px; gap: 6px; text-align: left; font-weight: inherit; }
@@ -228,7 +228,7 @@
 .fc-d .d-ptabs [role="tab"]:hover { background: var(--cg-hover); }
 .fc-d .d-ptabs [role="tab"].active { background: var(--cg-press); color: var(--cg-ink); font-weight: 600; }
 .fc-d .d-pcount { min-width: 18px; padding: 0 5px; border-radius: var(--cg-radius-pill); font-size: var(--cg-text-micro); font-weight: 700; line-height: 17px; text-align: center; background: var(--cg-hover); color: var(--cg-muted); }
-.fc-d .d-pcount.issues { background: var(--cg-badge-error); color: var(--cg-status-error); }
+.fc-d .d-pcount.issues { background: var(--cg-badge-error); color: var(--cg-badge-error-text); }
 .fc-d .d-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; flex-shrink: 0; padding: 2px; margin-bottom: 4px; border-radius: var(--cg-radius-group); background: var(--cg-hover); }
 .fc-d .d-seg button { justify-content: center; height: var(--cg-control); border-radius: var(--cg-radius-control); font-size: var(--cg-text-small); }
 .fc-d .d-seg button.active { background: var(--cg-pane); font-weight: 600; box-shadow: var(--cg-elev-thumb); }
