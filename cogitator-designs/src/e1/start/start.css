@@ -58,3 +58,14 @@
 .e1s-start strong { font-weight: 600; }
 .e1s-start small { color: var(--cg-muted); font-size: var(--cg-text-small); }
 .e1s-top > .cg-caption { margin-left: auto; }
+
+/* ---------- Dialogs over the editor: a static Direction D window with an overlay in the same token scope ---------- */
+.e1s-over-host { position: relative; width: max-content; }
+.e1s-over { position: absolute; inset: 0; overflow: hidden; border-radius: var(--cg-radius-window); pointer-events: none; }
+.e1s-over > * { pointer-events: auto; }
+.e1s-anchor { position: absolute; inset: 0; }
+.e1s-switcher > .cg-menu { position: absolute; left: var(--cg-space-4); top: calc(var(--cg-header) + var(--cg-helper-header) + var(--cg-space-1)); }
+.e1s-toast { position: absolute; left: 50%; bottom: var(--cg-space-9); display: flex; align-items: center; gap: var(--cg-space-6); max-width: 70%; padding: var(--cg-space-4) var(--cg-space-4) var(--cg-space-4) var(--cg-space-7); border: 1px solid var(--cg-line); border-radius: var(--cg-radius-float); background: var(--cg-float); box-shadow: var(--cg-elev-pill); font-size: var(--cg-text-small); transform: translateX(-50%); }
+.e1s-toast button { flex-shrink: 0; height: var(--cg-control-sm); padding: 0 var(--cg-space-4); border-radius: var(--cg-radius-control); color: var(--cg-accent-text); font-weight: 600; }
+.e1s-toast button:hover { background: var(--cg-hover); }
+.e1s-over .cg-dialog-list li > svg { color: var(--cg-muted); }

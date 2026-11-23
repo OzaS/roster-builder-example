@@ -1,5 +1,6 @@
 import type { E1Screen } from "../types";
 import { StartWindow, type OpenProblem, type StartState } from "./StartWindow";
+import { EditorDialogs, type EditorDialog } from "./EditorDialogs";
 
 /** Worker A: open and recent datasets, settings, the window's empty and error states. */
 export const startScreens: E1Screen[] = [
@@ -51,6 +52,28 @@ export const startScreens: E1Screen[] = [
     render: ({ mode, platform, state, interactive }) => {
       const problem = (["not-dataset", "newer-format", "parse-errors", "permission"].includes(state ?? "") ? state : "not-dataset") as OpenProblem;
       return <StartWindow key={problem} mode={mode} platform={platform} problem={problem} interactive={interactive} />;
+    },
+  },
+  {
+    id: "e1-start-editor-dialogs",
+    group: "Open a dataset",
+    title: "Window-level dialogs over the editor",
+    item: "cg-e1-start-editor-dialogs",
+    summary: "Drawn over a static Direction D window (D unchanged). The sidebar's dataset switcher (Demo Skirmish ▾) as a popover with sections: the open dataset with its folder and layers, recent datasets, Open… and Convert…, Show in Finder and Close dataset. Closing or switching with unsaved changes asks Save / Don't save / Cancel and lists the changed entries. A module changed by another program: Reload / Keep mine / Compare, without and with unsaved edits (Compare becomes the primary when both changed). A save that failed: the reason, Retry, Save as…; the edits stay in the editor. macOS (Direction D's frame); the Windows dialog form is on the open-errors screen.",
+    states: [
+      { id: "switcher", title: "Dataset switcher" },
+      { id: "unsaved", title: "Unsaved changes" },
+      { id: "changed-on-disk", title: "Changed on disk, no unsaved edits" },
+      { id: "changed-on-disk-edits", title: "Changed on disk, with unsaved edits" },
+      { id: "save-failed", title: "Save failed" },
+    ],
+    tryIt: [
+      { what: "Switcher", how: "pick a recent dataset or Close dataset: with unsaved changes, the Save / Don't save / Cancel sheet follows." },
+      { what: "Choices", how: "every choice closes the dialog and says what happened in a toast; Esc takes the safe choice; Show the dialog again brings it back." },
+    ],
+    render: ({ mode, state, interactive }) => {
+      const initial = (["switcher", "unsaved", "changed-on-disk", "changed-on-disk-edits", "save-failed"].includes(state ?? "") ? state : "switcher") as EditorDialog;
+      return <EditorDialogs key={initial} mode={mode} initial={initial} interactive={interactive} />;
     },
   },
 ];

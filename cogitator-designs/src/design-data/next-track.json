@@ -82,6 +82,18 @@
       "screen": "e1-start-errors",
       "summary": "Dialogs (sheets on macOS) over the start window when a dataset cannot be opened as is: not a dataset (Convert… for XML data files), newer DKLPO version (open read-only), files that do not parse (open anyway, they open as source text with their errors), folder not writable (open read-only or Save as…). One sentence, the folder, choices as verbs; Return = primary, Esc = Cancel; macOS and Windows.",
       "source": "D4 step 3a, E1 screens (2026-11-22)"
+    },
+    {
+      "id": "cg-e1-start-editor-dialogs",
+      "title": "E1 window-level dialogs over the editor",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "desktop"
+      ],
+      "screen": "e1-start-editor-dialogs",
+      "summary": "Over a static Direction D window: the dataset switcher popover (open dataset, recents, Open…, Convert…, Show in Finder, Close dataset), unsaved changes (Save / Don’t save / Cancel with the changed entries), a module changed on disk without and with unsaved edits (Reload / Keep mine / Compare), save failed (reason, Retry, Save as…). macOS.",
+      "source": "D4 step 3a, E1 screens (2026-11-22)"
     }
   ]
 }
