@@ -409,7 +409,7 @@ function scoped(scope: Scope, pageIssues: Diagnostic[], tab: Tab) {
 }
 
 /** The floating helper box: this page's issues, suggestions and actions in one raised object at the top right of the editor. */
-function HelperBox(props: {
+export function HelperBox(props: {
   issues: Diagnostic[]; resolved: ReadonlySet<string>; elsewhere: number; checking: "idle" | "busy" | "done";
   onCollapse: () => void; onExpand: () => void; onFix: (id: string) => void; onUndo: (id: string) => void; onDiff: (d: Diagnostic) => void; onAll: () => void;
   onChecks: () => void; onInsert: () => void; onProperties: () => void;
@@ -459,7 +459,7 @@ function HelperBox(props: {
 }
 
 /** The helper collapsed to a pill: counts by kind; click to bring the box back. */
-function HelperPill({ issues, onOpen }: { issues: Diagnostic[]; onOpen: () => void }) {
+export function HelperPill({ issues, onOpen }: { issues: Diagnostic[]; onOpen: () => void }) {
   const counts = (["error", "preservation", "suggestion"] as DiagKind[]).map((kind) => ({ kind, n: issues.filter((d) => d.kind === kind).length })).filter((c) => c.n);
   const label = counts.length ? counts.map((c) => `${c.n} ${diagOne[c.kind].toLowerCase()}`).join(", ") : "no issues";
   return (

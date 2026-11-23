@@ -1,0 +1,100 @@
+{
+  "about": "Field Cogitator design data. `language` summarises the design language (token groups in src/language/tokens.css, layout numbers in src/language/layout.ts). `elements.sections` lists the Elements view's sections and entries in page order; the Elements page renders from this list, so a new primitive needs an entry here and a renderer there. Everything is a Proposal on Next until the user approves it (next-track.json).",
+  "product": "Field Cogitator",
+  "source": "D4 step 2, design language (2026-11-22), extracted from Direction D",
+  "language": {
+    "status": "proposal",
+    "nextItem": "cg-design-language",
+    "tokenFile": "src/language/tokens.css",
+    "layoutFile": "src/language/layout.ts",
+    "primitivesFile": "src/language/primitives.css",
+    "scope": "An element with .fc-cg and .light or .dark; macOS is the base layer, [data-platform=\"windows\"] the Windows layer, [data-text=\"large\"] large text (1.25×).",
+    "groups": [
+      { "id": "colour", "title": "Colour", "tokens": ["--cg-surface", "--cg-pane", "--cg-float", "--cg-ink", "--cg-muted", "--cg-line", "--cg-accent", "--cg-accent-text", "--cg-accent-ink", "--cg-status-error", "--cg-status-preservation", "--cg-status-suggestion", "--cg-status-ok", "--cg-tag-1", "--cg-tag-2", "--cg-tag-3", "--cg-tag-mix", "--cg-caption-close"], "themes": ["light", "dark"], "note": "Semantic names; status colours always come with a shape (edge or icon)." },
+      { "id": "state", "title": "State mixes", "tokens": ["--cg-hover", "--cg-press", "--cg-select", "--cg-mention", "--cg-mention-hover", "--cg-exit-hover", "--cg-badge-error", "--cg-flag-error", "--cg-flag-preservation", "--cg-flag-suggestion", "--cg-press-filter", "--cg-row-pressed", "--cg-accent-press"], "note": "Mixes of ink or accent, so every theme gets them; Windows presses with a fill, macOS with a filter." },
+      { "id": "type", "title": "Type", "tokens": ["--cg-font", "--cg-font-ui", "--cg-mono", "--cg-text", "--cg-leading", "--cg-text-small", "--cg-text-caption", "--cg-text-micro", "--cg-text-mono", "--cg-text-mono-kw", "--cg-text-section", "--cg-weight-section", "--cg-text-title", "--cg-weight-title", "--cg-text-title-key", "--cg-text-palette"], "platforms": { "mac": "system font, 13 px working text", "windows": "Segoe UI Variable, 14 px working text" } },
+      { "id": "spacing", "title": "Spacing", "tokens": ["--cg-space-1", "--cg-space-2", "--cg-space-3", "--cg-space-4", "--cg-space-5", "--cg-space-6", "--cg-space-7", "--cg-space-8", "--cg-space-9", "--cg-space-10"], "note": "4 px grid with D's half steps (6, 10, 14, 18)." },
+      { "id": "density", "title": "Density", "tokens": ["--cg-row", "--cg-row-group-gap", "--cg-control", "--cg-control-sm", "--cg-colheads", "--cg-prop-row", "--cg-menu-item", "--cg-pill", "--cg-header", "--cg-toolbar", "--cg-footer", "--cg-helper-header", "--cg-icon-button", "--cg-icon-button-sm"], "platforms": { "mac": "28 px rows, 44 px headers", "windows": "32 px rows, 48 px headers" }, "rowsInView": { "window": 900, "mac": 26, "windows": 23, "note": "Source list rows without group headings; Iron Wardens (4 headings, 13 rows) fits on both." } },
+      { "id": "radii", "title": "Radii", "tokens": ["--cg-radius-chip", "--cg-radius-block", "--cg-radius-control", "--cg-radius-tab", "--cg-radius-group", "--cg-radius-popover", "--cg-radius-float", "--cg-radius-window", "--cg-radius-pill"], "platforms": { "mac": "6 px controls, 9 / 12 px floating, 12 px window", "windows": "4 px controls, 8 px floating and window" } },
+      { "id": "elevation", "title": "Elevation", "tokens": ["--cg-elev-thumb", "--cg-elev-pill", "--cg-elev-box", "--cg-elev-popover", "--cg-elev-menu", "--cg-elev-dialog", "--cg-elev-window"], "note": "Only floating things are raised: pill, helper box, popovers, menus, palette, dialogs (no-card rule)." },
+      { "id": "motion", "title": "Motion", "tokens": ["--cg-motion-fast", "--cg-motion-layout", "--cg-ease"], "note": "Layout changes 0.2 s, small feedback 0.12 s; zero with reduced motion." },
+      { "id": "focus", "title": "Focus", "tokens": ["--cg-focus-width", "--cg-focus-color", "--cg-focus-offset"], "platforms": { "mac": "2 px accent ring inside the control", "windows": "2 px ink ring 1 px outside the control" } },
+      { "id": "layout", "title": "Layout", "file": "src/language/layout.ts", "values": { "sidebar": 232, "sourceList": 318, "sourceListFocus": 348, "pageMin": 480, "pageMax": 760, "panel": 328, "panelMin": 260, "panelMax": 520, "helperBox": 276, "windowMin": 960 }, "collapseOrder": ["Below 1358 px: helper panel becomes the floating box", "Below 1322 px: floating box becomes the pill", "Below 1030 px: sidebar hides (focus-mode layout)", "960 px: minimum window width"] }
+    ]
+  },
+  "elements": {
+    "status": "proposal",
+    "nextItem": "cg-elements",
+    "sections": [
+      {
+        "id": "window", "title": "Window",
+        "entries": [
+          { "id": "window.frame", "title": "Window frame and title row", "from": "Direction D; Windows frame new (Battle Augur RK-03 style)", "platforms": ["mac", "windows"], "states": ["light", "dark", "caption hover", "close hover"], "summary": "macOS: traffic lights in the sidebar's top row, 12 px corners. Windows: no menu bar; the dataset switcher moves up into the title row, Windows' own caption buttons (46 px, the header's height) sit at the far right, 8 px corners." }
+        ]
+      },
+      {
+        "id": "sidebar", "title": "Sidebar",
+        "entries": [
+          { "id": "sidebar.item", "title": "Sidebar item", "from": "Direction D", "platforms": ["mac", "windows"], "states": ["default", "hover", "pressed", "focus", "active", "current", "count badge", "key", "disabled"], "summary": "28 px rows on the surface paper. Active (the source shown in the list) is the selection tint; current (the open entry) is bold with an accent icon, no fill." }
+        ]
+      },
+      {
+        "id": "source-list", "title": "Source list",
+        "entries": [
+          { "id": "source.group-heading", "title": "Source group heading", "from": "Direction D", "platforms": ["mac"], "states": ["unfolded", "folded", "hover", "focus"], "summary": "Caption size, weight 600, sentence case, the count in regular weight; a chevron folds the group. Space above it separates groups, no hairline." },
+          { "id": "source.row", "title": "Source row", "from": "Direction D", "platforms": ["mac", "windows"], "states": ["default", "hover", "pressed", "focus", "selected", "error edge", "preservation edge", "suggestion edge", "changed", "lowered cost", "no cost", "no text"], "summary": "Glyph, name, changed dot, cost and diagnostic in fixed columns under the column heads; the status edge anchors the row. Costs in tabular figures, right-aligned." },
+          { "id": "source.filter", "title": "Filter field", "from": "Direction D", "platforms": ["mac", "windows"], "states": ["empty", "focus", "typed"], "summary": "A quiet filled field (hover fill), the focus ring inside it; Esc clears it." }
+        ]
+      },
+      {
+        "id": "controls", "title": "Controls",
+        "entries": [
+          { "id": "control.button", "title": "Buttons", "from": "Direction D; disabled and Windows pressed states new", "platforms": ["mac", "windows"], "states": ["default", "hover", "pressed", "focus", "disabled", "on"], "summary": "Primary (accent), quiet (hover fill), small (in rows), ghost (toolbar, icon + label + key) and icon buttons." },
+          { "id": "control.segmented", "title": "Segmented control", "from": "Direction D", "platforms": ["mac", "windows"], "states": ["selected", "hover", "focus"], "summary": "Two scopes (This entry, Dataset) with counts; the selected one is the pane colour with a thumb shadow." },
+          { "id": "control.kbd", "title": "Keycap", "from": "Direction D", "platforms": ["mac", "windows"], "states": ["single", "chord", "beside a command"], "summary": "Micro size, hairline border, muted; macOS glyphs, Windows names." }
+        ]
+      },
+      {
+        "id": "page", "title": "Page",
+        "entries": [
+          { "id": "page.breadcrumbs", "title": "Breadcrumbs and page toolbar", "from": "Direction D", "platforms": ["mac", "windows"], "states": ["default", "focus on", "long name"], "summary": "Source / entry, then status text and the ghost buttons Focus and Source." },
+          { "id": "page.title", "title": "Page title and backlinks", "from": "Direction D", "platforms": ["mac"], "states": ["default", "no text"], "summary": "Kind glyph, title, backlinks as mentions; an entry without text shows its key in mono with a suggestion tag." },
+          { "id": "page.layer-chip", "title": "Layer chip", "from": "Direction D", "platforms": ["mac"], "states": ["add-on", "variant"], "summary": "Selection tint, accent text, micro weight 600: marks which layer a source or value comes from." },
+          { "id": "page.mention", "title": "Tags, mentions and the peek", "from": "Direction D", "platforms": ["mac"], "states": ["tag tones", "mention", "hover", "focus", "broken", "peek", "broken peek"], "summary": "Tags are hues mixed into the paper; a mention is an accent chip with ↗ that opens its entry; hover or focus shows the peek popover. A broken reference is red mono with a wavy underline." },
+          { "id": "page.property-row", "title": "Property row", "from": "Direction D", "platforms": ["mac", "windows"], "states": ["default", "hover", "more properties"], "summary": "Label column (icon + label, muted) and a value cell that tints on hover; the properties block ends with a hairline." },
+          { "id": "page.statement-block", "title": "Statement block", "from": "Direction D", "platforms": ["mac"], "states": ["default", "hover", "folded", "nested", "error", "preservation", "suggestion", "table", "insert"], "summary": "Mono keyword, then the value; a chevron folds children; a flagged block gets a 2 px status edge and a faint tint while its diagnostic is open." }
+        ]
+      },
+      {
+        "id": "helper", "title": "Helper",
+        "entries": [
+          { "id": "helper.pill", "title": "Helper pill", "from": "Direction D", "platforms": ["mac"], "states": ["counts", "no issues", "hover"], "summary": "The helper collapsed: counts by kind with their icons; click brings the box back." },
+          { "id": "helper.box", "title": "Floating helper box", "from": "Direction D", "platforms": ["mac"], "states": ["issues", "clear"], "summary": "This page's issues, suggestions and actions in the one raised object over the page margin; collapse to the pill or expand to the panel." },
+          { "id": "helper.panel-tabs", "title": "Panel tabs and resize edge", "from": "Direction D", "platforms": ["mac", "windows"], "states": ["active", "hover", "counts", "resize hover"], "summary": "Issues, Suggestions, Properties; the active tab is the press fill; issue counts in the error badge. The panel's left edge lights up in the accent when it can be dragged." },
+          { "id": "helper.issue-row", "title": "Issue row", "from": "Direction D", "platforms": ["mac"], "states": ["default", "hover", "selected", "with diff", "done", "elsewhere"], "summary": "Status edge, message with code, where in mono; selected shows the fix as a primary small button (and Go to when elsewhere); done shows Undo." },
+          { "id": "helper.empty-state", "title": "Empty states", "from": "Direction D", "platforms": ["mac"], "states": ["none here", "no match", "clear"], "summary": "One muted line with what is empty and the way out (Clear filter); a check in OK green when nothing is wrong." }
+        ]
+      },
+      {
+        "id": "focus", "title": "Focus mode",
+        "entries": [
+          { "id": "focus.exit", "title": "Exit focus and focus toggles", "from": "Direction D", "platforms": ["mac", "windows"], "states": ["default", "hover", "focus"], "summary": "In focus mode the list header carries the window controls and Exit focus with its key; outside it, an icon button enters focus." }
+        ]
+      },
+      {
+        "id": "overlays", "title": "Menus and palette",
+        "entries": [
+          { "id": "overlay.slash-menu", "title": "/ insert menu", "from": "Direction D", "platforms": ["mac"], "states": ["open", "selected item"], "summary": "Statements valid at the cursor with their syntax in mono; ↵ inserts the selected one." },
+          { "id": "overlay.command-palette", "title": "Command palette (⌘K)", "from": "New, drawn from the tokens", "platforms": ["mac", "windows"], "states": ["results", "selected", "no match"], "summary": "Search entries and run commands: entries with glyph, key and cost, commands with their key; a dialog, so it floats with the dialog elevation." },
+          { "id": "overlay.context-menu", "title": "Context menu", "from": "New, drawn from the tokens", "platforms": ["mac", "windows"], "states": ["default", "hover", "disabled", "destructive", "separator"], "summary": "Right-click or ⇧F10 on a row: verbs with targets, shortcuts as muted text, destructive last in error red." }
+        ]
+      },
+      {
+        "id": "checks", "title": "Checks",
+        "entries": [
+          { "id": "check.large-text", "title": "Large text (1.25×)", "from": "New rule for Direction D's rows", "platforms": ["mac", "windows"], "states": ["default", "large"], "summary": "Working text at 1.25×: rows grow from a minimum height, names wrap instead of truncating, costs keep their right-aligned column, property labels wrap." }
+        ]
+      }
+    ]
+  }
+}
