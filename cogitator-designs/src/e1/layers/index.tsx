@@ -1,5 +1,6 @@
 import type { E1Screen } from "../types";
 import { LayerStackScreen } from "./LayerStackScreen";
+import { SearchScreen } from "./SearchScreen";
 
 /** E1 screens part 2, worker B: the layer stack with its page overlay, dataset search, the dataset runner. */
 export const layerScreens: E1Screen[] = [
@@ -24,5 +25,27 @@ export const layerScreens: E1Screen[] = [
       { what: "Overlay", how: "Show on page beside a Warden Squad value; on the page click the House rules chip for how it changed; Effective / Base only; Back or the sidebar's Layers return." },
     ],
     render: ({ mode, state, interactive }) => <LayerStackScreen mode={mode} state={state} interactive={interactive} />,
+  },
+  {
+    id: "e1-layers-search",
+    group: "Search",
+    title: "Dataset search and replace",
+    item: "cg-e1-layers-search",
+    summary:
+      "Search the whole dataset (⇧⌘F, or the palette's “Search everywhere”); ⌘K stays the quick jump to one entry or command. One field with Match case and Whole word, and four scopes with their counts: Entries (names and keys), Text (rule text, notes), References, Statements. Results fill the view in place of the list and the page, grouped by source (a layer's source says which layer holds it), then by entry, each match with its field, the line's text with the match highlighted, and file:line; filter chips for kind, source and layer say how many matches they hide. The preview shows the lines around the selected match with Open (↵) and Open at the line (⌘↵). Replace (⌥⌘F) works on names and text only: each match shows its change (struck, then inserted) with a checkbox, Replace n in m files applies the checked ones and Undo takes them back. Keys and references are not replaced as text: renaming a key changes every reference and writes a move record, so they show as locked and lead to Rename… (F2, the rename preview). With no match the view says what it searched, what it skipped (a layer that is off, filters) and offers to search with that layer or create the entry.",
+    states: [
+      { id: "results", title: "Results for “shield”" },
+      { id: "no-results", title: "No results" },
+      { id: "filters", title: "Search with filters" },
+      { id: "replace", title: "Replace preview" },
+    ],
+    tryIt: [
+      { what: "Search", how: "type in the field (try “warden”, “cost”, “blade”); Aa and ab narrow; the scope chips turn Entries, Text, References and Statements on and off." },
+      { what: "Filters", how: "Kind, Source and Layer open a menu with counts; × or Clear removes them." },
+      { what: "Results", how: "↑ ↓ move (the preview follows), ↵ or double-click opens the entry." },
+      { what: "Replace", how: "in the replace state uncheck a match, then Replace; Undo brings the text back; keys stay locked with Rename… in the preview." },
+      { what: "No results", how: "Search with Draft points on adds the off layer to the search." },
+    ],
+    render: ({ mode, state, interactive }) => <SearchScreen mode={mode} state={state} interactive={interactive} />,
   },
 ];
