@@ -24,7 +24,7 @@
   --cg-status-error: #c4352a;
   --cg-status-preservation: #a36307;
   --cg-status-suggestion: #1b7aa0;
-  --cg-status-ok: #1f8a4f;
+  --cg-status-ok: #1b7f48;
   /* Tag hues (categories, mention chips): a hue mixed into the background, never a fill of its own. */
   --cg-tag-1: #c98a3c;
   --cg-tag-2: #4f9a6c;
@@ -41,6 +41,7 @@
   --cg-mention-hover: color-mix(in srgb, var(--cg-accent) 18%, transparent);
   --cg-exit-hover: color-mix(in srgb, var(--cg-accent) 22%, transparent);
   --cg-badge-error: color-mix(in srgb, var(--cg-status-error) 16%, transparent);
+  --cg-badge-error-text: color-mix(in srgb, var(--cg-status-error) 80%, var(--cg-ink));
   --cg-flag-error: color-mix(in srgb, var(--cg-status-error) 9%, transparent);
   --cg-flag-preservation: color-mix(in srgb, var(--cg-status-preservation) 11%, transparent);
   --cg-flag-suggestion: color-mix(in srgb, var(--cg-status-suggestion) 9%, transparent);
@@ -142,6 +143,7 @@
   --cg-status-preservation: #f0b44a;
   --cg-status-suggestion: #5cc6ec;
   --cg-status-ok: #57d98a;
+  --cg-badge-error-text: var(--cg-status-error);
   --cg-elev-pill: 0 6px 18px rgb(0 0 0 / .5);
   --cg-elev-box: 0 12px 34px rgb(0 0 0 / .5);
   --cg-elev-popover: 0 12px 32px rgb(0 0 0 / .55);
