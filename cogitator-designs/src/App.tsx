@@ -1,5 +1,5 @@
 import { TrackChip, TrackSwitch } from "@designs/kit";
-import { Blend, Columns3, Component, FileText, LayoutGrid, PanelsTopLeft, Palette } from "lucide-react";
+import { AppWindow, Blend, Columns3, Component, FileText, LayoutGrid, PanelsTopLeft, Palette } from "lucide-react";
 import type { ReactNode } from "react";
 import { cogitatorNext, cogitatorTrack } from "./track";
 import { go, hrefFor, pageOf, useSearch, type Page } from "./route";
@@ -10,6 +10,8 @@ import { MoodBoard } from "./pages/MoodBoard";
 import { DirectionPage } from "./pages/DirectionPage";
 import { LanguagePage } from "./pages/LanguagePage";
 import { ElementsPage } from "./pages/ElementsPage";
+import { E1Page } from "./pages/E1Page";
+import { e1ScreenById } from "./e1/registry";
 
 const icons: Record<DirectionId, ReactNode> = { a: <Columns3 size={16} />, b: <FileText size={16} />, c: <PanelsTopLeft size={16} />, d: <Blend size={16} /> };
 const dStates: DState[] = ["default", "collapsed", "panel", "focus", "focus-panel"];
@@ -18,6 +20,7 @@ const dStates: DState[] = ["default", "collapsed", "panel", "focus", "focus-pane
  * The Field Cogitator design gallery. D4 step 1: the mood board (patterns from Linear, the Battle Augur desktop app and
  * Notion, each marked borrow or avoid), three directions for the entry editor and the user's mix of them (D, interactive).
  * D4 step 2: the design language (tokens, type, density, layout) and the Elements view, drawn from Direction D.
+ * D4 step 3: the E1 screens (`src/e1/`), each registered in `src/e1/registry.ts`.
  * Everything is a Proposal on Next.
  */
 export function App() {
@@ -27,6 +30,12 @@ export function App() {
 
   // `?view=frame&direction=a&mode=dark`: one direction's window alone at its design width (captures); D also takes `&state=`.
   if (params.get("view") === "frame") {
+    const e1 = e1ScreenById(params.get("screen"));
+    if (e1) {
+      const mode = params.get("mode") === "dark" ? "dark" : "light";
+      const platform = params.get("platform") === "windows" ? "windows" : "mac";
+      return <div className={`cg-frame-only ${mode}`}>{e1.render({ mode, platform, state: params.get("state") ?? undefined, interactive: true })}</div>;
+    }
     const id = (["a", "b", "c", "d"].includes(params.get("direction") ?? "") ? params.get("direction") : "c") as DirectionId;
     const state = dStates.includes(params.get("state") as DState) ? (params.get("state") as DState) : undefined;
     return <div className={`cg-frame-only ${params.get("mode") === "dark" ? "dark" : "light"}`}><DirectionScreen id={id} mode={params.get("mode") === "dark" ? "dark" : "light"} state={state} /></div>;
@@ -46,11 +55,13 @@ export function App() {
           <h2>D4 · Design language</h2>
           <NavLink page="language" current={page} icon={<Palette size={16} />} label="Design language" meta="Tokens, type, density, layout" />
           <NavLink page="elements" current={page} icon={<Component size={16} />} label="Elements" meta="Primitives, macOS and Windows" />
+          <h2>D4 · E1 screens</h2>
+          <NavLink page="e1" current={page} icon={<AppWindow size={16} />} label="E1 screens" meta="Open, edit, references, diagnostics" />
         </nav>
         <a className="cg-back" href="../">All design galleries</a>
       </aside>
       <main className="cg-stage">
-        {track === "current" ? <CurrentEmpty /> : page === "board" ? <MoodBoard /> : page === "language" ? <LanguagePage /> : page === "elements" ? <ElementsPage /> : <DirectionPage id={page} />}
+        {track === "current" ? <CurrentEmpty /> : page === "board" ? <MoodBoard /> : page === "language" ? <LanguagePage /> : page === "elements" ? <ElementsPage /> : page === "e1" ? <E1Page screen={params.get("screen")} /> : <DirectionPage id={page} />}
       </main>
     </div>
   );
