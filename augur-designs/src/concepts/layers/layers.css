@@ -249,8 +249,9 @@
 .lyr-phone .lyr-order-foot > .ux-src-ghost { padding-left: 0; }
 .lyr-review-actions { justify-content: flex-end; }
 .lyr-phone .lyr-review-actions { position: sticky; bottom: -32px; z-index: 2; margin: 0 -8px -32px; padding: 12px 20px 20px; background: linear-gradient(to bottom, transparent, var(--ux-bg) 14px); }
-.lyr-phone .lyr-review-actions { flex-direction: column-reverse; align-items: stretch; gap: 8px; }
-.lyr-phone .lyr-review-actions > .lyr-btn { flex: none; justify-content: center; }
+/* One compact row on phone (vertical space first): Keep for review beside Open with current data. */
+.lyr-phone .lyr-review-actions { flex-direction: row; flex-wrap: nowrap; align-items: stretch; gap: 8px; padding-top: 10px; padding-bottom: 14px; }
+.lyr-phone .lyr-review-actions > .lyr-btn { flex: 1 1 0; min-width: 0; justify-content: center; }
 
 /* Tablet: the layers under the base row in the list pane, and the detail pane's spacing */
 .lyr-tablet-children { margin: -4px 0 6px 34px; }
