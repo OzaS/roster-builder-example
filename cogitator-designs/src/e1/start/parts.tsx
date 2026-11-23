@@ -170,11 +170,11 @@ export function SetRow({ label, help, children, top, stack }: { label: ReactNode
 }
 
 /** An on/off setting: a checkbox with its text on macOS; a switch with On / Off on Windows (the row label carries the text). */
-export function Toggle({ platform, on, text, onChange, disabled }: { platform: E1Platform; on: boolean; text: string; onChange?: (on: boolean) => void; disabled?: boolean }) {
+export function Toggle({ platform, on, text, onChange, disabled, title }: { platform: E1Platform; on: boolean; text: string; onChange?: (on: boolean) => void; disabled?: boolean; title?: string }) {
   if (platform === "windows") {
-    return <button type="button" role="switch" aria-checked={on} aria-label={text} className="cg-switch" disabled={disabled} onClick={() => onChange?.(!on)}>{on ? "On" : "Off"}<i /></button>;
+    return <button type="button" role="switch" aria-checked={on} aria-label={text} className="cg-switch" disabled={disabled} title={title} onClick={() => onChange?.(!on)}>{on ? "On" : "Off"}<i /></button>;
   }
-  return <button type="button" role="checkbox" aria-checked={on} className="cg-check" disabled={disabled} onClick={() => onChange?.(!on)}><i>{on ? <Check size={11} strokeWidth={3} /> : null}</i>{text}</button>;
+  return <button type="button" role="checkbox" aria-checked={on} className="cg-check" disabled={disabled} title={title} onClick={() => onChange?.(!on)}><i>{on ? <Check size={11} strokeWidth={3} /> : null}</i>{text}</button>;
 }
 
 /** A row for an on/off setting: macOS puts the group label at the left and the text by the checkbox; Windows names the row with the text. */

@@ -94,6 +94,136 @@
         "entries": [
           { "id": "check.large-text", "title": "Large text (1.25×)", "from": "New rule for Direction D's rows", "platforms": ["mac", "windows"], "states": ["default", "large"], "summary": "Working text at 1.25×: rows grow from a minimum height, names wrap instead of truncating, costs keep their right-aligned column, property labels wrap." }
         ]
+      },
+      {
+        "id": "e1-start",
+        "title": "Open a dataset and settings (E1)",
+        "entries": [
+          {
+            "id": "e1.recent-row",
+            "title": "Recent-dataset row",
+            "from": "New in E1 (start window)",
+            "platforms": [
+              "mac",
+              "windows"
+            ],
+            "states": [
+              "default",
+              "hover",
+              "selected with actions",
+              "error / preservation / suggestion edge",
+              "archive tag",
+              "missing on disk",
+              "large text"
+            ],
+            "summary": "Icon, title (with an Archive or Sample tag), folder, DKLPO version, layers on / total, last opened; the status edge is the last check’s worst kind. Selected, a second line shows the last check and the actions (Open, Show in Finder, Remove from the list) or, when missing, Locate… / Remove from the list."
+          },
+          {
+            "id": "e1.progress-row",
+            "title": "Progress row",
+            "from": "New in E1 (opening, converting)",
+            "platforms": [
+              "mac"
+            ],
+            "states": [
+              "done",
+              "running",
+              "waiting",
+              "failed"
+            ],
+            "summary": "A step of a longer job: status icon, label, count, and a thin accent bar while it runs."
+          },
+          {
+            "id": "e1.drop-target",
+            "title": "Drop target",
+            "from": "New in E1 (start window)",
+            "platforms": [
+              "mac"
+            ],
+            "states": [
+              "idle",
+              "dragging over"
+            ],
+            "summary": "A dashed outline that holds no content (not a card); turns into the selection tint while a folder or archive is dragged over it."
+          },
+          {
+            "id": "e1.dialog",
+            "title": "Dialog and sheet",
+            "from": "New in E1 (open errors, editor dialogs)",
+            "platforms": [
+              "mac",
+              "windows"
+            ],
+            "states": [
+              "sheet (macOS)",
+              "dialog with footer band (Windows)",
+              "primary + Esc keys",
+              "destructive choice"
+            ],
+            "summary": "What happened in one sentence, the file or folder, the choices as verbs; Return does the primary, Esc the safe choice. Floats with the dialog elevation over a scrim."
+          },
+          {
+            "id": "e1.popover-sections",
+            "title": "Popover menu with sections",
+            "from": "The context menu, extended in E1 (dataset switcher)",
+            "platforms": [
+              "mac",
+              "windows"
+            ],
+            "states": [
+              "head block",
+              "section label",
+              "two-line item",
+              "hover",
+              "tag"
+            ],
+            "summary": "The context menu, wider, with a head block for the open dataset, section labels and two-line items with a folder in mono."
+          },
+          {
+            "id": "e1.settings-row",
+            "title": "Settings row and controls",
+            "from": "New in E1 (settings)",
+            "platforms": [
+              "mac",
+              "windows"
+            ],
+            "states": [
+              "checkbox / switch on, off, unavailable",
+              "pop-up / drop-down closed and open",
+              "radios with notes",
+              "help text"
+            ],
+            "summary": "Label, control, help text. macOS: the classic preferences layout with checkboxes; Windows: label and help left, control right, switches with On / Off, radios stacked; no setting cards."
+          },
+          {
+            "id": "e1.settings-nav",
+            "title": "Settings tabs and navigation list",
+            "from": "New in E1 (settings)",
+            "platforms": [
+              "mac",
+              "windows"
+            ],
+            "states": [
+              "selected",
+              "hover"
+            ],
+            "summary": "macOS toolbar tabs (icon above label); Windows navigation list with the accent indicator bar."
+          },
+          {
+            "id": "e1.shortcut-list",
+            "title": "Shortcut list",
+            "from": "New in E1 (settings, Keyboard)",
+            "platforms": [
+              "mac",
+              "windows"
+            ],
+            "states": [
+              "grouped rows",
+              "hover"
+            ],
+            "summary": "Command and its keys as one keycap per key, grouped by task; read-only in E1."
+          }
+        ]
       }
     ]
   },
