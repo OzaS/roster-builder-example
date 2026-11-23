@@ -6,7 +6,7 @@ export type E1Platform = "mac" | "windows";
 
 /**
  * One E1 screen (D4 step 3) in the gallery: drawn at 1440 px (or `width`), in light and dark, optionally on Windows.
- * `group` heads the screen's section on the E1 page; `item` is its `next-track.json` id (every E1 screen is a Proposal).
+ * `group` heads the screen's section on the E1 page; `item` is its `next-track.json` id (approved by the user 2026-11-23; new screens start as Proposals).
  * `states` are named starting states shown side by side (`?view=frame&screen=<id>&state=<state>`); the first is the default.
  */
 export type E1Screen = {

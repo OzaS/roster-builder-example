@@ -1,9 +1,7 @@
 import { TrackChip } from "@designs/kit";
-import { ArrowLeft, ArrowRight } from "lucide-react";
 import { ScaledFrame } from "../frames";
 import { directions, type DirectionId } from "../directions/meta";
 import { DirectionScreen } from "../directions";
-import { go, hrefFor } from "../route";
 
 /** What to try in the interactive Direction D window. */
 const tryIt: { what: string; how: string }[] = [
@@ -15,16 +13,13 @@ const tryIt: { what: string; how: string }[] = [
   { what: "Page", how: "hover a mention for its peek, fold and unfold statements with the chevrons, click “Type / to insert a statement” for the / menu, “more properties” opens the Properties tab." },
 ];
 
-/** One direction: what it optimises for and what it costs, then the entry editor at 1440 px in light and dark. */
+/** Direction D: what it optimises for and what it costs, then the entry editor at 1440 px in light and dark. */
 export function DirectionPage({ id }: { id: DirectionId }) {
-  const index = directions.findIndex((direction) => direction.id === id);
-  const direction = directions[index];
-  const previous = directions[index - 1];
-  const next = directions[index + 1];
+  const direction = directions.find((candidate) => candidate.id === id) ?? directions[0];
   return (
     <article className="cg-page">
       <header className="cg-head">
-        <p className="cg-kicker">Direction {direction.letter} <TrackChip status="proposal" /></p>
+        <p className="cg-kicker">Direction {direction.letter} <TrackChip status="approved" /></p>
         <h1>{direction.title}</h1>
         <p className="cg-lede">{direction.oneLine}</p>
       </header>
@@ -45,17 +40,13 @@ export function DirectionPage({ id }: { id: DirectionId }) {
           <ul>{tryIt.map((item) => <li key={item.what}><strong>{item.what}:</strong> {item.how}</li>)}</ul>
         </section>
       ) : null}
-      <p className="cg-note">Same task in every direction: the entry editor with <code>iron-wardens:warden-squad</code> open, its properties, references and the diagnostics area. In view at 1440 × 900: {direction.rows}. Synthetic sample dataset.</p>
+      <p className="cg-note">The entry editor with <code>iron-wardens:warden-squad</code> open, its properties, references and the diagnostics area. In view at 1440 × 900: {direction.rows}. Synthetic sample dataset.</p>
       {(["light", "dark"] as const).map((mode) => (
         <section key={mode} className="cg-shot" aria-label={`${direction.title}, ${mode}`}>
           <h2>{mode === "light" ? "Light" : "Dark"} <a href={`?view=frame&direction=${id}&mode=${mode}`}>Open at 1440 px</a></h2>
           <ScaledFrame interactive={id === "d"} label={`${direction.title} entry editor, ${mode} theme`}><DirectionScreen id={id} mode={mode} /></ScaledFrame>
         </section>
       ))}
-      <nav className="cg-pager" aria-label="Directions">
-        {previous ? <a href={hrefFor(previous.id)} onClick={(event) => { event.preventDefault(); go(previous.id); }}><ArrowLeft size={14} /> {previous.letter} · {previous.title}</a> : <a href={hrefFor("board")} onClick={(event) => { event.preventDefault(); go("board"); }}><ArrowLeft size={14} /> Mood board</a>}
-        {next ? <a href={hrefFor(next.id)} onClick={(event) => { event.preventDefault(); go(next.id); }}>{next.letter} · {next.title} <ArrowRight size={14} /></a> : <a href={hrefFor("board")} onClick={(event) => { event.preventDefault(); go("board", "pick"); }}>Questions to pick <ArrowRight size={14} /></a>}
-      </nav>
     </article>
   );
 }

@@ -15,7 +15,7 @@ export function E1Page({ screen }: { screen: string | null }) {
   return (
     <article className="cg-page">
       <header className="cg-head">
-        <p className="cg-kicker">D4 step 3 · E1 screens <TrackChip status="proposal" /></p>
+        <p className="cg-kicker">D4 step 3 · E1 screens <TrackChip status="approved" /></p>
         <h1>{one ? one.title : "E1 screens"}</h1>
         <p className="cg-lede">{one ? one.summary : "The screens of the first scope (E1): open a dataset, edit it, follow references, read diagnostics. Direction D and the design language, synthetic sample data."}</p>
       </header>
