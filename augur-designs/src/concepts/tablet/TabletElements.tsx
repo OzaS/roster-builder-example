@@ -10,6 +10,7 @@ import { TabletToolbar, type ToolbarAction } from './TabletToolbar';
 import { TabletExperienceControls } from './tabletExperience';
 import { TabletDeviceFrame } from './TabletDeviceFrame';
 import { TabletRail } from './TabletRail';
+import { LayersElementsDemo } from '../layers/LayersElements';
 import { TabletResizer, type PanePresets } from './TabletResizer';
 import { EmptyState, InstallRow, Row, WorkspaceScope } from './TabletPieces';
 import { Chip as MobileChip } from '../ux/uxShared';
@@ -304,6 +305,12 @@ export function TabletElements() {
       <NoPresetDemo />
       <p>A GitHub version already kept on this device with every faction installed pauses the install on the reinstall offer (Advanced installation on or off) instead of an empty faction picker: a form sheet with Cancel (cancels the install), “{'{name}'} · {'{version}'}” and Reinstall this version. It asks first in the app dialog; confirmed, that version is in use and the one in use before stays kept (the jobs popover shows the done state); a failure shows the error and the previous version stays in use. Screen: Sources · Reinstall a kept version; Sources › Add game data › Preview states › Kept version · reinstall fails.</p>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-sources-reinstall" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="split"><TabletWorkbench workflowScreen="tablet-sources-reinstall" /></TabletDeviceFrame></div>
+      {next && <>
+        <h2>Add-ons and variants (A3 · Next · Proposal) · layer rows · order · requirement check · roster open review</h2>
+        <p>Sources lists each base's add-ons and variants under it; the detail manages them in two groups with switches and Edit order (drag handle and Move up / Move down). Installing, the requirement check, a base update and the roster open review are form sheets.</p>
+        <div className="tb-app ux-screen dark tb-el-card tb-touch"><LayersElementsDemo platform="tablet" /></div>
+        <div className="tb-el-frames"><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-layers-problems" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="ipad-landscape"><TabletWorkbench workflowScreen="tablet-layers-review" /></TabletDeviceFrame></div>
+      </>}
       <h2>Framed compositions · the selected device and input mode</h2>
       <div className="tb-el-frames"><TabletDeviceFrame fit="width"><TabletWorkbench workflowScreen="tablet-rosters" /></TabletDeviceFrame><TabletDeviceFrame fit="width" device="split"><TabletWorkbench workflowScreen="tablet-lookup" /></TabletDeviceFrame><TabletDeviceFrame fit="width"><TabletWorkbench workflowScreen="tablet-sources-choose-factions" /></TabletDeviceFrame></div>
     </div>

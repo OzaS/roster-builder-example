@@ -1,3 +1,4 @@
+import type { LayerScreen } from "./concepts/layers/layerScreens";
 import type { LucideIcon } from "lucide-react";
 
 export type PlatformPreview = "phone" | "tablet";
@@ -294,7 +295,8 @@ export type WorkflowScreen =
   | "links-nothing-found"
   | "links-finding"
   | "links-search-data"
-  | "links-guide";
+  | "links-guide"
+  | LayerScreen;
 
 export type RosterOption = {
   id: string;

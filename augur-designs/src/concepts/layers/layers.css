@@ -1,0 +1,289 @@
+/*
+ * A3 host UI: add-ons and variants (Next track, Proposal). Every class starts with `lyr-`, so nothing on Current changes.
+ * The Next look's language: open lists, no boxes except floating surfaces, rows kept apart by a status edge, sentence-case
+ * group headings, declared actions. Colours come from the --ux-* tokens every platform frame sets.
+ */
+.lyr {
+  --lyr-title: 17px;
+  --lyr-meta: 13px;
+  --lyr-row: 64px;
+  --lyr-pad: 12px;
+  --lyr-radius: 12px;
+  --lyr-target: 44px;
+  --lyr-hover: color-mix(in srgb, var(--ux-ink) 6%, transparent);
+  --lyr-press: color-mix(in srgb, var(--ux-ink) 11%, transparent);
+  --lyr-tint: color-mix(in srgb, var(--ux-accent) 15%, transparent);
+  --lyr-ok: var(--ux-ok);
+  --lyr-warn: var(--ux-warn);
+  --lyr-err: var(--ux-err);
+  --lyr-info: var(--ux-accent);
+  --lyr-off: color-mix(in srgb, var(--ux-muted) 45%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--ux-ink);
+  text-align: left;
+  min-width: 0;
+}
+.lyr-tablet { --lyr-meta: 14px; }
+.lyr-desktop { --lyr-title: 13px; --lyr-meta: 12px; --lyr-row: 48px; --lyr-pad: 10px; --lyr-radius: 8px; --lyr-target: 28px; }
+
+.lyr button { font: inherit; color: inherit; }
+.lyr .lyr-text { display: flex; flex-direction: column; min-width: 0; gap: 1px; flex: 1 1 auto; }
+.lyr .lyr-text strong { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: var(--lyr-title); line-height: 1.3; font-weight: 600; }
+.lyr .lyr-text small { color: var(--ux-muted); font-size: var(--lyr-meta); line-height: 1.35; }
+.lyr-hint { margin: 6px var(--lyr-pad) 0; color: var(--ux-muted); font-size: var(--lyr-meta); line-height: 1.45; }
+.lyr-hint b { color: var(--ux-ink); font-weight: 600; }
+
+/* ---------- Status edge (the rows' anchor, as on roster and unit rows) ---------- */
+.lyr-edge { flex: none; align-self: stretch; width: 4px; margin-block: 6px; border-radius: 2px; background: var(--lyr-ok); }
+[data-tone="off"] > .lyr-edge { background: var(--lyr-off); }
+[data-tone="warn"] > .lyr-edge { background: var(--lyr-warn); }
+[data-tone="err"] > .lyr-edge, [data-tone="missing"] > .lyr-edge { background: var(--lyr-err); }
+[data-tone="info"] > .lyr-edge, [data-tone="changed"] > .lyr-edge { background: var(--lyr-info); }
+
+/* ---------- Groups ---------- */
+.lyr-groups { gap: 20px; }
+.lyr-group { display: flex; flex-direction: column; gap: 2px; }
+.lyr-group-head { display: flex; align-items: flex-end; gap: 12px; padding: 0 var(--lyr-pad) 4px; }
+.lyr-group-head > span { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.lyr-group-head strong { font-size: 13px; line-height: 18px; font-weight: 600; color: var(--ux-ink); }
+.lyr-group-head em { margin-left: 6px; font-style: normal; font-weight: 400; color: var(--ux-muted); font-variant-numeric: tabular-nums; }
+.lyr-group-head small { color: var(--ux-muted); font-size: 12px; line-height: 16px; }
+.lyr-link { flex: none; min-height: var(--lyr-target); padding: 0 8px; border: 0; border-radius: 8px; background: transparent; color: var(--ux-accent) !important; font-weight: 600 !important; font-size: 15px; cursor: pointer; }
+.lyr-link.desktop { font-size: 12px; min-height: 24px; }
+.lyr-link:hover { background: var(--lyr-hover); }
+.lyr-link:active { background: var(--lyr-press); }
+
+/* ---------- Layer row ---------- */
+.lyr-row { position: relative; display: grid; grid-template-columns: 4px minmax(0, 1fr) auto; column-gap: 10px; align-items: center; min-height: var(--lyr-row); padding: 0 var(--lyr-pad) 0 8px; border-radius: var(--lyr-radius); }
+.lyr-row:hover { background: var(--lyr-hover); }
+.lyr-row.selected { background: var(--lyr-tint); }
+.lyr-row > .lyr-edge { grid-row: 1 / span 2; }
+.lyr-row-main { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 10px 0; border: 0; background: transparent; text-align: left; cursor: pointer; }
+.lyr-row-main:active { opacity: .7; }
+.lyr-kind { display: grid; place-items: center; flex: none; width: 28px; height: 28px; border-radius: 8px; background: var(--lyr-tint); color: var(--ux-accent); }
+.lyr-desktop .lyr-kind { width: 22px; height: 22px; border-radius: 6px; }
+.lyr-desktop .lyr-kind svg { width: 13px; height: 13px; }
+.lyr-row.off .lyr-kind { background: color-mix(in srgb, var(--ux-muted) 14%, transparent); color: var(--ux-muted); }
+.lyr-row.off .lyr-text strong { color: color-mix(in srgb, var(--ux-ink) 78%, transparent); }
+.lyr-report { font-variant-numeric: tabular-nums; }
+.lyr-desktop .lyr-row-main { padding: 7px 0; gap: 10px; }
+.lyr-desktop .lyr-text small { display: inline; }
+.lyr-desktop .lyr-text { flex-direction: row; flex-wrap: wrap; align-items: baseline; column-gap: 10px; }
+.lyr-desktop .lyr-text strong { flex: 1 0 100%; }
+
+.lyr-test { display: inline-flex; align-items: center; gap: 3px; padding: 1px 7px; border-radius: 999px; background: color-mix(in srgb, var(--ux-warn) 18%, transparent); color: color-mix(in srgb, var(--ux-warn) 70%, var(--ux-ink)); font-size: 12px; line-height: 18px; font-weight: 700; letter-spacing: .01em; }
+
+/* Problem in words, with its fix as a declared button. */
+.lyr-problem { grid-column: 2 / span 2; display: flex; align-items: center; gap: 10px; margin: 0 0 10px; color: var(--ux-ink); }
+.lyr-problem > svg { flex: none; align-self: flex-start; margin-top: 2px; }
+.lyr-problem.requirement > svg { color: var(--lyr-warn); }
+.lyr-problem.order > svg, .lyr-problem.changes-rules > svg { color: var(--lyr-err); }
+.lyr-problem.moved > svg { color: var(--lyr-info); }
+.lyr-problem > span { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.lyr-problem strong { font-size: var(--lyr-meta); font-weight: 600; line-height: 1.35; }
+.lyr-problem small { color: var(--ux-muted); font-size: var(--lyr-meta); line-height: 1.4; }
+.lyr-phone .lyr-problem { flex-wrap: wrap; }
+.lyr-phone .lyr-problem > .lyr-btn { margin-left: 25px; }
+.lyr-btn { flex: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
+
+/* Switch: platform-sized; off is a hollow track, so it reads without colour. */
+.lyr-switch { flex: none; position: relative; width: 51px; height: 31px; padding: 0; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--ux-muted) 32%, transparent); cursor: pointer; transition: background .15s; }
+.lyr-switch i { position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px #0004; transition: transform .15s; }
+.lyr-switch.on { background: var(--ux-ok); }
+.lyr-switch.on i { transform: translateX(20px); }
+.lyr-switch:disabled { opacity: .45; cursor: not-allowed; }
+.lyr-switch:focus-visible { outline: 2px solid var(--ux-accent); outline-offset: 2px; }
+.lyr-desktop .lyr-switch { width: 32px; height: 18px; }
+.lyr-desktop .lyr-switch i { top: 2px; left: 2px; width: 14px; height: 14px; }
+.lyr-desktop .lyr-switch.on i { transform: translateX(14px); }
+.lyr-tablet .lyr-switch.on, .lyr-desktop .lyr-switch.on { background: var(--ux-accent); }
+
+/* Add row (accent tile) */
+.lyr-add-row { display: flex; align-items: center; gap: 12px; min-height: var(--lyr-row); padding: 8px var(--lyr-pad); border: 0; border-radius: var(--lyr-radius); background: transparent; color: var(--ux-ink); text-align: left; cursor: pointer; }
+.lyr-add-row:hover { background: var(--lyr-hover); }
+.lyr-add-row:active { background: var(--lyr-press); }
+.lyr-add-row > svg { color: var(--ux-muted); flex: none; }
+.lyr-add-icon { display: grid; place-items: center; flex: none; width: 32px; height: 32px; border-radius: 10px; background: var(--lyr-tint); color: var(--ux-accent); }
+.lyr-add-row.primary .lyr-add-icon { background: var(--ux-accent); color: var(--ux-accent-ink, #fff); }
+.lyr-desktop .lyr-add-row { min-height: 44px; }
+.lyr-desktop .lyr-add-icon { width: 24px; height: 24px; border-radius: 6px; }
+.lyr-desktop .lyr-add-icon svg { width: 14px; height: 14px; }
+
+/* Banner (one line per stack state, not a card: tinted text block) */
+.lyr-banner { flex-direction: row; align-items: flex-start; gap: 10px; padding: 10px var(--lyr-pad); border-radius: var(--lyr-radius); background: color-mix(in srgb, var(--ux-err) 10%, transparent); }
+.lyr-banner > svg { flex: none; color: var(--lyr-err); margin-top: 2px; }
+.lyr-banner span { display: flex; flex-direction: column; }
+.lyr-banner strong { font-size: var(--lyr-title); font-weight: 600; line-height: 1.3; }
+.lyr-banner small { color: var(--ux-muted); font-size: var(--lyr-meta); line-height: 1.4; }
+
+/* ---------- Order editor ---------- */
+.lyr-order { gap: 8px; }
+.lyr-order-note { display: flex; gap: 8px; margin: 0; padding: 0 var(--lyr-pad); color: var(--ux-muted); font-size: var(--lyr-meta); line-height: 1.45; }
+.lyr-order-note svg { flex: none; margin-top: 2px; }
+.lyr-order-list { display: flex; flex-direction: column; gap: 4px; }
+.lyr-order-slot { position: relative; }
+.lyr-order-row { display: flex; align-items: center; gap: 10px; min-height: var(--lyr-row); padding: 0 6px 0 8px; border-radius: var(--lyr-radius); background: color-mix(in srgb, var(--ux-ink) 4%, transparent); outline: none; }
+.lyr-order-row:focus-visible { box-shadow: 0 0 0 2px var(--ux-accent); }
+.lyr-order-row.lifted { background: var(--ux-surface); box-shadow: 0 10px 28px #0003, 0 0 0 1px var(--ux-line); transform: scale(1.01); }
+.lyr-order-row.bad { background: color-mix(in srgb, var(--ux-err) 10%, transparent); }
+.lyr-order-row.bad .lyr-text small { color: var(--lyr-err); font-weight: 600; }
+.lyr-handle { display: grid; place-items: center; flex: none; width: 28px; height: var(--lyr-target); color: var(--ux-muted); cursor: grab; }
+.lyr-pos { flex: none; width: 18px; color: var(--ux-muted); font-size: var(--lyr-meta); font-variant-numeric: tabular-nums; text-align: center; }
+.lyr-order-btns { display: flex; gap: 2px; }
+.lyr-icon-btn { display: grid; place-items: center; width: var(--lyr-target); height: var(--lyr-target); border: 0; border-radius: 10px; background: transparent; cursor: pointer; }
+.lyr-icon-btn:hover { background: var(--lyr-hover); }
+.lyr-icon-btn:active { background: var(--lyr-press); }
+.lyr-icon-btn:disabled { opacity: .3; cursor: default; }
+.lyr-kbd { flex: none; padding: 1px 6px; border: 1px solid var(--ux-line); border-radius: 4px; color: var(--ux-muted); font: 12px/18px inherit; }
+.lyr-drop-line { display: block; height: 3px; margin: -3px 8px 0; border-radius: 2px; background: var(--ux-accent); }
+.lyr-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.lyr-order-foot { display: flex; align-items: center; gap: 8px; padding: 8px var(--lyr-pad) 0; }
+.lyr-spacer { flex: 1; }
+.lyr-why { display: flex; align-items: center; gap: 6px; margin: 0; padding: 0 var(--lyr-pad); color: var(--lyr-err); font-size: var(--lyr-meta); font-weight: 600; }
+.lyr-phone .lyr-order-foot { flex-wrap: wrap; }
+
+/* ---------- Install ---------- */
+.lyr-install-source { gap: 14px; }
+.lyr-link-form { display: flex; align-items: flex-end; gap: 8px; padding: 0 var(--lyr-pad); }
+.lyr-field { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; }
+.lyr-field > span:first-child { color: var(--ux-muted); font-size: 13px; font-weight: 600; }
+.lyr-field-box { display: flex; align-items: center; gap: 8px; min-height: var(--lyr-target); padding: 0 12px; border-radius: 10px; background: color-mix(in srgb, var(--ux-ink) 6%, transparent); color: var(--ux-muted); }
+.lyr-field-box input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ux-ink); font: inherit; font-size: var(--lyr-title); outline: none; }
+.lyr-desktop .lyr-field-box { border-radius: 6px; min-height: 30px; }
+.lyr-phone .lyr-link-form { flex-direction: column; align-items: stretch; }
+
+.lyr-check { gap: 12px; }
+.lyr-file { display: flex; align-items: center; gap: 6px; margin: 0; padding: 0 var(--lyr-pad); color: var(--ux-muted); font-size: var(--lyr-meta); }
+.lyr-verdict { display: flex; align-items: flex-start; gap: 10px; padding: 10px var(--lyr-pad); border-radius: var(--lyr-radius); }
+.lyr-verdict > svg { flex: none; margin-top: 2px; }
+.lyr-verdict span { display: flex; flex-direction: column; gap: 2px; }
+.lyr-verdict strong { font-size: var(--lyr-title); line-height: 1.3; font-weight: 600; }
+.lyr-verdict small { color: var(--ux-muted); font-size: var(--lyr-meta); line-height: 1.45; }
+.lyr-verdict.ok { background: color-mix(in srgb, var(--ux-ok) 12%, transparent); }
+.lyr-verdict.ok > svg { color: var(--ux-ok); }
+.lyr-verdict.warn { background: color-mix(in srgb, var(--ux-warn) 13%, transparent); }
+.lyr-verdict.warn > svg { color: var(--ux-warn); }
+.lyr-verdict.err { background: color-mix(in srgb, var(--ux-err) 11%, transparent); }
+.lyr-verdict.err > svg { color: var(--ux-err); }
+.lyr-check-title { margin: 4px var(--lyr-pad) 0; font-size: calc(var(--lyr-title) + 3px); line-height: 1.25; font-weight: 700; }
+.lyr-facts { display: grid; gap: 6px; margin: 0; padding: 0 var(--lyr-pad); }
+.lyr-facts > div { display: grid; grid-template-columns: minmax(84px, 30%) 1fr; gap: 12px; align-items: baseline; }
+.lyr-facts dt { color: var(--ux-muted); font-size: var(--lyr-meta); }
+.lyr-facts dd { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 0; font-size: var(--lyr-title); line-height: 1.35; }
+.lyr-dd-line { flex: 1 0 100%; display: flex; align-items: center; gap: 8px; }
+.lyr-fit { display: inline-flex; align-items: center; gap: 3px; font-size: var(--lyr-meta); font-weight: 600; }
+.lyr-fit.ok { color: var(--ux-ok); }
+.lyr-fit.warn { color: color-mix(in srgb, var(--ux-warn) 75%, var(--ux-ink)); }
+.lyr-details { margin: 0 var(--lyr-pad); font-size: var(--lyr-meta); }
+.lyr-details summary { min-height: var(--lyr-target); display: flex; align-items: center; color: var(--ux-accent); font-weight: 600; cursor: pointer; }
+.lyr-details ul { margin: 0; padding-left: 18px; color: var(--ux-muted); line-height: 1.6; }
+.lyr-actions { display: flex; justify-content: flex-end; gap: 8px; padding: 8px var(--lyr-pad) 0; }
+.lyr-phone .lyr-actions > .lyr-btn { flex: 1; justify-content: center; }
+
+/* ---------- Roster open review ---------- */
+.lyr-review { gap: 16px; }
+.lyr-review-lede { margin: 0; padding: 0 var(--lyr-pad); color: var(--ux-muted); font-size: var(--lyr-meta); line-height: 1.45; }
+.lyr-review-group { display: flex; flex-direction: column; gap: 2px; }
+.lyr-review-group > h3, .lyr-impact > h3 { margin: 0 0 4px; padding: 0 var(--lyr-pad); color: var(--ux-muted); font-size: 13px; line-height: 18px; font-weight: 600; }
+.lyr-review-line { display: flex; align-items: center; gap: 10px; min-height: calc(var(--lyr-row) - 8px); padding: 0 var(--lyr-pad) 0 8px; border-radius: var(--lyr-radius); }
+.lyr-review-line > svg { flex: none; align-self: flex-start; margin-top: 12px; color: var(--ux-muted); }
+.lyr-desktop .lyr-review-line > svg { margin-top: 9px; }
+.lyr-review-line[data-tone="missing"] > svg, .lyr-review-line[data-tone="err"] > svg { color: var(--lyr-err); }
+.lyr-review-line[data-tone="warn"] > svg { color: var(--lyr-warn); }
+.lyr-review-line[data-tone="changed"] > svg, .lyr-review-line[data-tone="info"] > svg { color: var(--lyr-info); }
+.lyr-review-line .lyr-text { padding: 8px 0; }
+.lyr-review-line .lyr-text strong { font-size: calc(var(--lyr-title) - 1px); }
+.lyr-desktop .lyr-review-line .lyr-text strong { font-size: var(--lyr-title); }
+.lyr-desktop .lyr-review-line .lyr-text { flex-direction: column; }
+.lyr-phone .lyr-review-line { flex-wrap: wrap; }
+.lyr-phone .lyr-review-line > .lyr-btn { margin: 0 0 8px 40px; }
+.lyr-review-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 4px var(--lyr-pad) 0; }
+.lyr-review-actions .lyr-hint { flex: 1 0 100%; margin: 4px 0 0; }
+
+/* ---------- Impact (base update) and roster layers ---------- */
+.lyr-impact { gap: 2px; }
+.lyr-roster-layers { gap: 8px; }
+
+/* ---------- Page pieces shared by the platform screens ---------- */
+.lyr-section { display: block; padding: 0 var(--lyr-pad, 12px); color: var(--ux-muted); font-size: 13px; line-height: 18px; font-weight: 600; }
+.lyr-page-title { margin: 0; padding: 0 12px; font-size: 22px; line-height: 1.25; font-weight: 700; letter-spacing: -0.01em; color: var(--ux-ink); }
+.lyr-info-head { padding: 0 var(--lyr-pad); }
+.lyr-info-head strong { font-size: calc(var(--lyr-title) + 3px) !important; font-weight: 700 !important; }
+.lyr-update-line { display: flex; align-items: center; gap: 12px; min-height: 56px; margin: 0; padding: 8px 12px; border: 0; border-radius: 12px; background: var(--lyr-tint, color-mix(in srgb, var(--ux-accent) 15%, transparent)); color: var(--ux-ink); font: inherit; text-align: left; cursor: pointer; }
+.lyr-update-line > svg:first-child { flex: none; color: var(--ux-accent); }
+.lyr-update-line > svg:last-child { flex: none; color: var(--ux-muted); }
+.lyr-update-line span { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.lyr-update-line strong { font-size: 16px; font-weight: 600; }
+.lyr-update-line small { color: var(--ux-muted); font-size: 13px; }
+.lyr-update-line:active { filter: brightness(.95); }
+.lyr-more { align-self: flex-start; margin-left: 4px; }
+
+/* Phone: page body spacing and sheets */
+.lyr-phone-body { padding: 4px 8px 32px !important; gap: 16px !important; }
+.lyr-phone-sheet { max-height: 88%; overflow-y: auto; gap: 12px; }
+.lyr-phone-sheet > .lyr { padding-bottom: 8px; }
+
+/* Phone Sources: base rows with their layers nested as child rows */
+.lyr-sources { gap: 6px; }
+.lyr-sources > .lyr-section { margin-top: 10px; }
+.lyr-base { display: grid; grid-template-columns: 4px minmax(0, 1fr); column-gap: 10px; padding: 0 0 0 8px; border-radius: 12px; }
+.lyr-base > .lyr-edge { grid-row: 1 / span 2; margin-block: 8px; }
+.lyr-base-main { display: flex; align-items: center; gap: 10px; min-height: 64px; padding: 8px 12px 8px 0; border: 0; background: transparent; text-align: left; cursor: pointer; }
+.lyr-base-main:active { opacity: .7; }
+.lyr-base-status { flex: none; color: var(--ux-accent); }
+.lyr-children { display: flex; flex-direction: column; margin: -2px 0 8px; }
+.lyr-child { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 12px 0 14px; border: 0; border-left: 2px solid color-mix(in srgb, var(--ux-muted) 30%, transparent); background: transparent; color: var(--ux-ink); font: inherit; font-size: 15px; text-align: left; cursor: pointer; }
+.lyr-child:active { background: var(--lyr-press); }
+.lyr-child.static { cursor: default; }
+.lyr-child-glyph { display: grid; place-items: center; flex: none; color: var(--ux-accent); }
+.lyr-child[data-tone="off"] .lyr-child-glyph, .lyr-child[data-tone="off"] .lyr-child-title { color: var(--ux-muted); }
+.lyr-child-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lyr-child-state { flex: none; color: var(--ux-muted); font-size: 13px; }
+.lyr-base-line { margin: 0; padding: 0 12px; color: var(--ux-muted); font-size: 14px; line-height: 1.4; }
+.lyr-phone .lyr-problem > span, .lyr-tablet.lyr-narrow .lyr-problem > span { flex: 1 1 calc(100% - 40px); }
+.lyr-phone .lyr-review-line > .lyr-text { flex: 1 1 calc(100% - 40px); }
+.lyr-phone .lyr-order-foot .lyr-spacer { flex: 1 0 100%; height: 0; }
+.lyr-phone .lyr-order-foot > .lyr-btn:not(.ux-src-ghost) { flex: 1; justify-content: center; }
+.lyr-phone .lyr-order-foot > .ux-src-ghost { padding-left: 0; }
+.lyr-review-actions { justify-content: flex-end; }
+.lyr-phone .lyr-review-actions { position: sticky; bottom: -32px; z-index: 2; margin: 0 -8px -32px; padding: 12px 20px 20px; background: linear-gradient(to bottom, transparent, var(--ux-bg) 14px); }
+/* One compact row on phone (vertical space first): Keep for review beside Open with current data. */
+.lyr-phone .lyr-review-actions { flex-direction: row; flex-wrap: nowrap; align-items: stretch; gap: 8px; padding-top: 10px; padding-bottom: 14px; }
+.lyr-phone .lyr-review-actions > .lyr-btn { flex: 1 1 0; min-width: 0; justify-content: center; }
+
+/* Tablet: the layers under the base row in the list pane, and the detail pane's spacing */
+.lyr-tablet-children { margin: -4px 0 6px 34px; }
+.lyr-tablet-children .lyr-child { min-height: 44px; font-size: 15px; }
+.lyr-tablet-page .tb-detail { display: flex; flex-direction: column; gap: 16px; }
+.lyr-tablet-page .tb-detail > .lyr-update-line { margin: 0; }
+.tbs-body > .lyr { flex: none; }
+.tbs-body .lyr-review-actions { padding-bottom: 4px; }
+
+/* Desktop: layers under the base row in the list pane; dialogs' body */
+.lyr-dt-children { margin: -2px 0 6px 18px; }
+.lyr-dt-children .lyr-child { min-height: 28px; font-size: 13px; padding-left: 12px; }
+.lyr-dt-children .lyr-child-state { font-size: 12px; }
+.lyr-dt-children .lyr-test { font-size: 11px; line-height: 16px; }
+.lyr-dt-detail > .lyr-groups, .lyr-dt-detail > .lyr-order, .lyr-dt-detail > .lyr-banner, .lyr-dt-detail > .lyr { margin-top: 14px; }
+.lyr-dt-update { min-height: 44px; margin-top: 12px !important; padding: 6px 10px !important; border-radius: 8px !important; }
+.lyr-dt-update strong { font-size: 13px !important; }
+.lyr-dt-update small { font-size: 12px !important; }
+.lyr-dt-body { display: flex; flex-direction: column; gap: 12px; padding: 14px 16px 16px; overflow-y: auto; min-height: 0; }
+.lyr-dt-body > .lyr-section { font-size: 12px; }
+.lyr-desktop .lyr-check-title { font-size: 16px; }
+.lyr-desktop .lyr-facts > div { grid-template-columns: 110px 1fr; }
+.lyr-desktop .lyr-btn { min-height: 28px; }
+.lyr-desktop .lyr-link-form { align-items: flex-end; }
+.lyr-switch:not(.on) { box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--ux-muted) 55%, transparent); }
+.lyr-switch:disabled { opacity: .55; }
+.tbs-body .lyr-review-actions { position: sticky; bottom: -24px; z-index: 2; margin: 0 -20px -24px; padding: 14px 20px 20px; background: linear-gradient(to bottom, transparent, var(--ux-bg) 14px); }
+
+/* Elements view */
+.lyr-el-demo { display: flex; flex-direction: column; gap: 10px; padding: 16px; }
+.lyr-el-demo > h3 { margin: 12px 0 0; color: var(--ux-muted); font-size: 13px; font-weight: 600; }
+.lyr-el-stack { max-width: 720px; }
+.lyr-el-inline { flex-direction: row; align-items: center; gap: 16px; padding: 4px 12px; }
+.lyr-el-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; align-items: start; }
+.lyr-el-grid.three { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }

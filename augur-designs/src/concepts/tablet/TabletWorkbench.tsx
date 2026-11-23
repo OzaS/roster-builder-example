@@ -7,6 +7,7 @@ import { TabletRail, railTop, type TabletPage } from './TabletRail';
 import { TabletHome, TabletLibrary, TabletLookup, TabletRosters, TabletTools } from './TabletPages';
 import { TabletLookup10 } from './TabletLookup10';
 import { TabletSources } from './TabletSources';
+import { TabletLayerOverlay, TabletLayers, tabletLayerOverlayState, tabletLayerPageState } from '../layers/TabletLayers';
 import { TabletSettings } from './TabletSettings';
 import { TabletEditor, type EditorStart } from './TabletEditor';
 import { ImportResultSheet } from './TabletEditorSheets';
@@ -134,7 +135,7 @@ function TabletShell({ route, initialEditor, initialImport = false, initialShort
           : page === 'lookup' ? route.page !== 'lookup' || route.state !== 'legacy' ? <TabletLookup10 {...shared} onAddData={addData} initial={route.state === 'v1-force' ? 'f-line-of-battle' : undefined} state={route.state} /> : <TabletLookup {...shared} onAddData={addData} />
             : page === 'tools' ? <TabletTools />
               : page === 'library' ? <TabletLibrary />
-                : page === 'sources' ? <TabletSources {...shared} onPage={setPage} onOpenRoster={openRoster} />
+                : page === 'sources' ? tabletLayerPageState(route.state) ? <TabletLayers {...shared} state={tabletLayerPageState(route.state)!} /> : <TabletSources {...shared} onPage={setPage} onOpenRoster={openRoster} />
                   : <TabletSettings {...shared} themePref={themePref} scheme={scheme} onTheme={chooseTheme} onScheme={chooseScheme} focusSearch={focusSearch} onFocusSearch={setFocusSearch} separateAll={separateAll} onSeparateAll={setSeparateAll} searchable />}
       <TabletJobsPanel session={session} />
     </main></>}
@@ -144,6 +145,7 @@ function TabletShell({ route, initialEditor, initialImport = false, initialShort
       const left = result.unmatched.length; notify(left ? `Opened “${result.name}” without ${left === 1 ? '1 entry' : `${left} entries`}` : `Opened “${result.name}”`);
     }} />}
     <TabletSessionSheets session={session} notify={notify} />
+    {tabletLayerOverlayState(route.state) && !editor && <TabletLayerOverlay state={tabletLayerOverlayState(route.state)!} notify={notify} />}
     {creating && <CreateRosterSheet sources={jobs.sources} review={creating === 'review'} stars={creating === 'stars'} onClose={() => setCreating(null)} onCreate={createRoster} onAddData={() => { setCreating(null); setEditor(null); addData(); }} onInstallFile={() => notify('Choose an archive, data files or a folder (prototype)')} />}
     <div className={`dt-app tb-shim ${light ? 'light' : ''}`}><ToastRegion toasts={toasts} /></div>
     <IconHints root={appRef} input={env.input} />

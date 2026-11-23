@@ -37,6 +37,486 @@
       ],
       "summary": "The unit editor can be docked as the roster editor's right panel, shown or hidden with the toolbar's panel toggle and resizable like the catalogue (300–560 px, 360 px at first), as the tablet's Unit details pane is. Shown, it follows the selected row; hidden, a unit opens in the dialog (the Current design, DEC-055). Gallery screens that draw the dialog start with the panel hidden.",
       "source": "User feedback 2026-11-22: horizontal space on desktop is cheap, keep the right panel as a user choice"
+    },
+    {
+      "id": "a3-phone-sources",
+      "title": "A3 · Sources · layers listed under their base",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "phone"
+      ],
+      "screen": "layers-sources",
+      "summary": "Phone Sources lists each base with its variants and add-ons as indented child rows (glyph, title, Test mark, Off).",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-phone-base",
+      "title": "A3 · Sources · Open Field with its variants and add-ons",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "phone"
+      ],
+      "screen": "layers-base",
+      "summary": "The base lists Variants and Add-ons as two open groups under it: kind glyph, title, purpose · version · file or link, the patch report, an enabled switch, a status edge; Edit order per group; Add an add-on or variant.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-phone-problems",
+      "title": "A3 · Sources · Problems in words, each with its fix",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "phone"
+      ],
+      "screen": "layers-problems",
+      "summary": "Each problem in words on its row with the fix as a button: requirement not met (amber, switch unavailable), layer-order conflict (red, Move below…), an add-on that changes rules (red, Remove). A banner counts them.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-phone-order",
+      "title": "A3 · Edit variant order",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "phone"
+      ],
+      "screen": "layers-order",
+      "summary": "Edit order: drag handle and Move up / Move down on touch; drag or Alt+↑/↓ on desktop; Automatic order resets to the derived order; each move is announced.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-phone-order-conflict",
+      "title": "A3 · Edit variant order · conflict, Done unavailable",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "phone"
+      ],
+      "screen": "layers-order-conflict",
+      "summary": "An order that breaks a layer-order rule shows on the row while editing; Done is unavailable and says why.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-phone-install",
+      "title": "A3 · Add an add-on or variant · a file first, a link second",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "phone"
+      ],
+      "screen": "layers-install",
+      "summary": "Add to Open Field: Choose a file on this device (primary, DEC-069), or paste a link and Check link. Nothing is added before the check.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-phone-check-fits",
+      "title": "A3 · Requirement check · fits",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "phone"
+      ],
+      "screen": "layers-check-fits",
+      "summary": "Requirement check, fits: file, verdict, kind, version, needs (you have 1.4), changes, licence; says rosters will ask for review; Add variant.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-phone-check-needs",
+      "title": "A3 · Requirement check · needs a newer base",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "phone"
+      ],
+      "screen": "layers-check-needs",
+      "summary": "Requirement check, needs a newer base: Needs Open Field 1.5 or later, you have 1.4; offers Update Open Field, then add.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-phone-check-rules",
+      "title": "A3 · Requirement check · refused, an add-on that changes rules",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "phone"
+      ],
+      "screen": "layers-check-rules",
+      "summary": "Refused: an add-on that changes rules (addon-changes-rules), with what it changes; only Close.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-phone-review",
+      "title": "A3 · Roster open · saved with different data",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "phone"
+      ],
+      "screen": "layers-review",
+      "summary": "Roster open review: Missing (the variant by title and source, Install from its link), Data (updated, added, order), Selections (followed renames, structural moves kept for review, orphans at cost 0), Add-ons (listed, never a review). Open with current data or Keep for review.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-phone-review-missing",
+      "title": "A3 · Roster open · a missing variant",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "phone"
+      ],
+      "screen": "layers-review-missing",
+      "summary": "A roster saved with a variant that is no longer installed: named by title and file, its selections kept unresolved; Install from a file….",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-phone-base-update",
+      "title": "A3 · Base update · a layer no longer fits, keys moved",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "phone"
+      ],
+      "screen": "layers-base-update",
+      "summary": "Before a base update: which layers will be turned off (out of range) and which follow moved keys and keep working.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-phone-after-update",
+      "title": "A3 · Base updated · turned off and moved, in the list",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "phone"
+      ],
+      "screen": "layers-after-update",
+      "summary": "After the base update: the turned-off variant and the moved one on their rows, each with its fix.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-phone-roster-info",
+      "title": "A3 · Roster info · the recorded layers",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "phone"
+      ],
+      "screen": "layers-roster-info",
+      "summary": "Roster info lists the data a roster was saved with: game data, variants (Test mark), add-ons.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-tablet-base",
+      "title": "A3 · Sources · Open Field with its variants and add-ons",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "tablet"
+      ],
+      "screen": "tablet-layers-base",
+      "summary": "The base lists Variants and Add-ons as two open groups under it: kind glyph, title, purpose · version · file or link, the patch report, an enabled switch, a status edge; Edit order per group; Add an add-on or variant.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-tablet-problems",
+      "title": "A3 · Sources · Problems in words, each with its fix",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "tablet"
+      ],
+      "screen": "tablet-layers-problems",
+      "summary": "Each problem in words on its row with the fix as a button: requirement not met (amber, switch unavailable), layer-order conflict (red, Move below…), an add-on that changes rules (red, Remove). A banner counts them.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-tablet-order",
+      "title": "A3 · Edit variant order",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "tablet"
+      ],
+      "screen": "tablet-layers-order",
+      "summary": "Edit order: drag handle and Move up / Move down on touch; drag or Alt+↑/↓ on desktop; Automatic order resets to the derived order; each move is announced.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-tablet-order-conflict",
+      "title": "A3 · Edit variant order · conflict, Done unavailable",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "tablet"
+      ],
+      "screen": "tablet-layers-order-conflict",
+      "summary": "An order that breaks a layer-order rule shows on the row while editing; Done is unavailable and says why.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-tablet-install",
+      "title": "A3 · Add an add-on or variant · a file first, a link second",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "tablet"
+      ],
+      "screen": "tablet-layers-install",
+      "summary": "Add to Open Field: Choose a file on this device (primary, DEC-069), or paste a link and Check link. Nothing is added before the check.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-tablet-check-fits",
+      "title": "A3 · Requirement check · fits",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "tablet"
+      ],
+      "screen": "tablet-layers-check-fits",
+      "summary": "Requirement check, fits: file, verdict, kind, version, needs (you have 1.4), changes, licence; says rosters will ask for review; Add variant.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-tablet-check-needs",
+      "title": "A3 · Requirement check · needs a newer base",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "tablet"
+      ],
+      "screen": "tablet-layers-check-needs",
+      "summary": "Requirement check, needs a newer base: Needs Open Field 1.5 or later, you have 1.4; offers Update Open Field, then add.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-tablet-check-rules",
+      "title": "A3 · Requirement check · refused, an add-on that changes rules",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "tablet"
+      ],
+      "screen": "tablet-layers-check-rules",
+      "summary": "Refused: an add-on that changes rules (addon-changes-rules), with what it changes; only Close.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-tablet-review",
+      "title": "A3 · Roster open · saved with different data",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "tablet"
+      ],
+      "screen": "tablet-layers-review",
+      "summary": "Roster open review: Missing (the variant by title and source, Install from its link), Data (updated, added, order), Selections (followed renames, structural moves kept for review, orphans at cost 0), Add-ons (listed, never a review). Open with current data or Keep for review.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-tablet-review-missing",
+      "title": "A3 · Roster open · a missing variant",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "tablet"
+      ],
+      "screen": "tablet-layers-review-missing",
+      "summary": "A roster saved with a variant that is no longer installed: named by title and file, its selections kept unresolved; Install from a file….",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-tablet-base-update",
+      "title": "A3 · Base update · a layer no longer fits, keys moved",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "tablet"
+      ],
+      "screen": "tablet-layers-base-update",
+      "summary": "Before a base update: which layers will be turned off (out of range) and which follow moved keys and keep working.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-tablet-after-update",
+      "title": "A3 · Base updated · turned off and moved, in the list",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "tablet"
+      ],
+      "screen": "tablet-layers-after-update",
+      "summary": "After the base update: the turned-off variant and the moved one on their rows, each with its fix.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-tablet-roster-info",
+      "title": "A3 · Roster info · the recorded layers",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "tablet"
+      ],
+      "screen": "tablet-layers-roster-info",
+      "summary": "Roster info lists the data a roster was saved with: game data, variants (Test mark), add-ons.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-desktop-base",
+      "title": "A3 · Sources · Open Field with its variants and add-ons",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "desktop"
+      ],
+      "screen": "desktop-layers-base",
+      "summary": "The base lists Variants and Add-ons as two open groups under it: kind glyph, title, purpose · version · file or link, the patch report, an enabled switch, a status edge; Edit order per group; Add an add-on or variant.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-desktop-problems",
+      "title": "A3 · Sources · Problems in words, each with its fix",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "desktop"
+      ],
+      "screen": "desktop-layers-problems",
+      "summary": "Each problem in words on its row with the fix as a button: requirement not met (amber, switch unavailable), layer-order conflict (red, Move below…), an add-on that changes rules (red, Remove). A banner counts them.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-desktop-order",
+      "title": "A3 · Edit variant order",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "desktop"
+      ],
+      "screen": "desktop-layers-order",
+      "summary": "Edit order: drag handle and Move up / Move down on touch; drag or Alt+↑/↓ on desktop; Automatic order resets to the derived order; each move is announced.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-desktop-order-conflict",
+      "title": "A3 · Edit variant order · conflict, Done unavailable",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "desktop"
+      ],
+      "screen": "desktop-layers-order-conflict",
+      "summary": "An order that breaks a layer-order rule shows on the row while editing; Done is unavailable and says why.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-desktop-install",
+      "title": "A3 · Add an add-on or variant · a file first, a link second",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "desktop"
+      ],
+      "screen": "desktop-layers-install",
+      "summary": "Add to Open Field: Choose a file on this device (primary, DEC-069), or paste a link and Check link. Nothing is added before the check.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-desktop-check-fits",
+      "title": "A3 · Requirement check · fits",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "desktop"
+      ],
+      "screen": "desktop-layers-check-fits",
+      "summary": "Requirement check, fits: file, verdict, kind, version, needs (you have 1.4), changes, licence; says rosters will ask for review; Add variant.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-desktop-check-needs",
+      "title": "A3 · Requirement check · needs a newer base",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "desktop"
+      ],
+      "screen": "desktop-layers-check-needs",
+      "summary": "Requirement check, needs a newer base: Needs Open Field 1.5 or later, you have 1.4; offers Update Open Field, then add.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-desktop-check-rules",
+      "title": "A3 · Requirement check · refused, an add-on that changes rules",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "desktop"
+      ],
+      "screen": "desktop-layers-check-rules",
+      "summary": "Refused: an add-on that changes rules (addon-changes-rules), with what it changes; only Close.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-desktop-review",
+      "title": "A3 · Roster open · saved with different data",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "desktop"
+      ],
+      "screen": "desktop-layers-review",
+      "summary": "Roster open review: Missing (the variant by title and source, Install from its link), Data (updated, added, order), Selections (followed renames, structural moves kept for review, orphans at cost 0), Add-ons (listed, never a review). Open with current data or Keep for review.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-desktop-review-missing",
+      "title": "A3 · Roster open · a missing variant",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "desktop"
+      ],
+      "screen": "desktop-layers-review-missing",
+      "summary": "A roster saved with a variant that is no longer installed: named by title and file, its selections kept unresolved; Install from a file….",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-desktop-base-update",
+      "title": "A3 · Base update · a layer no longer fits, keys moved",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "desktop"
+      ],
+      "screen": "desktop-layers-base-update",
+      "summary": "Before a base update: which layers will be turned off (out of range) and which follow moved keys and keep working.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-desktop-after-update",
+      "title": "A3 · Base updated · turned off and moved, in the list",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "desktop"
+      ],
+      "screen": "desktop-layers-after-update",
+      "summary": "After the base update: the turned-off variant and the moved one on their rows, each with its fix.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
+    },
+    {
+      "id": "a3-desktop-roster-info",
+      "title": "A3 · Roster info · the recorded layers",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "desktop"
+      ],
+      "screen": "desktop-layers-roster-info",
+      "summary": "Roster info lists the data a roster was saved with: game data, variants (Test mark), add-ons.",
+      "source": "A3 host UI (DKLPO add-ons and variants, DEC-072/073); D2 2026-11-22"
     }
   ]
 }

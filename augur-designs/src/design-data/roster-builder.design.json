@@ -364,6 +364,62 @@
         {
           "id": "source-legacy",
           "label": "Archive · Earlier Lookup"
+        },
+        {
+          "id": "layers-sources",
+          "label": "A3 · Sources · layers listed under their base"
+        },
+        {
+          "id": "layers-base",
+          "label": "A3 · Sources · Open Field with its variants and add-ons"
+        },
+        {
+          "id": "layers-problems",
+          "label": "A3 · Sources · Problems in words, each with its fix"
+        },
+        {
+          "id": "layers-order",
+          "label": "A3 · Edit variant order"
+        },
+        {
+          "id": "layers-order-conflict",
+          "label": "A3 · Edit variant order · conflict, Done unavailable"
+        },
+        {
+          "id": "layers-install",
+          "label": "A3 · Add an add-on or variant · a file first, a link second"
+        },
+        {
+          "id": "layers-check-fits",
+          "label": "A3 · Requirement check · fits"
+        },
+        {
+          "id": "layers-check-needs",
+          "label": "A3 · Requirement check · needs a newer base"
+        },
+        {
+          "id": "layers-check-rules",
+          "label": "A3 · Requirement check · refused, an add-on that changes rules"
+        },
+        {
+          "id": "layers-review",
+          "label": "A3 · Roster open · saved with different data"
+        },
+        {
+          "id": "layers-review-missing",
+          "label": "A3 · Roster open · a missing variant"
+        },
+        {
+          "id": "layers-base-update",
+          "label": "A3 · Base update · a layer no longer fits, keys moved"
+        },
+        {
+          "id": "layers-after-update",
+          "label": "A3 · Base updated · turned off and moved, in the list"
+        },
+        {
+          "id": "layers-roster-info",
+          "label": "A3 · Roster info · the recorded layers"
         }
       ],
       "workflows": [
@@ -510,6 +566,26 @@
           ]
         },
         {
+          "id": "layers",
+          "label": "Layers (A3)",
+          "screens": [
+            "layers-sources",
+            "layers-base",
+            "layers-problems",
+            "layers-order",
+            "layers-order-conflict",
+            "layers-install",
+            "layers-check-fits",
+            "layers-check-needs",
+            "layers-check-rules",
+            "layers-review",
+            "layers-review-missing",
+            "layers-base-update",
+            "layers-after-update",
+            "layers-roster-info"
+          ]
+        },
+        {
           "id": "archive",
           "label": "Archive",
           "screens": [
@@ -572,6 +648,11 @@
               {"id": "jobs.modal", "title": "Background Job Modal", "level": "overlay", "status": "specified", "platforms": ["phone", "tablet"], "states": ["running", "several", "mobile-data", "waiting-wifi", "needs-you", "cancelling", "done", "updated", "failed", "cancelled", "reinstall-offer: the GitHub version picked is a kept version with every faction installed (Advanced installation on or off): header \"{name} · {version}\", info block \"This version is already on this device\", Cancel (cancels the job) and primary Reinstall this version (DEC-060, approved 2026-11-02)", "reinstall-confirm: AppDialog \"Reinstall {name} {version}?\" with Cancel and primary Reinstall (DEC-060, approved 2026-11-02)", "reinstall-done: the done state, \"{name} {version} is in use.\" (DEC-060, approved 2026-11-02)", "reinstall-failed: the failed state with the error; the previous version stays in use (DEC-060, approved 2026-11-02)"], "screens": ["install-job"], "reactNative": {"component": "JobSheet", "behavior": "Native form sheet opened when an install or update starts: overall progress, steps (download, read, choose factions, import per faction, write) with per-step progress, Cancel (no confirmation: finished factions stay installed) and Hide. Several jobs run at once (DEC-024): the sheet shows 'n jobs', the opening job expanded and the others collapsed with their own Cancel; jobs over the measured limit show 'Waiting for another install'. Running jobs are listed first; an ended job sits after them worded as ended (Installed / Updated / Could not install / Cancelled install of {name}) with its result line, no progress and no Cancel; a new job for a source replaces that source's ended job, so a source is never listed twice (UX-011). Cancel shows 'Cancelling…' at once (UX-010). A one-time mobile-data notice makes Download on Wi-Fi only known; with it on, Download waits for Wi-Fi with Download now. 'Notify me when it finishes' asks the notification permission in context. After an update: Check rosters / Later. Hide, swipe down and Android back keep the jobs running in the worker (DEC-018, DEC-023).", "accessibility": "Never show step state by colour alone (icon per state); announce step changes and the outcome, not every percent; Hide is labelled as continuing the work."}},
               { "id": "jobs.indicator", "title": "Global Job Indicator", "level": "navigation", "status": "specified", "platforms": ["phone", "tablet"], "states": ["running", "several", "needs-you", "waiting-wifi"], "screens": ["install-job"], "reactNative": { "component": "JobPill", "behavior": "Floating pill on every screen while a job runs: 12 pt above the tab bar, or above the bottom safe area on pushed screens and the roster workbench; screens add a bottom inset. Shows a progress ring, the job and its percent, 'n jobs' with the overall percent when several run, an accent 'needs you' state and 'Waiting for Wi-Fi'. Tap reopens the job sheet. Hidden while a sheet or the keyboard is open.", "accessibility": "One button: job, percent, and 'Opens the progress'; announce only step changes and the end." } },
               { "id": "jobs.toasts", "title": "Job Toasts", "level": "primitive", "status": "specified", "platforms": ["phone", "tablet"], "states": ["installed", "updated", "failed", "mobile-data"], "screens": ["install-job"], "reactNative": { "component": "Toast (ds)", "behavior": "End of a hidden job: success with View, an update with Check rosters (Report once checked and a roster changed), failure with Details (reopens the sheet in its failed state); the first mobile-data download with Wi-Fi only. Uses the built toast with an action (6 s); stacks above the job pill.", "accessibility": "Announced without taking focus; the action is a named button." } },
+              {"id": "layers.row", "title": "Layer Row", "level": "composite", "status": "needs-review", "platforms": ["phone"], "states": ["A3 (Next track, Proposal, D2 2026-11-22; not approved)", "on", "off", "Test mark", "needs a newer base (switch unavailable, says why)", "order conflict", "changes rules", "moved keys (keeps working)"], "screens": ["layers-base", "layers-problems", "layers-after-update"]},
+              {"id": "layers.groups", "title": "Add-ons and Variants Groups", "level": "screen-composition", "status": "needs-review", "platforms": ["phone"], "states": ["A3 (Next track, Proposal, D2 2026-11-22; not approved)", "Variants then Add-ons under the base", "Edit order per group", "Add an add-on or variant", "Sources list: layers as child rows of their base"], "screens": ["layers-sources", "layers-base"]},
+              {"id": "layers.order", "title": "Layer Order Editor", "level": "composite", "status": "needs-review", "platforms": ["phone"], "states": ["A3 (Next track, Proposal, D2 2026-11-22; not approved)", "drag handle", "Move up / Move down", "Automatic order", "conflict: Done unavailable, says why"], "screens": ["layers-order", "layers-order-conflict"]},
+              {"id": "layers.check", "title": "Layer Requirement Check", "level": "overlay", "status": "needs-review", "platforms": ["phone"], "states": ["A3 (Next track, Proposal, D2 2026-11-22; not approved)", "a file first, a link second", "fits", "needs a newer base", "refused: an add-on that changes rules"], "screens": ["layers-install", "layers-check-fits", "layers-check-needs", "layers-check-rules"]},
+              {"id": "layers.roster-review", "title": "Roster Open Review", "level": "overlay", "status": "needs-review", "platforms": ["phone"], "states": ["A3 (Next track, Proposal, D2 2026-11-22; not approved)", "missing variant (title, source, how to get it)", "changed data", "followed renames", "kept for review (structural)", "orphans (cost 0)", "add-ons listed, never a review", "Open with current data", "Keep for review"], "screens": ["layers-review", "layers-review-missing"]},
               { "id": "sources.update-card", "title": "Source Update Card", "level": "composite", "status": "specified", "platforms": ["phone", "tablet"], "states": ["update-available", "removes-used-faction", "up-to-date", "updating", "updated", "rosters-not-checked", "update-failed", "older-version"], "screens": ["source-detail"], "reactNative": { "component": "SourceUpdateCard", "behavior": "Top of the source detail: the new version and date, what changed (changed / new / removed factions, game system file) from a tree diff (nothing downloaded), a warning when rosters use a removed faction (they open read-only after the update), Update and View on GitHub. Turns into a progress row while updating, a Last update card after (Check rosters before the roster check, View report after), or a failure notice with Try again. \"Using an older version · Switch to {commit}\" is a row above it (Source Versions).", "accessibility": "Heading for the card; the changes are a list; the progress row is one button that opens the job sheet." } },
               { "id": "sources.migration-report", "title": "Migration Report", "level": "screen-composition", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["checked", "not-checked", "checking", "changed", "faction-removed", "unchanged-only"], "screens": ["migration-report"], "reactNative": { "component": "UpdateReportScreen", "behavior": "After an update (DS-5) and its offered roster check (DEC-024; built at summary level, battle-augur plan 2F part 2): summary chips, changed rosters with their changes (entries no longer in the data, totals before → after, new errors) and Open roster, rosters whose faction was removed, unchanged rosters, and the data changes by revision. Before the check: the data changes and Check rosters. Kept until the next update of the source.", "accessibility": "Each roster card has a heading; changes are not colour-coded only (a label per line)." } },
               { "id": "sources.collection-page", "title": "Collection Page", "level": "screen-composition", "status": "ready-for-rn", "platforms": ["phone", "tablet"], "states": ["collection", "library", "offline", "loading", "error", "empty", "menu-default", "menu-user", "remove-confirm"], "screens": ["collection", "add-source"], "reactNative": { "component": "CollectionScreen", "behavior": "Built (battle-augur plan 2C): one collection (a JSON list of repositories) or library (a GitHub organisation or user): subtitle, description, link and Updated date; search above eight entries; rows with Supported / Installed / Update available / Archived chips (Installed only when the button does not say it) and a trailing Install, Installed, Update, Waiting or percent action; archived behind Show archived; the collection's own libraries and collections under Listed here (nested collections one level deep). A cached copy shows offline with its date. The ⋯ menu offers Refresh, Copy link, Remove collection for the user's own entries (confirmed: installed data stays), and Hide collection for the default collection only (DEC-028). Errors (not a collection, too new, network, gone) have Try again, and Remove for the user's entries.", "accessibility": "Row actions name the source; chips carry words; the offline notice is announced." } },
@@ -1071,6 +1152,58 @@
         {
           "id": "tablet-lookup-legacy",
           "label": "Archive · Earlier Lookup"
+        },
+        {
+          "id": "tablet-layers-base",
+          "label": "Tablet · A3 · Sources · Open Field with its variants and add-ons"
+        },
+        {
+          "id": "tablet-layers-problems",
+          "label": "Tablet · A3 · Sources · Problems in words, each with its fix"
+        },
+        {
+          "id": "tablet-layers-order",
+          "label": "Tablet · A3 · Edit variant order"
+        },
+        {
+          "id": "tablet-layers-order-conflict",
+          "label": "Tablet · A3 · Edit variant order · conflict, Done unavailable"
+        },
+        {
+          "id": "tablet-layers-install",
+          "label": "Tablet · A3 · Add an add-on or variant · a file first, a link second"
+        },
+        {
+          "id": "tablet-layers-check-fits",
+          "label": "Tablet · A3 · Requirement check · fits"
+        },
+        {
+          "id": "tablet-layers-check-needs",
+          "label": "Tablet · A3 · Requirement check · needs a newer base"
+        },
+        {
+          "id": "tablet-layers-check-rules",
+          "label": "Tablet · A3 · Requirement check · refused, an add-on that changes rules"
+        },
+        {
+          "id": "tablet-layers-review",
+          "label": "Tablet · A3 · Roster open · saved with different data"
+        },
+        {
+          "id": "tablet-layers-review-missing",
+          "label": "Tablet · A3 · Roster open · a missing variant"
+        },
+        {
+          "id": "tablet-layers-base-update",
+          "label": "Tablet · A3 · Base update · a layer no longer fits, keys moved"
+        },
+        {
+          "id": "tablet-layers-after-update",
+          "label": "Tablet · A3 · Base updated · turned off and moved, in the list"
+        },
+        {
+          "id": "tablet-layers-roster-info",
+          "label": "Tablet · A3 · Roster info · the recorded layers"
         }
       ],
       "workflows": [
@@ -1204,6 +1337,25 @@
           ]
         },
         {
+          "id": "layers",
+          "label": "Layers (A3)",
+          "screens": [
+            "tablet-layers-base",
+            "tablet-layers-problems",
+            "tablet-layers-order",
+            "tablet-layers-order-conflict",
+            "tablet-layers-install",
+            "tablet-layers-check-fits",
+            "tablet-layers-check-needs",
+            "tablet-layers-check-rules",
+            "tablet-layers-review",
+            "tablet-layers-review-missing",
+            "tablet-layers-base-update",
+            "tablet-layers-after-update",
+            "tablet-layers-roster-info"
+          ]
+        },
+        {
           "id": "archive",
           "label": "Archive",
           "screens": [
@@ -1284,6 +1436,7 @@
               {"id": "tablet.rename-sheet", "title": "Rename Sheet (one field)", "level": "composite", "status": "needs-review", "platforms": ["tablet"], "states": ["R2-02 (F4b, approved 2026-11-07, DEC-051; to build)", "roster, force or unit name", "field selected on open, character count", "Save stays off while the name is empty or unchanged", "Enter saves", "More menu: Rename roster; force menu: Rename force", "unit: field prefilled with the unit's name (its custom name when renamed) and selected, count up to 60, hint \"Empty restores “{entry name}”.\"; Save off while unchanged (an empty name is allowed for a unit and clears the custom name); one Undo step; off while read-only", "unit pane: Rename before Duplicate and Remove; tree row menu: Rename unit"], "screens": ["tablet-editor-rename-unit"]},
               {"id": "tablet.star-button", "title": "Star Button", "level": "primitive", "status": "specified", "platforms": ["tablet"], "states": ["R2-03 (F4c, approved 2026-11-08, DEC-051; to build)", "off: outline star in the muted colour", "on: filled star in the accent colour (never the warning amber of Slot full)", "always visible (touch and pointer): 20 px icon, 44 pt target, before the name", "catalogue rows (pane and slide-over): its own column before the name; the row's add target stays the rest of the row", "New roster faction step and Add force force types: over the start of the choice row; the star only stars, the rest of the row chooses", "a blocked force type keeps its reason when starred"], "screens": ["tablet-stars-catalogue", "tablet-stars-catalogue-role", "tablet-stars-add-force", "tablet-stars-faction"], "reactNative": {"component": "StarButton (shared with the phone) in CataloguePane rows, the creation sheet's faction choices and AddForceSheet; app-core stars store", "behavior": "R2-03 (F4c, approved 2026-11-08, to build): a separate button before the name on every row of the catalogue, the faction step and Add force. Kept per faction: unit and force stars per catalogue, faction stars per game system (user decision 2026-11-08). No stars: the lists look as they do now (no empty Starred group, no hint). Stale stars (the entry is gone after a data update or its source was removed) are left out without a message and kept. Role chips and search keep Starred first: with Core chosen, Starred shows only the starred Core units. Read-only rosters have no catalogue, so no unit stars; faction stars in New roster work as usual. A device preference: it survives a restart, is not part of the roster file and is not an Undo step. Accessibility: \"Star {name}\" / \"Unstar {name}\" with the pressed (selected) state; VoiceOver and TalkBack announce Starred. Add force's faction field (other catalogues) uses the faction stars from New roster: starred factions first in its list. Gallery: R2-03 · Roster editor · Catalogue with the Starred group; … Core chosen; R2-03 · Add force · Starred forces; R2-03 · New roster · Faction step with a starred faction.", "accessibility": "Labelled \"Star {name}\" / \"Unstar {name}\" with accessibilityState selected; its own focus stop before the row's add target; 44 pt."}},
               {"id": "tablet.starred-group", "title": "Starred Group Heading", "level": "primitive", "status": "specified", "platforms": ["tablet"], "states": ["R2-03 (F4c, approved 2026-11-08, DEC-051; to build)", "catalogue: a Starred group above the role groups; the pane's group heading in the accent colour with a filled star glyph and the count", "starred rows are not repeated in their role group and keep their state (Slot full chip, quota chip 1 / 1 with the unavailable Add)", "a role chip filters Starred too (Core: only starred Core units)", "factions and force types: starred first in the data's order, a divider, then the rest", "no stars: no group, no divider, no hint"], "screens": ["tablet-stars-catalogue", "tablet-stars-catalogue-role", "tablet-stars-add-force", "tablet-stars-faction"], "reactNative": {"component": "CataloguePane section header (Starred) and the starred/rest divider", "behavior": "R2-03 (F4c, approved 2026-11-08, to build). Kept per faction: unit and force stars per catalogue, faction stars per game system (user decision 2026-11-08). No stars: the lists look as they do now (no empty Starred group, no hint). Stale stars (the entry is gone after a data update or its source was removed) are left out without a message and kept. Role chips and search keep Starred first: with Core chosen, Starred shows only the starred Core units. Read-only rosters have no catalogue, so no unit stars; faction stars in New roster work as usual. A device preference: it survives a restart, is not part of the roster file and is not an Undo step. Accessibility: \"Star {name}\" / \"Unstar {name}\" with the pressed (selected) state; VoiceOver and TalkBack announce Starred.", "accessibility": "The Starred heading is a header (\"Starred, 2\"); the divider is hidden from screen readers."}},
+              {"id": "tablet.layers", "title": "Add-ons and Variants (A3)", "level": "screen-composition", "status": "needs-review", "platforms": ["tablet"], "states": ["A3 (Next track, Proposal, D2 2026-11-22; not approved)", "layers under the base in the list", "groups with switches and Edit order in the detail", "install and check, base update and roster open review as form sheets", "roster info sheet"], "screens": ["tablet-layers-base", "tablet-layers-problems", "tablet-layers-order-conflict", "tablet-layers-check-fits", "tablet-layers-review"]},
               {"id": "tablet.text-size", "title": "Larger Text and Display Zoom", "level": "screen-composition", "status": "needs-review", "platforms": ["tablet"], "states": ["text size 100%, 150%, 200% (iOS accessibility sizes, Android font scale 2.0, display zoom)", "type, targets and spacing scale together; the layout gets the logical width (device width ÷ scale)", "panes collapse to the next width class instead of clipping: Expanded → Medium → single pane", "the whole layout zooms (display zoom), not only the type (TB-00 review 2026-10-26)", "editor: three panes → tree and details → tree with details over it", "pages: list and detail → list with the detail over it; Home in one column", "rail scrolls when taller than the window; it is icon-only at every width (2026-11-01; accessible names and hints stay)", "editor header under 440: Back, roster mark, points total, More (undo and redo inside More)", "toolbars wrap; long names end with an ellipsis", "DEC-050: toolbar action captions stay at every width; their text scale is capped at 150 %; the search shrinks before actions move into More", "DEC-050: catalogue state chips are icon only; at 150 % in the Android tablet's 300 px catalogue pane they keep their size and the caption shows on press (tablet-editor-chips-text-150 is drawn on that device and size whatever the gallery switches say)"], "screens": ["tablet-editor-text-200", "tablet-rosters-text-200", "tablet-editor-chips-text-150"]},
               {"id": "tablet.shortcut-overlay", "title": "Keyboard Shortcut Overlay", "level": "overlay", "status": "needs-review", "platforms": ["tablet"], "states": ["fixed shortcuts with a hardware keyboard (no bindings editor on the tablet)", "General: ⌘N new roster, ⌘F find on the page, ⌘1–5 rail pages, ⌘, Settings, Esc closes a sheet, menu or popover", "Roster editor: ⌘Z undo, ⇧⌘Z redo (text fields keep their own undo), ⌘F find a unit to add, ⌘E export, Esc back to the roster", "iPad: the system overlay while ⌘ is held (translucent panel, app name, groups in columns, glyph keys); released or another key hides it", "Android: Ctrl + / opens the keyboard shortcuts helper (dialog, close button, key caps as chips, Ctrl + Shift + Z notation)", "lists the editor group first while a roster is open", "with a pointer, the hints of the rail, New roster, Undo and Redo name the shortcut", "Settings › Keyboard shortcuts shows the same list in the device notation", "shortcuts stay off while a form sheet is open"], "screens": ["tablet-editor-shortcuts", "tablet-settings-shortcuts"]}
             ]
@@ -1739,6 +1892,58 @@
         {
           "id": "desktop-lookup-legacy",
           "label": "Archive · Earlier Lookup"
+        },
+        {
+          "id": "desktop-layers-base",
+          "label": "Desktop · A3 · Sources · Open Field with its variants and add-ons"
+        },
+        {
+          "id": "desktop-layers-problems",
+          "label": "Desktop · A3 · Sources · Problems in words, each with its fix"
+        },
+        {
+          "id": "desktop-layers-order",
+          "label": "Desktop · A3 · Edit variant order"
+        },
+        {
+          "id": "desktop-layers-order-conflict",
+          "label": "Desktop · A3 · Edit variant order · conflict, Done unavailable"
+        },
+        {
+          "id": "desktop-layers-install",
+          "label": "Desktop · A3 · Add an add-on or variant · a file first, a link second"
+        },
+        {
+          "id": "desktop-layers-check-fits",
+          "label": "Desktop · A3 · Requirement check · fits"
+        },
+        {
+          "id": "desktop-layers-check-needs",
+          "label": "Desktop · A3 · Requirement check · needs a newer base"
+        },
+        {
+          "id": "desktop-layers-check-rules",
+          "label": "Desktop · A3 · Requirement check · refused, an add-on that changes rules"
+        },
+        {
+          "id": "desktop-layers-review",
+          "label": "Desktop · A3 · Roster open · saved with different data"
+        },
+        {
+          "id": "desktop-layers-review-missing",
+          "label": "Desktop · A3 · Roster open · a missing variant"
+        },
+        {
+          "id": "desktop-layers-base-update",
+          "label": "Desktop · A3 · Base update · a layer no longer fits, keys moved"
+        },
+        {
+          "id": "desktop-layers-after-update",
+          "label": "Desktop · A3 · Base updated · turned off and moved, in the list"
+        },
+        {
+          "id": "desktop-layers-roster-info",
+          "label": "Desktop · A3 · Roster info · the recorded layers"
         }
       ],
       "workflows": [
@@ -1824,6 +2029,25 @@
             "desktop-links-data-repo",
             "desktop-links-nothing-found",
             "desktop-links-guide"
+          ]
+        },
+        {
+          "id": "layers",
+          "label": "Layers (A3)",
+          "screens": [
+            "desktop-layers-base",
+            "desktop-layers-problems",
+            "desktop-layers-order",
+            "desktop-layers-order-conflict",
+            "desktop-layers-install",
+            "desktop-layers-check-fits",
+            "desktop-layers-check-needs",
+            "desktop-layers-check-rules",
+            "desktop-layers-review",
+            "desktop-layers-review-missing",
+            "desktop-layers-base-update",
+            "desktop-layers-after-update",
+            "desktop-layers-roster-info"
           ]
         },
         {
@@ -2423,6 +2647,7 @@
                 "states": ["R2-06 (F4e, approved 2026-11-09, DEC-051; to build)", "opened by the Step-by-step guide text link (or a result's guide button): the dialog body becomes Step-by-step guide", "six numbered steps in accent circles: Choose Search for data · Search for your game system's data repository or collection · Open a result and copy its address (repository or .json file) · Paste it into the link field · Check the preview, then Add collection · Open it, choose game data, Install", "then WHICH LINK IS WHICH? (Repository, Collection, Organisation or user, accent terms) and the hint \"Found game data but no collection? Choose Install it when the app offers it. You don't need a collection to install.\", the same content as phone and tablet (one set of strings; the approved desktop frame was drawn with the steps only)", "‹ Back and Paste a link: both return to the link field and focus it", "DEC-069 (approved 2026-11-17): two groups, each numbered from 1. From a file on this device: 1 Save the game data on this device: an archive (.zip or .bsr), data files (.gst and .cat, also .gstz, .catz or their .json form) or a folder that holds them. 2 Choose Install from a file and pick the archive, the files or the folder. (with an Install from a file button that starts the file install) 3 Battle Augur reads them and installs the game data it finds. It stays on this device. From a link: 1 Copy the address of a repository or a collection file (.json). 2 Paste it into the link field, check the preview, then Add collection. 3 Open it, choose game data, Install. Which link is which?, the hint, Back and Paste a link unchanged."],
                 "screens": ["desktop-links-guide"]
               },
+              {"id": "desktop.layers", "title": "Add-ons and Variants (A3)", "level": "screen-composition", "status": "needs-review", "platforms": ["desktop"], "states": ["A3 (Next track, Proposal, D2 2026-11-22; not approved)", "layers under the base in the list", "groups with switches in the detail", "order: drag by the handle or Alt+↑/↓ on a focused row", "install and check, base update, roster open review and roster info as dialogs"], "screens": ["desktop-layers-base", "desktop-layers-problems", "desktop-layers-order", "desktop-layers-check-needs", "desktop-layers-review"]},
               {
                 "id": "desktop.rule-no-text",
                 "title": "Rule Row Without Text",

@@ -6,6 +6,7 @@ import { prototypeToWorkflowScreen, workflowToPrototypeScreen } from "./gallery/
 import { captureElementAsPng } from "./utils/captureStage";
 import { useTrack } from "./look";
 import { screenForTrack } from "./nextTrack";
+import { layerScreenIds } from "./concepts/layers/layerScreens";
 import { TabletPrefsContext } from "./concepts/tablet/tabletEnv";
 import { defaultDeviceId, defaultInput, defaultTextScale, isDeviceId, isTabletInput, isTextScale, type TabletDeviceId, type TabletInput, type TextScale } from "./concepts/tablet/tabletDevices";
 import type { AppLanguage, ColorScheme, ConceptId, DetachmentFavorite, FavoriteLibrary, ForceCreationMode, NavigatorView, NavStyle, PlatformPreview, PrototypeScreen, Roster, RosterForce, RosterSection, RosterUnit, TabletPanelLayout, ThemeMode, ThemePreference, UnitDetailView, UnitFavorite, WorkflowScreen } from "./types";
@@ -292,6 +293,7 @@ const workflowScreenIds = [
   "links-finding",
   "links-search-data",
   "links-guide",
+  ...layerScreenIds,
 ] satisfies WorkflowScreen[];
 const prototypeScreenIds = [
   "library",

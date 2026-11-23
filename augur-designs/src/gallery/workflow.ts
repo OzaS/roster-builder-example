@@ -1,4 +1,5 @@
 import type { PrototypeScreen, WorkflowScreen } from "../types";
+import { layerScreenLabels } from "../concepts/layers/layerScreens";
 
 export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "tablet-home", label: "Tablet · Home" },
@@ -245,6 +246,7 @@ export const workflowScreens: Array<{ id: WorkflowScreen; label: string }> = [
   { id: "links-finding", label: "R2-06 · Add collection · Looking in the repository" },
   { id: "links-search-data", label: "R2-06 · Add collection · Search for data page" },
   { id: "links-guide", label: "R2-06 · Add collection · Step-by-step guide page" },
+  ...layerScreenLabels,
 ];
 
 const workflowLabels: Record<WorkflowScreen, string> = workflowScreens.reduce(
@@ -275,7 +277,7 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen === "desktop-editor" || screen.startsWith("desktop-editor-")) return "overview";
   if (screen === "desktop-rosters") return "library";
   if (screen === "desktop-lookup-legacy" || screen === "desktop-lookup" || screen.startsWith("desktop-lookup-1-0")) return "catalogue";
-  if (screen === "desktop-sources" || screen.startsWith("desktop-links-")) return "sources"; // R2-06: Sources with the Add collection dialog
+  if (screen === "desktop-sources" || screen.startsWith("desktop-links-") || screen.startsWith("desktop-layers-")) return "sources"; // R2-06: Sources with the Add collection dialog; A3: Sources with add-ons and variants
   if (screen === "desktop-settings" || screen.startsWith("desktop-settings-")) return "settings";
   if (screen === "desktop-first-run") return "library";
   if (screen === "desktop-menus" || screen === "desktop-menus-rename-unit" || screen === "desktop-menus-star-unit") return "overview";
@@ -300,6 +302,7 @@ export function workflowToPrototypeScreen(screen: WorkflowScreen): PrototypeScre
   if (screen === "stars-add-unit") return "add-unit"; // R2-03: the Add unit sheet with the Starred group
   if (screen === "stars-faction") return "system"; // R2-03: New roster with the faction picker open
   if (screen.startsWith("links-")) return "add-source"; // R2-06: Add game data with the Add collection sheet in a links state
+  if (screen.startsWith("layers-")) return "sources"; // A3 (Next): the phone layer screens draw over the Sources route
   if (screen === "stars-add-force") return "overview"; // R2-03: the roster with Add force open // R2-02: the roster with a renamed unit, its ⋯ menu, the Points limit sheet, the warning
   if (screen === "export" || screen === "export-json" || screen === "export-pdf" || screen === "export-preview") return "overview"; // the export sheet over the roster
   return screen as PrototypeScreen; // the tablet screens returned above are not narrowed away by startsWith
