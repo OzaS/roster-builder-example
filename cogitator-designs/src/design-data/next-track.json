@@ -58,6 +58,18 @@
       "platforms": ["desktop"],
       "summary": "Every primitive Direction D uses, live from the tokens, in light and dark and on macOS and Windows where they differ, with states side by side; new: Windows window frame (caption buttons), command palette (⌘K), context menu, the large text rule for rows. Entries listed in cogitator.design.json (elements.sections). Gallery page ?page=elements.",
       "source": "D4 step 2, design language (2026-11-22)"
+    },
+    {
+      "id": "cg-e1-start-window",
+      "title": "E1 start window (recent datasets)",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "desktop"
+      ],
+      "screen": "e1-start-window",
+      "summary": "What Field Cogitator shows with no dataset open: the app actions in the sidebar (Open folder…, Open file…, Convert from XML data…, the sample, Settings), recent datasets as dense rows with a status edge from the last check, a drop target; states recent, first run, opening (steps with counts and Cancel), missing on disk, 960 px and large text; macOS and Windows.",
+      "source": "D4 step 3a, E1 screens (2026-11-22)"
     }
   ]
 }
