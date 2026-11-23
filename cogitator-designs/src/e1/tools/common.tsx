@@ -3,6 +3,7 @@ import { useState, type ReactNode } from "react";
 import { DiagIcon } from "../../glyphs";
 import { diagOne, type DiagKind } from "../../sample";
 import { sourceById } from "../../directions/direction-d-content";
+import { layout } from "../../language/layout";
 import { ironWardens } from "../editor/data";
 import { LinkedPage } from "../editor/page";
 import { BackForward, EditorGrid, Sidebar, SourceList, Win, type Mode } from "../editor/shell";
@@ -116,6 +117,43 @@ export function CommandLine({ command }: { command: string }) {
       <code>{command}</code>
       <button type="button" className="d-btn sm" onClick={() => setCopied(true)} title="Copy the command to the clipboard"><Copy size={12} />{copied ? "Copied" : "Copy"}</button>
     </p>
+  );
+}
+
+/** Sheet widths: a form sheet (export) and a preview sheet (rename), the page column at its widest. */
+export const sheetWidth = 600;
+export const previewWidth = layout.pageMax;
+
+/** A sheet action: like the dialog primitive's, plus disabled-with-a-reason (the reason is its tooltip and shown in the sheet). */
+export type SheetAction = { label: ReactNode; kind?: "primary" | "danger"; cancel?: boolean; left?: boolean; disabled?: boolean; title?: string; onClick?: () => void; key?: string };
+
+/**
+ * A sheet (macOS) in the dialog primitive's classes (`.cg-dialog.sheet`, icon, title, target, body, actions), for the
+ * tool sheets that need more than the alert dialog: wider bodies, actions that can be unavailable, a note beside them.
+ */
+export function Sheet({ tone = "info", icon, title, target, children, actions, width, note, label }: {
+  tone?: "error" | "warn" | "info"; icon: ReactNode; title: ReactNode; target?: ReactNode; children?: ReactNode; actions: SheetAction[]; width: number; note?: ReactNode; label: string;
+}) {
+  return (
+    <div className="cg-dialog sheet cg-tl-sheet" role="dialog" aria-modal="true" aria-label={label} style={{ width }}>
+      <div className="cg-dialog-main">
+        <span className={`cg-dialog-icon ${tone}`} aria-hidden>{icon}</span>
+        <div>
+          <h2>{title}</h2>
+          {target ? <p className="cg-dialog-target">{target}</p> : null}
+          {children ? <div className="cg-dialog-body cg-tl-sheet-body">{children}</div> : null}
+        </div>
+      </div>
+      <footer className="cg-dialog-actions">
+        {note ? <span className="cg-tl-sheet-note">{note}</span> : null}
+        {actions.map((a, i) => (
+          <button key={i} type="button" title={a.title} onClick={a.onClick} disabled={a.disabled}
+            className={`d-btn${a.kind === "primary" ? " primary" : a.kind === "danger" ? " danger" : ""}${a.left ? " cg-dialog-left" : ""}`}>
+            {a.label}{a.key ? <kbd>{a.key}</kbd> : a.kind === "primary" ? <kbd>↵</kbd> : a.cancel ? <kbd>Esc</kbd> : null}
+          </button>
+        ))}
+      </footer>
+    </div>
   );
 }
 

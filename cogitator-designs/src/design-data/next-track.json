@@ -158,6 +158,16 @@
       "screen": "e1-tools-convert",
       "summary": "Convert as a window of its own (from the start window and File › Convert…): the options in the left column as the convert command's flags in words (input folder / archive / files, output folder or Update, dataset key, version, text language, text columns, compatibility envelope, keep the original files, full id map, roundtrip after converting), the right pane with the input's documents, the steps with counts and Cancel, then the report (C2, C1, C3 verdicts, the numbers convert reports, each document's C1 differences, preservation diagnostics, Open the converted dataset, the commands to copy). Dry run writes nothing. States: options, converting, equal, differences found, input can't be read; macOS and Windows.",
       "source": "D4 step 3b, E1 screens part 2 (2026-11-23)"
+    },
+    {
+      "id": "cg-e1-tools-export",
+      "title": "E1: Export",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "e1-tools-export",
+      "summary": "Export (⇧⌘E) as a sheet over the editor: format (XML data files / JSON data files for documents added since conversion), destination, text language, and the exactness from a dry run as the sheet opens: exact (all envelope entries current, Write the original files available, C3) or not exact with counts and each reason (preserve/stale, preserve/unbound, preserve/original-outdated) and that it still writes (Export anyway) unless Require an exact export is on, which refuses and says why beside the button. Result lists the written files; a Level 1 construct refuses the export by name. States: exact, not exact, written, refused.",
+      "source": "D4 step 3b, E1 screens part 2 (2026-11-23)"
     }
   ]
 }

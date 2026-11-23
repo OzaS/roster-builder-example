@@ -1,6 +1,7 @@
 import type { E1Screen } from "../types";
 import { ChecksScreen } from "./ChecksScreen";
 import { ConvertScreen } from "./ConvertScreen";
+import { ExportScreen } from "./ExportScreen";
 
 /** Part 2, worker A: the command-line tools inside the editor (run checks, convert, export, roundtrip, rename with a move record). */
 export const toolScreens: E1Screen[] = [
@@ -46,5 +47,24 @@ export const toolScreens: E1Screen[] = [
       { what: "Report", how: "Convert another goes back to the options." },
     ],
     render: ({ mode, platform, state, interactive }) => <ConvertScreen key={`${state}-${platform}`} mode={mode} platform={platform} state={state} interactive={interactive} />,
+  },
+  {
+    id: "e1-tools-export",
+    group: "Checks and tools",
+    title: "Export",
+    item: "cg-e1-tools-export",
+    summary:
+      "File › Export… (⇧⌘E) opens a sheet over the editor: the format (XML data files or JSON data files: each document keeps the format it was converted from, the choice is for documents added since), the destination and the text language, then the exactness the export would have, from a dry run made as the sheet opens. Exact: every envelope entry is current, and Write the original files can return the kept files byte for byte (C3). Not exact: the counts (current, stale, unbound, conflicts) and each entry that won't apply with its entry, code (preserve/stale, preserve/unbound) and why, Write the original files unavailable with its reason (preserve/original-outdated), and that the export still writes (Export anyway) unless Require an exact export is on, which refuses and says so beside the button. The result lists the written files with their sizes. A Level 1 construct refuses the export by name, exact or not, and nothing is written.",
+    states: [
+      { id: "exact", title: "Exact: originals available" },
+      { id: "non-exact", title: "Not exact, with the reasons" },
+      { id: "written", title: "Written: the files" },
+      { id: "failed", title: "Refused: a Level 1 construct" },
+    ],
+    tryIt: [
+      { what: "Exactness", how: "in the non-exact state turn Require an exact export on: the button becomes Export refused and the reason shows beside it; off again writes anyway." },
+      { what: "Export", how: "Export (anyway) shows the written files; Done or Esc closes the sheet, and the toast brings it back." },
+    ],
+    render: ({ mode, state, interactive }) => <ExportScreen key={state} mode={mode} state={state} interactive={interactive} />,
   },
 ];
