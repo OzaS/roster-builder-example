@@ -90,6 +90,15 @@ a { color: var(--accent); }
 .cg-open { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; text-decoration: none; }
 .cg-scaled { overflow: hidden; }
 
+/* The user's mix (D) on the board: a wider preview beside its text. */
+.cg-mix { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 24px 32px; align-items: start; }
+.cg-mix > div > h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 4px; font-size: 16px; }
+.cg-mix > div > p { margin: 0 0 10px; color: var(--muted); font-size: 13px; }
+.cg-mix-shot { text-decoration: none; }
+.cg-mix > div > dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; margin: 0 0 10px; font-size: 13px; }
+.cg-mix > div > dl > dt { color: var(--muted); font-weight: 600; }
+.cg-mix > div > dl > dd { margin: 0; }
+
 .cg-questions { display: grid; gap: 12px; max-width: 860px; margin: 0; padding-left: 22px; }
 .cg-questions li strong { display: block; font-weight: 600; }
 .cg-questions li span { color: var(--muted); font-size: 13px; }
@@ -100,6 +109,11 @@ a { color: var(--accent); }
 .cg-tradeoff ul { margin: 0; padding-left: 18px; color: var(--ink); font-size: 14px; }
 .cg-tradeoff li + li { margin-top: 4px; }
 .cg-note { max-width: 1100px; margin: 18px 0 0; color: var(--muted); font-size: 13px; }
+.cg-try { max-width: 1100px; margin-top: 24px; }
+.cg-try h2 { margin: 0 0 4px; font-size: 14px; font-weight: 600; }
+.cg-try p { margin: 0 0 6px; color: var(--muted); font-size: 13px; }
+.cg-try ul { display: grid; gap: 4px; margin: 0; padding-left: 18px; font-size: 14px; }
+.cg-try strong { font-weight: 600; }
 .cg-shot { margin-top: 32px; }
 .cg-shot h2 { display: flex; align-items: baseline; gap: 12px; margin: 0 0 12px; font-size: 15px; }
 .cg-shot h2 a { font-size: 13px; font-weight: 500; }
@@ -119,6 +133,7 @@ a { color: var(--accent); }
 
 @media (max-width: 1180px) {
   .cg-directions { grid-template-columns: 1fr; max-width: 760px; }
+  .cg-mix { grid-template-columns: 1fr; max-width: 760px; }
 }
 @media (max-width: 860px) {
   .cg-gallery { grid-template-columns: minmax(0, 1fr); }

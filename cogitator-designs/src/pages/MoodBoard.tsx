@@ -27,6 +27,7 @@ export function MoodBoard() {
         <nav className="cg-jump" aria-label="On this page">
           {patternGroups.map((group) => <a key={group.id} href={`#${group.id}`}>{group.source}</a>)}
           <a href="#directions">Three directions</a>
+          <a href="#mix">User mix (D)</a>
           <a href="#pick">Questions to pick</a>
           <span className="cg-tally"><Check size={14} /> {counts.borrow ?? 0} borrow <X size={14} /> {counts.avoid ?? 0} avoid</span>
         </nav>
@@ -56,7 +57,7 @@ export function MoodBoard() {
           <p>The same task each time: the entry editor with a dataset navigator, one entry open with its properties and references, and the diagnostics area. Open a direction for the full 1440 px screen in light and dark.</p>
         </header>
         <ul className="cg-directions">
-          {directions.map((direction) => (
+          {directions.filter((direction) => direction.id !== "d").map((direction) => (
             <li key={direction.id}>
               <a className="cg-direction-shot" href={hrefFor(direction.id)} onClick={(event) => { event.preventDefault(); go(direction.id); }} aria-label={`Open direction ${direction.letter}, ${direction.title}`}>
                 <ScaledFrame label={`${direction.title} preview`}><DirectionScreen id={direction.id} mode={mode} /></ScaledFrame>
@@ -72,6 +73,29 @@ export function MoodBoard() {
           ))}
         </ul>
       </section>
+
+      {directions.filter((direction) => direction.id === "d").map((direction) => (
+        <section key={direction.id} id="mix" className="cg-source">
+          <header>
+            <h2>User mix: Direction D</h2>
+            <p>The user's pick after the three directions (2026-11-22): B's page and sidebar, A's source list, C's panel behind a floating helper box. It is interactive: open it to click through the source list, focus mode and the helper states.</p>
+          </header>
+          <div className="cg-mix">
+            <a className="cg-direction-shot cg-mix-shot" href={hrefFor(direction.id)} onClick={(event) => { event.preventDefault(); go(direction.id); }} aria-label={`Open direction ${direction.letter}, ${direction.title}`}>
+              <ScaledFrame label={`${direction.title} preview`}><DirectionScreen id={direction.id} mode={mode} interactive={false} /></ScaledFrame>
+            </a>
+            <div>
+              <h3><span className="cg-letter">{direction.letter}</span>{direction.title}</h3>
+              <p>{direction.oneLine}</p>
+              <dl>
+                <dt>Optimises for</dt><dd>{direction.optimises[0]}</dd>
+                <dt>Costs</dt><dd>{direction.costs[0]}</dd>
+              </dl>
+              <a className="cg-open" href={hrefFor(direction.id)} onClick={(event) => { event.preventDefault(); go(direction.id); }}>Open {direction.letter} and try it <ArrowRight size={14} /></a>
+            </div>
+          </div>
+        </section>
+      ))}
 
       <section id="pick" className="cg-source">
         <header>

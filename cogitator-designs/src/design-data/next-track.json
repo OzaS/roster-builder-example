@@ -30,6 +30,16 @@
       "screen": "entry-editor-c",
       "summary": "Entry editor in Battle Augur desktop panes and tokens (tree with status edges and cost column, inspector), Linear speed (palette, issues inbox, keys) and the entry as a Notion-style page. Recommended (D4 mood board).",
       "source": "D4 step 1, mood board (2026-11-22)"
+    },
+    {
+      "id": "cg-direction-d",
+      "title": "Direction D: User mix (A + B + C)",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "entry-editor-d",
+      "summary": "Entry editor mixing the three directions: B's sidebar and document page in the middle; selecting a source opens A's dense grouped list beside the sidebar; a floating helper box (issues, suggestions, actions) collapses to a pill or expands into C's resizable inspector panel; focus mode (double-click a source, ⌘. or the toolbar) hides the sidebar. Interactive mock.",
+      "source": "User mix of A, B and C (2026-11-22)"
     }
   ]
 }

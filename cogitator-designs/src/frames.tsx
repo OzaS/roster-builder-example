@@ -2,9 +2,10 @@ import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 
 /**
  * Draws its child at a fixed design width and scales it down to the available width (never up), so a 1440 px
- * window fits a narrow stage without horizontal scrolling. The outer box takes the scaled height.
+ * window fits a narrow stage without horizontal scrolling. The outer box takes the scaled height. `interactive` keeps the
+ * window's controls in the accessibility tree (a region instead of an image); clicks work through the scale either way.
  */
-export function ScaledFrame({ width = 1440, children, label }: { width?: number; children: ReactNode; label?: string }) {
+export function ScaledFrame({ width = 1440, children, label, interactive = false }: { width?: number; children: ReactNode; label?: string; interactive?: boolean }) {
   const outer = useRef<HTMLDivElement>(null);
   const inner = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
@@ -23,7 +24,7 @@ export function ScaledFrame({ width = 1440, children, label }: { width?: number;
     return () => observer.disconnect();
   }, [width]);
   return (
-    <div className="cg-scaled" ref={outer} style={{ height }} role="img" aria-label={label}>
+    <div className="cg-scaled" ref={outer} style={{ height }} role={interactive ? "region" : "img"} aria-label={label}>
       <div ref={inner} style={{ width, transform: `scale(${scale})`, transformOrigin: "0 0" }}>{children}</div>
     </div>
   );

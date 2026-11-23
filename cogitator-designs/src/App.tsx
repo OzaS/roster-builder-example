@@ -1,28 +1,32 @@
 import { TrackChip, TrackSwitch } from "@designs/kit";
-import { Columns3, FileText, LayoutGrid, PanelsTopLeft } from "lucide-react";
+import { Blend, Columns3, FileText, LayoutGrid, PanelsTopLeft } from "lucide-react";
 import type { ReactNode } from "react";
 import { cogitatorNext, cogitatorTrack } from "./track";
 import { go, hrefFor, pageOf, useSearch, type Page } from "./route";
 import { directions, type DirectionId } from "./directions/meta";
 import { DirectionScreen } from "./directions";
+import type { DState } from "./directions/DirectionD";
 import { MoodBoard } from "./pages/MoodBoard";
 import { DirectionPage } from "./pages/DirectionPage";
 
-const icons: Record<DirectionId, ReactNode> = { a: <Columns3 size={16} />, b: <FileText size={16} />, c: <PanelsTopLeft size={16} /> };
+const icons: Record<DirectionId, ReactNode> = { a: <Columns3 size={16} />, b: <FileText size={16} />, c: <PanelsTopLeft size={16} />, d: <Blend size={16} /> };
+const dStates: DState[] = ["default", "collapsed", "panel", "focus", "focus-panel"];
 
 /**
  * The Field Cogitator design gallery. D4 step 1: the mood board (patterns from Linear, the Battle Augur desktop app and
- * Notion, each marked borrow or avoid) and three directions for the entry editor. Everything is a Proposal on Next.
+ * Notion, each marked borrow or avoid), three directions for the entry editor and the user's mix of them (D, interactive).
+ * Everything is a Proposal on Next.
  */
 export function App() {
   const params = useSearch();
   const track = cogitatorTrack.useTrack();
   const page = pageOf(params);
 
-  // `?view=frame&direction=a&mode=dark`: one direction's window alone at its design width (captures).
+  // `?view=frame&direction=a&mode=dark`: one direction's window alone at its design width (captures); D also takes `&state=`.
   if (params.get("view") === "frame") {
-    const id = (["a", "b", "c"].includes(params.get("direction") ?? "") ? params.get("direction") : "c") as DirectionId;
-    return <div className={`cg-frame-only ${params.get("mode") === "dark" ? "dark" : "light"}`}><DirectionScreen id={id} mode={params.get("mode") === "dark" ? "dark" : "light"} /></div>;
+    const id = (["a", "b", "c", "d"].includes(params.get("direction") ?? "") ? params.get("direction") : "c") as DirectionId;
+    const state = dStates.includes(params.get("state") as DState) ? (params.get("state") as DState) : undefined;
+    return <div className={`cg-frame-only ${params.get("mode") === "dark" ? "dark" : "light"}`}><DirectionScreen id={id} mode={params.get("mode") === "dark" ? "dark" : "light"} state={state} /></div>;
   }
 
   return (
@@ -34,7 +38,7 @@ export function App() {
           <h2>D4 · Direction</h2>
           <NavLink page="board" current={page} icon={<LayoutGrid size={16} />} label="Mood board" meta="Patterns, borrow or avoid" />
           {directions.map((direction) => (
-            <NavLink key={direction.id} page={direction.id} current={page} icon={icons[direction.id]} label={`${direction.letter} · ${direction.title}`} meta="Entry editor, light and dark" />
+            <NavLink key={direction.id} page={direction.id} current={page} icon={icons[direction.id]} label={`${direction.letter} · ${direction.title}`} meta={direction.id === "d" ? "Interactive, light and dark" : "Entry editor, light and dark"} />
           ))}
         </nav>
         <a className="cg-back" href="../">All design galleries</a>
@@ -71,7 +75,7 @@ function CurrentEmpty() {
   return (
     <section className="cg-empty">
       <h1>Nothing ships yet</h1>
-      <p>Current shows what Field Cogitator ships, and it has no released screens. The mood board and the three directions for the entry editor are Proposals on the Next track.</p>
+      <p>Current shows what Field Cogitator ships, and it has no released screens. The mood board and the directions for the entry editor are Proposals on the Next track.</p>
       <button type="button" className="cg-primary" onClick={() => cogitatorTrack.setTrack("next")}>Show Next: the mood board</button>
     </section>
   );
