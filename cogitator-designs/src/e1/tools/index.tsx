@@ -2,6 +2,7 @@ import type { E1Screen } from "../types";
 import { ChecksScreen } from "./ChecksScreen";
 import { ConvertScreen } from "./ConvertScreen";
 import { ExportScreen } from "./ExportScreen";
+import { RenameScreen } from "./RenameScreen";
 import { RoundtripScreen } from "./RoundtripScreen";
 
 /** Part 2, worker A: the command-line tools inside the editor (run checks, convert, export, roundtrip, rename with a move record). */
@@ -86,5 +87,24 @@ export const toolScreens: E1Screen[] = [
       { what: "Route", how: "switch From the XML data / From this dataset in the toolbar; Run roundtrip runs it again." },
     ],
     render: ({ mode, state, interactive }) => <RoundtripScreen key={state} mode={mode} state={state} interactive={interactive} />,
+  },
+  {
+    id: "e1-tools-rename",
+    group: "Checks and tools",
+    title: "Rename with a move record",
+    item: "cg-e1-tools-rename",
+    summary:
+      "F2 (or Rename… on an entry, a list row or a key in the text) opens a sheet over the editor: the new key, with the module prefix, and the preview the move command gives as a dry run while you type. The classification first (parent-preserving: same parent, a minor change, records at the manifest's version; structural: a new parent selection, which needs a new major, with Raise the version to 4.0.0 as --bump-major does), then what rosters do on open (followed and listed as moved, or kept unresolved for review with “moved to …: add it again”), the counts (declaration, uses moved with it, references, text keys, map lines, records), every file with its lines before and after, and the records appended to moves.dkl (a use named after the entry is renamed with it and gets its own record). Apply writes every file or none; ⌘Z undoes it. A key that is taken refuses with move/new-exists and names what holds it; an invalid key says the rule. Moving under another parent is drawn ahead of the command line, which refuses it today (move/relocate).",
+    states: [
+      { id: "rename", title: "Rename: parent-preserving" },
+      { id: "structural", title: "Move to another parent: structural, bump major" },
+      { id: "conflict", title: "Refused: the key is taken" },
+    ],
+    tryIt: [
+      { what: "Type", how: "change the key: every hunk and record follows; try halberd (taken), an upper-case letter (invalid) or spear (unchanged)." },
+      { what: "Structural", how: "turn Raise the version off: Apply becomes unavailable and the reason shows beside it." },
+      { what: "Apply", how: "Apply or Esc closes the sheet; the toast offers Undo or brings the sheet back." },
+    ],
+    render: ({ mode, state, interactive }) => <RenameScreen key={state} mode={mode} state={state} interactive={interactive} />,
   },
 ];

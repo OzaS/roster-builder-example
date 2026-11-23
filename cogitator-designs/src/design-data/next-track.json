@@ -178,6 +178,16 @@
       "screen": "e1-tools-roundtrip",
       "summary": "Roundtrip as a tool view in place of the list and the page (like the inbox), with the two routes of the roundtrip command switched in the toolbar: from the XML data the dataset was converted from (C2 norm, C1 per-document source trees, the documents with verdicts) and from this dataset (deterministic writing, import and compare, reconvert with ids and files). Left: contracts and documents with status edges; right: what the selected row compared and every difference, with the command to copy. States: equal, differences, reverse route, refused (input partly imported).",
       "source": "D4 step 3b, E1 screens part 2 (2026-11-23)"
+    },
+    {
+      "id": "cg-e1-tools-rename",
+      "title": "E1: Rename with a move record",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "e1-tools-rename",
+      "summary": "Rename (F2) as a sheet over the editor: the new key with the module prefix and the move command's dry-run preview as you type: classification (parent-preserving, minor; structural, needs a new major with Raise the version as --bump-major), what rosters do on open (followed and listed as moved, or kept unresolved for review), counts, the records appended to moves.dkl (uses named after the entry get their own), every file's lines before and after; Apply writes all or none, ⌘Z undoes. A taken key refuses with move/new-exists. States: rename, move to another parent (structural, drawn ahead of move/relocate), conflict.",
+      "source": "D4 step 3b, E1 screens part 2 (2026-11-23)"
     }
   ]
 }

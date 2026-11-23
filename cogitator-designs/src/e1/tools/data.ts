@@ -160,9 +160,9 @@ export const structuralPlan: { files: FileEdit[]; records: string[]; counts: { l
     {
       path: "iron-wardens/module.dkl", change: "edited", what: "the block moves from the model to the unit",
       edits: [
-        { line: L("cost pts 20"), after: "  upgrade banner ..1" },
-        { line: L("cost pts 20"), after: "    hide when no(warden-captain in force, deep)" },
-        { line: L("cost pts 20"), after: "    cost pts 10" },
+        { line: L("cost pts 20") + 1, after: "  upgrade banner ..1" },
+        { line: L("cost pts 20") + 2, after: "    hide when no(warden-captain in force, deep)" },
+        { line: L("cost pts 20") + 3, after: "    cost pts 10" },
         { line: L("upgrade banner ..1"), before: "    upgrade banner ..1" },
         { line: L("upgrade banner ..1") + 1, before: "      hide when no(warden-captain in force, deep)" },
         { line: L("upgrade banner ..1") + 2, before: "      cost pts 10" },
