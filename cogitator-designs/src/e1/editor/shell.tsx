@@ -41,10 +41,12 @@ export type SideProps = {
   onSource?: (id: string) => void;
   onEntry?: (id: string) => void;
   foot?: ReactNode;
+  /** A source this mock adds (a new, empty catalogue), drawn after D's sources. */
+  extra?: { id: string; name: string; rows: { id: string; name: string }[] };
 };
 
 /** D's sidebar (B): dataset switcher, Search, Updates, Layers, the source tree, tables, text pack. */
-export function Sidebar({ active, source, entry, updates, broken, onUpdates, onSearch, onSource, onEntry, foot }: SideProps) {
+export function Sidebar({ active, source, entry, updates, broken, onUpdates, onSearch, onSource, onEntry, foot, extra }: SideProps) {
   const [expanded, setExpanded] = useState<ReadonlySet<string>>(new Set([entry?.split(":")[0] ?? "iron-wardens"]));
   return (
     <aside className="d-side" aria-label="Dataset sidebar">
@@ -79,6 +81,15 @@ export function Sidebar({ active, source, entry, updates, broken, onUpdates, onS
             </div>
           );
         })}
+        {extra ? (
+          <div className="d-tree-group">
+            <div className={`d-item d-src-item${source === extra.id ? " active" : ""}`}>
+              <button type="button" className="d-tog" aria-label={`Collapse ${extra.name} in the tree`} aria-expanded><ChevronDown size={13} /></button>
+              <button type="button" className="d-src-btn" aria-pressed={source === extra.id} onClick={() => onSource?.(extra.id)}><KindIcon kind="system" size={15} />{extra.name}<span className="d-muted">{extra.rows.length ? "new" : "empty"}</span></button>
+            </div>
+            {extra.rows.map((row) => <button type="button" key={row.id} className={`d-item i1${entry === row.id ? " current" : ""}`}><span className="d-tog-space" /><KindIcon kind="unit" size={15} />{row.name}</button>)}
+          </div>
+        ) : null}
         <button type="button" className="d-item d-add" title="New entry in the source shown in the list (⌘N)"><Plus size={14} />New entry</button>
 
         <h3>Tables</h3>

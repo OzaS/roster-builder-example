@@ -88,6 +88,16 @@
       "screen": "e1-editor-diagnostics",
       "summary": "The dataset's diagnostics as a full Linear-style inbox from the sidebar's Updates: grouped by kind, filter chips (source, layer, code), keyboard triage, a detail pane with the affected text or the export difference, bulk fix per suggestion code; out-of-date and no-issues states. The helper panel stays the quick view beside a page.",
       "source": "D4 step 3a, E1 screens (2026-11-22)"
+    },
+    {
+      "id": "cg-e1-editor-empty",
+      "title": "E1: Editor empty states",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "e1-editor-empty",
+      "summary": "Empty states inside the editor: a source with no entries (inline New entry with its key), an entry with no statements (the / hint as the first block), a search with no result (the palette says what it searched and offers next steps).",
+      "source": "D4 step 3a, E1 screens (2026-11-22)"
     }
   ]
 }

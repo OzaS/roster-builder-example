@@ -173,4 +173,19 @@ export const editorRenderers: Record<string, Renderer> = {
       </div>
     ),
   },
+  "editor.new-entry": {
+    render: () => (
+      <div className="cg-row-flex">
+        <State label="Key valid">
+          <div className="cg-col-318"><div className="cg-newrow"><p className="cg-newrow-label">New entry in Ember Guard</p><div className="cg-newrow-fields"><button type="button" className="cg-kindpick"><KindIcon kind="unit" size={14} />Unit<ChevronDown size={12} /></button><label className="cg-keyfield"><span className="mono d-muted">ember-guard:</span><input className="mono" defaultValue="ash-warden" aria-label="Key" /></label></div><p className="cg-newrow-help">The key is how references name it; the name goes in the text pack.</p><p className="cg-newrow-actions"><button type="button" className="d-btn sm primary">Create unit<kbd>↵</kbd></button><button type="button" className="d-btn sm">Cancel<kbd>Esc</kbd></button></p></div></div>
+        </State>
+        <State label="Key not valid (create disabled, says why)">
+          <div className="cg-col-318"><div className="cg-newrow"><p className="cg-newrow-label">New entry in Ember Guard</p><div className="cg-newrow-fields"><button type="button" className="cg-kindpick"><KindIcon kind="unit" size={14} />Unit<ChevronDown size={12} /></button><label className="cg-keyfield bad"><span className="mono d-muted">ember-guard:</span><input className="mono" defaultValue="Ash Warden" aria-label="Key" /></label></div><p className="cg-newrow-help bad">A key is lower case: letters, digits and hyphens, starting with a letter.</p><p className="cg-newrow-actions"><button type="button" className="d-btn sm primary" disabled title="Fix the key first">Create unit<kbd>↵</kbd></button><button type="button" className="d-btn sm">Cancel<kbd>Esc</kbd></button></p></div></div>
+        </State>
+        <State label="Empty source list">
+          <div className="cg-col-318"><div className="cg-listempty"><p><strong>No entries yet</strong></p><p className="d-muted">Ember Guard is an empty catalogue. Add a unit, a model or an upgrade; each becomes a page.</p><button type="button" className="d-btn sm primary">New entry<kbd>⌘N</kbd></button></div></div>
+        </State>
+      </div>
+    ),
+  },
 };

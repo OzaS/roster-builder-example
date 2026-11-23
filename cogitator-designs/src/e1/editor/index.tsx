@@ -1,5 +1,6 @@
 import type { E1Screen } from "../types";
 import { DiagnosticsScreen } from "./DiagnosticsScreen";
+import { EmptyScreen } from "./EmptyScreen";
 import { ReferencesScreen } from "./ReferencesScreen";
 import { SourceScreen } from "./SourceScreen";
 
@@ -70,5 +71,24 @@ export const editorScreens: E1Screen[] = [
       { what: "Checks", how: "Run checks (⌘⇧C) shows progress, then the out-of-date note goes." },
     ],
     render: ({ mode, state, interactive }) => <DiagnosticsScreen mode={mode} state={state} interactive={interactive} />,
+  },
+  {
+    id: "e1-editor-empty",
+    group: "Edit",
+    title: "Editor empty states",
+    item: "cg-e1-editor-empty",
+    summary:
+      "What the editor shows when there is nothing yet. A source with no entries (a new, invented catalogue, Ember Guard): the list says so and New entry (⌘N) opens an inline row with the kind and the key, validated as you type (lower case, digits, hyphens), ↵ creates, Esc cancels; the page area shows the module text so far instead of a blank. An entry with no statements: its page has the `/` hint as the first block, with the usual first statements named, a name to add in the text pack and no backlinks yet. A search with no result: the palette (⌘K) says what it searched (and what it skipped: a layer that is off) and offers to create the entry, search with that layer on, or clear.",
+    states: [
+      { id: "no-entries", title: "Source with no entries, New entry open" },
+      { id: "no-statements", title: "Entry with no statements" },
+      { id: "no-results", title: "Search with no result" },
+    ],
+    tryIt: [
+      { what: "New entry", how: "type a key (try an upper-case letter to see the error), ↵ creates the unit and opens its empty page; ⌘N starts another." },
+      { what: "First statement", how: "click the / block for the insert menu; Esc closes it." },
+      { what: "Search", how: "⌘K opens the palette; type to change the query; Esc closes it." },
+    ],
+    render: ({ mode, state, interactive }) => <EmptyScreen mode={mode} state={state} interactive={interactive} />,
   },
 ];
