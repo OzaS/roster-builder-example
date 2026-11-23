@@ -325,7 +325,7 @@ export function LanguagePage() {
   return (
     <article className="cg-page cg-lang">
       <header className="cg-head">
-        <p className="cg-kicker">D4 · Step 2 <TrackChip status="proposal" /></p>
+        <p className="cg-kicker">D4 · Step 2 <TrackChip status="approved" /></p>
         <h1>Design language</h1>
         <p className="cg-lede">Direction D written down as one token file and a few rules, so the E1 screens are drawn from the same parts. Nothing new is invented here: every value is the one Direction D already uses, and D now reads them from <code>language/tokens.css</code> (pane widths from <code>language/layout.ts</code>). Windows is a platform layer on top.</p>
         <nav className="cg-jump" aria-label="On this page">{sections.map((s) => <a key={s.id} href={`#${s.id}`}>{s.label}</a>)}</nav>

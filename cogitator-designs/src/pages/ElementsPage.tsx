@@ -531,7 +531,7 @@ export function ElementsPage() {
   return (
     <article className="cg-page cg-lang">
       <header className="cg-head">
-        <p className="cg-kicker">D4 · Step 2 <TrackChip status="proposal" /></p>
+        <p className="cg-kicker">D4 · Step 2 <TrackChip status="approved" /></p>
         <h1>Elements</h1>
         <p className="cg-lede">Every primitive Direction D uses, drawn live from the tokens, in light and dark and, where they differ, on macOS and Windows. States sit side by side. The command palette and the context menu are new: D doesn't draw them, but every E1 screen needs them. The list comes from <code>design-data/cogitator.design.json</code> (<code>elements.sections</code>).</p>
         <nav className="cg-jump" aria-label="Sections">{sections.map((s) => <a key={s.id} href={`#${s.id}`}>{s.title}</a>)}</nav>

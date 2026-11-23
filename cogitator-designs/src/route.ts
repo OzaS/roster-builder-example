@@ -2,13 +2,13 @@ import { useSyncExternalStore } from "react";
 
 /**
  * Gallery routing in the query string, so a copied link opens the same page:
- * `?page=board|a|b|c|d|language|elements|e1` (the mood board, a direction, the design language, the Elements view or the E1 screens, `&screen=<id>` for one), `?theme=light|dark` (gallery theme; default follows the OS),
- * `?view=frame&direction=a&mode=dark` (one direction's window alone at its 1440 px design width, for captures).
+ * `?page=d|language|elements|e1` (Direction D, the design language, the Elements view or the E1 screens, `&screen=<id>` for one; the removed `board`, `a`, `b`, `c` open D), `?theme=light|dark` (gallery theme; default follows the OS),
+ * `?view=frame&direction=d&mode=dark` (Direction D's window alone at its 1440 px design width, for captures).
  * Direction D is interactive; `&state=default|collapsed|panel|focus|focus-panel` sets its starting layout in the frame view.
  * `?view=frame&screen=<id>&mode=dark&state=<state>&platform=windows`: one E1 screen alone at its design width.
  */
-export type Page = "board" | "a" | "b" | "c" | "d" | "language" | "elements" | "e1";
-const pages: Page[] = ["board", "a", "b", "c", "d", "language", "elements", "e1"];
+export type Page = "d" | "language" | "elements" | "e1";
+const pages: Page[] = ["d", "language", "elements", "e1"];
 
 const listeners = new Set<() => void>();
 const read = () => (typeof window === "undefined" ? "" : window.location.search);
@@ -27,12 +27,12 @@ export function useSearch() {
 
 export function pageOf(params: URLSearchParams): Page {
   const value = params.get("page");
-  return pages.includes(value as Page) ? (value as Page) : "board";
+  return pages.includes(value as Page) ? (value as Page) : "d";
 }
 
 export function hrefFor(page: Page) {
   const url = new URL(window.location.href);
-  if (page === "board") url.searchParams.delete("page");
+  if (page === "d") url.searchParams.delete("page");
   else url.searchParams.set("page", page);
   url.searchParams.delete("screen");
   url.hash = "";

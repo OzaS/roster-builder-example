@@ -9,7 +9,10 @@ Field Cogitator (working name) is a **desktop editor for datasets** in the DKLPO
 - **Linear** for structure and speed: sidebar, dense grouped lists, keyboard first, a command palette, detail view with a properties panel, diagnostics as an inbox, quiet chrome with one accent.
 - **Notion** for content: each entry a page (title, properties block, rules and text as blocks), `/` to insert, references as mentions with backlinks, table views.
 - **Battle Augur desktop** for flavour: menu bar, macOS and Windows frames, tokens and accent, tree and inspector panes, aligned cost columns, category symbols.
-- Start with a **mood board** (patterns side by side, each marked borrow or avoid); the user picks before the design language and screens.
+- The mood board and directions A–C led to **Direction D** (the user's mix, 2026-11-22). A–C and the mood board were removed on 2026-11-23 (no longer used); they stay in the history at the tag `cogitator-directions-2026-11-22`.
+
+## Approved (user, 2026-11-23)
+- Direction D, the design language, the Elements view and the E1 screens (parts 1 and 2) are **approved** (`status: "approved"` in `next-track.json`). The user expects changes once they use the app: a change to an approved design is drawn as a Proposal and approved again (the Battle Augur design freeze rule, DEC-051, applies once E1 implementation starts).
 
 ## Design language (D4 step 2, 2026-11-22)
 - New screens take every value from `src/language/tokens.css` (colour, type, density, radii, elevation, motion, focus; macOS base, `[data-platform="windows"]`, `[data-text="large"]`) and pane widths from `src/language/layout.ts`; no hard-coded colours or sizes in screen CSS.
@@ -21,6 +24,6 @@ Field Cogitator (working name) is a **desktop editor for datasets** in the DKLPO
 - Screens draw on a gallery page beside others: no focus on mount (`autoFocus` or effects), or the page scrolls to the last screen.
 
 ## Rules
-- Track: `src/track.ts` (own storage key) and `src/design-data/next-track.json`; everything is Next / Proposal until the user approves it.
+- Track: `src/track.ts` (own storage key) and `src/design-data/next-track.json`; new designs start as Next / Proposal until the user approves them; approved items stay on Next until the app builds them.
 - Sample data: synthetic datasets only (the Battle Augur docs' synthetic DKLPO examples are fine); no third-party product content or vocabulary.
 - Shared chrome comes from `@designs/kit`; move code into the kit only when a second gallery needs it.
