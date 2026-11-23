@@ -160,14 +160,14 @@ export function RunnerPane({ state, variant, interactive, onOpenEntry, reveal, o
             <button type="button" role="menuitemradio" aria-checked={mode === "typing"} className={`cg-menu-item two${mode === "typing" ? " sel" : ""}`} onClick={() => { setMode("typing"); setMenu(null); }}><span className="cg-rn-radio" data-on={mode === "typing"} /><span><span>While typing</span><small>After a 400 ms pause, unsaved text included</small></span></button>
             <div className="cg-menu-sep" />
             <button type="button" role="menuitem" className="cg-menu-item" onClick={() => { setLive(live === "paused" ? "live" : "paused"); setWaiting(live === "paused" ? 0 : 1); setMenu(null); }}>{live === "paused" ? <Play size={14} /> : <Pause size={14} />}{live === "paused" ? "Resume live reload" : "Pause live reload"}<span className="cg-menu-key">⌥⌘P</span></button>
-            <button type="button" role="menuitem" className="cg-menu-item" onClick={() => { setMenu(null); reloadNow(); }}><RefreshCw size={14} />Reload now<span className="cg-menu-key">⇧⌘R</span></button>
+            <button type="button" role="menuitem" className="cg-menu-item" onClick={() => { setMenu(null); reloadNow(build === 1); }}><RefreshCw size={14} />Reload now<span className="cg-menu-key">⇧⌘R</span></button>
             <button type="button" role="menuitem" className="cg-menu-item"><FileText size={14} />Show the build log</button>
           </div>
         ) : null}
       </span>
       <span className="d-spacer" />
       <button type="button" className="d-ghost sm" onClick={() => { setLive(live === "paused" ? "live" : "paused"); setWaiting(live === "paused" ? 0 : 1); }} disabled={live === "error" || live === "building"} title={live === "paused" ? "Resume live reload (⌥⌘P)" : "Pause live reload: saves no longer rebuild (⌥⌘P)"}>{live === "paused" ? <Play size={13} /> : <Pause size={13} />}{live === "paused" ? "Resume" : "Pause"}</button>
-      <button type="button" className="d-ghost sm" onClick={() => reloadNow()} disabled={live === "building"} title="Rebuild the dataset now and reopen the roster on it (⇧⌘R)"><RefreshCw size={13} />Reload<kbd>⇧⌘R</kbd></button>
+      <button type="button" className="d-ghost sm" onClick={() => reloadNow(build === 1)} disabled={live === "building"} title="Rebuild the dataset now and reopen the roster on it (⇧⌘R)"><RefreshCw size={13} />Reload<kbd>⇧⌘R</kbd></button>
       {variant === "docked" ? <button type="button" className="d-icon sm" onClick={onDetach} aria-label="Open the runner in its own window" title="Open the runner in its own window"><ExternalLink size={14} /></button> : null}
       {variant === "detached" ? <button type="button" className="d-ghost sm" onClick={onDock} title="Dock the runner beside the editor again (⌘R)"><PictureInPicture2 size={13} />Dock</button> : null}
       {variant === "docked" ? <button type="button" className="d-icon sm" onClick={onClose} aria-label="Close the runner" title="Close the runner (⌘R); the roster is kept"><X size={15} /></button> : null}
@@ -226,7 +226,7 @@ export function RunnerPane({ state, variant, interactive, onOpenEntry, reveal, o
   } else if (summary === "same") {
     banner = <div className="cg-ly-callout cg-rn-banner" role="status"><Check size={14} /><span>Reloaded {buildAt.at}: nothing in this roster changed · roster kept</span><span className="cg-rn-banner-actions"><button type="button" className="d-icon sm" aria-label="Hide" onClick={() => setSummary(null)}><X size={13} /></button></span></div>;
   } else if (live === "paused") {
-    banner = <div className="cg-ly-callout warn cg-rn-banner" role="status"><Pause size={14} /><span>Live reload is paused: saves don't rebuild until you resume.</span><span className="cg-rn-banner-actions"><button type="button" className="d-btn sm" onClick={() => { setLive("live"); setWaiting(0); }}><Play size={12} />Resume</button><button type="button" className="d-btn sm" onClick={() => reloadNow()}><RefreshCw size={12} />Reload now</button></span></div>;
+    banner = <div className="cg-ly-callout warn cg-rn-banner" role="status"><Pause size={14} /><span>Live reload is paused: saves don't rebuild until you resume.</span><span className="cg-rn-banner-actions"><button type="button" className="d-btn sm" onClick={() => { setLive("live"); setWaiting(0); }}><Play size={12} />Resume</button><button type="button" className="d-btn sm" onClick={() => reloadNow(build === 1)}><RefreshCw size={12} />Reload now</button></span></div>;
   }
 
   /* ---------- Body ---------- */

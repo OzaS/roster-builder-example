@@ -44,7 +44,7 @@ export const layerScreens: E1Screen[] = [
       { what: "Search", how: "type in the field (try “warden”, “cost”, “blade”); Aa and ab narrow; the scope chips turn Entries, Text, References and Statements on and off." },
       { what: "Filters", how: "Kind, Source and Layer open a menu with counts; × or Clear removes them." },
       { what: "Results", how: "↑ ↓ move (the preview follows), ↵ or double-click opens the entry." },
-      { what: "Replace", how: "in the replace state uncheck a match, then Replace; Undo brings the text back; keys stay locked with Rename… in the preview." },
+      { what: "Replace", how: "in the replace state (shield → Guard) uncheck a match, then Replace; Undo brings the text back; the key shield-wall and its references stay locked, with Rename… in the preview." },
       { what: "No results", how: "Search with Draft points on adds the off layer to the search." },
     ],
     render: ({ mode, state, interactive }) => <SearchScreen mode={mode} state={state} interactive={interactive} />,

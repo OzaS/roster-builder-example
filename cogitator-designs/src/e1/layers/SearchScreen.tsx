@@ -34,7 +34,7 @@ const preset: Record<SearchState, { q: string; filters: Filters; replace?: strin
   results: { q: "shield", filters: {}, sel: "iron-wardens/text/en.dkl:4" },
   "no-results": { q: "pikeman", filters: {} },
   filters: { q: "ward", filters: { kind: "unit", layer: "Base" }, sel: "iron-wardens:13" },
-  replace: { q: "Shield Wall", filters: {}, replace: "Shield Line", sel: "demo-skirmish/text/en.dkl:1" },
+  replace: { q: "shield", filters: {}, replace: "Guard", sel: "demo-skirmish/text/en.dkl:1" },
 };
 type Filters = { kind?: string; source?: string; layer?: string };
 
@@ -231,7 +231,7 @@ export function SearchScreen({ mode, state = "results", interactive }: { mode: M
                   );
                 })}
               </div>
-              <Preview doc={sel} re={re} keyHits={keyHits.length} replaceOpen={replaceOpen} onOpen={() => sel && setOpened(sel.entry ? entryName(sel.entry) : sel.file)} />
+              <Preview doc={sel} re={re} keyHits={keyHits.length} replaceOpen={replaceOpen} replacedWith={sel && replaced?.has(sel.id) ? replacement : undefined} onOpen={() => sel && setOpened(sel.entry ? entryName(sel.entry) : sel.file)} />
             </div>
           )}
           <footer className="cg-ib-keys"><kbd>↑</kbd><kbd>↓</kbd> move <kbd>↵</kbd> open the entry <kbd>⌘↵</kbd> open at the line <kbd>⌥⌘F</kbd> replace <span className="d-spacer" />{opened ? <span className="cg-ib-opened">Opens {opened} at the match · <kbd>⌘[</kbd> back to these results</span> : <span><kbd>⌘K</kbd> jumps to one entry; <kbd>⇧⌘F</kbd> searches everything</span>}</footer>
@@ -241,13 +241,14 @@ export function SearchScreen({ mode, state = "results", interactive }: { mode: M
   );
 }
 
-function Preview({ doc, re, keyHits, replaceOpen, onOpen }: { doc?: SearchDoc; re: RegExp | null; keyHits: number; replaceOpen: boolean; onOpen: () => void }) {
+function Preview({ doc, re, keyHits, replaceOpen, replacedWith, onOpen }: { doc?: SearchDoc; re: RegExp | null; keyHits: number; replaceOpen: boolean; replacedWith?: string; onOpen: () => void }) {
   if (!doc) return <section className="cg-sr-preview" aria-label="Preview" />;
-  const lines = doc.lines ?? [doc.text];
+  const source = doc.lines ?? [doc.text];
+  const lines = replacedWith !== undefined && re ? source.map((l, i) => (i === doc.line - 1 ? l.replace(new RegExp(re.source, re.flags), replacedWith) : l)) : source;
   const from = Math.max(1, doc.line - 4);
   const to = Math.min(lines.length, doc.line + 4);
   const line = lines[doc.line - 1] ?? "";
-  const m = re ? new RegExp(re.source, re.flags.replace("g", "")).exec(line) : null;
+  const m = re && replacedWith === undefined ? new RegExp(re.source, re.flags.replace("g", "")).exec(line) : null;
   const isKey = doc.field === "key" || doc.field === "reference";
   return (
     <section className="cg-sr-preview" aria-label="Preview">
