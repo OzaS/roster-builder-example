@@ -1,4 +1,5 @@
 import type { E1Screen } from "../types";
+import { DiagnosticsScreen } from "./DiagnosticsScreen";
 import { ReferencesScreen } from "./ReferencesScreen";
 import { SourceScreen } from "./SourceScreen";
 
@@ -48,5 +49,26 @@ export const editorScreens: E1Screen[] = [
       { what: "Unresolved", how: "click the red halbred mention on Ice Guard: no navigation, the fix is offered; Change to halberd resolves it." },
     ],
     render: ({ mode, state, interactive }) => <ReferencesScreen mode={mode} state={state} interactive={interactive} />,
+  },
+  {
+    id: "e1-editor-diagnostics",
+    group: "Diagnostics",
+    title: "Diagnostics inbox",
+    item: "cg-e1-editor-diagnostics",
+    summary:
+      "The dataset's diagnostics as a full view, reached from the sidebar's Updates (⌘⇧U). It takes the place of the list and the page; D's helper box and panel stay the quick view beside a page (this page, or Dataset scope), and their “Open all” leads here, so the two show the same list at two sizes. Grouped by kind (errors, preservation failures, authoring suggestions) with status edges; filters by source, layer and code plus a text filter; ↑ ↓ move, ↵ opens the entry with the issue in its helper, ⌥↵ applies the fix; the detail pane shows the affected text or, for a preservation failure, the export difference, and offers “Apply to all n of this kind” for a suggestion code. When the dataset changed since the last check the list says it is out of date and offers Run checks (⌘⇧C); with no issues it says when it checked and what.",
+    states: [
+      { id: "inbox", title: "Inbox, an error selected" },
+      { id: "preservation", title: "Preservation failure with its diff" },
+      { id: "stale", title: "Out of date: edits since the check" },
+      { id: "clear", title: "No issues" },
+    ],
+    tryIt: [
+      { what: "Triage", how: "↑ ↓ (or j k) move through the list, ↵ opens the entry, ⌥↵ applies the selected fix; Undo brings it back." },
+      { what: "Bulk", how: "select a default-value suggestion and Apply to all 3 of this kind." },
+      { what: "Filters", how: "Source, Layer and Code open a menu; × clears one; type in the filter field." },
+      { what: "Checks", how: "Run checks (⌘⇧C) shows progress, then the out-of-date note goes." },
+    ],
+    render: ({ mode, state, interactive }) => <DiagnosticsScreen mode={mode} state={state} interactive={interactive} />,
   },
 ];

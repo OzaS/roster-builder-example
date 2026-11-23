@@ -78,6 +78,16 @@
       "screen": "e1-editor-references",
       "summary": "Following references: Go to definition with Back / Forward and breadcrumbs, an inline peek (page or text, editable in place), backlinks as a fourth tab of the helper panel grouped by source and layer, and an unresolved reference that offers its fix instead of navigating.",
       "source": "D4 step 3a, E1 screens (2026-11-22)"
+    },
+    {
+      "id": "cg-e1-editor-diagnostics",
+      "title": "E1: Diagnostics inbox",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "e1-editor-diagnostics",
+      "summary": "The dataset's diagnostics as a full Linear-style inbox from the sidebar's Updates: grouped by kind, filter chips (source, layer, code), keyboard triage, a detail pane with the affected text or the export difference, bulk fix per suggestion code; out-of-date and no-issues states. The helper panel stays the quick view beside a page.",
+      "source": "D4 step 3a, E1 screens (2026-11-22)"
     }
   ]
 }

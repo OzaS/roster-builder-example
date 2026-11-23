@@ -1,4 +1,6 @@
-import { Code2 } from "lucide-react";
+import { Check, ChevronDown, Code2, FileDiff, RefreshCw, X } from "lucide-react";
+import { KindIcon } from "../../glyphs";
+import { code as codeText } from "./parts";
 import type { ReactNode } from "react";
 import { DiagIcon } from "../../glyphs";
 import { State, type Mode, type Platform } from "../../language/Specimen";
@@ -113,5 +115,62 @@ export const editorRenderers: Record<string, Renderer> = {
   "editor.unresolved": {
     paper: "none",
     render: () => <div className="cg-el-pop"><Unresolved keyText="iron-wardens:halbred" onFix={() => undefined} onClose={() => undefined} /></div>,
+  },
+  "inbox.row": {
+    render: () => {
+      const row = (kind: "error" | "preservation" | "suggestion", msg: string, entry: string, source: string, codeName: string, cls = "", layer?: string, extra?: ReactNode) => (
+        <div className={`cg-ib-row edge-${kind} ${cls}`}>
+          <p className="cg-ib-msg">{cls.includes("done") ? <><Check size={13} className="d-ok" />Applied: Remove line</> : codeText(msg)}</p>
+          <p className="cg-ib-meta"><KindIcon kind="unit" size={13} /><span className="cg-ib-entry">{entry}</span><span className="mono">{source}</span>{layer ? <span className="d-layer">{layer}</span> : null}{extra}<span className="d-spacer" /><span className="mono cg-ib-codename">{codeName}</span></p>
+        </div>
+      );
+      return (
+        <div className="cg-col" style={{ width: 520 }}>
+          <State label="Group heading, error row with a layer"><section className="cg-ib-group"><h3><DiagIcon kind="error" size={13} />Errors<span className="d-muted">2</span></h3>{row("error", "Unknown reference `halbred`", "Ice Guard", "Frost Wardens", "ref-unknown", "", "Frost Wardens")}</section></State>
+          <State label="Selected (preservation)">{row("preservation", "Source comment moves below `x-bs.exampleReviewState` on export", "Warden Squad", "Iron Wardens", "order-changed", "selected")}</State>
+          <State label="Hover, edited since the check">{row("suggestion", "`x-bs.exampleReviewState` is read by no rule", "Warden Squad", "Iron Wardens", "unread-key", "is-hover", undefined, <span className="cg-ib-edited">edited since the check</span>)}</State>
+          <State label="Done (Undo in the detail)">{row("suggestion", "", "Spear", "Iron Wardens", "default-value", "done")}</State>
+          <State label="Focus">{row("suggestion", "`cost pts 0` is the default", "Spear", "Iron Wardens", "default-value", "is-focus")}</State>
+        </div>
+      );
+    },
+  },
+  "inbox.filters": {
+    render: () => (
+      <div className="cg-stack">
+        <State label="Filter field and chips (dashed while All)" wide>
+          <div className="cg-ib-filters cg-el-filters"><label className="d-filter cg-ib-search"><input placeholder="Filter messages and paths" aria-label="Filter" /></label>
+            <span className="cg-chipwrap"><button type="button" className="cg-chip">Source<strong>All</strong><ChevronDown size={12} /></button></span>
+            <span className="cg-chipwrap"><button type="button" className="cg-chip on">Layer<strong>Frost Wardens</strong><ChevronDown size={12} /></button><button type="button" className="cg-chip-x" aria-label="Clear the layer filter"><X size={12} /></button></span>
+            <span className="cg-chipwrap"><button type="button" className="cg-chip is-hover">Code<strong>All</strong><ChevronDown size={12} /></button></span>
+          </div>
+        </State>
+        <State label="Chip menu (a menu, so it floats)" wide>
+          <div className="cg-menu" style={{ width: 240 }}>
+            <button type="button" className="cg-menu-item">All codes<span className="cg-menu-key">10</span></button>
+            <div className="cg-menu-sep" />
+            <button type="button" className="cg-menu-item sel"><span className="mono">dklpo/default-value</span><span className="cg-menu-key">3</span></button>
+            <button type="button" className="cg-menu-item"><span className="mono">dklpo/ref-unknown</span><span className="cg-menu-key">1</span></button>
+          </div>
+        </State>
+      </div>
+    ),
+  },
+  "inbox.diff": {
+    render: () => (
+      <div className="cg-stack" style={{ width: 520 }}>
+        <State label="Export difference: removed, kept, added (sign and tint)" wide>
+          <div className="cg-diff">
+            <p className="cg-diff-head"><FileDiff size={13} />original<span>→</span>export<span className="d-spacer" />1 line moves</p>
+            <p className="cg-diff-line del"><span className="cg-diff-sign">-</span><span>{"<!-- review: second pass -->"}</span></p>
+            <p className="cg-diff-line"><span className="cg-diff-sign"> </span><span>{"<selectionEntry name=\"Warden Squad\" exampleReviewState=\"draft\">"}</span></p>
+            <p className="cg-diff-line add"><span className="cg-diff-sign">+</span><span>{"  <!-- review: second pass -->"}</span></p>
+          </div>
+        </State>
+        <State label="Out of date (inline note, not a card)" wide>
+          <div className="cg-ib-stale" style={{ margin: 0 }}><RefreshCw size={14} /><p><strong>Out of date.</strong> 3 edits since the check at 14:06.</p><button type="button" className="d-btn sm primary">Run checks<kbd>⌘⇧C</kbd></button></div>
+        </State>
+      </div>
+    ),
   },
 };
