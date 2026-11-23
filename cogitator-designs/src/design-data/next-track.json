@@ -94,6 +94,18 @@
       "screen": "e1-start-editor-dialogs",
       "summary": "Over a static Direction D window: the dataset switcher popover (open dataset, recents, Open…, Convert…, Show in Finder, Close dataset), unsaved changes (Save / Don’t save / Cancel with the changed entries), a module changed on disk without and with unsaved edits (Reload / Keep mine / Compare), save failed (reason, Retry, Save as…). macOS.",
       "source": "D4 step 3a, E1 screens (2026-11-22)"
+    },
+    {
+      "id": "cg-e1-start-settings",
+      "title": "E1 settings window",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "desktop"
+      ],
+      "screen": "e1-start-settings",
+      "summary": "Settings: macOS ~720 px window with toolbar tabs and the classic preferences layout; Windows: Windows settings layout (navigation list, section title, label + help left, control right) in the app frame, without setting cards. General, Editor, Checking, Text, Appearance, Keyboard (read-only shortcut list), Command line (engine and tool versions). No accounts, sync or cloud.",
+      "source": "D4 step 3a, E1 screens (2026-11-22)"
     }
   ]
 }

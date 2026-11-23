@@ -275,7 +275,7 @@
 .fc-cg .cg-radio small { grid-column: 2; color: var(--cg-muted); font-size: var(--cg-text-small); }
 .fc-cg[data-platform="windows"] .cg-radio { grid-template-columns: 20px minmax(0, 1fr); gap: 0 8px; min-height: var(--cg-control); }
 .fc-cg[data-platform="windows"] .cg-radio > i { width: 20px; height: 20px; border-color: color-mix(in srgb, var(--cg-ink) 55%, transparent); }
-.fc-cg[data-platform="windows"] .cg-radio[aria-checked="true"] > i { border-width: 6px; }
+.fc-cg[data-platform="windows"] .cg-radio[aria-checked="true"] > i { border: 6px solid var(--cg-accent); }
 .fc-cg[data-platform="windows"] .cg-set-control .cg-radios { justify-items: start; }
 /* Pop-up button (macOS) and drop-down (Windows) */
 .fc-cg .cg-select-wrap { position: relative; display: inline-flex; }

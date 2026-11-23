@@ -69,3 +69,24 @@
 .e1s-toast button { flex-shrink: 0; height: var(--cg-control-sm); padding: 0 var(--cg-space-4); border-radius: var(--cg-radius-control); color: var(--cg-accent-text); font-weight: 600; }
 .e1s-toast button:hover { background: var(--cg-hover); }
 .e1s-over .cg-dialog-list li > svg { color: var(--cg-muted); }
+
+/* ---------- Settings window ---------- */
+.e1s-set { display: flex; flex-direction: column; }
+.e1s-set-bar { flex-shrink: 0; border-bottom: 1px solid var(--cg-line); background: var(--cg-surface); }
+.e1s-set-titlerow { position: relative; display: flex; align-items: center; justify-content: center; height: var(--cg-helper-header); }
+.e1s-set-titlerow .fc-traffic { position: absolute; left: var(--cg-space-7); }
+.e1s-set-titlerow strong { font-weight: 600; }
+.e1s-set-body { padding: var(--cg-space-9) var(--cg-space-10) var(--cg-space-10); background: var(--cg-pane); }
+.e1s-set-wintitle { display: flex; align-items: center; gap: var(--cg-space-5); height: var(--cg-header); flex-shrink: 0; padding-left: var(--cg-space-6); font-size: var(--cg-text-caption); }
+.e1s-set-wintitle .d-ws-mark { width: var(--cg-icon-button-sm); height: var(--cg-icon-button-sm); font-size: var(--cg-text-micro); }
+.e1s-set-wingrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 3fr); flex: 1; min-height: 0; }
+.e1s-set-nav { align-content: start; padding: var(--cg-space-2) var(--cg-space-4) var(--cg-space-8); }
+.e1s-set-winbody { padding: var(--cg-space-8) var(--cg-space-9) var(--cg-space-10); border-top: 1px solid var(--cg-line); border-left: 1px solid var(--cg-line); border-top-left-radius: var(--cg-radius-float); background: var(--cg-pane); }
+.e1s-win .e1s-set-winbody h1 { margin: 0 0 var(--cg-space-8); padding-left: var(--cg-space-6); font-size: var(--cg-text-title); font-weight: var(--cg-weight-title); line-height: 1.2; }
+.e1s-keyhead { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cg-space-4) var(--cg-space-6); margin-bottom: var(--cg-space-8); }
+.e1s-keyhead .d-filter { flex: 0 1 50%; height: var(--cg-control); }
+.fc-cg[data-platform="windows"] .e1s-keyhead { padding-left: var(--cg-space-6); }
+.e1s-win .e1s-keygroup + .e1s-keygroup { margin-top: var(--cg-space-8); }
+.fc-cg[data-platform="windows"] .e1s-keygroup .cg-keyrow { padding-inline: var(--cg-space-6); }
+.e1s-win .e1s-cmd { padding: var(--cg-space-2) var(--cg-space-4); border-radius: var(--cg-radius-control); background: var(--cg-hover); font-family: var(--cg-mono); font-size: var(--cg-text-mono); overflow-wrap: anywhere; }
+.e1s-win .cg-set-help .e1s-link { margin-left: 0; }

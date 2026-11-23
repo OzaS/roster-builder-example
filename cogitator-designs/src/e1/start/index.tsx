@@ -1,6 +1,7 @@
 import type { E1Screen } from "../types";
 import { StartWindow, type OpenProblem, type StartState } from "./StartWindow";
 import { EditorDialogs, type EditorDialog } from "./EditorDialogs";
+import { SettingsWindow, settingsSections, type SettingsSection } from "./Settings";
 
 /** Worker A: open and recent datasets, settings, the window's empty and error states. */
 export const startScreens: E1Screen[] = [
@@ -74,6 +75,25 @@ export const startScreens: E1Screen[] = [
     render: ({ mode, state, interactive }) => {
       const initial = (["switcher", "unsaved", "changed-on-disk", "changed-on-disk-edits", "save-failed"].includes(state ?? "") ? state : "switcher") as EditorDialog;
       return <EditorDialogs key={initial} mode={mode} initial={initial} interactive={interactive} />;
+    },
+  },
+  {
+    id: "e1-start-settings",
+    group: "Settings",
+    title: "Settings",
+    item: "cg-e1-start-settings",
+    width: 880,
+    platforms: ["mac", "windows"],
+    summary: "The settings window. macOS: about 720 px wide, toolbar tabs (icon above label), the section name as the title, labels right-aligned at the left and controls with help text at the right (the classic preferences layout, no grouped boxes). Windows: Windows' own settings layout in a window of the app's frame (title row with the caption buttons, navigation list with the accent indicator, the section title, label and help at the left of each row and the control at the right edge), without Windows' setting cards: rows are an open list separated by space. Sections: General, Editor, Checking, Text, Appearance, Keyboard (read-only shortcut list), Command line (engine and tool versions, read-only). Only what E1 has: no accounts, sync or cloud.",
+    states: settingsSections.map((s) => ({ id: s.id, title: s.title })),
+    tryIt: [
+      { what: "Sections", how: "the toolbar tabs (macOS) or the navigation list (Windows) switch sections." },
+      { what: "Controls", how: "checkboxes and switches toggle; pop-up buttons and drop-downs open their options; radios pick; Clear recent datasets… answers with Undo; Copy command says Copied." },
+      { what: "Keyboard", how: "filter the shortcut list by command name." },
+    ],
+    render: ({ mode, platform, state }) => {
+      const initial = (settingsSections.some((s) => s.id === state) ? state : "general") as SettingsSection;
+      return <SettingsWindow key={`${initial}-${platform}`} mode={mode} platform={platform} initial={initial} />;
     },
   },
 ];
