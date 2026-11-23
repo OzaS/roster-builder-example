@@ -1,5 +1,5 @@
 import { TrackChip, TrackSwitch } from "@designs/kit";
-import { Blend, Columns3, FileText, LayoutGrid, PanelsTopLeft } from "lucide-react";
+import { Blend, Columns3, Component, FileText, LayoutGrid, PanelsTopLeft, Palette } from "lucide-react";
 import type { ReactNode } from "react";
 import { cogitatorNext, cogitatorTrack } from "./track";
 import { go, hrefFor, pageOf, useSearch, type Page } from "./route";
@@ -8,6 +8,8 @@ import { DirectionScreen } from "./directions";
 import type { DState } from "./directions/DirectionD";
 import { MoodBoard } from "./pages/MoodBoard";
 import { DirectionPage } from "./pages/DirectionPage";
+import { LanguagePage } from "./pages/LanguagePage";
+import { ElementsPage } from "./pages/ElementsPage";
 
 const icons: Record<DirectionId, ReactNode> = { a: <Columns3 size={16} />, b: <FileText size={16} />, c: <PanelsTopLeft size={16} />, d: <Blend size={16} /> };
 const dStates: DState[] = ["default", "collapsed", "panel", "focus", "focus-panel"];
@@ -15,6 +17,7 @@ const dStates: DState[] = ["default", "collapsed", "panel", "focus", "focus-pane
 /**
  * The Field Cogitator design gallery. D4 step 1: the mood board (patterns from Linear, the Battle Augur desktop app and
  * Notion, each marked borrow or avoid), three directions for the entry editor and the user's mix of them (D, interactive).
+ * D4 step 2: the design language (tokens, type, density, layout) and the Elements view, drawn from Direction D.
  * Everything is a Proposal on Next.
  */
 export function App() {
@@ -40,11 +43,14 @@ export function App() {
           {directions.map((direction) => (
             <NavLink key={direction.id} page={direction.id} current={page} icon={icons[direction.id]} label={`${direction.letter} · ${direction.title}`} meta={direction.id === "d" ? "Interactive, light and dark" : "Entry editor, light and dark"} />
           ))}
+          <h2>D4 · Design language</h2>
+          <NavLink page="language" current={page} icon={<Palette size={16} />} label="Design language" meta="Tokens, type, density, layout" />
+          <NavLink page="elements" current={page} icon={<Component size={16} />} label="Elements" meta="Primitives, macOS and Windows" />
         </nav>
         <a className="cg-back" href="../">All design galleries</a>
       </aside>
       <main className="cg-stage">
-        {track === "current" ? <CurrentEmpty /> : page === "board" ? <MoodBoard /> : <DirectionPage id={page} />}
+        {track === "current" ? <CurrentEmpty /> : page === "board" ? <MoodBoard /> : page === "language" ? <LanguagePage /> : page === "elements" ? <ElementsPage /> : <DirectionPage id={page} />}
       </main>
     </div>
   );
@@ -75,7 +81,7 @@ function CurrentEmpty() {
   return (
     <section className="cg-empty">
       <h1>Nothing ships yet</h1>
-      <p>Current shows what Field Cogitator ships, and it has no released screens. The mood board and the directions for the entry editor are Proposals on the Next track.</p>
+      <p>Current shows what Field Cogitator ships, and it has no released screens. The mood board, the directions for the entry editor, the design language and the Elements view are Proposals on the Next track.</p>
       <button type="button" className="cg-primary" onClick={() => cogitatorTrack.setTrack("next")}>Show Next: the mood board</button>
     </section>
   );

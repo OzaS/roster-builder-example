@@ -2,12 +2,12 @@ import { useSyncExternalStore } from "react";
 
 /**
  * Gallery routing in the query string, so a copied link opens the same page:
- * `?page=board|a|b|c|d` (the mood board or a direction), `?theme=light|dark` (gallery theme; default follows the OS),
+ * `?page=board|a|b|c|d|language|elements` (the mood board, a direction, the design language or the Elements view), `?theme=light|dark` (gallery theme; default follows the OS),
  * `?view=frame&direction=a&mode=dark` (one direction's window alone at its 1440 px design width, for captures).
  * Direction D is interactive; `&state=default|collapsed|panel|focus|focus-panel` sets its starting layout in the frame view.
  */
-export type Page = "board" | "a" | "b" | "c" | "d";
-const pages: Page[] = ["board", "a", "b", "c", "d"];
+export type Page = "board" | "a" | "b" | "c" | "d" | "language" | "elements";
+const pages: Page[] = ["board", "a", "b", "c", "d", "language", "elements"];
 
 const listeners = new Set<() => void>();
 const read = () => (typeof window === "undefined" ? "" : window.location.search);
