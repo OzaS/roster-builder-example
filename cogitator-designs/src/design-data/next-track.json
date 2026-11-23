@@ -140,6 +140,56 @@
       "source": "D4 step 3a, E1 screens (2026-11-22)"
     },
     {
+      "id": "cg-e1-tools-checks",
+      "title": "E1: Run checks",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "e1-tools-checks",
+      "summary": "Run checks (⌘⇧C) inside the editor: a check status button in the page toolbar (complete, n errors, doesn't compile, running, out of date) opens a run popover with the steps and counts (Parse, Compile, Lower, Export check) and Cancel, then the result per class with its codes leading into the diagnostics inbox, what was checked (dataset, profile, layers, patch, export dry run) and the same command to copy. States: running, complete, incomplete with counts, doesn't compile (stops before Lower), out of date.",
+      "source": "D4 step 3b, E1 screens part 2 (2026-11-23)"
+    },
+    {
+      "id": "cg-e1-tools-convert",
+      "title": "E1: Convert from XML data",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "e1-tools-convert",
+      "summary": "Convert as a window of its own (from the start window and File › Convert…): the options in the left column as the convert command's flags in words (input folder / archive / files, output folder or Update, dataset key, version, text language, text columns, compatibility envelope, keep the original files, full id map, roundtrip after converting), the right pane with the input's documents, the steps with counts and Cancel, then the report (C2, C1, C3 verdicts, the numbers convert reports, each document's C1 differences, preservation diagnostics, Open the converted dataset, the commands to copy). Dry run writes nothing. States: options, converting, equal, differences found, input can't be read; macOS and Windows.",
+      "source": "D4 step 3b, E1 screens part 2 (2026-11-23)"
+    },
+    {
+      "id": "cg-e1-tools-export",
+      "title": "E1: Export",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "e1-tools-export",
+      "summary": "Export (⇧⌘E) as a sheet over the editor: format (XML data files / JSON data files for documents added since conversion), destination, text language, and the exactness from a dry run as the sheet opens: exact (all envelope entries current, Write the original files available, C3) or not exact with counts and each reason (preserve/stale, preserve/unbound, preserve/original-outdated) and that it still writes (Export anyway) unless Require an exact export is on, which refuses and says why beside the button. Result lists the written files; a Level 1 construct refuses the export by name. States: exact, not exact, written, refused.",
+      "source": "D4 step 3b, E1 screens part 2 (2026-11-23)"
+    },
+    {
+      "id": "cg-e1-tools-roundtrip",
+      "title": "E1: Roundtrip",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "e1-tools-roundtrip",
+      "summary": "Roundtrip as a tool view in place of the list and the page (like the inbox), with the two routes of the roundtrip command switched in the toolbar: from the XML data the dataset was converted from (C2 norm, C1 per-document source trees, the documents with verdicts) and from this dataset (deterministic writing, import and compare, reconvert with ids and files). Left: contracts and documents with status edges; right: what the selected row compared and every difference, with the command to copy. States: equal, differences, reverse route, refused (input partly imported).",
+      "source": "D4 step 3b, E1 screens part 2 (2026-11-23)"
+    },
+    {
+      "id": "cg-e1-tools-rename",
+      "title": "E1: Rename with a move record",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "e1-tools-rename",
+      "summary": "Rename (F2) as a sheet over the editor: the new key with the module prefix and the move command's dry-run preview as you type: classification (parent-preserving, minor; structural, needs a new major with Raise the version as --bump-major), what rosters do on open (followed and listed as moved, or kept unresolved for review), counts, the records appended to moves.dkl (uses named after the entry get their own), every file's lines before and after; Apply writes all or none, ⌘Z undoes. A taken key refuses with move/new-exists. States: rename, move to another parent (structural, drawn ahead of move/relocate), conflict.",
+      "source": "D4 step 3b, E1 screens part 2 (2026-11-23)"
+    },
+    {
       "id": "cg-e1-layers-stack",
       "title": "E1: Layer stack and page overlay",
       "kind": "screen",
