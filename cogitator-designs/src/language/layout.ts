@@ -51,7 +51,7 @@ export const collapseSteps = [
   },
   {
     below: layout.windowMin, // 960
-    hides: "Nothing more",
-    becomes: "960 px is the minimum window width: the list (318 px) and the page (612 px) always fit side by side",
+    hides: "Minimum window",
+    becomes: "nothing else hides; the window is not made narrower, so the list (348 px in the focus layout) and the page (612 px) always fit side by side",
   },
 ] as const;
