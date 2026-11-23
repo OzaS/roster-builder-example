@@ -2,6 +2,7 @@ import type { E1Screen } from "../types";
 import { ChecksScreen } from "./ChecksScreen";
 import { ConvertScreen } from "./ConvertScreen";
 import { ExportScreen } from "./ExportScreen";
+import { RoundtripScreen } from "./RoundtripScreen";
 
 /** Part 2, worker A: the command-line tools inside the editor (run checks, convert, export, roundtrip, rename with a move record). */
 export const toolScreens: E1Screen[] = [
@@ -66,5 +67,24 @@ export const toolScreens: E1Screen[] = [
       { what: "Export", how: "Export (anyway) shows the written files; Done or Esc closes the sheet, and the toast brings it back." },
     ],
     render: ({ mode, state, interactive }) => <ExportScreen key={state} mode={mode} state={state} interactive={interactive} />,
+  },
+  {
+    id: "e1-tools-roundtrip",
+    group: "Checks and tools",
+    title: "Roundtrip",
+    item: "cg-e1-tools-roundtrip",
+    summary:
+      "Roundtrip (palette › Roundtrip, Tools menu) as a tool view in place of the list and the page, like the diagnostics inbox. Two routes, as the roundtrip command has them, switched in the toolbar. From the XML data (the input the dataset was converted from): C2, norm of the import against norm of the converted dataset, and C1, each regenerated document's source tree against its original, with the documents listed below with their verdicts. From this dataset (the reverse route): the XML written twice must be byte-identical, its import must give the same norm as the dataset's lowering, and with reconvert it is converted back and compared by norm, identities and files (a changed file is listed, not a failure). The left column holds the contracts and documents with status edges; the right shows what the selected row compared and every difference (norm path, or class, path and before → after), with the command to copy. An input that is only partly imported stops before C2 and says which file and why.",
+    states: [
+      { id: "equal", title: "From the XML data: equal" },
+      { id: "differences", title: "Differences in a document" },
+      { id: "reverse", title: "From this dataset: reverse route" },
+      { id: "refused", title: "Refused: input partly imported" },
+    ],
+    tryIt: [
+      { what: "Rows", how: "click C2, C1 or a document: the right side shows what was compared and the differences." },
+      { what: "Route", how: "switch From the XML data / From this dataset in the toolbar; Run roundtrip runs it again." },
+    ],
+    render: ({ mode, state, interactive }) => <RoundtripScreen key={state} mode={mode} state={state} interactive={interactive} />,
   },
 ];

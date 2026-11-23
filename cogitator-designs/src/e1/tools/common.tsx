@@ -63,13 +63,13 @@ export function VerdictMark({ v, children }: { v: Verdict; children?: ReactNode 
  * A contract row: C1 / C2 / C3 (or a step of the reverse route) with what it compares, its verdict and a detail line.
  * An open row with a status edge, not a box.
  */
-export function ContractRow({ tag, title, what, v, detail, selected, onClick }: { tag: string; title: string; what: ReactNode; v: Verdict; detail?: ReactNode; selected?: boolean; onClick?: () => void }) {
+export function ContractRow({ tag, title, what, v, word, detail, selected, onClick }: { tag: string; title: string; what: ReactNode; v: Verdict; word?: string; detail?: ReactNode; selected?: boolean; onClick?: () => void }) {
   const edge = v === "different" ? "edge-preservation" : v === "refused" ? "edge-error" : v === "equal" ? "edge-ok" : "";
   const body = (
     <>
       <span className="cg-tl-ctag">{tag}</span>
       <span className="cg-tl-cmain"><strong>{title}</strong><span className="d-muted">{what}</span>{detail ? <span className="cg-tl-cdetail">{detail}</span> : null}</span>
-      <VerdictMark v={v} />
+      <VerdictMark v={v}>{word}</VerdictMark>
     </>
   );
   return onClick

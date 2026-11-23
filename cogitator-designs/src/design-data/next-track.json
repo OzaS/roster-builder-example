@@ -168,6 +168,16 @@
       "screen": "e1-tools-export",
       "summary": "Export (⇧⌘E) as a sheet over the editor: format (XML data files / JSON data files for documents added since conversion), destination, text language, and the exactness from a dry run as the sheet opens: exact (all envelope entries current, Write the original files available, C3) or not exact with counts and each reason (preserve/stale, preserve/unbound, preserve/original-outdated) and that it still writes (Export anyway) unless Require an exact export is on, which refuses and says why beside the button. Result lists the written files; a Level 1 construct refuses the export by name. States: exact, not exact, written, refused.",
       "source": "D4 step 3b, E1 screens part 2 (2026-11-23)"
+    },
+    {
+      "id": "cg-e1-tools-roundtrip",
+      "title": "E1: Roundtrip",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "e1-tools-roundtrip",
+      "summary": "Roundtrip as a tool view in place of the list and the page (like the inbox), with the two routes of the roundtrip command switched in the toolbar: from the XML data the dataset was converted from (C2 norm, C1 per-document source trees, the documents with verdicts) and from this dataset (deterministic writing, import and compare, reconvert with ids and files). Left: contracts and documents with status edges; right: what the selected row compared and every difference, with the command to copy. States: equal, differences, reverse route, refused (input partly imported).",
+      "source": "D4 step 3b, E1 screens part 2 (2026-11-23)"
     }
   ]
 }
