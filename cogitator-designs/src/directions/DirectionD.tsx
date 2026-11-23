@@ -4,6 +4,8 @@ import { MacWindow, TrafficLights } from "../frames";
 import { DiagIcon, KindIcon } from "../glyphs";
 import { diagLabel, diagnostics, diagOne, entry, type DiagKind, type Diagnostic } from "../sample";
 import { DContext, M, entryOfDiag, issuesFor, pageFor, rowCount, sourceById, sourceOfEntry, sources, tables, type DSource } from "./direction-d-content";
+import { layout } from "../language/layout";
+import "../language/tokens.css";
 import "./direction-d.css";
 
 /**
@@ -16,12 +18,12 @@ type Helper = "collapsed" | "floating" | "panel";
 type Tab = "issues" | "suggestions" | "properties";
 type Scope = "entry" | "dataset";
 
-const NAV_W = 232;
-const SRC_W = 318;
-/** In focus mode the list also carries the window controls, so it is a little wider. */
-const SRC_FOCUS_W = 348;
-const PANEL_MIN = 260;
-const PANEL_MAX = 520;
+/** Pane widths from the design language (`../language/layout.ts`). */
+const NAV_W = layout.sidebar;
+const SRC_W = layout.sourceList;
+const SRC_FOCUS_W = layout.sourceListFocus;
+const PANEL_MIN = layout.panelMin;
+const PANEL_MAX = layout.panelMax;
 
 /** Several windows can be on one gallery page; the keyboard goes to the one used last. */
 let activeWindow: string | null = null;
@@ -38,7 +40,7 @@ export function DirectionD({ mode, initial = "default", interactive = true }: { 
   const [helper, setHelper] = useState<Helper>(initial === "collapsed" ? "collapsed" : initial.endsWith("panel") ? "panel" : "floating");
   const [tab, setTab] = useState<Tab>("issues");
   const [scope, setScope] = useState<Scope>("entry");
-  const [panelW, setPanelW] = useState(328);
+  const [panelW, setPanelW] = useState<number>(layout.panel);
   const [dragging, setDragging] = useState(false);
   const [expanded, setExpanded] = useState<ReadonlySet<string>>(new Set(["iron-wardens"]));
   const [folded, setFolded] = useState<ReadonlySet<string>>(new Set());
@@ -148,7 +150,7 @@ export function DirectionD({ mode, initial = "default", interactive = true }: { 
   const crumbsSource = sourceOfEntry(entryId)?.name ?? "Dataset";
 
   return (
-    <MacWindow mode={mode} className={`fc-d${interactive ? "" : " static"}`}>
+    <MacWindow mode={mode} className={`fc-d fc-cg${interactive ? "" : " static"}`}>
       <DContext.Provider value={{ open: openEntry, resolved }}>
         <div ref={root} className={`d-grid${dragging ? " dragging" : ""}`} style={{ gridTemplateColumns: columns }} onPointerDownCapture={claim} onFocusCapture={claim}>
           {/* ---------- Sidebar (B) ---------- */}
