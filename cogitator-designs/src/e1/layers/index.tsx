@@ -1,6 +1,7 @@
 import type { E1Screen } from "../types";
 import { LayerStackScreen } from "./LayerStackScreen";
 import { SearchScreen } from "./SearchScreen";
+import { RunnerScreen } from "./RunnerScreen";
 
 /** E1 screens part 2, worker B: the layer stack with its page overlay, dataset search, the dataset runner. */
 export const layerScreens: E1Screen[] = [
@@ -47,5 +48,32 @@ export const layerScreens: E1Screen[] = [
       { what: "No results", how: "Search with Draft points on adds the off layer to the search." },
     ],
     render: ({ mode, state, interactive }) => <SearchScreen mode={mode} state={state} interactive={interactive} />,
+  },
+  {
+    id: "e1-layers-runner",
+    group: "Run",
+    title: "Dataset runner with hot reload",
+    item: "cg-e1-layers-runner",
+    summary:
+      "Run (⌘R, or the toolbar's Run) opens a basic roster builder over the dataset being edited, as the Battle Augur desktop app builds rosters but plain: a developer tool with no export sheets, stars, grouped units or appearance. Docked, it is a right-hand pane beside the page (728 px at 1440, resizable by its left edge down to 560; the source list folds and the helper box becomes its pill while it is open); its header button opens it in its own window (Dock brings it back). The header says what runs and how fresh it is (“Live · built 12:04:31 · 180 ms”); the status opens the live-reload menu: Reload On save (default) or While typing (after a 400 ms pause), Pause live reload (⌥⌘P), Reload now (⇧⌘R), the build log. The configuration row picks what runs like augur dklpo test --with (the dataset alone or with its layers, the variants, Draft points marked Test, the locale), the force and the points limit, with the total against the limit. Below: the Add list by category with costs and slot counts, the roster tree (force → categories → selections with their option summary and cost), the selected item's options (counts with min and max, choices, toggles), its profile and rules as plain tables and a cost breakdown, and the engine's validation errors with the item they belong to. On reload the runner swaps to the new build keeping the roster, reopened through the roster-open rules (parent-preserving move records followed, otherwise matched by name, structural moves kept for review); a summary says what happened and marks the affected items. A build that fails keeps running the last good build under a banner that leads to the error. Go to entry (F12, or double-click) opens an item's page; Show in runner (⌥⌘R) does the reverse. Save as test… writes the roster with its expected results as test/*.yaml for augur dklpo test; Roster ▸ Open saved roster…, Reset roster. At 960 px the runner can't sit beside a 480 px page, so it takes the page area and ⌘R switches between page and runner (its own window keeps both in view).",
+    states: [
+      { id: "empty", title: "Empty: pick a force" },
+      { id: "progress", title: "Roster in progress" },
+      { id: "reloaded", title: "Just reloaded, change summary" },
+      { id: "error", title: "Compile error: last good build" },
+      { id: "review", title: "Kept for review after a structural move" },
+      { id: "save-test", title: "Save as test scenario" },
+      { id: "detached", title: "Detached window, live menu open" },
+      { id: "narrow", title: "960 px window" },
+    ],
+    tryIt: [
+      { what: "Build", how: "click a row in Add; select an item in the tree; change counts with − +, pick a weapon, take the Banner; the costs, the total and the errors follow. Fewer than 5 Wardens is an error with its item." },
+      { what: "Reload", how: "Reload (⇧⌘R) rebuilds and keeps the roster; Pause stops saves from rebuilding; the status opens the live menu (On save / While typing)." },
+      { what: "Review", how: "in the reloaded state Review (or the amber Banner row) shows why it was kept; Add it again under Command or Remove it." },
+      { what: "Editor", how: "Go to entry (F12) or double-click a roster item opens its page on the left; Show in runner (⌥⌘R) selects the page's entry in the roster; ⌘R closes and opens the runner." },
+      { what: "Window", how: "the ↗ button detaches the runner into its own window, Dock brings it back; drag the runner's left edge to resize it." },
+      { what: "Test", how: "Save as test… opens the sheet: name, where it is saved, what it expects, the YAML it writes." },
+    ],
+    render: ({ mode, state, interactive }) => <RunnerScreen mode={mode} state={state} interactive={interactive} />,
   },
 ];
