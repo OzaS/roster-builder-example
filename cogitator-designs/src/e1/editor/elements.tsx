@@ -163,7 +163,7 @@ export const editorRenderers: Record<string, Renderer> = {
           <div className="cg-diff">
             <p className="cg-diff-head"><FileDiff size={13} />original<span>→</span>export<span className="d-spacer" />1 line moves</p>
             <p className="cg-diff-line del"><span className="cg-diff-sign">-</span><span>{"<!-- review: second pass -->"}</span></p>
-            <p className="cg-diff-line"><span className="cg-diff-sign"> </span><span>{"<selectionEntry name=\"Warden Squad\" exampleReviewState=\"draft\">"}</span></p>
+            <p className="cg-diff-line"><span className="cg-diff-sign"> </span><span>{"<entry name=\"Warden Squad\" exampleReviewState=\"draft\">"}</span></p>
             <p className="cg-diff-line add"><span className="cg-diff-sign">+</span><span>{"  <!-- review: second pass -->"}</span></p>
           </div>
         </State>

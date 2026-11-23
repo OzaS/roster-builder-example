@@ -34,15 +34,15 @@ const diffs: Record<string, { file: string; note: string; lines: { t: " " | "-" 
     file: "iron-wardens.cat", note: "The comment is kept (in the compatibility envelope), but the export writes it inside the entry, after the attributes, instead of before it. The data is the same; only the comment's place differs.",
     lines: [
       { t: "-", text: "<!-- review: second pass -->" },
-      { t: " ", text: "<selectionEntry id=\"1f0a-5e1e-0000-0001\" name=\"Warden Squad\" type=\"unit\" exampleReviewState=\"draft\">" },
+      { t: " ", text: "<entry id=\"1f0a-5e1e-0000-0001\" name=\"Warden Squad\" type=\"unit\" exampleReviewState=\"draft\">" },
       { t: "+", text: "  <!-- review: second pass -->" },
-      { t: " ", text: "  <categoryLinks>" },
+      { t: " ", text: "  <categories>" },
     ],
   },
   d3: {
     file: "demo-skirmish.gst", note: "The element is kept with its namespace, but the export writes the namespace on the element instead of the prefix declared on the root. Readers that compare text see a change; readers that parse XML don't.",
     lines: [
-      { t: " ", text: "<gameSystem id=\"d5a0-0000-0000-0001\" name=\"Demo Skirmish\" xmlns:ex=\"https://example.org/editor\">" },
+      { t: " ", text: "<system id=\"d5a0-0000-0000-0001\" name=\"Demo Skirmish\" xmlns:ex=\"https://example.org/editor\">" },
       { t: "-", text: "  <ex:editorState pinned=\"true\"/>" },
       { t: "+", text: "  <editorState xmlns=\"https://example.org/editor\" pinned=\"true\"/>" },
     ],

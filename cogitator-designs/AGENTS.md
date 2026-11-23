@@ -16,6 +16,10 @@ Field Cogitator (working name) is a **desktop editor for datasets** in the DKLPO
 - Primitives come from the Elements view (`?page=elements`): Direction D's under `.fc-d` in `src/directions/direction-d.css`, the newer ones in `src/language/primitives.css`. A new primitive gets an Elements entry (renderer in `src/pages/ElementsPage.tsx`) and an entry in `src/design-data/cogitator.design.json` (`elements.sections`, which the page renders from).
 - Direction D's frame captures (`?view=frame&direction=d&mode=light|dark&state=…`) must stay byte-identical unless a change to D is approved.
 
+## E1 screens (D4 step 3, 2026-11-22)
+- Each E1 screen is an `E1Screen` (`src/e1/types.ts`) registered in its part's list (`src/e1/start/`, `src/e1/editor/`, collected by `src/e1/registry.ts`), with a `next-track.json` item and an entry in `cogitator.design.json` `screens`. `?page=e1` shows them all, `&screen=<id>` one, `?view=frame&screen=<id>&mode=&state=&platform=windows` one alone for captures.
+- Screens draw on a gallery page beside others: no focus on mount (`autoFocus` or effects), or the page scrolls to the last screen.
+
 ## Rules
 - Track: `src/track.ts` (own storage key) and `src/design-data/next-track.json`; everything is Next / Proposal until the user approves it.
 - Sample data: synthetic datasets only (the Battle Augur docs' synthetic DKLPO examples are fine); no third-party product content or vocabulary.

@@ -30,20 +30,24 @@ export function E1Page({ screen }: { screen: string | null }) {
           {shown.length ? null : <p className="cg-note">No E1 screens yet.</p>}
         </nav>
       )}
-      {shown.map((s) => <ScreenSection key={s.id} screen={s} />)}
+      {shown.map((s) => <ScreenSection key={s.id} screen={s} solo={Boolean(one)} />)}
     </article>
   );
 }
 
-function ScreenSection({ screen }: { screen: E1Screen }) {
+function ScreenSection({ screen, solo }: { screen: E1Screen; solo: boolean }) {
   const states = screen.states?.length ? screen.states : [{ id: "", title: "" }];
   const platforms: E1Platform[] = screen.platforms?.length ? screen.platforms : ["mac"];
   const shots: { mode: E1Mode; platform: E1Platform; state: string; stateTitle: string }[] = [];
   for (const state of states) for (const platform of platforms) for (const mode of ["light", "dark"] as const) shots.push({ mode, platform, state: state.id, stateTitle: state.title });
   return (
     <section id={screen.id} className="cg-e1-screen" aria-label={screen.title}>
-      <h2 className="cg-e1-title">{screen.title} <a href={`${hrefFor("e1")}&screen=${screen.id}`}>Only this screen</a></h2>
-      <p className="cg-note">{screen.summary}</p>
+      {solo ? null : (
+        <>
+          <h2 className="cg-e1-title">{screen.title} <a href={`${hrefFor("e1")}&screen=${screen.id}`}>Only this screen</a></h2>
+          <p className="cg-note">{screen.summary}</p>
+        </>
+      )}
       {screen.tryIt?.length ? (
         <section className="cg-try" aria-label="Try it">
           <h2>Try it</h2>

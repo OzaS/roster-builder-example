@@ -61,7 +61,7 @@ export function EmptyScreen({ mode, state = "no-entries", interactive }: { mode:
                 <button type="button" className="cg-kindpick" title="Kind of entry (Tab, then ↑ ↓)"><KindIcon kind="unit" size={14} />Unit<ChevronDown size={12} /></button>
                 <label className={`cg-keyfield${keyOk(key) ? "" : " bad"}`}>
                   <span className="mono d-muted">ember-guard:</span>
-                  <input ref={input} className="mono" value={key} onChange={(e) => setKey(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") create(); if (e.key === "Escape") { e.stopPropagation(); setDrafting(false); } }} aria-label="Key of the new entry" autoFocus={interactive && s === "no-entries"} />
+                  <input ref={input} className="mono" value={key} onChange={(e) => setKey(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") create(); if (e.key === "Escape") { e.stopPropagation(); setDrafting(false); } }} aria-label="Key of the new entry" />
                 </label>
               </div>
               <p className={`cg-newrow-help${keyOk(key) ? "" : " bad"}`}>{keyOk(key) ? <>The key is how references name it (<span className="mono">use ash-warden</span>); the name goes in the text pack. </> : <>A key is lower case: letters, digits and hyphens, starting with a letter. </>}</p>
@@ -145,7 +145,7 @@ export function EmptyScreen({ mode, state = "no-entries", interactive }: { mode:
       {palette ? (
         <div className="cg-scrim" onClick={() => setPalette(false)}>
           <div className="cg-palette cg-ed-palette" role="dialog" aria-label="Search" onClick={(e) => e.stopPropagation()}>
-            <div className="cg-pal-input"><Search size={16} /><input value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Search entries, commands and text" autoFocus={interactive && s === "no-results"} /><span className="cg-pal-scope">All</span><kbd>Esc</kbd></div>
+            <div className="cg-pal-input"><Search size={16} /><input value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Search entries, commands and text" /><span className="cg-pal-scope">All</span><kbd>Esc</kbd></div>
             <div className="cg-pal-body">
               <p className="cg-pal-empty">Nothing matches “{query}”. Searched 28 entries in 4 sources, the en text pack and the commands; Draft points is off, so its entries weren't searched.</p>
               <div className="cg-pal-group">Next steps</div>
