@@ -1,0 +1,61 @@
+/*
+ * E1 screens part 2, worker B: dataset search. Scoped to `.cg-ed` or to `cg-` class names Direction D never uses; every value from tokens.css.
+ * Shared pieces (the callout, the status text) are in `layers.css`.
+ */
+
+/* ---------- Dataset search ---------- */
+.fc-cg .cg-sr-head { display: grid; gap: 6px; flex-shrink: 0; padding: 4px 14px 8px 12px; }
+.fc-cg .cg-sr-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.fc-cg .cg-sr-indent { width: var(--cg-icon-button-sm); flex-shrink: 0; }
+.fc-cg .cg-sr-field { flex: 0 1 460px; display: flex; align-items: center; gap: 8px; height: var(--cg-row); padding: 0 4px 0 9px; border-radius: var(--cg-radius-control); background: var(--cg-hover); color: var(--cg-muted); }
+.fc-cg .cg-sr-field:focus-within { box-shadow: inset 0 0 0 1.5px var(--cg-accent); }
+.fc-cg .cg-sr-field input { flex: 1; min-width: 0; border: 0; background: none; color: var(--cg-ink); font: inherit; outline: none; }
+.fc-cg .cg-sr-field input::placeholder { color: var(--cg-muted); }
+.fc-cg .cg-sr-toggles { display: inline-flex; gap: 2px; }
+.fc-cg .cg-sr-toggles button { justify-content: center; min-width: 24px; height: 20px; padding: 0 4px; border-radius: var(--cg-radius-chip); color: var(--cg-muted); font-size: var(--cg-text-caption); font-weight: 600; }
+.fc-cg .cg-sr-toggles button:hover { background: var(--cg-hover); color: var(--cg-ink); }
+.fc-cg .cg-sr-toggles button.on { background: var(--cg-select); color: var(--cg-accent-text); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--cg-accent) 45%, transparent); }
+.fc-cg .cg-sr-word { text-decoration: underline; text-underline-offset: 2px; }
+.fc-cg .cg-sr-scopes { display: inline-flex; flex-wrap: wrap; gap: 4px; margin-left: 4px; }
+.fc-cg .cg-sr-scope { gap: 4px; height: var(--cg-control-sm); padding: 0 8px; border-radius: var(--cg-radius-pill); color: var(--cg-muted); font-size: var(--cg-text-small); box-shadow: inset 0 0 0 1px var(--cg-line); }
+.fc-cg .cg-sr-scope:hover { background: var(--cg-hover); }
+.fc-cg .cg-sr-scope.on { background: var(--cg-select); color: var(--cg-accent-text); font-weight: 600; box-shadow: none; }
+.fc-cg .cg-sr-scope > span { font-weight: 400; font-variant-numeric: tabular-nums; }
+.fc-cg .cg-sr-done { display: inline-flex; align-items: center; gap: 8px; font-size: var(--cg-text-small); }
+.cg-ed .cg-sr-filters { border-top: 1px solid var(--cg-line); }
+.cg-ed .cg-sr { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(520px, 1.25fr) minmax(400px, 1fr); grid-template-rows: minmax(0, 1fr); }
+.cg-ed .cg-sr-list { min-height: 0; overflow: auto; padding: 4px 10px 16px; border-right: 1px solid var(--cg-line); }
+.fc-cg .cg-sr-group h3 { display: flex; align-items: center; gap: 6px; padding: 12px 8px 2px; color: var(--cg-muted); font-size: var(--cg-text-caption); font-weight: 600; }
+.fc-cg .cg-sr-group h3 .d-muted { font-size: var(--cg-text-caption); font-weight: 400; }
+.fc-cg .cg-sr-entry { display: grid; gap: 0; margin-top: 2px; }
+.fc-cg .cg-sr-ehead { display: flex; align-items: center; gap: 7px; min-height: var(--cg-row); padding: 0 8px; }
+.fc-cg .cg-sr-ehead > svg { color: var(--cg-muted); }
+.fc-cg .cg-sr-ehead strong { font-weight: 600; }
+.fc-cg .cg-sr-ehead .mono { color: var(--cg-muted); font: var(--cg-text-mono-kw) var(--cg-mono); }
+.fc-cg .cg-sr-hit { display: grid; grid-template-columns: 70px minmax(0, 1fr) auto; align-items: start; gap: 8px; padding: 3px 8px 3px 30px; border-radius: var(--cg-radius-control); cursor: default; }
+.fc-cg .cg-sr-hit:hover { background: var(--cg-hover); }
+.fc-cg .cg-sr-hit.selected { background: var(--cg-select); }
+.fc-cg .cg-sr-hit:focus-visible { outline: var(--cg-focus-width) solid var(--cg-focus-color); outline-offset: var(--cg-focus-offset); }
+.fc-cg .cg-sr-field-tag, .fc-cg .cg-sr-lock { justify-self: start; margin-top: 2px; padding: 0 5px; border-radius: var(--cg-radius-chip); background: var(--cg-hover); color: var(--cg-muted); font-size: var(--cg-text-micro); font-weight: 600; line-height: 17px; }
+.fc-cg .cg-sr-field-tag.text, .fc-cg .cg-sr-field-tag.name { background: color-mix(in srgb, var(--cg-tag-2) var(--cg-tag-mix), transparent); color: var(--cg-ink); }
+.fc-cg .cg-sr-field-tag.reference, .fc-cg .cg-sr-field-tag.key { background: var(--cg-mention); color: var(--cg-accent-text); }
+.fc-cg .cg-sr-check { justify-self: start; margin-top: 1px; }
+.fc-cg .cg-sr-check > i svg { color: var(--cg-accent-ink); }
+.fc-cg .cg-sr-text { min-width: 0; overflow-wrap: anywhere; line-height: 1.45; font-size: var(--cg-text-small); }
+.fc-cg .cg-sr-text.mono { font: var(--cg-text-mono)/1.5 var(--cg-mono); white-space: pre-wrap; }
+.fc-cg .cg-sr-prefix { color: var(--cg-muted); font: var(--cg-text-mono-kw) var(--cg-mono); }
+.fc-cg .cg-sr-mark { padding: 0 1px; border-radius: 2px; background: color-mix(in srgb, var(--cg-tag-1) 38%, transparent); color: var(--cg-ink); font-weight: 600; }
+.fc-cg .cg-sr-diff del { padding: 0 1px; border-radius: 2px; background: var(--cg-flag-error); color: var(--cg-status-error); }
+.fc-cg .cg-sr-diff ins { margin-left: 2px; padding: 0 1px; border-radius: 2px; background: color-mix(in srgb, var(--cg-status-ok) 14%, transparent); color: var(--cg-status-ok); font-weight: 600; text-decoration: none; }
+.fc-cg .cg-sr-ins { padding: 0 1px; border-radius: 2px; background: color-mix(in srgb, var(--cg-status-ok) 14%, transparent); color: var(--cg-ink); font-weight: 600; }
+.fc-cg .cg-sr-hit.locked .cg-sr-text { color: var(--cg-muted); }
+.fc-cg .cg-sr-hit.locked .cg-sr-mark { background: var(--cg-hover); color: var(--cg-muted); }
+.fc-cg .cg-sr-line { display: inline-flex; align-items: center; gap: 4px; margin-top: 1px; color: var(--cg-muted); font: var(--cg-text-mono-kw) var(--cg-mono); white-space: nowrap; }
+.cg-ed .cg-sr-preview { min-width: 0; min-height: 0; overflow: auto; padding: 16px 22px 24px; }
+.fc-cg .cg-sr-code { margin: 8px 0 10px; }
+.fc-cg .cg-sr-facts > div { grid-template-columns: 72px minmax(0, 1fr); }
+.cg-ed .cg-sr-none { width: 560px; }
+.cg-ed .cg-sr-none-mark { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--cg-hover); color: var(--cg-muted); }
+.cg-ed .cg-sr-none .cg-ib-checked > div { grid-template-columns: 110px minmax(0, 1fr); }
+.cg-ed .cg-sr-none .cg-linkbtn { margin-left: 4px; }
+.cg-ed .cg-sr-emptywrap { flex: 1; min-height: 0; overflow: auto; }
