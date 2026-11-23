@@ -68,6 +68,16 @@
       "screen": "e1-editor-source",
       "summary": "Source (⌘⌥U) splits the editor into the entry page and its DKLPO text, synced both ways; text editor with line numbers, syntax colours, diagnostic gutter and underlines, hover card, quick-fix menu (⌥↵) and status line; a module that doesn't parse opens as text only. States: split, text only, unknown reference, parse error, large text, 960 px.",
       "source": "D4 step 3a, E1 screens (2026-11-22)"
+    },
+    {
+      "id": "cg-e1-editor-references",
+      "title": "E1: Go to definition, peek and backlinks",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "e1-editor-references",
+      "summary": "Following references: Go to definition with Back / Forward and breadcrumbs, an inline peek (page or text, editable in place), backlinks as a fourth tab of the helper panel grouped by source and layer, and an unresolved reference that offers its fix instead of navigating.",
+      "source": "D4 step 3a, E1 screens (2026-11-22)"
     }
   ]
 }

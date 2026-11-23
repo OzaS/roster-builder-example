@@ -2,7 +2,7 @@ import { FileCode2 } from "lucide-react";
 import { useLayoutEffect, useRef, type ReactNode } from "react";
 import { DiagIcon } from "../../glyphs";
 import type { DiagKind } from "../../sample";
-import { charClasses, type SynClass } from "./syntax";
+import { charClasses, tokenize, type SynClass } from "./syntax";
 
 /**
  * The source text editor (a new primitive): line numbers, a diagnostics gutter, DKLPO syntax colours from the tokens
@@ -110,4 +110,9 @@ export function CodeStatus({ caret, fmt, counts, children }: { caret?: CodeCaret
       <span>UTF-8</span><span>LF</span><span>Spaces: 2</span><span>DKLPO 1.0</span>
     </footer>
   );
+}
+
+/** One DKLPO line, syntax-coloured, inline (backlink rows, inbox excerpts). */
+export function SynText({ text }: { text: string }) {
+  return <span className="cg-syn">{tokenize(text).map((tok, index) => <span key={index} className={tok.c ? `syn-${tok.c}` : undefined}>{tok.text}</span>)}</span>;
 }

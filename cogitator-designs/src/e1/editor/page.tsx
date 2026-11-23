@@ -1,5 +1,5 @@
 import { ArrowDownLeft, ChevronDown, ChevronRight, Plus } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useState, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from "react";
 import { KindIcon } from "../../glyphs";
 import { lookupRow, M, pageFor } from "../../directions/direction-d-content";
 import type { DiagKind } from "../../sample";
@@ -40,22 +40,31 @@ export const entryAt = (module: ModuleText, line: number) => {
 
 export type PageSel = { line: number | null; onSelect: (line: number) => void };
 
-function Mention({ module, keyText, broken, onFollow }: { module: string; keyText: string; broken?: boolean; onFollow?: (id: string, from: HTMLElement) => void }) {
-  const id = resolve(module, keyText);
-  if (!id || broken) return <span className="d-mwrap"><button type="button" className="d-mention broken" aria-label={`Unknown reference ${keyText}`} title="Unknown reference: F12 offers the fix">{keyText.split(":").pop()}</button></span>;
+/** Follow a reference: click or F12 goes to the definition, ⌥-click or ⌥F12 peeks it. `id` is missing when it resolves to nothing. */
+export type Follow = (target: { id?: string; key: string; peek: boolean; line: number; el: HTMLElement }) => void;
+
+function Mention({ module, keyText, broken, onFollow, line }: { module: string; keyText: string; broken?: boolean; onFollow?: Follow; line: number }) {
+  const resolved = resolve(module, keyText);
+  const id = broken ? undefined : resolved;
+  const go = (el: HTMLElement, peek: boolean) => onFollow?.({ id, key: keyText, peek, line, el });
+  const keys = (event: ReactKeyboardEvent<HTMLButtonElement>) => { if (event.key === "F12") { event.preventDefault(); event.stopPropagation(); go(event.currentTarget, event.altKey); } };
+  if (!id) {
+    return <span className="d-mwrap"><button type="button" className="d-mention broken" data-ref={keyText} aria-label={`Unknown reference ${keyText}`} title="Unknown reference: F12 offers the fix"
+      onClick={onFollow ? (event) => { event.stopPropagation(); go(event.currentTarget, false); } : undefined} onKeyDown={onFollow ? keys : undefined}>{keyText.split(":").pop()}</button></span>;
+  }
   const name = lookupRow(id)?.row.name ?? title(keyText);
   return onFollow
-    ? <span className="d-mwrap"><button type="button" className="d-mention" title={`Open ${name} (F12) · peek (⌥F12)`} onClick={(event) => { event.stopPropagation(); onFollow(id, event.currentTarget); }}>{name}</button></span>
+    ? <span className="d-mwrap"><button type="button" className="d-mention" data-ref={id} title={`Go to ${name} (F12, ⌘-click) · peek (⌥F12, ⌥-click)`} onClick={(event) => { event.stopPropagation(); go(event.currentTarget, event.altKey); }} onKeyDown={keys}>{name}</button></span>
     : <M to={id}>{name}</M>;
 }
 
 const profileHeads: Record<string, string[]> = { fighter: ["Profile", "Type", "Move", "Attack", "Wounds"], weapon: ["Profile", "Type", "Reach", "Strength"] };
 
 /** One statement line drawn as a block value. */
-function Value({ module, text, follow, broken }: { module: string; text: string; follow?: (id: string, from: HTMLElement) => void; broken?: boolean }) {
+function Value({ module, text, follow, broken, line }: { module: string; text: string; follow?: Follow; broken?: boolean; line: number }) {
   const [kw, ...rest] = text.trim().split(" ");
   const args = rest.join(" ");
-  const mention = (key: string) => <Mention module={module} keyText={key} onFollow={follow} broken={broken} />;
+  const mention = (key: string) => <Mention module={module} keyText={key} onFollow={follow} broken={broken} line={line} />;
   if (kw === "model") {
     const [key, range] = rest;
     const [lo, hi] = (range ?? "1").split("..");
@@ -67,7 +76,7 @@ function Value({ module, text, follow, broken }: { module: string; text: string;
     const [key, n, , def] = rest;
     return <><strong>{title(key)}</strong><span className="d-muted">choose {n}, default</span>{mention(def)}</>;
   }
-  if (kw === "use") return <>{mention(rest[0])}{(() => { const id = resolve(module, rest[0]); const cost = id ? lookupRow(id)?.row.cost : undefined; return cost !== undefined && !broken ? <span className="d-muted">{cost} pts</span> : <span className="d-muted">2 pts</span>; })()}</>;
+  if (kw === "use") return <>{mention(rest[0])}{(() => { const id = resolve(module, rest[0]); const cost = id ? lookupRow(id)?.row.cost : undefined; return cost !== undefined && !broken ? <span className="d-muted">{cost} pts</span> : broken ? <span className="d-muted">no cost: unresolved</span> : null; })()}</>;
   if (kw === "hide") {
     const target = args.match(/no\(([\w-]+)/)?.[1] ?? "";
     return <><span className="mono">no(</span>{mention(target)}<span className="mono">in force, deep)</span></>;
@@ -94,7 +103,7 @@ function ProfileTable({ text }: { text: string }) {
 
 /** Statement lines of one entry as page blocks (props lines are drawn in the properties block instead). */
 export function Blocks({ module, decl, sel, flags, follow, folded: initialFolded = [], after, brokenLines = [] }: {
-  module: ModuleText; decl: number; sel?: PageSel; flags?: Record<number, DiagKind>; follow?: (id: string, from: HTMLElement) => void;
+  module: ModuleText; decl: number; sel?: PageSel; flags?: Record<number, DiagKind>; follow?: Follow;
   folded?: number[]; after?: Record<number, ReactNode>; brokenLines?: number[];
 }) {
   const [folded, setFolded] = useState<ReadonlySet<number>>(new Set(initialFolded));
@@ -131,7 +140,7 @@ export function Blocks({ module, decl, sel, flags, follow, folded: initialFolded
             {isFolded ? <ChevronRight size={14} /> : <ChevronDown size={14} />}
           </button>
         ) : <span className="d-tog-space" />}
-        {kw === "profile" ? <ProfileTable text={text} /> : <><span className="d-kw">{kwLabel}</span><Value module={module.id} text={text} follow={follow} broken={brokenLines.includes(n)} /></>}
+        {kw === "profile" ? <ProfileTable text={text} /> : <><span className="d-kw">{kwLabel}</span><Value module={module.id} text={text} follow={follow} broken={brokenLines.includes(n)} line={n} /></>}
         {sel ? <span className="cg-lineno" aria-label={`Line ${n}`}>{n}</span> : null}
       </div>,
     );
@@ -157,7 +166,7 @@ export function propLines(module: ModuleText, decl: number) {
 
 /** The page: D's title, backlinks and properties for the entry, then its statements as linked blocks. */
 export function LinkedPage({ id, module, sel, flags, follow, folded, after, onBacklinks, brokenLines, noTail }: {
-  id: string; module: ModuleText; sel?: PageSel; flags?: Record<number, DiagKind>; follow?: (id: string, from: HTMLElement) => void; folded?: number[];
+  id: string; module: ModuleText; sel?: PageSel; flags?: Record<number, DiagKind>; follow?: Follow; folded?: number[];
   after?: Record<number, ReactNode>; onBacklinks?: () => void; brokenLines?: number[]; noTail?: boolean;
 }) {
   const page = pageFor(id);

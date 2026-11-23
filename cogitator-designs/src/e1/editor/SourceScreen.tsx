@@ -169,7 +169,7 @@ export function SourceScreen({ mode, state = "split", interactive }: { mode: Mod
     <div className="cg-split-page" aria-label="Page">
       {view === "split" ? <Pill issues={pageIssues} className="cg-split-pill" /> : null}
       <div className="d-doc">
-        <LinkedPage key={entry} id={entry} module={pageModule} flags={flagsFrom(placed)} follow={(id) => openEntry(id)} folded={s === "split" || s === "large" ? [lineOf(ironWardens, "upgrade banner ..1")] : []}
+        <LinkedPage key={entry} id={entry} module={pageModule} flags={flagsFrom(placed)} follow={({ id }) => { if (id) openEntry(id); }} folded={s === "split" || s === "large" ? [lineOf(ironWardens, "upgrade banner ..1")] : []}
           sel={{ line: sel && decl && entryAt(pageModule, sel) === entry ? sel : null, onSelect: selectBlock }} brokenLines={resolved.has("d1") ? [] : [lineOf(frostWardens, "use iron-wardens:halbred")]} noTail={view === "split"} />
       </div>
     </div>
@@ -204,7 +204,7 @@ export function SourceScreen({ mode, state = "split", interactive }: { mode: Mod
           {narrow ? <p className="cg-narrow-note"><PanelLeftClose size={13} />Page and text side by side need {SPLIT_MIN} px; this window is {width} px, so Source switches between them.</p> : null}
           {view === "page" ? (
             <div className="d-scroll helper-floating">
-              <div className="d-doc"><LinkedPage key={entry} id={entry} module={pageModule} flags={flagsFrom(placed)} follow={(id) => openEntry(id)} brokenLines={resolved.has("d1") ? [] : [lineOf(frostWardens, "use iron-wardens:halbred")]} /></div>
+              <div className="d-doc"><LinkedPage key={entry} id={entry} module={pageModule} flags={flagsFrom(placed)} follow={({ id }) => { if (id) openEntry(id); }} brokenLines={resolved.has("d1") ? [] : [lineOf(frostWardens, "use iron-wardens:halbred")]} /></div>
               {!narrow ? <HelperBox issues={pageIssues} resolved={resolved} elsewhere={open.length - pageIssues.length} checking="idle" onCollapse={() => undefined} onExpand={() => undefined} onFix={resolve} onUndo={() => undefined} onDiff={() => undefined} onAll={() => undefined} onChecks={() => undefined} onInsert={() => undefined} onProperties={() => undefined} /> : null}
             </div>
           ) : (

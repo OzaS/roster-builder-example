@@ -6,6 +6,8 @@ import { allDiagnostics, frostBroken, frostWardens, ironWardens, lineOf } from "
 import { CodeHead, CodeStatus, CodeView, type CodeMark } from "./code";
 import { Blocks } from "./page";
 import { DiagCard, FixMenu } from "./parts";
+import { BacklinksPanel, Peek, Unresolved } from "./ReferencesScreen";
+import { BackForward } from "./shell";
 import "./editor.css";
 
 /**
@@ -83,5 +85,33 @@ export const editorRenderers: Record<string, Renderer> = {
         </State>
       </div>
     ),
+  },
+  "editor.history": {
+    render: (_mode, platform) => (
+      <div className="cg-row-flex">
+        <State label="Back available, nothing forward"><div className="d-top cg-el-top"><BackForward back="Warden Squad" /><span className="d-crumbs">Demo Skirmish<span>/</span>Shield Wall</span></div></State>
+        <State label="Both available"><div className="d-top cg-el-top"><BackForward back="Warden Squad" forward="Spear" /><span className="d-crumbs">Iron Wardens<span>/</span>Halberd</span></div></State>
+        <State label={`No history yet (${key(platform, "⌘[ / ⌘]", "Alt+Left / Alt+Right")})`}><div className="d-top cg-el-top"><BackForward /><span className="d-crumbs">Iron Wardens<span>/</span>Warden Squad</span></div></State>
+      </div>
+    ),
+  },
+  "editor.peek": {
+    wide: true,
+    render: () => (
+      <div className="cg-stack" style={{ width: 640 }}>
+        <State label="Page, editing in place" wide><Peek target="iron-wardens:spear" view="page" onView={() => undefined} onOpen={() => undefined} onClose={() => undefined} /></State>
+        <State label="Text" wide><Peek target="iron-wardens:spear" view="text" onView={() => undefined} onOpen={() => undefined} onClose={() => undefined} /></State>
+      </div>
+    ),
+  },
+  "editor.backlinks": {
+    paper: "surface",
+    render: () => (
+      <div className="cg-el-panel"><BacklinksPanel width={412} panelRef={{ current: null }} sel={1} onSel={() => undefined} onOpen={() => undefined} onClose={() => undefined} /></div>
+    ),
+  },
+  "editor.unresolved": {
+    paper: "none",
+    render: () => <div className="cg-el-pop"><Unresolved keyText="iron-wardens:halbred" onFix={() => undefined} onClose={() => undefined} /></div>,
   },
 };
