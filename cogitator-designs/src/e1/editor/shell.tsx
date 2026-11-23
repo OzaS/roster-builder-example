@@ -1,5 +1,5 @@
 import { ArrowLeft, ArrowRight, Bell, ChevronDown, ChevronRight, CircleAlert, FileText, Layers, Maximize2, Plus, Search, SlidersHorizontal, Table2, X } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { TrafficLights } from "../../frames";
 import { DiagIcon, KindIcon } from "../../glyphs";
 import { diagOne } from "../../sample";
@@ -19,12 +19,32 @@ import "./editor.css";
 export type Mode = "light" | "dark";
 
 /** The window: Direction D's frame (`.fc-window.fc-d.fc-cg`) with the platform and large-text hooks of the design language. */
-export function Win({ mode, width = layout.windowDesign, large, interactive = true, children, label }: { mode: Mode; width?: number; large?: boolean; interactive?: boolean; children: ReactNode; label?: string }) {
+export function Win({ mode, width = layout.windowDesign, large, interactive = true, children, label, onClaim }: { mode: Mode; width?: number; large?: boolean; interactive?: boolean; children: ReactNode; label?: string; onClaim?: () => void }) {
   return (
-    <div className={`fc-window fc-d fc-cg cg-ed ${mode}${interactive ? "" : " static"}`} style={{ width, height: layout.windowHeight }} data-text={large ? "large" : undefined} aria-label={label}>
+    <div className={`fc-window fc-d fc-cg cg-ed ${mode}${interactive ? "" : " static"}`} style={{ width, height: layout.windowHeight }} data-text={large ? "large" : undefined} aria-label={label}
+      onPointerDownCapture={onClaim} onFocusCapture={onClaim}>
       {children}
     </div>
   );
+}
+
+/**
+ * Window keys, as in Direction D: several windows can be on one gallery page, so the keyboard goes to the one used last
+ * (claimed by a pointer press or focus inside it; the first one mounted holds it until then). Returns the claim function.
+ */
+let activeWindow: string | null = null;
+export function useWindowKeys(interactive: boolean, handler: (event: KeyboardEvent) => void) {
+  const uid = useId();
+  const latest = useRef(handler);
+  latest.current = handler;
+  useEffect(() => {
+    if (!interactive) return;
+    if (activeWindow === null) activeWindow = uid;
+    const onKey = (event: KeyboardEvent) => { if (activeWindow === uid) latest.current(event); };
+    document.addEventListener("keydown", onKey);
+    return () => { document.removeEventListener("keydown", onKey); if (activeWindow === uid) activeWindow = null; };
+  }, [interactive, uid]);
+  return () => { if (interactive) activeWindow = uid; };
 }
 
 export type SideProps = {

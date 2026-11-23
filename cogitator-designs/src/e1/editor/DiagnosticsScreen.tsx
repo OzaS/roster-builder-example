@@ -1,12 +1,12 @@
 import { Check, CheckCheck, ChevronDown, Code2, Copy, CornerDownLeft, FileDiff, Play, RefreshCw, Search, Undo2, X } from "lucide-react";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { DiagIcon, KindIcon } from "../../glyphs";
 import { diagOne, type DiagKind, type Diagnostic } from "../../sample";
 import { lookupRow, sourceOfEntry } from "../../directions/direction-d-content";
 import { allDiagnostics, kindHeading, kindOrder, modulesById, place, plain } from "./data";
 import { CodeView } from "./code";
 import { code } from "./parts";
-import { BackForward, EditorGrid, Sidebar, Win, type Mode } from "./shell";
+import { BackForward, EditorGrid, Sidebar, Win, type Mode, useWindowKeys } from "./shell";
 
 /**
  * Screen 3: the diagnostics inbox. The sidebar's Updates opens it as a full view in place of the list and the page
@@ -86,9 +86,7 @@ export function DiagnosticsScreen({ mode, state = "inbox", interactive }: { mode
     enter: () => { if (sel?.entry) setOpened(sel.entryName); },
     fix: () => { if (sel && sel.kind !== "preservation" && !resolved.has(sel.id)) resolve([sel.id]); },
   };
-  useEffect(() => {
-    if (!interactive) return;
-    const onKey = (event: KeyboardEvent) => {
+  const claim = useWindowKeys(interactive, (event: KeyboardEvent) => {
       if ((event.target as HTMLElement).tagName === "INPUT") return;
       if (event.metaKey && event.shiftKey && event.key.toLowerCase() === "c") { event.preventDefault(); keys.current.run(); return; }
       if (event.key === "ArrowDown" || event.key === "j") { event.preventDefault(); keys.current.move(1); }
@@ -96,10 +94,7 @@ export function DiagnosticsScreen({ mode, state = "inbox", interactive }: { mode
       if (event.key === "Enter" && event.altKey) { event.preventDefault(); keys.current.fix(); return; }
       if (event.key === "Enter") keys.current.enter();
       if (event.key === "Escape") { setMenu(null); setOpened(null); }
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [interactive]);
+  });
 
   const all = open.length === 0;
   const options = {
@@ -156,7 +151,7 @@ export function DiagnosticsScreen({ mode, state = "inbox", interactive }: { mode
   });
 
   return (
-    <Win mode={mode} interactive={interactive}>
+    <Win mode={mode} interactive={interactive} onClaim={claim}>
       <EditorGrid side={<Sidebar active="updates" updates={open.length} entry={null} source={null} foot={stale ? <><span className="d-dot cg-dot-warn" />Edited since the check</> : undefined} />}>
         <main className="d-main" aria-label="Updates">
           <header className="d-top">

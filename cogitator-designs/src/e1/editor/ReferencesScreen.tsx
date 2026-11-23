@@ -1,5 +1,5 @@
 import { ArrowDownLeft, CircleAlert, Code2, CornerDownLeft, FileText, Focus, PictureInPicture2, Plus, Wrench, X } from "lucide-react";
-import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type ReactNode, type RefObject } from "react";
+import { useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type ReactNode, type RefObject } from "react";
 import { DiagIcon, KindIcon } from "../../glyphs";
 import { backlinks, type Diagnostic } from "../../sample";
 import { DContext, M, lookupRow, pageFor, sourceById, sourceOfEntry } from "../../directions/direction-d-content";
@@ -8,7 +8,7 @@ import { allDiagnostics, blockEnd, frostWardens, houseRules, ironWardens, lineOf
 import { CodeHead, CodeView, SynText } from "./code";
 import { Blocks, flagsFrom, LinkedPage, propLines, type Follow } from "./page";
 import { Pill } from "./parts";
-import { BackForward, EditorGrid, Sidebar, SourceList, Win, type Mode } from "./shell";
+import { BackForward, EditorGrid, Sidebar, SourceList, Win, type Mode, useWindowKeys } from "./shell";
 
 /**
  * Screen 2: go to definition, peek and backlinks. Following a reference keeps a history (Back / Forward, ⌘[ / ⌘]) and
@@ -62,17 +62,12 @@ export function ReferencesScreen({ mode, state = "definition", interactive }: { 
     esc: () => { if (unresolved) { setUnresolved(null); return true; } if (peek) { setPeek(null); return true; } if (panel) { setPanel(false); return true; } return false; },
     backlinks: () => { setPanel(true); setLinkSel(0); requestAnimationFrame(() => panelRef.current?.querySelector<HTMLElement>(".cg-bl.sel")?.focus()); },
   };
-  useEffect(() => {
-    if (!interactive) return;
-    const onKey = (event: KeyboardEvent) => {
+  const claim = useWindowKeys(interactive, (event: KeyboardEvent) => {
       if (event.metaKey && event.key === "[") { event.preventDefault(); keys.current.goBack(); }
       if (event.metaKey && event.key === "]") { event.preventDefault(); keys.current.goForward(); }
       if (event.key === "F12" && event.shiftKey) { event.preventDefault(); keys.current.backlinks(); }
       if (event.key === "Escape" && keys.current.esc()) event.preventDefault();
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [interactive]);
+  });
 
   const resolved = new Set(fixed ? ["d1"] : []);
   const open = allDiagnostics.filter((d) => !resolved.has(d.id));
@@ -118,7 +113,7 @@ export function ReferencesScreen({ mode, state = "definition", interactive }: { 
   }
 
   return (
-    <Win mode={mode} interactive={interactive}>
+    <Win mode={mode} interactive={interactive} onClaim={claim}>
       <DContext.Provider value={{ open: (id) => go({ kind: "entry", id }), resolved }}>
         <EditorGrid panelWidth={panelW}
           side={<Sidebar source={listSource} entry={entryId} updates={open.length} onEntry={(id) => go({ kind: "entry", id })} onSource={(id) => setListSource(id)} />}

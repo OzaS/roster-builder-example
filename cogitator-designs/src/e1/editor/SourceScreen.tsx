@@ -1,5 +1,5 @@
 import { CircleAlert, Code2, Columns2, FileText, Focus, PanelLeftClose, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { TrafficLights } from "../../frames";
 import { DiagIcon } from "../../glyphs";
 import { sourceById, sourceOfEntry } from "../../directions/direction-d-content";
@@ -9,7 +9,7 @@ import { allDiagnostics, blockEnd, frostBroken, frostWardens, ironWardens, lineO
 import { CodeHead, CodeStatus, CodeView, type CodeCaret, type CodeMark, type CodePop } from "./code";
 import { declOf, entryAt, flagsFrom, LinkedPage } from "./page";
 import { DiagCard, FixMenu, Pill } from "./parts";
-import { BackForward, EditorGrid, Sidebar, SourceList, Win, type Mode } from "./shell";
+import { BackForward, EditorGrid, Sidebar, SourceList, Win, type Mode, useWindowKeys } from "./shell";
 
 /**
  * Screen 1: source text beside the page. Source (⌘⌥U) splits the page area: the entry page on the left, its module's
@@ -89,16 +89,11 @@ export function SourceScreen({ mode, state = "split", interactive }: { mode: Mod
   };
 
   /* ⌘⌥U toggles the text; ⌥↵ opens the quick fixes at the caret; Esc closes the menu. */
-  useEffect(() => {
-    if (!interactive) return;
-    const onKey = (event: KeyboardEvent) => {
+  const claim = useWindowKeys(interactive, (event: KeyboardEvent) => {
       if (event.metaKey && event.altKey && event.code === "KeyU") { event.preventDefault(); setView((v) => (v === "page" ? (narrow ? "text" : "split") : "page")); }
       if (event.altKey && event.key === "Enter") { event.preventDefault(); setMenu(true); }
       if (event.key === "Escape") setMenu(false);
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [interactive, narrow]);
+  });
 
   const caretDiags = caret ? placed.filter((p) => p.line === caret.line && (p.kind !== "preservation")) : [];
   const hoverDiag = hover ? placed.filter((p) => p.id === hover || (p.line === placed.find((x) => x.id === hover)?.line)) : [];
@@ -178,7 +173,7 @@ export function SourceScreen({ mode, state = "split", interactive }: { mode: Mod
   const crumbs = sourceOfEntry(entry)?.name ?? "Dataset";
   const list = listOpen && !narrow ? sourceById(module.id) : undefined;
   return (
-    <Win mode={mode} width={width} large={s === "large"} interactive={interactive}>
+    <Win mode={mode} width={width} large={s === "large"} interactive={interactive} onClaim={claim}>
       <EditorGrid hideSide={narrow}
         side={<Sidebar source={list ? module.id : null} entry={entry} updates={open.length} broken={broken ? "frost-wardens" : undefined} onEntry={openEntry} onSource={(id) => { if (id === "iron-wardens" || id === "frost-wardens") { setModuleId(id); setListOpen(true); setView((v) => (v === "split" ? "text" : v)); } }}
           foot={broken ? <><span className="d-dot cg-dot-err" />Saved · 1 parse error</> : undefined} />}

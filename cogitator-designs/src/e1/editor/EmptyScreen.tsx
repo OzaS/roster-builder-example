@@ -1,9 +1,9 @@
 import { ArrowDownLeft, ChevronDown, Code2, FileText, Focus, Layers, Maximize2, Plus, Search, SlidersHorizontal, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { KindIcon } from "../../glyphs";
 import { allDiagnostics } from "./data";
 import { CodeView } from "./code";
-import { BackForward, EditorGrid, Sidebar, Win, type Mode } from "./shell";
+import { BackForward, EditorGrid, Sidebar, Win, type Mode, useWindowKeys } from "./shell";
 import { layout } from "../../language/layout";
 
 /**
@@ -25,16 +25,11 @@ export function EmptyScreen({ mode, state = "no-entries", interactive }: { mode:
   const [slash, setSlash] = useState(false);
   const input = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (!interactive) return;
-    const onKey = (event: KeyboardEvent) => {
+  const claim = useWindowKeys(interactive, (event: KeyboardEvent) => {
       if (event.metaKey && event.key.toLowerCase() === "k") { event.preventDefault(); setPalette(true); }
       if (event.metaKey && event.key.toLowerCase() === "n") { event.preventDefault(); setCreated(false); setDrafting(true); requestAnimationFrame(() => input.current?.focus()); }
       if (event.key === "Escape") { setPalette(false); setSlash(false); }
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [interactive]);
+  });
 
   const create = () => { if (keyOk(key)) { setCreated(true); setDrafting(false); } };
   const name = key.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
@@ -131,7 +126,7 @@ export function EmptyScreen({ mode, state = "no-entries", interactive }: { mode:
   );
 
   return (
-    <Win mode={mode} interactive={interactive}>
+    <Win mode={mode} interactive={interactive} onClaim={claim}>
       <EditorGrid
         side={<Sidebar source="ember-guard" entry={created ? `ember-guard:${key}` : null} updates={allDiagnostics.length} active={palette ? "search" : null} onSearch={() => setPalette(true)} extra={{ id: "ember-guard", name: "Ember Guard", rows: created ? [{ id: `ember-guard:${key}`, name: key }] : [] }} />}
         list={list}>
