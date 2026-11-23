@@ -27,6 +27,9 @@ export const layout = {
   windowDesign: 1440,
   windowHeight: 900,
   windowMin: 960,
+  /** The dataset runner docked beside the page (E1 part 2): resizable by its left edge; the source list folds while it is open. */
+  runner: 728,
+  runnerMin: 560,
 } as const;
 
 /**

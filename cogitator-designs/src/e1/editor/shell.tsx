@@ -48,8 +48,8 @@ export function useWindowKeys(interactive: boolean, handler: (event: KeyboardEve
 }
 
 export type SideProps = {
-  /** Which top item is active (Search, Updates). */
-  active?: "search" | "updates" | null;
+  /** Which top item is active (Search, Updates, Layers). */
+  active?: "search" | "updates" | "layers" | null;
   /** The source shown in the list (tint), the entry open on the page (bold). */
   source?: string | null;
   entry?: string | null;
@@ -63,10 +63,13 @@ export type SideProps = {
   foot?: ReactNode;
   /** A source this mock adds (a new, empty catalogue), drawn after D's sources. */
   extra?: { id: string; name: string; rows: { id: string; name: string }[] };
+  /** The Layers item's count (default "3 of 4") and what it opens (the layer stack, E1 part 2). */
+  layers?: ReactNode;
+  onLayers?: () => void;
 };
 
 /** D's sidebar (B): dataset switcher, Search, Updates, Layers, the source tree, tables, text pack. */
-export function Sidebar({ active, source, entry, updates, broken, onUpdates, onSearch, onSource, onEntry, foot, extra }: SideProps) {
+export function Sidebar({ active, source, entry, updates, broken, onUpdates, onSearch, onSource, onEntry, foot, extra, layers, onLayers }: SideProps) {
   const [expanded, setExpanded] = useState<ReadonlySet<string>>(new Set([entry?.split(":")[0] ?? "iron-wardens"]));
   return (
     <aside className="d-side" aria-label="Dataset sidebar">
@@ -75,7 +78,7 @@ export function Sidebar({ active, source, entry, updates, broken, onUpdates, onS
         <button type="button" className="d-ws" title="Switch dataset"><span className="d-ws-mark">D</span><strong>Demo Skirmish</strong><ChevronDown size={14} /></button>
         <button type="button" className={`d-item${active === "search" ? " active" : ""}`} onClick={onSearch} title="Search entries and commands (⌘K)"><Search size={15} />Search<kbd>⌘K</kbd></button>
         <button type="button" className={`d-item${active === "updates" ? " active" : ""}`} onClick={onUpdates} aria-pressed={active === "updates"} title="Open the diagnostics inbox (⌘⇧U)"><Bell size={15} />Updates{updates ? <span className="d-count">{updates}</span> : <span className="d-muted">None</span>}</button>
-        <button type="button" className="d-item"><Layers size={15} />Layers<span className="d-muted">3 of 4</span></button>
+        <button type="button" className={`d-item${active === "layers" ? " active" : ""}`} onClick={onLayers}><Layers size={15} />Layers<span className="d-muted">{layers ?? "3 of 4"}</span></button>
 
         <h3>Sources</h3>
         {sources.map((s) => {
