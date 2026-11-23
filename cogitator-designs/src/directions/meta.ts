@@ -1,0 +1,70 @@
+/** The three directions of the D4 mood board: what each optimises for and what it costs. All Proposals. */
+export type DirectionId = "a" | "b" | "c";
+
+export type DirectionMeta = {
+  id: DirectionId;
+  letter: string;
+  title: string;
+  item: string;
+  oneLine: string;
+  optimises: string[];
+  costs: string[];
+  rows: string;
+};
+
+export const directions: DirectionMeta[] = [
+  {
+    id: "a",
+    letter: "A",
+    title: "Linear-first",
+    item: "cg-direction-a",
+    oneLine: "A dense entry list beside a detail view with a properties panel; diagnostics are an inbox you triage.",
+    optimises: [
+      "Scanning and triage: 20 entry rows in view (27 with group headings), with cost, layer-change and diagnostic columns.",
+      "Keyboard flow: j / k through the list, Enter opens, single-key properties (C cost, L layer).",
+      "Diagnostics as work: an inbox grouped by kind, each item marked done or snoozed.",
+    ],
+    costs: [
+      "The entry body reads as a form, not as the DKLPO text authors think in; nested statements lose their shape.",
+      "Three columns leave the detail about 530 px wide; long rule text wraps hard.",
+      "Close to an issue tracker: authors may expect assignees and states that a dataset doesn't have.",
+    ],
+    rows: "20 entry rows in the list, 6 content lines and 3 backlinks in the detail",
+  },
+  {
+    id: "b",
+    letter: "B",
+    title: "Notion-first",
+    item: "cg-direction-b",
+    oneLine: "Each entry is a document page: properties block, statements as blocks and toggles, mentions, / insert, backlinks; table views in the sidebar.",
+    optimises: [
+      "Reading and writing one entry: the page shows the whole entry in file order, nested children as toggles.",
+      "References: every reference is a mention with a peek; backlinks sit under the title.",
+      "Learning the format: the / menu lists the statements that are valid at the cursor.",
+    ],
+    costs: [
+      "Fewer rows in view: the page tree shows 8 entries, and the page one entry at a time.",
+      "Diagnostics are margin notes beside their block and a list under Updates; there is no inbox to triage the whole dataset beside the work.",
+      "Free-form expectations: a page invites layouts the grammar can't hold, so the editor must refuse them politely.",
+    ],
+    rows: "8 entries in the page tree, 10 body blocks, 2 margin notes",
+  },
+  {
+    id: "c",
+    letter: "C",
+    title: "Augur blend",
+    item: "cg-direction-c",
+    oneLine: "Battle Augur desktop panes and tokens, Linear speed (palette, inbox, keys), the entry as a Notion-style page.",
+    optimises: [
+      "One family with Battle Augur: frames, tokens, tree and inspector, status edges, aligned cost column.",
+      "Both views at once: a tree with 20 rows and status edges, the entry as a page, the issues inbox beside it.",
+      "Layers in plain sight: the stack in the tree header, layer changes marked on rows and values.",
+    ],
+    costs: [
+      "Busiest of the three: three panes plus tabs; the inspector needs to collapse below 1280 px.",
+      "Two models to learn: blocks for the entry, rows for everything else.",
+      "Inherits Augur's roster habits (cost column, edges) that must be re-read for data authors.",
+    ],
+    rows: "20 tree rows plus the 4-layer stack, 8 statement lines, 7 issues",
+  },
+];

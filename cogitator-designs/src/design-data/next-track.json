@@ -1,4 +1,35 @@
 {
   "about": "The Field Cogitator Next track: designed but not yet built. Each item is a Proposal until the user approves it; implementation takes only Approved items. Same rules as the Battle Augur gallery (DEC-074 in the Battle Augur docs).",
-  "items": []
+  "items": [
+    {
+      "id": "cg-direction-a",
+      "title": "Direction A: Linear-first",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "entry-editor-a",
+      "summary": "Entry editor as a dense grouped entry list beside a detail view with a properties panel; diagnostics are an inbox (D4 mood board).",
+      "source": "D4 step 1, mood board (2026-11-22)"
+    },
+    {
+      "id": "cg-direction-b",
+      "title": "Direction B: Notion-first",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "entry-editor-b",
+      "summary": "Entry editor as a document page: properties block, statements as blocks and toggles, mentions with peek, / insert, backlinks; diagnostics as margin notes (D4 mood board).",
+      "source": "D4 step 1, mood board (2026-11-22)"
+    },
+    {
+      "id": "cg-direction-c",
+      "title": "Direction C: Augur blend",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "entry-editor-c",
+      "summary": "Entry editor in Battle Augur desktop panes and tokens (tree with status edges and cost column, inspector), Linear speed (palette, issues inbox, keys) and the entry as a Notion-style page. Recommended (D4 mood board).",
+      "source": "D4 step 1, mood board (2026-11-22)"
+    }
+  ]
 }
