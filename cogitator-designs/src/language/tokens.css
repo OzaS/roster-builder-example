@@ -152,6 +152,30 @@
   --cg-elev-window: 0 24px 60px rgb(0 0 0 / .5), 0 0 0 .5px rgb(255 255 255 / .1);
 }
 
+/*
+ * ---------- Syntax colours (the source text editor, E1 screens part B) ----------
+ * DKLPO text: statement keywords, declaration keys, references (the mention accent, so a reference reads the same in the
+ * page and in the text), strings and text values, comments, numbers and ranges. Each passes 4.5:1 on the pane in its theme.
+ * Diagnostics never use these: they keep the status colours (underline + gutter icon).
+ */
+.fc-cg {
+  --cg-syntax-keyword: #7b3fb0;
+  --cg-syntax-key: var(--cg-ink);
+  --cg-syntax-ref: var(--cg-accent-text);
+  --cg-syntax-string: #3a7428;
+  --cg-syntax-comment: var(--cg-muted);
+  --cg-syntax-number: #a8336a;
+  --cg-syntax-punct: var(--cg-muted);
+  /* The text editor's line height (relative, so it grows with large text) and its gutter. */
+  --cg-code-leading: 1.65;
+  --cg-code-gutter: 5ch;
+}
+.fc-cg.dark {
+  --cg-syntax-keyword: #c7a2f2;
+  --cg-syntax-string: #a3d68e;
+  --cg-syntax-number: #f39cc4;
+}
+
 /* ---------- Platform layer: Windows (Segoe UI Variable, 14 px working text, 4 / 8 px corners, explicit pressed and focus) ---------- */
 .fc-cg[data-platform="windows"] {
   --cg-font: "Segoe UI Variable Text", "Segoe UI Variable", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;

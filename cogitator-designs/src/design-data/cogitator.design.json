@@ -19,6 +19,7 @@
       { "id": "elevation", "title": "Elevation", "tokens": ["--cg-elev-thumb", "--cg-elev-pill", "--cg-elev-box", "--cg-elev-popover", "--cg-elev-menu", "--cg-elev-dialog", "--cg-elev-window"], "note": "Only floating things are raised: pill, helper box, popovers, menus, palette, dialogs (no-card rule)." },
       { "id": "motion", "title": "Motion", "tokens": ["--cg-motion-fast", "--cg-motion-layout", "--cg-ease"], "note": "Layout changes 0.2 s, small feedback 0.12 s; zero with reduced motion." },
       { "id": "focus", "title": "Focus", "tokens": ["--cg-focus-width", "--cg-focus-color", "--cg-focus-offset"], "platforms": { "mac": "2 px accent ring inside the control", "windows": "2 px ink ring 1 px outside the control" } },
+      {"id": "syntax", "title": "Syntax colours", "tokens": ["--cg-syntax-keyword", "--cg-syntax-key", "--cg-syntax-ref", "--cg-syntax-string", "--cg-syntax-comment", "--cg-syntax-number", "--cg-syntax-punct", "--cg-code-leading", "--cg-code-gutter"], "themes": ["light", "dark"], "note": "DKLPO text in the source editor (E1 part B): keywords, declaration keys (ink, weight 600), references (the mention accent), strings and text values, comments (italic), numbers and ranges. Each 4.5:1 or more on the pane in its theme; diagnostics keep the status colours."},
       { "id": "layout", "title": "Layout", "file": "src/language/layout.ts", "values": { "sidebar": 232, "sourceList": 318, "sourceListFocus": 348, "pageMin": 480, "pageMax": 760, "panel": 328, "panelMin": 260, "panelMax": 520, "helperBox": 276, "windowMin": 960 }, "collapseOrder": ["Below 1358 px: helper panel becomes the floating box", "Below 1322 px: floating box becomes the pill", "Below 1030 px: sidebar hides (focus-mode layout)", "960 px: minimum window width"] }
     ]
   },
@@ -94,7 +95,19 @@
         "entries": [
           { "id": "check.large-text", "title": "Large text (1.25×)", "from": "New rule for Direction D's rows", "platforms": ["mac", "windows"], "states": ["default", "large"], "summary": "Working text at 1.25×: rows grow from a minimum height, names wrap instead of truncating, costs keep their right-aligned column, property labels wrap." }
         ]
+      },
+      {
+        "id": "editor", "title": "Source text editor",
+        "entries": [
+          {"id": "editor.code", "title": "Code editor with gutter", "from": "New (E1 part B), drawn from the tokens", "platforms": ["mac"], "states": ["default", "selected block", "caret line", "error underline", "preservation underline", "suggestion underline", "parse error inline"], "summary": "Mono text with line numbers, a diagnostics gutter (the kind's icon), DKLPO syntax colours (--cg-syntax-*), underlines that differ by shape (error wavy, preservation dashed, suggestion dotted), the lines of the block selected on the page tinted with an accent edge, the caret line in the hover fill. A parse error shows under its line with its fix, edged like a flagged block."},
+          {"id": "editor.text-chrome", "title": "Text header and status line", "from": "New (E1 part B)", "platforms": ["mac"], "states": ["header", "fmt clean", "fmt would change", "doesn't parse"], "summary": "Header: the file in mono, where the selection is, the view buttons (Text only / Page beside, close). Status line on the surface paper: counts by kind, caret position, fmt state (dot in OK green, amber or red), UTF-8, LF, indentation, DKLPO version."},
+          {"id": "editor.diag-card", "title": "Diagnostic hover card and quick-fix menu", "from": "New (E1 part B); the menu is the context menu primitive", "platforms": ["mac", "windows"], "states": ["one diagnostic", "two on a line", "quick-fix menu"], "summary": "Hovering an underline shows a popover with the kind, the code, the message and the fix as a button (the first fix primary, ⌥↵ / Alt+Enter). ⌥↵ at the caret opens the quick fixes as a menu: the first fix selected, the rest as verbs with targets."},
+          {"id": "editor.linked-block", "title": "Linked statement block", "from": "Direction D's statement block, plus the line link", "platforms": ["mac"], "states": ["selected with its lines", "flagged", "line number"], "summary": "In the split view a block is selected together with its lines: the block and its children take the selection tint and show their line number at the right edge; a flagged block keeps its status edge."}
+        ]
       }
     ]
-  }
+  },
+  "screens": [
+    {"id": "e1-editor-source", "title": "Source text beside the page", "item": "cg-e1-editor-source", "group": "Edit", "states": ["split", "text-only", "error", "parse-error", "large", "narrow"], "summary": "Source (⌘⌥U) splits the page area into the entry page and its module's DKLPO text, synced both ways; text editor with gutter, syntax colours, diagnostic underlines, hover card, quick-fix menu (⌥↵) and status line. The split needs 1000 px of page area: the source list folds away while it is open, and in a 960 px window Source switches between page and text. A module that doesn't parse opens as text only.", "workflows": ["Read an entry's text beside its page and select a statement in either", "Fix an unknown reference from the quick-fix menu", "Fix a parse error; the module's pages come back once it parses"]}
+  ]
 }

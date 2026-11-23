@@ -11,6 +11,7 @@ import { Blk, M, TableBlk, issuesFor, pageFor } from "../directions/direction-d-
 import { HelperBox } from "../directions/DirectionD";
 import { Matrix, State, type Mode, type Platform } from "../language/Specimen";
 import { diagOne, entry, type DiagKind, type Kind } from "../sample";
+import { editorRenderers } from "../e1/editor/elements";
 
 /* ---------- Small helpers ---------- */
 
@@ -532,7 +533,7 @@ export function ElementsPage() {
         <section key={section.id} id={section.id} className="cg-lang-section">
           <h2>{section.title}</h2>
           {section.entries.map((item) => {
-            const renderer = renderers[item.id];
+            const renderer = renderers[item.id] ?? editorRenderers[item.id];
             const platforms = item.platforms.filter((p): p is Platform => p === "mac" || p === "windows");
             return (
               <div key={item.id} id={item.id} className="cg-el">

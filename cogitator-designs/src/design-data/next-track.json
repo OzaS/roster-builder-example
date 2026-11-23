@@ -58,6 +58,16 @@
       "platforms": ["desktop"],
       "summary": "Every primitive Direction D uses, live from the tokens, in light and dark and on macOS and Windows where they differ, with states side by side; new: Windows window frame (caption buttons), command palette (⌘K), context menu, the large text rule for rows. Entries listed in cogitator.design.json (elements.sections). Gallery page ?page=elements.",
       "source": "D4 step 2, design language (2026-11-22)"
+    },
+    {
+      "id": "cg-e1-editor-source",
+      "title": "E1: Source text beside the page",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "e1-editor-source",
+      "summary": "Source (⌘⌥U) splits the editor into the entry page and its DKLPO text, synced both ways; text editor with line numbers, syntax colours, diagnostic gutter and underlines, hover card, quick-fix menu (⌥↵) and status line; a module that doesn't parse opens as text only. States: split, text only, unknown reference, parse error, large text, 960 px.",
+      "source": "D4 step 3a, E1 screens (2026-11-22)"
     }
   ]
 }
