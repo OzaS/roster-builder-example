@@ -13,7 +13,7 @@
 .fc-cg .cg-rn-head strong { font-weight: 600; }
 .fc-cg .cg-rn-mark { color: var(--cg-accent-text); }
 .fc-cg .cg-rn-statuswrap { position: relative; display: inline-flex; margin-left: 4px; }
-.fc-cg .cg-rn-status { gap: 6px; height: var(--cg-control-sm); padding: 0 6px 0 8px; border-radius: var(--cg-radius-pill); background: var(--cg-hover); color: var(--cg-ink); font-size: var(--cg-text-small); font-variant-numeric: tabular-nums; }
+.fc-cg .cg-rn-status { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; height: var(--cg-control-sm); padding: 0 6px 0 8px; border-radius: var(--cg-radius-pill); background: var(--cg-hover); color: var(--cg-ink); font-size: var(--cg-text-small); font-variant-numeric: tabular-nums; }
 .fc-cg .cg-rn-status:hover { background: var(--cg-press); }
 .fc-cg .cg-rn-status > svg:last-child { color: var(--cg-muted); }
 .fc-cg .cg-rn-status.error { background: var(--cg-flag-error); color: var(--cg-status-error); font-weight: 500; }
@@ -181,3 +181,4 @@
 .fc-cg .cg-rn-menu .cg-menu-item { display: flex; white-space: nowrap; }
 .fc-cg .cg-rn-menu .cg-menu-item.two { white-space: normal; }
 .fc-d .d-icon.cg-rn-on { background: var(--cg-select); color: var(--cg-accent-text); }
+.fc-spec .cg-rn-banner { margin: 0; }

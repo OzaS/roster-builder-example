@@ -125,6 +125,7 @@
 .fc-cg .cg-ly-bar > svg { color: var(--cg-accent-text); }
 .fc-cg .cg-ly-bar strong { font-weight: 600; }
 .fc-cg .cg-ly-bar .cg-seg { background: color-mix(in srgb, var(--cg-pane) 60%, transparent); }
+.fc-cg .cg-ly-bar .cg-seg button { white-space: nowrap; }
 .fc-cg .cg-ly-barnote { display: flex; align-items: center; gap: 6px; margin: 0 0 10px; padding: 0 2px 0 10px; color: var(--cg-muted); font-size: var(--cg-text-small); }
 .fc-cg .cg-ly-barnote .d-icon { margin-left: auto; }
 /* A changed row: an accent edge; the value carries the struck base value and the layer chip */
@@ -144,3 +145,5 @@
 .fc-cg .cg-ly-card-op > .mono { color: var(--cg-muted); }
 .fc-cg .cg-ly-card-note { color: var(--cg-muted); }
 .fc-cg .cg-ly-card .cg-hc-actions { align-items: center; }
+/* Elements view: the card drawn in place. */
+.fc-spec .cg-ly-card { position: relative; left: auto; top: auto; }
