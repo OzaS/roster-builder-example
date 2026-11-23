@@ -58,6 +58,86 @@
       "platforms": ["desktop"],
       "summary": "Every primitive Direction D uses, live from the tokens, in light and dark and on macOS and Windows where they differ, with states side by side; new: Windows window frame (caption buttons), command palette (⌘K), context menu, the large text rule for rows. Entries listed in cogitator.design.json (elements.sections). Gallery page ?page=elements.",
       "source": "D4 step 2, design language (2026-11-22)"
+    },
+    {
+      "id": "cg-e1-start-window",
+      "title": "E1 start window (recent datasets)",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "e1-start-window",
+      "summary": "What Field Cogitator shows with no dataset open: the app actions in the sidebar (Open folder…, Open file…, Convert from XML data…, the sample, Settings), recent datasets as dense rows with a status edge from the last check, a drop target; states recent, first run, opening (steps with counts and Cancel), missing on disk, 960 px and large text; macOS and Windows.",
+      "source": "D4 step 3a, E1 screens (2026-11-22)"
+    },
+    {
+      "id": "cg-e1-start-errors",
+      "title": "E1 open errors",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "e1-start-errors",
+      "summary": "Dialogs (sheets on macOS) over the start window when a dataset cannot be opened as is: not a dataset (Convert… for XML data files), newer DKLPO version (open read-only), files that do not parse (open anyway, they open as source text with their errors), folder not writable (open read-only or Save as…). One sentence, the folder, choices as verbs; Return = primary, Esc = Cancel; macOS and Windows.",
+      "source": "D4 step 3a, E1 screens (2026-11-22)"
+    },
+    {
+      "id": "cg-e1-start-editor-dialogs",
+      "title": "E1 window-level dialogs over the editor",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "e1-start-editor-dialogs",
+      "summary": "Over a static Direction D window: the dataset switcher popover (open dataset, recents, Open…, Convert…, Show in Finder, Close dataset), unsaved changes (Save / Don’t save / Cancel with the changed entries), a module changed on disk without and with unsaved edits (Reload / Keep mine / Compare), save failed (reason, Retry, Save as…). macOS.",
+      "source": "D4 step 3a, E1 screens (2026-11-22)"
+    },
+    {
+      "id": "cg-e1-start-settings",
+      "title": "E1 settings window",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "e1-start-settings",
+      "summary": "Settings: macOS ~720 px window with toolbar tabs and the classic preferences layout; Windows: Windows settings layout (navigation list, section title, label + help left, control right) in the app frame, without setting cards. General, Editor, Checking, Text, Appearance, Keyboard (read-only shortcut list), Command line (engine and tool versions). No accounts, sync or cloud.",
+      "source": "D4 step 3a, E1 screens (2026-11-22)"
+    },
+    {
+      "id": "cg-e1-editor-source",
+      "title": "E1: Source text beside the page",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "e1-editor-source",
+      "summary": "Source (⌘⌥U) splits the editor into the entry page and its DKLPO text, synced both ways; text editor with line numbers, syntax colours, diagnostic gutter and underlines, hover card, quick-fix menu (⌥↵) and status line; a module that doesn't parse opens as text only. States: split, text only, unknown reference, parse error, large text, 960 px.",
+      "source": "D4 step 3a, E1 screens (2026-11-22)"
+    },
+    {
+      "id": "cg-e1-editor-references",
+      "title": "E1: Go to definition, peek and backlinks",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "e1-editor-references",
+      "summary": "Following references: Go to definition with Back / Forward and breadcrumbs, an inline peek (page or text, editable in place), backlinks as a fourth tab of the helper panel grouped by source and layer, and an unresolved reference that offers its fix instead of navigating.",
+      "source": "D4 step 3a, E1 screens (2026-11-22)"
+    },
+    {
+      "id": "cg-e1-editor-diagnostics",
+      "title": "E1: Diagnostics inbox",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "e1-editor-diagnostics",
+      "summary": "The dataset's diagnostics as a full Linear-style inbox from the sidebar's Updates: grouped by kind, filter chips (source, layer, code), keyboard triage, a detail pane with the affected text or the export difference, bulk fix per suggestion code; out-of-date and no-issues states. The helper panel stays the quick view beside a page.",
+      "source": "D4 step 3a, E1 screens (2026-11-22)"
+    },
+    {
+      "id": "cg-e1-editor-empty",
+      "title": "E1: Editor empty states",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "e1-editor-empty",
+      "summary": "Empty states inside the editor: a source with no entries (inline New entry with its key), an entry with no statements (the / hint as the first block), a search with no result (the palette says what it searched and offers next steps).",
+      "source": "D4 step 3a, E1 screens (2026-11-22)"
     }
   ]
 }

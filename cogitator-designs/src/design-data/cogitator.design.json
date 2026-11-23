@@ -19,6 +19,7 @@
       { "id": "elevation", "title": "Elevation", "tokens": ["--cg-elev-thumb", "--cg-elev-pill", "--cg-elev-box", "--cg-elev-popover", "--cg-elev-menu", "--cg-elev-dialog", "--cg-elev-window"], "note": "Only floating things are raised: pill, helper box, popovers, menus, palette, dialogs (no-card rule)." },
       { "id": "motion", "title": "Motion", "tokens": ["--cg-motion-fast", "--cg-motion-layout", "--cg-ease"], "note": "Layout changes 0.2 s, small feedback 0.12 s; zero with reduced motion." },
       { "id": "focus", "title": "Focus", "tokens": ["--cg-focus-width", "--cg-focus-color", "--cg-focus-offset"], "platforms": { "mac": "2 px accent ring inside the control", "windows": "2 px ink ring 1 px outside the control" } },
+      {"id": "syntax", "title": "Syntax colours", "tokens": ["--cg-syntax-keyword", "--cg-syntax-key", "--cg-syntax-ref", "--cg-syntax-string", "--cg-syntax-comment", "--cg-syntax-number", "--cg-syntax-punct", "--cg-code-leading", "--cg-code-gutter"], "themes": ["light", "dark"], "note": "DKLPO text in the source editor (E1 part B): keywords, declaration keys (ink, weight 600), references (the mention accent), strings and text values, comments (italic), numbers and ranges. Each 4.5:1 or more on the pane in its theme; diagnostics keep the status colours."},
       { "id": "layout", "title": "Layout", "file": "src/language/layout.ts", "values": { "sidebar": 232, "sourceList": 318, "sourceListFocus": 348, "pageMin": 480, "pageMax": 760, "panel": 328, "panelMin": 260, "panelMax": 520, "helperBox": 276, "windowMin": 960 }, "collapseOrder": ["Below 1358 px: helper panel becomes the floating box", "Below 1322 px: floating box becomes the pill", "Below 1030 px: sidebar hides (focus-mode layout)", "960 px: minimum window width"] }
     ]
   },
@@ -94,7 +95,174 @@
         "entries": [
           { "id": "check.large-text", "title": "Large text (1.25×)", "from": "New rule for Direction D's rows", "platforms": ["mac", "windows"], "states": ["default", "large"], "summary": "Working text at 1.25×: rows grow from a minimum height, names wrap instead of truncating, costs keep their right-aligned column, property labels wrap." }
         ]
+      },
+      {
+        "id": "e1-start",
+        "title": "Open a dataset and settings (E1)",
+        "entries": [
+          {
+            "id": "e1.recent-row",
+            "title": "Recent-dataset row",
+            "from": "New in E1 (start window)",
+            "platforms": [
+              "mac",
+              "windows"
+            ],
+            "states": [
+              "default",
+              "hover",
+              "selected with actions",
+              "error / preservation / suggestion edge",
+              "archive tag",
+              "missing on disk",
+              "large text"
+            ],
+            "summary": "Icon, title (with an Archive or Sample tag), folder, DKLPO version, layers on / total, last opened; the status edge is the last check’s worst kind. Selected, a second line shows the last check and the actions (Open, Show in Finder, Remove from the list) or, when missing, Locate… / Remove from the list."
+          },
+          {
+            "id": "e1.progress-row",
+            "title": "Progress row",
+            "from": "New in E1 (opening, converting)",
+            "platforms": [
+              "mac"
+            ],
+            "states": [
+              "done",
+              "running",
+              "waiting",
+              "failed"
+            ],
+            "summary": "A step of a longer job: status icon, label, count, and a thin accent bar while it runs."
+          },
+          {
+            "id": "e1.drop-target",
+            "title": "Drop target",
+            "from": "New in E1 (start window)",
+            "platforms": [
+              "mac"
+            ],
+            "states": [
+              "idle",
+              "dragging over"
+            ],
+            "summary": "A dashed outline that holds no content (not a card); turns into the selection tint while a folder or archive is dragged over it."
+          },
+          {
+            "id": "e1.dialog",
+            "title": "Dialog and sheet",
+            "from": "New in E1 (open errors, editor dialogs)",
+            "platforms": [
+              "mac",
+              "windows"
+            ],
+            "states": [
+              "sheet (macOS)",
+              "dialog with footer band (Windows)",
+              "primary + Esc keys",
+              "destructive choice"
+            ],
+            "summary": "What happened in one sentence, the file or folder, the choices as verbs; Return does the primary, Esc the safe choice. Floats with the dialog elevation over a scrim."
+          },
+          {
+            "id": "e1.popover-sections",
+            "title": "Popover menu with sections",
+            "from": "The context menu, extended in E1 (dataset switcher)",
+            "platforms": [
+              "mac",
+              "windows"
+            ],
+            "states": [
+              "head block",
+              "section label",
+              "two-line item",
+              "hover",
+              "tag"
+            ],
+            "summary": "The context menu, wider, with a head block for the open dataset, section labels and two-line items with a folder in mono."
+          },
+          {
+            "id": "e1.settings-row",
+            "title": "Settings row and controls",
+            "from": "New in E1 (settings)",
+            "platforms": [
+              "mac",
+              "windows"
+            ],
+            "states": [
+              "checkbox / switch on, off, unavailable",
+              "pop-up / drop-down closed and open",
+              "radios with notes",
+              "help text"
+            ],
+            "summary": "Label, control, help text. macOS: the classic preferences layout with checkboxes; Windows: label and help left, control right, switches with On / Off, radios stacked; no setting cards."
+          },
+          {
+            "id": "e1.settings-nav",
+            "title": "Settings tabs and navigation list",
+            "from": "New in E1 (settings)",
+            "platforms": [
+              "mac",
+              "windows"
+            ],
+            "states": [
+              "selected",
+              "hover"
+            ],
+            "summary": "macOS toolbar tabs (icon above label); Windows navigation list with the accent indicator bar."
+          },
+          {
+            "id": "e1.shortcut-list",
+            "title": "Shortcut list",
+            "from": "New in E1 (settings, Keyboard)",
+            "platforms": [
+              "mac",
+              "windows"
+            ],
+            "states": [
+              "grouped rows",
+              "hover"
+            ],
+            "summary": "Command and its keys as one keycap per key, grouped by task; read-only in E1."
+          }
+        ]
+      },
+      {
+        "id": "editor", "title": "Source text editor",
+        "entries": [
+          {"id": "editor.code", "title": "Code editor with gutter", "from": "New (E1 part B), drawn from the tokens", "platforms": ["mac"], "states": ["default", "selected block", "caret line", "error underline", "preservation underline", "suggestion underline", "parse error inline"], "summary": "Mono text with line numbers, a diagnostics gutter (the kind's icon), DKLPO syntax colours (--cg-syntax-*), underlines that differ by shape (error wavy, preservation dashed, suggestion dotted), the lines of the block selected on the page tinted with an accent edge, the caret line in the hover fill. A parse error shows under its line with its fix, edged like a flagged block."},
+          {"id": "editor.text-chrome", "title": "Text header and status line", "from": "New (E1 part B)", "platforms": ["mac"], "states": ["header", "fmt clean", "fmt would change", "doesn't parse"], "summary": "Header: the file in mono, where the selection is, the view buttons (Text only / Page beside, close). Status line on the surface paper: counts by kind, caret position, fmt state (dot in OK green, amber or red), UTF-8, LF, indentation, DKLPO version."},
+          {"id": "editor.diag-card", "title": "Diagnostic hover card and quick-fix menu", "from": "New (E1 part B); the menu is the context menu primitive", "platforms": ["mac", "windows"], "states": ["one diagnostic", "two on a line", "quick-fix menu"], "summary": "Hovering an underline shows a popover with the kind, the code, the message and the fix as a button (the first fix primary, ⌥↵ / Alt+Enter). ⌥↵ at the caret opens the quick fixes as a menu: the first fix selected, the rest as verbs with targets."},
+          {"id": "editor.linked-block", "title": "Linked statement block", "from": "Direction D's statement block, plus the line link", "platforms": ["mac"], "states": ["selected with its lines", "flagged", "line number"], "summary": "In the split view a block is selected together with its lines: the block and its children take the selection tint and show their line number at the right edge; a flagged block keeps its status edge."},
+          {"id": "editor.new-entry", "title": "New entry row and empty list", "from": "New (E1 part B)", "platforms": ["mac"], "states": ["key valid", "key not valid", "empty list"], "summary": "New entry (⌘N) opens an inline row in the source list, in the selection tint: the kind picker and the key field (the module prefix muted), validated as you type with the rule in plain words; Create is disabled while the key is wrong and says why. An empty list says what is empty and offers New entry with its key."}
+        ]
+      },
+      {
+        "id": "references", "title": "References",
+        "entries": [
+          {"id": "editor.history", "title": "Back and Forward", "from": "New (E1 part B)", "platforms": ["mac"], "states": ["back available", "both", "none (disabled, says why)"], "summary": "Two icon buttons at the start of the page toolbar, before the breadcrumbs: they name where they go in the tooltip and accessible name (Back to Warden Squad, ⌘[), and when there is no history they are disabled and say so."},
+          {"id": "editor.peek", "title": "Peek frame", "from": "New (E1 part B)", "platforms": ["mac"], "states": ["page", "text", "editing in place"], "summary": "The target entry inline under the line that refers to it: an embedded view on the surface paper with a hairline frame and a 3 px accent edge (not raised). Header: glyph, name, path in mono, source and layer chip, Page / Text, Open (F12), Close (Esc). Edits save to the target's file, named in the footer."},
+          {"id": "editor.backlinks", "title": "Backlinks tab", "from": "Direction D's helper panel, a fourth tab", "platforms": ["mac"], "states": ["grouped by source and layer", "selected with Open", "keys"], "summary": "Every place that refers to the entry, grouped by source and layer (headings as in the issue lists); each row shows the referring line in syntax colours, a note with its glyph, and file:line; the selected row shows Open with ↵. The panel opens at 412 px for four tabs."},
+          {"id": "editor.unresolved", "title": "No-definition popover", "from": "New (E1 part B)", "platforms": ["mac"], "states": ["with fix"], "summary": "Go to definition on a reference that resolves to nothing: a popover at the reference says so (and that nothing was opened), names the closest key and offers the fix (⌥↵) or creating the entry."}
+        ]
+      },
+      {
+        "id": "inbox", "title": "Diagnostics inbox",
+        "entries": [
+          {"id": "inbox.row", "title": "Inbox row and group heading", "from": "Direction D's issue row, wider and two lines", "platforms": ["mac"], "states": ["default", "hover", "selected", "focus", "done", "edited since the check", "layer chip"], "summary": "Status edge, the message (code in mono), then the entry with its glyph, the source, a layer chip when it isn't Base, and the code at the right. Groups by kind under caption headings with counts, no hairlines. Done rows go muted with a check."},
+          {"id": "inbox.filters", "title": "Filter chips", "from": "New (E1 part B)", "platforms": ["mac"], "states": ["all (dashed)", "set (tinted, ×)", "hover", "menu"], "summary": "Source, Layer and Code as pill chips: dashed while they show everything, tinted with the value and a clear button when set; each opens a menu with counts. A text filter on the left."},
+          {"id": "inbox.diff", "title": "Diff block and out-of-date note", "from": "Direction D's “Show diff”, enlarged", "platforms": ["mac"], "states": ["removed", "kept", "added", "out of date"], "summary": "The export difference of a preservation failure: a header (original → export, what changed), lines with a sign column and error / OK tints, wrapping long lines. The out-of-date note is an inline tinted row with the preservation edge and Run checks."}
+        ]
       }
     ]
-  }
+  },
+  "screens": [
+    {"id": "e1-start-window", "title": "Start window", "item": "cg-e1-start-window", "group": "Open a dataset", "states": ["recent", "first-run", "opening", "missing", "narrow", "large"], "platforms": ["mac", "windows"], "summary": "No dataset open: app actions in the sidebar, recent datasets (title, folder, DKLPO version, layers on / total, last opened, status edge), a drop target. The selected row opens a second line with the last check and Open / Show in Finder / Remove from the list, or for a missing dataset Locate… / Remove from the list.", "workflows": ["Open a recent dataset: select (click or ↑ ↓), Return or double-click; progress shows reading files, compiling and checking with counts; Esc cancels", "Remove a recent dataset: ⌘⌫ (Delete on Windows) or the row action; Undo in the footer (⌘Z)", "Missing dataset: Locate… points the row at its new folder, or remove it", "Open folder… / Open file… / drop a folder or archive; a problem shows the open-errors dialog", "Convert from XML data…: pick a folder of .gst / .cat files; the steps run with counts and the new dataset opens", "First run: the empty state offers the three actions and the sample dataset"]},
+    {"id": "e1-start-errors", "title": "Open errors", "item": "cg-e1-start-errors", "group": "Open a dataset", "states": ["not-dataset", "newer-format", "parse-errors", "permission"], "platforms": ["mac", "windows"], "summary": "A sheet (macOS) or dialog with a footer band (Windows) over the start window: what happened, the folder, the choices as verbs; the primary takes Return, Cancel takes Esc.", "workflows": ["Not a dataset: Convert… (XML data files found), Choose another folder…, Cancel", "Newer DKLPO version: Open read-only (what the newer version added shows as source text, nothing saved) or Cancel", "Files that do not parse: Open anyway (the files open as source text with their errors; their entries are left out) or Cancel", "Folder not writable: Open read-only, Save as… elsewhere, or Cancel"]},
+    {"id": "e1-start-editor-dialogs", "title": "Window-level dialogs over the editor", "item": "cg-e1-start-editor-dialogs", "group": "Open a dataset", "states": ["switcher", "unsaved", "changed-on-disk", "changed-on-disk-edits", "save-failed"], "platforms": ["mac"], "summary": "Dataset switcher popover and the sheets for unsaved changes, a module changed on disk and a failed save, over a static Direction D window.", "workflows": ["Switch dataset: Demo Skirmish ▾ opens the switcher; a recent dataset, Open…, Convert… or Close dataset; with unsaved changes the Save / Don’t save / Cancel sheet follows", "Changed on disk without edits: Reload (primary), Keep mine (Esc), Compare", "Changed on disk with edits: Compare (primary), Keep mine (Esc), Reload and discard my edits", "Save failed: Retry (primary), Save as…, Cancel (Esc); edits stay in the editor"]},
+    {"id": "e1-start-settings", "title": "Settings", "item": "cg-e1-start-settings", "group": "Settings", "states": ["general", "editor", "checking", "text", "appearance", "keyboard", "command-line"], "platforms": ["mac", "windows"], "summary": "Settings window, one state per section; macOS toolbar tabs, Windows navigation list; open rows of label, control and help text.", "workflows": ["General: open the last dataset at start, recent list length, clear the recent list (Undo)", "Editor: source text beside the page by default, / insert, format on save (fmt), font size", "Checking: default check level lenient / strict (a dataset’s checking: wins), run checks on save, show authoring suggestions", "Text: text pack language, how names without text show", "Appearance: theme (system / light / dark), accent (system or app)", "Keyboard: read-only shortcut list with a filter", "Command line: engine, DKLPO and augur dklpo versions; copy the same check command"]},
+    {"id": "e1-editor-source", "title": "Source text beside the page", "item": "cg-e1-editor-source", "group": "Edit", "states": ["split", "text-only", "error", "parse-error", "large", "narrow"], "summary": "Source (⌘⌥U) splits the page area into the entry page and its module's DKLPO text, synced both ways; text editor with gutter, syntax colours, diagnostic underlines, hover card, quick-fix menu (⌥↵) and status line. The split needs 1000 px of page area: the source list folds away while it is open, and in a 960 px window Source switches between page and text. A module that doesn't parse opens as text only.", "workflows": ["Read an entry's text beside its page and select a statement in either", "Fix an unknown reference from the quick-fix menu", "Fix a parse error; the module's pages come back once it parses"]},
+    {"id": "e1-editor-references", "title": "Go to definition, peek and backlinks", "item": "cg-e1-editor-references", "group": "References", "states": ["definition", "peek", "backlinks", "unresolved"], "summary": "Go to definition (F12, ⌘-click, click) with Back / Forward (⌘[ / ⌘]) and breadcrumbs; Peek (⌥F12, ⌥-click) inline under the line, page or text, editable in place; Backlinks (⇧F12) as a fourth tab of the helper panel, grouped by source and layer, ↵ opens; an unresolved reference offers its fix instead of navigating.", "workflows": ["Follow a reference and come back", "Look at a referenced entry without leaving the page", "Walk through every place that refers to an entry", "Fix a reference that resolves to nothing"]},
+    {"id": "e1-editor-diagnostics", "title": "Diagnostics inbox", "item": "cg-e1-editor-diagnostics", "group": "Diagnostics", "states": ["inbox", "preservation", "stale", "clear"], "summary": "Updates (⌘⇧U) opens the dataset's diagnostics as a full view in place of the list and the page; the helper box and panel stay the quick view beside a page and lead here with Open all. Grouped by kind, filters by source, layer and code, keyboard triage (↑ ↓, ↵ open, ⌥↵ fix), detail pane with the affected text or the export difference, bulk fix per suggestion code, out-of-date and clear states.", "workflows": ["Triage every diagnostic of the dataset by keyboard", "Apply one suggestion everywhere it occurs", "Read a preservation failure's export difference", "See that the list is out of date and run checks"]},
+    {"id": "e1-editor-empty", "title": "Editor empty states", "item": "cg-e1-editor-empty", "group": "Edit", "states": ["no-entries", "no-statements", "no-results"], "summary": "A source with no entries (inline New entry with kind and key, the module text so far on the page side), an entry with no statements (the / hint as the first block, a name to add, no backlinks yet), and a search with no result (the palette says what it searched and skipped, and offers create, search with the off layer, clear).", "workflows": ["Add the first entry to a new catalogue", "Start an empty entry with its first statement", "Recover from a search that finds nothing"]}
+  ]
 }

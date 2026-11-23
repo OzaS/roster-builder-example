@@ -145,3 +145,11 @@ a { color: var(--accent); }
 @media (max-width: 420px) {
   .cg-patterns { grid-template-columns: 1fr; }
 }
+
+/* E1 screens page (D4 step 3) */
+.cg-e1-index { display: flex; flex-wrap: wrap; gap: 12px 40px; max-width: 1100px; margin: 0 0 8px; }
+.cg-e1-index h2 { margin: 0 0 4px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.cg-e1-index ul { margin: 0; padding-left: 18px; font-size: 14px; }
+.cg-e1-screen { margin-top: 48px; }
+.cg-e1-title { display: flex; align-items: baseline; gap: 12px; margin: 0; font-size: 20px; }
+.cg-e1-title a { font-size: 13px; font-weight: 500; }
