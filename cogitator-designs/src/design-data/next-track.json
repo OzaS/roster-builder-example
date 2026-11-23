@@ -138,6 +138,16 @@
       "screen": "e1-editor-empty",
       "summary": "Empty states inside the editor: a source with no entries (inline New entry with its key), an entry with no statements (the / hint as the first block), a search with no result (the palette says what it searched and offers next steps).",
       "source": "D4 step 3a, E1 screens (2026-11-22)"
+    },
+    {
+      "id": "cg-e1-tools-checks",
+      "title": "E1: Run checks",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": ["desktop"],
+      "screen": "e1-tools-checks",
+      "summary": "Run checks (⌘⇧C) inside the editor: a check status button in the page toolbar (complete, n errors, doesn't compile, running, out of date) opens a run popover with the steps and counts (Parse, Compile, Lower, Export check) and Cancel, then the result per class with its codes leading into the diagnostics inbox, what was checked (dataset, profile, layers, patch, export dry run) and the same command to copy. States: running, complete, incomplete with counts, doesn't compile (stops before Lower), out of date.",
+      "source": "D4 step 3b, E1 screens part 2 (2026-11-23)"
     }
   ]
 }
