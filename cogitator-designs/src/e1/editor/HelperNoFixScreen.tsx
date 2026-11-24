@@ -5,8 +5,8 @@ import { diagLabel, type DiagKind, type Diagnostic } from "../../sample";
 import { sourceById } from "../../directions/direction-d-content";
 import { HelperBox } from "../../directions/DirectionD";
 import { layout } from "../../language/layout";
-import { allDiagnostics, ironWardens } from "./data";
-import { LinkedPage } from "./page";
+import { allDiagnostics, ironWardens, placedIn } from "./data";
+import { flagsFrom, LinkedPage } from "./page";
 import { code, LATER_FIX } from "./parts";
 import { BackForward, EditorGrid, Sidebar, SourceList, Win, type Mode } from "./shell";
 
@@ -95,7 +95,7 @@ export function HelperNoFixScreen({ mode, state = "box", interactive }: { mode: 
             <button type="button" className="d-ghost" title="Show the DKLPO text beside the page (⌘⌥U)"><Code2 size={14} />Source<kbd>⌘⌥U</kbd></button>
           </header>
           <div className={`d-scroll helper-${panel ? "panel" : "floating"}`}>
-            <div className="d-doc"><LinkedPage id={ENTRY} module={ironWardens} /></div>
+            <div className="d-doc"><LinkedPage id={ENTRY} module={ironWardens} flags={flagsFrom(placedIn("iron-wardens"))} /></div>
             {panel ? null : (
               <HelperBox noFixes issues={pageIssues} resolved={new Set()} elsewhere={allDiagnostics.length - pageIssues.length} checking="idle" onCollapse={() => undefined} onExpand={() => undefined}
                 onFix={() => undefined} onUndo={() => undefined} onDiff={() => undefined} onAll={() => undefined} onChecks={() => undefined} onInsert={() => undefined} onProperties={() => undefined} />

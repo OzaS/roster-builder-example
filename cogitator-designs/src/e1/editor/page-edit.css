@@ -6,7 +6,7 @@
 
 /* The title in place: the h1's own type in the accent-ringed cell; "↵ saves" in the small type after it. */
 .fc-d .d-page h1.cg-editing-title { display: flex; align-items: baseline; gap: 10px; margin-left: -6px; padding: 0 6px; border-radius: var(--cg-radius-block); background: var(--cg-pane); box-shadow: inset 0 0 0 1.5px var(--cg-accent); }
-.fc-d .d-page h1.cg-editing-title .cg-caret { align-self: center; height: 1em; }
+.fc-d .d-page h1.cg-editing-title .cg-caret { height: 1em; vertical-align: -0.12em; }
 .fc-d .d-page h1.cg-editing-title > .d-muted { margin-left: auto; font-size: var(--cg-text-small); font-weight: 400; letter-spacing: 0; white-space: nowrap; }
 
 /* A refusal stands beside the field, in error red, where the drawn note sits. */

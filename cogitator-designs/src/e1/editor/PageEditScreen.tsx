@@ -113,7 +113,7 @@ export function PageEditScreen({ mode, state = "edit-value", interactive }: { mo
   const propEdit: Record<string, ReactNode> = {};
   if (s === "edit-value") propEdit.Cost = <Field text="16" after={<span>pts</span>} />;
   if (s === "field-refusal") propEdit.Cost = <Field text="16 | 2" after={<span>pts</span>} refused="With this value the line would be another statement, not this setting" />;
-  const titleEdit = s === "edit-title" ? <><span className="cg-pe-title-text">Warden Patrol</span><span className="cg-caret" aria-hidden /><span className="d-muted">↵ saves</span></> : undefined;
+  const titleEdit = s === "edit-title" ? <><span className="cg-pe-title-text">Warden Patrol<span className="cg-caret" aria-hidden /></span><span className="d-muted">↵ saves</span></> : undefined;
 
   const page = (
     <LinkedPage key={s} id={ENTRY} module={module} flags={flagsFrom(placed)} folded={split ? [lineOf(ironWardens, "upgrade banner ..1")] : []}

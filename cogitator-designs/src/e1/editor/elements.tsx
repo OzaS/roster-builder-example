@@ -94,7 +94,7 @@ export const editorRenderers: Record<string, Renderer> = {
           </State>
         </div>
         <State label="The title in place, in the h1's own type" wide>
-          <div className="d-page" style={{ width: 520 }}><h1 className="cg-editing-title">Warden Patrol<span className="cg-caret" aria-hidden /><span className="d-muted">{key(platform, "↵", "Enter")} saves</span></h1></div>
+          <div className="d-page" style={{ width: 520 }}><h1 className="cg-editing-title"><span className="cg-pe-title-text">Warden Patrol<span className="cg-caret" aria-hidden /></span><span className="d-muted">{key(platform, "↵", "Enter")} saves</span></h1></div>
         </State>
         <div className="cg-row-flex">
           <State label="Statement context menu: an item that can't run is disabled">
