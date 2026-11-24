@@ -1,6 +1,6 @@
 /*
  * Gallery chrome tokens (the design kit's track switch uses --surface, --surface-2, --ink, --muted, --radius-sm).
- * Theme: `?theme=light|dark` sets data-theme on <html>; without it the OS setting applies.
+ * Theme: the rail's switch (theme.ts, `?theme=light|dark|both`) sets data-theme on <html>; on Both the OS setting applies.
  */
 :root {
   --bg: #f4f5f7; --surface: #ffffff; --surface-2: #eceef2; --ink: #17202a; --muted: #56616d; --faint: #6b7580; --line: #dde1e7;
@@ -101,3 +101,10 @@ a { color: var(--accent); }
 .cg-e1-screen { margin-top: 48px; }
 .cg-e1-title { display: flex; align-items: baseline; gap: 12px; margin: 0; font-size: 20px; }
 .cg-e1-title a { font-size: 13px; font-weight: 500; }
+
+/* ---- Theme switch (rail): Light, Dark, Both; theme.ts ---- */
+.cg-theme-switch { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 4px; border-radius: 10px; background: var(--surface-2); }
+.cg-theme-switch button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 30px; border: 0; border-radius: 7px; background: transparent; color: var(--muted); cursor: pointer; font: inherit; font-size: 12.5px; font-weight: 600; }
+.cg-theme-switch button:hover { color: var(--ink); }
+.cg-theme-switch button.active { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12); }
+.cg-theme-switch button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }

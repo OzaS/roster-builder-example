@@ -1,3 +1,4 @@
+import { shownModes } from "../theme";
 import { TrackChip } from "@designs/kit";
 import { ScaledFrame } from "../frames";
 import { e1Screens, e1ScreenById } from "../e1/registry";
@@ -39,7 +40,7 @@ function ScreenSection({ screen, solo }: { screen: E1Screen; solo: boolean }) {
   const states = screen.states?.length ? screen.states : [{ id: "", title: "" }];
   const platforms: E1Platform[] = screen.platforms?.length ? screen.platforms : ["mac"];
   const shots: { mode: E1Mode; platform: E1Platform; state: string; stateTitle: string }[] = [];
-  for (const state of states) for (const platform of platforms) for (const mode of ["light", "dark"] as const) shots.push({ mode, platform, state: state.id, stateTitle: state.title });
+  for (const state of states) for (const platform of platforms) for (const mode of shownModes()) shots.push({ mode, platform, state: state.id, stateTitle: state.title });
   return (
     <section id={screen.id} className="cg-e1-screen" aria-label={screen.title}>
       {solo ? null : (
