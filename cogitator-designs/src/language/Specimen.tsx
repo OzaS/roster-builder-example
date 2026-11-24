@@ -1,3 +1,4 @@
+import { shownModes } from "../theme";
 import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
 import "./tokens.css";
 import "./primitives.css";
@@ -33,7 +34,7 @@ export function Spec({ mode, platform = "mac", large, paper = "pane", className 
 }
 
 /**
- * One Elements entry's specimens: light and dark side by side, and a row per platform where the platforms differ.
+ * One Elements entry's specimens: in the rail's theme (light and dark side by side on Both), and a row per platform where the platforms differ.
  * The children function draws the specimen for one theme and platform.
  */
 export function Matrix({ platforms = ["mac"], paper = "pane", large, children, cellStyle, wide }: {
@@ -41,7 +42,7 @@ export function Matrix({ platforms = ["mac"], paper = "pane", large, children, c
 }) {
   return (
     <div className={`cg-matrix${wide ? " wide" : ""}`}>
-      {platforms.map((platform) => modes.map((mode) => (
+      {platforms.map((platform) => shownModes().map((mode) => (
         <figure key={`${platform}-${mode}`} className="cg-cell">
           <figcaption>{platforms.length > 1 ? `${platformLabel[platform]} · ` : ""}{mode === "light" ? "Light" : "Dark"}</figcaption>
           <Spec mode={mode} platform={platform} paper={paper} large={large} style={cellStyle} label={`${platformLabel[platform]}, ${mode}`}>{children(mode, platform)}</Spec>

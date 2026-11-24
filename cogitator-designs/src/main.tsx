@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
-import { applyTheme } from "./route";
+import { applyTheme } from "./theme";
 import "./styles.css";
 import "./directions/frame.css";
 

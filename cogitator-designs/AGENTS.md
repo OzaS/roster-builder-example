@@ -22,6 +22,7 @@ Field Cogitator (working name) is a **desktop editor for datasets** in the DKLPO
 ## E1 screens (D4 step 3, 2026-11-22)
 - Each E1 screen is an `E1Screen` (`src/e1/types.ts`) registered in its part's list (`src/e1/start/`, `src/e1/editor/`, collected by `src/e1/registry.ts`), with a `next-track.json` item and an entry in `cogitator.design.json` `screens`. `?page=e1` shows them all, `&screen=<id>` one, `?view=frame&screen=<id>&mode=&state=&platform=windows` one alone for captures.
 - Screens draw on a gallery page beside others: no focus on mount (`autoFocus` or effects), or the page scrolls to the last screen.
+- **Theme switch (user, 2026-11-24):** the rail's Light / Dark / Both switch (`src/theme.ts`, `?theme=`) sets the chrome and the theme every E1 screen, Direction D window and Elements specimen is drawn in, so a review goes through each design once. A page that draws designs side by side takes its themes from `shownModes()`, never a fixed `["light", "dark"]`; the Design language page keeps both columns (it compares the themes). Frame links keep their own `mode`.
 
 ## Rules
 - Track: `src/track.ts` (own storage key) and `src/design-data/next-track.json`; new designs start as Next / Proposal until the user approves them; approved items stay on Next until the app builds them.

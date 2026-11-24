@@ -1,3 +1,4 @@
+import { shownModes } from "../theme";
 import { TrackChip } from "@designs/kit";
 import { ScaledFrame } from "../frames";
 import { directions, type DirectionId } from "../directions/meta";
@@ -13,7 +14,7 @@ const tryIt: { what: string; how: string }[] = [
   { what: "Page", how: "hover a mention for its peek, fold and unfold statements with the chevrons, click “Type / to insert a statement” for the / menu, “more properties” opens the Properties tab." },
 ];
 
-/** Direction D: what it optimises for and what it costs, then the entry editor at 1440 px in light and dark. */
+/** Direction D: what it optimises for and what it costs, then the entry editor at 1440 px in light and dark (the rail's theme switch picks one or both). */
 export function DirectionPage({ id }: { id: DirectionId }) {
   const direction = directions.find((candidate) => candidate.id === id) ?? directions[0];
   return (
@@ -41,7 +42,7 @@ export function DirectionPage({ id }: { id: DirectionId }) {
         </section>
       ) : null}
       <p className="cg-note">The entry editor with <code>iron-wardens:warden-squad</code> open, its properties, references and the diagnostics area. In view at 1440 × 900: {direction.rows}. Synthetic sample dataset.</p>
-      {(["light", "dark"] as const).map((mode) => (
+      {shownModes().map((mode) => (
         <section key={mode} className="cg-shot" aria-label={`${direction.title}, ${mode}`}>
           <h2>{mode === "light" ? "Light" : "Dark"} <a href={`?view=frame&direction=${id}&mode=${mode}`}>Open at 1440 px</a></h2>
           <ScaledFrame interactive={id === "d"} label={`${direction.title} entry editor, ${mode} theme`}><DirectionScreen id={id} mode={mode} /></ScaledFrame>
