@@ -8,7 +8,7 @@ import { layout } from "../../language/layout";
 import { allDiagnostics, blockEnd, frostBroken, frostWardens, ironWardens, lineOf, place, plain, type ModuleText } from "./data";
 import { CodeHead, CodeStatus, CodeView, type CodeCaret, type CodeMark, type CodePop } from "./code";
 import { declOf, entryAt, flagsFrom, LinkedPage } from "./page";
-import { DiagCard, FixMenu, Pill } from "./parts";
+import { DiagCard, FixMenu, LATER_FIX, NoFixMenu, Pill } from "./parts";
 import { BackForward, EditorGrid, Sidebar, SourceList, Win, type Mode, useWindowKeys } from "./shell";
 
 /**
@@ -16,7 +16,8 @@ import { BackForward, EditorGrid, Sidebar, SourceList, Win, type Mode, useWindow
  * DKLPO text on the right, synced both ways. The split needs `SPLIT_MIN` px (page 480 + text 520); narrower, the Source
  * button switches between page and text instead. A module that doesn't parse opens as text only.
  */
-export type SourceState = "split" | "text-only" | "error" | "parse-error" | "large" | "narrow";
+export type SourceState = "split" | "text-only" | "error" | "parse-error" | "large" | "narrow" | "no-fix" | "no-fix-card" | "parse-error-no-fix" | "text-alone";
+const sourceStates: SourceState[] = ["split", "text-only", "error", "parse-error", "large", "narrow", "no-fix", "no-fix-card", "parse-error-no-fix", "text-alone"];
 type View = "page" | "split" | "text";
 
 export const TEXT_MIN = 520;
@@ -37,15 +38,19 @@ const fixedLines = (module: ModuleText, resolved: ReadonlySet<string>) => {
 };
 
 export function SourceScreen({ mode, state = "split", interactive }: { mode: Mode; state?: string; interactive: boolean }) {
-  const s = (["split", "text-only", "error", "parse-error", "large", "narrow"].includes(state) ? state : "split") as SourceState;
+  const given = (sourceStates.includes(state as SourceState) ? state : "split") as SourceState;
+  /* E1 as built (approved 2026-11-24): before diagnostics carry fixes (P30), a module that doesn't parse (P31), the text alone below 1000 px (P27). */
+  const noFix = given === "no-fix" || given === "no-fix-card" || given === "parse-error-no-fix";
+  const alone = given === "text-alone";
+  const s: SourceState = given === "no-fix" ? "error" : given === "no-fix-card" ? "split" : given === "parse-error-no-fix" ? "parse-error" : given;
   const narrow = s === "narrow";
-  const width = narrow ? layout.windowMin : layout.windowDesign;
+  const width = narrow || alone ? layout.windowMin : layout.windowDesign;
   const startModule = s === "parse-error" ? frostBroken : s === "text-only" || s === "error" ? frostWardens : ironWardens;
   const startEntry = s === "error" || s === "text-only" || s === "parse-error" ? "frost-wardens:ice-guard" : "iron-wardens:warden-squad";
 
   const [moduleId, setModuleId] = useState(startModule.id);
   const [entry, setEntry] = useState(startEntry);
-  const [view, setView] = useState<View>(s === "text-only" || s === "parse-error" || narrow ? "text" : "split");
+  const [view, setView] = useState<View>(s === "text-only" || s === "parse-error" || narrow || alone ? "text" : "split");
   const [resolved, setResolved] = useState<ReadonlySet<string>>(new Set());
   const [listOpen, setListOpen] = useState(s === "text-only");
   const broken = s === "parse-error" && !resolved.has("indent");
@@ -60,7 +65,7 @@ export function SourceScreen({ mode, state = "split", interactive }: { mode: Mod
     if (s === "text-only") return { line: lineOf(frostWardens, "use iron-wardens:halbred"), col: 6 };
     return { line: initialSel, col: 2 };
   });
-  const [hover, setHover] = useState<string | null>(s === "split" || s === "large" ? "d4" : null);
+  const [hover, setHover] = useState<string | null>((s === "split" || s === "large") && !alone ? "d4" : null);
   const [menu, setMenu] = useState(s === "error");
 
   /* Placed diagnostics in the current text; the bad indent is a parse error of its own. */
@@ -90,7 +95,7 @@ export function SourceScreen({ mode, state = "split", interactive }: { mode: Mod
 
   /* ⌘⌥U toggles the text; ⌥↵ opens the quick fixes at the caret; Esc closes the menu. */
   const claim = useWindowKeys(interactive, (event: KeyboardEvent) => {
-      if (event.metaKey && event.altKey && event.code === "KeyU") { event.preventDefault(); setView((v) => (v === "page" ? (narrow ? "text" : "split") : "page")); }
+      if (event.metaKey && event.altKey && event.code === "KeyU") { event.preventDefault(); setView((v) => (v === "page" ? (narrow || alone ? "text" : "split") : "page")); }
       if (event.altKey && event.key === "Enter") { event.preventDefault(); setMenu(true); }
       if (event.key === "Escape") setMenu(false);
   });
@@ -98,7 +103,11 @@ export function SourceScreen({ mode, state = "split", interactive }: { mode: Mod
   const caretDiags = caret ? placed.filter((p) => p.line === caret.line && (p.kind !== "preservation")) : [];
   const hoverDiag = hover ? placed.filter((p) => p.id === hover || (p.line === placed.find((x) => x.id === hover)?.line)) : [];
   let pop: CodePop | null = null;
-  if (menu && caret && broken) {
+  if (menu && caret && broken && noFix) {
+    pop = { line: caret.line, col: 0, node: <NoFixMenu message="Indented 3 spaces: a level is exactly 2 spaces" code="indent" /> };
+  } else if (menu && caret && caretDiags.length && noFix) {
+    pop = { line: caret.line, col: caretDiags[0].from, node: <NoFixMenu message={caretDiags[0].message} code={caretDiags[0].code} /> };
+  } else if (menu && caret && broken) {
     pop = { line: caret.line, col: 0, node: <FixMenu title={<>Parse error · <span className="mono">dklpo/indent</span></>} items={[{ label: "Indent to 4 spaces (one level)", key: "↵" }, { label: "Indent to 2 spaces", key: "" }]} onPick={() => resolve("indent")} /> };
   } else if (menu && caret && caretDiags.length) {
     const d = caretDiags[0];
@@ -115,10 +124,10 @@ export function SourceScreen({ mode, state = "split", interactive }: { mode: Mod
     };
   } else if (hoverDiag.length) {
     const first = hoverDiag[0];
-    pop = { line: first.line, col: first.from, node: <DiagCard list={hoverDiag} onFix={(d) => resolve(d.id)} /> };
+    pop = { line: first.line, col: first.from, node: <DiagCard list={hoverDiag} onFix={(d) => resolve(d.id)} noFixes={noFix} /> };
   }
 
-  const fullyFits = !narrow;
+  const fullyFits = !narrow && !alone;
   const showText = view !== "page";
   const showPage = view === "page" || (view === "split" && fullyFits);
   const decl = declOf(lines, sel ?? caret?.line ?? 0);
@@ -129,7 +138,9 @@ export function SourceScreen({ mode, state = "split", interactive }: { mode: Mod
   const counts = { error: marks.filter((m) => m.kind === "error").length, preservation: marks.filter((m) => m.kind === "preservation").length, suggestion: marks.filter((m) => m.kind === "suggestion").length };
   const inline = broken ? { [indentLine]: (
     <p><DiagIcon kind="error" size={13} /><strong>Parse error</strong><span className="mono">dklpo/indent</span><span>Indented 3 spaces: a level is exactly 2 spaces, so this line can't belong to <code>model guard</code>.</span>
-      <button type="button" className="d-btn sm primary" onClick={() => resolve("indent")}>Indent to 4 spaces<kbd>⌥↵</kbd></button></p>
+      {noFix
+        ? <button type="button" className="d-btn sm primary" disabled title={LATER_FIX}>Quick fix<kbd>⌥↵</kbd></button>
+        : <button type="button" className="d-btn sm primary" onClick={() => resolve("indent")}>Indent to 4 spaces<kbd>⌥↵</kbd></button>}</p>
   ) } : undefined;
 
   const text = (
@@ -157,7 +168,7 @@ export function SourceScreen({ mode, state = "split", interactive }: { mode: Mod
           <button type="button" className="d-btn primary" onClick={() => { setCaret({ line: indentLine, col: 0 }); setMenu(true); }}>Go to line {indentLine}<kbd>F8</kbd></button>
           <button type="button" className="d-btn" disabled title="fmt runs only on text that parses">Format file</button>
         </p>
-        <p className="d-muted">Ice Guard, frost-seer and Rime Blade come back when it parses. Saving keeps the text as typed.</p>
+        <p className="d-muted">{noFix ? "ice-guard, frost-seer and rime-blade" : "Ice Guard, frost-seer and Rime Blade"} come back when it parses. Saving keeps the text as typed.</p>
       </div>
     </div>
   ) : (
@@ -192,8 +203,8 @@ export function SourceScreen({ mode, state = "split", interactive }: { mode: Mod
                 <button type="button" role="radio" aria-checked={view !== "page"} className={view !== "page" ? "active" : ""} onClick={() => setView("text")} title="Show the text (⌘⌥U)"><Code2 size={13} />Text</button>
               </span>
             ) : (
-              <button type="button" className={`d-ghost${showText ? " on" : ""}`} aria-pressed={showText} disabled={broken} onClick={() => setView(showText ? "page" : "split")}
-                title={broken ? "The module doesn't parse: it stays in text until it does" : showText ? "Hide the text (⌘⌥U)" : "Show the DKLPO text beside the page (⌘⌥U)"}><Code2 size={14} />Source<kbd>⌘⌥U</kbd></button>
+              <button type="button" className={`d-ghost${showText ? " on" : ""}`} aria-pressed={showText} disabled={broken} onClick={() => setView(showText ? "page" : alone ? "text" : "split")}
+                title={broken ? "The module doesn't parse: it stays in text until it does" : showText ? "Hide the text (⌘⌥U)" : alone ? "Show the DKLPO text in place of the page: page and text side by side need 1000 px (⌘⌥U)" : "Show the DKLPO text beside the page (⌘⌥U)"}><Code2 size={14} />Source<kbd>⌘⌥U</kbd></button>
             )}
           </header>
           {narrow ? <p className="cg-narrow-note"><PanelLeftClose size={13} />Page and text side by side need {SPLIT_MIN} px; this window is {width} px, so Source switches between them.</p> : null}

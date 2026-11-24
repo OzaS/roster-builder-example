@@ -132,6 +132,58 @@
       "source": "D4 step 3a, E1 screens (2026-11-22)"
     },
     {
+      "id": "cg-e1-editor-page-edits",
+      "title": "E1: Editing on the page",
+      "kind": "screen",
+      "status": "approved",
+      "platforms": [
+        "desktop"
+      ],
+      "screen": "e1-editor-page-edits",
+      "summary": "Editing on the page as built in E1-3: a value or the title in place (accent ring, “↵ saves”), a refusal beside the field or in the top bar for 6 s, the selected statement as the linked block (no focus ring over the tint), the / menu after the selected statement (“Valid in” its block, scrolls past 340 px), the new statement selected after an insert with its placeholder key selected in the text, the statement context menu, the sidebar footer's “Unsaved · n files”. States: edit-value, edit-title, field-refusal, selected, slash-after, inserted, context-menu, top-refusal.",
+      "source": "E1-2 / E1-3 as built; approved by the user 2026-11-24 (E1-2/E1-3 Proposals review, P1, P2, P3, P4, P6, P7, P9, P41)"
+    },
+    {
+      "id": "cg-e1-editor-helper-no-fixes",
+      "title": "E1: Helper before there are fixes",
+      "kind": "screen",
+      "status": "approved",
+      "platforms": [
+        "desktop"
+      ],
+      "screen": "e1-editor-helper-no-fixes",
+      "summary": "D's helper while diagnostics carry no fixes: the floating box's rows carry no fix buttons; the panel's selected row shows Quick fix or Show diff drawn disabled (the design language's disabled button, never a live blue primary). Changed by the user: “make them disabled if they do nothing”. D's own frames keep their live buttons.",
+      "source": "E1-2 / E1-3 as built; approved by the user 2026-11-24 (E1-2/E1-3 Proposals review, P39)"
+    },
+    {
+      "id": "cg-e1-editor-source-as-built",
+      "title": "E1: Source text, as built (new states)",
+      "kind": "look",
+      "status": "approved",
+      "platforms": [
+        "desktop"
+      ],
+      "open": {
+        "desktop": "e1-editor-source"
+      },
+      "summary": "New states of e1-editor-source beside the approved ones: no-fix (the quick-fix menu with the message and one disabled row “No quick fix for dklpo/code yet”), no-fix-card (the hover card's buttons disabled), parse-error-no-fix (the inline note's Quick fix disabled; the page side names up to three top-level rows by key), text-alone (a 960 px window: Source shows the text alone, no Page / Text switch until E1-7).",
+      "source": "E1-2 / E1-3 as built; approved by the user 2026-11-24 (E1-2/E1-3 Proposals review, P27, P30, P31)"
+    },
+    {
+      "id": "cg-e1-editor-diagnostics-as-built",
+      "title": "E1: Diagnostics inbox, as built (new states)",
+      "kind": "look",
+      "status": "approved",
+      "platforms": [
+        "desktop"
+      ],
+      "open": {
+        "desktop": "e1-editor-diagnostics"
+      },
+      "summary": "New states of e1-editor-diagnostics beside the approved ones: no-fixes (header “Built 14:06 · lenient”; Quick fix, Apply to all and Run checks drawn disabled), no-fixes-preservation (no export difference yet: Show diff and Copy the difference disabled), stale-build (“Built 14:06, 2 files edited since”) and stale-no-build (“Doesn't build · 1 file edited”): the newest build failed, the list is what it reported, rows in edited files say “edited since the build”.",
+      "source": "E1-2 / E1-3 as built; approved by the user 2026-11-24 (E1-2/E1-3 Proposals review, P36, P37, P39)"
+    },
+    {
       "id": "cg-e1-tools-checks",
       "title": "E1: Run checks",
       "kind": "screen",

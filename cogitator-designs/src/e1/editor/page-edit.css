@@ -1,0 +1,28 @@
+/*
+ * E1-3 page edits as built (approved by the user 2026-11-24): a value or the title edited in place, the `/` menu after
+ * a selected statement, a statement's context menu, refusals. Scoped to `cg-` names Direction D never uses. Values from
+ * tokens.css; the field's ring is the drawn `cg-editing` cell (editor.css).
+ */
+
+/* The title in place: the h1's own type in the accent-ringed cell; "↵ saves" in the small type after it. */
+.fc-d .d-page h1.cg-editing-title { display: flex; align-items: baseline; gap: 10px; margin-left: -6px; padding: 0 6px; border-radius: var(--cg-radius-block); background: var(--cg-pane); box-shadow: inset 0 0 0 1.5px var(--cg-accent); }
+.fc-d .d-page h1.cg-editing-title .cg-caret { align-self: center; height: 1em; }
+.fc-d .d-page h1.cg-editing-title > .d-muted { margin-left: auto; font-size: var(--cg-text-small); font-weight: 400; letter-spacing: 0; white-space: nowrap; }
+
+/* A refusal stands beside the field, in error red, where the drawn note sits. */
+.fc-cg .cg-peek-note.cg-pe-refused { color: var(--cg-status-error); }
+
+/* The `/` line and its menu right after the selected statement; the list scrolls past 340 px. */
+.fc-d .cg-pe-slash-at { position: relative; }
+.fc-d .cg-pe-slashmenu { max-height: 340px; overflow-y: auto; }
+
+/* A statement's context menu at the pointer (the context-menu primitive), over the page. */
+.fc-d .cg-pe-menu-at { position: relative; height: 0; }
+.fc-cg .cg-pe-menu { position: absolute; top: -14px; left: 196px; z-index: 5; width: 240px; }
+.fc-cg .cg-pe-menu .cg-menu-label.mono { font: var(--cg-text-mono-kw) var(--cg-mono); }
+
+/* A refused remove, move or insert: in the top bar, in place of "Edited just now". */
+.fc-cg .cg-pe-status { display: inline-flex; align-items: center; gap: 5px; max-width: 46ch; overflow: hidden; color: var(--cg-status-error); font-size: var(--cg-text-small); text-overflow: ellipsis; white-space: nowrap; }
+
+/* The inserted statement's placeholder key, selected in the text, ready to type over. */
+.fc-cg .cg-code-pick { border-radius: 2px; background: var(--cg-select-text); }

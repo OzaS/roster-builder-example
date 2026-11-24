@@ -413,6 +413,8 @@ export function HelperBox(props: {
   issues: Diagnostic[]; resolved: ReadonlySet<string>; elsewhere: number; checking: "idle" | "busy" | "done";
   onCollapse: () => void; onExpand: () => void; onFix: (id: string) => void; onUndo: (id: string) => void; onDiff: (d: Diagnostic) => void; onAll: () => void;
   onChecks: () => void; onInsert: () => void; onProperties: () => void;
+  /** Before diagnostics carry fixes (E1 as built, P39): the rows carry no fix buttons. D itself never sets it. */
+  noFixes?: boolean;
 }) {
   const { issues, resolved } = props;
   const problems = issues.filter((d) => d.kind !== "suggestion");
@@ -425,7 +427,7 @@ export function HelperBox(props: {
         <span className="d-hmsg">{done ? `${d.kind === "error" ? "Fixed" : "Applied"}: ${d.fix?.replace(/`/g, "")}` : code(d.message)}</span>
         {done ? (
           <button type="button" className="d-btn sm" onClick={() => props.onUndo(d.id)}>Undo</button>
-        ) : d.kind === "preservation" ? (
+        ) : props.noFixes ? null : d.kind === "preservation" ? (
           <button type="button" className="d-btn sm" onClick={() => props.onDiff(d)}>Show diff</button>
         ) : (
           <button type="button" className="d-btn sm" onClick={() => props.onFix(d.id)}>{d.fix?.replace(/`/g, "")}</button>

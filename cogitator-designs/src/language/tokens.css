@@ -37,6 +37,8 @@
   --cg-hover: color-mix(in srgb, var(--cg-ink) 5%, transparent);
   --cg-press: color-mix(in srgb, var(--cg-ink) 10%, transparent);
   --cg-select: color-mix(in srgb, var(--cg-accent) 14%, transparent);
+  /* Text selected inside a selected line (an inserted statement's placeholder key, E1-3 as built). */
+  --cg-select-text: color-mix(in srgb, var(--cg-accent) 30%, transparent);
   --cg-mention: color-mix(in srgb, var(--cg-accent) 10%, transparent);
   --cg-mention-hover: color-mix(in srgb, var(--cg-accent) 18%, transparent);
   --cg-exit-hover: color-mix(in srgb, var(--cg-accent) 22%, transparent);
@@ -255,6 +257,7 @@
 @media (forced-colors: active) {
   .fc-cg {
     --cg-select: Highlight;
+    --cg-select-text: Highlight;
     --cg-focus-color: CanvasText;
     --cg-focus-offset: 1px;
   }

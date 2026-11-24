@@ -1,6 +1,8 @@
 import type { E1Screen } from "../types";
 import { DiagnosticsScreen } from "./DiagnosticsScreen";
 import { EmptyScreen } from "./EmptyScreen";
+import { HelperNoFixScreen } from "./HelperNoFixScreen";
+import { PageEditScreen } from "./PageEditScreen";
 import { ReferencesScreen } from "./ReferencesScreen";
 import { SourceScreen } from "./SourceScreen";
 
@@ -20,6 +22,10 @@ export const editorScreens: E1Screen[] = [
       { id: "parse-error", title: "Module doesn't parse" },
       { id: "large", title: "Large text" },
       { id: "narrow", title: "960 px window" },
+      { id: "no-fix", title: "As built: quick fix menu, no fixes yet" },
+      { id: "no-fix-card", title: "As built: hover card, fix buttons disabled" },
+      { id: "parse-error-no-fix", title: "As built: module doesn't parse, no fixes yet" },
+      { id: "text-alone", title: "As built: 960 px, the text alone" },
     ],
     tryIt: [
       { what: "Sync", how: "click a block or a property on the page: its lines light up in the text; click a line in the text: its block lights up (a line in another entry opens that entry)." },
@@ -63,6 +69,10 @@ export const editorScreens: E1Screen[] = [
       { id: "preservation", title: "Preservation failure with its diff" },
       { id: "stale", title: "Out of date: edits since the check" },
       { id: "clear", title: "No issues" },
+      { id: "no-fixes", title: "As built: Built 14:06, fix buttons disabled" },
+      { id: "no-fixes-preservation", title: "As built: preservation failure, no diff yet" },
+      { id: "stale-build", title: "As built: newest build failed, edits since" },
+      { id: "stale-no-build", title: "As built: doesn't build" },
     ],
     tryIt: [
       { what: "Triage", how: "↑ ↓ (or j k) move through the list, ↵ opens the entry, ⌥↵ applies the selected fix; Undo brings it back." },
@@ -71,6 +81,39 @@ export const editorScreens: E1Screen[] = [
       { what: "Checks", how: "Run checks (⌘⇧C) shows progress, then the out-of-date note goes." },
     ],
     render: ({ mode, state, interactive }) => <DiagnosticsScreen mode={mode} state={state} interactive={interactive} />,
+  },
+  {
+    id: "e1-editor-page-edits",
+    group: "Edit",
+    title: "Editing on the page",
+    item: "cg-e1-editor-page-edits",
+    summary:
+      "Editing an entry on its page (E1-3 as built, approved by the user 2026-11-24). A value cell edits in place: click it, or ↵ on a focused row; the value becomes a field in the same type and size with the accent ring and “↵ saves”; ↵ saves, Esc or clicking away cancels; each tag or cost edits its own statement. The title edits the same way in the h1's own type. A refusal stands beside the field in error red. A selected statement is drawn as the text view's linked block (the selection tint); the keyboard focus goes with it and draws no ring over the tint. With a statement selected, / opens the insert menu right after it, inserting into its block (“Valid in” names that block); the list scrolls past 340 px. After inserting, the new statement is selected; with the text open, the text has the focus with the placeholder key selected, ready to type over. A right-click (⇧F10) opens the statement's context menu: Insert below…, Move up, Move down, then Remove statement in error red, keys as muted text; an item that can't run is disabled and says why. A refused remove, move or insert shows in the top bar, in place of “Edited just now”, for 6 s. While files are unsaved, the sidebar footer reads “Unsaved · n files” with the warning dot.",
+    states: [
+      { id: "edit-value", title: "Editing a value (Cost)" },
+      { id: "edit-title", title: "Editing the title" },
+      { id: "field-refusal", title: "A value refused beside the field" },
+      { id: "selected", title: "A selected statement" },
+      { id: "slash-after", title: "/ menu after the selected statement" },
+      { id: "inserted", title: "After inserting, text open, unsaved" },
+      { id: "context-menu", title: "Statement context menu" },
+      { id: "top-refusal", title: "A move refused in the top bar" },
+    ],
+    render: ({ mode, state, interactive }) => <PageEditScreen mode={mode} state={state} interactive={interactive} />,
+  },
+  {
+    id: "e1-editor-helper-no-fixes",
+    group: "Diagnostics",
+    title: "Helper before there are fixes",
+    item: "cg-e1-editor-helper-no-fixes",
+    summary:
+      "D's helper while diagnostics carry no fixes (E1 as built, approved by the user 2026-11-24: “make them disabled if they do nothing”). The floating box's rows carry no fix buttons. In the panel the selected row shows Quick fix, or Show diff for a preservation failure, drawn disabled (the design language's disabled button: muted text on the hover fill, never a live blue primary), the reason in its tooltip. D's own box and panel keep their live buttons for when fixes arrive.",
+    states: [
+      { id: "box", title: "Floating box: no fix buttons" },
+      { id: "panel-issues", title: "Panel: Show diff disabled" },
+      { id: "panel-suggestions", title: "Panel: Quick fix disabled" },
+    ],
+    render: ({ mode, state, interactive }) => <HelperNoFixScreen mode={mode} state={state} interactive={interactive} />,
   },
   {
     id: "e1-editor-empty",
