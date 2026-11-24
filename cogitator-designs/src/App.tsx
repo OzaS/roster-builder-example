@@ -1,8 +1,9 @@
 import { TrackChip, TrackSwitch } from "@designs/kit";
-import { AppWindow, Blend, Component, Palette } from "lucide-react";
+import { AppWindow, Blend, Columns2, Component, Moon, Palette, Sun } from "lucide-react";
 import type { ReactNode } from "react";
 import { cogitatorNext, cogitatorTrack } from "./track";
 import { go, hrefFor, pageOf, useSearch, type Page } from "./route";
+import { setGalleryTheme, useGalleryTheme, type GalleryTheme } from "./theme";
 import { DirectionScreen } from "./directions";
 import type { DState } from "./directions/DirectionD";
 import type { DirectionId } from "./directions/meta";
@@ -24,6 +25,7 @@ export function App() {
   const params = useSearch();
   const track = cogitatorTrack.useTrack();
   const page = pageOf(params);
+  const theme = useGalleryTheme();
 
   // `?view=frame&direction=d&mode=dark&state=…`: Direction D's window alone at its design width (captures).
   if (params.get("view") === "frame") {
@@ -43,9 +45,10 @@ export function App() {
       <aside className="cg-rail" aria-label="Gallery">
         <div className="cg-brand"><span className="cg-mark" aria-hidden>FC</span><span><strong>Field Cogitator</strong><small>Desktop design library</small></span></div>
         <TrackSwitch store={cogitatorTrack} entries={cogitatorNext.entries} showItems={false} />
+        <ThemeSwitch theme={theme} />
         <nav className="cg-nav" aria-label="Pages">
           <h2>D4 · Direction</h2>
-          <NavLink page="d" current={page} icon={<Blend size={16} />} label="Direction D · Entry editor" meta="Interactive, light and dark" />
+          <NavLink page="d" current={page} icon={<Blend size={16} />} label="Direction D · Entry editor" meta="Interactive" />
           <h2>D4 · Design language</h2>
           <NavLink page="language" current={page} icon={<Palette size={16} />} label="Design language" meta="Tokens, type, density, layout" />
           <NavLink page="elements" current={page} icon={<Component size={16} />} label="Elements" meta="Primitives, macOS and Windows" />
@@ -57,6 +60,25 @@ export function App() {
       <main className="cg-stage">
         {track === "current" ? <CurrentEmpty /> : page === "language" ? <LanguagePage /> : page === "elements" ? <ElementsPage /> : page === "e1" ? <E1Page screen={params.get("screen")} /> : <DirectionPage id={page} />}
       </main>
+    </div>
+  );
+}
+
+const themeChoices: { theme: GalleryTheme; label: string; icon: ReactNode; title: string }[] = [
+  { theme: "light", label: "Light", icon: <Sun size={14} />, title: "Draw every design in light" },
+  { theme: "dark", label: "Dark", icon: <Moon size={14} />, title: "Draw every design in dark" },
+  { theme: "both", label: "Both", icon: <Columns2 size={14} />, title: "Draw light and dark side by side" },
+];
+
+/** One switch for the whole gallery: the chrome and every design follow it (theme.ts). */
+function ThemeSwitch({ theme }: { theme: GalleryTheme }) {
+  return (
+    <div className="cg-theme-switch" role="group" aria-label="Theme of the designs">
+      {themeChoices.map((choice) => (
+        <button key={choice.theme} type="button" className={theme === choice.theme ? "active" : ""} aria-pressed={theme === choice.theme} title={choice.title} onClick={() => setGalleryTheme(choice.theme)}>
+          {choice.icon}{choice.label}
+        </button>
+      ))}
     </div>
   );
 }

@@ -2,7 +2,7 @@ import { useSyncExternalStore } from "react";
 
 /**
  * Gallery routing in the query string, so a copied link opens the same page:
- * `?page=d|language|elements|e1` (Direction D, the design language, the Elements view or the E1 screens, `&screen=<id>` for one; the removed `board`, `a`, `b`, `c` open D), `?theme=light|dark` (gallery theme; default follows the OS),
+ * `?page=d|language|elements|e1` (Direction D, the design language, the Elements view or the E1 screens, `&screen=<id>` for one; the removed `board`, `a`, `b`, `c` open D), `?theme=light|dark|both` (the theme switch, `theme.ts`),
  * `?view=frame&direction=d&mode=dark` (Direction D's window alone at its 1440 px design width, for captures).
  * Direction D is interactive; `&state=default|collapsed|panel|focus|focus-panel` sets its starting layout in the frame view.
  * `?view=frame&screen=<id>&mode=dark&state=<state>&platform=windows`: one E1 screen alone at its design width.
@@ -44,10 +44,4 @@ export function go(page: Page, anchor?: string) {
   listeners.forEach((listener) => listener());
   if (anchor) document.getElementById(anchor)?.scrollIntoView();
   else window.scrollTo(0, 0);
-}
-
-/** Applies `?theme=` to the root element (CSS reads `data-theme`; without it the OS setting applies). */
-export function applyTheme() {
-  const theme = new URLSearchParams(window.location.search).get("theme");
-  if (theme === "light" || theme === "dark") document.documentElement.dataset.theme = theme;
 }
