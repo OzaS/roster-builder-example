@@ -7,7 +7,9 @@ import { State, type Mode, type Platform } from "../../language/Specimen";
 import { allDiagnostics, frostBroken, frostWardens, ironWardens, lineOf } from "./data";
 import { CodeHead, CodeStatus, CodeView, type CodeMark } from "./code";
 import { Blocks } from "./page";
-import { DiagCard, FixMenu } from "./parts";
+import { DiagCard, FixMenu, LATER_FIX, NoFixMenu } from "./parts";
+import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
+import "./page-edit.css";
 import { BacklinksPanel, Peek, Unresolved } from "./ReferencesScreen";
 import { BackForward } from "./shell";
 import "./editor.css";
@@ -75,6 +77,53 @@ export const editorRenderers: Record<string, Renderer> = {
             { label: <>Change to <span className="mono">rime-blade</span></> },
             { label: <>Create upgrade <span className="mono">halbred</span> in Frost Wardens…</>, icon: "idea" },
           ]} />
+        </State>
+      </div>
+    ),
+  },
+  "editor.page-edit": {
+    wide: true,
+    render: (_mode, platform) => (
+      <div className="cg-stack">
+        <div className="cg-row-flex">
+          <State label={`A value in place: the accent ring, ${key(platform, "↵", "Enter")} saves`}>
+            <dl className="d-props" style={{ width: 460 }}><div><dt>Cost</dt><dd className="cg-editing"><strong className="num">16</strong><span className="cg-caret" aria-hidden /><span>pts</span><span className="d-muted">{key(platform, "↵", "Enter")} saves</span></dd></div></dl>
+          </State>
+          <State label="Refused: the reason beside the field, in error red">
+            <dl className="d-props" style={{ width: 460 }}><div><dt>Cost</dt><dd className="cg-editing"><strong className="num">16 | 2</strong><span className="cg-caret" aria-hidden /><span>pts</span><span className="cg-peek-note cg-pe-refused"><DiagIcon kind="error" size={12} />Would be another statement</span></dd></div></dl>
+          </State>
+        </div>
+        <State label="The title in place, in the h1's own type" wide>
+          <div className="d-page" style={{ width: 520 }}><h1 className="cg-editing-title"><span className="cg-pe-title-text">Warden Patrol<span className="cg-caret" aria-hidden /></span><span className="d-muted">{key(platform, "↵", "Enter")} saves</span></h1></div>
+        </State>
+        <div className="cg-row-flex">
+          <State label="Statement context menu: an item that can't run is disabled">
+            <div className="cg-menu" role="menu" aria-label="use spear" style={{ width: 240 }}>
+              <p className="cg-menu-label mono">use spear</p>
+              <button type="button" role="menuitem" className="cg-menu-item"><Plus size={15} />Insert below…<span className="cg-menu-key">/</span></button>
+              <button type="button" role="menuitem" className="cg-menu-item" disabled><ArrowUp size={15} />Move up<span className="cg-menu-key">{key(platform, "⌥↑", "Alt+Up")}</span></button>
+              <button type="button" role="menuitem" className="cg-menu-item"><ArrowDown size={15} />Move down<span className="cg-menu-key">{key(platform, "⌥↓", "Alt+Down")}</span></button>
+              <div className="cg-menu-sep" role="separator" />
+              <button type="button" role="menuitem" className="cg-menu-item danger"><Trash2 size={15} />Remove statement<span className="cg-menu-key">{key(platform, "⌫", "Del")}</span></button>
+            </div>
+          </State>
+          <State label="A refused remove, move or insert in the top bar (6 s)">
+            <span className="cg-pe-status" role="status"><DiagIcon kind="error" size={12} />It is the first statement of its block</span>
+          </State>
+        </div>
+        <div className="cg-row-flex">
+          <State label="Quick fixes before there are any: one disabled row">
+            <NoFixMenu message="Unknown reference `halbred`" code="ref-unknown" />
+          </State>
+          <State label="Hover card: fix buttons disabled">
+            <DiagCard list={allDiagnostics.filter((d) => d.id === "d2" || d.id === "d4")} noFixes />
+          </State>
+          <State label="Inbox or panel: Quick fix drawn disabled">
+            <span className="cg-row-flex"><button type="button" className="d-btn primary" disabled title={LATER_FIX}>Quick fix<kbd>{key(platform, "⌥↵", "Alt+Enter")}</kbd></button><button type="button" className="d-btn" disabled>Copy the difference</button></span>
+          </State>
+        </div>
+        <State label="After inserting: the placeholder key selected in the text, ready to type over" wide>
+          <div className="cg-el-code"><CodeView lines={[...iron.slice(0, sq + 1), "  upgrade new-upgrade ..1"]} start={sq} end={sq + 2} selected={[sq + 2, sq + 2]} caret={{ line: sq + 2, col: 21 }} pick={{ line: sq + 2, from: 10, to: 21 }} label="Code editor, inserted statement" compact /></div>
         </State>
       </div>
     ),

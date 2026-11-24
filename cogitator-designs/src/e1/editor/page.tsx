@@ -165,9 +165,15 @@ export function propLines(module: ModuleText, decl: number) {
 }
 
 /** The page: D's title, backlinks and properties for the entry, then its statements as linked blocks. */
-export function LinkedPage({ id, module, sel, flags, follow, folded, after, onBacklinks, brokenLines, noTail }: {
+export function LinkedPage({ id, module, sel, flags, follow, folded, after, onBacklinks, brokenLines, noTail, propEdit, propValue, titleEdit }: {
   id: string; module: ModuleText; sel?: PageSel; flags?: Record<number, DiagKind>; follow?: Follow; folded?: number[];
   after?: Record<number, ReactNode>; onBacklinks?: () => void; brokenLines?: number[]; noTail?: boolean;
+  /** A property row's value drawn as a field in place (the `cg-editing` cell), by its label (E1-3 page edits). */
+  propEdit?: Record<string, ReactNode>;
+  /** A property row's value replaced (a value after an edit), by its label. */
+  propValue?: Record<string, ReactNode>;
+  /** The title drawn as a field in place, in the h1's own type (E1-3 page edits). */
+  titleEdit?: ReactNode;
 }) {
   const page = pageFor(id);
   const key = id.split(":")[1];
@@ -177,7 +183,7 @@ export function LinkedPage({ id, module, sel, flags, follow, folded, after, onBa
   return (
     <article className="d-page cg-linked-page">
       <div className="d-pageicon"><KindIcon kind={page.kind} size={28} /></div>
-      <h1 className={page.noText ? "d-notext" : ""}>{page.name}{page.noText ? <span className="d-tag warn">No en text</span> : null}</h1>
+      {titleEdit ? <h1 className="cg-editing-title">{titleEdit}</h1> : <h1 className={page.noText ? "d-notext" : ""}>{page.name}{page.noText ? <span className="d-tag warn">No en text</span> : null}</h1>}
       <p className="d-backlinks">
         <ArrowDownLeft size={14} />
         {onBacklinks ? <button type="button" className="cg-backlinks-btn" onClick={onBacklinks} title="List every place that refers to this entry (⇧F12)">{page.backlinks.length} backlink{page.backlinks.length === 1 ? "" : "s"}<kbd>⇧F12</kbd></button> : <span className="d-muted">{page.backlinks.length} backlink{page.backlinks.length === 1 ? "" : "s"}</span>}
@@ -189,7 +195,7 @@ export function LinkedPage({ id, module, sel, flags, follow, folded, after, onBa
           const linked = Boolean(line && range && line >= range[0] && line <= range[1]);
           return (
             <div key={prop.label} className={linked ? "cg-linked-prop" : undefined} onClick={line && sel ? () => sel.onSelect(line) : undefined}>
-              <dt>{prop.icon}{prop.label}</dt><dd>{prop.value}{line && sel ? <span className="cg-lineno" aria-label={`Line ${line}`}>{line}</span> : null}</dd>
+              <dt>{prop.icon}{prop.label}</dt><dd className={propEdit?.[prop.label] ? "cg-editing" : undefined}>{propEdit?.[prop.label] ?? propValue?.[prop.label] ?? prop.value}{line && sel ? <span className="cg-lineno" aria-label={`Line ${line}`}>{line}</span> : null}</dd>
             </div>
           );
         })}

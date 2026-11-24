@@ -29,6 +29,7 @@ const swatchGroups: { label: string; tokens: { name: string; use: string }[] }[]
     { name: "--cg-hover", use: "Hover (ink 5%)" },
     { name: "--cg-press", use: "Pressed, active tab (ink 10%)" },
     { name: "--cg-select", use: "Selection (accent 14%)" },
+    { name: "--cg-select-text", use: "Text selected inside a selected line (accent 30%)" },
     { name: "--cg-mention", use: "Mention chip (accent 10%)" },
   ] },
   { label: "Status", tokens: [
@@ -52,6 +53,7 @@ const pairs: Pair[] = [
   { fg: "--cg-ink", bg: "--cg-surface", use: "Sidebar and panel text", need: 4.5 },
   { fg: "--cg-ink", bg: "--cg-float", use: "Helper box, menus, palette", need: 4.5 },
   { fg: "--cg-ink", bg: "--cg-select", base: "--cg-surface", use: "Active sidebar item", need: 4.5 },
+  { fg: "--cg-ink", bg: "--cg-select-text", base: "--cg-pane", use: "Placeholder key selected in the text", need: 4.5 },
   { fg: "--cg-muted", bg: "--cg-pane", use: "Secondary text, column heads, keywords", need: 4.5 },
   { fg: "--cg-muted", bg: "--cg-surface", use: "Sidebar headings and counts", need: 4.5 },
   { fg: "--cg-muted", bg: "--cg-float", use: "Muted text in floating objects", need: 4.5 },

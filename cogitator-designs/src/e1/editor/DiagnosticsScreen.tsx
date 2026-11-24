@@ -14,10 +14,22 @@ import { BackForward, EditorGrid, Sidebar, Win, type Mode, useWindowKeys } from 
  * grouped by kind, filters (source, layer, code), keyboard triage, a detail pane with the affected text and the fix,
  * the export difference for a preservation failure, and a bulk fix for a suggestion code.
  */
-export type InboxState = "inbox" | "preservation" | "stale" | "clear";
+export type InboxState = "inbox" | "preservation" | "stale" | "clear" | "no-fixes" | "no-fixes-preservation" | "stale-build" | "stale-no-build";
+const inboxStates: InboxState[] = ["inbox", "preservation", "stale", "clear", "no-fixes", "no-fixes-preservation", "stale-build", "stale-no-build"];
+
+/** Why a button that does nothing yet is drawn disabled (E1 as built, P39: the design language's disabled button). */
+const LATER_FIX = "Quick fixes come with a later slice: diagnostics carry no fixes yet";
+const LATER_EXPORT = "Comes with Roundtrip and Export (E1-5)";
+const LATER_CHECKS = "Run checks comes with E1-5";
+
+/** The parse error of the newest build when it failed (the out-of-date states as built, P36): what that build reported. */
+const parseRow: Row = {
+  id: "pe1", kind: "error", code: "bracket", where: "iron-wardens:warden-squad/warden/banner", message: "Unclosed bracket", layer: "Base",
+  entry: "iron-wardens:warden-squad", entryName: "Warden Squad", source: "Iron Wardens", file: "iron-wardens/module.dkl",
+};
 
 type Row = Diagnostic & { entry?: string; entryName: string; source: string; file: string; line?: number };
-const rows: Row[] = allDiagnostics.map((d) => {
+const allRows: Row[] = allDiagnostics.map((d) => {
   const top = d.where.split("/")[0];
   const entry = top.includes(":") && lookupRow(top) ? top : undefined;
   const p = place(d);
@@ -52,8 +64,12 @@ const diffs: Record<string, { file: string; note: string; lines: { t: " " | "-" 
 const CHECKED = "14:06";
 
 export function DiagnosticsScreen({ mode, state = "inbox", interactive }: { mode: Mode; state?: string; interactive: boolean }) {
-  const s = (["inbox", "preservation", "stale", "clear"].includes(state) ? state : "inbox") as InboxState;
-  const [selId, setSelId] = useState(s === "preservation" ? "d2" : "d1");
+  const s = (inboxStates.includes(state as InboxState) ? state : "inbox") as InboxState;
+  /* As built (approved 2026-11-24): the header names the build, fix buttons are disabled; the newest build failed in the two stale-* states. */
+  const built = s === "no-fixes" || s === "no-fixes-preservation" || s === "stale-build" || s === "stale-no-build";
+  const buildStale = s === "stale-build" || s === "stale-no-build";
+  const rows = buildStale ? [parseRow, ...allRows] : allRows;
+  const [selId, setSelId] = useState(s === "preservation" || s === "no-fixes-preservation" ? "d2" : buildStale ? "pe1" : "d1");
   const [resolved, setResolved] = useState<ReadonlySet<string>>(new Set(s === "clear" ? allDiagnostics.map((d) => d.id) : []));
   const [stale, setStale] = useState(s === "stale");
   const [checking, setChecking] = useState<"idle" | "busy">("idle");
@@ -84,7 +100,7 @@ export function DiagnosticsScreen({ mode, state = "inbox", interactive }: { mode
   keys.current = {
     move, run: runChecks,
     enter: () => { if (sel?.entry) setOpened(sel.entryName); },
-    fix: () => { if (sel && sel.kind !== "preservation" && !resolved.has(sel.id)) resolve([sel.id]); },
+    fix: () => { if (!built && sel && sel.kind !== "preservation" && !resolved.has(sel.id)) resolve([sel.id]); },
   };
   const claim = useWindowKeys(interactive, (event: KeyboardEvent) => {
       if ((event.target as HTMLElement).tagName === "INPUT") return;
@@ -129,7 +145,7 @@ export function DiagnosticsScreen({ mode, state = "inbox", interactive }: { mode
         <h3><DiagIcon kind={kind} size={13} />{kindHeading[kind]}<span className="d-muted">{list.filter((r) => !resolved.has(r.id)).length}</span></h3>
         {list.map((r) => {
           const done = resolved.has(r.id);
-          const edited = stale && (r.entry === "iron-wardens:warden-squad" || r.entry === "frost-wardens:ice-guard");
+          const edited = (stale && (r.entry === "iron-wardens:warden-squad" || r.entry === "frost-wardens:ice-guard")) || (buildStale && r.file === "iron-wardens/module.dkl");
           return (
             <div key={r.id} data-id={r.id} role="option" aria-selected={sel?.id === r.id} tabIndex={sel?.id === r.id ? 0 : -1}
               className={`cg-ib-row edge-${kind}${sel?.id === r.id ? " selected" : ""}${done ? " done" : ""}`} onClick={() => setSelId(r.id)} onDoubleClick={() => r.entry && setOpened(r.entryName)}>
@@ -139,7 +155,7 @@ export function DiagnosticsScreen({ mode, state = "inbox", interactive }: { mode
                 <span className="cg-ib-entry">{r.entryName}</span>
                 <span className="mono">{r.source}</span>
                 {r.layer !== "Base" ? <span className="d-layer">{r.layer}</span> : null}
-                {edited ? <span className="cg-ib-edited">edited since the check</span> : null}
+                {edited ? <span className="cg-ib-edited">{buildStale ? "edited since the build" : "edited since the check"}</span> : null}
                 <span className="d-spacer" />
                 <span className="mono cg-ib-codename">{r.code}</span>
               </p>
@@ -152,14 +168,14 @@ export function DiagnosticsScreen({ mode, state = "inbox", interactive }: { mode
 
   return (
     <Win mode={mode} interactive={interactive} onClaim={claim}>
-      <EditorGrid side={<Sidebar active="updates" updates={open.length} entry={null} source={null} foot={stale ? <><span className="d-dot cg-dot-warn" />Edited since the check</> : undefined} />}>
+      <EditorGrid side={<Sidebar active="updates" updates={open.length} entry={null} source={null} foot={stale ? <><span className="d-dot cg-dot-warn" />Edited since the check</> : buildStale ? <><span className="d-dot cg-dot-err" />Unsaved · 1 parse error</> : undefined} />}>
         <main className="d-main" aria-label="Updates">
           <header className="d-top">
             <BackForward back="Warden Squad" />
             <span className="d-crumbs">Demo Skirmish<span>/</span>Updates</span>
             <span className="d-spacer" />
-            <span className={`d-muted${stale ? " cg-stale-text" : ""}`}>{checking === "busy" ? "Checking 3 sources…" : stale ? `Checked ${CHECKED}, 3 edits since` : `Checked ${checkedAt} · lenient`}</span>
-            <button type="button" className="d-btn" onClick={runChecks} disabled={checking === "busy"} title="Check the whole dataset again (⌘⇧C)">{checking === "busy" ? <RefreshCw size={14} className="cg-spin" /> : <Play size={14} />}{checking === "busy" ? "Checking…" : "Run checks"}<kbd>⌘⇧C</kbd></button>
+            <span className={`d-muted${stale || buildStale ? " cg-stale-text" : ""}`}>{checking === "busy" ? "Checking 3 sources…" : stale ? `Checked ${CHECKED}, 3 edits since` : s === "stale-build" ? `Built ${CHECKED}, 2 files edited since` : s === "stale-no-build" ? "Doesn't build · 1 file edited" : built ? `Built ${CHECKED} · lenient` : `Checked ${checkedAt} · lenient`}</span>
+            <button type="button" className="d-btn" onClick={runChecks} disabled={checking === "busy" || built} title={built ? LATER_CHECKS : "Check the whole dataset again (⌘⇧C)"}>{checking === "busy" ? <RefreshCw size={14} className="cg-spin" /> : <Play size={14} />}{checking === "busy" ? "Checking…" : "Run checks"}<kbd>⌘⇧C</kbd></button>
           </header>
 
           {all ? (
@@ -180,11 +196,17 @@ export function DiagnosticsScreen({ mode, state = "inbox", interactive }: { mode
                       <p><strong>Out of date.</strong> 3 edits in Warden Squad and Ice Guard since the check at {CHECKED}; some of these may be fixed or new ones may exist.</p>
                       <button type="button" className="d-btn sm primary" onClick={runChecks} disabled={checking === "busy"}>{checking === "busy" ? "Checking…" : "Run checks"}<kbd>⌘⇧C</kbd></button>
                     </div>
+                  ) : buildStale ? (
+                    <div className="cg-ib-stale" role="status">
+                      <RefreshCw size={14} />
+                      <p><strong>Out of date.</strong> The newest build doesn't compile (Unclosed bracket): this list is what it reported, so the checks after compiling didn't run. {s === "stale-build" ? "2 files" : "1 file"} edited since the last build that built.</p>
+                      <button type="button" className="d-btn sm primary" disabled title={LATER_CHECKS}>Run checks<kbd>⌘⇧C</kbd></button>
+                    </div>
                   ) : null}
                   <div className={stale ? "cg-ib-dim" : undefined}>{listBody}</div>
                   {shown.length ? null : <p className="d-empty">No diagnostic matches these filters. <button type="button" onClick={() => { setFilters({}); setQuery(""); }}>Clear filters</button></p>}
                 </div>
-                {sel ? <Detail row={sel} stale={stale} done={resolved.has(sel.id)} onFix={(ids) => resolve(ids)} onUndo={unresolve} resolved={resolved} onOpen={() => sel.entry && setOpened(sel.entryName)} /> : null}
+                {sel ? <Detail row={sel} stale={stale} built={built} buildStale={buildStale} rows={rows} done={resolved.has(sel.id)} onFix={(ids) => resolve(ids)} onUndo={unresolve} resolved={resolved} onOpen={() => sel.entry && setOpened(sel.entryName)} /> : null}
               </div>
               <footer className="cg-ib-keys"><kbd>↑</kbd><kbd>↓</kbd> move <kbd>↵</kbd> open the entry <kbd>⌥↵</kbd> apply the fix <kbd>⌘⇧C</kbd> run checks <span className="d-spacer" />{opened ? <span className="cg-ib-opened">Opens {opened} with this issue in its helper · <kbd>⌘[</kbd> back here</span> : <span>The helper panel's Dataset scope shows the same list beside a page</span>}</footer>
             </>
@@ -195,13 +217,28 @@ export function DiagnosticsScreen({ mode, state = "inbox", interactive }: { mode
   );
 }
 
-function Detail({ row, done, resolved, onFix, onUndo, onOpen, stale }: { row: Row; done: boolean; resolved: ReadonlySet<string>; stale?: boolean; onFix: (ids: string[]) => void; onUndo: (id: string) => void; onOpen: () => void }) {
+function Detail({ row, done, resolved, onFix, onUndo, onOpen, stale, built, buildStale, rows }: { row: Row; done: boolean; resolved: ReadonlySet<string>; stale?: boolean; built?: boolean; buildStale?: boolean; rows: Row[]; onFix: (ids: string[]) => void; onUndo: (id: string) => void; onOpen: () => void }) {
   const p = place(row);
   const m = p ? modulesById[p.module] : undefined;
   const sameCode = rows.filter((r) => r.code === row.code && !resolved.has(r.id));
-  const diff = diffs[row.id];
+  /* As built, the export difference comes with E1-5: Show diff stands in its place, disabled. */
+  const diff = built ? undefined : diffs[row.id];
   let fix: ReactNode;
-  if (done) fix = <p className="cg-ib-done"><Check size={14} className="d-ok" />{row.kind === "error" ? "Fixed" : "Applied"}: {plain(row.fix ?? "")}<button type="button" className="d-btn sm" onClick={() => onUndo(row.id)}><Undo2 size={12} />Undo<kbd>⌘Z</kbd></button></p>;
+  if (built && row.kind === "preservation") fix = (
+    <div className="cg-ib-actions">
+      <button type="button" className="d-btn" onClick={onOpen} disabled={!row.entry} title={row.entry ? undefined : "A module-level difference: no entry page"}><CornerDownLeft size={13} />{row.entry ? `Open ${row.entryName}` : "No entry to open"}<kbd>↵</kbd></button>
+      <button type="button" className="d-btn" disabled title={LATER_EXPORT}><FileDiff size={13} />Show diff</button>
+      <button type="button" className="d-btn" disabled title={LATER_EXPORT}><Copy size={13} />Copy the difference</button>
+    </div>
+  );
+  else if (built) fix = (
+    <div className="cg-ib-actions">
+      <button type="button" className="d-btn primary" disabled title={LATER_FIX}><CornerDownLeft size={13} />Quick fix<kbd>⌥↵</kbd></button>
+      {row.kind === "suggestion" && sameCode.length > 1 ? <button type="button" className="d-btn" disabled title={LATER_FIX}><CheckCheck size={13} />Apply to all {sameCode.length} of this kind</button> : null}
+      <button type="button" className="d-btn" onClick={onOpen} disabled={!row.entry}>{row.entry ? `Open ${row.entryName}` : "Open the patch"}<kbd>↵</kbd></button>
+    </div>
+  );
+  else if (done) fix = <p className="cg-ib-done"><Check size={14} className="d-ok" />{row.kind === "error" ? "Fixed" : "Applied"}: {plain(row.fix ?? "")}<button type="button" className="d-btn sm" onClick={() => onUndo(row.id)}><Undo2 size={12} />Undo<kbd>⌘Z</kbd></button></p>;
   else if (row.kind === "preservation") fix = (
     <div className="cg-ib-actions">
       <button type="button" className="d-btn" onClick={onOpen} disabled={!row.entry} title={row.entry ? undefined : "A module-level difference: no entry page"}><CornerDownLeft size={13} />{row.entry ? `Open ${row.entryName}` : "No entry to open"}<kbd>↵</kbd></button>
@@ -219,6 +256,7 @@ function Detail({ row, done, resolved, onFix, onUndo, onOpen, stale }: { row: Ro
     <section className="cg-ib-detail" aria-label="Diagnostic detail">
       <p className="cg-ib-kicker"><DiagIcon kind={row.kind} size={14} />{diagOne[row.kind]}<span className="mono">dklpo/{row.code}</span></p>
       <h2>{code(row.message)}</h2>
+      {buildStale && row.file === "iron-wardens/module.dkl" ? <p className="cg-ib-stalenote"><RefreshCw size={13} />{row.entryName} was edited after the last build that built: this may already be fixed, or read differently once it builds.</p> : null}
       {stale && (row.entry === "iron-wardens:warden-squad" || row.entry === "frost-wardens:ice-guard") ? <p className="cg-ib-stalenote"><RefreshCw size={13} />{row.entryName} was edited after the check: this may already be fixed. Run checks (⌘⇧C) to be sure.</p> : null}
       <dl className="cg-ib-facts">
         <div><dt>Entry</dt><dd>{row.entry ? <span className="d-mwrap"><span className="d-mention">{row.entryName}</span></span> : <span className="d-muted">{row.entryName}</span>}</dd></div>
@@ -242,7 +280,8 @@ function Detail({ row, done, resolved, onFix, onUndo, onOpen, stale }: { row: Ro
         </>
       ) : null}
       <h3 className="cg-ib-h">{row.kind === "preservation" ? "What you can do" : "Fix"}</h3>
-      {row.kind === "preservation" && !done ? <p className="cg-ib-note">No fix is needed to keep the data. For a byte-identical export, move the comment in the original data files; until then the export report lists this difference.</p> : null}
+      {row.kind === "preservation" && !done && built ? <p className="cg-ib-note">No fix is needed to keep the data. The export difference shows with Roundtrip and Export (E1-5).</p> : null}
+      {row.kind === "preservation" && !done && !built ? <p className="cg-ib-note">No fix is needed to keep the data. For a byte-identical export, move the comment in the original data files; until then the export report lists this difference.</p> : null}
       {fix}
     </section>
   );

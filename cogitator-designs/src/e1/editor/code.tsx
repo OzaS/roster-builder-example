@@ -16,17 +16,18 @@ export type CodePop = { line: number; col: number; node: ReactNode; above?: bool
 
 const rank: Record<DiagKind, number> = { error: 0, preservation: 1, suggestion: 2 };
 
-function Line({ text, marks, caret, pop, onHover }: { text: string; marks: CodeMark[]; caret?: number; pop?: CodePop; onHover?: (id: string | null) => void }) {
+function Line({ text, marks, caret, pop, onHover, pick }: { text: string; marks: CodeMark[]; caret?: number; pop?: CodePop; onHover?: (id: string | null) => void; pick?: [number, number] }) {
   const classes = charClasses(text);
   const markAt = (i: number) => marks.filter((m) => i >= m.from && i < m.to).sort((a, b) => rank[a.kind] - rank[b.kind])[0];
-  const runs: { text: string; c: SynClass; mark?: CodeMark; start: number }[] = [];
+  const runs: { text: string; c: SynClass; mark?: CodeMark; start: number; picked?: boolean }[] = [];
   for (let i = 0; i < text.length; i += 1) {
     const c = classes[i] ?? "";
     const mark = markAt(i);
     const last = runs[runs.length - 1];
-    const cut = i === caret || i === pop?.col;
+    const picked = pick ? i >= pick[0] && i < pick[1] : undefined;
+    const cut = i === caret || i === pop?.col || (pick !== undefined && (i === pick[0] || i === pick[1]));
     if (last && last.c === c && last.mark === mark && !cut) last.text += text[i];
-    else runs.push({ text: text[i], c, mark, start: i });
+    else runs.push({ text: text[i], c, mark, start: i, picked });
   }
   const anchor = (at: number) => (
     <>
@@ -39,7 +40,7 @@ function Line({ text, marks, caret, pop, onHover }: { text: string; marks: CodeM
       {runs.map((run) => (
         <span key={run.start} style={{ display: "contents" }}>
           {anchor(run.start)}
-          <span className={`${run.c ? `syn-${run.c}` : ""}${run.mark ? ` cg-u ${run.mark.kind}` : ""}`}
+          <span className={`${run.c ? `syn-${run.c}` : ""}${run.mark ? ` cg-u ${run.mark.kind}` : ""}${run.picked ? " cg-code-pick" : ""}`}
             onMouseEnter={run.mark && onHover ? () => onHover(run.mark!.id) : undefined}>{run.text}</span>
         </span>
       ))}
@@ -48,8 +49,10 @@ function Line({ text, marks, caret, pop, onHover }: { text: string; marks: CodeM
   );
 }
 
-export function CodeView({ lines, marks = [], selected, caret, pop, inline, onLine, onHover, scrollTo, start = 1, end, label, compact, wrapClass = "" }: {
+export function CodeView({ lines, marks = [], selected, caret, pop, inline, onLine, onHover, scrollTo, start = 1, end, label, compact, wrapClass = "", pick }: {
   lines: string[]; marks?: CodeMark[]; selected?: [number, number] | null; caret?: CodeCaret | null; pop?: CodePop | null;
+  /** Text selected in one line (an inserted statement's placeholder key, ready to type over): 0-based columns, `to` exclusive. */
+  pick?: { line: number; from: number; to: number } | null;
   inline?: Record<number, ReactNode>; onLine?: (line: number) => void; onHover?: (id: string | null) => void;
   /** Line to keep in view (scrolled to on mount and when it changes; placed a few lines below the top). */
   scrollTo?: number; start?: number; end?: number; label: string; compact?: boolean; wrapClass?: string;
@@ -75,7 +78,7 @@ export function CodeView({ lines, marks = [], selected, caret, pop, inline, onLi
         onClick={onLine ? () => onLine(n) : undefined}>
         <span className="cg-code-gut" aria-hidden>{kind ? <DiagIcon kind={kind} size={12} /> : null}</span>
         <span className="cg-code-num" aria-hidden>{n}</span>
-        <span className="cg-code-text"><Line text={text} marks={marks.filter((m) => m.line === n)} caret={caret?.line === n ? caret.col : undefined} pop={pop?.line === n ? pop : undefined} onHover={onHover} />{text ? null : "​"}</span>
+        <span className="cg-code-text"><Line text={text} marks={marks.filter((m) => m.line === n)} caret={caret?.line === n ? caret.col : undefined} pop={pop?.line === n ? pop : undefined} onHover={onHover} pick={pick?.line === n ? [pick.from, pick.to] : undefined} />{text ? null : "​"}</span>
       </div>,
     );
     if (inline?.[n]) rows.push(<div key={`i${n}`} className="cg-code-inline">{inline[n]}</div>);
