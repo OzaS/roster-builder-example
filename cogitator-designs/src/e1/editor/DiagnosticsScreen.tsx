@@ -1,7 +1,7 @@
 import { Check, CheckCheck, ChevronDown, Code2, Copy, CornerDownLeft, FileDiff, Play, RefreshCw, Search, Undo2, X } from "lucide-react";
 import { useRef, useState, type ReactNode } from "react";
 import { DiagIcon, KindIcon } from "../../glyphs";
-import { diagOne, type DiagKind, type Diagnostic } from "../../sample";
+import { diagLabel, diagOne, type DiagKind, type Diagnostic } from "../../sample";
 import { lookupRow, sourceOfEntry } from "../../directions/direction-d-content";
 import { allDiagnostics, kindHeading, kindOrder, modulesById, place, plain } from "./data";
 import { CodeView } from "./code";
@@ -14,8 +14,8 @@ import { BackForward, EditorGrid, Sidebar, Win, type Mode, useWindowKeys } from 
  * grouped by kind, filters (source, layer, code), keyboard triage, a detail pane with the affected text and the fix,
  * the export difference for a preservation failure, and a bulk fix for a suggestion code.
  */
-export type InboxState = "inbox" | "preservation" | "stale" | "clear" | "no-fixes" | "no-fixes-preservation" | "stale-build" | "stale-no-build";
-const inboxStates: InboxState[] = ["inbox", "preservation", "stale", "clear", "no-fixes", "no-fixes-preservation", "stale-build", "stale-no-build"];
+export type InboxState = "inbox" | "preservation" | "stale" | "clear" | "no-fixes" | "no-fixes-preservation" | "stale-build" | "stale-no-build" | "class-filter";
+const inboxStates: InboxState[] = ["inbox", "preservation", "stale", "clear", "no-fixes", "no-fixes-preservation", "stale-build", "stale-no-build", "class-filter"];
 
 /** Why a button that does nothing yet is drawn disabled (E1 as built, P39: the design language's disabled button). */
 const LATER_FIX = "Quick fixes come with a later slice: diagnostics carry no fixes yet";
@@ -66,7 +66,9 @@ const CHECKED = "14:06";
 export function DiagnosticsScreen({ mode, state = "inbox", interactive }: { mode: Mode; state?: string; interactive: boolean }) {
   const s = (inboxStates.includes(state as InboxState) ? state : "inbox") as InboxState;
   /* As built (approved 2026-11-24): the header names the build, fix buttons are disabled; the newest build failed in the two stale-* states. */
-  const built = s === "no-fixes" || s === "no-fixes-preservation" || s === "stale-build" || s === "stale-no-build";
+  const built = s === "no-fixes" || s === "no-fixes-preservation" || s === "stale-build" || s === "stale-no-build" || s === "class-filter";
+  /* E1-5 as built (approved 2026-11-25, A7): a class row of the check run opens the inbox filtered by that class, shown as a Class chip that clears it; Run checks runs. */
+  const checksLive = s === "class-filter";
   const buildStale = s === "stale-build" || s === "stale-no-build";
   const rows = buildStale ? [parseRow, ...allRows] : allRows;
   const [selId, setSelId] = useState(s === "preservation" || s === "no-fixes-preservation" ? "d2" : buildStale ? "pe1" : "d1");
@@ -75,13 +77,14 @@ export function DiagnosticsScreen({ mode, state = "inbox", interactive }: { mode
   const [checking, setChecking] = useState<"idle" | "busy">("idle");
   const [checkedAt, setCheckedAt] = useState(s === "clear" ? "14:21" : CHECKED);
   const [filters, setFilters] = useState<{ source?: string; layer?: string; code?: string }>({});
+  const [kindFilter, setKindFilter] = useState<DiagKind | undefined>(s === "class-filter" ? "error" : undefined);
   const [menu, setMenu] = useState<"source" | "layer" | "code" | null>(null);
   const [query, setQuery] = useState("");
   const [opened, setOpened] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
   const q = query.trim().toLowerCase();
-  const shown = rows.filter((r) => (!filters.source || r.source === filters.source) && (!filters.layer || r.layer === filters.layer) && (!filters.code || r.code === filters.code) && (!q || plain(r.message).toLowerCase().includes(q) || r.where.includes(q)));
+  const shown = rows.filter((r) => (!kindFilter || r.kind === kindFilter) && (!filters.source || r.source === filters.source) && (!filters.layer || r.layer === filters.layer) && (!filters.code || r.code === filters.code) && (!q || plain(r.message).toLowerCase().includes(q) || r.where.includes(q)));
   const open = rows.filter((r) => !resolved.has(r.id));
   const ordered = kindOrder.flatMap((k) => shown.filter((r) => r.kind === k));
   const sel = rows.find((r) => r.id === selId) ?? ordered[0];
@@ -168,14 +171,14 @@ export function DiagnosticsScreen({ mode, state = "inbox", interactive }: { mode
 
   return (
     <Win mode={mode} interactive={interactive} onClaim={claim}>
-      <EditorGrid side={<Sidebar active="updates" updates={open.length} entry={null} source={null} foot={stale ? <><span className="d-dot cg-dot-warn" />Edited since the check</> : buildStale ? <><span className="d-dot cg-dot-err" />Unsaved · 1 parse error</> : undefined} />}>
+      <EditorGrid side={<Sidebar active="updates" updates={open.length} entry={null} source={null} foot={stale ? <><span className="d-dot cg-dot-warn" />Edited since the check</> : buildStale ? <><span className="d-dot cg-dot-err" />Unsaved · 1 parse error</> : checksLive ? <><span className="d-dot cg-dot-err" />Checked {CHECKED} · 2 errors</> : undefined} />}>
         <main className="d-main" aria-label="Updates">
           <header className="d-top">
             <BackForward back="Warden Squad" />
             <span className="d-crumbs">Demo Skirmish<span>/</span>Updates</span>
             <span className="d-spacer" />
             <span className={`d-muted${stale || buildStale ? " cg-stale-text" : ""}`}>{checking === "busy" ? "Checking 3 sources…" : stale ? `Checked ${CHECKED}, 3 edits since` : s === "stale-build" ? `Built ${CHECKED}, 2 files edited since` : s === "stale-no-build" ? "Doesn't build · 1 file edited" : built ? `Built ${CHECKED} · lenient` : `Checked ${checkedAt} · lenient`}</span>
-            <button type="button" className="d-btn" onClick={runChecks} disabled={checking === "busy" || built} title={built ? LATER_CHECKS : "Check the whole dataset again (⌘⇧C)"}>{checking === "busy" ? <RefreshCw size={14} className="cg-spin" /> : <Play size={14} />}{checking === "busy" ? "Checking…" : "Run checks"}<kbd>⌘⇧C</kbd></button>
+            <button type="button" className="d-btn" onClick={runChecks} disabled={checking === "busy" || (built && !checksLive)} title={built && !checksLive ? LATER_CHECKS : "Check the whole dataset again (⌘⇧C)"}>{checking === "busy" ? <RefreshCw size={14} className="cg-spin" /> : <Play size={14} />}{checking === "busy" ? "Checking…" : "Run checks"}<kbd>⌘⇧C</kbd></button>
           </header>
 
           {all ? (
@@ -184,6 +187,12 @@ export function DiagnosticsScreen({ mode, state = "inbox", interactive }: { mode
             <>
               <div className="cg-ib-filters" role="toolbar" aria-label="Filters">
                 <label className="d-filter cg-ib-search"><Search size={13} /><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Filter messages and paths" aria-label="Filter messages and paths" /></label>
+                {kindFilter ? (
+                  <span className="cg-chipwrap">
+                    <button type="button" className="cg-chip on" title="Opened from the check run's result: one class only">Class<strong>{diagLabel[kindFilter]}</strong></button>
+                    <button type="button" className="cg-chip-x" aria-label="Clear the class filter" title="Clear this filter: every class" onClick={() => setKindFilter(undefined)}><X size={12} /></button>
+                  </span>
+                ) : null}
                 {chip("source", "Source")}{chip("layer", "Layer")}{chip("code", "Code")}
                 <span className="d-spacer" />
                 <span className="d-muted cg-ib-total">{open.length} open · {shown.length} shown</span>
@@ -204,7 +213,7 @@ export function DiagnosticsScreen({ mode, state = "inbox", interactive }: { mode
                     </div>
                   ) : null}
                   <div className={stale ? "cg-ib-dim" : undefined}>{listBody}</div>
-                  {shown.length ? null : <p className="d-empty">No diagnostic matches these filters. <button type="button" onClick={() => { setFilters({}); setQuery(""); }}>Clear filters</button></p>}
+                  {shown.length ? null : <p className="d-empty">No diagnostic matches these filters. <button type="button" onClick={() => { setFilters({}); setKindFilter(undefined); setQuery(""); }}>Clear filters</button></p>}
                 </div>
                 {sel ? <Detail row={sel} stale={stale} built={built} buildStale={buildStale} rows={rows} done={resolved.has(sel.id)} onFix={(ids) => resolve(ids)} onUndo={unresolve} resolved={resolved} onOpen={() => sel.entry && setOpened(sel.entryName)} /> : null}
               </div>

@@ -63,7 +63,7 @@ export const editorScreens: E1Screen[] = [
     title: "Diagnostics inbox",
     item: "cg-e1-editor-diagnostics",
     summary:
-      "The dataset's diagnostics as a full view, reached from the sidebar's Updates (⌘⇧U). It takes the place of the list and the page; D's helper box and panel stay the quick view beside a page (this page, or Dataset scope), and their “Open all” leads here, so the two show the same list at two sizes. Grouped by kind (errors, preservation failures, authoring suggestions) with status edges; filters by source, layer and code plus a text filter; ↑ ↓ move, ↵ opens the entry with the issue in its helper, ⌥↵ applies the fix; the detail pane shows the affected text or, for a preservation failure, the export difference, and offers “Apply to all n of this kind” for a suggestion code. When the dataset changed since the last check the list says it is out of date and offers Run checks (⌘⇧C); with no issues it says when it checked and what.",
+      "The dataset's diagnostics as a full view, reached from the sidebar's Updates (⌘⇧U). It takes the place of the list and the page; D's helper box and panel stay the quick view beside a page (this page, or Dataset scope), and their “Open all” leads here, so the two show the same list at two sizes. Grouped by kind (errors, preservation failures, authoring suggestions) with status edges; filters by source, layer and code plus a text filter; ↑ ↓ move, ↵ opens the entry with the issue in its helper, ⌥↵ applies the fix; the detail pane shows the affected text or, for a preservation failure, the export difference, and offers “Apply to all n of this kind” for a suggestion code. When the dataset changed since the last check the list says it is out of date and offers Run checks (⌘⇧C); with no issues it says when it checked and what. As built in E1-5 (approved 2026-11-25, A7): a class row of the check run opens the inbox filtered by that class, shown as a Class chip that clears it (the inbox draws no class filter otherwise); Run checks runs.",
     states: [
       { id: "inbox", title: "Inbox, an error selected" },
       { id: "preservation", title: "Preservation failure with its diff" },
@@ -73,6 +73,7 @@ export const editorScreens: E1Screen[] = [
       { id: "no-fixes-preservation", title: "As built: preservation failure, no diff yet" },
       { id: "stale-build", title: "As built: newest build failed, edits since" },
       { id: "stale-no-build", title: "As built: doesn't build" },
+      { id: "class-filter", title: "As built: opened from a check class (Class chip)" },
     ],
     tryIt: [
       { what: "Triage", how: "↑ ↓ (or j k) move through the list, ↵ opens the entry, ⌥↵ applies the selected fix; Undo brings it back." },
