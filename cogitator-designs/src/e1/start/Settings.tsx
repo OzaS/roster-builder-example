@@ -43,6 +43,7 @@ const shortcuts: { group: string; rows: { what: string; mac: string[]; win: stri
     { what: "Search entries and commands", mac: ["⌘", "K"], win: ["Ctrl", "K"] },
     { what: "Go to definition", mac: ["F12"], win: ["F12"] },
     { what: "Show backlinks", mac: ["⇧", "F12"], win: ["Shift", "F12"] },
+    { what: "Layers", mac: ["⇧", "⌘", "L"], win: ["Ctrl", "Shift", "L"] },
     { what: "Next and previous entry", mac: ["↓", "↑"], win: ["↓", "↑"] },
     { what: "Focus mode", mac: ["⌘", "."], win: ["Ctrl", "."] },
   ] },
