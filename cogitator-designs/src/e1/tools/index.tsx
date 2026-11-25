@@ -13,13 +13,15 @@ export const toolScreens: E1Screen[] = [
     title: "Run checks",
     item: "cg-e1-tools-checks",
     summary:
-      "Run checks (⌘⇧C, or the check status button in the page toolbar) checks the dataset with its layers on, while the page stays editable. The toolbar button always says what the last run found (complete, 2 errors, doesn't compile) or that it is running or out of date, and opens the run popover under it: the steps with counts (Parse, Compile, Lower, Export check) and Cancel while it runs; then the result (complete or incomplete, the time), one row per class (errors, preservation failures, authoring suggestions) with its codes, leading into the diagnostics inbox filtered by that class, and what was checked (dataset and profile, layers on and off, the patch, the export dry run). The run is `augur dklpo check --with <layers>` plus `export --dry-run --exact`, and the popover shows that command to copy. A dataset that doesn't compile stops before Lower and offers the fix at the error.",
+      "Run checks (⌘⇧C, or the check status button in the page toolbar) checks the dataset with its layers on, while the page stays editable. The toolbar button always says what the last run found (complete, 2 errors, doesn't compile) or that it is running or out of date, and opens the run popover under it: the steps with counts (Parse, Compile, Lower, Export check) and Cancel while it runs; then the result (complete or incomplete, the time), one row per class (errors, preservation failures, authoring suggestions) with its codes, leading into the diagnostics inbox filtered by that class, and what was checked (dataset and profile, layers on and off, the patch, the export dry run). The run is `augur dklpo check --with <layers>` plus `export --dry-run --exact`, and the popover shows that command to copy. A dataset that doesn't compile stops before Lower and offers the fix at the error. As built (E1-5, approved by the user 2026-11-25): the check button stands in the page toolbar before Focus, Source and Run, and reads Run checks ⌘⇧C before any run (A3); the sidebar's foot keeps Saved until a run exists, then the checks foot replaces it (A4); while the popover is open the floating helper is its pill (A3); the command to copy is the two commands the run is, `check --with` the layers that are on and the export check of the dataset alone (A8, with E1-6's G6).",
     states: [
       { id: "running", title: "Running: compile 3 of 5" },
       { id: "passed", title: "Complete, suggestions only" },
       { id: "failed", title: "Incomplete: 2 errors" },
       { id: "no-compile", title: "Doesn't compile: stopped before Lower" },
       { id: "stale", title: "Out of date since the last check" },
+      { id: "before-run", title: "As built: before any run (Run checks ⌘⇧C)" },
+      { id: "as-built", title: "As built: beside Focus, Source and Run; the two commands" },
     ],
     tryIt: [
       { what: "Run", how: "⌘⇧C or Run again: the steps fill with counts, then the result; Esc or Cancel stops a run (the old results stay, out of date)." },
