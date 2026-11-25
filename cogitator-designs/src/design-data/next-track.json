@@ -374,6 +374,20 @@
       },
       "summary": "New states of e1-layers-stack: menu (a layer row's ⋯, shown on hover, selection and focus, and its context menu: Turn off (Space), Open its manifest, Show in Finder, then Remove from this stack… in the destructive colour; the base row has none), remove (the confirmation: “Remove Frost Wardens from Demo Skirmish's stack?”, the folder, “Its folder stays on disk (frost-content/); Add layer… brings it back. Rosters that used it open with the data-changed review.”, Cancel / Remove; Delete on a selected row opens it too), checking (“Checking the stack…” while Check layers reads the folders again and rebuilds), addon-fixes (Declare it a variant… and Remove rally from the pack drawn disabled, “… is in no slice yet”) and add-refused (“Not added. That folder is the dataset itself: a layer is another dataset.” above the list, Dismiss).",
       "source": "E1-6 grooming readings; approved by the user 2026-11-25 (E1-6 Proposals review, G1, G3, G5 (a design change, drawn as the review page's mockup), G11)"
+    },
+    {
+      "id": "cg-e1-layers-key",
+      "title": "E1: Layers ⇧⌘L",
+      "kind": "look",
+      "status": "approved",
+      "platforms": [
+        "desktop"
+      ],
+      "open": {
+        "desktop": "e1-layers-stack"
+      },
+      "summary": "Layers gets a key, after T3 Code's and VS Code's panel keys: ⇧⌘L (Ctrl+Shift+L on Windows) in the Go menu beside Updates, needs a dataset, a toggle (pressed in the stack view it returns to the page it covers, as Back). The sidebar's Layers names the key in its tooltip (“Open the layer stack (⇧⌘L)”) and Settings › Keyboard lists it under Find and move. Pairs with Layer Changes ⌥⌘L.",
+      "source": "E1-6 worker Proposals review, A2-6 changed; approved by the user 2026-11-25"
     }
   ]
 }

@@ -78,7 +78,7 @@ export function Sidebar({ active, source, entry, updates, broken, onUpdates, onS
         <button type="button" className="d-ws" title="Switch dataset"><span className="d-ws-mark">D</span><strong>Demo Skirmish</strong><ChevronDown size={14} /></button>
         <button type="button" className={`d-item${active === "search" ? " active" : ""}`} onClick={onSearch} title="Search entries and commands (⌘K)"><Search size={15} />Search<kbd>⌘K</kbd></button>
         <button type="button" className={`d-item${active === "updates" ? " active" : ""}`} onClick={onUpdates} aria-pressed={active === "updates"} title="Open the diagnostics inbox (⌘⇧U)"><Bell size={15} />Updates{updates ? <span className="d-count">{updates}</span> : <span className="d-muted">None</span>}</button>
-        <button type="button" className={`d-item${active === "layers" ? " active" : ""}`} onClick={onLayers}><Layers size={15} />Layers<span className="d-muted">{layers ?? "3 of 4"}</span></button>
+        <button type="button" className={`d-item${active === "layers" ? " active" : ""}`} onClick={onLayers} aria-pressed={active === "layers"} title="Open the layer stack (⇧⌘L)"><Layers size={15} />Layers<span className="d-muted">{layers ?? "3 of 4"}</span></button>
 
         <h3>Sources</h3>
         {sources.map((s) => {
