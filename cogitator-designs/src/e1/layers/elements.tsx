@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { DiagIcon, KindIcon } from "../../glyphs";
 import { State, type Mode, type Platform } from "../../language/Specimen";
 import { stackFor } from "./data";
-import { ChangeCard, Changed, LayerRow, ValueChain } from "./LayerStackScreen";
+import { ChangeCard, Changed, LayerRow, RowMenu, ValueChain } from "./LayerStackScreen";
 import "./layers.css";
 import "./search.css";
 import "./runner.css";
@@ -32,6 +32,17 @@ export const layerRenderers: Record<string, Renderer> = {
         <State label="Conflict: overrides an earlier layer (info edge), Test" wide>{box(<LayerRow layer={conflict[4]} n={5} selected={false} explicit={false} conflict={{ text: "overrides House rules on 1 value", by: false }} />)}</State>
         <State label="Off (test variants are never on by default)" wide>{box(<LayerRow layer={stack[4]} selected={false} explicit={false} />)}</State>
         <State label="Hover" wide>{box(<LayerRow layer={stack[3]} n={4} selected={false} explicit={false} cls="is-hover" />)}</State>
+      </div>
+    ),
+  },
+  "layers.row-menu": {
+    wide: true,
+    render: () => (
+      <div className="cg-stack">
+        <State label="Base: no ⋯, no menu" wide>{box(<LayerRow layer={stack[0]} n={1} selected={false} explicit={false} onMore={() => undefined} />, 520)}</State>
+        <State label="Selected: ⋯ shown (also on hover and focus)" wide>{box(<LayerRow layer={stack[2]} n={3} selected explicit={false} onMore={() => undefined} />, 520)}</State>
+        <State label="Not selected: ⋯ hidden until hover" wide>{box(<LayerRow layer={stack[1]} n={2} selected={false} explicit={false} onMore={() => undefined} />, 520)}</State>
+        <State label="Menu (right-click or ⋯): Turn off first, Remove last in the destructive colour"><RowMenu layer={stack[2]} inline /></State>
       </div>
     ),
   },

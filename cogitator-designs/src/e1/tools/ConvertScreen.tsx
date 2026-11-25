@@ -130,7 +130,7 @@ export function ConvertScreen({ mode, platform, state = "options", interactive }
         <section>
           <Head>Dataset</Head>
           <div className="cg-tl-grid2">
-            <label><span>Key</span><span className="cg-tl-field mono" title={asBuilt ? "The converter's default is shown as the value; changing it adds --dataset-key" : undefined}>{commands ? "demo-skirmish" : "skirmish-xml"}</span></label>
+            <label style={badVersion ? { alignSelf: "start" } : undefined}><span>Key</span><span className="cg-tl-field mono" title={asBuilt ? "The converter's default is shown as the value; changing it adds --dataset-key" : undefined}>{commands ? "demo-skirmish" : "skirmish-xml"}</span></label>
             <label><span>Version</span><span className={`cg-tl-field mono${badVersion ? " invalid" : ""}`} aria-invalid={badVersion || undefined}>{badVersion ? "1.0" : "1.0.0"}</span>{badVersion ? <span className="cg-tl-fielderr">Three numbers, like 1.0.0</span> : null}</label>
             <span><span>Text language</span><Select platform={platform} value={locale} options={["en", "de", "fr"]} onChange={setLocale} label="Text language" /></span>
             <span><span>Text columns</span><Select platform={platform} value={columns} options={["Auto", "None", "All"]} onChange={setColumns} label="Profile columns marked as text" /></span>

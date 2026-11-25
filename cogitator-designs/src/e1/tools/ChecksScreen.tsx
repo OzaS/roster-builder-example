@@ -224,7 +224,7 @@ export function ChecksScreen({ mode, state = "failed", interactive }: { mode: Mo
         onFix={() => undefined} onUndo={() => undefined} onDiff={() => undefined} onAll={() => undefined} onChecks={start} onInsert={() => undefined} onProperties={() => undefined} />
     : open ? null : <Pill issues={outcome === "passed" ? pageIssues.filter((d) => d.kind === "suggestion") : pageIssues} />;
   return (
-    <EditorBehind mode={mode} interactive={interactive} onClaim={claim} top={top} foot={foot} updates={outcome === "passed" ? 4 : outcome === null ? allDiagnostics.length : nIssues}
+    <EditorBehind mode={mode} interactive={interactive} onClaim={claim} top={top} foot={foot} updates={outcome === "passed" ? 4 : beforeRun && outcome === null ? allDiagnostics.length : nIssues}
       popover={<>{helper}{popover}</>} />
   );
 }

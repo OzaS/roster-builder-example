@@ -189,9 +189,9 @@ export function LayerStackScreen({ mode, state = "stack", interactive }: { mode:
 }
 
 /** G5 (as built): a layer row's context menu. The base row has none. */
-function RowMenu({ layer: l, onToggle, onRemove }: { layer: LayerDef; onToggle: () => void; onRemove: () => void }) {
+export function RowMenu({ layer: l, onToggle, onRemove, inline }: { layer: LayerDef; onToggle?: () => void; onRemove?: () => void; inline?: boolean }) {
   return (
-    <div className="cg-menu cg-ly-menu" role="menu" aria-label={`${l.title}`} onClick={(e) => e.stopPropagation()}>
+    <div className="cg-menu cg-ly-menu" role="menu" aria-label={`${l.title}`} onClick={(e) => e.stopPropagation()} style={inline ? { position: "static" } : undefined}>
       <button type="button" role="menuitem" className="cg-menu-item sel" onClick={onToggle}><Power size={14} />{l.status === "off" ? "Turn on" : "Turn off"}<span className="cg-menu-key">Space</span></button>
       <button type="button" role="menuitem" className="cg-menu-item" title="Open the layer's dataset.dkl"><Code2 size={14} />Open its manifest</button>
       <button type="button" role="menuitem" className="cg-menu-item" title={`Show ${l.folder} in Finder`}><FolderOpen size={14} />Show in Finder</button>
