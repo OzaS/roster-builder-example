@@ -58,12 +58,15 @@ export const toolScreens: E1Screen[] = [
     title: "Export",
     item: "cg-e1-tools-export",
     summary:
-      "File › Export… (⇧⌘E) opens a sheet over the editor: the format (XML data files or JSON data files: each document keeps the format it was converted from, the choice is for documents added since), the destination and the text language, then the exactness the export would have, from a dry run made as the sheet opens. Exact: every envelope entry is current, and Write the original files can return the kept files byte for byte (C3). Not exact: the counts (current, stale, unbound, conflicts) and each entry that won't apply with its entry, code (preserve/stale, preserve/unbound) and why, Write the original files unavailable with its reason (preserve/original-outdated), and that the export still writes (Export anyway) unless Require an exact export is on, which refuses and says so beside the button. The result lists the written files with their sizes. A Level 1 construct refuses the export by name, exact or not, and nothing is written.",
+      "File › Export… (⇧⌘E) opens a sheet over the editor: the format (XML data files or JSON data files: each document keeps the format it was converted from, the choice is for documents added since), the destination and the text language, then the exactness the export would have, from a dry run made as the sheet opens. Exact: every envelope entry is current, and Write the original files can return the kept files byte for byte (C3). Not exact: the counts (current, stale, unbound, conflicts) and each entry that won't apply with its entry, code (preserve/stale, preserve/unbound) and why, Write the original files unavailable with its reason (preserve/original-outdated), and that the export still writes (Export anyway) unless Require an exact export is on, which refuses and says so beside the button. The result lists the written files with their sizes. A Level 1 construct refuses the export by name, exact or not, and nothing is written. As built (E1-5, approved by the user 2026-11-25): Require an exact export starts on when the dry run is exact and off when it isn't, and a dataset without an envelope reads “Not exact: no envelope (bsdata.compat.json)” (A12); a write that fails says “Can’t export … to <folder>” with the reason, the files written before it stopped and Try again (A13); the written sizes are B, KB or MB as Convert writes them (A14, changed by the user).",
     states: [
       { id: "exact", title: "Exact: originals available" },
       { id: "non-exact", title: "Not exact, with the reasons" },
       { id: "written", title: "Written: the files" },
       { id: "failed", title: "Refused: a Level 1 construct" },
+      { id: "written-sizes", title: "As built: written sizes in B, KB or MB" },
+      { id: "no-envelope", title: "As built: not exact, no envelope" },
+      { id: "write-failed", title: "As built: a write that fails" },
     ],
     tryIt: [
       { what: "Exactness", how: "in the non-exact state turn Require an exact export on: the button becomes Export refused and the reason shows beside it; off again writes anyway." },
