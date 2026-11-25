@@ -147,3 +147,13 @@
 .fc-cg .cg-ly-card .cg-hc-actions { align-items: center; }
 /* Elements view: the card drawn in place. */
 .fc-spec .cg-ly-card { position: relative; left: auto; top: auto; }
+
+/* E1-6 as built (G5, approved 2026-11-25): the row's ⋯ in a 24 px column before the switch, shown on hover, selection
+   and focus; its context menu under it (the context menu primitive). */
+.fc-cg .cg-ly-row.with-more { grid-template-columns: 14px 16px 16px minmax(0, 1fr) 24px auto; }
+.fc-cg .cg-ly-more { visibility: hidden; color: var(--cg-muted); }
+.fc-cg .cg-ly-row:is(:hover, .selected, :focus-within) .cg-ly-more, .fc-cg .cg-ly-more.open { visibility: visible; }
+.fc-cg .cg-ly-menu { position: absolute; right: 30px; top: calc(100% - 6px); z-index: 6; }
+.fc-cg .cg-ly-menu .cg-menu-item.sel { box-shadow: inset 0 0 0 var(--cg-focus-width) var(--cg-focus-color); }
+.fc-cg .cg-ly-menu .cg-menu-key { display: inline-flex; align-items: center; }
+.fc-cg .cg-ly-menu .cg-menu-item { padding: 0 8px; }
