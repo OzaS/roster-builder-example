@@ -2,6 +2,7 @@ import type { E1Screen } from "../types";
 import { ChecksScreen } from "./ChecksScreen";
 import { ConvertScreen } from "./ConvertScreen";
 import { ExportScreen } from "./ExportScreen";
+import { PaletteScreen } from "./PaletteScreen";
 import { RenameScreen } from "./RenameScreen";
 import { RoundtripScreen } from "./RoundtripScreen";
 
@@ -13,13 +14,15 @@ export const toolScreens: E1Screen[] = [
     title: "Run checks",
     item: "cg-e1-tools-checks",
     summary:
-      "Run checks (⌘⇧C, or the check status button in the page toolbar) checks the dataset with its layers on, while the page stays editable. The toolbar button always says what the last run found (complete, 2 errors, doesn't compile) or that it is running or out of date, and opens the run popover under it: the steps with counts (Parse, Compile, Lower, Export check) and Cancel while it runs; then the result (complete or incomplete, the time), one row per class (errors, preservation failures, authoring suggestions) with its codes, leading into the diagnostics inbox filtered by that class, and what was checked (dataset and profile, layers on and off, the patch, the export dry run). The run is `augur dklpo check --with <layers>` plus `export --dry-run --exact`, and the popover shows that command to copy. A dataset that doesn't compile stops before Lower and offers the fix at the error.",
+      "Run checks (⌘⇧C, or the check status button in the page toolbar) checks the dataset with its layers on, while the page stays editable. The toolbar button always says what the last run found (complete, 2 errors, doesn't compile) or that it is running or out of date, and opens the run popover under it: the steps with counts (Parse, Compile, Lower, Export check) and Cancel while it runs; then the result (complete or incomplete, the time), one row per class (errors, preservation failures, authoring suggestions) with its codes, leading into the diagnostics inbox filtered by that class, and what was checked (dataset and profile, layers on and off, the patch, the export dry run). The run is `augur dklpo check --with <layers>` plus `export --dry-run --exact`, and the popover shows that command to copy. A dataset that doesn't compile stops before Lower and offers the fix at the error. As built (E1-5, approved by the user 2026-11-25): the check button stands in the page toolbar before Focus, Source and Run, and reads Run checks ⌘⇧C before any run (A3); the sidebar's foot keeps Saved until a run exists, then the checks foot replaces it (A4); while the popover is open the floating helper is its pill (A3); the command to copy is the two commands the run is, `check --with` the layers that are on and the export check of the dataset alone (A8, with E1-6's G6).",
     states: [
       { id: "running", title: "Running: compile 3 of 5" },
       { id: "passed", title: "Complete, suggestions only" },
       { id: "failed", title: "Incomplete: 2 errors" },
       { id: "no-compile", title: "Doesn't compile: stopped before Lower" },
       { id: "stale", title: "Out of date since the last check" },
+      { id: "before-run", title: "As built: before any run (Run checks ⌘⇧C)" },
+      { id: "as-built", title: "As built: beside Focus, Source and Run; the two commands" },
     ],
     tryIt: [
       { what: "Run", how: "⌘⇧C or Run again: the steps fill with counts, then the result; Esc or Cancel stops a run (the old results stay, out of date)." },
@@ -35,13 +38,15 @@ export const toolScreens: E1Screen[] = [
     item: "cg-e1-tools-convert",
     platforms: ["mac", "windows"],
     summary:
-      "From the start window's Convert from XML data… or File › Convert…: a window of its own, because it starts with no dataset open and ends by opening a new one. The options stay in the left column as the command's flags in words: the input (a folder, an archive or some files, with what was found in it), the output folder (new and empty, or Update a dataset converted before), the dataset key, version, text language and text columns, the compatibility envelope and Keep the original files (C1, C3; the full id map is always written), and Run a roundtrip after converting (C2 and C1). The right pane lists the input's documents and what Convert writes, then the steps with counts and Cancel, then the report: the three contracts with verdicts, the numbers the command reports, each document's C1 result with its differences (class, path, before → after), the preservation diagnostics, Open the converted dataset, and the commands to copy. Dry run converts and reports without writing. An input that can't be read stops before anything is written.",
+      "From the start window's Convert from XML data… or File › Convert…: a window of its own, because it starts with no dataset open and ends by opening a new one. The options stay in the left column as the command's flags in words: the input (a folder, an archive or some files, with what was found in it), the output folder (new and empty, or Update a dataset converted before), the dataset key, version, text language and text columns, the compatibility envelope and Keep the original files (C1, C3; the full id map is always written), and Run a roundtrip after converting (C2 and C1). The right pane lists the input's documents and what Convert writes, then the steps with counts and Cancel, then the report: the three contracts with verdicts, the numbers the command reports, each document's C1 result with its differences (class, path, before → after), the preservation diagnostics, Open the converted dataset, and the commands to copy. Dry run converts and reports without writing. An input that can't be read stops before anything is written. As built (E1-5, approved by the user 2026-11-25): the window is 1120 × 760 (at least 960 × 600), its own window beside the editor; opening it again focuses it (B2). The key and version fields show the converter's defaults as their values; an invalid version marks the field and keeps Convert unavailable with the reason (B10). The commands to copy are two, convert and roundtrip: the home as ~ outside the quotes, paths with spaces quoted, --dataset-key and --version only when changed from the defaults, --locale and --text-columns only when not en / auto (B9).",
     states: [
       { id: "options", title: "Options and the input's documents" },
       { id: "converting", title: "Converting: steps with counts" },
       { id: "equal", title: "Report: equal" },
       { id: "differences", title: "Report: differences found" },
       { id: "refused", title: "Input can't be read" },
+      { id: "window", title: "As built: 1120 × 760, an invalid version" },
+      { id: "commands", title: "As built: the commands to copy" },
     ],
     tryIt: [
       { what: "Convert", how: "Convert (⌘↵) runs the steps, then the report; Esc cancels. Dry run does the same and writes nothing (Open is then unavailable and says why)." },
@@ -56,18 +61,37 @@ export const toolScreens: E1Screen[] = [
     title: "Export",
     item: "cg-e1-tools-export",
     summary:
-      "File › Export… (⇧⌘E) opens a sheet over the editor: the format (XML data files or JSON data files: each document keeps the format it was converted from, the choice is for documents added since), the destination and the text language, then the exactness the export would have, from a dry run made as the sheet opens. Exact: every envelope entry is current, and Write the original files can return the kept files byte for byte (C3). Not exact: the counts (current, stale, unbound, conflicts) and each entry that won't apply with its entry, code (preserve/stale, preserve/unbound) and why, Write the original files unavailable with its reason (preserve/original-outdated), and that the export still writes (Export anyway) unless Require an exact export is on, which refuses and says so beside the button. The result lists the written files with their sizes. A Level 1 construct refuses the export by name, exact or not, and nothing is written.",
+      "File › Export… (⇧⌘E) opens a sheet over the editor: the format (XML data files or JSON data files: each document keeps the format it was converted from, the choice is for documents added since), the destination and the text language, then the exactness the export would have, from a dry run made as the sheet opens. Exact: every envelope entry is current, and Write the original files can return the kept files byte for byte (C3). Not exact: the counts (current, stale, unbound, conflicts) and each entry that won't apply with its entry, code (preserve/stale, preserve/unbound) and why, Write the original files unavailable with its reason (preserve/original-outdated), and that the export still writes (Export anyway) unless Require an exact export is on, which refuses and says so beside the button. The result lists the written files with their sizes. A Level 1 construct refuses the export by name, exact or not, and nothing is written. As built (E1-5, approved by the user 2026-11-25): Require an exact export starts on when the dry run is exact and off when it isn't, and a dataset without an envelope reads “Not exact: no envelope (bsdata.compat.json)” (A12); a write that fails says “Can’t export … to <folder>” with the reason, the files written before it stopped and Try again (A13); the written sizes are B, KB or MB as Convert writes them (A14, changed by the user).",
     states: [
       { id: "exact", title: "Exact: originals available" },
       { id: "non-exact", title: "Not exact, with the reasons" },
       { id: "written", title: "Written: the files" },
       { id: "failed", title: "Refused: a Level 1 construct" },
+      { id: "written-sizes", title: "As built: written sizes in B, KB or MB" },
+      { id: "no-envelope", title: "As built: not exact, no envelope" },
+      { id: "write-failed", title: "As built: a write that fails" },
     ],
     tryIt: [
       { what: "Exactness", how: "in the non-exact state turn Require an exact export on: the button becomes Export refused and the reason shows beside it; off again writes anyway." },
       { what: "Export", how: "Export (anyway) shows the written files; Done or Esc closes the sheet, and the toast brings it back." },
     ],
     render: ({ mode, state, interactive }) => <ExportScreen key={state} mode={mode} state={state} interactive={interactive} />,
+  },
+  {
+    id: "e1-tools-palette",
+    group: "Checks and tools",
+    title: "⌘K palette, as built",
+    item: "cg-e1-tools-palette",
+    summary:
+      "The ⌘K palette as built in E1-5 (approved by the user 2026-11-25, A15): desktop-kit's dialog restyled to the gallery's palette (its title row kept for screen readers only). Entries are ranked starts with, then word start, then contains, up to 8, then “n more”; then the commands that match, up to 6, with their keys; then Search the dataset for “…” (⇧⌘F), which opens the dataset search with the text. Entries open through the navigation (Back returns), commands run as their keys do; window keys wait while it is open. With nothing found it says what it searched and offers the next steps: Search the dataset, Create entry … (drawn disabled: no slice holds it yet), a layer that is off, Clear the search. The foot reads ↑ ↓ move, ↵ open or run, Esc close. The sidebar's Search item stays the dataset search; its tooltip names ⌘K.",
+    states: [
+      { id: "results", title: "Entries, commands, Search the dataset" },
+      { id: "no-result", title: "Nothing found: the next steps" },
+    ],
+    tryIt: [
+      { what: "Search", how: "type in the field; Esc closes the palette, ⌘K opens it again." },
+    ],
+    render: ({ mode, state, interactive }) => <PaletteScreen key={state} mode={mode} state={state} interactive={interactive} />,
   },
   {
     id: "e1-tools-roundtrip",

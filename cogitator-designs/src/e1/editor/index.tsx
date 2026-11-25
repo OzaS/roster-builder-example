@@ -63,7 +63,7 @@ export const editorScreens: E1Screen[] = [
     title: "Diagnostics inbox",
     item: "cg-e1-editor-diagnostics",
     summary:
-      "The dataset's diagnostics as a full view, reached from the sidebar's Updates (⌘⇧U). It takes the place of the list and the page; D's helper box and panel stay the quick view beside a page (this page, or Dataset scope), and their “Open all” leads here, so the two show the same list at two sizes. Grouped by kind (errors, preservation failures, authoring suggestions) with status edges; filters by source, layer and code plus a text filter; ↑ ↓ move, ↵ opens the entry with the issue in its helper, ⌥↵ applies the fix; the detail pane shows the affected text or, for a preservation failure, the export difference, and offers “Apply to all n of this kind” for a suggestion code. When the dataset changed since the last check the list says it is out of date and offers Run checks (⌘⇧C); with no issues it says when it checked and what.",
+      "The dataset's diagnostics as a full view, reached from the sidebar's Updates (⌘⇧U). It takes the place of the list and the page; D's helper box and panel stay the quick view beside a page (this page, or Dataset scope), and their “Open all” leads here, so the two show the same list at two sizes. Grouped by kind (errors, preservation failures, authoring suggestions) with status edges; filters by source, layer and code plus a text filter; ↑ ↓ move, ↵ opens the entry with the issue in its helper, ⌥↵ applies the fix; the detail pane shows the affected text or, for a preservation failure, the export difference, and offers “Apply to all n of this kind” for a suggestion code. When the dataset changed since the last check the list says it is out of date and offers Run checks (⌘⇧C); with no issues it says when it checked and what. As built in E1-5 (approved 2026-11-25, A7): a class row of the check run opens the inbox filtered by that class, shown as a Class chip that clears it (the inbox draws no class filter otherwise); Run checks runs.",
     states: [
       { id: "inbox", title: "Inbox, an error selected" },
       { id: "preservation", title: "Preservation failure with its diff" },
@@ -73,6 +73,7 @@ export const editorScreens: E1Screen[] = [
       { id: "no-fixes-preservation", title: "As built: preservation failure, no diff yet" },
       { id: "stale-build", title: "As built: newest build failed, edits since" },
       { id: "stale-no-build", title: "As built: doesn't build" },
+      { id: "class-filter", title: "As built: opened from a check class (Class chip)" },
     ],
     tryIt: [
       { what: "Triage", how: "↑ ↓ (or j k) move through the list, ↵ opens the entry, ⌥↵ applies the selected fix; Undo brings it back." },
@@ -107,11 +108,12 @@ export const editorScreens: E1Screen[] = [
     title: "Helper before there are fixes",
     item: "cg-e1-editor-helper-no-fixes",
     summary:
-      "D's helper while diagnostics carry no fixes (E1 as built, approved by the user 2026-11-24: “make them disabled if they do nothing”). The floating box's rows carry no fix buttons. In the panel the selected row shows Quick fix, or Show diff for a preservation failure, drawn disabled (the design language's disabled button: muted text on the hover fill, never a live blue primary), the reason in its tooltip. D's own box and panel keep their live buttons for when fixes arrive.",
+      "D's helper while diagnostics carry no fixes (E1 as built, approved by the user 2026-11-24: “make them disabled if they do nothing”). The floating box's rows carry no fix buttons. In the panel the selected row shows Quick fix, or Show diff for a preservation failure, drawn disabled (the design language's disabled button: muted text on the hover fill, never a live blue primary), the reason in its tooltip. D's own box and panel keep their live buttons for when fixes arrive. As built in E1-4 (approved 2026-11-24): the panel opens at 412 px with a fourth tab, Backlinks; where the page would keep less than 480 px beside the sidebar, the list and the panel, the source list folds away.",
     states: [
       { id: "box", title: "Floating box: no fix buttons" },
       { id: "panel-issues", title: "Panel: Show diff disabled" },
       { id: "panel-suggestions", title: "Panel: Quick fix disabled" },
+      { id: "panel-412", title: "As built: panel at 412 px, the list folded" },
     ],
     render: ({ mode, state, interactive }) => <HelperNoFixScreen mode={mode} state={state} interactive={interactive} />,
   },

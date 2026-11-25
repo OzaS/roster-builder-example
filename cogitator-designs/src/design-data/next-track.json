@@ -278,6 +278,102 @@
       "screen": "e1-layers-runner",
       "summary": "User request 2026-11-23: Run (⌘R) builds a roster against the dataset in a basic developer UI, docked beside the editor or in its own window (960 px: takes the page area). What runs (dataset alone or with layers, variants, locale), Add list, roster tree, options / profile / rules, totals, engine errors; hot reload on save or while typing keeps the roster through the roster-open rules, with a change summary, the last good build on a compile error and a review of structural moves; Go to entry / Show in runner; Save as test scenario. States: empty, in progress, reloaded, compile error, kept for review, save as test, detached, 960 px.",
       "source": "D4 step 3b, E1 screens part 2 (2026-11-23)"
+    },
+    {
+      "id": "cg-e1-editor-helper-panel-412",
+      "title": "E1: Helper panel at 412 px, as built",
+      "kind": "look",
+      "status": "approved",
+      "platforms": [
+        "desktop"
+      ],
+      "open": {
+        "desktop": "e1-editor-helper-no-fixes"
+      },
+      "summary": "New state of e1-editor-helper-no-fixes: panel-412, the helper panel opening at 412 px (the references design's width for four tabs; D's was 328) with Backlinks as its fourth tab; where the page would keep less than 480 px beside the sidebar, the list and the panel, the source list folds away (as the references screen's Backlinks state draws it).",
+      "source": "E1-4 as built; approved by the user 2026-11-24 (E1-4 Proposals review, the 412 px panel)"
+    },
+    {
+      "id": "cg-e1-tools-checks-as-built",
+      "title": "E1: Run checks, as built (new states)",
+      "kind": "look",
+      "status": "approved",
+      "platforms": [
+        "desktop"
+      ],
+      "open": {
+        "desktop": "e1-tools-checks"
+      },
+      "summary": "New states of e1-tools-checks: before-run (the check button reads Run checks ⌘⇧C before any run, the floating helper stands as its box, the sidebar's foot keeps Saved) and as-built (the check button in the page toolbar before Focus, Source and Run; the checks foot “Checked 14:22 · 2 errors” replaces the saved foot; the helper is its pill while the popover is open; the command to copy is `augur dklpo check <dir> --with <layers on> && augur dklpo export bsdata <dir> --dry-run --exact`, the Export fact says the dataset alone; Strict profile once drawn disabled).",
+      "source": "E1-5 as built; approved by the user 2026-11-25 (E1-5 Proposals review, A3, A4, A8, A9; with E1-6 G6)"
+    },
+    {
+      "id": "cg-e1-editor-diagnostics-class",
+      "title": "E1: Inbox filtered by a check class, as built",
+      "kind": "look",
+      "status": "approved",
+      "platforms": [
+        "desktop"
+      ],
+      "open": {
+        "desktop": "e1-editor-diagnostics"
+      },
+      "summary": "New state of e1-editor-diagnostics: class-filter, the inbox opened from a class row of the check run, filtered by that class and shown as a Class chip (Class Errors ×) before the Source, Layer and Code chips; × clears it (the inbox draws no class filter otherwise). Run checks runs; fix buttons stay disabled (P39).",
+      "source": "E1-5 as built; approved by the user 2026-11-25 (E1-5 Proposals review, A7)"
+    },
+    {
+      "id": "cg-e1-tools-export-as-built",
+      "title": "E1: Export, as built (new states)",
+      "kind": "look",
+      "status": "approved",
+      "platforms": [
+        "desktop"
+      ],
+      "open": {
+        "desktop": "e1-tools-export"
+      },
+      "summary": "New states of e1-tools-export: written-sizes (the written files' sizes in B, KB or MB as Convert writes them, “21.4 KB”), no-envelope (“Not exact: no envelope (bsdata.compat.json), so documents are written in canonical form”, Require an exact export off, Write the original files unavailable with preserve/no-original) and write-failed (“Can’t export Demo Skirmish to ~/Exports/demo-skirmish”, the reason, the files written before it stopped, Cancel / Try again).",
+      "source": "E1-5 as built; approved by the user 2026-11-25 (E1-5 Proposals review, A12, A13; A14 changed by the user: B, KB or MB)"
+    },
+    {
+      "id": "cg-e1-tools-palette",
+      "title": "E1: ⌘K palette, as built",
+      "kind": "screen",
+      "status": "approved",
+      "platforms": [
+        "desktop"
+      ],
+      "screen": "e1-tools-palette",
+      "summary": "The ⌘K palette as built: desktop-kit's dialog restyled to the gallery's palette; entries ranked starts with, then word start, then contains, up to 8, then “n more”; commands that match, up to 6, with their keys; then Search the dataset for “…” (⇧⌘F). Nothing found: what was searched, then Search the dataset, Create entry … (disabled), a layer that is off, Clear the search. Foot: ↑ ↓ move, ↵ open or run, Esc close. The sidebar's Search stays the dataset search, its tooltip naming ⌘K.",
+      "source": "E1-5 as built; approved by the user 2026-11-25 (E1-5 Proposals review, A15)"
+    },
+    {
+      "id": "cg-e1-tools-convert-as-built",
+      "title": "E1: Convert, as built (new states)",
+      "kind": "look",
+      "status": "approved",
+      "platforms": [
+        "desktop"
+      ],
+      "open": {
+        "desktop": "e1-tools-convert"
+      },
+      "summary": "New states of e1-tools-convert: window (the window at 1120 × 760, at least 960 × 600; the key and version fields show the converter's defaults as their values; an invalid version marks the field, “Three numbers, like 1.0.0”, and keeps Dry run and Convert unavailable with the reason in the footer) and commands (the commands to copy as two lines, convert and roundtrip: the home as ~ outside the quotes, a path with spaces quoted, --dataset-key / --version only when changed, --locale / --text-columns only when not en / auto).",
+      "source": "E1-5 as built; approved by the user 2026-11-25 (E1-5 Proposals review, B2, B9, B10)"
+    },
+    {
+      "id": "cg-e1-layers-stack-as-built",
+      "title": "E1: Layer stack, as built (new states)",
+      "kind": "look",
+      "status": "approved",
+      "platforms": [
+        "desktop"
+      ],
+      "open": {
+        "desktop": "e1-layers-stack"
+      },
+      "summary": "New states of e1-layers-stack: menu (a layer row's ⋯, shown on hover, selection and focus, and its context menu: Turn off (Space), Open its manifest, Show in Finder, then Remove from this stack… in the destructive colour; the base row has none), remove (the confirmation: “Remove Frost Wardens from Demo Skirmish's stack?”, the folder, “Its folder stays on disk (frost-content/); Add layer… brings it back. Rosters that used it open with the data-changed review.”, Cancel / Remove; Delete on a selected row opens it too), checking (“Checking the stack…” while Check layers reads the folders again and rebuilds), addon-fixes (Declare it a variant… and Remove rally from the pack drawn disabled, “… is in no slice yet”) and add-refused (“Not added. That folder is the dataset itself: a layer is another dataset.” above the list, Dismiss).",
+      "source": "E1-6 grooming readings; approved by the user 2026-11-25 (E1-6 Proposals review, G1, G3, G5 (a design change, drawn as the review page's mockup), G11)"
     }
   ]
 }

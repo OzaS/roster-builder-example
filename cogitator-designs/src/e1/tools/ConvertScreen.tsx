@@ -40,8 +40,23 @@ function steps(tick: number, verify: boolean) {
 
 type Phase = "options" | "converting" | "equal" | "differences" | "refused";
 
+/**
+ * E1-5 as built (approved by the user 2026-11-25): B2, the window is 1120 × 760 (at least 960 × 600), its own window
+ * beside the editor; B10, the key and version fields show the converter's defaults as their values, and an invalid
+ * version marks the field and keeps Convert unavailable with the reason; B9, the commands to copy write the home as `~`
+ * outside the quotes, quote paths with spaces, and name --dataset-key / --version only when changed from the defaults,
+ * --locale / --text-columns only when not en / auto; convert and roundtrip are two commands, each with its Copy.
+ */
+const AS_BUILT_WINDOW = { width: 1120, height: 760 };
+const AS_BUILT_INPUT = "~/Downloads/'Skirmish XML'";
+const AS_BUILT_INPUT_SHOWN = "~/Downloads/Skirmish XML";
+const AS_BUILT_OUTPUT = "~/Datasets/demo-skirmish";
+
 export function ConvertScreen({ mode, platform, state = "options", interactive }: { mode: E1Mode; platform: E1Platform; state?: string; interactive: boolean }) {
-  const s = (["options", "converting", "equal", "differences", "refused"].includes(state) ? state : "options") as ConvertState;
+  const asBuilt = state === "window" || state === "commands";
+  const badVersion = state === "window";
+  const commands = state === "commands";
+  const s = (asBuilt ? (commands ? "equal" : "options") : ["options", "converting", "equal", "differences", "refused"].includes(state) ? state : "options") as ConvertState;
   const [phase, setPhase] = useState<Phase>(s);
   const [tick, setTick] = useState(s === "converting" ? 9 : 0);
   const [kind, setKind] = useState<"folder" | "archive" | "files">("folder");
@@ -49,12 +64,15 @@ export function ConvertScreen({ mode, platform, state = "options", interactive }
   const [original, setOriginal] = useState(true);
   const [update, setUpdate] = useState(false);
   const [verify, setVerify] = useState(true);
-  const [locale, setLocale] = useState("en");
+  const [locale, setLocale] = useState(commands ? "de" : "en");
   const [columns, setColumns] = useState("Auto");
   const [dry, setDry] = useState(false);
   const result = useRef<Phase>(s === "differences" ? "differences" : "equal");
   const timer = useRef<number | null>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
   useEffect(() => () => { if (timer.current) window.clearInterval(timer.current); }, []);
+  /* The commands state shows the end of the report, where the commands to copy stand (the pane scrolls, not the page). */
+  useEffect(() => { if (commands && bodyRef.current) bodyRef.current.scrollTop = bodyRef.current.scrollHeight; }, [commands]);
 
   const convert = (dryRun: boolean) => {
     if (!interactive || phase === "refused") return;
@@ -101,19 +119,19 @@ export function ConvertScreen({ mode, platform, state = "options", interactive }
                 title={id === "folder" ? "A folder of XML data files (every file below it)" : id === "archive" ? "A .zip, or one compressed .gstz / .catz" : "Some .gst / .cat files"}>{label}</button>
             ))}
           </span>
-          <span className="cg-tl-pathrow"><span className="cg-tl-field mono" title={convertInput[platform]}>{kind === "archive" ? `${convertInput[platform]}.zip` : convertInput[platform]}</span><button type="button" className="d-btn">Choose…</button></span>
+          <span className="cg-tl-pathrow"><span className="cg-tl-field mono" title={commands ? AS_BUILT_INPUT_SHOWN : convertInput[platform]}>{commands ? AS_BUILT_INPUT_SHOWN : kind === "archive" ? `${convertInput[platform]}.zip` : convertInput[platform]}</span><button type="button" className="d-btn">Choose…</button></span>
           <p className="cg-tl-help">{phase === "refused" ? <span className="cg-err">ember-guard.cat isn’t readable: see the report.</span> : <>5 documents: 1 game system, 4 catalogues; {ignoredFiles.length} other files ignored.</>}</p>
         </section>
         <section>
           <Head>Output</Head>
-          <span className="cg-tl-pathrow"><span className="cg-tl-field mono" title={convertOutput[platform]}>{convertOutput[platform]}</span><button type="button" className="d-btn">Choose…</button></span>
+          <span className="cg-tl-pathrow"><span className="cg-tl-field mono" title={commands ? AS_BUILT_OUTPUT : convertOutput[platform]}>{commands ? AS_BUILT_OUTPUT : convertOutput[platform]}</span><button type="button" className="d-btn">Choose…</button></span>
           {opt("Update a dataset converted before", update, setUpdate, <>Otherwise the folder must be new or empty. Update rewrites it in place; key changes become move records.</>)}
         </section>
         <section>
           <Head>Dataset</Head>
           <div className="cg-tl-grid2">
-            <label><span>Key</span><span className="cg-tl-field mono">skirmish-xml</span></label>
-            <label><span>Version</span><span className="cg-tl-field mono">1.0.0</span></label>
+            <label style={badVersion ? { alignSelf: "start" } : undefined}><span>Key</span><span className="cg-tl-field mono" title={asBuilt ? "The converter's default is shown as the value; changing it adds --dataset-key" : undefined}>{commands ? "demo-skirmish" : "skirmish-xml"}</span></label>
+            <label><span>Version</span><span className={`cg-tl-field mono${badVersion ? " invalid" : ""}`} aria-invalid={badVersion || undefined}>{badVersion ? "1.0" : "1.0.0"}</span>{badVersion ? <span className="cg-tl-fielderr">Three numbers, like 1.0.0</span> : null}</label>
             <span><span>Text language</span><Select platform={platform} value={locale} options={["en", "de", "fr"]} onChange={setLocale} label="Text language" /></span>
             <span><span>Text columns</span><Select platform={platform} value={columns} options={["Auto", "None", "All"]} onChange={setColumns} label="Profile columns marked as text" /></span>
           </div>
@@ -132,11 +150,12 @@ export function ConvertScreen({ mode, platform, state = "options", interactive }
       </div>
       <footer className="cg-tl-cv-actions">
         {written ? <span className="cg-tl-help cg-tl-why">Converted. To convert again, turn on Update or choose another output folder.</span> : null}
+        {badVersion ? <span className="cg-tl-help cg-tl-why">Convert is unavailable: the version 1.0 isn’t three numbers (like 1.0.0).</span> : null}
         {written || (dry && (phase === "equal" || phase === "differences"))
           ? <button type="button" className="d-btn" onClick={() => setPhase("options")} title="Back to the options and the input's documents">Convert another</button>
-          : <button type="button" className="d-btn" onClick={() => convert(true)} disabled={busy || phase === "refused"} title="Convert and report; write nothing">Dry run</button>}
-        <button type="button" className="d-btn primary" onClick={() => convert(false)} disabled={busy || phase === "refused" || written}
-          title={phase === "refused" ? "The input can’t be read: choose another" : written ? "The output folder isn’t empty now: turn on Update, or choose another folder" : "Convert and write the dataset"}>Convert<kbd>{keyFor(platform, "⌘↵", "Ctrl+Enter")}</kbd></button>
+          : <button type="button" className="d-btn" onClick={() => convert(true)} disabled={busy || phase === "refused" || badVersion} title={badVersion ? "The version isn’t valid: three numbers, like 1.0.0" : "Convert and report; write nothing"}>Dry run</button>}
+        <button type="button" className="d-btn primary" onClick={() => convert(false)} disabled={busy || phase === "refused" || written || badVersion}
+          title={badVersion ? "The version isn’t valid: three numbers, like 1.0.0" : phase === "refused" ? "The input can’t be read: choose another" : written ? "The output folder isn’t empty now: turn on Update, or choose another folder" : "Convert and write the dataset"}>Convert<kbd>{keyFor(platform, "⌘↵", "Ctrl+Enter")}</kbd></button>
       </footer>
     </aside>
   );
@@ -202,7 +221,7 @@ export function ConvertScreen({ mode, platform, state = "options", interactive }
     const diff = phase === "differences";
     title = (
       <>
-        <strong>{dry ? "Dry run: skirmish-xml converts" : "Converted skirmish-xml"}</strong>
+        <strong>{dry ? "Dry run: skirmish-xml converts" : commands ? "Converted Skirmish XML" : "Converted skirmish-xml"}</strong>
         <VerdictMark v={diff ? "different" : "equal"}>{diff ? "2 documents differ" : "Equal"}</VerdictMark>
         <span className="d-muted">3.8 s</span>
         <span className="d-spacer" />
@@ -218,7 +237,7 @@ export function ConvertScreen({ mode, platform, state = "options", interactive }
             detail={diff ? "3 of 5 documents equal · 3 differences in 2 documents" : "5 of 5 documents equal"} />
           <ContractRow tag="C3" title="Identical bytes" what="The original files are kept, so an unedited export can return them" v={original ? "equal" : "not-run"} detail={original ? "5 files kept, SHA-256 recorded" : "Originals not kept"} />
         </div>
-        <Head note={dry ? "a dry run: nothing was written" : `in ${convertOutput[platform]}`}>Written</Head>
+        <Head note={dry ? "a dry run: nothing was written" : `in ${commands ? AS_BUILT_OUTPUT : convertOutput[platform]}`}>Written</Head>
         <Facts rows={[
           { label: "Documents", value: <>{conversionFacts.documents}<span className="d-muted">1 game system, 4 catalogues</span></> },
           { label: "Entities", value: <>{conversionFacts.entities}</> },
@@ -249,18 +268,23 @@ export function ConvertScreen({ mode, platform, state = "options", interactive }
           </ul>
         ) : <p className="cg-tl-note cg-tl-okline"><Check size={13} />No errors and no preservation failures. 2 authoring suggestions, listed in the dataset.</p>}
         {diff ? <p className="cg-tl-note">The dataset is written and behaves the same (C2 equal). An export won’t give these 2 documents back byte for byte; until then the differences stay in the inbox as preservation failures.</p> : null}
-        <CommandLine command={`${cmd}${verify ? ` && augur dklpo roundtrip ${convertInput.mac}` : ""}`} />
+        {commands ? (
+          <>
+            <CommandLine command={`augur dklpo convert ${AS_BUILT_INPUT} --out ${AS_BUILT_OUTPUT} --full-map${envelope ? "" : " --no-compat"}${envelope && original ? " --keep-original" : ""}${locale !== "en" ? ` --locale ${locale}` : ""} --dataset-key demo-skirmish`} />
+            {verify ? <CommandLine command={`augur dklpo roundtrip ${AS_BUILT_INPUT}${locale !== "en" ? ` --locale ${locale}` : ""}`} /> : null}
+          </>
+        ) : <CommandLine command={`${cmd}${verify ? ` && augur dklpo roundtrip ${convertInput.mac}` : ""}`} />}
       </>
     );
   }
 
   return (
-    <E1Window mode={mode} platform={platform} label="Convert from XML data" className={interactive ? "" : "static"}>
+    <E1Window mode={mode} platform={platform} label="Convert from XML data" className={interactive ? "" : "static"} {...(badVersion ? AS_BUILT_WINDOW : {})}>
       <div className="e1s-grid cg-tl-cv" style={{ gridTemplateColumns: `${layout.pageMin}px minmax(0, 1fr)` }} onPointerDownCapture={claim} onFocusCapture={claim}>
         {options}
         <main className="cg-tl-cv-main" aria-label="Conversion">
           <header className="cg-tl-cv-top"><span className="cg-tl-cv-head">{title}</span>{mac ? null : <WinCaption />}</header>
-          <div className="cg-tl-cv-body"><div style={{ maxWidth: layout.pageMax }}>{body}</div></div>
+          <div className="cg-tl-cv-body" ref={bodyRef}><div style={{ maxWidth: layout.pageMax }}>{body}</div></div>
         </main>
       </div>
     </E1Window>

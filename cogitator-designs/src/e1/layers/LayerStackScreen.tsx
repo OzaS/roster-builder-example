@@ -1,4 +1,4 @@
-import { ArrowDownLeft, ArrowRight, Check, ChevronDown, CircleAlert, CircleSlash, Code2, Copy, CornerDownLeft, FileCode2, Focus, FolderOpen, GitMerge, GripVertical, Hash, Info, Layers, Play, Plus, RefreshCw, X } from "lucide-react";
+import { ArrowDownLeft, ArrowRight, Check, ChevronDown, CircleAlert, CircleSlash, Code2, Copy, CornerDownLeft, Delete, FileCode2, Focus, FolderOpen, GitMerge, GripVertical, Hash, Info, Layers, MoreHorizontal, Play, Plus, Power, RefreshCw, Trash2, X } from "lucide-react";
 import { useRef, useState, type DragEvent, type ReactNode } from "react";
 import { DiagIcon, KindIcon } from "../../glyphs";
 import { M } from "../../directions/direction-d-content";
@@ -6,6 +6,7 @@ import { allDiagnostics } from "../editor/data";
 import { CodeView, SynText } from "../editor/code";
 import { Pill } from "../editor/parts";
 import { BackForward, EditorGrid, Sidebar, Win, type Mode, useWindowKeys } from "../editor/shell";
+import { Sheet } from "../tools/common";
 import { BASE_VERSION, BUILT_AT, kindLabel, stackFor, type LayerDef, type LayerState } from "./data";
 import "./layers.css";
 
@@ -20,14 +21,35 @@ import "./layers.css";
 const initialSel: Record<LayerState, string> = { stack: "demo-skirmish-house", refused: "demo-skirmish-frost", conflict: "demo-skirmish-draft", "addon-rules": "demo-skirmish-names", overlay: "demo-skirmish-house" };
 const draftKey = "demo-skirmish-draft";
 const houseKey = "demo-skirmish-house";
+const frostKey = "demo-skirmish-frost";
+
+/**
+ * E1-6 as built (the grooming readings, approved by the user 2026-11-25). G5 (a design change, drawn as the review
+ * page's mockup): a layer row's context menu, by right-click or the row's ⋯ (shown on hover, selection and focus; the
+ * base row has none): Turn off / on (Space), Open its manifest, Show in Finder, then Remove from this stack… in the
+ * destructive colour; it and Delete on a selected row open the confirmation. Removing drops the folder from the base's
+ * stack only, never touching it on disk. G3: Check layers reads the folders again and rebuilds, the header reading
+ * "Checking the stack…". G11: Declare it a variant… and Remove … from the pack stay drawn disabled ("… is in no slice
+ * yet"). G1: Add layer… refuses a folder that is no layer, above the list, with Dismiss.
+ */
+type AsBuilt = "menu" | "remove" | "checking" | "addon-fixes" | "add-refused";
+const AS_BUILT: AsBuilt[] = ["menu", "remove", "checking", "addon-fixes", "add-refused"];
+const asBuiltBase: Record<AsBuilt, LayerState> = { menu: "stack", remove: "stack", checking: "stack", "addon-fixes": "addon-rules", "add-refused": "stack" };
+const asBuiltSel: Record<AsBuilt, string> = { menu: frostKey, remove: frostKey, checking: houseKey, "addon-fixes": "demo-skirmish-names", "add-refused": houseKey };
+const DECLARE_LATER = "Declare it a variant… is in no slice yet";
+const REMOVE_KEY_LATER = "Remove rally from the pack is in no slice yet";
 
 export function LayerStackScreen({ mode, state = "stack", interactive }: { mode: Mode; state?: string; interactive: boolean }) {
-  const s = (["stack", "refused", "conflict", "addon-rules", "overlay"].includes(state) ? state : "stack") as LayerState;
+  const built = (AS_BUILT as string[]).includes(state) ? (state as AsBuilt) : null;
+  const s = (built ? asBuiltBase[built] : ["stack", "refused", "conflict", "addon-rules", "overlay"].includes(state) ? state : "stack") as LayerState;
   const [view, setView] = useState<"stack" | "overlay">(s === "overlay" ? "overlay" : "stack");
   const [stack, setStack] = useState<LayerDef[]>(() => stackFor(s === "overlay" ? "stack" : s));
-  const [sel, setSel] = useState(initialSel[s]);
+  const [sel, setSel] = useState(built ? asBuiltSel[built] : initialSel[s]);
   const [order, setOrder] = useState<"derived" | "explicit">("derived");
-  const [checking, setChecking] = useState(false);
+  const [checking, setChecking] = useState(built === "checking");
+  const [menuFor, setMenuFor] = useState<string | null>(built === "menu" ? frostKey : null);
+  const [removing, setRemoving] = useState<string | null>(built === "remove" ? frostKey : null);
+  const [addRefusal, setAddRefusal] = useState(built === "add-refused");
   const [copied, setCopied] = useState(false);
   const dragKey = useRef<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -73,11 +95,15 @@ export function LayerStackScreen({ mode, state = "stack", interactive }: { mode:
     });
   };
   const runCheck = () => { if (checking) return; setChecking(true); window.setTimeout(() => setChecking(false), 900); };
+  const remove = (key: string) => { setStack((cur) => cur.filter((l) => l.key !== key)); setSel((cur) => (cur === key ? stack[0].key : cur)); setRemoving(null); setMenuFor(null); };
+  const removingLayer = removing ? stack.find((l) => l.key === removing) : undefined;
 
-  const keys = useRef({ toggle, move, sel });
-  keys.current = { toggle, move, sel };
+  const keys = useRef({ toggle, move, sel, ask: (_key: string) => undefined as void, esc: () => undefined as void });
+  keys.current = { toggle, move, sel, ask: (key) => { if (built && key !== stack[0].key) setRemoving(key); }, esc: () => { setMenuFor(null); setRemoving(null); } };
   const claim = useWindowKeys(interactive, (event: KeyboardEvent) => {
     if (view !== "stack" || (event.target as HTMLElement).tagName === "INPUT") return;
+    if (event.key === "Escape") { keys.current.esc(); return; }
+    if ((event.key === "Delete" || event.key === "Backspace") && (event.target as HTMLElement).closest?.(".cg-ly-row")) { event.preventDefault(); keys.current.ask(keys.current.sel); return; }
     const list = applied.concat(off);
     const i = list.findIndex((l) => l.key === keys.current.sel);
     if (event.altKey && (event.key === "ArrowUp" || event.key === "ArrowDown")) { event.preventDefault(); keys.current.move(keys.current.sel, event.key === "ArrowUp" ? -1 : 1); return; }
@@ -105,7 +131,7 @@ export function LayerStackScreen({ mode, state = "stack", interactive }: { mode:
             <span className="d-spacer" />
             {checking ? <span className="cg-ly-status"><RefreshCw size={13} className="cg-spin" />Checking the stack…</span> : status}
             <button type="button" className="d-btn" onClick={runCheck} disabled={checking} title="Resolve, apply and check every layer over the base (augur dklpo layer check)">{checking ? <RefreshCw size={14} className="cg-spin" /> : <Play size={14} />}Check layers</button>
-            <button type="button" className="d-ghost" title="Add an add-on, a variant or a dataset layer from a folder"><Plus size={14} />Add layer…</button>
+            <button type="button" className="d-ghost" onClick={built ? () => setAddRefusal(true) : undefined} title="Add an add-on, a variant or a dataset layer from a folder"><Plus size={14} />Add layer…</button>
           </header>
           <div className="cg-ib-filters cg-ly-tools" role="toolbar" aria-label="Order">
             <span className="cg-ly-label">Order</span>
@@ -121,27 +147,57 @@ export function LayerStackScreen({ mode, state = "stack", interactive }: { mode:
           </div>
           <div className="cg-ly">
             <div className="cg-ly-list" ref={listRef} role="listbox" aria-label="Layer stack">
+              {addRefusal ? <p className="cg-ly-callout err" role="alert"><CircleAlert size={14} /><span><strong>Not added.</strong> That folder is the dataset itself: a layer is another dataset. <button type="button" className="cg-linkbtn" onClick={() => setAddRefusal(false)}>Dismiss</button></span></p> : null}
               {orderError ? <p className="cg-ly-callout err" role="alert"><CircleAlert size={14} /><span><strong>dklpo/layer-order.</strong> {code(orderError)} <button type="button" className="cg-linkbtn" onClick={() => setOrder("derived")}>Use the derived order</button></span></p> : null}
               <section className="cg-ly-group" aria-label="Applied in this order">
                 <h3>Applied in this order<span className="d-muted">{applied.length}</span><span className="d-spacer" /><span className="cg-ly-wins">later wins <ArrowRight size={11} /></span></h3>
                 {applied.map((l, i) => (
                   <LayerRow key={l.key} layer={l} n={i + 1} selected={sel === l.key} explicit={order === "explicit"} conflict={conflictOf(l, stack)} onSel={() => setSel(l.key)} onToggle={() => toggle(l.key)}
-                    onDragStart={() => { dragKey.current = l.key; }} onDrop={() => dropOn(l.key)} />
+                    onDragStart={() => { dragKey.current = l.key; }} onDrop={() => dropOn(l.key)}
+                    {...(built ? { onMore: () => { setSel(l.key); setMenuFor(menuFor === l.key ? null : l.key); }, menu: menuFor === l.key ? <RowMenu layer={l} onToggle={() => { toggle(l.key); setMenuFor(null); }} onRemove={() => { setMenuFor(null); setRemoving(l.key); }} /> : undefined } : {})} />
                 ))}
               </section>
               {off.length ? (
                 <section className="cg-ly-group" aria-label="Off">
                   <h3>Off<span className="d-muted">{off.length}</span></h3>
-                  {off.map((l) => <LayerRow key={l.key} layer={l} selected={sel === l.key} explicit={false} onSel={() => setSel(l.key)} onToggle={() => toggle(l.key)} />)}
+                  {off.map((l) => <LayerRow key={l.key} layer={l} selected={sel === l.key} explicit={false} onSel={() => setSel(l.key)} onToggle={() => toggle(l.key)}
+                    {...(built ? { onMore: () => { setSel(l.key); setMenuFor(menuFor === l.key ? null : l.key); }, menu: menuFor === l.key ? <RowMenu layer={l} onToggle={() => { toggle(l.key); setMenuFor(null); }} onRemove={() => { setMenuFor(null); setRemoving(l.key); }} /> : undefined } : {})} />)}
                 </section>
               ) : null}
             </div>
-            <Detail layer={selected} stack={stack} n={applied.findIndex((l) => l.key === selected.key) + 1} explicit={order === "explicit"} onToggle={() => toggle(selected.key)} onShow={() => setView("overlay")} onCheck={runCheck} />
+            <Detail layer={selected} stack={stack} n={applied.findIndex((l) => l.key === selected.key) + 1} explicit={order === "explicit"} onToggle={() => toggle(selected.key)} onShow={() => setView("overlay")} onCheck={runCheck} fixesDisabled={Boolean(built)} />
           </div>
           <footer className="cg-ib-keys"><kbd>↑</kbd><kbd>↓</kbd> move <kbd>⌥↑</kbd><kbd>⌥↓</kbd> reorder (explicit) <kbd>Space</kbd> on / off <span className="d-spacer" /><span>The order and the on / off set are kept for this base; rosters record them</span></footer>
         </main>
       </EditorGrid>
+      {removingLayer ? (
+        <div className="cg-scrim" onClick={() => setRemoving(null)}>
+          <div onClick={(e) => e.stopPropagation()}>
+            <Sheet label="Remove a layer" tone="warn" icon={<Trash2 size={18} />} width={460}
+              title={<>Remove {removingLayer.title} from Demo Skirmish’s stack?</>} target={`~/Datasets/${removingLayer.folder.replace(/\/$/, "")}`}
+              actions={[
+                { label: "Cancel", cancel: true, onClick: () => setRemoving(null) },
+                { label: "Remove", kind: "primary", onClick: () => remove(removingLayer.key), title: "Take it out of this base's stack; its folder stays on disk" },
+              ]}>
+              <p>Its folder stays on disk (<code>{removingLayer.folder}</code>); Add layer… brings it back. Rosters that used it open with the data-changed review.</p>
+            </Sheet>
+          </div>
+        </div>
+      ) : null}
     </Win>
+  );
+}
+
+/** G5 (as built): a layer row's context menu. The base row has none. */
+export function RowMenu({ layer: l, onToggle, onRemove, inline }: { layer: LayerDef; onToggle?: () => void; onRemove?: () => void; inline?: boolean }) {
+  return (
+    <div className="cg-menu cg-ly-menu" role="menu" aria-label={`${l.title}`} onClick={(e) => e.stopPropagation()} style={inline ? { position: "static" } : undefined}>
+      <button type="button" role="menuitem" className="cg-menu-item sel" onClick={onToggle}><Power size={14} />{l.status === "off" ? "Turn on" : "Turn off"}<span className="cg-menu-key">Space</span></button>
+      <button type="button" role="menuitem" className="cg-menu-item" title="Open the layer's dataset.dkl"><Code2 size={14} />Open its manifest</button>
+      <button type="button" role="menuitem" className="cg-menu-item" title={`Show ${l.folder} in Finder`}><FolderOpen size={14} />Show in Finder</button>
+      <div className="cg-menu-sep" role="separator" />
+      <button type="button" role="menuitem" className="cg-menu-item danger" onClick={onRemove}><Trash2 size={14} />Remove from this stack…<span className="cg-menu-key"><Delete size={13} /></span></button>
+    </div>
   );
 }
 
@@ -172,15 +228,17 @@ function summary(l: LayerDef) {
 }
 
 /** One layer: grip (explicit order), position, kind glyph, title and chips, then its key, version, requires result and status. */
-export function LayerRow({ layer: l, n, selected, explicit, conflict, onSel, onToggle, onDragStart, onDrop, cls = "" }: {
+export function LayerRow({ layer: l, n, selected, explicit, conflict, onSel, onToggle, onDragStart, onDrop, cls = "", onMore, menu }: {
   layer: LayerDef; n?: number; selected: boolean; explicit: boolean; conflict?: { text: string; by: boolean }; onSel?: () => void; onToggle?: () => void; onDragStart?: () => void; onDrop?: () => void; cls?: string;
+  /** E1-6 as built (G5): the row's ⋯ and its context menu; the row grid gains a 24 px column before the switch. */
+  onMore?: () => void; menu?: ReactNode;
 }) {
   const isBase = l.kind === "dataset";
   const edge = l.status === "refused" ? " edge-error" : conflict ? " edge-suggestion" : "";
   const drag = explicit && !isBase && l.status !== "off";
   return (
-    <div data-key={l.key} role="option" aria-selected={selected} tabIndex={selected ? 0 : -1} className={`cg-ly-row${selected ? " selected" : ""}${l.status === "off" ? " off" : ""}${edge} ${cls}`}
-      onClick={onSel} draggable={drag} onDragStart={drag ? (e: DragEvent) => { e.dataTransfer.effectAllowed = "move"; onDragStart?.(); } : undefined}
+    <div data-key={l.key} role="option" aria-selected={selected} tabIndex={selected ? 0 : -1} className={`cg-ly-row${selected ? " selected" : ""}${l.status === "off" ? " off" : ""}${edge}${onMore ? " with-more" : ""} ${cls}`}
+      onClick={onSel} onContextMenu={onMore && !isBase ? (e) => { e.preventDefault(); onMore(); } : undefined} draggable={drag} onDragStart={drag ? (e: DragEvent) => { e.dataTransfer.effectAllowed = "move"; onDragStart?.(); } : undefined}
       onDragOver={explicit ? (e: DragEvent) => e.preventDefault() : undefined} onDrop={explicit ? (e: DragEvent) => { e.preventDefault(); onDrop?.(); } : undefined}>
       <span className={`cg-ly-grip${drag ? "" : " off"}`} aria-hidden title={drag ? "Drag to reorder" : undefined}><GripVertical size={14} /></span>
       <span className="cg-ly-n num">{n ?? "–"}</span>
@@ -199,6 +257,8 @@ export function LayerRow({ layer: l, n, selected, explicit, conflict, onSel, onT
             : <span className="cg-ly-sum">{summary(l)}</span>}
         </span>
       </span>
+      {onMore ? (isBase ? <span aria-hidden /> : <button type="button" className={`d-icon sm cg-ly-more${menu ? " open" : ""}`} aria-haspopup="menu" aria-expanded={Boolean(menu)} aria-label={`More for ${l.title}`} title="More: turn off, open its manifest, show in Finder, remove" onClick={(e) => { e.stopPropagation(); onMore(); }}><MoreHorizontal size={15} /></button>) : null}
+      {menu}
       {isBase ? <span className="cg-ly-fixed" aria-hidden /> : (
         <button type="button" role="switch" aria-checked={l.status !== "off"} className="cg-ly-switch" onClick={(e) => { e.stopPropagation(); onToggle?.(); }}
           aria-label={`${l.status === "off" ? "Turn on" : "Turn off"} ${l.title}`} title={l.status === "off" ? `Turn ${l.title} on` : `Turn ${l.title} off`}><i /></button>
@@ -210,7 +270,7 @@ export function LayerRow({ layer: l, n, selected, explicit, conflict, onSel, onT
 const outcomeIcon = (o: string) => (o === "failed" ? <CircleAlert size={13} className="cg-ly-bad" /> : o === "overridden" || o === "overrides" ? <GitMerge size={13} className="cg-ly-info" /> : <Check size={13} className="d-ok" />);
 const outcomeLabel: Record<string, string> = { applied: "applied", failed: "failed", moved: "moved", overridden: "set again later", overrides: "overrides" };
 
-function Detail({ layer: l, stack, n, explicit, onToggle, onShow, onCheck }: { layer: LayerDef; stack: LayerDef[]; n: number; explicit: boolean; onToggle: () => void; onShow: () => void; onCheck: () => void }) {
+function Detail({ layer: l, stack, n, explicit, onToggle, onShow, onCheck, fixesDisabled }: { layer: LayerDef; stack: LayerDef[]; n: number; explicit: boolean; onToggle: () => void; onShow: () => void; onCheck: () => void; fixesDisabled?: boolean }) {
   const isBase = l.kind === "dataset";
   const before = n > 1 ? stack.filter((x) => x.status !== "off")[n - 2] : undefined;
   const house = stack.find((x) => x.key === houseKey);
@@ -255,8 +315,8 @@ function Detail({ layer: l, stack, n, explicit, onToggle, onShow, onCheck }: { l
                 <p className="d-muted">{l.displayOnly.detail}. The base's <code>attack += $rally</code> reads the text key <code>rally</code>, which this pack fills in.</p>
                 <div className="cg-ib-code cg-ly-code"><CodeView lines={["## Short names (invented content only)", "warden-squad.short: Squad", "warden-captain.short: Captain", "rally: 1"]} start={1} end={4} marks={[{ id: "rally", line: 4, from: 0, to: 8, kind: "error" }]} selected={[4, 4]} label="short-names/iron-wardens/text/en.dkl" compact /></div>
                 <p className="cg-ib-actions">
-                  <button type="button" className="d-btn primary"><Code2 size={13} />Declare it a variant…</button>
-                  <button type="button" className="d-btn">Remove <code>rally</code> from the pack</button>
+                  <button type="button" className="d-btn primary" disabled={fixesDisabled} title={fixesDisabled ? DECLARE_LATER : undefined}><Code2 size={13} />Declare it a variant…</button>
+                  <button type="button" className="d-btn" disabled={fixesDisabled} title={fixesDisabled ? REMOVE_KEY_LATER : undefined}>Remove <code>rally</code> from the pack</button>
                   <button type="button" className="d-btn"><FolderOpen size={13} />Open en.dkl:4</button>
                 </p>
               </div>
