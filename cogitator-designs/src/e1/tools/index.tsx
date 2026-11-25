@@ -2,6 +2,7 @@ import type { E1Screen } from "../types";
 import { ChecksScreen } from "./ChecksScreen";
 import { ConvertScreen } from "./ConvertScreen";
 import { ExportScreen } from "./ExportScreen";
+import { PaletteScreen } from "./PaletteScreen";
 import { RenameScreen } from "./RenameScreen";
 import { RoundtripScreen } from "./RoundtripScreen";
 
@@ -73,6 +74,22 @@ export const toolScreens: E1Screen[] = [
       { what: "Export", how: "Export (anyway) shows the written files; Done or Esc closes the sheet, and the toast brings it back." },
     ],
     render: ({ mode, state, interactive }) => <ExportScreen key={state} mode={mode} state={state} interactive={interactive} />,
+  },
+  {
+    id: "e1-tools-palette",
+    group: "Checks and tools",
+    title: "⌘K palette, as built",
+    item: "cg-e1-tools-palette",
+    summary:
+      "The ⌘K palette as built in E1-5 (approved by the user 2026-11-25, A15): desktop-kit's dialog restyled to the gallery's palette (its title row kept for screen readers only). Entries are ranked starts with, then word start, then contains, up to 8, then “n more”; then the commands that match, up to 6, with their keys; then Search the dataset for “…” (⇧⌘F), which opens the dataset search with the text. Entries open through the navigation (Back returns), commands run as their keys do; window keys wait while it is open. With nothing found it says what it searched and offers the next steps: Search the dataset, Create entry … (drawn disabled: no slice holds it yet), a layer that is off, Clear the search. The foot reads ↑ ↓ move, ↵ open or run, Esc close. The sidebar's Search item stays the dataset search; its tooltip names ⌘K.",
+    states: [
+      { id: "results", title: "Entries, commands, Search the dataset" },
+      { id: "no-result", title: "Nothing found: the next steps" },
+    ],
+    tryIt: [
+      { what: "Search", how: "type in the field; Esc closes the palette, ⌘K opens it again." },
+    ],
+    render: ({ mode, state, interactive }) => <PaletteScreen key={state} mode={mode} state={state} interactive={interactive} />,
   },
   {
     id: "e1-tools-roundtrip",
