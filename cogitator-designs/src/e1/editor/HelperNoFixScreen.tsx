@@ -16,8 +16,16 @@ import { BackForward, EditorGrid, Sidebar, SourceList, Win, type Mode } from "./
  * for a preservation failure, Show diff) drawn disabled: the design language's disabled button, never a live primary.
  * D's own box and panel keep their live buttons.
  */
-export type HelperNoFixState = "box" | "panel-issues" | "panel-suggestions";
-export const helperNoFixStates: HelperNoFixState[] = ["box", "panel-issues", "panel-suggestions"];
+export type HelperNoFixState = "box" | "panel-issues" | "panel-suggestions" | "panel-412";
+export const helperNoFixStates: HelperNoFixState[] = ["box", "panel-issues", "panel-suggestions", "panel-412"];
+
+/**
+ * E1-4 as built (approved by the user 2026-11-24): the panel opens at 412 px, the width the references design gives its
+ * four tabs (D's was 328). Where the page would keep less than 480 px beside the sidebar, the list and the panel
+ * (232 + 318 + 412 leaves 478 at 1440), the source list folds away, as the Backlinks state draws it.
+ */
+const PANEL_AS_BUILT = 412;
+const BACKLINKS = 3;
 
 const ENTRY = "iron-wardens:warden-squad";
 const LATER_EXPORT = "Comes with Roundtrip and Export (E1-5)";
@@ -26,6 +34,8 @@ export function HelperNoFixScreen({ mode, state = "box", interactive }: { mode: 
   const s = (helperNoFixStates.includes(state as HelperNoFixState) ? state : "box") as HelperNoFixState;
   const pageIssues = allDiagnostics.filter((d) => d.where === ENTRY || d.where.startsWith(`${ENTRY}/`));
   const panel = s !== "box";
+  const wide = s === "panel-412";
+  const panelWidth = wide ? PANEL_AS_BUILT : layout.panel;
   const tab = s === "panel-suggestions" ? "suggestions" : "issues";
   const selected = s === "panel-suggestions" ? "d4" : "d2";
 
@@ -49,7 +59,7 @@ export function HelperNoFixScreen({ mode, state = "box", interactive }: { mode: 
   const panelNode = panel ? (
     <aside className="d-panel" aria-label="Helper panel">
       <div className="d-resize" role="separator" aria-orientation="vertical" aria-label="Resize the helper panel" title="Drag to resize" />
-      <div className="d-panel-in" style={{ width: layout.panel }}>
+      <div className="d-panel-in" style={{ width: panelWidth }}>
         <header className="d-ptabs">
           <div role="tablist" aria-label="Helper">
             {(["issues", "suggestions", "properties"] as const).map((t) => (
@@ -58,6 +68,7 @@ export function HelperNoFixScreen({ mode, state = "box", interactive }: { mode: 
                 {t !== "properties" && count(t) ? <span className={`d-pcount ${t}`}>{count(t)}</span> : null}
               </button>
             ))}
+            {wide ? <button type="button" role="tab" aria-selected={false} title="Every place that refers to this entry (⇧F12)">Backlinks<span className="d-pcount">{BACKLINKS}</span></button> : null}
           </div>
           <span className="d-spacer" />
           <button type="button" className="d-icon" aria-label="Back to the floating box" title="Back to the floating box (Esc)"><PictureInPicture2 size={15} /></button>
@@ -85,7 +96,7 @@ export function HelperNoFixScreen({ mode, state = "box", interactive }: { mode: 
   return (
     <Win mode={mode} interactive={interactive}>
       <EditorGrid side={<Sidebar source="iron-wardens" entry={ENTRY} updates={allDiagnostics.length} />}
-        list={<SourceList source={sourceById("iron-wardens")!} entry={ENTRY} />} panel={panelNode} panelWidth={layout.panel}>
+        list={wide ? undefined : <SourceList source={sourceById("iron-wardens")!} entry={ENTRY} />} panel={panelNode} panelWidth={panelWidth}>
         <main className="d-main" aria-label="Entry">
           <header className="d-top">
             <BackForward />
