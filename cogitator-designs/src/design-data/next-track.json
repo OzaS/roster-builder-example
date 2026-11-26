@@ -388,6 +388,17 @@
       },
       "summary": "Layers gets a key, after T3 Code's and VS Code's panel keys: ⇧⌘L (Ctrl+Shift+L on Windows) in the Go menu beside Updates, needs a dataset, a toggle (pressed in the stack view it returns to the page it covers, as Back). The sidebar's Layers names the key in its tooltip (“Open the layer stack (⇧⌘L)”) and Settings › Keyboard lists it under Find and move. Pairs with Layer Changes ⌥⌘L.",
       "source": "E1-6 worker Proposals review, A2-6 changed; approved by the user 2026-11-25"
+    },
+    {
+      "id": "cg-e1-app-icon",
+      "title": "E1: App icon",
+      "kind": "look",
+      "status": "approved",
+      "platforms": [
+        "desktop"
+      ],
+      "summary": "Field Cogitator's app icon: a brass terminal with a green screen of indented lines under a pointed arch, in a laurel wreath, on a deep green plate (#152a1e). macOS draws it as the Icon Composer squircle, Windows as the rounded square plate; Elements › Window › App icon at 256, 64, 32 and 16 px.",
+      "source": "The user's image (generated from a prompt written in E1-7b), 2026-11-25; built in E1-7b (apps/cogitator/assets)"
     }
   ]
 }

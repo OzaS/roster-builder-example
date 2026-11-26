@@ -51,6 +51,19 @@ function PropRows({ cls }: { cls?: string }) {
 type Renderer = { paper?: "pane" | "surface" | "none"; wide?: boolean; render: (mode: Mode, platform: Platform) => ReactNode; after?: ReactNode };
 
 const renderers: Record<string, Renderer> = {
+  /* E1-7b: the app icon (the user's image), as each platform shows it. */
+  "window.app-icon": {
+    render: (_mode, platform) => (
+      <div style={{ display: "flex", alignItems: "flex-end", gap: 24, padding: 8 }}>
+        {[256, 64, 32, 16].map((size) => (
+          <figure key={size} style={{ margin: 0, display: "grid", justifyItems: "center", gap: 6 }}>
+            <img src={`./app-icon/${platform === "mac" ? "macos" : "windows"}.png`} width={size === 256 ? 128 : size} height={size === 256 ? 128 : size} alt={size === 256 ? "Field Cogitator app icon" : ""} />
+            <figcaption className="d-muted" style={{ fontSize: 11 }}>{size === 256 ? "128 pt (256 px)" : `${size} px`}</figcaption>
+          </figure>
+        ))}
+      </div>
+    ),
+  },
   "window.frame": {
     wide: true, paper: "none",
     render: (_mode, platform) => (
