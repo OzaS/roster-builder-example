@@ -1,10 +1,11 @@
-import { ArrowRightLeft, BookOpen, FileInput, FileWarning, FileX, FolderOpen, FolderSearch, Lock, Search, Settings, Upload } from "lucide-react";
+import { ArrowRightLeft, BookOpen, FileInput, FileWarning, FileX, FolderOpen, FolderPlus, FolderSearch, Lock, Search, Settings, Upload } from "lucide-react";
 import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from "react";
 import { TrafficLights, WinCaption } from "../../frames";
 import { DiagIcon } from "../../glyphs";
 import { layout } from "../../language/layout";
 import type { E1Mode, E1Platform } from "../types";
 import { recents, xmlFolder, type Recent } from "./data";
+import { NewDatasetFailed, NewDatasetSheet, type NewDatasetInit } from "./NewDataset";
 import { CheckCounts, Dialog, E1Window, ProgressRow, RecentHeads, RecentRow, keyFor, type DlgAction, type StepStatus } from "./parts";
 
 /**
@@ -42,8 +43,10 @@ function jobSteps(job: Job): { label: string; status: StepStatus; count: string;
 }
 const jobDone = (job: Job) => jobSteps(job).every((s) => s.status === "done");
 
-export function StartWindow({ mode, platform, initial = "recent", problem, interactive = true, width = 1440, height = 900, large }: {
+export function StartWindow({ mode, platform, initial = "recent", problem, interactive = true, width = 1440, height = 900, large, newDataset }: {
   mode: E1Mode; platform: E1Platform; initial?: StartState; problem?: OpenProblem; interactive?: boolean; width?: number; height?: number; large?: boolean;
+  /** X3 (approved 2026-11-26, N1–N4): New dataset… in the sidebar and the first-run actions; `sheet` / `failed` start with the sheet open. */
+  newDataset?: { sheet?: NewDatasetInit; failed?: boolean };
 }) {
   const [list, setList] = useState<Recent[]>(initial === "first-run" ? [] : recents);
   const [sel, setSel] = useState<string | null>(initial === "missing" ? "glass-moors" : initial === "first-run" ? null : problemRow(problem) ?? "demo-skirmish");
@@ -57,6 +60,10 @@ export function StartWindow({ mode, platform, initial = "recent", problem, inter
   const gridRef = useRef<HTMLDivElement>(null);
   const userDialog = useRef(false);
   const showDialog = (p: OpenProblem) => { userDialog.current = true; setDialog(p); };
+  /* X3: the New dataset sheet (and its failed-write sheet), only where the screen draws New dataset…. */
+  const [sheet, setSheet] = useState<NewDatasetInit | null>(newDataset?.sheet ?? (newDataset?.failed ? { template: "starter", name: "Copper Coast" } : null));
+  const [failed, setFailed] = useState<boolean>(newDataset?.failed ?? false);
+  const openSheet = () => { if (newDataset) { userDialog.current = true; setDialog(null); setFailed(false); setSheet({ template: "starter", name: "" }); } };
 
   /* A dialog opened by the user takes the focus (its primary choice), so Return and Esc reach it; the starting state doesn't steal focus. */
   useEffect(() => {
@@ -103,6 +110,8 @@ export function StartWindow({ mode, platform, initial = "recent", problem, inter
   /* Keyboard: ↑ ↓ move, Enter opens, ⌘⌫ / Delete removes, ⌘Z undoes the removal, Esc cancels a dialog or a job, ⌘O opens a folder. */
   const onKey = (event: ReactKeyboardEvent<HTMLDivElement>) => {
     const mod = platform === "mac" ? event.metaKey : event.ctrlKey;
+    if (newDataset && mod && event.shiftKey && event.key.toLowerCase() === "n" && !job) { event.preventDefault(); openSheet(); return; }
+    if (sheet) return;
     if (event.key === "Escape") {
       if (dialog) { event.preventDefault(); close(); return; }
       if (job && !jobDone(job)) { event.preventDefault(); setJob(null); return; }
@@ -184,10 +193,11 @@ export function StartWindow({ mode, platform, initial = "recent", problem, inter
   /* ---------- Sidebar: the app's actions ---------- */
   const app = <span className="e1s-app"><span className="d-ws-mark" aria-hidden>FC</span><span><strong>Field Cogitator</strong><small>No dataset open</small></span></span>;
   const side = (
-    <aside className="d-side" aria-label="Start" inert={dialog ? true : undefined}>
+    <aside className="d-side" aria-label="Start" inert={dialog || sheet ? true : undefined}>
       <div className="d-side-in" style={{ width: layout.sidebar }}>
         <div className="d-side-top">{platform === "mac" ? <TrafficLights /> : app}</div>
         {platform === "mac" ? app : null}
+        {newDataset ? <button type="button" className="d-item" onClick={openSheet} title="Write a new dataset from a template: Blank or Starter"><FolderPlus size={15} />New dataset…<kbd>{keyFor(platform, "⇧⌘N", "Ctrl+Shift+N")}</kbd></button> : null}
         <button type="button" className="d-item" onClick={openFolder} title="Open a dataset folder (one with dataset.dkl at its top)"><FolderOpen size={15} />Open folder…<kbd>{keyFor(platform, "⌘O", "Ctrl+O")}</kbd></button>
         <button type="button" className="d-item" onClick={openFolder} title="Open a .dkl file or a dataset archive (.zip)"><FileInput size={15} />Open file…<kbd>{keyFor(platform, "⇧⌘O", "Ctrl+Shift+O")}</kbd></button>
         <button type="button" className="d-item" onClick={convert} title="Pick a folder of XML data files (.gst, .cat) and make a DKLPO dataset from it"><ArrowRightLeft size={15} />Convert from XML data…</button>
@@ -235,8 +245,11 @@ export function StartWindow({ mode, platform, initial = "recent", problem, inter
         <div className="e1s-body">
           <Col><section className="e1s-empty" style={{ maxWidth: layout.pageMax }} aria-label="Get started">
             <h2>No recent datasets yet</h2>
-            <p>Open a dataset folder, a <code>.dkl</code> file or a dataset archive, or convert XML data files into a new dataset. Datasets you open are listed here.</p>
+            {newDataset
+              ? <p>Write a new dataset, open a dataset folder, a <code>.dkl</code> file or a dataset archive, or convert XML data files into a new dataset. Datasets you open are listed here.</p>
+              : <p>Open a dataset folder, a <code>.dkl</code> file or a dataset archive, or convert XML data files into a new dataset. Datasets you open are listed here.</p>}
             <div className="e1s-starts">
+              {newDataset ? <StartAction icon={<FolderPlus size={18} />} verb="New dataset…" what="Start from a template: Blank, or Starter with a few entries and a passing test" k={keyFor(platform, "⇧⌘N", "Ctrl+Shift+N")} onClick={openSheet} /> : null}
               <StartAction icon={<FolderOpen size={18} />} verb="Open folder…" what="A folder with dataset.dkl at its top" k={keyFor(platform, "⌘O", "Ctrl+O")} onClick={openFolder} />
               <StartAction icon={<FileInput size={18} />} verb="Open file…" what="A .dkl file, or a dataset archive (.zip)" k={keyFor(platform, "⇧⌘O", "Ctrl+Shift+O")} onClick={openFolder} />
               <StartAction icon={<ArrowRightLeft size={18} />} verb="Convert from XML data…" what="A folder of XML data files (.gst, .cat) becomes a new DKLPO dataset" onClick={convert} />
@@ -292,8 +305,16 @@ export function StartWindow({ mode, platform, initial = "recent", problem, inter
     <E1Window mode={mode} platform={platform} width={width} height={height} large={large} label="Field Cogitator start window" className={interactive ? "" : "static"}>
       <div ref={gridRef} className="e1s-grid" style={{ gridTemplateColumns: `${layout.sidebar}px minmax(0, 1fr)` }} onKeyDown={onKey}>
         {side}
-        <main className="e1s-main" aria-label="Recent datasets" inert={dialog ? true : undefined}>{main}</main>
+        <main className="e1s-main" aria-label="Recent datasets" inert={dialog || sheet ? true : undefined}>{main}</main>
         {dialog ? <div className="cg-scrim" onClick={(event) => { if (event.target === event.currentTarget) setDialog(null); }}>{dialogFor(dialog)}</div> : null}
+        {sheet ? (
+          <div className="cg-scrim">
+            {failed
+              ? <NewDatasetFailed platform={platform} keyName={sheet.key ?? "copper-coast"} onRetry={() => { setFailed(false); setSheet(null); startJob({ kind: "open", title: sheet.name || "the new dataset", path: `~/Datasets/${sheet.key ?? "copper-coast"}`, files: 6, modules: 2 }); }} onCancel={() => setFailed(false)} />
+              : <NewDatasetSheet platform={platform} init={sheet} onCancel={() => setSheet(null)}
+                  onCreate={(key) => { setSheet(null); startJob({ kind: "open", title: key, path: platform === "mac" ? `~/Datasets/${key}` : `C:\\Users\\you\\Datasets\\${key}`, files: 6, modules: 2 }); }} />}
+          </div>
+        ) : null}
       </div>
     </E1Window>
   );

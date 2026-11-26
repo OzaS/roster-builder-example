@@ -170,6 +170,23 @@
             "summary": "What happened in one sentence, the file or folder, the choices as verbs; Return does the primary, Esc the safe choice. Floats with the dialog elevation over a scrim."
           },
           {
+            "id": "e1.new-dataset",
+            "title": "New dataset sheet (X3)",
+            "from": "X3 UI Proposals review, N2–N3, approved 2026-11-26",
+            "platforms": [
+              "mac",
+              "windows"
+            ],
+            "states": [
+              "Starter with its files",
+              "Blank",
+              "files hidden",
+              "the folder holds files",
+              "write failed"
+            ],
+            "summary": "The open-errors dialog's frame (sheet on macOS, centred with a footer band on Windows) holding a form: Template radios with one line each, Name and Key fields side by side (the key mono, red with a line when it can't be used or its folder holds files), Location as a path field with Choose…, the line “Creates <folder> with N files” with Hide files, and the files as a mono list in a quiet inset with what each is on the right. Create is the primary (↵), disabled until valid; Cancel (Esc)."
+          },
+          {
             "id": "e1.popover-sections",
             "title": "Popover menu with sections",
             "from": "The context menu, extended in E1 (dataset switcher)",
@@ -289,6 +306,7 @@
   },
   "screens": [
     {"id": "e1-start-window", "title": "Start window", "item": "cg-e1-start-window", "group": "Open a dataset", "states": ["recent", "first-run", "opening", "missing", "narrow", "large"], "platforms": ["mac", "windows"], "summary": "No dataset open: app actions in the sidebar, recent datasets (title, folder, DKLPO version, layers on / total, last opened, status edge), a drop target. The selected row opens a second line with the last check and Open / Show in Finder / Remove from the list, or for a missing dataset Locate… / Remove from the list.", "workflows": ["Open a recent dataset: select (click or ↑ ↓), Return or double-click; progress shows reading files, compiling and checking with counts; Esc cancels", "Remove a recent dataset: ⌘⌫ (Delete on Windows) or the row action; Undo in the footer (⌘Z)", "Missing dataset: Locate… points the row at its new folder, or remove it", "Open folder… / Open file… / drop a folder or archive; a problem shows the open-errors dialog", "Convert from XML data…: pick a folder of .gst / .cat files; the steps run with counts and the new dataset opens", "First run: the empty state offers the three actions and the sample dataset"]},
+    {"id": "e1-start-new-dataset", "title": "New dataset", "item": "cg-e1-start-new-dataset", "group": "Open a dataset", "states": ["start", "first-run", "starter", "blank", "files-hidden", "exists", "failed", "narrow"], "platforms": ["mac", "windows"], "summary": "X3, approved by the user 2026-11-26 (N1–N5): New dataset… ⇧⌘N first in the start window's sidebar and first-run actions; the New dataset sheet (Template Blank / Starter, Name, Key following the name, Location with Choose…, the generator's file list with Hide files, Create ↵ and Cancel Esc); a key folder that already holds files (Key red, a line under Location, Create disabled); a failed write (Retry, Cancel). The Windows form is the centred dialog with its footer band.", "workflows": ["Start a new dataset from a template", "Start from the Starter template and see a roster at once", "Choose another key when the folder already holds files", "Retry a write that failed"]},
     {"id": "e1-start-errors", "title": "Open errors", "item": "cg-e1-start-errors", "group": "Open a dataset", "states": ["not-dataset", "newer-format", "parse-errors", "permission"], "platforms": ["mac", "windows"], "summary": "A sheet (macOS) or dialog with a footer band (Windows) over the start window: what happened, the folder, the choices as verbs; the primary takes Return, Cancel takes Esc.", "workflows": ["Not a dataset: Convert… (XML data files found), Choose another folder…, Cancel", "Newer DKLPO version: Open read-only (what the newer version added shows as source text, nothing saved) or Cancel", "Files that do not parse: Open anyway (the files open as source text with their errors; their entries are left out) or Cancel", "Folder not writable: Open read-only, Save as… elsewhere, or Cancel"]},
     {"id": "e1-start-editor-dialogs", "title": "Window-level dialogs over the editor", "item": "cg-e1-start-editor-dialogs", "group": "Open a dataset", "states": ["switcher", "unsaved", "changed-on-disk", "changed-on-disk-edits", "save-failed"], "platforms": ["mac"], "summary": "Dataset switcher popover and the sheets for unsaved changes, a module changed on disk and a failed save, over a static Direction D window.", "workflows": ["Switch dataset: Demo Skirmish ▾ opens the switcher; a recent dataset, Open…, Convert… or Close dataset; with unsaved changes the Save / Don’t save / Cancel sheet follows", "Changed on disk without edits: Reload (primary), Keep mine (Esc), Compare", "Changed on disk with edits: Compare (primary), Keep mine (Esc), Reload and discard my edits", "Save failed: Retry (primary), Save as…, Cancel (Esc); edits stay in the editor"]},
     {"id": "e1-start-settings", "title": "Settings", "item": "cg-e1-start-settings", "group": "Settings", "states": ["general", "editor", "checking", "text", "appearance", "keyboard", "command-line"], "platforms": ["mac", "windows"], "summary": "Settings window, one state per section; macOS toolbar tabs, Windows navigation list; open rows of label, control and help text.", "workflows": ["General: open the last dataset at start, recent list length, clear the recent list (Undo)", "Editor: source text beside the page by default, / insert, format on save (fmt), font size", "Checking: default check level lenient / strict (a dataset’s checking: wins), run checks on save, show authoring suggestions", "Text: text pack language, how names without text show", "Appearance: theme (system / light / dark), accent (system or app)", "Keyboard: read-only shortcut list with a filter", "Command line: engine, DKLPO and augur dklpo versions; copy the same check command"]},
