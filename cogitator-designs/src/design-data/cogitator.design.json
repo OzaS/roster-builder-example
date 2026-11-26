@@ -30,6 +30,7 @@
       {
         "id": "window", "title": "Window",
         "entries": [
+          { "id": "window.app-icon", "title": "App icon", "from": "New (E1-7b): the user's image", "platforms": ["mac", "windows"], "states": ["256 px", "64 px", "32 px", "16 px"], "summary": "A brass terminal under a pointed arch, its green screen showing indented lines, in a laurel wreath, on a deep green plate: a sibling of Battle Augur's bronze icon. macOS: the Icon Composer squircle (the plate fills it); Windows: the square plate with rounded corners. Packaged from apps/cogitator/assets." },
           { "id": "window.frame", "title": "Window frame and title row", "from": "Direction D; Windows frame new (Battle Augur RK-03 style)", "platforms": ["mac", "windows"], "states": ["light", "dark", "caption hover", "close hover"], "summary": "macOS: traffic lights in the sidebar's top row, 12 px corners. Windows: no menu bar; the dataset switcher moves up into the title row, Windows' own caption buttons (46 px, the header's height) sit at the far right, 8 px corners." }
         ]
       },
