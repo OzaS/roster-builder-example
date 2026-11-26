@@ -1,4 +1,4 @@
-import { ArrowRightLeft, Check, CornerDownLeft, FileCode2, FileX, FolderOpen } from "lucide-react";
+import { ArrowRightLeft, Check, CornerDownLeft, FileCode2, FileX, Folder, FolderOpen } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { TrafficLights, WinCaption } from "../../frames";
 import { DiagIcon } from "../../glyphs";
@@ -14,7 +14,7 @@ import { CommandLine, ContractRow, Facts, Head, VerdictMark } from "./common";
  * options stay in the left column (input, output, dataset, preservation, verify), the right pane shows the input's
  * documents, then the steps with counts, then the report: the contracts (C2 semantic equivalence, C1 source information,
  * C3 kept bytes), the numbers `convert --json` reports, each document with its differences, the preservation diagnostics,
- * and Open the converted dataset. The run is `augur dklpo convert … --full-map` followed by `augur dklpo roundtrip`.
+ * and Open dataset. The run is `augur dklpo convert … --full-map` followed by `augur dklpo roundtrip`.
  */
 
 const STEPS = [
@@ -52,11 +52,21 @@ const AS_BUILT_INPUT = "~/Downloads/'Skirmish XML'";
 const AS_BUILT_INPUT_SHOWN = "~/Downloads/Skirmish XML";
 const AS_BUILT_OUTPUT = "~/Datasets/demo-skirmish";
 
+/**
+ * FB3a (the user's feedback of 2026-11-26, approved; built in PR #183): where the report header is under 660 px (the
+ * 960 px window, large text, Windows' caption), Show in Finder / Show in Explorer is its folder icon with the name in
+ * its tooltip, Open says just "Open" without its key, the duration is left out, and the title shrinks first, then the
+ * verdict's words shorten with "…". FB3b: the primary button says "Open dataset".
+ */
+const NARROW_WINDOW = { width: 960, height: 760 };
+const NARROW_NAME = "skirmish-xml-club-archive-export";
+
 export function ConvertScreen({ mode, platform, state = "options", interactive }: { mode: E1Mode; platform: E1Platform; state?: string; interactive: boolean }) {
+  const narrow = state === "narrow" || state === "narrow-differ";
   const asBuilt = state === "window" || state === "commands";
   const badVersion = state === "window";
   const commands = state === "commands";
-  const s = (asBuilt ? (commands ? "equal" : "options") : ["options", "converting", "equal", "differences", "refused"].includes(state) ? state : "options") as ConvertState;
+  const s = (narrow ? (state === "narrow-differ" ? "differences" : "equal") : asBuilt ? (commands ? "equal" : "options") : ["options", "converting", "equal", "differences", "refused"].includes(state) ? state : "options") as ConvertState;
   const [phase, setPhase] = useState<Phase>(s);
   const [tick, setTick] = useState(s === "converting" ? 9 : 0);
   const [kind, setKind] = useState<"folder" | "archive" | "files">("folder");
@@ -219,14 +229,23 @@ export function ConvertScreen({ mode, platform, state = "options", interactive }
     );
   } else {
     const diff = phase === "differences";
-    title = (
+    const reveal = mac ? "Show in Finder" : "Show in Explorer";
+    title = narrow ? (
+      <>
+        <strong title={`Converted ${NARROW_NAME}`}>Converted {NARROW_NAME}</strong>
+        <VerdictMark v={diff ? "different" : "equal"}><span className="cg-tl-vtext" title={diff ? "2 documents differ" : undefined}>{diff ? "2 documents differ" : "Equal"}</span></VerdictMark>
+        <span className="d-spacer" />
+        <button type="button" className="d-btn cg-tl-iconbtn" aria-label={reveal} title={reveal}><Folder size={14} /></button>
+        <button type="button" className="d-btn primary" title={`Open the new dataset in an editor window (${keyFor(platform, "↵", "Enter")})`}><CornerDownLeft size={13} />Open</button>
+      </>
+    ) : (
       <>
         <strong>{dry ? "Dry run: skirmish-xml converts" : commands ? "Converted Skirmish XML" : "Converted skirmish-xml"}</strong>
         <VerdictMark v={diff ? "different" : "equal"}>{diff ? "2 documents differ" : "Equal"}</VerdictMark>
         <span className="d-muted">3.8 s</span>
         <span className="d-spacer" />
-        <button type="button" className="d-btn">{mac ? "Show in Finder" : "Show in Explorer"}</button>
-        <button type="button" className="d-btn primary" disabled={dry} title={dry ? "A dry run wrote nothing: Convert first" : "Open the new dataset in an editor window"}><CornerDownLeft size={13} />{dry ? "Nothing to open: dry run" : "Open the converted dataset"}{dry ? null : <kbd>{keyFor(platform, "↵", "Enter")}</kbd>}</button>
+        <button type="button" className="d-btn">{reveal}</button>
+        <button type="button" className="d-btn primary" disabled={dry} title={dry ? "A dry run wrote nothing: Convert first" : "Open the new dataset in an editor window"}><CornerDownLeft size={13} />{dry ? "Nothing to open: dry run" : "Open dataset"}{dry ? null : <kbd>{keyFor(platform, "↵", "Enter")}</kbd>}</button>
       </>
     );
     body = (
@@ -279,11 +298,11 @@ export function ConvertScreen({ mode, platform, state = "options", interactive }
   }
 
   return (
-    <E1Window mode={mode} platform={platform} label="Convert from XML data" className={interactive ? "" : "static"} {...(badVersion ? AS_BUILT_WINDOW : {})}>
+    <E1Window mode={mode} platform={platform} label="Convert from XML data" className={interactive ? "" : "static"} {...(badVersion ? AS_BUILT_WINDOW : narrow ? NARROW_WINDOW : {})}>
       <div className="e1s-grid cg-tl-cv" style={{ gridTemplateColumns: `${layout.pageMin}px minmax(0, 1fr)` }} onPointerDownCapture={claim} onFocusCapture={claim}>
         {options}
         <main className="cg-tl-cv-main" aria-label="Conversion">
-          <header className="cg-tl-cv-top"><span className="cg-tl-cv-head">{title}</span>{mac ? null : <WinCaption />}</header>
+          <header className="cg-tl-cv-top"><span className={`cg-tl-cv-head${narrow ? " cg-tl-compact" : ""}`}>{title}</span>{mac ? null : <WinCaption />}</header>
           <div className="cg-tl-cv-body" ref={bodyRef}><div style={{ maxWidth: layout.pageMax }}>{body}</div></div>
         </main>
       </div>
