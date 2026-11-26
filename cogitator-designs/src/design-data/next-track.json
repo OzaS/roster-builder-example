@@ -441,6 +441,20 @@
       },
       "summary": "FB2: the dataset switcher as already drawn (state switcher), with Close dataset ⇧⌘W, is built as the visible way to close a dataset (until now only File › Close Dataset). No change to the drawing.",
       "source": "User feedback 2026-11-26 (review page battle-augur-captures/feedback-2026-11-26/review); approved by the user 2026-11-26"
+    },
+    {
+      "id": "cg-e1-start-new-dataset",
+      "title": "E1: New dataset… (X3: Blank and Starter templates)",
+      "kind": "look",
+      "status": "approved",
+      "platforms": [
+        "desktop"
+      ],
+      "open": {
+        "desktop": "e1-start-new-dataset"
+      },
+      "summary": "N1: New dataset… ⇧⌘N (Ctrl+Shift+N) first in the start window's sidebar and first-run actions, the intro names it; File › New Dataset… with the same key (⌘N stays New Entry's); an editor window opens the same sheet over the editor. N2: the 540 px sheet: Template (Blank / Starter; Starter first, then remembered), Name (focused) and Key (follows the name until edited), Location (last folder, ~/Datasets first, Choose…), “Creates <location>/<key>/ with N files” and the generator's files (Hide files, remembered), Create ↵ (disabled until valid), Cancel Esc. N3: the key checked as typed; a folder that holds files turns Key red with a line under Location, Create disabled, nothing written over; a failed write shows Retry and Cancel (temporary folder, then moved into place). N4: Create adds the dataset to Recent datasets and opens it (Starter on its first entry with its scenario in the runner, Blank on the system module). N5: no layer template. The file list is the generator's (-units, test/starter.yaml or test/README.md), not the review page's.",
+      "source": "X3 UI Proposals review (review page battle-augur-captures/x3/review/x3-new-dataset-proposals.html); approved by the user 2026-11-26"
     }
   ]
 }
