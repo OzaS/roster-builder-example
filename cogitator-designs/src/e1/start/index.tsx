@@ -1,5 +1,6 @@
 import type { E1Screen } from "../types";
 import { StartWindow, type OpenProblem, type StartState } from "./StartWindow";
+import type { NewDatasetInit } from "./NewDataset";
 import { EditorDialogs, type EditorDialog } from "./EditorDialogs";
 import { SettingsWindow, settingsSections, type SettingsSection } from "./Settings";
 
@@ -31,6 +32,41 @@ export const startScreens: E1Screen[] = [
       const initial = (["recent", "first-run", "opening", "missing"].includes(state ?? "") ? state : "recent") as StartState;
       if (state === "narrow") return <StartWindow mode={mode} platform={platform} interactive={interactive} width={960} height={760} />;
       return <StartWindow mode={mode} platform={platform} initial={initial} interactive={interactive} large={state === "large"} />;
+    },
+  },
+  {
+    id: "e1-start-new-dataset",
+    group: "Open a dataset",
+    title: "New dataset",
+    item: "cg-e1-start-new-dataset",
+    platforms: ["mac", "windows"],
+    summary: "X3, approved by the user 2026-11-26 (N1–N5). New dataset… ⇧⌘N (Ctrl+Shift+N) comes first in the start window's sidebar and in the first-run actions, and the intro names it; File › New Dataset… has the same key, and an editor window opens the same sheet over the editor. The sheet: Template (Blank / Starter, one line each; Starter the first time, then the last choice), Name (focused; the manifest's title) and Key (follows the name until edited; the dataset key and its folder), Location (the last folder, ~/Datasets the first time, Choose…), “Creates <location>/<key>/ with N files” and the generator's file list (Hide files, remembered), Create ↵ (disabled until the name and the key are valid), Cancel Esc. A folder that already holds files turns Key red with a line under Location; nothing is written over. A failed write says what failed and offers Retry; the files go to a temporary folder first and are moved into place only when all are written. Create adds the dataset to Recent datasets and opens it: Starter on its first entry's page with its scenario in the runner, Blank on the system module; nothing runs by itself.",
+    states: [
+      { id: "start", title: "Sidebar: New dataset…" },
+      { id: "first-run", title: "First run: New dataset… first" },
+      { id: "starter", title: "Sheet: Starter, the file list" },
+      { id: "blank", title: "Sheet: Blank" },
+      { id: "files-hidden", title: "Sheet: files hidden" },
+      { id: "exists", title: "Sheet: the folder holds files" },
+      { id: "failed", title: "The write failed" },
+      { id: "narrow", title: "Sheet at the 960 px minimum window" },
+    ],
+    tryIt: [
+      { what: "Open the sheet", how: "New dataset… in the sidebar or the first-run actions, or ⇧⌘N (Ctrl+Shift+N)." },
+      { what: "Name and key", how: "type a name: the key follows it until you edit the key; a key the format can't take turns red and says why, and Create stays disabled." },
+      { what: "Template and files", how: "switch Blank / Starter: the file list follows; Hide files folds it." },
+      { what: "Create or cancel", how: "Create ↵ opens the new dataset (this mock shows the opening steps); Cancel or Esc closes the sheet without writing anything." },
+    ],
+    render: ({ mode, platform, state, interactive }) => {
+      if (state === "first-run") return <StartWindow key="first-run" mode={mode} platform={platform} initial="first-run" interactive={interactive} newDataset={{}} />;
+      if (state === "narrow") return <StartWindow key="narrow" mode={mode} platform={platform} interactive={interactive} width={960} height={760} newDataset={{ sheet: { template: "starter", name: "Copper Coast" } }} />;
+      const sheet: NewDatasetInit | undefined =
+        state === "starter" ? { template: "starter", name: "Copper Coast" }
+        : state === "blank" ? { template: "blank", name: "Copper Coast" }
+        : state === "files-hidden" ? { template: "starter", name: "Copper Coast", hidden: true }
+        : state === "exists" ? { template: "blank", name: "Demo Skirmish", exists: true }
+        : undefined;
+      return <StartWindow key={state ?? "start"} mode={mode} platform={platform} interactive={interactive} newDataset={state === "failed" ? { failed: true } : { sheet }} />;
     },
   },
   {

@@ -1,0 +1,28 @@
+/*
+ * X3 (approved by the user 2026-11-26, N1–N5): the New dataset sheet. The review page's drawing (`draw.mjs`'s
+ * DIALOG_CSS) with every value from tokens.css; `cg-` / `e1s-` names Direction D never uses.
+ */
+.fc-cg .cg-dialog.e1s-new { width: 540px; }
+.fc-cg .e1s-new-sec { display: grid; gap: var(--cg-space-3); }
+.fc-cg .e1s-new-sec + .e1s-new-sec { margin-top: var(--cg-space-3); }
+.fc-cg .e1s-new-h { color: var(--cg-muted); font-size: var(--cg-text-small); font-weight: 600; }
+.fc-cg .e1s-new .cg-radio { align-items: start; padding: var(--cg-space-2) 0; }
+.fc-cg .e1s-new .cg-radio > i { margin-top: var(--cg-space-1); }
+.fc-cg .e1s-new .cg-radio > span { font-weight: 600; }
+.fc-cg .e1s-new .cg-radio small { line-height: 1.4; }
+.fc-cg .e1s-new-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--cg-space-4) var(--cg-space-5); }
+.fc-cg .e1s-new-grid label { display: grid; gap: var(--cg-space-2); }
+.fc-cg .e1s-new-grid label > span:first-child, .fc-cg .e1s-new-lbl { color: var(--cg-muted); font-size: var(--cg-text-small); }
+.fc-cg .e1s-new-path { display: flex; align-items: center; gap: var(--cg-space-3); }
+.fc-cg .e1s-new-path .cg-tl-field { flex: 1; }
+.fc-cg .e1s-new-files { margin: var(--cg-space-1) 0 0; padding: var(--cg-space-3) var(--cg-space-4); border-radius: var(--cg-radius-control); background: var(--cg-pane); box-shadow: inset 0 0 0 1px var(--cg-line); font: var(--cg-text-mono) var(--cg-mono); }
+.fc-cg .e1s-new-files li { grid-template-columns: 14px max-content minmax(0, 1fr); align-items: center; gap: 0 var(--cg-space-4); padding: var(--cg-space-1) 0; color: var(--cg-ink); }
+.fc-cg .e1s-new-files li small { grid-column: 3; justify-self: end; overflow: hidden; color: var(--cg-muted); font-family: var(--cg-font-ui); font-size: var(--cg-text-small); text-overflow: ellipsis; white-space: nowrap; }
+.fc-cg .e1s-new-files li > svg { margin-top: 0; }
+.fc-cg .e1s-new-sum { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cg-space-3); margin: 0; color: var(--cg-muted); font-size: var(--cg-text-small); }
+.fc-cg .e1s-new-sum .mono, .fc-cg .e1s-new-bad .mono { color: var(--cg-ink); font: var(--cg-text-mono) var(--cg-mono); }
+.fc-cg .e1s-new-bad { display: flex; align-items: flex-start; gap: var(--cg-space-3); margin: 0; color: var(--cg-status-error); font-size: var(--cg-text-small); }
+.fc-cg .e1s-new-bad .mono { color: inherit; }
+.fc-cg .e1s-new-bad svg { flex: none; margin-top: var(--cg-space-1); }
+.fc-cg button.e1s-new-link { padding: 0; border: 0; background: none; color: var(--cg-accent-text); font: inherit; cursor: pointer; }
+.fc-cg button.e1s-new-link:hover { text-decoration: underline; }
