@@ -1,6 +1,7 @@
 import type { E1Screen } from "../types";
 import { DiagnosticsScreen } from "./DiagnosticsScreen";
 import { EmptyScreen } from "./EmptyScreen";
+import { EntryPageScreen } from "./EntryPageScreen";
 import { HelperNoFixScreen } from "./HelperNoFixScreen";
 import { PageEditScreen } from "./PageEditScreen";
 import { ReferencesScreen } from "./ReferencesScreen";
@@ -135,5 +136,28 @@ export const editorScreens: E1Screen[] = [
       { what: "Search", how: "⌘K opens the palette; type to change the query; Esc closes it." },
     ],
     render: ({ mode, state, interactive }) => <EmptyScreen mode={mode} state={state} interactive={interactive} />,
+  },
+  {
+    id: "e1-editor-entry-page",
+    group: "Edit",
+    title: "Entry page: toolbar, text pack, resizing, cells",
+    item: "cg-e1-editor-entry-page",
+    summary:
+      "The entry page after the user's feedback of 2026-11-26 (approved Proposals FB1, FB7, FB8, FB9). FB1, the toolbar (option A): Back / Forward and the crumbs, then Run checks (the checklist icon, so the play icon means only Run) and Layer changes as icon buttons, a thin divider, Source and Run with their labels (Run the accent button: accent text, the play icon filled), and a ⋯ button whose menu lists Run checks ⌘⇧C, Layer changes ⌘⌥L, Source beside the page ⌘⌥U and Run the dataset ⌘R, then Focus mode ⌘. drawn disabled (not built yet) and “Every command and its key: ⌘K”. Keys leave the bar and appear in tooltips; Focus leaves the bar (it stays on ⌘.); “Read-only” stays only in the sidebar footer; below 1030 px of window Source and Run become their icons too. FB7, text-pack text on the page in the current language: a rule's text as a Text block under the properties (“Text”, the language, the text pack it comes from, “Click to edit”), and the text behind `$` in profile cells, names and labels shown resolved with its language; edits are saved into the pack, one undo step each; a missing text keeps the “No text” tag. FB8, drag handles on the sidebar's and the source list's right edge and on the page / text split, drawn as the helper panel's: an accent line on hover or drag, a col-resize cursor; the page keeps at least 480 px; double-click goes back to the drawn width; widths are remembered; a focused handle takes ← →. FB9 (its own later slice, after FB7): a profile table's cell edits in place, with the accent ring and the caret; Tab / ⇧Tab move between cells, ↵ saves, Esc cancels, one undo step per cell.",
+    states: [
+      { id: "toolbar", title: "Toolbar: icons, Source, Run, ⋯" },
+      { id: "toolbar-menu", title: "Toolbar: the ⋯ menu" },
+      { id: "toolbar-tip", title: "Toolbar: the key in a tooltip" },
+      { id: "rule-text", title: "A rule's text from the text pack" },
+      { id: "label-text", title: "The text behind $ resolved" },
+      { id: "resize-list", title: "Resizing the source list" },
+      { id: "resize-split", title: "The page / text split's handle" },
+      { id: "cell-edit", title: "A profile cell edited in place" },
+    ],
+    tryIt: [
+      { what: "Toolbar", how: "hover or focus a toolbar button for its tooltip and key; ⋯ opens the menu, Esc closes it; Layer changes toggles." },
+      { what: "Resize", how: "drag the line at the sidebar's or the list's right edge (the page keeps 480 px); ← → on a focused handle; double-click goes back to the drawn width." },
+    ],
+    render: ({ mode, state, interactive }) => <EntryPageScreen mode={mode} state={state} interactive={interactive} />,
   },
 ];

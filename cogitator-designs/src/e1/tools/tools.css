@@ -273,3 +273,11 @@
 /* Convert as built (E1-5, B10): an invalid field is marked in error red with the rule under it. */
 .fc-cg .cg-tl-field.invalid { box-shadow: inset 0 0 0 1.5px var(--cg-status-error); }
 .fc-cg .cg-tl-fielderr { color: var(--cg-status-error); font-size: var(--cg-text-caption); }
+
+/* FB3a (feedback 2026-11-26, approved; built in PR #183): the report header under 660 px. The title shrinks first (to
+   about 9 em), then the verdict's words shorten with "…"; Show in Finder is its folder icon; Open has no key. */
+.fc-cg .cg-tl-compact > strong { flex: 0 1000 auto; min-width: 9em; overflow: hidden; text-overflow: ellipsis; }
+.fc-cg .cg-tl-compact > .cg-tl-verdict { flex: 0 1 auto; min-width: 2.6em; overflow: hidden; }
+.fc-cg .cg-tl-vtext { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.fc-cg .cg-tl-compact > .d-btn { flex-shrink: 0; }
+.fc-cg .cg-tl-iconbtn { justify-content: center; width: var(--cg-control); padding: 0; }

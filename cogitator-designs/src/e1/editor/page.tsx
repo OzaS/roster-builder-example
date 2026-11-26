@@ -90,21 +90,26 @@ function Value({ module, text, follow, broken, line }: { module: string; text: s
   return <span className="mono">{args}</span>;
 }
 
-function ProfileTable({ text }: { text: string }) {
+/** A profile table; `edit` draws one value cell in place (FB9: the accent ring and the caret), by its index among the values. */
+function ProfileTable({ text, edit }: { text: string; edit?: { cell: number; content: ReactNode } }) {
   const [head, ...cells] = text.trim().replace(/^profile /, "").split("|").map((c) => c.trim());
   const [key, type] = head.split(":").map((c) => c.trim());
   return (
     <table>
       <thead><tr>{(profileHeads[type] ?? ["Profile", "Type"]).map((cell) => <th key={cell}>{cell}</th>)}</tr></thead>
-      <tbody><tr><td>{title(key)}</td><td><M to={`demo-skirmish:${type}`}>{type}</M></td>{cells.map((cell, i) => <td key={i} className="num">{cell}</td>)}</tr></tbody>
+      <tbody><tr><td>{title(key)}</td><td><M to={`demo-skirmish:${type}`}>{type}</M></td>{cells.map((cell, i) => (edit?.cell === i ? <td key={i} className="num cg-cell-editing" aria-label="Editing">{edit.content}</td> : <td key={i} className="num">{cell}</td>))}</tr></tbody>
     </table>
   );
 }
 
 /** Statement lines of one entry as page blocks (props lines are drawn in the properties block instead). */
-export function Blocks({ module, decl, sel, flags, follow, folded: initialFolded = [], after, brokenLines = [] }: {
+export function Blocks({ module, decl, sel, flags, follow, folded: initialFolded = [], after, brokenLines = [], cellEdit, texts }: {
   module: ModuleText; decl: number; sel?: PageSel; flags?: Record<number, DiagKind>; follow?: Follow;
   folded?: number[]; after?: Record<number, ReactNode>; brokenLines?: number[];
+  /** FB9: a profile cell drawn in place, by the profile's line. */
+  cellEdit?: Record<number, { cell: number; content: ReactNode }>;
+  /** FB7: the text behind a `$`, shown resolved from the text pack, by line. */
+  texts?: Record<number, string>;
 }) {
   const [folded, setFolded] = useState<ReadonlySet<number>>(new Set(initialFolded));
   const lines = module.lines;
@@ -140,7 +145,9 @@ export function Blocks({ module, decl, sel, flags, follow, folded: initialFolded
             {isFolded ? <ChevronRight size={14} /> : <ChevronDown size={14} />}
           </button>
         ) : <span className="d-tog-space" />}
-        {kw === "profile" ? <ProfileTable text={text} /> : <><span className="d-kw">{kwLabel}</span><Value module={module.id} text={text} follow={follow} broken={brokenLines.includes(n)} line={n} /></>}
+        {kw === "profile" ? <ProfileTable text={text} edit={cellEdit?.[n]} /> : <><span className="d-kw">{kwLabel}</span>{texts?.[n] !== undefined
+          ? <><span>{texts[n]}</span><span className="cg-lang-tag" title="From the text pack (the text behind $)">en</span></>
+          : <Value module={module.id} text={text} follow={follow} broken={brokenLines.includes(n)} line={n} />}</>}
         {sel ? <span className="cg-lineno" aria-label={`Line ${n}`}>{n}</span> : null}
       </div>,
     );
@@ -165,7 +172,7 @@ export function propLines(module: ModuleText, decl: number) {
 }
 
 /** The page: D's title, backlinks and properties for the entry, then its statements as linked blocks. */
-export function LinkedPage({ id, module, sel, flags, follow, folded, after, onBacklinks, brokenLines, noTail, propEdit, propValue, titleEdit }: {
+export function LinkedPage({ id, module, sel, flags, follow, folded, after, onBacklinks, brokenLines, noTail, propEdit, propValue, titleEdit, cellEdit, texts }: {
   id: string; module: ModuleText; sel?: PageSel; flags?: Record<number, DiagKind>; follow?: Follow; folded?: number[];
   after?: Record<number, ReactNode>; onBacklinks?: () => void; brokenLines?: number[]; noTail?: boolean;
   /** A property row's value drawn as a field in place (the `cg-editing` cell), by its label (E1-3 page edits). */
@@ -174,6 +181,9 @@ export function LinkedPage({ id, module, sel, flags, follow, folded, after, onBa
   propValue?: Record<string, ReactNode>;
   /** The title drawn as a field in place, in the h1's own type (E1-3 page edits). */
   titleEdit?: ReactNode;
+  /** FB9 and FB7 (feedback 2026-11-26): a profile cell in place; the text behind `$` resolved (see `Blocks`). */
+  cellEdit?: Record<number, { cell: number; content: ReactNode }>;
+  texts?: Record<number, string>;
 }) {
   const page = pageFor(id);
   const key = id.split(":")[1];
@@ -202,7 +212,7 @@ export function LinkedPage({ id, module, sel, flags, follow, folded, after, onBa
         <div className="d-more"><dt><button type="button"><Plus size={14} />{page.more.length} more {page.more.length === 1 ? "property" : "properties"}</button></dt><dd /></div>
       </dl>
       <div className="d-blocks">
-        {decl ? <Blocks module={module} decl={decl} sel={sel} flags={flags} follow={follow} folded={folded} after={after} brokenLines={brokenLines} /> : null}
+        {decl ? <Blocks module={module} decl={decl} sel={sel} flags={flags} follow={follow} folded={folded} after={after} brokenLines={brokenLines} cellEdit={cellEdit} texts={texts} /> : null}
         {noTail ? null : <div className="d-block i0 typing"><span className="d-tog-space" /><span className="d-slashbtn"><span className="d-slash">/</span><span className="d-placeholder">Type / to insert a statement</span></span></div>}
       </div>
     </article>

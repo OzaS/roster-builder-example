@@ -66,14 +66,16 @@ export type SideProps = {
   /** The Layers item's count (default "3 of 4") and what it opens (the layer stack, E1 part 2). */
   layers?: ReactNode;
   onLayers?: () => void;
+  /** FB8 (feedback 2026-11-26): the sidebar's width when dragged; the drawn width otherwise. */
+  width?: number;
 };
 
 /** D's sidebar (B): dataset switcher, Search, Updates, Layers, the source tree, tables, text pack. */
-export function Sidebar({ active, source, entry, updates, broken, onUpdates, onSearch, onSource, onEntry, foot, extra, layers, onLayers }: SideProps) {
+export function Sidebar({ active, source, entry, updates, broken, onUpdates, onSearch, onSource, onEntry, foot, extra, layers, onLayers, width = layout.sidebar }: SideProps) {
   const [expanded, setExpanded] = useState<ReadonlySet<string>>(new Set([entry?.split(":")[0] ?? "iron-wardens"]));
   return (
     <aside className="d-side" aria-label="Dataset sidebar">
-      <div className="d-side-in" style={{ width: layout.sidebar }}>
+      <div className="d-side-in" style={{ width }}>
         <div className="d-side-top"><TrafficLights /></div>
         <button type="button" className="d-ws" title="Switch dataset"><span className="d-ws-mark">D</span><strong>Demo Skirmish</strong><ChevronDown size={14} /></button>
         <button type="button" className={`d-item${active === "search" ? " active" : ""}`} onClick={onSearch} title="Search entries and commands (⌘K)"><Search size={15} />Search<kbd>⌘K</kbd></button>
@@ -125,11 +127,11 @@ export function Sidebar({ active, source, entry, updates, broken, onUpdates, onS
 }
 
 /** D's source column (A's dense grouped list with status edges and the cost column). */
-export function SourceList({ source, entry, onEntry, onClose }: { source: DSource; entry?: string | null; onEntry?: (id: string) => void; onClose?: () => void }) {
+export function SourceList({ source, entry, onEntry, onClose, width = layout.sourceList }: { source: DSource; entry?: string | null; onEntry?: (id: string) => void; onClose?: () => void; width?: number }) {
   const [folded, setFolded] = useState<ReadonlySet<string>>(new Set());
   return (
     <section className="d-src" aria-label={`${source.name} entries`}>
-      <div className="d-src-in" style={{ width: layout.sourceList }}>
+      <div className="d-src-in" style={{ width }}>
         <header className="d-src-head">
           {source.table ? <Table2 size={15} /> : <KindIcon kind="system" size={15} />}
           <strong>{source.name}</strong>

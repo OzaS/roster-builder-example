@@ -399,6 +399,48 @@
       ],
       "summary": "Field Cogitator's app icon: a brass terminal with a green screen of indented lines under a pointed arch, in a laurel wreath, on a deep green plate (#152a1e). macOS draws it as the Icon Composer squircle, Windows as the rounded square plate; Elements › Window › App icon at 256, 64, 32 and 16 px.",
       "source": "The user's image (generated from a prompt written in E1-7b), 2026-11-25; built in E1-7b (apps/cogitator/assets)"
+    },
+    {
+      "id": "cg-e1-editor-entry-page",
+      "title": "E1: Entry page after feedback (toolbar, text pack, resizing, cells)",
+      "kind": "look",
+      "status": "approved",
+      "platforms": [
+        "desktop"
+      ],
+      "open": {
+        "desktop": "e1-editor-entry-page"
+      },
+      "summary": "FB1 toolbar option A: Run checks (checklist icon) and Layer changes as icon buttons, a divider, Source and Run labelled (Run the accent), a ⋯ menu with every toolbar command and its key, Focus mode disabled, keys in tooltips, Focus and Read-only off the bar. FB7: a rule's text from the text pack as a Text block (Text, en, the pack's path, Click to edit) and the text behind $ resolved with its language tag. FB8: drag handles on the sidebar, the source list and the page / text split (accent line, col-resize, the page keeps 480 px, double-click restores, ← → when focused). FB9 (a later slice): a profile cell edited in place, Tab / ⇧Tab, ↵ saves, Esc cancels, one undo step per cell.",
+      "source": "User feedback 2026-11-26 (review page battle-augur-captures/feedback-2026-11-26/review); approved by the user 2026-11-26"
+    },
+    {
+      "id": "cg-e1-tools-convert-feedback",
+      "title": "E1: Convert, narrow report header and Open dataset",
+      "kind": "look",
+      "status": "approved",
+      "platforms": [
+        "desktop"
+      ],
+      "open": {
+        "desktop": "e1-tools-convert"
+      },
+      "summary": "FB3a (built in PR #183): states narrow and narrow-differ (960 px window; Windows too): under 660 px of report header Show in Finder / Explorer is its folder icon, Open says just Open without its key, the duration is left out, the title shrinks first and then the verdict's words shorten with “…”. FB3b: the primary button says “Open dataset” in every state.",
+      "source": "User feedback 2026-11-26 (review page battle-augur-captures/feedback-2026-11-26/review); approved by the user 2026-11-26"
+    },
+    {
+      "id": "cg-e1-dataset-switcher-close",
+      "title": "E1: Close dataset from the dataset switcher",
+      "kind": "behaviour",
+      "status": "approved",
+      "platforms": [
+        "desktop"
+      ],
+      "open": {
+        "desktop": "e1-start-editor-dialogs"
+      },
+      "summary": "FB2: the dataset switcher as already drawn (state switcher), with Close dataset ⇧⌘W, is built as the visible way to close a dataset (until now only File › Close Dataset). No change to the drawing.",
+      "source": "User feedback 2026-11-26 (review page battle-augur-captures/feedback-2026-11-26/review); approved by the user 2026-11-26"
     }
   ]
 }
