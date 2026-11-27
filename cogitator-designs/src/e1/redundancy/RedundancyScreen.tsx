@@ -164,7 +164,7 @@ function Change({ g, phase, large }: { g: Group; phase: Phase; large?: boolean }
         {(large ? bigModulesList.slice(0, 5).map((m) => `${m.key}/entries.dkl`) : memberFiles).map((f) => {
           const mem = g.members.find((m) => m.file === f);
           const n = large ? bigModulesList.find((m) => f.startsWith(m.key))?.n : 1;
-          return <li key={f}><FileCode2 size={13} /><span className="mono">{f}</span><span>{large ? `${n} members become ` : ""}<span className="mono">extends {g.base}</span>{!large && mem?.keeps?.length ? `, keeps ${mem.keeps.length} values` : large ? "" : ", no block"}</span></li>;
+          return <li key={f}><FileCode2 size={13} /><span className="mono">{f}</span><span>{large ? `${n} members become ` : ""}<span className="mono">extends {g.base}</span>{!large && mem?.keeps?.length ? `, keeps ${mem.keeps.length} ${mem.keeps.length === 1 ? "value" : "values"}` : large ? "" : ", no block"}</span></li>;
         })}
         {large ? <li className="cg-rd-more"><span /><span>14 more module files, and the text packs: 1 name moves, 804 entries leave the members’ packs</span></li>
           : <li><FileCode2 size={13} /><span className="mono">{files - memberFiles.length - 1} text packs</span><span>{plan.moved} {plan.moved === 1 ? "name moves" : "names move"} to <span className="mono">{baseModule}/text/en.dkl</span>, {plan.removed} entries leave the members’ packs</span></li>}
@@ -214,7 +214,7 @@ function Differences({ g }: { g: Group }) {
   );
   return (
     <>
-      <h3 className="cg-tl-h">Differences<span className="d-muted">{g.differences.length} places · the base takes the most common value (a tie: the first member’s); a member keeps a value only where it differs</span></h3>
+      <h3 className="cg-tl-h">Differences<span className="d-muted">{g.differences.length} {g.differences.length === 1 ? "place" : "places"} · the base takes the most common value (a tie: the first member’s); a member keeps a value only where it differs</span></h3>
       {g.differences.map((d) => (
         <div key={d.place} className="cg-rd-diff">
           <p className="cg-rd-place"><Hash size={12} /><span className="mono">{d.place}</span></p>

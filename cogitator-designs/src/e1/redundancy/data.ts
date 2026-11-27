@@ -94,7 +94,7 @@ export const x0Groups: Group[] = [
   },
   {
     id: "ember-guild:stalker-beast", name: "Stalker Beast", key: "stalker-beast", kind: "value-only", subject: "entry", entryKind: "unit", saved: 0, base: "common-kit:stalker-beast",
-    members: [m("ember-guild", "stalker-beast", "unit", "entries.dkl", 86, 137), m("moss-covenant", "stalker-beast", "unit", "entries.dkl", 67, 137), m("tide-compact", "stalker-beast", "unit", "entries.dkl", 96, 137)],
+    members: [m("ember-guild", "stalker-beast", "unit", "entries.dkl", 86, 137, []), m("moss-covenant", "stalker-beast", "unit", "entries.dkl", 67, 137, ["stalker: profile row 8\" | 3 | 5 | 5"]), m("tide-compact", "stalker-beast", "unit", "entries.dkl", 96, 137, ["stalker: profile row 7\" | 4 | 6 | 4"])],
     differences: [{ place: "stalker/stalker header", values: ["profile stalker: fighter | 8\" | 4 | 5 | 4", "profile stalker: fighter | 8\" | 3 | 5 | 5", "profile stalker: fighter | 7\" | 4 | 6 | 4"], base: 0 }],
     plan: { overlays: 2, moved: 2, removed: 6, after: 12675, files: 8 },
   },
