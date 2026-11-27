@@ -4,6 +4,10 @@ import { ScaledFrame } from "../frames";
 import { e1Screens, e1ScreenById } from "../e1/registry";
 import type { E1Mode, E1Platform, E1Screen } from "../e1/types";
 import { hrefFor } from "../route";
+import nextTrack from "../design-data/next-track.json";
+
+/** The status of a screen's Next-track item (the E1 screens are approved; later ones start as Proposals). */
+const statusOf = (item: string) => (nextTrack.items.find((i) => i.id === item)?.status ?? "approved") as "approved" | "proposal";
 
 /**
  * D4 step 3, the E1 screens: every screen of the first Field Cogitator scope in Direction D's language, in light and dark
@@ -16,7 +20,7 @@ export function E1Page({ screen }: { screen: string | null }) {
   return (
     <article className="cg-page">
       <header className="cg-head">
-        <p className="cg-kicker">D4 step 3 · E1 screens <TrackChip status="approved" /></p>
+        <p className="cg-kicker">D4 step 3 · E1 screens <TrackChip status={one ? statusOf(one.item) : "approved"} /></p>
         <h1>{one ? one.title : "E1 screens"}</h1>
         <p className="cg-lede">{one ? one.summary : "The screens of the first scope (E1): open a dataset, edit it, follow references, read diagnostics. Direction D and the design language, synthetic sample data."}</p>
       </header>
@@ -45,7 +49,7 @@ function ScreenSection({ screen, solo }: { screen: E1Screen; solo: boolean }) {
     <section id={screen.id} className="cg-e1-screen" aria-label={screen.title}>
       {solo ? null : (
         <>
-          <h2 className="cg-e1-title">{screen.title} <a href={`${hrefFor("e1")}&screen=${screen.id}`}>Only this screen</a></h2>
+          <h2 className="cg-e1-title">{screen.title} {statusOf(screen.item) === "approved" ? null : <><TrackChip status={statusOf(screen.item)} />{" "}</>}<a href={`${hrefFor("e1")}&screen=${screen.id}`}>Only this screen</a></h2>
           <p className="cg-note">{screen.summary}</p>
         </>
       )}

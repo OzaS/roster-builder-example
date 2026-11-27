@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, Bell, ChevronDown, ChevronRight, CircleAlert, FileText, Layers, Maximize2, Plus, Search, SlidersHorizontal, Table2, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Bell, ChevronDown, ChevronRight, CircleAlert, Copy, FileText, Layers, Maximize2, Plus, Search, SlidersHorizontal, Table2, X } from "lucide-react";
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { TrafficLights } from "../../frames";
 import { DiagIcon, KindIcon } from "../../glyphs";
@@ -68,22 +68,29 @@ export type SideProps = {
   onLayers?: () => void;
   /** FB8 (feedback 2026-11-26): the sidebar's width when dragged; the drawn width otherwise. */
   width?: number;
+  /** X1 Proposal: another dataset than Demo Skirmish (its name, switcher mark, sources and tables). */
+  dataset?: { name: string; mark: string; sources: DSource[]; tables?: DSource[] };
+  /** X1 Proposal: the Redundancy item after Layers (its count of groups to extract, pressed while the view is open). */
+  redundancy?: { count: ReactNode; active?: boolean; stale?: boolean; onOpen?: () => void };
 };
 
 /** D's sidebar (B): dataset switcher, Search, Updates, Layers, the source tree, tables, text pack. */
-export function Sidebar({ active, source, entry, updates, broken, onUpdates, onSearch, onSource, onEntry, foot, extra, layers, onLayers, width = layout.sidebar }: SideProps) {
-  const [expanded, setExpanded] = useState<ReadonlySet<string>>(new Set([entry?.split(":")[0] ?? "iron-wardens"]));
+export function Sidebar({ active, source, entry, updates, broken, onUpdates, onSearch, onSource, onEntry, foot, extra, layers, onLayers, width = layout.sidebar, dataset, redundancy }: SideProps) {
+  const [expanded, setExpanded] = useState<ReadonlySet<string>>(new Set([entry?.split(":")[0] ?? (dataset ? dataset.sources[1]?.id ?? "" : "iron-wardens")]));
+  const shownSources = dataset?.sources ?? sources;
+  const shownTables = dataset?.tables ?? tables;
   return (
     <aside className="d-side" aria-label="Dataset sidebar">
       <div className="d-side-in" style={{ width }}>
         <div className="d-side-top"><TrafficLights /></div>
-        <button type="button" className="d-ws" title="Switch dataset"><span className="d-ws-mark">D</span><strong>Demo Skirmish</strong><ChevronDown size={14} /></button>
+        <button type="button" className="d-ws" title="Switch dataset"><span className="d-ws-mark">{dataset?.mark ?? "D"}</span><strong>{dataset?.name ?? "Demo Skirmish"}</strong><ChevronDown size={14} /></button>
         <button type="button" className={`d-item${active === "search" ? " active" : ""}`} onClick={onSearch} title="Search entries and commands (⌘K)"><Search size={15} />Search<kbd>⌘K</kbd></button>
         <button type="button" className={`d-item${active === "updates" ? " active" : ""}`} onClick={onUpdates} aria-pressed={active === "updates"} title="Open the diagnostics inbox (⌘⇧U)"><Bell size={15} />Updates{updates ? <span className="d-count">{updates}</span> : <span className="d-muted">None</span>}</button>
         <button type="button" className={`d-item${active === "layers" ? " active" : ""}`} onClick={onLayers} aria-pressed={active === "layers"} title="Open the layer stack (⇧⌘L)"><Layers size={15} />Layers<span className="d-muted">{layers ?? "3 of 4"}</span></button>
+        {redundancy ? <button type="button" className={`d-item${redundancy.active ? " active" : ""}`} onClick={redundancy.onOpen} aria-pressed={redundancy.active} title="Open Redundancy: copies across modules (⇧⌘D)"><Copy size={15} />Redundancy<span className={redundancy.stale ? "d-muted cg-rd-stalecount" : "d-muted"}>{redundancy.count}</span></button> : null}
 
         <h3>Sources</h3>
-        {sources.map((s) => {
+        {shownSources.map((s) => {
           const isOpen = expanded.has(s.id) && broken !== s.id;
           const children = s.groups.find((group) => group.label === "Units")?.rows ?? s.groups.filter((group) => group.label === "Forces" || group.label === "Rules").flatMap((group) => group.rows.slice(0, 1));
           return (
@@ -118,7 +125,7 @@ export function Sidebar({ active, source, entry, updates, broken, onUpdates, onS
         <button type="button" className="d-item d-add" title="New entry in the source shown in the list (⌘N)"><Plus size={14} />New entry</button>
 
         <h3>Tables</h3>
-        {tables.map((t) => <button type="button" key={t.id} className="d-item"><Table2 size={15} />{t.name}<span className="d-muted">{rowCount(t)}</span></button>)}
+        {shownTables.map((t) => <button type="button" key={t.id} className="d-item"><Table2 size={15} />{t.name}<span className="d-muted">{rowCount(t)}</span></button>)}
         <button type="button" className="d-item"><FileText size={15} />Text pack · en</button>
         <footer className="d-side-foot">{foot ?? <><span className="d-dot" />Saved · fmt clean</>}</footer>
       </div>
