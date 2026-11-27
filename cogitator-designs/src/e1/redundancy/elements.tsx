@@ -23,12 +23,21 @@ export const redundancyRenderers: Record<string, Renderer> = {
     wide: true,
     render: () => (
       <div className="cg-stack">
-        <State label="Saves (status edge)" wide>{box(<GroupRow name="Levy Band" keyText="ember-guild:levy-band" kind="identical" entryKind="unit" members={3} modules={three} saved={287} base="common-kit:levy-band" />)}</State>
-        <State label="Value-only, selected" wide>{box(<GroupRow name="Shield Line" keyText="ember-guild:shield-line" kind="value-only" entryKind="unit" members={3} modules={three} saved={178} diffs={2} base="common-kit:shield-line" selected onClick={() => undefined} />)}</State>
-        <State label="Saves nothing (no edge, 0 B)" wide>{box(<GroupRow name="Throwing Axe" keyText="ember-guild:throwing-axe" kind="identical" entryKind="profile" members={3} modules={three} saved={0} base="common-kit:throwing-axe" />)}</State>
-        <State label="Extracted (until the next scan)" wide>{box(<GroupRow name="Shield Line" keyText="ember-guild:shield-line" kind="value-only" entryKind="unit" members={3} modules={three} saved={178} diffs={2} base="common-kit:shield-line" done />)}</State>
-        <State label="Similar (dotted edge, listed only)" wide>{box(<GroupRow name="Standard Guard" keyText="ember-guild:standard-guard" kind="similar" entryKind="unit" members={2} modules={["ember-guild", "tide-compact"]} saved={0} />)}</State>
-        <State label="Many members in many modules" wide>{box(<GroupRow name="Weapon Choice" keyText="weapon-choice" kind="identical" entryKind="group" members={804} modules={["ember-guild", "tide-compact", "moss-covenant", ...Array.from({ length: 16 }, (_, i) => `m${i}`)]} saved={96410} base="common-kit:weapon-choice" />)}</State>
+        <State label="Saves (status edge)" wide>{box(<GroupRow name="Levy Band" keyText="ember-guild:levy-band" kind="identical" entryKind="unit" members={3} modules={three} shared={8} base="common-kit:levy-band" />)}</State>
+        <State label="Value-only, selected" wide>{box(<GroupRow name="Shield Line" keyText="ember-guild:shield-line" kind="value-only" entryKind="unit" members={3} modules={three} shared={6} diffs={2} base="common-kit:shield-line" selected onClick={() => undefined} />)}</State>
+        <State label="Nothing to share (no edge)" wide>{box(<GroupRow name="Hand Weapon" keyText="hand-weapon" kind="value-only" entryKind="profile" members={165} modules={["ember-guild", "tide-compact", "moss-covenant", "ash-lodge"]} shared={0} diffs={1} base="common-kit:hand-weapon" />)}</State>
+        <State label="Extracted (until the next scan)" wide>{box(<GroupRow name="Shield Line" keyText="ember-guild:shield-line" kind="value-only" entryKind="unit" members={3} modules={three} shared={6} diffs={2} base="common-kit:shield-line" done />)}</State>
+        <State label="Similar (dotted edge, listed only)" wide>{box(<GroupRow name="Standard Guard" keyText="ember-guild:standard-guard" kind="similar" entryKind="unit" members={2} modules={["ember-guild", "tide-compact"]} shared={11} />)}</State>
+        <State label="Marked not a copy" wide>{box(<GroupRow name="Rally" keyText="ember-guild:rally" kind="identical" entryKind="rule" members={3} modules={three} shared={1} marked />)}</State>
+        <State label="Many members in many modules" wide>{box(<GroupRow name="Weapon Choice" keyText="weapon-choice" kind="identical" entryKind="group" members={804} modules={["ember-guild", "tide-compact", "moss-covenant", ...Array.from({ length: 16 }, (_, i) => `m${i}`)]} shared={3} base="common-kit:weapon-choice" />)}</State>
+      </div>
+    ),
+  },
+  "redundancy.inherited-tag": {
+    render: () => (
+      <div className="cg-stack" style={{ width: 360 }}>
+        <State label="Inherited (muted, read-only)" wide><span className="cg-rd-inh" style={{ display: "flex", gap: 8 }}><span className="d-muted">7 pts</span><span className="cg-rd-from">Common Kit</span></span></State>
+        <State label="Its own (written here)" wide><span style={{ display: "flex", gap: 8 }}><span>up to 1 in a roster</span><span className="cg-rd-own">own</span></span></State>
       </div>
     ),
   },

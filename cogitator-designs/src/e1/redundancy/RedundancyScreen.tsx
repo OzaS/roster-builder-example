@@ -14,14 +14,15 @@ import "./redundancy.css";
 /**
  * X1's Cogitator part (Proposal, 2026-11-27): the Redundancy tool view, in place of the list and the page like Updates
  * and Roundtrip. It is `augur dklpo clones` (the list) and `augur dklpo extract` (the preview and Apply) on the open
- * dataset: groups by kind (entries, groups, rules, profiles), ranked by the logic bytes an extraction saves, the groups
- * that save nothing folded at the end of their kind, similar groups listed last without Apply. The selected group shows
+ * dataset: groups by kind (entries, groups, rules, profiles), the most repeated work first ((copies − 1) × statements
+ * shared; round 2, RV6 changed: no byte counter), groups with nothing to share folded at the end of their kind, similar
+ * groups listed last without Apply, groups an author marked “not a copy” folded at the end. The selected group shows
  * its members, its differences and the change `extract --dry-run` plans with the gate's verdict; Apply writes it as one
  * undo step. Data: the X0 synthetic dataset (Lantern Marches) as the commands report it.
  */
 
-export type RedundancyState = "list" | "preview" | "checking" | "applied" | "refused" | "similar" | "empty" | "no-compile" | "large" | "narrow" | "large-text";
-export const redundancyStates: RedundancyState[] = ["list", "preview", "checking", "applied", "refused", "similar", "empty", "no-compile", "large", "narrow", "large-text"];
+export type RedundancyState = "list" | "preview" | "checking" | "applied" | "refused" | "similar" | "empty" | "no-compile" | "large" | "narrow" | "large-text" | "marking" | "marked";
+export const redundancyStates: RedundancyState[] = ["list", "preview", "checking", "applied", "refused", "similar", "empty", "no-compile", "large", "narrow", "large-text", "marking", "marked"];
 
 const SCANNED = "14:20";
 const subjectTitle: Record<Subject, string> = { entry: "Entries", group: "Groups", rule: "Rules", profile: "Profiles" };
@@ -40,24 +41,25 @@ export function CopyMark({ kind, diffs }: { kind: CopyKind; diffs?: number }) {
   return <span className={`cg-rd-kind ${kind}`}>{kindWord[kind]}{kind === "value-only" && diffs ? <span>· {diffs} {diffs === 1 ? "difference" : "differences"}</span> : null}</span>;
 }
 
-/** A group row: name and key, the saving at the right; under it the copy kind, the members' modules and the base module. */
-export function GroupRow({ name, keyText, kind, entryKind, members, modules, saved, diffs, base, selected, done, onClick }: {
-  name: string; keyText: string; kind: CopyKind; entryKind: Kind | "profile"; members: number; modules: string[]; saved: number; diffs?: number; base?: string; selected?: boolean; done?: boolean; onClick?: () => void;
+/** A group row: name and key, what the members share at the right; under it the copy kind, the members' modules and the base module. */
+export function GroupRow({ name, keyText, kind, entryKind, members, modules, shared, diffs, base, selected, done, marked, onClick }: {
+  name: string; keyText: string; kind: CopyKind; entryKind: Kind | "profile"; members: number; modules: string[]; shared: number; diffs?: number; base?: string; selected?: boolean; done?: boolean; marked?: boolean; onClick?: () => void;
 }) {
-  const edge = done ? "" : kind === "similar" ? " similar" : saved > 0 ? " edge-suggestion" : "";
+  const edge = done || marked ? "" : kind === "similar" ? " similar" : shared > 0 ? " edge-suggestion" : "";
   return (
-    <button type="button" role="option" aria-selected={selected} className={`cg-rd-row${edge}${selected ? " selected" : ""}${done ? " done" : ""}`} onClick={onClick}>
+    <button type="button" role="option" aria-selected={selected} className={`cg-rd-row${edge}${selected ? " selected" : ""}${done || marked ? " done" : ""}`} onClick={onClick}>
       <span className="cg-rd-line1">
         <KindIcon kind={iconKind(entryKind)} size={14} />
         <strong>{name}</strong>
         <span className="mono">{keyText}</span>
         <span className="d-spacer" />
         {done ? <span className="cg-rd-done"><Check size={13} />Extracted</span>
+          : marked ? <span className="cg-rd-save none" title="Marked not a copy: augur dklpo clones skips it">not a copy</span>
           : kind === "similar" ? <span className="cg-rd-save none" title="Similar groups are listed, not extracted">listed only</span>
-            : <span className={`cg-rd-save${saved ? "" : " none"}`} title={saved ? `An extraction saves about ${fmt(saved)} bytes of logic` : "An extraction saves no logic bytes (each member keeps its header and extends clause)"}>{saved ? `−${fmt(saved)} B` : "0 B"}</span>}
+            : <span className={`cg-rd-save${shared ? "" : " none"}`} title={shared ? `${shared} ${shared === 1 ? "statement" : "statements"} written once instead of ${fmt(members)} times` : "Nothing to share: every member would keep its whole content"}>{shared ? `${shared} shared` : "nothing to share"}</span>}
       </span>
       <span className="cg-rd-line2">
-        <CopyMark kind={kind} diffs={diffs} />
+        {marked ? <span className="cg-rd-kind notcopy">Not a copy</span> : <CopyMark kind={kind} diffs={diffs} />}
         <span className="cg-rd-mods">{fmt(members)} in {modules.length === members ? names(modules) : `${modules.length} modules: ${names(modules)}`}</span>
         {base ? <span className="cg-rd-into">→ {moduleName[base.split(":")[0]] ?? base.split(":")[0]}</span> : null}
       </span>
@@ -66,7 +68,7 @@ export function GroupRow({ name, keyText, kind, entryKind, members, modules, sav
 }
 
 const fromGroup = (g: Group, extra: Partial<Parameters<typeof GroupRow>[0]> = {}) => (
-  <GroupRow key={g.id} name={g.name} keyText={g.id} kind={g.kind} entryKind={g.entryKind} members={g.total ?? g.members.length} modules={[...new Set(g.members.map((m) => m.module))]} saved={g.saved} diffs={g.differences.length} base={g.base} {...extra} />
+  <GroupRow key={g.id} name={g.name} keyText={g.id} kind={g.kind} entryKind={g.entryKind} members={g.total ?? g.members.length} modules={[...new Set(g.members.map((m) => m.module))]} shared={g.shared} diffs={g.differences.length} base={g.base} {...extra} />
 );
 
 /** A section of the list: a kind heading with its counts, the rows that save, then a fold for the ones that don't. */
@@ -87,7 +89,7 @@ function Section({ title, note, children, folded, onFold, foldLabel, foldRows }:
 
 /* ------------------------------------------------------------------ the change: files planned by extract --dry-run */
 
-function FileHunk({ file, open, onToggle }: { file: FileChange; open: boolean; onToggle: () => void }) {
+export function FileHunk({ file, open, onToggle }: { file: FileChange; open: boolean; onToggle: () => void }) {
   const added = file.edits.filter((e) => e.after !== undefined && e.after !== "").length;
   const removed = file.edits.filter((e) => e.before !== undefined).length;
   return (
@@ -229,7 +231,41 @@ function Differences({ g }: { g: Group }) {
   );
 }
 
-function Detail({ g, phase, large, onApply, onUndo, onOpen }: { g: Group; phase: Phase; large?: boolean; onApply: () => void; onUndo: () => void; onOpen: (path: string) => void }) {
+/** “Not a copy…”: a popover over the action bar. The mark is kept in the dataset, so `augur dklpo clones` skips the group too. */
+function MarkPopover({ g, onMark, onCancel }: { g: Group; onMark: () => void; onCancel: () => void }) {
+  return (
+    <div className="cg-rd-markpop" role="dialog" aria-label={`Mark ${g.name} as not a copy`}>
+      <p className="cg-rd-markhead"><strong>Mark {g.name} as not a copy</strong></p>
+      <p className="cg-tl-help">The {g.members.length} declarations stay as they are and leave the list, here and in <code>augur dklpo clones</code>. The mark is kept in the dataset (<code>copies.dkl</code>), so other authors see it too. A member added or removed brings the group back.</p>
+      <label className="cg-rd-note"><span>Why (optional, kept with the mark)</span><span className="cg-tl-field focus"><input defaultValue="Each faction’s Rally will change on its own" aria-label="Why" /></span></label>
+      <p className="cg-rd-markacts"><button type="button" className="d-btn" onClick={onCancel}>Cancel<kbd>Esc</kbd></button><button type="button" className="d-btn primary" onClick={onMark}>Mark as not a copy<kbd>↵</kbd></button></p>
+    </div>
+  );
+}
+
+function MarkedDetail({ g, onUnmark, onOpen }: { g: Group; onUnmark: () => void; onOpen: (path: string) => void }) {
+  return (
+    <section className="cg-rd-detail" aria-label="Group">
+      <div className="cg-rd-body">
+        <p className="cg-tl-kicker"><KindIcon kind={iconKind(g.entryKind)} size={14} />Marked not a copy · {g.entryKind} · {g.members.length} modules</p>
+        <h2 className="cg-tl-dh">{g.name} is written in {g.members.length} modules on purpose</h2>
+        <Facts rows={[
+          { label: "Why", value: <>Each faction’s Rally will change on its own</> },
+          { label: "Marked", value: <>14:24<span className="d-muted">in <span className="mono">copies.dkl</span>, with its {g.members.length} members’ paths</span></> },
+          { label: "Comes back", value: <>when a member is added or removed<span className="d-muted">changing a member’s text or numbers keeps the mark</span></> },
+        ]} />
+        <Members g={g} onOpen={onOpen} />
+        <CommandLine command={`augur dklpo clones ${X0_DIR} --marked`} />
+      </div>
+      <footer className="cg-rd-bar">
+        <button type="button" className="d-btn" onClick={onUnmark}><Undo2 size={13} />Unmark: list it again</button>
+        <span className="cg-rd-why">⌘Z undoes the mark too</span>
+      </footer>
+    </section>
+  );
+}
+
+function Detail({ g, phase, large, onApply, onUndo, onOpen, marking, onMarking, onMark }: { g: Group; phase: Phase; large?: boolean; onApply: () => void; onUndo: () => void; onOpen: (path: string) => void; marking?: boolean; onMarking?: (open: boolean) => void; onMark?: () => void }) {
   const total = g.total ?? g.members.length;
   const mods = g.modules ?? new Set(g.members.map((m) => m.module)).size;
   const plan = g.plan;
@@ -271,7 +307,7 @@ function Detail({ g, phase, large, onApply, onUndo, onOpen }: { g: Group; phase:
         <h2 className="cg-tl-dh">{g.name} now extends <span className="mono">{g.base}</span></h2>
         <Facts rows={[
           { label: "Written", value: <>{plan!.files} files<span className="d-muted">the base in common-kit/module.dkl, 3 members, 4 text packs</span></> },
-          { label: "Logic", value: <>{fmt(x0Density.logicBytes)} → {fmt(plan!.after)} B<span className="d-muted">−{fmt(x0Density.logicBytes - plan!.after)} B</span></> },
+          { label: "Written once", value: <>{g.shared} statements, in the base<span className="d-muted">the members keep {plan!.overlays} values of their own</span></> },
           { label: "Text", value: <>{plan!.moved} names moved to Common Kit’s pack<span className="d-muted">{plan!.removed} entries left the members’ packs</span></> },
           { label: "Rescan", value: <>8 → 7 groups to extract<span className="d-muted">no group is new; copies {pct(afterShieldLine.cloneBytes, afterShieldLine.logicBytes)} of the logic</span></> },
         ]} />
@@ -286,7 +322,8 @@ function Detail({ g, phase, large, onApply, onUndo, onOpen }: { g: Group; phase:
     </section>
   );
 
-  const zero = g.saved === 0;
+  const zero = g.shared === 0;
+  const keeps = Math.max(0, ...g.members.map((m) => m.keeps?.length ?? 0));
   const canApply = phase === "ready";
   const why = phase === "checking" ? "Apply waits for the check" : phase === "refused" ? "Refused by the check: nothing to apply" : undefined;
   return (
@@ -296,9 +333,9 @@ function Detail({ g, phase, large, onApply, onUndo, onOpen }: { g: Group; phase:
         <h2 className="cg-tl-dh">{g.name} is written in {mods} modules{large ? ` (${fmt(total)} copies)` : ""}</h2>
         <Facts rows={[
           { label: "Base", value: <><span className="mono">{g.base}</span><span className="d-muted">abstract, new · in the deepest module every member imports</span><button type="button" className="cg-linkbtn" title="Choose the base module and key (extract --into, --key)">Change…</button></> },
-          { label: "Saves", value: zero
-            ? <>nothing in logic bytes<span className="d-muted">+{fmt(plan!.after - x0Density.logicBytes)} B: each member keeps its header and extends clause; {plan!.moved} {plan!.moved === 1 ? "name moves" : "names move"} to one pack</span></>
-            : large ? <>about {fmt(g.saved)} B of logic<span className="d-muted">1.4 % of {fmt(bigTotals.logicBytes)} B</span></> : <>about {fmt(g.saved)} B of logic<span className="d-muted">{fmt(x0Density.logicBytes)} → {fmt(plan!.after)} B</span></> },
+          { label: "Shared", value: zero
+            ? <>nothing<span className="d-muted">every member would keep its whole content; only the names move to one pack</span></>
+            : <>{g.shared} {g.shared === 1 ? "statement" : "statements"} written once instead of {fmt(total)} times<span className="d-muted">{g.kind === "identical" ? "the members keep nothing of their own" : `each member keeps at most ${keeps || g.differences.length} of its own`}</span></> },
         ]} />
         {phase === "refused" ? (
           <div className="cg-tl-errline cg-rd-refused" role="alert">
@@ -317,7 +354,10 @@ function Detail({ g, phase, large, onApply, onUndo, onOpen }: { g: Group; phase:
         <button type="button" className={`d-btn${zero ? "" : " primary"}`} disabled={!canApply} onClick={onApply} title={why ?? `Write the base and rewrite the ${total} members: one undo step (⌘Z)`}>
           {phase === "checking" ? <RefreshCw size={13} className="cg-spin" /> : <Play size={13} />}Apply: extract into {g.base!.split(":")[0]}<kbd>⌘↵</kbd>
         </button>
-        <span className="cg-rd-why">{why ?? (zero ? "Saves no logic bytes; still allowed" : `One undo step · ${plan!.files} files`)}</span>
+        <span className="cg-rd-why">{why ?? (zero ? "Nothing to share; still allowed" : `One undo step · ${plan!.files} files`)}</span>
+        <span className="d-spacer" />
+        {large ? null : <button type="button" className="d-btn" aria-expanded={marking} onClick={() => onMarking?.(!marking)} title="These copies are on purpose: take the group off the list (kept in the dataset)">Not a copy…</button>}
+        {marking ? <MarkPopover g={g} onMark={() => onMark?.()} onCancel={() => onMarking?.(false)} /> : null}
       </footer>
     </section>
   );
@@ -348,11 +388,13 @@ export function RedundancyScreen({ mode, state = "list", interactive }: { mode: 
   const s = (redundancyStates.includes(state as RedundancyState) ? state : "list") as RedundancyState;
   const large = s === "large";
   const shield = x0Groups[1];
-  const initialSel = s === "list" || s === "empty" || s === "no-compile" ? null : s === "similar" ? "ember-guild:standard-guard" : large ? bigGroup.id : shield.id;
+  const initialSel = s === "list" || s === "empty" || s === "no-compile" ? null : s === "similar" ? "ember-guild:standard-guard" : s === "marking" || s === "marked" ? "ember-guild:rally" : large ? bigGroup.id : shield.id;
   const [sel, setSel] = useState<string | null>(initialSel);
   const [applied, setApplied] = useState<ReadonlySet<string>>(new Set(s === "applied" ? [shield.id] : s === "empty" ? x0Groups.filter((g) => g.kind !== "similar").map((g) => g.id) : []));
   const [toast, setToast] = useState(s === "applied");
-  const [folds, setFolds] = useState<ReadonlySet<string>>(new Set(["entry", "group", "rule", "profile"]));
+  const [folds, setFolds] = useState<ReadonlySet<string>>(new Set(["entry", "group", "rule", "profile", ...(s === "marked" ? [] : ["marked"])]));
+  const [marks, setMarks] = useState<ReadonlySet<string>>(new Set(s === "marked" ? ["ember-guild:rally"] : []));
+  const [marking, setMarking] = useState(s === "marking");
   const [phase, setPhase] = useState<Phase>(s === "checking" ? "checking" : s === "refused" ? "refused" : "ready");
   const keys = useRef({ apply: () => undefined as void, down: () => undefined as void, up: () => undefined as void, undo: () => undefined as void });
   const claim = useWindowKeys(interactive, (event) => {
@@ -363,8 +405,8 @@ export function RedundancyScreen({ mode, state = "list", interactive }: { mode: 
   });
   const toggleFold = (k: string) => setFolds((cur) => { const next = new Set(cur); if (next.has(k)) next.delete(k); else next.add(k); return next; });
 
-  const visible = x0Groups.filter((g) => g.kind === "similar" || g.saved > 0 || !folds.has(g.subject));
-  const select = (id: string) => { setSel(id); if (s !== "refused") setPhase(id === shield.id && s === "checking" ? "checking" : "ready"); };
+  const visible = x0Groups.filter((g) => !marks.has(g.id) && (g.kind === "similar" || g.shared > 0 || !folds.has(g.subject)));
+  const select = (id: string) => { setSel(id); setMarking(false); if (s !== "refused") setPhase(id === shield.id && s === "checking" ? "checking" : "ready"); };
   const apply = () => { if (!sel || phase !== "ready") return; const g = x0Groups.find((x) => x.id === sel); if (!g || g.kind === "similar") return; setApplied((cur) => new Set([...cur, sel])); setToast(true); };
   const undo = () => { if (!sel) return; setApplied((cur) => { const next = new Set(cur); next.delete(sel); return next; }); setToast(false); };
   keys.current = {
@@ -373,7 +415,7 @@ export function RedundancyScreen({ mode, state = "list", interactive }: { mode: 
     up: () => { const i = visible.findIndex((g) => g.id === sel); const prev = visible[Math.max(i - 1, 0)]; if (prev) select(prev.id); },
   };
 
-  const remaining = x0Groups.filter((g) => g.kind !== "similar" && !applied.has(g.id));
+  const remaining = x0Groups.filter((g) => g.kind !== "similar" && !applied.has(g.id) && !marks.has(g.id));
   const density = s === "empty" ? { cloneBytes: 0, logicBytes: 12402 } : applied.has(shield.id) && applied.size === 1 ? afterShieldLine : x0Density;
   const selected = large ? bigGroup : x0Groups.find((g) => g.id === sel) ?? null;
 
@@ -383,10 +425,10 @@ export function RedundancyScreen({ mode, state = "list", interactive }: { mode: 
     list = (
       <>
         {bigRows.map((sec) => (
-          <Section key={sec.subject} title={sec.title} note={`${sec.groups} groups · ranked by saving`} folded={folds.has(sec.subject)} onFold={() => toggleFold(sec.subject)} foldLabel={`${sec.zero} save nothing`}
-            foldRows={<p className="cg-rd-foldnote d-muted">{sec.zero} rows, each 0 B (most are one-line profiles: the row is all they hold)</p>}>
-            {sec.rows.map((r: BigRow, i) => <GroupRow key={r.key} name={r.name} keyText={r.key} kind={r.kind} entryKind={r.entryKind} members={r.members} modules={r.modules} saved={r.saved} diffs={r.diffs} base={`common-kit:${r.key}`} selected={sec.subject === "group" && i === 0} />)}
-            <p className="cg-rd-foldnote d-muted">{sec.groups - sec.zero - sec.rows.length} more that save · scroll</p>
+          <Section key={sec.subject} title={sec.title} note={`${sec.groups} groups · most repeated first`} folded={folds.has(sec.subject)} onFold={() => toggleFold(sec.subject)} foldLabel={`${sec.zero} with nothing to share`}
+            foldRows={<p className="cg-rd-foldnote d-muted">{sec.zero} groups whose members would keep their whole content (most are one-line profiles: the row is all they hold)</p>}>
+            {sec.rows.map((r: BigRow, i) => <GroupRow key={r.key} name={r.name} keyText={r.key} kind={r.kind} entryKind={r.entryKind} members={r.members} modules={r.modules} shared={r.shared} diffs={r.diffs} base={`common-kit:${r.key}`} selected={sec.subject === "group" && i === 0} />)}
+            <p className="cg-rd-foldnote d-muted">{sec.groups - sec.zero - sec.rows.length} more · scroll</p>
           </Section>
         ))}
         <Section title="Similar" note={`${bigTotals.similar} groups, ${bigTotals.similarMembers} members · listed only`} foldLabel={`${bigTotals.similar} similar groups`} folded onFold={() => undefined} />
@@ -405,14 +447,15 @@ export function RedundancyScreen({ mode, state = "list", interactive }: { mode: 
             <Check size={18} />
             <p><strong>Nothing left to extract.</strong> No entry, group, rule or profile is written in two modules, identically or with other numbers. 8 groups were extracted in this session (⌘Z undoes the last).</p>
           </div>
-        ) : bySubject.map(({ subject, groups }) => {
-          const saving = groups.filter((g) => g.saved > 0);
-          const zero = groups.filter((g) => g.saved === 0);
-          const total = saving.reduce((sum, g) => sum + (applied.has(g.id) ? 0 : g.saved), 0);
+        ) : bySubject.map(({ subject, groups: all }) => {
+          const groups = all.filter((g) => !marks.has(g.id));
+          if (!groups.length) return null;
+          const saving = groups.filter((g) => g.shared > 0);
+          const zero = groups.filter((g) => g.shared === 0);
           const left = groups.filter((g) => !applied.has(g.id)).length;
           return (
-            <Section key={subject} title={subjectTitle[subject]} note={saving.length ? `${left} ${left === 1 ? "group" : "groups"} · saves about ${fmt(total)} B` : `${groups.length} ${groups.length === 1 ? "group saves" : "groups save"} nothing`}
-              folded={folds.has(subject)} onFold={() => toggleFold(subject)} foldLabel={zero.length ? (saving.length ? `${zero.length} more ${zero.length === 1 ? "saves" : "save"} nothing` : `Show ${zero.length === 1 ? "it" : `the ${zero.length}`}`) : undefined}
+            <Section key={subject} title={subjectTitle[subject]} note={`${left} ${left === 1 ? "group" : "groups"}${saving.length > 1 ? " · most repeated first" : ""}`}
+              folded={folds.has(subject)} onFold={() => toggleFold(subject)} foldLabel={zero.length ? `${zero.length} with nothing to share` : undefined}
               foldRows={zero.map((g) => fromGroup(g, { selected: sel === g.id, done: applied.has(g.id), onClick: () => select(g.id) }))}>
               {saving.map((g) => fromGroup(g, { selected: sel === g.id, done: applied.has(g.id), onClick: () => select(g.id) }))}
             </Section>
@@ -421,17 +464,25 @@ export function RedundancyScreen({ mode, state = "list", interactive }: { mode: 
         <Section title="Similar" note="listed only, no Apply">
           {similar.map((g) => fromGroup(g, { selected: sel === g.id, onClick: () => select(g.id) }))}
         </Section>
+        {marks.size ? (
+          <Section title="Marked not copies" note={`${marks.size} · kept in copies.dkl`} folded={folds.has("marked")} onFold={() => toggleFold("marked")} foldLabel={folds.has("marked") ? `Show ${marks.size === 1 ? "it" : `the ${marks.size}`}` : "Hide"}
+            foldRows={x0Groups.filter((g) => marks.has(g.id)).map((g) => fromGroup(g, { marked: true, selected: sel === g.id, onClick: () => select(g.id) }))} />
+        ) : null}
       </>
     );
   }
 
-  const counts = s === "empty"
+  const counts = s === "marked"
+    ? [{ k: "Identical", g: 4, m: 11 }, { k: "Value-only", g: 3, m: 9 }, { k: "Similar", g: 1, m: 2 }, { k: "Marked not copies", g: 1, m: 3 }]
+    : s === "empty"
     ? [{ k: "Identical", g: 0, m: 0 }, { k: "Value-only", g: 0, m: 0 }, { k: "Similar", g: 1, m: 2 }]
     : [{ k: "Identical", g: 5, m: 14 }, { k: "Value-only", g: applied.has(shield.id) ? 2 : 3, m: applied.has(shield.id) ? 6 : 9 }, { k: "Similar", g: 1, m: 2 }];
 
   let detail: ReactNode;
   if (!selected) detail = <Overview cloneBytes={density.cloneBytes} logicBytes={density.logicBytes} counts={counts} none={s === "empty"} />;
-  else detail = <Detail key={selected.id} g={selected} phase={applied.has(selected.id) ? "applied" : phase} large={large} onApply={apply} onUndo={undo} onOpen={() => undefined} />;
+  else if (marks.has(selected.id)) detail = <MarkedDetail g={selected} onUnmark={() => setMarks((cur) => { const next = new Set(cur); next.delete(selected.id); return next; })} onOpen={() => undefined} />;
+  else detail = <Detail key={selected.id} g={selected} phase={applied.has(selected.id) ? "applied" : phase} large={large} onApply={apply} onUndo={undo} onOpen={() => undefined}
+    marking={marking} onMarking={setMarking} onMark={() => { setMarks((cur) => new Set([...cur, selected.id])); setMarking(false); setFolds((cur) => { const next = new Set(cur); next.delete("marked"); return next; }); }} />;
 
   const totals = large
     ? <>{bigTotals.toExtract} to extract · {bigTotals.similar} similar · copies {pct(bigTotals.cloneBytes, bigTotals.logicBytes)} of the logic</>
@@ -491,20 +542,21 @@ export function RedundancyScreen({ mode, state = "list", interactive }: { mode: 
 export type OpensState = "opens-palette" | "opens-menu";
 
 /** The X0 editor behind the entry points: the sidebar, Ember Guild in the list, Shield Line's page with its copies line. */
-function X0Editor({ mode, interactive, onClaim, overlay, menu }: { mode: Mode; interactive: boolean; onClaim?: () => void; overlay?: ReactNode; menu?: ReactNode }) {
-  const list = x0Sources[2];
+export function X0Editor({ mode, interactive, onClaim, overlay, menu, page, entry = "ember-guild:shield-line", crumbs, back = "Levy Band" }: { mode: Mode; interactive: boolean; onClaim?: () => void; overlay?: ReactNode; menu?: ReactNode; page?: ReactNode; entry?: string; crumbs?: ReactNode; back?: string }) {
+  const list = x0Sources.find((x) => entry.startsWith(`${x.id}:`)) ?? x0Sources[2];
   return (
     <Win mode={mode} interactive={interactive} onClaim={onClaim}>
       <div className="cg-tl-contents" inert={overlay ? true : undefined}>
-        <EditorGrid side={<Sidebar dataset={{ name: "Lantern Marches", mark: "L", sources: x0Sources, tables: x0Tables }} redundancy={{ count: "8" }} source="ember-guild" entry="ember-guild:shield-line" updates={0} />}
-          list={<SourceList source={list} entry="ember-guild:shield-line" />}>
+        <EditorGrid side={<Sidebar dataset={{ name: "Lantern Marches", mark: "L", sources: x0Sources, tables: x0Tables }} redundancy={{ count: "8" }} source={list.id} entry={entry} updates={0} />}
+          list={<SourceList source={list} entry={entry} />}>
           <main className="d-main" aria-label="Entry">
             <header className="d-top">
-              <BackForward back="Levy Band" />
-              <span className="d-crumbs">Ember Guild<span>/</span>Shield Line</span>
+              <BackForward back={back} />
+              <span className="d-crumbs">{crumbs ?? <>Ember Guild<span>/</span>Shield Line</>}</span>
               <span className="d-spacer" />
               <span className="d-muted">Edited just now</span>
             </header>
+            {page ?? (
             <div className="d-scroll helper-collapsed">
               <div className="d-doc">
                 <article className="d-page">
@@ -529,6 +581,7 @@ function X0Editor({ mode, interactive, onClaim, overlay, menu }: { mode: Mode; i
                 </article>
               </div>
             </div>
+            )}
             {menu}
           </main>
         </EditorGrid>

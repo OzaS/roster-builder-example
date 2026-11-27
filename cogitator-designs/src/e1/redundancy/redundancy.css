@@ -158,3 +158,31 @@
 .cg-ed .cg-rd.narrow .cg-rd-kept { display: none; }
 .cg-ed .cg-rd.narrow .cg-rd-val { grid-template-columns: calc(var(--cg-text) * 7.5) minmax(0, max-content) auto; gap: var(--cg-space-4); }
 .cg-ed .cg-rd.narrow .cg-rd-body { padding-inline: var(--cg-space-7); }
+
+/* Round 2 (user 2026-11-27): Not a copy… popover, the marked chip */
+.fc-cg .cg-rd-bar { position: relative; }
+.fc-cg .cg-rd-markpop { position: absolute; right: var(--cg-space-9); bottom: calc(100% + var(--cg-space-2)); z-index: 9; display: grid; gap: var(--cg-space-4); width: 380px; padding: var(--cg-space-6) var(--cg-space-7); border: 1px solid var(--cg-line); border-radius: var(--cg-radius-popover); background: var(--cg-float); box-shadow: var(--cg-elev-popover); }
+.fc-cg .cg-rd-markpop p { margin: 0; }
+.fc-cg .cg-rd-markhead strong { font-weight: 600; }
+.fc-cg .cg-rd-markpop .cg-tl-help code { font: var(--cg-text-mono-kw) var(--cg-mono); }
+.fc-cg .cg-rd-note { display: grid; gap: var(--cg-space-2); }
+.fc-cg .cg-rd-note > span:first-child { color: var(--cg-muted); font-size: var(--cg-text-small); }
+.fc-cg .cg-rd-markacts { display: flex; justify-content: flex-end; gap: var(--cg-space-4); }
+.fc-cg .cg-rd-markacts .d-btn { display: inline-flex; gap: var(--cg-space-3); }
+.fc-cg .cg-rd-kind.notcopy { background: var(--cg-hover); color: var(--cg-muted); font-weight: 500; }
+
+/* Round 2: a derived entry's page (own and inherited rows) and the Make independent sheet */
+.fc-cg .cg-rd-from, .fc-cg .cg-rd-own { margin-left: auto; padding: 0 var(--cg-space-3); border-radius: var(--cg-radius-chip); font-size: var(--cg-text-caption); line-height: 18px; white-space: nowrap; }
+.fc-cg .cg-rd-from { color: var(--cg-muted); box-shadow: inset 0 0 0 1px var(--cg-line); }
+.fc-cg .cg-rd-own { background: var(--cg-select); color: var(--cg-accent-text); font-weight: 600; }
+.fc-cg .cg-rd-inh dd, .fc-cg .d-block.cg-rd-inh { color: var(--cg-muted); }
+.fc-cg .cg-rd-inh dd strong { color: var(--cg-muted); font-weight: 500; }
+.fc-cg .cg-rd-extends dd { flex-wrap: wrap; }
+.fc-cg .cg-rd-extends .mono { font: var(--cg-text-mono-kw) var(--cg-mono); }
+.fc-cg .d-page { position: relative; }
+.fc-cg .cg-rd-inhmenu { position: absolute; left: 300px; top: 268px; z-index: 9; }
+.fc-cg .cg-rd-inhmenu .cg-menu-item.two > span { display: grid; }
+.fc-cg .cg-rd-inhmenu small { font-size: var(--cg-text-caption); }
+.fc-cg .cg-rd-sheetp { margin: 0 0 var(--cg-space-4); line-height: 1.45; }
+.fc-cg .cg-rd-sheetp code { font: var(--cg-text-mono-kw) var(--cg-mono); }
+.fc-cg .cg-rd-sheetopt { margin-bottom: var(--cg-space-2); }

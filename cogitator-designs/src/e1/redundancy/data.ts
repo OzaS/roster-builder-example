@@ -42,7 +42,8 @@ export type Difference = { place: string; values: string[]; base: number };
 export type Group = {
   id: string; name: string; key: string; kind: CopyKind; subject: Subject; entryKind: Kind | "profile";
   members: Member[]; differences: Difference[]; extra?: { member: string; at: string; lines: string[]; bytes: number }[];
-  saved: number; base?: string;
+  /** Statements every member has the same (written once in the base); 0: nothing to share. Ranks by (members − 1) × shared. */
+  saved: number; shared: number; base?: string;
   /** `extract --dry-run`: overlay statements, text entries moved / removed, logic bytes after, files. */
   plan?: { overlays: number; moved: number; removed: number; after: number; files: number };
   /** Members beyond the ones listed (the large state). */
@@ -57,12 +58,12 @@ export const LOGIC_BYTES = 12659;
 /** The nine groups `augur dklpo clones` reports on X0, in its order (ranked by saved bytes within each kind). */
 export const x0Groups: Group[] = [
   {
-    id: "ember-guild:levy-band", name: "Levy Band", key: "levy-band", kind: "identical", subject: "entry", entryKind: "unit", saved: 287, base: "common-kit:levy-band",
+    id: "ember-guild:levy-band", name: "Levy Band", key: "levy-band", kind: "identical", subject: "entry", entryKind: "unit", saved: 287, shared: 8, base: "common-kit:levy-band",
     members: [m("ember-guild", "levy-band", "unit", "entries.dkl", 25, 214), m("moss-covenant", "levy-band", "unit", "entries.dkl", 26, 214), m("tide-compact", "levy-band", "unit", "entries.dkl", 22, 214)],
     differences: [], plan: { overlays: 0, moved: 3, removed: 9, after: 12373, files: 8 },
   },
   {
-    id: "ember-guild:shield-line", name: "Shield Line", key: "shield-line", kind: "value-only", subject: "entry", entryKind: "unit", saved: 178, base: "common-kit:shield-line",
+    id: "ember-guild:shield-line", name: "Shield Line", key: "shield-line", kind: "value-only", subject: "entry", entryKind: "unit", saved: 178, shared: 6, base: "common-kit:shield-line",
     members: [
       m("ember-guild", "shield-line", "unit", "entries.dkl", 54, 211, []),
       m("moss-covenant", "shield-line", "unit", "entries.dkl", 36, 212, ["max 1 in roster", "model shieldbearer 10..20"]),
@@ -75,7 +76,7 @@ export const x0Groups: Group[] = [
     plan: { overlays: 4, moved: 2, removed: 6, after: 12481, files: 8 },
   },
   {
-    id: "ember-guild:scout-riders", name: "Scout Riders", key: "scout-riders", kind: "value-only", subject: "entry", entryKind: "unit", saved: 83, base: "common-kit:scout-riders",
+    id: "ember-guild:scout-riders", name: "Scout Riders", key: "scout-riders", kind: "value-only", subject: "entry", entryKind: "unit", saved: 83, shared: 5, base: "common-kit:scout-riders",
     members: [
       m("ember-guild", "scout-riders", "unit", "entries.dkl", 64, 165, []),
       m("moss-covenant", "scout-riders", "unit", "entries.dkl", 46, 165, ["cost pts 55", "rider: cost pts 13"]),
@@ -88,33 +89,33 @@ export const x0Groups: Group[] = [
     plan: { overlays: 4, moved: 2, removed: 6, after: 12577, files: 8 },
   },
   {
-    id: "ember-guild:signal-horn", name: "Signal Horn", key: "signal-horn", kind: "identical", subject: "entry", entryKind: "upgrade", saved: 8, base: "common-kit:signal-horn",
-    members: [m("ember-guild", "signal-horn", "upgrade", "entries.dkl", 106, 85), m("moss-covenant", "signal-horn", "upgrade", "entries.dkl", 92, 85), m("tide-compact", "signal-horn", "upgrade", "entries.dkl", 113, 85)],
-    differences: [], plan: { overlays: 0, moved: 1, removed: 3, after: 12652, files: 8 },
-  },
-  {
-    id: "ember-guild:stalker-beast", name: "Stalker Beast", key: "stalker-beast", kind: "value-only", subject: "entry", entryKind: "unit", saved: 0, base: "common-kit:stalker-beast",
+    id: "ember-guild:stalker-beast", name: "Stalker Beast", key: "stalker-beast", kind: "value-only", subject: "entry", entryKind: "unit", saved: 0, shared: 4, base: "common-kit:stalker-beast",
     members: [m("ember-guild", "stalker-beast", "unit", "entries.dkl", 86, 137, []), m("moss-covenant", "stalker-beast", "unit", "entries.dkl", 67, 137, ["stalker: profile row 8\" | 3 | 5 | 5"]), m("tide-compact", "stalker-beast", "unit", "entries.dkl", 96, 137, ["stalker: profile row 7\" | 4 | 6 | 4"])],
     differences: [{ place: "stalker/stalker header", values: ["profile stalker: fighter | 8\" | 4 | 5 | 4", "profile stalker: fighter | 8\" | 3 | 5 | 5", "profile stalker: fighter | 7\" | 4 | 6 | 4"], base: 0 }],
     plan: { overlays: 2, moved: 2, removed: 6, after: 12675, files: 8 },
   },
   {
-    id: "ember-guild:rally", name: "Rally", key: "rally", kind: "identical", subject: "rule", entryKind: "rule", saved: 0, base: "common-kit:rally",
+    id: "ember-guild:signal-horn", name: "Signal Horn", key: "signal-horn", kind: "identical", subject: "entry", entryKind: "upgrade", saved: 8, shared: 3, base: "common-kit:signal-horn",
+    members: [m("ember-guild", "signal-horn", "upgrade", "entries.dkl", 106, 85), m("moss-covenant", "signal-horn", "upgrade", "entries.dkl", 92, 85), m("tide-compact", "signal-horn", "upgrade", "entries.dkl", 113, 85)],
+    differences: [], plan: { overlays: 0, moved: 1, removed: 3, after: 12652, files: 8 },
+  },
+  {
+    id: "ember-guild:rally", name: "Rally", key: "rally", kind: "identical", subject: "rule", entryKind: "rule", saved: 0, shared: 1, base: "common-kit:rally",
     members: [m("ember-guild", "rally", "rule", "entries.dkl", 1, 21), m("moss-covenant", "rally", "rule", "entries.dkl", 1, 21), m("tide-compact", "rally", "rule", "entries.dkl", 1, 21)],
     differences: [], plan: { overlays: 0, moved: 1, removed: 3, after: 12735, files: 8 },
   },
   {
-    id: "ash-lodge:smoke-flask", name: "Smoke Flask", key: "smoke-flask", kind: "identical", subject: "profile", entryKind: "profile", saved: 0, base: "common-kit:smoke-flask",
-    members: [m("ash-lodge", "smoke-flask", "profile", "module.dkl", 19, 33), m("tide-compact", "smoke-flask", "profile", "entries.dkl", 8, 33)],
-    differences: [], plan: { overlays: 0, moved: 1, removed: 2, after: 12756, files: 6 },
-  },
-  {
-    id: "ember-guild:throwing-axe", name: "Throwing Axe", key: "throwing-axe", kind: "identical", subject: "profile", entryKind: "profile", saved: 0, base: "common-kit:throwing-axe",
+    id: "ember-guild:throwing-axe", name: "Throwing Axe", key: "throwing-axe", kind: "identical", subject: "profile", entryKind: "profile", saved: 0, shared: 1, base: "common-kit:throwing-axe",
     members: [m("ember-guild", "throwing-axe", "profile", "entries.dkl", 7, 42), m("moss-covenant", "throwing-axe", "profile", "entries.dkl", 7, 42), m("tide-compact", "throwing-axe", "profile", "entries.dkl", 7, 42)],
     differences: [], plan: { overlays: 0, moved: 1, removed: 3, after: 12768, files: 8 },
   },
   {
-    id: "ember-guild:standard-guard", name: "Standard Guard", key: "standard-guard", kind: "similar", subject: "entry", entryKind: "unit", saved: 0,
+    id: "ash-lodge:smoke-flask", name: "Smoke Flask", key: "smoke-flask", kind: "identical", subject: "profile", entryKind: "profile", saved: 0, shared: 1, base: "common-kit:smoke-flask",
+    members: [m("ash-lodge", "smoke-flask", "profile", "module.dkl", 19, 33), m("tide-compact", "smoke-flask", "profile", "entries.dkl", 8, 33)],
+    differences: [], plan: { overlays: 0, moved: 1, removed: 2, after: 12756, files: 6 },
+  },
+  {
+    id: "ember-guild:standard-guard", name: "Standard Guard", key: "standard-guard", kind: "similar", subject: "entry", entryKind: "unit", saved: 0, shared: 11,
     members: [m("ember-guild", "standard-guard", "unit", "entries.dkl", 73, 299), m("tide-compact", "standard-guard", "unit", "entries.dkl", 63, 337)],
     differences: [], extra: [{ member: "tide-compact:standard-guard", at: "war-drum", lines: ["  upgrade war-drum ..1", "    cost pts 8"], bytes: 38 }],
   },
@@ -210,30 +211,30 @@ const bigName = (k: string) => k.split("-").map((w) => w.charAt(0).toUpperCase()
 export const bigModuleName = (k: string) => moduleName[k] ?? bigName(k);
 const bigUnits = ["line-infantry", "levy-band", "shield-line", "watch-patrol", "pike-block", "archer-line", "skirmish-screen", "vanguard"];
 export const bigGroup: Group = {
-  id: "ember-guild:line-infantry/weapon-choice", name: "Weapon Choice", key: "weapon-choice", kind: "identical", subject: "group", entryKind: "group", saved: 96410, base: "common-kit:weapon-choice",
+  id: "ember-guild:line-infantry/weapon-choice", name: "Weapon Choice", key: "weapon-choice", kind: "identical", subject: "group", entryKind: "group", saved: 96410, shared: 3, base: "common-kit:weapon-choice",
   members: bigUnits.map((u, i) => m(bigModules[i % 3], `${u}/weapon-choice`, "group", "entries.dkl", 30 + i * 37, 188)),
   differences: [], total: 804, modules: 19, plan: { overlays: 0, moved: 1, removed: 804, after: 6648120, files: 20 },
 };
 export const bigModulesList = bigModules.map((k, i) => ({ key: k, name: bigModuleName(k), n: bigModuleCounts[i] }));
-export type BigRow = { name: string; key: string; kind: CopyKind; entryKind: Kind | "profile"; members: number; modules: string[]; saved: number; diffs?: number };
+export type BigRow = { name: string; key: string; kind: CopyKind; entryKind: Kind | "profile"; members: number; modules: string[]; saved: number; shared: number; diffs?: number };
 export const bigRows: { subject: Subject; title: string; groups: number; zero: number; rows: BigRow[] }[] = [
   {
     subject: "group", title: "Groups", groups: 212, zero: 31, rows: [
-      { name: "Weapon Choice", key: "weapon-choice", kind: "identical", entryKind: "group", members: 804, modules: bigModules.slice(0, 19), saved: 96410 },
-      { name: "Mount", key: "mount", kind: "identical", entryKind: "group", members: 212, modules: bigModules.slice(2, 14), saved: 21880 },
-      { name: "Banner Choice", key: "banner-choice", kind: "value-only", entryKind: "group", members: 96, modules: bigModules.slice(0, 9), saved: 7420, diffs: 1 },
-      { name: "Wargear", key: "wargear", kind: "identical", entryKind: "group", members: 64, modules: bigModules.slice(4, 12), saved: 5310 },
+      { name: "Weapon Choice", key: "weapon-choice", kind: "identical", entryKind: "group", members: 804, modules: bigModules.slice(0, 19), saved: 96410, shared: 3 },
+      { name: "Mount", key: "mount", kind: "identical", entryKind: "group", members: 212, modules: bigModules.slice(2, 14), saved: 21880, shared: 6 },
+      { name: "Banner Choice", key: "banner-choice", kind: "value-only", entryKind: "group", members: 96, modules: bigModules.slice(0, 9), saved: 7420, shared: 4, diffs: 1 },
+      { name: "Wargear", key: "wargear", kind: "identical", entryKind: "group", members: 64, modules: bigModules.slice(4, 12), saved: 5310, shared: 5 },
     ],
   },
   {
     subject: "entry", title: "Entries", groups: 140, zero: 22, rows: [
-      { name: "Line Infantry", key: "line-infantry", kind: "value-only", entryKind: "unit", members: 19, modules: bigModules.slice(0, 2), saved: 4360, diffs: 1 },
-      { name: "Watch Patrol", key: "watch-patrol", kind: "identical", entryKind: "unit", members: 12, modules: bigModules.slice(3, 15), saved: 3910 },
+      { name: "Line Infantry", key: "line-infantry", kind: "value-only", entryKind: "unit", members: 19, modules: bigModules.slice(0, 2), saved: 4360, shared: 9, diffs: 1 },
+      { name: "Watch Patrol", key: "watch-patrol", kind: "identical", entryKind: "unit", members: 12, modules: bigModules.slice(3, 15), saved: 3910, shared: 12 },
     ],
   },
   {
     subject: "profile", title: "Profiles", groups: 290, zero: 268, rows: [
-      { name: "Hand Weapon", key: "hand-weapon", kind: "identical", entryKind: "profile", members: 165, modules: bigModules.slice(0, 19), saved: 2140 },
+      { name: "Hand Weapon", key: "hand-weapon", kind: "identical", entryKind: "profile", members: 165, modules: bigModules.slice(0, 19), saved: 2140, shared: 1 },
     ],
   },
 ];
