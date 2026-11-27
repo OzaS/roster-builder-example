@@ -455,6 +455,34 @@
       },
       "summary": "N1: New dataset… ⇧⌘N (Ctrl+Shift+N) first in the start window's sidebar and first-run actions, the intro names it; File › New Dataset… with the same key (⌘N stays New Entry's); an editor window opens the same sheet over the editor. N2: the 540 px sheet: Template (Blank / Starter; Starter first, then remembered), Name (focused) and Key (follows the name until edited), Location (last folder, ~/Datasets first, Choose…), “Creates <location>/<key>/ with N files” and the generator's files (Hide files, remembered), Create ↵ (disabled until valid), Cancel Esc. N3: the key checked as typed; a folder that holds files turns Key red with a line under Location, Create disabled, nothing written over; a failed write shows Retry and Cancel (temporary folder, then moved into place). N4: Create adds the dataset to Recent datasets and opens it (Starter on its first entry with its scenario in the runner, Blank on the system module). N5: no layer template. The file list is the generator's (-units, test/starter.yaml or test/README.md), not the review page's.",
       "source": "X3 UI Proposals review (review page battle-augur-captures/x3/review/x3-new-dataset-proposals.html); approved by the user 2026-11-26"
+    },
+    {
+      "id": "cg-x1-redundancy",
+      "title": "X1: Redundancy view (copies across modules)",
+      "kind": "screen",
+      "status": "approved",
+      "platforms": [
+        "desktop"
+      ],
+      "open": {
+        "desktop": "x1-redundancy"
+      },
+      "summary": "The Field Cogitator part of X1: `augur dklpo clones` and `extract` as a tool view. Opens from Tools › Redundancy (⇧⌘D), the ⌘K palette, a new sidebar item after Layers (groups left to extract) and a line on a member's page. The list groups copies by kind, the most repeated work first ((copies − 1) × statements shared; no byte counter); groups with nothing to share fold at the end of their kind; similar groups are listed last without Apply; Not a copy… takes a group off the list on purpose (kept in the dataset, copies.dkl), folded at the end. A selected group shows its base (Change… for --into / --key), what is shared, the check verdict, the differences with the base value marked, the members with what each keeps and the change as files; Apply (⌘↵) is one undo step and the view scans again. States: list, preview, checking, applied, refused, similar, empty, no-compile, large, narrow (960 px), large text; the entry points. Data: the X0 synthetic dataset. Round 1 (user 2026-11-27): RV1–RV5 and RV7–RV19 approved; RV6 changed (no byte ranking; Not a copy added) and drawn again for round 2. Round 2 (user 2026-11-27): R1–R11 approved.",
+      "source": "X1 Cogitator design, review page battle-augur-captures/x1-view/review (2026-11-27)"
+    },
+    {
+      "id": "cg-x1-detach",
+      "title": "X1: Make an entry independent (the inverse of extract)",
+      "kind": "screen",
+      "status": "approved",
+      "platforms": [
+        "desktop"
+      ],
+      "open": {
+        "desktop": "x1-detach"
+      },
+      "summary": "Round 2 (user 2026-11-27). A derived entry's page shows Extends (the base, inherited and own counts, Make independent…) and marks each row inherited (the base's module, muted, read-only) or own. Make independent… (the Extends row, Entry › Make Independent…, the palette, an inherited statement's menu) opens a sheet: the inherited statements and the names read from the base are copied in and extends is dropped; the path stays, so references, links, rosters and XML ids keep working; the base stays while other entries extend it, and for the last one Then remove the base is on. Same check as extract; one undo step. Override here copies one inherited statement into the entry, which keeps extending the base. CLI: augur dklpo detach <dataset> <path> [--remove-base]. Approved by the user 2026-11-27 (round 2, R7–R11).",
+      "source": "User 2026-11-27 (X1 view review, round 1); review page battle-augur-captures/x1-view/review"
     }
   ]
 }

@@ -16,6 +16,7 @@ import { editorRenderers } from "../e1/editor/elements";
 import { toolRenderers } from "../e1/tools/elements";
 /* E1 part 2, worker B: layer stack, dataset search, dataset runner. */
 import { layerRenderers } from "../e1/layers/elements";
+import { redundancyRenderers } from "../e1/redundancy/elements";
 
 /* ---------- Small helpers ---------- */
 
@@ -554,7 +555,7 @@ export function ElementsPage() {
           <h2>{section.title}</h2>
           {section.entries.map((item) => {
             const renderer = renderers[item.id] ?? editorRenderers[item.id] ?? toolRenderers[item.id]
-              ?? layerRenderers[item.id];
+              ?? layerRenderers[item.id] ?? redundancyRenderers[item.id];
             const platforms = item.platforms.filter((p): p is Platform => p === "mac" || p === "windows");
             return (
               <div key={item.id} id={item.id} className="cg-el">

@@ -3,6 +3,7 @@ import { startScreens } from "./start";
 import { editorScreens } from "./editor";
 import { toolScreens } from "./tools";
 import { layerScreens } from "./layers";
+import { redundancyScreens } from "./redundancy";
 
 /** Every E1 screen in page order. Each part keeps its own list so they can grow independently. */
 export const e1Screens: E1Screen[] = [
@@ -10,6 +11,7 @@ export const e1Screens: E1Screen[] = [
   ...editorScreens,
   ...toolScreens,
   ...layerScreens,
+  ...redundancyScreens,
 ];
 
 export const e1ScreenById = (id: string | null) => e1Screens.find((screen) => screen.id === id);
