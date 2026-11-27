@@ -455,6 +455,20 @@
       },
       "summary": "N1: New dataset… ⇧⌘N (Ctrl+Shift+N) first in the start window's sidebar and first-run actions, the intro names it; File › New Dataset… with the same key (⌘N stays New Entry's); an editor window opens the same sheet over the editor. N2: the 540 px sheet: Template (Blank / Starter; Starter first, then remembered), Name (focused) and Key (follows the name until edited), Location (last folder, ~/Datasets first, Choose…), “Creates <location>/<key>/ with N files” and the generator's files (Hide files, remembered), Create ↵ (disabled until valid), Cancel Esc. N3: the key checked as typed; a folder that holds files turns Key red with a line under Location, Create disabled, nothing written over; a failed write shows Retry and Cancel (temporary folder, then moved into place). N4: Create adds the dataset to Recent datasets and opens it (Starter on its first entry with its scenario in the runner, Blank on the system module). N5: no layer template. The file list is the generator's (-units, test/starter.yaml or test/README.md), not the review page's.",
       "source": "X3 UI Proposals review (review page battle-augur-captures/x3/review/x3-new-dataset-proposals.html); approved by the user 2026-11-26"
+    },
+    {
+      "id": "cg-x1-redundancy",
+      "title": "X1: Redundancy view (copies across modules)",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "desktop"
+      ],
+      "open": {
+        "desktop": "x1-redundancy"
+      },
+      "summary": "The Field Cogitator part of X1: `augur dklpo clones` and `extract` as a tool view. Opens from Tools › Redundancy (⇧⌘D), the ⌘K palette, a new sidebar item after Layers (groups left to extract) and a line on a member's page. The list groups copies by kind, ranked by the logic bytes an extraction saves; groups that save nothing fold at the end of their kind; similar groups are listed last without Apply. A selected group shows its base (Change… for --into / --key), the saving, the check verdict, the differences with the base value marked, the members with what each keeps and the change as files; Apply (⌘↵) is one undo step and the view scans again. States: list, preview, checking, applied, refused, similar, empty, no-compile, large, narrow (960 px), large text; the entry points. Data: the X0 synthetic dataset.",
+      "source": "X1 Cogitator design, review page battle-augur-captures/x1-view/review (2026-11-27)"
     }
   ]
 }
