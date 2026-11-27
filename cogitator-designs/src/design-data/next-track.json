@@ -467,8 +467,22 @@
       "open": {
         "desktop": "x1-redundancy"
       },
-      "summary": "The Field Cogitator part of X1: `augur dklpo clones` and `extract` as a tool view. Opens from Tools › Redundancy (⇧⌘D), the ⌘K palette, a new sidebar item after Layers (groups left to extract) and a line on a member's page. The list groups copies by kind, ranked by the logic bytes an extraction saves; groups that save nothing fold at the end of their kind; similar groups are listed last without Apply. A selected group shows its base (Change… for --into / --key), the saving, the check verdict, the differences with the base value marked, the members with what each keeps and the change as files; Apply (⌘↵) is one undo step and the view scans again. States: list, preview, checking, applied, refused, similar, empty, no-compile, large, narrow (960 px), large text; the entry points. Data: the X0 synthetic dataset.",
+      "summary": "The Field Cogitator part of X1: `augur dklpo clones` and `extract` as a tool view. Opens from Tools › Redundancy (⇧⌘D), the ⌘K palette, a new sidebar item after Layers (groups left to extract) and a line on a member's page. The list groups copies by kind, the most repeated work first ((copies − 1) × statements shared; no byte counter); groups with nothing to share fold at the end of their kind; similar groups are listed last without Apply; Not a copy… takes a group off the list on purpose (kept in the dataset, copies.dkl), folded at the end. A selected group shows its base (Change… for --into / --key), what is shared, the check verdict, the differences with the base value marked, the members with what each keeps and the change as files; Apply (⌘↵) is one undo step and the view scans again. States: list, preview, checking, applied, refused, similar, empty, no-compile, large, narrow (960 px), large text; the entry points. Data: the X0 synthetic dataset. Round 1 (user 2026-11-27): RV1–RV5 and RV7–RV19 approved; RV6 changed (no byte ranking; Not a copy added) and drawn again for round 2.",
       "source": "X1 Cogitator design, review page battle-augur-captures/x1-view/review (2026-11-27)"
+    },
+    {
+      "id": "cg-x1-detach",
+      "title": "X1: Make an entry independent (the inverse of extract)",
+      "kind": "screen",
+      "status": "proposal",
+      "platforms": [
+        "desktop"
+      ],
+      "open": {
+        "desktop": "x1-detach"
+      },
+      "summary": "Round 2 (user 2026-11-27). A derived entry's page shows Extends (the base, inherited and own counts, Make independent…) and marks each row inherited (the base's module, muted, read-only) or own. Make independent… (the Extends row, Entry › Make Independent…, the palette, an inherited statement's menu) opens a sheet: the inherited statements and the names read from the base are copied in and extends is dropped; the path stays, so references, links, rosters and XML ids keep working; the base stays while other entries extend it, and for the last one Then remove the base is on. Same check as extract; one undo step. Override here copies one inherited statement into the entry, which keeps extending the base. CLI: augur dklpo detach <dataset> <path> [--remove-base].",
+      "source": "User 2026-11-27 (X1 view review, round 1); review page battle-augur-captures/x1-view/review"
     }
   ]
 }
