@@ -52,8 +52,9 @@
 
 /* ---------- FB9 round 2 (approved 2026-11-27): a selected cell, long values wrapping, the cell's menu, a cell turned into text ---------- */
 .fc-d .d-tableblock td.cg-cell-selected { box-shadow: inset 0 0 0 1.5px var(--cg-accent); }
-.fc-d .d-tableblock td.cg-cell-long { max-width: 240px; white-space: normal; text-align: left; overflow-wrap: anywhere; }
-.fc-d .d-tableblock td.cg-cell-editing.cg-cell-long .cg-cell-wrapfield { display: block; white-space: normal; }
+/* LV-Q5 (user, 2026-11-28): a long value wraps right-aligned at the column's width, as the app draws it; the field being edited wraps left-aligned. */
+.fc-d .d-tableblock td.cg-cell-long { max-width: 240px; white-space: normal; text-align: right; overflow-wrap: anywhere; }
+.fc-d .d-tableblock td.cg-cell-editing.cg-cell-long .cg-cell-wrapfield { display: block; white-space: normal; text-align: left; }
 .fc-d .d-tableblock td.cg-cell-text { white-space: nowrap; }
 .fc-d .d-tableblock td.cg-cell-text .cg-lang-tag { margin-left: var(--cg-space-2); }
 .fc-cg .cg-cellhint > span { display: inline-flex; align-items: center; gap: var(--cg-space-2); white-space: nowrap; }
