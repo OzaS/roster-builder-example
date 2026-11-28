@@ -502,7 +502,7 @@
       "id": "cg-fb9-long-value-hint",
       "title": "E1: Long-value hint in a profile cell",
       "kind": "look",
-      "status": "proposal",
+      "status": "approved",
       "platforms": [
         "desktop"
       ],
@@ -510,7 +510,7 @@
         "desktop": "e1-editor-long-value-hint"
       },
       "summary": "A long plain value (over 40 characters, not a number) suggests moving it to the text pack: A a glyph in the cell's corner with a tooltip, a click opens the cell's menu at Turn into text; B an authoring suggestion in the helper box with Turn into text · en as its fix.",
-      "source": "User, 2026-11-27 (FB9-P6b decision: a small hint suggesting Turn into text)"
+      "source": "User, 2026-11-27 (FB9-P6b decision: a small hint suggesting Turn into text); both A and B approved by the user 2026-11-28"
     }
   ]
 }

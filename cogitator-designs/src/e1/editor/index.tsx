@@ -182,10 +182,10 @@ export const editorScreens: E1Screen[] = [
   {
     id: "e1-editor-long-value-hint",
     group: "Edit",
-    title: "Long-value hint (Proposal)",
+    title: "Long-value hint",
     item: "cg-fb9-long-value-hint",
     summary:
-      "Proposal (asked for by the user on 2026-11-27 with FB9-P6b): a plain cell value longer than 40 characters that isn't a number gets a hint to move it into the text pack, where words get translated. A: a quiet glyph (the translate icon on a tag tint) in the cell's top-right corner; its tooltip says “A long value: Turn into text · en moves it to the text pack (…/text/en.dkl), where it can be translated”, and a click opens the cell's menu at Turn into text. B: an authoring suggestion in the helper box (“Warden · Attack holds a long value: words to translate belong in the text pack”), flagged on the profile's block, with Turn into text · en as its fix. Choose A or B (or both).",
+      "Approved by the user on 2026-11-28, both A and B (asked for on 2026-11-27 with FB9-P6b): a plain cell value longer than 40 characters that isn't a number gets a hint to move it into the text pack, where words get translated. A: a quiet glyph (the translate icon on a tag tint) in the cell's top-right corner; its tooltip says “A long value: Turn into text · en moves it to the text pack (…/text/en.dkl), where it can be translated”, and a click opens the cell's menu at Turn into text. B: an authoring suggestion in the helper box (“Warden · Attack holds a long value: words to translate belong in the text pack”), flagged on the profile's block, with Turn into text · en as its fix. Both are to be built.",
     states: [
       { id: "hint-a", title: "A: a glyph in the cell" },
       { id: "hint-b", title: "B: a suggestion in the helper box" },
