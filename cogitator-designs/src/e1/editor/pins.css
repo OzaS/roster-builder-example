@@ -56,3 +56,7 @@
 
 /* Windows: the caption buttons end the page's header row (as on the start and tool windows). */
 .fc-cg[data-platform="windows"] .d-top.cg-pin-top-win { padding-right: 0; }
+
+/* Elements view: the bar alone at a fixed width; the menus drawn in place (not raised over a bar). */
+.fc-spec .cg-el-pinbar { display: block; min-height: 0; background: var(--cg-pane); }
+.fc-spec .cg-el-pinmenu .cg-pin-pop { position: static; }

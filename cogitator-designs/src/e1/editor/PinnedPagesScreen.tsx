@@ -25,7 +25,7 @@ export type PinsState = "bar" | "recent" | "pin-menu" | "pin-command" | "pin-ent
 export const pinsStates: PinsState[] = ["bar", "recent", "pin-menu", "pin-command", "pin-entry", "overflow", "large"];
 
 type Platform = "mac" | "windows";
-type PinRef = { id: string; name: string; kind: Kind; missing?: boolean };
+export type PinRef = { id: string; name: string; kind: Kind; missing?: boolean };
 
 const SQUAD = "iron-wardens:warden-squad";
 const CAPTAIN = "iron-wardens:warden-captain";
@@ -35,12 +35,12 @@ const ARCHERS = "iron-wardens:warden-archers";
 const LONGBOW = "iron-wardens:longbow";
 const ICE_GUARD = "frost-wardens:ice-guard";
 /** A pinned entry that isn't in the dataset now (removed since it was pinned): the pin keeps its last title. */
-const WAR_HORN: PinRef = { id: "iron-wardens:war-horn", name: "War Horn", kind: "upgrade", missing: true };
+export const WAR_HORN: PinRef = { id: "iron-wardens:war-horn", name: "War Horn", kind: "upgrade", missing: true };
 const MISSING_TIP = "Not in the dataset now";
 /** The source list row the entry menu is opened on (Halberd, the third upgrade). */
 const ENTRY_ROW = '.d-src [role="group"][aria-label="Upgrades"] > .d-row:nth-of-type(4)';
 
-const ref = (id: string): PinRef => {
+export const ref = (id: string): PinRef => {
   const row = lookupRow(id)?.row;
   return { id, name: row?.name ?? id, kind: row?.kind ?? "unit" };
 };
@@ -90,7 +90,7 @@ function Chip({ pin, index, current, platform, open, tip, onOpen, onMenu }: {
 }
 
 /** A pin's context menu (right-click, ⇧F10): Open, Move left, Move right, then Unpin. */
-function PinMenu({ pin, index, count, platform, onOpen, onMove, onUnpin }: {
+export function PinMenu({ pin, index, count, platform, onOpen, onMove, onUnpin }: {
   pin: PinRef; index: number; count: number; platform: Platform; onOpen: () => void; onMove: (by: -1 | 1) => void; onUnpin: () => void;
 }) {
   return (
@@ -108,7 +108,7 @@ function PinMenu({ pin, index, count, platform, onOpen, onMove, onUnpin }: {
 }
 
 /** Recent ▾: the last distinct pages opened, newest first; the page shown checked, pinned ones with the pin glyph. */
-function RecentMenu({ recent, pins, shown, onOpen }: { recent: string[]; pins: PinRef[]; shown: string; onOpen: (id: string) => void }) {
+export function RecentMenu({ recent, pins, shown, onOpen }: { recent: string[]; pins: PinRef[]; shown: string; onOpen: (id: string) => void }) {
   return (
     <div className="cg-menu cg-pin-pop cg-recent-menu" role="menu" aria-label="Recent pages">
       <p className="cg-menu-label">Recent pages</p>
