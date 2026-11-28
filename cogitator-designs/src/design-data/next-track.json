@@ -483,6 +483,34 @@
       },
       "summary": "Round 2 (user 2026-11-27). A derived entry's page shows Extends (the base, inherited and own counts, Make independent…) and marks each row inherited (the base's module, muted, read-only) or own. Make independent… (the Extends row, Entry › Make Independent…, the palette, an inherited statement's menu) opens a sheet: the inherited statements and the names read from the base are copied in and extends is dropped; the path stays, so references, links, rosters and XML ids keep working; the base stays while other entries extend it, and for the last one Then remove the base is on. Same check as extract; one undo step. Override here copies one inherited statement into the entry, which keeps extending the base. CLI: augur dklpo detach <dataset> <path> [--remove-base]. Approved by the user 2026-11-27 (round 2, R7–R11).",
       "source": "User 2026-11-27 (X1 view review, round 1); review page battle-augur-captures/x1-view/review"
+    },
+    {
+      "id": "cg-fb9-round2",
+      "title": "E1: Profile cells like a spreadsheet (FB9 round 2)",
+      "kind": "behaviour",
+      "status": "approved",
+      "platforms": [
+        "desktop"
+      ],
+      "open": {
+        "desktop": "e1-editor-cells"
+      },
+      "summary": "FB9-P1b leaving saves, only Esc discards; P2b Tab at a row's end goes to the next row of the same profile type; P3b selected or being edited, Excel / Numbers keys, a keys line per mode; P5b a refused save keeps the field, “Esc discards”; P6b long values wrap when shown and while edited; P4b the cell's menu: Edit, Turn into text · en, Turn into plain value, Copy value.",
+      "source": "Review page battle-augur-captures/fb9-tables/review2 (round 2); approved by the user 2026-11-27 (P6b changed to wrap)"
+    },
+    {
+      "id": "cg-fb9-long-value-hint",
+      "title": "E1: Long-value hint in a profile cell",
+      "kind": "look",
+      "status": "proposal",
+      "platforms": [
+        "desktop"
+      ],
+      "open": {
+        "desktop": "e1-editor-long-value-hint"
+      },
+      "summary": "A long plain value (over 40 characters, not a number) suggests moving it to the text pack: A a glyph in the cell's corner with a tooltip, a click opens the cell's menu at Turn into text; B an authoring suggestion in the helper box with Turn into text · en as its fix.",
+      "source": "User, 2026-11-27 (FB9-P6b decision: a small hint suggesting Turn into text)"
     }
   ]
 }

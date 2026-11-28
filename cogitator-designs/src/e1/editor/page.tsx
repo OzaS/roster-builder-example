@@ -90,14 +90,20 @@ function Value({ module, text, follow, broken, line }: { module: string; text: s
   return <span className="mono">{args}</span>;
 }
 
+/**
+ * One value cell drawn differently (FB9): by default edited in place (the accent ring and the caret); with `className`
+ * another state (FB9 round 2: selected, a long value, a text), with `title` its tooltip.
+ */
+export type CellDraw = { cell: number; content: ReactNode; className?: string; title?: string };
+
 /** A profile table; `edit` draws one value cell in place (FB9: the accent ring and the caret), by its index among the values. */
-function ProfileTable({ text, edit }: { text: string; edit?: { cell: number; content: ReactNode } }) {
+function ProfileTable({ text, edit }: { text: string; edit?: CellDraw }) {
   const [head, ...cells] = text.trim().replace(/^profile /, "").split("|").map((c) => c.trim());
   const [key, type] = head.split(":").map((c) => c.trim());
   return (
     <table>
       <thead><tr>{(profileHeads[type] ?? ["Profile", "Type"]).map((cell) => <th key={cell}>{cell}</th>)}</tr></thead>
-      <tbody><tr><td>{title(key)}</td><td><M to={`demo-skirmish:${type}`}>{type}</M></td>{cells.map((cell, i) => (edit?.cell === i ? <td key={i} className="num cg-cell-editing" aria-label="Editing">{edit.content}</td> : <td key={i} className="num">{cell}</td>))}</tr></tbody>
+      <tbody><tr><td>{title(key)}</td><td><M to={`demo-skirmish:${type}`}>{type}</M></td>{cells.map((cell, i) => (edit?.cell === i ? <td key={i} className={`num ${edit.className ?? "cg-cell-editing"}`} aria-label={edit.className ? undefined : "Editing"} title={edit.title}>{edit.content}</td> : <td key={i} className="num">{cell}</td>))}</tr></tbody>
     </table>
   );
 }
@@ -107,7 +113,7 @@ export function Blocks({ module, decl, sel, flags, follow, folded: initialFolded
   module: ModuleText; decl: number; sel?: PageSel; flags?: Record<number, DiagKind>; follow?: Follow;
   folded?: number[]; after?: Record<number, ReactNode>; brokenLines?: number[];
   /** FB9: a profile cell drawn in place, by the profile's line. */
-  cellEdit?: Record<number, { cell: number; content: ReactNode }>;
+  cellEdit?: Record<number, CellDraw>;
   /** FB7: the text behind a `$`, shown resolved from the text pack, by line. */
   texts?: Record<number, string>;
 }) {
@@ -182,7 +188,7 @@ export function LinkedPage({ id, module, sel, flags, follow, folded, after, onBa
   /** The title drawn as a field in place, in the h1's own type (E1-3 page edits). */
   titleEdit?: ReactNode;
   /** FB9 and FB7 (feedback 2026-11-26): a profile cell in place; the text behind `$` resolved (see `Blocks`). */
-  cellEdit?: Record<number, { cell: number; content: ReactNode }>;
+  cellEdit?: Record<number, CellDraw>;
   texts?: Record<number, string>;
 }) {
   const page = pageFor(id);

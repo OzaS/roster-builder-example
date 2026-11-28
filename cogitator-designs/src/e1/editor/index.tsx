@@ -1,6 +1,7 @@
 import type { E1Screen } from "../types";
 import { DiagnosticsScreen } from "./DiagnosticsScreen";
 import { EmptyScreen } from "./EmptyScreen";
+import { CellsScreen } from "./CellsScreen";
 import { EntryPageScreen } from "./EntryPageScreen";
 import { HelperNoFixScreen } from "./HelperNoFixScreen";
 import { PageEditScreen } from "./PageEditScreen";
@@ -160,4 +161,36 @@ export const editorScreens: E1Screen[] = [
     ],
     render: ({ mode, state, interactive }) => <EntryPageScreen mode={mode} state={state} interactive={interactive} />,
   },
+  {
+    id: "e1-editor-cells",
+    group: "Edit",
+    title: "Profile cells like a spreadsheet",
+    item: "cg-fb9-round2",
+    summary:
+      "FB9 round 2, approved by the user on 2026-11-27. A value cell is either selected (the accent outline) or being edited (the ring and the caret). Selected: the arrows move the selection (← → along the row, ↑ ↓ to the same column of the previous or next row of that profile type), typing replaces the value, ↵ or F2 edits it, ⌫ edits it empty, Esc goes back to the page's rows. Editing: ← → move the caret, ↵ saves and selects the same column in the next row (⇧↵ up), Tab / ⇧Tab save and edit the next / previous cell (at a row's end the next row of the same type), Esc throws the text away. Leaving a cell saves it (a click on another cell edits that one; switching apps leaves the field open). The keys line follows the mode. A refused save keeps the field, nothing moves, and the reason ends with “Esc discards”. A long value wraps in its cell when shown and wraps in the cell's width while edited. The cell's context menu (right-click, ⇧F10): Edit, Turn into text · en (writes $ and puts the value in the module's text pack), Turn into plain value, Copy value; after Turn into text the cell shows its text with the language tag.",
+    states: [
+      { id: "selected", title: "A selected cell and its keys" },
+      { id: "editing", title: "Editing: the keys while editing" },
+      { id: "refused", title: "A refused save: Esc discards" },
+      { id: "wrap", title: "A long value wraps in its cell" },
+      { id: "wrap-edit", title: "A long value wraps while edited" },
+      { id: "menu", title: "The cell's context menu" },
+      { id: "text", title: "After Turn into text" },
+    ],
+    render: ({ mode, state, interactive }) => <CellsScreen mode={mode} state={state ?? "selected"} interactive={interactive} />,
+  },
+  {
+    id: "e1-editor-long-value-hint",
+    group: "Edit",
+    title: "Long-value hint (Proposal)",
+    item: "cg-fb9-long-value-hint",
+    summary:
+      "Proposal (asked for by the user on 2026-11-27 with FB9-P6b): a plain cell value longer than 40 characters that isn't a number gets a hint to move it into the text pack, where words get translated. A: a quiet glyph (the translate icon on a tag tint) in the cell's top-right corner; its tooltip says “A long value: Turn into text · en moves it to the text pack (…/text/en.dkl), where it can be translated”, and a click opens the cell's menu at Turn into text. B: an authoring suggestion in the helper box (“Warden · Attack holds a long value: words to translate belong in the text pack”), flagged on the profile's block, with Turn into text · en as its fix. Choose A or B (or both).",
+    states: [
+      { id: "hint-a", title: "A: a glyph in the cell" },
+      { id: "hint-b", title: "B: a suggestion in the helper box" },
+    ],
+    render: ({ mode, state, interactive }) => <CellsScreen mode={mode} state={state ?? "hint-a"} interactive={interactive} />,
+  },
+
 ];
