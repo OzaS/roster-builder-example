@@ -5,6 +5,7 @@ import { CellsScreen } from "./CellsScreen";
 import { EntryPageScreen } from "./EntryPageScreen";
 import { HelperNoFixScreen } from "./HelperNoFixScreen";
 import { PageEditScreen } from "./PageEditScreen";
+import { PinnedPagesScreen } from "./PinnedPagesScreen";
 import { ReferencesScreen } from "./ReferencesScreen";
 import { SourceScreen } from "./SourceScreen";
 
@@ -192,5 +193,29 @@ export const editorScreens: E1Screen[] = [
     ],
     render: ({ mode, state, interactive }) => <CellsScreen mode={mode} state={state ?? "hint-a"} interactive={interactive} />,
   },
-
+  {
+    id: "e1-editor-pinned-pages",
+    group: "Edit",
+    title: "Pinned pages",
+    item: "cg-tv-p6b-pinned-pages",
+    platforms: ["mac", "windows"],
+    summary:
+      "TV-P6b, option A, approved by the user on 2026-11-27 (review page battle-augur-captures/fb9-tables/review2): pinned pages, with no tabs in the top bar. You pin a page with Pin page in its ⋯ menu or in an entry's context menu. ⌃1–⌃9 (Ctrl+1–9 on Windows) open the first nine pins. A pin's context menu unpins or reorders it. Pins are kept per dataset, and the pinned page you're on is highlighted (the selection tint). A 36 px bar at the bottom of the page column (40 px on Windows, the platform's density), shown only when something is pinned: the pin glyph and a muted “Pinned”, then a chip per pin (kind icon, title, the key hint), and Recent ▾ at its right, listing the last pages opened. The sidebar and the source list are untouched. Elaborations of the approved text beyond the approved image (states 2–7, to confirm): Recent ▾ lists the last 10 distinct pages opened, newest first, each with its kind icon, title and source in muted text, the pin glyph on pinned ones and a check on the page you're on; a pin's context menu is Open (its key), Move left, Move right (unavailable at the ends, saying why), then Unpin; the ⋯ menu's Pin page stands after the page commands, before Focus mode (Unpin page when the page is pinned); the entry context menu's Pin page follows Show backlinks; where the page column is too narrow, the chips that don't fit fold into “n more ▾” before Recent; a pin whose entry isn't in the dataset now is drawn muted and struck through, with the tooltip “Not in the dataset now”, and doesn't open; at large text the chips grow with the text.",
+    states: [
+      { id: "bar", title: "Three pins, the shown page highlighted" },
+      { id: "recent", title: "Recent ▾ open: the last pages opened" },
+      { id: "pin-menu", title: "A pin's context menu" },
+      { id: "pin-command", title: "Pin page in the ⋯ menu" },
+      { id: "pin-entry", title: "Pin page in an entry's context menu" },
+      { id: "overflow", title: "Narrow page column: n more ▾, a missing pin" },
+      { id: "large", title: "Large text" },
+    ],
+    tryIt: [
+      { what: "Open a pin", how: "click a chip, or ⌃1–⌃3 (Ctrl+1–3 on Windows): the page changes and its chip is tinted; Recent ▾ lists it first." },
+      { what: "Pin", how: "open Halberd from the list, then ⋯ › Pin page: a chip is added at the end; on a pinned page the item reads Unpin page." },
+      { what: "Reorder and unpin", how: "right-click a chip for Open, Move left, Move right and Unpin; Esc closes the menu." },
+      { what: "Overflow", how: "in the narrow state “3 more ▾” lists the pins that don't fit, with their keys." },
+    ],
+    render: ({ mode, platform, state, interactive }) => <PinnedPagesScreen key={`${state}-${platform}`} mode={mode} platform={platform} state={state ?? "bar"} interactive={interactive} />,
+  },
 ];

@@ -19,9 +19,9 @@ import "./editor.css";
 export type Mode = "light" | "dark";
 
 /** The window: Direction D's frame (`.fc-window.fc-d.fc-cg`) with the platform and large-text hooks of the design language. */
-export function Win({ mode, width = layout.windowDesign, large, interactive = true, children, label, onClaim }: { mode: Mode; width?: number; large?: boolean; interactive?: boolean; children: ReactNode; label?: string; onClaim?: () => void }) {
+export function Win({ mode, width = layout.windowDesign, large, interactive = true, children, label, onClaim, platform = "mac" }: { mode: Mode; width?: number; large?: boolean; interactive?: boolean; children: ReactNode; label?: string; onClaim?: () => void; platform?: "mac" | "windows" }) {
   return (
-    <div className={`fc-window fc-d fc-cg cg-ed ${mode}${interactive ? "" : " static"}`} style={{ width, height: layout.windowHeight }} data-text={large ? "large" : undefined} aria-label={label}
+    <div className={`fc-window fc-d fc-cg cg-ed ${mode}${interactive ? "" : " static"}`} style={{ width, height: layout.windowHeight }} data-platform={platform === "windows" ? "windows" : undefined} data-text={large ? "large" : undefined} aria-label={label}
       onPointerDownCapture={onClaim} onFocusCapture={onClaim}>
       {children}
     </div>
@@ -72,19 +72,21 @@ export type SideProps = {
   dataset?: { name: string; mark: string; sources: DSource[]; tables?: DSource[] };
   /** X1 Proposal: the Redundancy item after Layers (its count of groups to extract, pressed while the view is open). */
   redundancy?: { count: ReactNode; active?: boolean; stale?: boolean; onOpen?: () => void };
+  /** Pinned pages (TV-P6b): on Windows the sidebar has no traffic lights (the caption is at the top right) and writes keys as Ctrl+. */
+  platform?: "mac" | "windows";
 };
 
 /** D's sidebar (B): dataset switcher, Search, Updates, Layers, the source tree, tables, text pack. */
-export function Sidebar({ active, source, entry, updates, broken, onUpdates, onSearch, onSource, onEntry, foot, extra, layers, onLayers, width = layout.sidebar, dataset, redundancy }: SideProps) {
+export function Sidebar({ active, source, entry, updates, broken, onUpdates, onSearch, onSource, onEntry, foot, extra, layers, onLayers, width = layout.sidebar, dataset, redundancy, platform = "mac" }: SideProps) {
   const [expanded, setExpanded] = useState<ReadonlySet<string>>(new Set([entry?.split(":")[0] ?? (dataset ? dataset.sources[1]?.id ?? "" : "iron-wardens")]));
   const shownSources = dataset?.sources ?? sources;
   const shownTables = dataset?.tables ?? tables;
   return (
     <aside className="d-side" aria-label="Dataset sidebar">
       <div className="d-side-in" style={{ width }}>
-        <div className="d-side-top"><TrafficLights /></div>
+        <div className="d-side-top">{platform === "windows" ? null : <TrafficLights />}</div>
         <button type="button" className="d-ws" title="Switch dataset"><span className="d-ws-mark">{dataset?.mark ?? "D"}</span><strong>{dataset?.name ?? "Demo Skirmish"}</strong><ChevronDown size={14} /></button>
-        <button type="button" className={`d-item${active === "search" ? " active" : ""}`} onClick={onSearch} title="Search entries and commands (⌘K)"><Search size={15} />Search<kbd>⌘K</kbd></button>
+        <button type="button" className={`d-item${active === "search" ? " active" : ""}`} onClick={onSearch} title={`Search entries and commands (${platform === "windows" ? "Ctrl+K" : "⌘K"})`}><Search size={15} />Search<kbd>{platform === "windows" ? "Ctrl+K" : "⌘K"}</kbd></button>
         <button type="button" className={`d-item${active === "updates" ? " active" : ""}`} onClick={onUpdates} aria-pressed={active === "updates"} title="Open the diagnostics inbox (⌘⇧U)"><Bell size={15} />Updates{updates ? <span className="d-count">{updates}</span> : <span className="d-muted">None</span>}</button>
         <button type="button" className={`d-item${active === "layers" ? " active" : ""}`} onClick={onLayers} aria-pressed={active === "layers"} title="Open the layer stack (⇧⌘L)"><Layers size={15} />Layers<span className="d-muted">{layers ?? "3 of 4"}</span></button>
         {redundancy ? <button type="button" className={`d-item${redundancy.active ? " active" : ""}`} onClick={redundancy.onOpen} aria-pressed={redundancy.active} title="Open Redundancy: copies across modules (⇧⌘D)"><Copy size={15} />Redundancy<span className={redundancy.stale ? "d-muted cg-rd-stalecount" : "d-muted"}>{redundancy.count}</span></button> : null}
@@ -134,7 +136,7 @@ export function Sidebar({ active, source, entry, updates, broken, onUpdates, onS
 }
 
 /** D's source column (A's dense grouped list with status edges and the cost column). */
-export function SourceList({ source, entry, onEntry, onClose, width = layout.sourceList }: { source: DSource; entry?: string | null; onEntry?: (id: string) => void; onClose?: () => void; width?: number }) {
+export function SourceList({ source, entry, onEntry, onClose, width = layout.sourceList, platform = "mac" }: { source: DSource; entry?: string | null; onEntry?: (id: string) => void; onClose?: () => void; width?: number; platform?: "mac" | "windows" }) {
   const [folded, setFolded] = useState<ReadonlySet<string>>(new Set());
   return (
     <section className="d-src" aria-label={`${source.name} entries`}>
@@ -174,7 +176,7 @@ export function SourceList({ source, entry, onEntry, onClose, width = layout.sou
             );
           })}
         </div>
-        <footer className="d-src-foot"><kbd>↑</kbd><kbd>↓</kbd> move <kbd>⌘.</kbd> focus <span className="d-spacer" />{source.tag ? `${source.tag} layer · by kind` : "Grouped by kind"}</footer>
+        <footer className="d-src-foot"><kbd>↑</kbd><kbd>↓</kbd> move <kbd>{platform === "windows" ? "Ctrl+." : "⌘."}</kbd> focus <span className="d-spacer" />{source.tag ? `${source.tag} layer · by kind` : "Grouped by kind"}</footer>
       </div>
     </section>
   );

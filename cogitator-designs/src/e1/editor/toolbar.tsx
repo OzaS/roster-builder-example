@@ -1,4 +1,4 @@
-import { Code2, Ellipsis, Focus, Layers, ListChecks, Play } from "lucide-react";
+import { Code2, Ellipsis, Focus, Layers, ListChecks, Pin, PinOff, Play } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import "./feedback.css";
 
@@ -26,9 +26,16 @@ export function Tip({ name, keys, className = "" }: { name: ReactNode; keys?: st
   return <span className={`cg-tip ${className}`} role="tooltip">{name}{keys ? <span className="cg-tip-key">{keys}</span> : null}</span>;
 }
 
-export function PageTools({ menu: menuAt = false, tip: tipAt = null, source = false, layers = false, interactive = true, onSource }: {
+/** A key as each platform writes it (the ⋯ menu's keys on Windows: TV-P6b pinned pages draw the editor on Windows). */
+const winKeys: Record<string, string> = { "⌘⇧C": "Ctrl+Shift+C", "⌘⌥L": "Ctrl+Alt+L", "⌘⌥U": "Ctrl+Alt+U", "⌘R": "Ctrl+R", "⌘.": "Ctrl+.", "⌘K": "Ctrl+K" };
+
+export function PageTools({ menu: menuAt = false, tip: tipAt = null, source = false, layers = false, interactive = true, onSource, platform = "mac", pin, onPin }: {
   menu?: boolean; tip?: ToolTip | null; source?: boolean; layers?: boolean; interactive?: boolean; onSource?: () => void;
+  platform?: "mac" | "windows";
+  /** TV-P6b pinned pages (approved 2026-11-27): the ⋯ menu's Pin page, or Unpin page when the page is pinned already. */
+  pin?: "pin" | "unpin"; onPin?: () => void;
 }) {
+  const k = (mac: string) => (platform === "windows" ? winKeys[mac] ?? mac : mac);
   const [menu, setMenu] = useState(menuAt);
   const [tip, setTip] = useState<ToolTip | null>(tipAt);
   const [layersOn, setLayersOn] = useState(layers);
@@ -61,13 +68,19 @@ export function PageTools({ menu: menuAt = false, tip: tipAt = null, source = fa
         {at("more")}
         {menu ? (
           <div className="cg-menu cg-tb-menu" role="menu" aria-label="Page commands">
-            <button type="button" role="menuitem" className="cg-menu-item"><ListChecks size={15} />Run checks<span className="cg-menu-key">⌘⇧C</span></button>
-            <button type="button" role="menuitem" className="cg-menu-item"><Layers size={15} />Layer changes<span className="cg-menu-key">⌘⌥L</span></button>
-            <button type="button" role="menuitem" className="cg-menu-item"><Code2 size={15} />Source beside the page<span className="cg-menu-key">⌘⌥U</span></button>
-            <button type="button" role="menuitem" className="cg-menu-item"><Play size={15} fill="currentColor" />Run the dataset<span className="cg-menu-key">⌘R</span></button>
+            <button type="button" role="menuitem" className="cg-menu-item"><ListChecks size={15} />Run checks<span className="cg-menu-key">{k("⌘⇧C")}</span></button>
+            <button type="button" role="menuitem" className="cg-menu-item"><Layers size={15} />Layer changes<span className="cg-menu-key">{k("⌘⌥L")}</span></button>
+            <button type="button" role="menuitem" className="cg-menu-item"><Code2 size={15} />Source beside the page<span className="cg-menu-key">{k("⌘⌥U")}</span></button>
+            <button type="button" role="menuitem" className="cg-menu-item"><Play size={15} fill="currentColor" />Run the dataset<span className="cg-menu-key">{k("⌘R")}</span></button>
             <div className="cg-menu-sep" role="separator" />
-            <button type="button" role="menuitem" className="cg-menu-item" disabled title="Focus mode isn't built yet"><Focus size={15} />Focus mode<span className="cg-menu-key">⌘.</span></button>
-            <p className="cg-menu-label cg-tb-menu-foot">Every command and its key: ⌘K</p>
+            {pin ? (
+              <button type="button" role="menuitem" className="cg-menu-item is-hover" onClick={() => { setMenu(false); onPin?.(); }}
+                title={pin === "pin" ? "Pin this page to the bar under the page: the first nine open with Control and their number" : "Take this page off the pinned bar"}>
+                {pin === "pin" ? <Pin size={15} /> : <PinOff size={15} />}{pin === "pin" ? "Pin page" : "Unpin page"}
+              </button>
+            ) : null}
+            <button type="button" role="menuitem" className="cg-menu-item" disabled title="Focus mode isn't built yet"><Focus size={15} />Focus mode<span className="cg-menu-key">{k("⌘.")}</span></button>
+            <p className="cg-menu-label cg-tb-menu-foot">Every command and its key: {k("⌘K")}</p>
           </div>
         ) : null}
       </span>

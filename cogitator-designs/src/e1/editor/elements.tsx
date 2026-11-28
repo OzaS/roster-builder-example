@@ -12,6 +12,7 @@ import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
 import "./page-edit.css";
 import { BacklinksPanel, Peek, Unresolved } from "./ReferencesScreen";
 import { BackForward } from "./shell";
+import { PinBar, PinMenu, RecentMenu, ref as pinRef, WAR_HORN } from "./PinnedPagesScreen";
 import "./editor.css";
 
 /**
@@ -31,6 +32,30 @@ const marksFrost: CodeMark[] = [{ id: "d1", line: halbred, from: 10, to: 30, kin
 const key = (platform: Platform, mac: string, win: string) => (platform === "mac" ? mac : win);
 
 export const editorRenderers: Record<string, Renderer> = {
+  "page.pin-bar": {
+    wide: true,
+    render: (_mode, platform) => {
+      const three = ["iron-wardens:warden-squad", "iron-wardens:warden-captain", "iron-wardens:spear"].map(pinRef);
+      const six = [three[0], WAR_HORN, three[1], three[2], pinRef("iron-wardens:warden-archers"), pinRef("iron-wardens:longbow")];
+      const none = () => undefined;
+      const bar = (pins: typeof three, shown: string, fit?: number, tip?: boolean) => (
+        <div className="d-main cg-el-pinbar" style={{ width: fit ? 560 : 720 }}>
+          <PinBar pins={pins} shown={shown} platform={platform} open={null} fit={fit} tipMissing={tip} onOpen={none} onMenu={none} onToggle={none} />
+        </div>
+      );
+      return (
+        <div className="cg-stack">
+          <State label="Three pins, the page you're on tinted, Recent ▾ at the right" wide>{bar(three, three[0].id)}</State>
+          <State label="On a page that isn't pinned: no chip tinted" wide>{bar(three, "iron-wardens:halberd")}</State>
+          <State label="Too narrow: 4 more ▾; a pin not in the dataset now (muted, struck through, its tooltip)" wide><div style={{ paddingTop: 34 }}>{bar(six, three[0].id, 2, true)}</div></State>
+          <div className="cg-row-flex">
+            <State label="A pin's menu: Move left unavailable on the first"><div className="cg-el-pinmenu"><PinMenu pin={three[0]} index={0} count={3} platform={platform} onOpen={none} onMove={none} onUnpin={none} /></div></State>
+            <State label="Recent ▾: newest first, the page you're on checked"><div className="cg-el-pinmenu"><RecentMenu recent={["iron-wardens:warden-squad", "iron-wardens:spear", "iron-wardens:halberd", "iron-wardens:warden-captain"]} pins={three} shown={three[0].id} onOpen={none} /></div></State>
+          </div>
+        </div>
+      );
+    },
+  },
   "editor.code": {
     wide: true,
     render: () => (

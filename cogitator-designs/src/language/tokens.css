@@ -95,6 +95,8 @@
   --cg-header: 44px;
   --cg-toolbar: 42px;
   --cg-footer: 30px;
+  /* The pinned pages bar under the page column (TV-P6b, approved 2026-11-27). */
+  --cg-pinbar: 36px;
   --cg-helper-header: 34px;
   --cg-icon-button: 28px;
   --cg-icon-button-sm: 24px;
@@ -207,6 +209,7 @@
   --cg-header: 48px;
   --cg-toolbar: 44px;
   --cg-footer: 32px;
+  --cg-pinbar: 40px;
   --cg-helper-header: 36px;
   --cg-icon-button: 32px;
   --cg-icon-button-sm: 28px;
