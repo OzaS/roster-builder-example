@@ -1,0 +1,58 @@
+/*
+ * TV-P6b pinned pages, option A (approved by the user 2026-11-27): a bar at the bottom of the page column, shown only when
+ * something is pinned. Scoped to `cg-pin*` names Direction D never uses, so D's captures stay byte-identical. Every value
+ * from tokens.css (the bar's height is `--cg-pinbar`).
+ */
+
+/* ---------- The bar: top border, the pane's paper, one row of chips, Recent at the right ---------- */
+.fc-d .cg-pinbar { position: relative; z-index: 4; display: flex; align-items: center; gap: var(--cg-space-1); flex-shrink: 0; min-height: var(--cg-pinbar); padding: 0 var(--cg-space-4) 0 var(--cg-space-6); border-top: 1px solid var(--cg-line); background: var(--cg-pane); white-space: nowrap; }
+.fc-d .cg-pinbar-label { display: inline-flex; align-items: center; gap: var(--cg-space-3); flex-shrink: 0; padding-right: var(--cg-space-4); color: var(--cg-muted); font-size: var(--cg-text-small); }
+.fc-d .cg-pinbar-label svg { color: var(--cg-muted); }
+.fc-d .cg-pinbar-chips { display: flex; align-items: center; gap: var(--cg-space-1); min-width: 0; }
+.fc-d .cg-pinbar-at { position: relative; display: inline-flex; flex-shrink: 0; }
+
+/* ---------- A pin chip: kind icon, title, the key hint (muted); the page you're on is tinted ---------- */
+.fc-d .cg-pin { display: inline-flex; align-items: center; gap: var(--cg-space-3); min-width: 0; max-width: 220px; height: var(--cg-row); padding: 0 var(--cg-space-4); border-radius: var(--cg-radius-control); color: var(--cg-ink); }
+.fc-d .cg-pin > svg { flex-shrink: 0; color: inherit; }
+.fc-d .cg-pin:hover, .fc-d .cg-pin.is-hover { background: var(--cg-hover); }
+.fc-d .cg-pin.current { background: var(--cg-select); }
+.fc-d .cg-pin.is-open { background: var(--cg-press); }
+.fc-d .cg-pin-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.fc-d .cg-pin-key { flex-shrink: 0; color: var(--cg-muted); font-size: var(--cg-text-micro); letter-spacing: .02em; }
+/* A pin whose entry isn't in the dataset now (removed, renamed, or its layer is off): muted, its title struck through. */
+.fc-d .cg-pin.missing, .fc-d .cg-pin.missing > svg { color: var(--cg-muted); }
+.fc-d .cg-pin.missing .cg-pin-title { text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--cg-muted) 60%, transparent); }
+/* Chips that don't fit fold into "n more ▾" before Recent. */
+.fc-d .cg-pin.more { gap: var(--cg-space-2); color: var(--cg-muted); }
+.fc-d .cg-pin.more.is-open { color: var(--cg-ink); }
+
+/* Recent ▾: muted text at the bar's right end. */
+.fc-d .cg-pinbar-recent { margin-left: auto; flex-shrink: 0; }
+.fc-d .cg-pinbar-recent .cg-pin { gap: var(--cg-space-2); color: var(--cg-muted); }
+.fc-d .cg-pinbar-recent .cg-pin.is-open { color: var(--cg-ink); }
+
+/* ---------- Menus and the tooltip open upward from the bar ---------- */
+.fc-cg .cg-pin-pop { position: absolute; bottom: calc(100% + var(--cg-space-3)); left: 0; z-index: 30; white-space: normal; }
+.fc-cg .cg-pinbar-recent .cg-pin-pop { right: 0; left: auto; }
+.fc-d .cg-pin-pop .cg-menu-item { display: flex; }
+.fc-cg .cg-tip.cg-tip-up { top: auto; bottom: calc(100% + var(--cg-space-3)); left: 0; transform: none; }
+
+/* Recent pages: kind icon, title, the module in muted text; the pin glyph on pinned ones; the page you're on checked. */
+.fc-cg .cg-recent-menu { width: 340px; }
+.fc-cg .cg-recent-menu .cg-menu-item { gap: var(--cg-space-4); }
+.fc-cg .cg-recent-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.fc-cg .cg-recent-mod { flex-shrink: 0; color: var(--cg-muted); font-size: var(--cg-text-caption); }
+.fc-cg .cg-recent-end { display: inline-flex; align-items: center; gap: var(--cg-space-3); flex-shrink: 0; margin-left: auto; color: var(--cg-muted); }
+.fc-cg .cg-recent-menu .cg-menu-item.shown .cg-recent-title { font-weight: 600; }
+.fc-cg .cg-recent-end .cg-recent-shown { color: var(--cg-accent-text); }
+
+/* The entry's context menu, opened from a row of the source list; the row keeps the focus ring while it is open. */
+.fc-cg .cg-pin-entrymenu { position: absolute; z-index: 30; }
+.fc-d .cg-pin-entrystate .d-src [role="group"][aria-label="Upgrades"] > .d-row:nth-of-type(4) { background: var(--cg-hover); box-shadow: inset 0 0 0 var(--cg-focus-width) var(--cg-focus-color); }
+.fc-d .cg-pin-entrymenu .cg-menu-item { display: flex; }
+
+/* Large text: the bar grows with its chips (the height is a minimum). */
+.fc-cg[data-text="large"] .cg-pin { height: auto; min-height: var(--cg-row); padding-block: 2px; }
+
+/* Windows: the caption buttons end the page's header row (as on the start and tool windows). */
+.fc-cg[data-platform="windows"] .d-top.cg-pin-top-win { padding-right: 0; }

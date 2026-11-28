@@ -511,6 +511,20 @@
       },
       "summary": "A long plain value (over 40 characters, not a number) suggests moving it to the text pack: A a glyph in the cell's corner with a tooltip, a click opens the cell's menu at Turn into text; B an authoring suggestion in the helper box with Turn into text · en as its fix.",
       "source": "User, 2026-11-27 (FB9-P6b decision: a small hint suggesting Turn into text); both A and B approved by the user 2026-11-28"
+    },
+    {
+      "id": "cg-tv-p6b-pinned-pages",
+      "title": "E1: Pinned pages (TV-P6b, option A)",
+      "kind": "behaviour",
+      "status": "approved",
+      "platforms": [
+        "desktop"
+      ],
+      "open": {
+        "desktop": "e1-editor-pinned-pages"
+      },
+      "summary": "No tabs in the top bar: Pin page in the page's ⋯ menu or an entry's context menu; ⌃1–⌃9 open the first nine pins; a pin's context menu unpins or reorders; pins kept per dataset; the pinned page you're on highlighted. A 36 px bar at the bottom of the page column, shown only when something is pinned, Recent ▾ on its right listing the last pages opened. Drawn beyond the approved image as elaborations of its text (to confirm): the Recent list, the pin's menu, Pin page in both menus, n more ▾ for chips that don't fit, a pin whose entry is gone drawn muted (“Not in the dataset now”), large text, 40 px on Windows.",
+      "source": "Review page battle-augur-captures/fb9-tables/review2 (P6x, option A); approved by the user 2026-11-27"
     }
   ]
 }
