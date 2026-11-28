@@ -49,3 +49,20 @@
 .fc-d .d-tableblock td.cg-cell-editing { background: var(--cg-pane); box-shadow: inset 0 0 0 1.5px var(--cg-accent); }
 .fc-cg .cg-cellhint { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cg-space-2); margin: var(--cg-space-2) 0 var(--cg-space-4) calc(var(--cg-space-10) + var(--cg-space-5)); color: var(--cg-muted); font-size: var(--cg-text-small); }
 .fc-cg .cg-cellhint .cg-kbd { font-size: var(--cg-text-micro); }
+
+/* ---------- FB9 round 2 (approved 2026-11-27): a selected cell, long values wrapping, the cell's menu, a cell turned into text ---------- */
+.fc-d .d-tableblock td.cg-cell-selected { box-shadow: inset 0 0 0 1.5px var(--cg-accent); }
+.fc-d .d-tableblock td.cg-cell-long { max-width: 240px; white-space: normal; text-align: left; overflow-wrap: anywhere; }
+.fc-d .d-tableblock td.cg-cell-editing.cg-cell-long .cg-cell-wrapfield { display: block; white-space: normal; }
+.fc-d .d-tableblock td.cg-cell-text { white-space: nowrap; }
+.fc-d .d-tableblock td.cg-cell-text .cg-lang-tag { margin-left: var(--cg-space-2); }
+.fc-cg .cg-cellhint > span { display: inline-flex; align-items: center; gap: var(--cg-space-2); white-space: nowrap; }
+.fc-cg .cg-cellhint-refused .cg-edit-refused { color: var(--cg-badge-error-text); white-space: normal; }
+.fc-cg .cg-cellhint-refused .cg-edit-refused svg { margin-right: var(--cg-space-2); }
+.fc-cg .cg-cellmenu-anchor { position: relative; height: 0; }
+.fc-cg .cg-cellmenu { position: absolute; left: 300px; top: 2px; z-index: 9; }
+.fc-cg .cg-cellmenu .cg-menu-item { display: flex; }
+
+/* ---------- Long-value hint (Proposal, 2026-11-27): A a corner glyph in the cell, B a suggestion in the helper box ---------- */
+.fc-d .d-tableblock td.cg-cell-hinted { position: relative; padding-right: calc(var(--cg-space-4) + 14px); }
+.fc-d .cg-cell-hint { position: absolute; top: var(--cg-space-2); right: var(--cg-space-2); display: inline-grid; place-items: center; width: 16px; height: 16px; border-radius: var(--cg-radius-chip); color: var(--cg-muted); background: color-mix(in srgb, var(--cg-tag-2) var(--cg-tag-mix), transparent); cursor: pointer; }
